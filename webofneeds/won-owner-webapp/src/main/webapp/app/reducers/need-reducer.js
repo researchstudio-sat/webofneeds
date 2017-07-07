@@ -87,6 +87,30 @@ export default function(state = initialState, action = {}) {
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(state, action.payload);
 
+        //NEW CONNECTIONS STATE UPDATES
+        case actionTypes.connections.close:
+            return changeConnectionState(state, action.payload.connectionUri, won.WON.Closed);
+
+        case actionTypes.messages.connectMessageReceived:
+        case actionTypes.messages.openMessageReceived:
+        case actionTypes.messages.hintMessageReceived:
+            return addConnectionFull(state, action.payload.connection, true);
+
+        case actionTypes.connections.connect: // user has sent a request
+            return changeConnectionState(state, action.payload.connectionUri, won.WON.RequestSent);
+
+        case actionTypes.connections.open:
+            return changeConnectionState(state,  action.payload.optimisticEvent.hasSender, won.WON.Connected);
+
+        case actionTypes.messages.open.failure:
+            return changeConnectionState(state,  action.payload.events['msg:FromSystem'].hasReceiver, won.WON.RequestReceived);
+
+        case actionTypes.messages.connect.success:
+            return changeConnectionState(state,  action.payload.hasReceiver, won.WON.RequestSent);
+
+        case actionTypes.messages.close.success:
+            return changeConnectionState(state,  action.payload.hasReceiver, won.WON.Closed);
+
         default:
             return state;
     }
@@ -307,5 +331,21 @@ function setIfNew(state, path, obj){
         val :
         //it's the first time we see this need -> add it
         Immutable.fromJS(obj))
+}
+
+function changeConnectionState(state, connectionUri, newState) {
+    let needs = state.get("allNeeds");
+    const need = needs.filter(need => need.get("ownNeed") && need.get("connections").has(connectionUri)).first();
+
+    if(!need) {
+        console.error("no need found for connectionUri", connectionUri);
+        return state;
+    }
+
+    const needUri = need.get("id");
+
+    return state
+            .setIn(["allNeeds", needUri, "connections", connectionUri, "state"], newState)
+            .setIn(["allNeeds", needUri, "connections", connectionUri, "newConnection"], true);
 }
 
