@@ -3,11 +3,8 @@
  */
 
 import { actionTypes } from '../actions/actions';
-import { repeatVar } from '../utils';
 import Immutable from 'immutable';
-import { createReducer } from 'redux-immutablejs';
 import { combineReducersStable } from '../redux-utils';
-import draftsReducer from './drafts-reducer';
 import { messagesReducer } from './message-reducers';
 import reduceReducers from 'reduce-reducers';
 import needReducer from './need-reducer';
@@ -38,7 +35,6 @@ const reducers = {
 
 
     connections:connectionReducer,
-    drafts: draftsReducer,
     events: eventReducer,
     user: userReducer,
     needs:needReducer,

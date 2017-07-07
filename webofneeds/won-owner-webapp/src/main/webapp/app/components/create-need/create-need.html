@@ -11,24 +11,25 @@
                 on-unselect="::self.unselectType()">
         </won-posttype-select>
 
-        <div class="cp__mandatory-rest" ng-show="self.userHasSelectedType">
+        <div class="cp__mandatory-rest" ng-show="self.draft.type">
             <won-image-dropzone
-                    on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
+                    on-image-picked="::self.pickImage(image)">
             </won-image-dropzone>
 
-            <need-textfield></need-textfield>
+            <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
         </div>
 
         <hr ng-show="self.tags && self.tags.size > 0"/>
         <div class="cp__tags" ng-show="self.tags && self.tags.size > 0">
             <div class="cp__header tags">Tags</div>
-            <span class="cp__tags__tag" ng-repeat="tag in self.tags.toJS()">{{tag}}</span>
+            <span class="cp__tags__tag" ng-repeat="tag in self.draft.tags">{{tag}}</span>
         </div>
+
 
         <hr ng-show="self.isValid()"/>
         <div class="cp__location" ng-show="self.isValid()">
             <div class="cp__header location">Location</div>
-            <won-location-picker></won-location-picker>
+            <won-location-picker on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
         </div>
 
         <!--

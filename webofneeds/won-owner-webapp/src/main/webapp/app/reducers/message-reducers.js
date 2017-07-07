@@ -21,13 +21,13 @@ export function messagesReducer(messages = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.logout:
             return initialState;
-        case actionTypes.drafts.publish:
+        case actionTypes.needs.create:
             return messages.setIn(
                 ['enqueued', action.payload.eventUri],
                 action.payload.message
             );
 
-        case actionTypes.drafts.publishSuccessful:
+        case actionTypes.needs.createSuccessful:
             return messages.removeIn(['waitingForAnswer', action.payload.publishEventUri]);
 
         case actionTypes.messages.chatMessage.failure:

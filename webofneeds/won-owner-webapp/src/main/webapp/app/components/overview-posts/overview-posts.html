@@ -28,18 +28,6 @@
                             need-uri="needUri">
         </won-post-item-line>
 
-        <!--
-        <div class="title clickable"
-             ng-click="self.draftsOpen = !self.draftsOpen">
-            Drafts
-            <span class="title__counter">{{self.drafts.length}}</span>
-        </div>
-        <won-post-item-line ng-show="self.draftsOpen"
-                            item="item"
-                            unread-counts="self.unreadCounts.get(item.uri)"
-                            ng-repeat="item in self.drafts">
-        </won-post-item-line>
-        -->
         <div class="title clickable"
              ng-click="self.closedPostsOpen = !self.closedPostsOpen"
              ng-class="{'open' : self.closedPostsOpen}"

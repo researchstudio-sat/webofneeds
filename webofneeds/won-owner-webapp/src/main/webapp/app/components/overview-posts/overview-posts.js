@@ -68,10 +68,6 @@ class OverviewPostsController {
                 inactivePostsCount: inactivePosts.length,
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),
-                //unreadMatchEventsOfNeed: unseenMatchesCounts,
-                //nrOfPostsWithNotifications: unseenMatchesCounts.length
-                drafts: null,
-                draftsOpen: false,
             }
         };
 

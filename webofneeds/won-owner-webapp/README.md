@@ -19,8 +19,8 @@ In both cases they cause a **single**(!) action to be dispatched (~= passed as i
 If you want to **add new action-creators** do so by adding to the `actionHierarcy`-object in `actions.js`.
 From that two objects are generated at the moment:
 
-* `actionTypes`, which contains string-constants (e.g. `actionTypes.drafts.change.title === 'drafts.change.title'`)
-* `actionCreators`, which houses the action creators. for the sake of injecting them with ng-redux, they are organised with `__` as seperator (e.g. `actionCreators.drafts__change__title('some title')`)
+* `actionTypes`, which contains string-constants (e.g. actionTypes.needs.close === 'needs.close')
+* `actionCreators`, which houses the action creators. for the sake of injecting them with ng-redux, they are organised with `__` as seperator (e.g. `actionCreators.needs__close()`)
 
 Btw, the easiest way for actions without sideffects is to just placing an `myAction: INJ_DEFAULT`.
 This results in an action-creator that just dispatches all function-arguments as payload,
