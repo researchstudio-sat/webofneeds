@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
 });
 
 export default function(state = initialState, action = {}) {
+    let connections;
     switch(action.type) {
         case actionTypes.logout:
         case actionTypes.needs.clean:
@@ -21,9 +22,9 @@ export default function(state = initialState, action = {}) {
         case actionTypes.initialPageLoad:
         case actionTypes.login:
             let ownNeeds = action.payload.get('ownNeeds');
-            ownNeeds = ownNeeds? ownNeeds : Immutable.Set();
+            ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
             let theirNeeds = action.payload.get('theirNeeds');
-            theirNeeds = theirNeeds? theirNeeds : Immutable.Set();
+            theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
             const stateWithOwnNeeds = ownNeeds.reduce(
                 (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
                 state
@@ -33,7 +34,17 @@ export default function(state = initialState, action = {}) {
                 stateWithOwnNeeds
 
             );
-            return stateWithOwnAndTheirNeeds;
+
+            connections = action.payload.get('connections');
+            connections = connections ? connections : Immutable.Set();
+            const stateWithOwnAndTheirNeedsAndConnections = storeConnectionsData(stateWithOwnAndTheirNeeds, connections, false);
+
+            return stateWithOwnAndTheirNeedsAndConnections;
+        case actionTypes.messages.closeNeed.failed:
+            connections = action.payload.get('connections');
+            connections = connections ? connections : Immutable.Set();
+
+            return stateWithConnections = storeConnectionsData(state, connections, false);
 
         case actionTypes.router.accessedNonLoadedPost:
             const theirNeed = action.payload.get('theirNeed');
@@ -68,9 +79,10 @@ export default function(state = initialState, action = {}) {
             return updatedNeeds;
 
         case actionTypes.messages.connectMessageReceived:
-            const {ownNeedUri, remoteNeed, updatedConnection } = action.payload;
+            const {ownNeedUri, remoteNeed, updatedConnection, connection } = action.payload;
             const stateWithBothNeeds = addNeed(state, remoteNeed, false); // guarantee that remoteNeed is in state
-            return addConnection(stateWithBothNeeds, ownNeedUri, updatedConnection);
+            const stateWithBothNeedsAndConnection = addConnection(stateWithBothNeeds, ownNeedUri, updatedConnection);
+            return addConnectionFull(stateWithBothNeedsAndConnection, connection, true);
 
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(state, action.payload);
@@ -84,7 +96,9 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     const stateWithOwnNeed = addNeed(state, ownNeed, true); // guarantee that ownNeed is in state
     const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
-    return addConnection(stateWithBothNeeds, ownNeed['@id'], connection.uri);
+    const stateWithConnection = addConnection(stateWithBothNeeds, ownNeed["@id"], connection.uri);
+
+    return addConnectionFull(stateWithConnection, connection, false);
 }
 
 function addNeed(needs, jsonldNeed, ownNeed) {
@@ -109,7 +123,6 @@ function addNeed(needs, jsonldNeed, ownNeed) {
 
 function parseNeed(jsonldNeed, ownNeed) {
     const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
-    console.log("jsonldNeed: ", jsonldNeedImm);
 
     let parsedNeed = {id: undefined,
                 title: undefined,
@@ -118,7 +131,7 @@ function parseNeed(jsonldNeed, ownNeed) {
                 state: undefined,
                 tags: undefined,
                 location: undefined,
-                connections: undefined,
+                connections: Immutable.Map(),
                 creationDate: undefined,
                 ownNeed};
 
@@ -137,7 +150,7 @@ function parseNeed(jsonldNeed, ownNeed) {
             return undefined;
         }
 
-        const creationDate = jsonldNeedImm.getIn(["dct:created"]);
+        const creationDate = jsonldNeedImm.get("dct:created");
         if(creationDate){
             parsedNeed.creationDate = creationDate;
         }
@@ -169,11 +182,70 @@ function parseNeed(jsonldNeed, ownNeed) {
 
         //TODO: LOCATION IS STILL MISSING
     }else{
-        console.error('Cant parse need data is an invalid need-object: ', jsonldNeedImm.toJS());
+        console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm.toJS());
         return undefined;
     }
 
     return Immutable.fromJS(parsedNeed);
+}
+
+function storeConnectionsData(state, connectionsToStore, newConnections) {
+    if(connectionsToStore && connectionsToStore.size > 0) {
+        connectionsToStore.map(function(connection){
+            state = addConnectionFull(state, connection, newConnections);
+        });
+    }
+    return state;
+}
+
+function parseConnection(jsonldConnection, newConnection) {
+    const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
+
+    let parsedConnection = {
+                                belongsToId: undefined,
+                                data: {
+                                    id: undefined,
+                                    state: undefined,
+                                    messages: Immutable.Map(),
+                                    remoteNeedId: undefined,
+                                    creationDate: undefined,
+                                    newConnection
+                                }
+                            };
+
+    const belongsToId = jsonldConnectionImm.get("belongsToNeed");
+    const remoteNeedId = jsonldConnectionImm.get("hasRemoteNeed");
+    const id = jsonldConnectionImm.get("uri");
+
+    if(!!id && !!belongsToId && !!remoteNeedId){
+        parsedConnection.belongsToId = belongsToId;
+        parsedConnection.data.id = id;
+        parsedConnection.data.remoteNeedId = remoteNeedId;
+
+        const creationDate = jsonldConnectionImm.get("dct:created"); //THIS IS NOT IN THE DATA
+        if(creationDate){
+            parsedConnection.data.creationDate = creationDate;
+        }
+
+        const state = jsonldConnectionImm.get("hasConnectionState");
+        if(
+            (state === won.WON.RequestReceived) ||
+            (state === won.WON.RequestSent) ||
+            (state === won.WON.Suggested) ||
+            (state === won.WON.Connected) ||
+            (state === won.WON.Closed)
+        ) {
+            parsedConnection.data.state = state;
+        }else{
+            console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
+            return undefined; //FOR UNKNOWN STATES
+        }
+
+        return Immutable.fromJS(parsedConnection);
+    }else{
+        console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
+        return undefined;
+    }
 }
 
 /**
@@ -189,7 +261,6 @@ function parseNeed(jsonldNeed, ownNeed) {
  */
 function addConnection(state, needUri, connectionUri) {
     const pathToConnections = ['ownNeeds', needUri, 'won:hasConnections', 'rdfs:member'];
-    const pathToNewConnections = ['allNeeds', needUri, 'connections'];
 
     if(!state.getIn(pathToConnections)) {
         state = state.setIn(pathToConnections, Immutable.List());
@@ -206,21 +277,27 @@ function addConnection(state, needUri, connectionUri) {
         );
     }
 
-    if(!state.getIn(pathToNewConnections)){
-        state = state.setIn(pathToNewConnections, Immutable.List());
-    }
-
-    const newConnections = state.getIn(pathToNewConnections);
-    if(connections.filter(c => c && c.get("id") === connectionUri).size == 0) {
-        state = state.updateIn(
-            pathToNewConnections,
-            newConnections => newConnections.push(
-                Immutable.fromJS({ "id": connectionUri })
-            )
-        )
-    }
-
     return state;
+}
+
+/**
+ * Add's the connection to the needs connections.
+ * @param state
+ * @param connection
+ * @param newConnection
+ * @return {*}
+ */
+function addConnectionFull(state, connection, newConnection) {
+    let parsedConnection = parseConnection(connection, newConnection);
+
+    if(parsedConnection){
+        let connections = state.getIn(['allNeeds', parsedConnection.get("belongsToId"), 'connections']);
+        connections = connections.set(parsedConnection.getIn(["data", "id"]), parsedConnection.get("data"));
+
+        return state.setIn(["allNeeds", parsedConnection.get("belongsToId"), "connections"], connections);
+    }else{
+        return state;
+    }
 }
 
 function setIfNew(state, path, obj){
