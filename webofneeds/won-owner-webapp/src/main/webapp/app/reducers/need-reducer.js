@@ -149,9 +149,9 @@ function addNeed(needs, jsonldNeed, ownNeed) {
     let newState;
     let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
-    if(parsedNeed && parsedNeed.get("id")) {
-        newState = setIfNew(needs, [mapName, parsedNeed.get("id")], jsonldNeedImm);
-        newState = setIfNew(newState, ["allNeeds", parsedNeed.get("id")], parsedNeed);
+    if(parsedNeed && parsedNeed.get("uri")) {
+        newState = setIfNew(needs, [mapName, parsedNeed.get("uri")], jsonldNeedImm);
+        newState = setIfNew(newState, ["allNeeds", parsedNeed.get("uri")], parsedNeed);
     } else {
         console.error('Tried to add invalid need-object: ', jsonldNeedImm);
         newState = needs;
@@ -163,7 +163,7 @@ function addNeed(needs, jsonldNeed, ownNeed) {
 function parseNeed(jsonldNeed, ownNeed) {
     const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
 
-    let parsedNeed = {id: undefined,
+    let parsedNeed = {uri: undefined,
                 title: undefined,
                 description: undefined,
                 type: undefined,
@@ -175,15 +175,15 @@ function parseNeed(jsonldNeed, ownNeed) {
                 ownNeed};
 
     if(jsonldNeedImm){
-        const id = jsonldNeedImm.get("@id");
+        const uri = jsonldNeedImm.get("@id");
 
         const is = jsonldNeedImm.get("won:is");
         const seeks = jsonldNeedImm.get("won:seeks");
 
         const title = (is && is.get("dc:title")) ? is.get("dc:title") : ((seeks && seeks.get("dc:title")) ? seeks.get("dc:title") : undefined);
 
-        if(!!id && !!title){
-            parsedNeed.id = id;
+        if(!!uri && !!title){
+            parsedNeed.uri = uri;
             parsedNeed.title = title;
         }else{
             return undefined;
@@ -243,25 +243,25 @@ function parseConnection(jsonldConnection, newConnection) {
     const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
 
     let parsedConnection = {
-                                belongsToId: undefined,
+                                belongsToUri: undefined,
                                 data: {
-                                    id: undefined,
+                                    uri: undefined,
                                     state: undefined,
                                     messages: Immutable.Map(),
-                                    remoteNeedId: undefined,
+                                    remoteNeedUri: undefined,
                                     creationDate: undefined,
                                     newConnection
                                 }
                             };
 
-    const belongsToId = jsonldConnectionImm.get("belongsToNeed");
-    const remoteNeedId = jsonldConnectionImm.get("hasRemoteNeed");
-    const id = jsonldConnectionImm.get("uri");
+    const belongsToUri = jsonldConnectionImm.get("belongsToNeed");
+    const remoteNeedUri = jsonldConnectionImm.get("hasRemoteNeed");
+    const uri = jsonldConnectionImm.get("uri");
 
-    if(!!id && !!belongsToId && !!remoteNeedId){
-        parsedConnection.belongsToId = belongsToId;
-        parsedConnection.data.id = id;
-        parsedConnection.data.remoteNeedId = remoteNeedId;
+    if(!!uri && !!belongsToUri && !!remoteNeedUri){
+        parsedConnection.belongsToUri = belongsToUri;
+        parsedConnection.data.uri = uri;
+        parsedConnection.data.remoteNeedUri = remoteNeedUri;
 
         const creationDate = jsonldConnectionImm.get("dct:created"); //THIS IS NOT IN THE DATA
         if(creationDate){
@@ -293,9 +293,9 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
     const jsonldMessageImm = Immutable.fromJS(jsonldMessage);
 
     let parsedMessage = {
-        belongsToId: undefined,
+        belongsToUri: undefined,
         data: {
-            id: undefined,
+            uri: undefined,
             text: undefined,
             date: undefined,
             outgoingMessage,
@@ -306,8 +306,8 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
 
 
     if(outgoingMessage){
-        parsedMessage.belongsToId = jsonldMessageImm.get("hasSender");
-        parsedMessage.data.id = jsonldMessageImm.get("uri");
+        parsedMessage.belongsToUri = jsonldMessageImm.get("hasSender");
+        parsedMessage.data.uri = jsonldMessageImm.get("uri");
         parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
         parsedMessage.data.date = jsonldMessageImm.get("hasSentTimestamp");
     }else{
@@ -315,8 +315,8 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
 
         if(fromOwner){
             //If message is received directly
-            parsedMessage.belongsToId = fromOwner.get("hasReceiver");
-            parsedMessage.data.id = fromOwner.get("uri");
+            parsedMessage.belongsToUri = fromOwner.get("hasReceiver");
+            parsedMessage.data.uri = fromOwner.get("uri");
             parsedMessage.data.text = fromOwner.get("hasTextMessage");
             parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["msg:FromExternal", "hasReceivedTimestamp"]));
         }else{
@@ -324,8 +324,8 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
 
             if(fromCorrespondingMessage){
                 //if message comes within the events of showLatestMessages/showMoreMessages action
-                parsedMessage.belongsToId = fromCorrespondingMessage.get("hasReceiver");
-                parsedMessage.data.id = fromCorrespondingMessage.get("uri");
+                parsedMessage.belongsToUri = fromCorrespondingMessage.get("hasReceiver");
+                parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
                 parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
                 parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
             }
@@ -333,8 +333,8 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
     }
 
     if(
-        !parsedMessage.data.id ||
-        !parsedMessage.belongsToId ||
+        !parsedMessage.data.uri ||
+        !parsedMessage.belongsToUri ||
         !parsedMessage.data.text ||
         !parsedMessage.data.date
     ) {
@@ -388,15 +388,15 @@ function addConnectionFull(state, connection, newConnection) {
     let parsedConnection = parseConnection(connection, newConnection);
 
     if(parsedConnection){
-        const needId = parsedConnection.get("belongsToId");
-        let connections = state.getIn(['allNeeds', needId, 'connections']);
+        const needUri = parsedConnection.get("belongsToUri");
+        let connections = state.getIn(['allNeeds', needUri, 'connections']);
 
         if(connections){
-            connections = connections.set(parsedConnection.getIn(["data", "id"]), parsedConnection.get("data"));
+            connections = connections.set(parsedConnection.getIn(["data", "uri"]), parsedConnection.get("data"));
 
-            return state.setIn(["allNeeds", needId, "connections"], connections);
+            return state.setIn(["allNeeds", needUri, "connections"], connections);
         }else{
-            console.error("Couldnt add valid connection - missing need data in state", needId);
+            console.error("Couldnt add valid connection - missing need data in state", needUri);
         }
     }
     return state;
@@ -406,13 +406,13 @@ function addMessage(state, message, outgoingMessage, newMessage) {
     let parsedMessage = parseMessage(message, outgoingMessage, newMessage);
 
     if(parsedMessage){
-        const connectionId = parsedMessage.get("belongsToId");
-        let need = getNeedForConnectionUri(state, connectionId);
+        const connectionUri = parsedMessage.get("belongsToUri");
+        let need = getNeedForConnectionUri(state, connectionUri);
         if(need){
-            let messages = state.getIn(['allNeeds', need.get("id"), "connections", connectionId, "messages"]);
-            messages = messages.set(parsedMessage.getIn(["data", "id"]), parsedMessage.get("data"));
+            let messages = state.getIn(['allNeeds', need.get("uri"), "connections", connectionUri, "messages"]);
+            messages = messages.set(parsedMessage.getIn(["data", "uri"]), parsedMessage.get("data"));
 
-            return state.setIn(["allNeeds", need.get("id"), "connections", connectionId, "messages"], messages);
+            return state.setIn(["allNeeds", need.get("uri"), "connections", connectionUri, "messages"], messages);
         }
     }
     return state;
@@ -455,7 +455,7 @@ function changeConnectionState(state, connectionUri, newState) {
         return state;
     }
 
-    const needUri = need.get("id");
+    const needUri = need.get("uri");
 
     return state
             .setIn(["allNeeds", needUri, "connections", connectionUri, "state"], newState)
