@@ -8,14 +8,9 @@ import { labels } from '../won-label-utils';
 import {
     selectUnreadEventsByNeedAndType,
     selectAllByConnections,
-    selectOpenPost,
     selectOpenPostUri,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -31,8 +26,8 @@ function genComponentConf() {
                     <won-square-image
                         ng-class="{'inactive' : !self.isActive}"
                         src="self.post.get('titleImgSrc')"
-                        title="self.postContent.get('dc:title')"
-                        uri="self.post.get('@id')">
+                        title="self.post.get('title')"
+                        uri="self.post.get('uri')">
                     </won-square-image>
                 </div>
 
@@ -42,8 +37,8 @@ function genComponentConf() {
 
                     <div class ="ntb__inner__right__upper">
                         <hgroup>
-                            <h1 class="ntb__title">{{ self.postContent.get('dc:title') }}</h1>
-                            <div class="ntb__titles__type">{{self.labels.type[self.postType]}}</div>
+                            <h1 class="ntb__title">{{ self.post.get('title') }}</h1>
+                            <div class="ntb__titles__type">{{self.labels.type[self.post.get('type')]}}</div>
                         </hgroup>
                         <img
                             class="ntb__icon clickable"
@@ -134,42 +129,30 @@ function genComponentConf() {
                 const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
 
                 const postUri = selectOpenPostUri(state);
-                const post = selectOpenPost(state);
-
-                const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
+                const post = state.getIn(["needs", "allNeeds", postUri]);
 
                 return {
-                    selectedTab: connectionTypeInParams || 'Info',
+                    selectedTab: decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType'])) || 'Info',
                     WON: won.WON,
                     postUri: postUri,
                     post: post,
-                    postContent: post && seeksOrIs(post) ,
-                    postType: post && inferLegacyNeedType(post),
-                    hasIncomingRequests: state.getIn(['connections'])
-                        .filter(conn =>
-                            conn.get('hasConnectionState') === won.WON.RequestReceived
-                            && conn.get('belongsToNeed') === postUri
-                        ).size > 0,
-                    hasSentRequests: state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.RequestSent
-                        && conn.get('belongsToNeed') === postUri
-                    ).size > 0,
-                    hasMatches: state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.Suggested
-                        && conn.get('belongsToNeed') === postUri
-                    ).size > 0,
-                    hasMessages: state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.Connected
-                        && conn.get('belongsToNeed') === postUri
-                    ).size > 0,
+                    hasIncomingRequests: post.get('connections')
+                        .filter(conn => conn.get('state') === won.WON.RequestReceived)
+                        .size > 0,
+                    hasSentRequests: post.get('connections')
+                        .filter(conn => conn.get('state') === won.WON.RequestSent)
+                        .size > 0,
+                    hasMatches: post.get('connections')
+                        .filter(conn => conn.get('state') === won.WON.Suggested)
+                        .size > 0,
+                    hasMessages: post.get('connections')
+                        .filter(conn => conn.get('state') === won.WON.Connected)
+                        .size > 0,
                     unreadMessages: unreadCounts.getIn([postUri, won.WONMSG.connectionMessage]),
                     unreadIncomingRequests: unreadCounts.getIn([postUri, won.WONMSG.connectMessage]),
                     unreadSentRequests: unreadCounts.getIn([postUri, won.WONMSG.connectSentMessage]),
                     unreadMatches: unreadCounts.getIn([postUri, won.WONMSG.hintMessage]),
-                    isActive: post && post.getIn(['won:isInState', '@id']) === won.WON.ActiveCompacted,
+                    isActive: post && post.get(['state']) === won.WON.ActiveCompacted,
                 };
             };
 
@@ -178,15 +161,15 @@ function genComponentConf() {
         }
 
         closePost() {
-            console.log("CLOSING THE POST: "+this.post.get("@id"));
+            console.log("CLOSING THE POST: "+this.post.get("uri"));
             this.settingsOpen = false;
-            this.needs__close(this.post.get("@id"));
+            this.needs__close(this.post.get("uri"));
         }
 
         reOpenPost() {
-            console.log("RE-OPENING THE POST: "+this.post.get("@id"));
+            console.log("RE-OPENING THE POST: "+this.post.get("uri"));
             this.settingsOpen = false;
-            this.needs__reopen(this.post.get("@id"));
+            this.needs__reopen(this.post.get("uri"));
         }
     }
     Controller.$inject = serviceDependencies;

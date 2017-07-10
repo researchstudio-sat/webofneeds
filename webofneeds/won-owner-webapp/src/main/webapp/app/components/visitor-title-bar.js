@@ -4,15 +4,10 @@
 ;
 
 import angular from 'angular';
-import { attach, mapToMatches, decodeUriComponentProperly } from '../utils';
-import won from '../won-es6';
+import { attach, } from '../utils';
 import { labels } from '../won-label-utils';
-import { selectOpenPost } from '../selectors';
+import { selectOpenPostUri } from '../selectors';
 import { actionCreators }  from '../actions/actions';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -24,13 +19,13 @@ function genComponentConf() {
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="vtb__icon">
                     </a>
                     <won-square-image 
-                        title="self.theirPostContent.get('dc:title')"
-                        src="self.theirPostContent.get('titleImgSrc')"
+                        title="self.theirPost.get('title')"
+                        src="self.theirPost.get('titleImgSrc')"
                         uri="self.theirPost.get('@id')">
                     </won-square-image>
                     <hgroup>
-                        <h1 class="vtb__title">{{ self.theirPostContent.get('dc:title') }}</h1>
-                        <div class="vtb__titles__type">{{self.labels.type[self.theirPostType]}}</div>
+                        <h1 class="vtb__title">{{ self.theirPost.get('title') }}</h1>
+                        <div class="vtb__titles__type">{{self.labels.type[self.theirPost.get("type")]}}</div>
                     </hgroup>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
@@ -59,13 +54,10 @@ function genComponentConf() {
             this.labels = labels;
             window.vtb4dbg = this;
             const selectFromState = state => {
-                const theirPost = selectOpenPost(state);
-                const theirPostContent = seeksOrIs(theirPost);
-                const theirPostType = inferLegacyNeedType(theirPost);
+                const postUri = selectOpenPostUri(state);
+                const theirPost = state.getIn(["needs", "allNeeds", postUri]);
                 return {
                     theirPost,
-                    theirPostContent,
-                    theirPostType,
                     labels,
                     hasConnectionWithOwnPost: false,
                 }

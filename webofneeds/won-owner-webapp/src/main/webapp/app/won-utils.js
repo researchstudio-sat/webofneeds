@@ -5,18 +5,12 @@
 import Immutable from 'immutable';
 import L from './leaflet-bundleable';
 import {
-    relativeTime,
-} from './won-label-utils';
-import {
     msStringToDate,
     is,
     arrEq,
 } from './utils';
 import {
     selectEvents,
-    selectAllByConnections,
-    selectOpenConnectionUri,
-    selectOpenConnection,
 } from './selectors';
 
 export function initLeaflet(mapMount) {

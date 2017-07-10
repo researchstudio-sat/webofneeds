@@ -5,15 +5,10 @@ import squareImageModule from './square-image';
 import feedbackGridModule from './feedback-grid';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
-import { labels, relativeTime, updateRelativeTimestamps } from '../won-label-utils';
+import { labels, } from '../won-label-utils';
 import {
-    selectAllByConnections,
-    selectLastUpdateTime,
+    selectNeedByConnectionUri,
 } from '../selectors';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 import postHeaderModule from './post-header';
 import postContentModule from './post-content';
 
@@ -24,11 +19,11 @@ function genComponentConf() {
             ng-click="self.toggleFeedback()">
 
             <won-post-header
-                need-uri="self.theirNeed.get('@id')">
+                need-uri="self.theirNeed.get('uri')">
             </won-post-header>
             <hr/>
             <won-post-content
-                need-uri="self.theirNeed.get('@id')">
+                need-uri="self.theirNeed.get('uri')">
             </won-post-content>
 
         </div>
@@ -38,16 +33,16 @@ function genComponentConf() {
             ng-click="self.showFeedback()">
                 <div class="mgi__match__description">
                     <div class="mgi__match__description__title">
-                        {{ self.ownNeedContent.get('dc:title') }}
+                        {{ self.ownNeed.get('title') }}
                     </div>
                     <div class="mgi__match__description__type">
-                        {{ self.labels.type[ self.ownNeedType ] }}
+                        {{ self.labels.type[ self.ownNeed.get("type") ] }}
                     </div>
                 </div>
                 <won-square-image
-                    src="self.ownNeedContent.get('titleImgSrc')"
-                    title="self.ownNeedContent.get('dc:title')"
-                    uri="self.ownNeed.getIn(['@id'])">
+                    src="self.ownNeed.get('titleImgSrc')"
+                    title="self.ownNeed.get('title')"
+                    uri="self.ownNeed.get('uri')">
                 </won-square-image>
         </div>
         <won-feedback-grid
@@ -63,26 +58,15 @@ function genComponentConf() {
             this.feedbackVisible = false;
             this.labels = labels;
             window.mgi4dbg = this;
-
+            const self = this;
             const selectFromState = (state) => {
-                const connectionData = selectAllByConnections(state).get(this.connectionUri);
-                const ownNeed = connectionData && connectionData.get('ownNeed');
-                const theirNeed = connectionData && connectionData.get('remoteNeed');
+                const ownNeed = selectNeedByConnectionUri(state, self.connectionUri);
+                const connectionData = state.getIn(["needs", "allNeeds", ownNeed.get("uri"), "connections", self.connectionUri]);
+                const theirNeed = state.getIn(["needs", "allNeeds", connectionData.get("remoteNeedUri")]);
 
                 return {
-                    connectionData,
-
                     ownNeed,
-                    ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
-                    ownNeedContent: ownNeed && seeksOrIs(ownNeed),
-
                     theirNeed,
-                    theirNeedType: theirNeed && inferLegacyNeedType(theirNeed),
-                    theirNeedContent: theirNeed && seeksOrIs(theirNeed),
-                    theirNeedCreatedOn: theirNeed && relativeTime(
-                        selectLastUpdateTime(state),
-                        theirNeed.get('dct:created')
-                    ),
                 };
             };
 
@@ -110,7 +94,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionUri: "="
+            connectionUri: "=",
         },
         template: template
     }

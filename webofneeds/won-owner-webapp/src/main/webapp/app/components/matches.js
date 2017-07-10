@@ -1,5 +1,6 @@
 ;
 
+import Immutable from 'immutable';
 import won from '../won-es6';
 import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
@@ -9,19 +10,13 @@ import sendRequestModule from './send-request';
 import connectionsOverviewModule from './connections-overview';
 import connectionSelectionModule from './connection-selection';
 
-import { attach, mapToMatches, decodeUriComponentProperly} from '../utils';
+import { attach, decodeUriComponentProperly} from '../utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
 import {
-    selectAllByConnections,
     selectOpenPostUri,
     displayingOverview,
-    selectOwnNeeds,
 } from '../selectors';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 let template = `
@@ -58,13 +53,13 @@ let template = `
         </div>
         <div ng-if="self.hasMatches && self.layout === 'tiles'" class="omc__content__flow">
             <won-matches-flow-item
-                    connection-uri="m.getIn(['connection','uri'])"
+                    connection-uri="m.get('uri')"
                     ng-repeat="m in self.matches">
             </won-matches-flow-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
-                    connection-uri="m.getIn(['connection','uri'])"
+                    connection-uri="m.get('uri')"
                     ng-repeat="m in self.matches">
             </won-matches-grid-item>
         </div>
@@ -100,9 +95,6 @@ class Controller {
         this.labels = labels;
 
         const selectFromState = (state) => {
-            const allMatchesByConnections = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
-
             const postUri = selectOpenPostUri(state);
             const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
 
@@ -116,11 +108,16 @@ class Controller {
             const isOverview = displayingOverview(state);
             let matchesByConnectionUri;
             if(isOverview) { //overview
-                matchesByConnectionUri = allMatchesByConnections
-                    .toList();
+                let allMatchesByConnections = Immutable.Map();
+
+                state.getIn(["needs", "allNeeds"]).filter(need => need.get("ownNeed")).map(function(need, key){
+                    allMatchesByConnections.merge(need.get("connections").filter(conn => conn.get("state") === won.WON.Suggested));
+                });
+
+                matchesByConnectionUri = allMatchesByConnections.toList();
             } else { // post-owner view
-                matchesByConnectionUri = allMatchesByConnections
-                    .filter(connectionRelated => connectionRelated.getIn(['ownNeed', '@id']) === postUri)
+                matchesByConnectionUri = state.getIn(["needs", "allNeeds", postUri, "connections"])
+                    .filter(conn => conn.get("state") === won.WON.Suggested)
                     .toList();
             }
 
@@ -128,10 +125,10 @@ class Controller {
                 isOverview,
                 layout,
                 //LAYOUT,
-                connection: state.getIn(['connections', connectionUri]),
+                connection: state.getIn(["needs", "allNeeds", postUri, 'connections', connectionUri]),
                 matches: matchesByConnectionUri.toArray(),
                 hasMatches: matchesByConnectionUri.size > 0,
-                post: state.getIn(['needs','ownNeeds', postUri]),
+                //post: state.getIn(['needs','allNeeds', postUri]),
             };
         };
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

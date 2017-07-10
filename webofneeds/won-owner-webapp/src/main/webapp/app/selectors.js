@@ -20,18 +20,25 @@ import { relativeTime } from './won-label-utils';
 export const selectConnections = state => state.getIn(['connections']);
 export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']); //TODO: REMOVE
-export const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']); //TODO: REMOVE
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
 
+
+
 export const selectAllNeeds = state => state.getIn(["needs", "allNeeds"]);
 
-export const selectAllOwnNeeds = state => state.getIn(["needs", "allNeeds"]).filter(need =>
+export const selectAllOwnNeeds = state => selectAllNeeds(state).filter(need =>
     need.get("ownNeed")
 );
-export const selectAllTheirNeeds = state => state.getIn(["needs", "allNeeds"]).filter(need =>
+export const selectAllTheirNeeds = state => selectAllNeeds(state).filter(need =>
     !need.get("ownNeed")
 );
+
+export function selectNeedByConnectionUri(state, connectionUri){
+    let needs = selectAllNeeds(state);
+    return needs.filter(need => need.getIn(["connections", connectionUri])).first();
+}
+
 
 export const selectOwnEventUris = createSelector(
     selectEvents,
@@ -82,6 +89,7 @@ export const selectConnectionsByNeed = createSelector(
             )
         )
 );
+
 export const selectMatchesUrisByNeed = createSelector(
     selectConnectionsByNeed,
     connectionsByNeed => connectionsByNeed
@@ -344,13 +352,9 @@ export const selectOpenPostUri = createSelector(
 );
 
 export const selectOpenPost = createSelector(
-    selectOpenPostUri, selectOwnNeeds, selectTheirNeeds, selectLastUpdateTime,
-    (openPostUri, ownNeeds, theirNeeds, lastUpdateTime) => {
-        let post = ownNeeds.get(openPostUri) || theirNeeds.get(openPostUri);
-        if(post) {
-            const timestamp = relativeTime(lastUpdateTime, post.get('dct:created'));
-            post = post.set('friendlyTimestamp', timestamp);
-        }
+    selectOpenPostUri, selectAllNeeds,
+    (openPostUri, allNeeds) => {
+        let post = allNeeds.get(openPostUri);
         return post;
     }
 )

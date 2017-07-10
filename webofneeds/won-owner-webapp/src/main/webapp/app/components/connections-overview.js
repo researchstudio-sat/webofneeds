@@ -19,7 +19,7 @@ import { attach } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 
 import {
-    selectOwnNeeds,
+    selectAllOwnNeeds,
     selectConnectionsByNeed,
     selectLastUpdatedPerConnection,
     selectRouterParams,
@@ -62,13 +62,10 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
 
-            window.connOvw4dbg = this;
             this.labels = labels;
             this.open = {};
 
             const self = this;
-
-
             const selectFromState = (state)=> {
 
                 const connectionsByNeed = selectConnectionsByNeed(state);
@@ -80,9 +77,10 @@ function genComponentConf() {
                     )
                     .filter(cnctUris => cnctUris.size > 0); // filter out needs without connections of that type/state
 
-                const ownNeeds = selectOwnNeeds(state);
-                const ownNeedUris = ownNeeds &&
-                    ownNeeds.keySeq().toSet();
+                const ownNeeds = selectAllOwnNeeds(state);
+                const ownNeedUris = ownNeeds && ownNeeds.keySeq().toSet();
+
+
 
                 // filter out needs without connections of that type/state
                 const relevantOwnNeedUris = relevantConnectionUrisByNeed &&

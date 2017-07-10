@@ -14,15 +14,13 @@ import {
     relativeTime,
 } from '../won-label-utils';
 import {
-    selectOpenPost,
+    selectOpenPostUri,
     selectLastUpdateTime,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 import L from '../leaflet-bundleable';
 import {
     initLeaflet,
-    initLeafletBaseMaps,
-    seeksOrIs,
 } from '../won-utils';
 
 import {
@@ -47,21 +45,21 @@ function genComponentConf() {
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.postContent.get('dc:description')">
+                    ng-show="self.post.get('description')">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.postContent.get('dc:description')">
-                    {{ self.postContent.get('dc:description')}}
+                    ng-show="self.post.get('description')">
+                    {{ self.post.get('description')}}
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.postContent.get('won:hasTag')">
+                    ng-show="self.post.get('tags')">
                     Tags
                 </h2>
                 <div class="post-info__details post-info__tags"
-                    ng-show="self.postContent.get('won:hasTag')">
-                        <span class="post-info__tags__tag" ng-repeat="tag in self.postContent.get('won:hasTag').toJS()">{{tag}}</span>
+                    ng-show="self.post.get('tags')">
+                        <span class="post-info__tags__tag" ng-repeat="tag in self.post.get('tags').toJS()">{{tag}}</span>
                 </div>
 
                 <h2 class="post-info__heading"
@@ -76,7 +74,7 @@ function genComponentConf() {
                     </a>
                 </p>
                 <p ng-show="self.debugmode">
-                    <a class="debuglink" target="_blank" href="{{self.post.get('@id')}}">[DATA]</a>
+                    <a class="debuglink" target="_blank" href="{{self.post.get('uri')}}">[DATA]</a>
                 </p>
                 <div class="post-info__mapmount"
                      id="post-info__mapmount"
@@ -117,12 +115,11 @@ function genComponentConf() {
 
 
             const selectFromState = (state) => {
-                const post = selectOpenPost(state);
-                const postContent = post && seeksOrIs(post);
-                const location = postContent && postContent.get('won:hasLocation');
+                const postUri = selectOpenPostUri(state);
+                const post = state.getIn(["needs", "allNeeds", postUri]);
+                const location = post && post.get('location');
                 return {
                     post,
-                    postContent,
                     location: location,
                     address: location && location.get('s:name'),
                     friendlyTimestamp: relativeTime(
