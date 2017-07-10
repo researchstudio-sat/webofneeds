@@ -95,7 +95,7 @@ function genComponentConf() {
             tags = tags && tags.length > 0? tags : undefined;
 
             const draft = {title, description, tags};
-            this.onDraftChange({draft});
+            this.$scope.$apply(() => this.onDraftChange({draft}));
             dispatchEvent(this.$element[0], 'draftChange', draft);
         }
 
