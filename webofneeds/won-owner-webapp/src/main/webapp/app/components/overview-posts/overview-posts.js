@@ -8,7 +8,7 @@ import { attach } from '../../utils';
 import {
     selectUnreadEvents,
     selectUnreadCountsByNeedAndType,
-    selectOwnNeeds,
+    selectAllOwnNeeds,
 } from '../../selectors';
 import won from '../../won-es6';
 

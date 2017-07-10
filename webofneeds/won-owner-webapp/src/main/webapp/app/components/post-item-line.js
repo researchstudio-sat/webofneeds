@@ -8,9 +8,8 @@ import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
 import { createSelector } from 'reselect';
 import {
-    selectAllByConnections,
     selectUnreadCountsByNeedAndType,
-    selectOwnNeeds,
+    selectAllOwnNeeds,
 } from '../selectors';
 
 import {
