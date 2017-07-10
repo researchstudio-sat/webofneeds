@@ -5,10 +5,9 @@ import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
 
 import {
-    selectAllByConnectionsByNeed,
     selectUnreadCountsByNeedAndType,
     selectUnreadEvents,
-    selectOwnNeeds,
+    selectAllOwnNeeds,
 } from '../../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
@@ -21,27 +20,20 @@ class FeedController {
 
             const unreadEvents = selectUnreadEvents(state);
 
-            window.selectUnread4dbg = selectUnreadEvents;
-
             //TODO attach events
 
             // sort by newest event (excluding matches)
 
             // wenn sich die sortierung aufgrund neuer events verändern wuerde, wird ein button/link angezeigt ("new messages/requests. click to update")
             // always show latest message in a line
-            const ownNeeds = selectOwnNeeds(state);
+            const ownNeeds = selectAllOwnNeeds(state);
 
             return {
-                unreadEvents4dbg: unreadEvents,
-                state4dbg: state,
-
-                ownNeedUris: ownNeeds && ownNeeds.filter(n => n.getIn([won.WON.isInStateCompacted, "@id"]) === won.WON.ActiveCompacted).map(n => n.get('@id')).toArray(),
-
-                connectionsByNeed: selectAllByConnectionsByNeed(state),
+                ownNeedUris: ownNeeds && ownNeeds.filter(need => need.get("state") === won.WON.ActiveCompacted).map(need => need.get('uri')).toArray(),
                 unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
             }
-        }
-        const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this)
+        };
+        const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
 
         window.fc4dbg = this;

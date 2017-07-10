@@ -9,7 +9,7 @@ import {
     relativeTime,
 } from '../won-label-utils';
 import {
-    selectOwnNeeds,
+    selectAllOwnNeeds,
     selectLastUpdateTime,
     selectUnreadCountsByNeedAndType,
 } from '../selectors';
@@ -27,13 +27,13 @@ function genComponentConf() {
         <div class="fi clickable" ui-sref="post({postUri: self.ownNeed.get('@id')})">
             <won-square-image
                 src="self.ownNeed.get('titleImg')"
-                title="self.ownNeedContent.get('dc:title')"
+                title="self.ownNeed.get('title')"
                 uri="self.ownNeed.get('@id')">
             </won-square-image>
             <div class="fi__description">
                 <div class="fi__description__topline">
                     <div class="fi__description__topline__title">
-                        {{ self.ownNeedContent.get('dc:title') }}
+                        {{ self.ownNeed.get('title') }}
                     </div>
                     <div class="fi__description__topline__date">
                         {{ self.createdOn }}
@@ -61,25 +61,26 @@ function genComponentConf() {
 
             <won-feed-item-line
                 class="fmil__item clickable"
-                ng-repeat="cnct in self.connections track by $index"
-                connection-uri="cnct.get('uri')"
+                ng-repeat="conn in self.connections track by $index"
+                connection-uri="conn.get('uri')"
+                need-uri="self.ownNeed.get('uri')"
                 ng-show="$index < self.maxNrOfItemsShown"
                 ui-sref="post({
-                    postUri: self.ownNeed.get('@id'),
-                    connectionUri: cnct.get('uri'),
-                    connectionType: cnct.get('hasConnectionState')
+                    postUri: self.ownNeed.get('uri'),
+                    connectionUri: conn.get('uri'),
+                    connectionType: conn.get('state')
                 })">
             </won-feed-item-line>
 
             <div class="fmil__more clickable"
-                 ng-show="self.nrOfConnections === self.maxNrOfItemsShown + 1"
+                 ng-show="self.connections.size === self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
                     1 more activity
             </div>
             <div class="fmil__more clickable"
-                 ng-show="self.nrOfConnections > self.maxNrOfItemsShown + 1"
+                 ng-show="self.connections.size > self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
-                    {{self.nrOfConnections - self.maxNrOfItemsShown}} more activities
+                    {{self.connections.size - self.maxNrOfItemsShown}} more activities
             </div>
         </div>
 
@@ -121,32 +122,20 @@ function genComponentConf() {
 
             this.maxNrOfItemsShown = 3;
             const selectFromState = (state) => {
-                const ownNeeds = selectOwnNeeds(state);
+                const ownNeeds = selectAllOwnNeeds(state);
                 const lastUpdated = selectLastUpdateTime(state);
 
                 const unreadCountsByNeedAndType = selectUnreadCountsByNeedAndType(state);
                 const ownNeed = ownNeeds && ownNeeds.get(self.needUri);
-                const ownNeedContent = ownNeed && seeksOrIs(ownNeed);
-
-                const cnctUriCollection = ownNeed.getIn(['won:hasConnections', 'rdfs:member']);
-                const connections = !cnctUriCollection?
-                    [] : // if there's no cnctUriCollection, there's no connections
-                    cnctUriCollection
-                        .filter(c => c) // filter out `undefined`s
-                        .map(c => state.getIn(['connections', c.get('@id')]))
-                        .toArray();
-
 
                 return {
                     ownNeed,
-                    ownNeedContent,
-                    connections,
+                    connections: ownNeed.get("connections").toArray(),
                     WON: won.WON,
-                    nrOfConnections: connections? connections.size : 0,
-                    createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('dct:created')),
+                    createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('creationDate')),
                     unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
                 }
-            }
+            };
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }

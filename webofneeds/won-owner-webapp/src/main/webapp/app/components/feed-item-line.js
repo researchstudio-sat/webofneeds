@@ -18,18 +18,12 @@ import {
     relativeTime,
 } from '../won-label-utils';
 import {
-    selectLastUpdateTime,
-    //selectAllByConnections,
-    selectUnreadCountsByNeedAndType,
-    selectConnections,
-    selectTheirNeeds,
-    //selectLatestUpdateByConnection,
+    selectAllTheirNeeds,
 } from '../selectors';
 
 import {
     seeksOrIs,
     inferLegacyNeedType,
-    selectTimestamp,
     connectionLastUpdatedAt,
     connect2Redux,
 } from '../won-utils';
@@ -39,13 +33,13 @@ function genComponentConf() {
     let template = `
         <won-square-image
             src="cnct.get('titleImg')"
-            title="self.remoteNeedContent && self.remoteNeedContent.get('dc:title')"
+            title="self.remoteNeed && self.remoteNeed.get('title')"
             uri="self.remoteNeedUri">
         </won-square-image>
         <div class="fmil__item__description">
             <div class="fmil__item__description__topline">
                 <div class="fmil__item__description__topline__title">
-                    {{self.remoteNeedContent && self.remoteNeedContent.get('dc:title')}}
+                    {{self.remoteNeed && self.remoteNeed.get('title')}}
                 </div>
                 <div class="fmil__item__description__topline__date">
                     <!-- TODO only show this when this is a group's thread -->
@@ -55,7 +49,7 @@ function genComponentConf() {
 
             <div class="fmil__item__description__message">
                 {{ self.connection && self.getTextForConnectionState(
-                     self.connection.get('hasConnectionState')
+                     self.connection.get('state')
                    )
                 }}
             </div>
@@ -74,15 +68,14 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state) => {
-                const connection = self.connectionUri && selectConnections(state).get(self.connectionUri);
-                const remoteNeedUri = connection && connection.get('hasRemoteNeed');
-                const remoteNeed = remoteNeedUri && selectTheirNeeds(state).get(remoteNeedUri);
-                const remoteNeedContent = remoteNeed && seeksOrIs(remoteNeed);
+                const connection = self.connectionUri && self.needUri && state.getIn(["allNeeds", self.needUri, "connections", self.connectionUri]);
+                const remoteNeedUri = connection && connection.get('remoteNeedUri');
+                const remoteNeed = remoteNeedUri && selectAllTheirNeeds(state).get(remoteNeedUri);
 
                 //Problem: lastUpdated atm is only calculable, after the connection is viewed and the events loaded
                 const lastUpdated = relativeTime(
                     state.get('lastUpdateTime'),
-                    connectionLastUpdatedAt(state, connection)
+                    connectionLastUpdatedAt(state, connection) //TODO: UPDATE/REFACTOR THIS
                 );
 
                 // const unreadCounts = TODO
@@ -91,10 +84,9 @@ function genComponentConf() {
                     connection,
                     remoteNeedUri,
                     remoteNeed,
-                    remoteNeedContent,
                     lastUpdated,
                 }
-            }
+            };
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
         }
 
@@ -114,6 +106,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
+            needUri: '=',
             connectionUri: '=',
         },
         template: template
