@@ -7,8 +7,7 @@ import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions/actions';
 
 import {
-    selectOwnNeeds,
-    selectTheirNeeds,
+    selectAllNeeds,
 } from './selectors';
 
 import {
@@ -96,9 +95,7 @@ function postViewEnsureLoaded($ngRedux, encodedPostUri) {
     const postUri = decodeUriComponentProperly(encodedPostUri);
     const state = $ngRedux.getState();
 
-    if (postUri
-        && !selectOwnNeeds(state).has(postUri)
-        && !selectTheirNeeds(state).has(postUri)) {
+    if (postUri && !selectAllNeeds(state).has(postUri)) {
 
         /*
          * got an uri but no post loaded to the state yet ->
