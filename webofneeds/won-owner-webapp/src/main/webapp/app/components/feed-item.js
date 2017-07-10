@@ -14,21 +14,16 @@ import {
     selectUnreadCountsByNeedAndType,
 } from '../selectors';
 
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
-
 import feedItemLineModule from './feed-item-line';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
-        <div class="fi clickable" ui-sref="post({postUri: self.ownNeed.get('@id')})">
+        <div class="fi clickable" ui-sref="post({postUri: self.ownNeed.get('uri')})">
             <won-square-image
                 src="self.ownNeed.get('titleImg')"
                 title="self.ownNeed.get('title')"
-                uri="self.ownNeed.get('@id')">
+                uri="self.ownNeed.get('uri')">
             </won-square-image>
             <div class="fi__description">
                 <div class="fi__description__topline">
@@ -50,7 +45,7 @@ function genComponentConf() {
                     <span class="fi__description__subtitle__type">
                         {{
                             self.labels.type[
-                                self.inferLegacyNeedType(self.ownNeed)
+                                self.ownNeed.get("type")
                             ]
                         }}
                     </span>
@@ -73,14 +68,14 @@ function genComponentConf() {
             </won-feed-item-line>
 
             <div class="fmil__more clickable"
-                 ng-show="self.connections.size === self.maxNrOfItemsShown + 1"
+                 ng-show="self.connections.length === self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
                     1 more activity
             </div>
             <div class="fmil__more clickable"
-                 ng-show="self.connections.size > self.maxNrOfItemsShown + 1"
+                 ng-show="self.connections.length > self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
-                    {{self.connections.size - self.maxNrOfItemsShown}} more activities
+                    {{self.connections.length - self.maxNrOfItemsShown}} more activities
             </div>
         </div>
 
@@ -111,8 +106,6 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            this.seeksOrIs = seeksOrIs;
-            this.inferLegacyNeedType = inferLegacyNeedType;
 
             window.fi4dbg = this;
 

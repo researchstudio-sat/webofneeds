@@ -6,7 +6,6 @@ import { attach } from '../../utils';
 
 import {
     selectUnreadCountsByNeedAndType,
-    selectUnreadEvents,
     selectAllOwnNeeds,
 } from '../../selectors';
 
@@ -17,9 +16,6 @@ class FeedController {
         this.selection = 0;
 
         const selectFromState = (state) => {
-
-            const unreadEvents = selectUnreadEvents(state);
-
             //TODO attach events
 
             // sort by newest event (excluding matches)

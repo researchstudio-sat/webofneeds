@@ -22,8 +22,6 @@ import {
 } from '../selectors';
 
 import {
-    seeksOrIs,
-    inferLegacyNeedType,
     connectionLastUpdatedAt,
     connect2Redux,
 } from '../won-utils';
@@ -59,8 +57,6 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            this.seeksOrIs = seeksOrIs;
-            this.inferLegacyNeedType = inferLegacyNeedType;
 
             window.fil4dbg = this;
 
@@ -68,7 +64,7 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state) => {
-                const connection = self.connectionUri && self.needUri && state.getIn(["allNeeds", self.needUri, "connections", self.connectionUri]);
+                const connection = state.getIn(["needs", "allNeeds", this.needUri, "connections", this.connectionUri]);
                 const remoteNeedUri = connection && connection.get('remoteNeedUri');
                 const remoteNeed = remoteNeedUri && selectAllTheirNeeds(state).get(remoteNeedUri);
 
