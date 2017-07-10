@@ -50,21 +50,22 @@ class OverviewPostsController {
             //goal: unseenCounts = { <uri> : { matches: 11, conversations: 0, incomingRequests: 2 }, <uri>:...}
             //TODO use memoized selector to avoid running this calculation on every tick
 
-            const ownNeeds = selectOwnNeeds(state);
+            const ownNeeds = selectAllOwnNeeds(state);
+
             let activePosts = ownNeeds.filter(post =>
-                post.getIn(['won:isInState', '@id']) === won.WON.ActiveCompacted
+                post.get("state") === won.WON.ActiveCompacted
             );
             activePosts = activePosts? activePosts.toArray() : [];
 
             let inactivePosts = ownNeeds.filter(post =>
-                post.getIn(['won:isInState', '@id']) === won.WON.InactiveCompacted
+                post.get("state") === won.WON.InactiveCompacted
             );
             inactivePosts = inactivePosts? inactivePosts.toArray() : [];
 
             return {
-                activePostsUris: activePosts.map(p => p.get('@id')),
+                activePostsUris: activePosts.map(p => p.get('uri')),
                 activePostsCount: activePosts.length,
-                inactivePostsUris: inactivePosts.map(p => p.get('@id')),
+                inactivePostsUris: inactivePosts.map(p => p.get('uri')),
                 inactivePostsCount: inactivePosts.length,
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),

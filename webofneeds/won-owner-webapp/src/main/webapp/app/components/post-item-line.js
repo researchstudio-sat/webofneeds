@@ -26,24 +26,24 @@ function genComponentConf() {
                     <won-square-image  
                         ng-class="{'inactive' : !self.isActive()}" 
                         src="self.ownNeed.get('titleImgSrc')"
-                        title="self.ownNeedContent.get('dc:title')"
+                        title="self.need.get('title')"
                         uri="self.needUri">
                     </won-square-image>
                 </a>
                 <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
                     <div class="pil__description__topline">
-                        <div class="pil__description__topline__title">{{self.ownNeedContent.get('dc:title')}}</div>
+                        <div class="pil__description__topline__title">{{self.need.get('title')}}</div>
                         <div class="pil__description__topline__creationdate">{{self.relativeCreationDate}}</div>
                     </div>
                     <div class="pil__description__subtitle">
-                        <span class="pil__description__subtitle__group" ng-show="self.ownNeed.get('group')">
+                        <span class="pil__description__subtitle__group" ng-show="self.need.get('group')">
                             <img src="generated/icon-sprite.svg#ico36_group"
                                  class="pil__description__subtitle__group__icon">
                              {{self.ownNeed.get('group')}}
                              <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                         </span>
                         <span class="pil__description__subtitle__type">
-                             {{self.labels.type[self.ownNeedType]}}
+                             {{self.labels.type[self.get('type')]}}
                         </span>
                     </div>
                 </a>
@@ -124,11 +124,10 @@ function genComponentConf() {
 
             const selectFromState = (state) => {
 
-                const ownNeeds = selectOwnNeeds(state);
+                const ownNeeds = selectAllOwnNeeds(state);
                 const need = ownNeeds && ownNeeds.get(self.needUri);
 
-                const allConnectionsByNeedUri = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['ownNeed', '@id']) === self.needUri);
+                const allConnectionsByNeedUri = need.get("connections");
 
                 const unreadCounts = selectUnreadCountsByNeedAndType(state).get(self.needUri);
 
@@ -136,22 +135,19 @@ function genComponentConf() {
                 return {
                     need,
                     ownNeed: need,
-                    ownNeedContent: need && seeksOrIs(need),
-                    ownNeedType: need && inferLegacyNeedType(need),
-                    relativeCreationDate: need?
-                        relativeTime(state.get('lastUpdateTime'), need.get('dct:created')) :
+                    relativeCreationDate: need ?
+                        relativeTime(state.get('lastUpdateTime'), need.get('creationDate')) :
                         "",
                     hasConversations: allConnectionsByNeedUri
                         .filter(conn =>
-                            conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected
+                            conn.get("state") === won.WON.Connected
                         ).size > 0,
                     hasRequests: allConnectionsByNeedUri
                         .filter(conn =>
-                            conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived
+                            conn.get("state") === won.WON.RequestReceived
                         ).size > 0,
-                    hasMatches: allConnectionsByNeedUri
-                        .filter(conn =>
-                            conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested
+                    hasMatches: allConnectionsByNeedUri.filter(conn =>
+                            conn.get("state") === won.WON.Suggested
                         ).size > 0,
                     WON: won.WON,
                     debugmode: won.debugmode,
