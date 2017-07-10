@@ -5,17 +5,11 @@ import squareImageModule from '../components/square-image';
 import won from '../won-es6';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
-import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
-import { createSelector } from 'reselect';
+import { labels, relativeTime, } from '../won-label-utils';
 import {
     selectUnreadCountsByNeedAndType,
     selectAllOwnNeeds,
 } from '../selectors';
-
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
@@ -25,7 +19,7 @@ function genComponentConf() {
                     <won-square-image  
                         ng-class="{'inactive' : !self.isActive()}" 
                         src="self.ownNeed.get('titleImgSrc')"
-                        title="self.need.get('title')"
+                        title="self.ownNeed.get('title')"
                         uri="self.needUri">
                     </won-square-image>
                 </a>
@@ -112,8 +106,6 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            this.seeksOrIs = seeksOrIs;
-            this.inferLegacyNeedType = inferLegacyNeedType;
 
             window.pil4dbg = this; //TODO deletme
             this.labels = labels;
@@ -159,7 +151,7 @@ function genComponentConf() {
         }
 
         isActive() {
-            return this.ownNeed && this.ownNeed.getIn(['won:isInState','@id']) === won.WON.ActiveCompacted;
+            return this.ownNeed && this.ownNeed.get("state") === won.WON.ActiveCompacted;
         }
 
         unreadXCount(type) {
