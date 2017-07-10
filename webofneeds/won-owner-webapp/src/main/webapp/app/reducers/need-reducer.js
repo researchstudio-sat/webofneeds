@@ -122,10 +122,10 @@ export default function(state = initialState, action = {}) {
                     addMessage(updatedState, )storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
                 state);*/
             var loadedEvents = action.payload.get('events');
-            //TODO: IMPLEMENT MESSAGE STORING OF MESSAGES
             if(loadedEvents){
-                console.log("showXMessages: ", loadedEvents.toJS());
+                state = addMessages(state, loadedEvents);
             }
+
             return state;
 
         default:
@@ -311,10 +311,25 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
         parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
         parsedMessage.data.date = jsonldMessageImm.get("hasSentTimestamp");
     }else{
-        parsedMessage.belongsToId = jsonldMessageImm.getIn(["msg:FromOwner", "hasReceiver"]);
-        parsedMessage.data.id = jsonldMessageImm.getIn(["msg:FromOwner", "uri"]);
-        parsedMessage.data.text = jsonldMessageImm.getIn(["msg:FromOwner", "hasTextMessage"]);
-        parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["msg:FromExternal", "hasReceivedTimestamp"]));
+        const fromOwner = jsonldMessageImm.get("msg:FromOwner");
+
+        if(fromOwner){
+            //If message is received directly
+            parsedMessage.belongsToId = fromOwner.get("hasReceiver");
+            parsedMessage.data.id = fromOwner.get("uri");
+            parsedMessage.data.text = fromOwner.get("hasTextMessage");
+            parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["msg:FromExternal", "hasReceivedTimestamp"]));
+        }else{
+            const fromCorrespondingMessage = jsonldMessageImm.get("hasCorrespondingRemoteMessage");
+
+            if(fromCorrespondingMessage){
+                //if message comes within the events of showLatestMessages/showMoreMessages action
+                parsedMessage.belongsToId = fromCorrespondingMessage.get("hasReceiver");
+                parsedMessage.data.id = fromCorrespondingMessage.get("uri");
+                parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
+                parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
+            }
+        }
     }
 
     if(
@@ -387,8 +402,8 @@ function addConnectionFull(state, connection, newConnection) {
     return state;
 }
 
-function addMessage(state, message, ownMessage, newMessage) {
-    let parsedMessage = parseMessage(message, ownMessage, newMessage);
+function addMessage(state, message, outgoingMessage, newMessage) {
+    let parsedMessage = parseMessage(message, outgoingMessage, newMessage);
 
     if(parsedMessage){
         const connectionId = parsedMessage.get("belongsToId");
@@ -399,6 +414,26 @@ function addMessage(state, message, ownMessage, newMessage) {
 
             return state.setIn(["allNeeds", need.get("id"), "connections", connectionId, "messages"], messages);
         }
+    }
+    return state;
+}
+
+function addMessages(state, messages) {
+    if(messages && messages.size > 0){
+        //TODO: load all events that have a ["hasCorrespondingRemoteMessage", "hasTextMessage"] (AT LEAST THAT)
+        //TODO: IMPLEMENT MESSAGE STORING OF MESSAGES
+
+        messages.map(function(message, key){
+            const outgoingMessage = !!message.get("hasTextMessage");
+            const incomingMessage = !!message.getIn(["hasCorrespondingRemoteMessage", "hasTextMessage"]);
+
+            if(outgoingMessage || incomingMessage){
+                //ONLY HANDLE TEXTMESSAGES
+                state = addMessage(state, message, outgoingMessage, true);
+            }
+        });
+    }else{
+        console.log("no messages to add");
     }
     return state;
 }
