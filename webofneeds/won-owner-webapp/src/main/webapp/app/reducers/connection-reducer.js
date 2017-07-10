@@ -13,6 +13,7 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.messages.closeNeed.failed:
         case actionTypes.initialPageLoad:
         case actionTypes.login:
+            //ALREADY REFACTORED TO NEW STATE
             return storeConnections(connections, action.payload.get('connections'));
 
         case actionTypes.messages.open.successOwn:
@@ -20,11 +21,13 @@ export default function(connections = initialState, action = {}) {
             return connections.setIn([connectionUri, 'messageDraft'], ""); // successful open -- can reset draft
 
         case actionTypes.connections.connect: // user has sent a request
-            var { connectionUri, eventUri } = action.payload
+            //ALREADY REFACTORED TO NEW STATE (WITHOUT EVENTURIS)
+            var { connectionUri, eventUri } = action.payload;
             return storeEventUris(connections, connectionUri, [eventUri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.RequestSent);
 
         case actionTypes.connections.open:
+            //ALREADY REFACTORED TO NEW STATE (WITHOUT EVENTURIS)
             var eventUri = action.payload.eventUri;
             var connectionUri = action.payload.optimisticEvent.hasSender;
             return connections.updateIn(
@@ -37,20 +40,24 @@ export default function(connections = initialState, action = {}) {
             );
 
         case actionTypes.messages.open.failure:
+            //ALREADY REFACTORED TO NEW STATE
             var acceptConnectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
             return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.RequestReceived);
 
         case actionTypes.messages.connect.success:
+            //ALREADY REFACTORED TO NEW STATE (WITHOUT EVENTURIS)
             var connectionUri = action.payload.hasReceiver;
             return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.RequestSent)
 
         case actionTypes.messages.close.success:
+            //ALREADY REFACTORED TO NEW STATE (WITHOUT EVENTURIS)
             var connectionUri = action.payload.hasReceiver;
             return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
 
         case actionTypes.connections.close:
+            //ALREADY REFACTORED TO NEW STATE
             return connections.setIn([action.payload.connectionUri, 'hasConnectionState'], won.WON.Closed);
 
 
@@ -68,6 +75,7 @@ export default function(connections = initialState, action = {}) {
             );
 
         case actionTypes.connections.load:
+            //ALREADY REFACTORED TO NEW STATE
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
@@ -137,6 +145,7 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.hintMessageReceived:
+            //ALREADY REFACTORED TO NEW STATE
             return storeConnection(connections, action.payload.connection);
 
         case actionTypes.logout:
@@ -177,6 +186,7 @@ function sanitizeConnection(connection) {
 
 
 function storeEventUri(connections, connectionUri, newEventUri) {
+    //TODO: NOT SURE IF WE WILL NEED THIS
     if(!newEventUri) {
         console.error("Tried to store event with undefined or empty uri: ", newEventUri);
         return connections;
@@ -190,6 +200,7 @@ function storeEventUri(connections, connectionUri, newEventUri) {
 }
 
 function storeEventUris(connections, connectionUri, newEventUris) {
+    //TODO: NOT SURE IF WE WILL NEED THIS
     if(!newEventUris) {
         console.error("Tried to store events from undefined or empty list: ", newEventUris);
         return connections;

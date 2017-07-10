@@ -123,6 +123,7 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.connections.showLatestMessages:
         case actionTypes.connections.showMoreMessages:
+            //ALREADY IN NEW STATE
             var loadedEvents = action.payload.get('events');
             return state.update('events', events => events.merge(loadedEvents));
 
