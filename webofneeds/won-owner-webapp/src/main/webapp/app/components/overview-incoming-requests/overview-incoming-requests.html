@@ -17,7 +17,7 @@
             </a>
         </div>
     </div>
-    <div class="oir__requests" ng-class="{'hidden': self.connection !== undefined}">
+    <div class="oir__requests" ng-class="{'hidden': self.connection}">
         <won-connections-overview
             connection-type="::self.WON.RequestReceived"
             on-selected-connection="self.selectedConnection(connectionUri)">

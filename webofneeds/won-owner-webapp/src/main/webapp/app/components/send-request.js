@@ -4,13 +4,9 @@ import angular from 'angular';
 import 'ng-redux';
 import postContentModule from './post-content';
 import postHeaderModule from './post-header';
-import { selectLastUpdateTime } from '../selectors';
+import { selectNeedByConnectionUri } from '../selectors';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 
@@ -26,11 +22,11 @@ function genComponentConf() {
       </div>
 
       <won-post-header
-        need-uri="self.theirNeedUri">
+        need-uri="self.connection.get('remoteNeedUri')">
       </won-post-header>
 
       <won-post-content
-        need-uri="self.theirNeedUri">
+        need-uri="self.connection.get('remoteNeedUri')">
       </won-post-content>
 
       <div class="sr__footer">
@@ -54,7 +50,7 @@ function genComponentConf() {
         <a ng-show="self.debugmode"
           class="debuglink"
           target="_blank"
-          href="{{self.connectionUri}}">
+          href="{{self.connection.get('uri')}}">
             [CONNDATA]
         </a>
       </div>
@@ -69,14 +65,11 @@ function genComponentConf() {
 
             const selectFromState = (state) => {
                 const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
-
-                const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
+                const ownNeed = selectNeedByConnectionUri(state, connectionUri);
+                const connection = ownNeed.getIn(["connections", connectionUri]);
 
                 return {
-                    connectionUri: connectionUri,
-                    connection: state.getIn(['connections', connectionUri]),
-
-                    theirNeedUri,
+                    connection,
                     debugmode: won.debugmode,
                 }
             };
@@ -85,7 +78,7 @@ function genComponentConf() {
         }
 
         sendRequest(message) {
-            this.connections__connect(this.connectionUri, message);
+            this.connections__connect(this.connection.get('uri'), message);
         }
     }
     Controller.$inject = serviceDependencies;

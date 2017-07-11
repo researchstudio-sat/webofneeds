@@ -7,24 +7,15 @@ import {
 } from '../won-label-utils';
 import {
     attach,
-    msStringToDate,
 } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
-    displayingOverview,
-    selectEventsOfOpenConnection,
     selectLastUpdateTime,
-    selectOpenConnection,
     selectConnectMessageOfOpenConnection,
     selectLastUpdatedPerConnection,
+    selectNeedByConnectionUri,
 } from '../selectors';
-
-import {
-    selectTimestamp,
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils'
 
 import postContentModule from './post-content';
 import postHeaderModule from './post-header';
@@ -38,14 +29,14 @@ function genComponentConf() {
         </a>
 
         <won-post-header
-          need-uri="self.theirNeed.get('@id')"
+          need-uri="self.remoteNeedUri"
           timestamp="self.lastUpdateTimestamp"
           hide-image="::true">
         </won-post-header>
       </div>
 
       <won-post-content
-        need-uri="self.theirNeed.get('@id')"
+        need-uri="self.remoteNeedUri"
         text-message="self.textMsg">
       </won-post-content>
 
@@ -74,32 +65,22 @@ function genComponentConf() {
             this.labels = labels;
             const selectFromState = (state) => {
                 const connectionUri = selectOpenConnectionUri(state);
-                const connection = selectOpenConnection(state);
-                const connectionState = connection && connection.get('hasConnectionState');
-                const theirNeedUri = connection && connection.get('hasRemoteNeed');
-                const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
-                const connectMsg = selectConnectMessageOfOpenConnection(state);
 
-                const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state)
+                const ownNeed = selectNeedByConnectionUri(state, connectionUri);
+                const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
+
+                const connectMsg = selectConnectMessageOfOpenConnection(state); //TODO: CHANGE THIS
+
+                const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
 
                 const lastStateUpdate = selectLastUpdateTime(state);
 
                 return {
-                    theirNeed,
+                    connectionUri,
+                    remoteNeedUri: connection.get("remoteNeedUri"),
+                    isSentRequest: connection.get('state') === won.WON.RequestSent,
+                    isReceivedRequest: connection.get('state') === won.WON.RequestReceived,
 
-                    connectionUri: connectionUri,
-                    isSentRequest: connectionState === won.WON.RequestSent,
-                    isReceivedRequest: connectionState === won.WON.RequestReceived,
-
-                    isOverview: displayingOverview(state),
-                    connection: selectOpenConnection(state),
-
-                    theirNeedType: theirNeed && inferLegacyNeedType(theirNeed),
-                    theirNeedContent: theirNeed && seeksOrIs(theirNeed),
-                    theirNeedCreatedOn: theirNeed && relativeTime(
-                        lastStateUpdate,
-                        theirNeed.get('dct:created')
-                    ),
                     lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
                     lastUpdated: lastUpdatedPerConnection &&
                         relativeTime(
@@ -123,7 +104,7 @@ function genComponentConf() {
         }
 
         openRequest(message){
-            this.connections__open(this.connectionUri,message);
+            this.connections__open(this.connectionUri, message);
         }
         closeRequest(){
             this.connections__close(this.connectionUri);

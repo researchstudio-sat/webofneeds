@@ -7,9 +7,9 @@ import angular from 'angular';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import {
-    selectUnreadCountsByType,
-    selectUnreadEventsByNeed,
-    selectAllByConnections,
+    selectAllOwnNeeds,
+    selectAllConnections,
+    selectAllMessages,
 } from '../selectors';
 import won from '../won-es6';
 
@@ -65,32 +65,18 @@ function genComponentConf() {
             window.getState4dbg = this.$ngRedux.getState;
 
             const selectFromState = (state) => {
-                const unreadCounts = selectUnreadCountsByType(state);
-                const nrOfNeedsWithUnread = selectUnreadEventsByNeed(state).size;
-                const ownNeeds = state.getIn(["needs", "ownNeeds"]);
-                const connectionsDeprecated = selectAllByConnections(state).toJS();
+                const ownNeeds = selectAllOwnNeeds(state);
+                const allConnections = selectAllConnections(state);
+                const allMessages = selectAllMessages(state);
 
                 return {
                     hasPosts: ownNeeds && ownNeeds.size > 0,
-                    hasRequests: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.RequestReceived){
-                                return true
-                            }
-                        }).length > 0,
-                    hasMatches: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn => {
-                            if(conn.connection.hasConnectionState===won.WON.Suggested){
-                                return true
-                            }
-                        }).length > 0,
-                    nrOfUnreadMessages: unreadCounts.get(won.WONMSG.connectionMessage),
-                    nrOfUnreadIncomingRequests: unreadCounts.get(won.WONMSG.connectMessage),
-                    nrOfUnreadSentRequests: unreadCounts.get(won.WONMSG.connectSentMessage),
-                    nrOfUnreadMatches: unreadCounts.get(won.WONMSG.hintMessage),
-                    nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnread > 0? nrOfNeedsWithUnread : undefined,
+                    hasRequests: allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
+                    hasMatches: allConnections.filter(conn => conn.get("state") === won.WON.Suggested).size > 0,
+                    nrOfUnreadMessages: allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size, //only count incoming messages
+                    nrOfUnreadIncomingRequests: allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived && conn.get("newConnection")).size,
+                    nrOfUnreadMatches: allConnections.filter(conn => conn.get("state") === won.WON.Suggested && conn.get("newConnection")).size,
+                    nrOfNeedsWithUnreadEvents: undefined, //TODO: COUNT HOW MANY NEEDS HAVE AT LEAST ONE NEW CONNECTION OR ONE NEW MESSAGE
                 };
             };
 

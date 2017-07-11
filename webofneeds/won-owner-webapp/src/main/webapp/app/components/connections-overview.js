@@ -20,40 +20,34 @@ import { actionCreators }  from '../actions/actions';
 
 import {
     selectAllOwnNeeds,
-    selectConnectionsByNeed,
-    selectLastUpdatedPerConnection,
     selectRouterParams,
-    selectUnreadCountsByNeedAndType,
+    selectNeedByConnectionUri,
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-      <div ng-repeat="needUri in self.relevantOwnNeedUris">
+      <div ng-repeat="need in self.relevantOwnNeeds">
         <div class="covw__own-need clickable"
-          ng-click="self.toggleConnections(needUri)">
+          ng-click="self.toggleConnections(need.get('uri'))">
           <won-post-header
-            need-uri="needUri"
+            need-uri="need.get('uri')"
             timestamp="'TODOlatestOfThatType'">
           </won-post-header>
 
           <div class="covw__unreadCount">
-            {{
-              self.unreadCounts.getIn([
-                  needUri, self.messageType
-              ])
-            }}
+            {{self.getUnreadConnectionsCountFilteredByType(need)}}
           </div>
-          <img class="covw__arrow" ng-show="self.isOpen(needUri)"
+          <img class="covw__arrow" ng-show="self.isOpen(need.get('uri'))"
               src="generated/icon-sprite.svg#ico16_arrow_up"/>
-          <img class="covw__arrow" ng-show="!self.isOpen(needUri)"
+          <img class="covw__arrow" ng-show="!self.isOpen(need.get('uri'))"
               src="generated/icon-sprite.svg#ico16_arrow_down"/>
         </div>
         <won-connection-selection-item
-          ng-show="self.isOpen(needUri)"
-          ng-repeat="cnctUri in self.relevantConnectionUrisByNeed.get(needUri)"
+          ng-show="self.isOpen(need.get('uri'))"
+          ng-repeat="conn in getConnectionsArrayFilteredByType(need)"
           on-selected-connection="self.selectConnection(connectionUri)"
-          connection-uri="cnctUri">
+          connection-uri="conn.get('uri')">
         </won-connection-selection-item>
       </div>
     `;
@@ -67,48 +61,16 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state)=> {
-
-                const connectionsByNeed = selectConnectionsByNeed(state);
-                const relevantConnectionUrisByNeed = connectionsByNeed && connectionsByNeed
-                    .map(connections => connections
-                        .filter(c => c && c.get('hasConnectionState') === self.connectionType)
-                        .map(c => c.get('uri'))
-                        .toSet()
-                    )
-                    .filter(cnctUris => cnctUris.size > 0); // filter out needs without connections of that type/state
-
-                const ownNeeds = selectAllOwnNeeds(state);
-                const ownNeedUris = ownNeeds && ownNeeds.keySeq().toSet();
-
-
-
-                // filter out needs without connections of that type/state
-                const relevantOwnNeedUris = relevantConnectionUrisByNeed &&
-                    relevantConnectionUrisByNeed.keySeq().toSet();
-
-                const relevantOwnNeeds = relevantOwnNeedUris && ownNeeds &&
-                    ownNeeds.filter(n => relevantOwnNeedUris.has(n.get('@id')));
+                //Select all needs with at least one connection
+                const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").size > 0);
 
                 const routerParams = selectRouterParams(state);
-                const cnctInRoute = routerParams &&
-                    decodeURIComponent(routerParams.get('connectionUri'));
-                const needImpliedInRoute = cnctInRoute && relevantConnectionUrisByNeed &&
-                    relevantConnectionUrisByNeed
-                        .filter(cncts => cncts.has(cnctInRoute)) // find ownNeed associated with the connection
-                        .keySeq() // get needUris
-                        .first(); // the openConnectionUri can only be associated with one need
+                const connUriInRoute = routerParams && decodeURIComponent(routerParams.get('connectionUri'));
+                const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
 
                 return {
                     needImpliedInRoute,
-                    lastUpdatePerConnection: selectLastUpdatedPerConnection(state),
-                    relevantOwnNeedUris: relevantOwnNeedUris && relevantOwnNeedUris.toArray(),
                     relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
-                    relevantConnectionUrisByNeed: relevantConnectionUrisByNeed &&
-                        relevantConnectionUrisByNeed.map(cncts => cncts.toJS()),
-
-                    unreadCounts: selectUnreadCountsByNeedAndType(state),
-
-                    messageType: won.cnctState2MessageType[this.connectionType],
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -118,12 +80,16 @@ function genComponentConf() {
             this.open[ownNeedUri] = !this.open[ownNeedUri]
         }
         isOpen(ownNeedUri) {
-            return !!this.open[ownNeedUri] ||
-                this.needImpliedInRoute === ownNeedUri;
+            return !!this.open[ownNeedUri] || this.needImpliedInRoute === ownNeedUri;
         }
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
-            //TODO either publish a dom-event as well; or directly call the route-change
+        }
+        getConnectionsArrayFilteredByType(need) {
+            return need.get('connections').filter(conn => conn.get('state') === this.connectionType).toArray();
+        }
+        getUnreadConnectionsCountFilteredByType(need){
+            return need.get('connections').filter(conn => conn.get('newConnection') && conn.get('state') === this.connectionType).size;
         }
     }
     Controller.$inject = serviceDependencies;

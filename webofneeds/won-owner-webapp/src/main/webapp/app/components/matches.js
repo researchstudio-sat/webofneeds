@@ -16,6 +16,7 @@ import { actionCreators }  from '../actions/actions';
 import {
     selectOpenPostUri,
     displayingOverview,
+    selectAllConnections,
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -53,14 +54,14 @@ let template = `
         </div>
         <div ng-if="self.hasMatches && self.layout === 'tiles'" class="omc__content__flow">
             <won-matches-flow-item
-                    connection-uri="m.get('uri')"
-                    ng-repeat="m in self.matches">
+                    connection-uri="match.get('uri')"
+                    ng-repeat="match in self.matchesArray">
             </won-matches-flow-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
-                    connection-uri="m.get('uri')"
-                    ng-repeat="m in self.matches">
+                    connection-uri="match.get('uri')"
+                    ng-repeat="match in self.matchesArray">
             </won-matches-grid-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'list'" class="omc__content__list">
@@ -98,7 +99,6 @@ class Controller {
             const postUri = selectOpenPostUri(state);
             const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
 
-
             // either of 'tiles', 'grid', 'list'
             let layout = state.getIn(['router','currentParams','layout']);
             if(!layout) {
@@ -106,19 +106,11 @@ class Controller {
             }
 
             const isOverview = displayingOverview(state);
-            let matchesByConnectionUri;
+            let matches;
             if(isOverview) { //overview
-                let allMatchesByConnections = Immutable.Map();
-
-                state.getIn(["needs", "allNeeds"]).filter(need => need.get("ownNeed")).map(function(need, key){
-                    allMatchesByConnections.merge(need.get("connections").filter(conn => conn.get("state") === won.WON.Suggested));
-                });
-
-                matchesByConnectionUri = allMatchesByConnections.toList();
+                matches = selectAllConnections(state).filter(conn => conn.get("state") === won.WON.Suggested);
             } else { // post-owner view
-                matchesByConnectionUri = state.getIn(["needs", "allNeeds", postUri, "connections"])
-                    .filter(conn => conn.get("state") === won.WON.Suggested)
-                    .toList();
+                matches = state.getIn(["needs", "allNeeds", postUri, "connections"]).filter(conn => conn.get("state") === won.WON.Suggested);
             }
 
             return {
@@ -126,20 +118,12 @@ class Controller {
                 layout,
                 //LAYOUT,
                 connection: state.getIn(["needs", "allNeeds", postUri, 'connections', connectionUri]),
-                matches: matchesByConnectionUri.toArray(),
-                hasMatches: matchesByConnectionUri.size > 0,
-                //post: state.getIn(['needs','allNeeds', postUri]),
+                matchesArray: matches.toArray(),
+                hasMatches: matches.size > 0,
             };
         };
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-      //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
-    }
-
-    loadMatches(){
-        this.matches__load(
-            this.$ngRedux.getState().getIn(['needs','ownNeeds']).toJS()
-        )
     }
 
     selectedConnection(connectionUri) {

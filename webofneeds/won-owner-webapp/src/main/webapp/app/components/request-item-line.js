@@ -80,11 +80,10 @@ function genComponentConf() {
                     currentPage: state.getIn(['router','currentState','name']),
                     unreadUris: selectUnreadEvents(state)
                 };
-            }
+            };
             this.labels = labels;
 
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
-            //  this.loadMatches();
             this.$scope.$on('$destroy', disconnect);
         }
 

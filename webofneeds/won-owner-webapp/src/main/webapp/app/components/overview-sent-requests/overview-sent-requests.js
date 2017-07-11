@@ -73,7 +73,6 @@ class SentRequestsController {
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
     selectedConnection(connectionUri) {

@@ -3,39 +3,26 @@
  */
 ;
 
-import won from '../won-es6';
 import angular from 'angular';
 import {
     labels,
-    relativeTime,
 } from '../won-label-utils';
 import { attach, decodeUriComponentProperly } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import {
-    selectOpenConnectionUri,
-    selectAllByConnections,
-    selectOpenPost,
     selectOpenPostUri,
-    selectLastUpdatedPerConnection,
-    selectLastUpdateTime,
-    selectConnectionsByNeed,
 } from '../selectors';
 
 import connectionSelectionItemModule from './connection-selection-item';
 
-import {
-    selectTimestamp,
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <won-connection-selection-item
-        ng-repeat="(key,cnctUri) in self.connectionUris"
+        ng-repeat="conn in self.connectionsArray"
         on-selected-connection="self.setOpen(connectionUri)"
-        connection-uri="cnctUri">
+        connection-uri="conn.get('uri')">
       </won-connection-selection-item>
     `;
 
@@ -50,28 +37,17 @@ function genComponentConf() {
 
             const selectFromState = (state)=>{
                 const postUri = selectOpenPostUri(state);
-                const allByConnections = selectAllByConnections(state);
-                const ownNeed = selectOpenPost(state);
+                const ownNeed = state.getIn(["needs", "allNeeds", postUri]);
 
                 const connectionTypeInParams = decodeUriComponentProperly(
                     state.getIn(['router', 'currentParams', 'connectionType'])
                 );
                 const connectionType = connectionTypeInParams || self.connectionType;
-
-                const connectionsByNeed = selectConnectionsByNeed(state);
-                const connections = connectionsByNeed && connectionsByNeed.get(postUri)
-
-                const connectionUris = !connections?
-                    [] :
-                    connections
-                        .filter(c => c && c.get('hasConnectionState') === this.connectionType)
-                        .map(c => c.get('uri'))
-                        .toJS();
-
+                const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);
                 return {
-                    connectionUris,
+                    connectionsArray: connections && connections.toArray(),
                 };
-            }
+            };
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
