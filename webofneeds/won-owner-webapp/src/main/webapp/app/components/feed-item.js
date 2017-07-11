@@ -9,9 +9,7 @@ import {
     relativeTime,
 } from '../won-label-utils';
 import {
-    selectAllOwnNeeds,
     selectLastUpdateTime,
-    selectUnreadCountsByNeedAndType,
 } from '../selectors';
 
 import feedItemLineModule from './feed-item-line';
@@ -43,11 +41,7 @@ function genComponentConf() {
                     </span>
                     -->
                     <span class="fi__description__subtitle__type">
-                        {{
-                            self.labels.type[
-                                self.ownNeed.get("type")
-                            ]
-                        }}
+                        {{self.labels.type[self.ownNeed.get("type")]}}
                     </span>
                 </div>
             </div>
@@ -56,7 +50,7 @@ function genComponentConf() {
 
             <won-feed-item-line
                 class="fmil__item clickable"
-                ng-repeat="conn in self.connections track by $index"
+                ng-repeat="conn in self.connectionsArray track by $index"
                 connection-uri="conn.get('uri')"
                 need-uri="self.ownNeed.get('uri')"
                 ng-show="$index < self.maxNrOfItemsShown"
@@ -68,35 +62,35 @@ function genComponentConf() {
             </won-feed-item-line>
 
             <div class="fmil__more clickable"
-                 ng-show="self.connections.length === self.maxNrOfItemsShown + 1"
+                 ng-show="self.connectionsSize === self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
                     1 more activity
             </div>
             <div class="fmil__more clickable"
-                 ng-show="self.connections.length > self.maxNrOfItemsShown + 1"
+                 ng-show="self.connectionsSize > self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
-                    {{self.connections.length - self.maxNrOfItemsShown}} more activities
+                    {{self.connectionsSize - self.maxNrOfItemsShown}} more activities
             </div>
         </div>
 
-        <div class="fi__footer" ng-show="self.unreadMatchesCount() || self.unreadRequestsCount()">
+        <div class="fi__footer" ng-show="self.unreadMatchesCount || self.unreadRequestsCount">
             <div class="fi__footer__indicators">
                 <a class="fi__footer__indicators__item clickable"
                    ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.needUri})"
-                   ng-show="self.unreadMatchesCount()">
+                   ng-show="self.unreadMatchesCount">
                     <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
-                       {{ self.unreadMatchesCount() }}
-                       Match{{self.unreadMatchesCount() > 1 ? 'es' : ''}}
+                       {{ self.unreadMatchesCount }}
+                       Match{{self.unreadMatchesCount > 1 ? 'es' : ''}}
                     </span>
                 </a>
                 <a class="fi__footer__indicators__item clickable"
                    ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.needUri})"
-                   ng-show="self.unreadRequestsCount()">
+                   ng-show="self.unreadRequestsCount">
                     <img src="generated/icon-sprite.svg#ico36_incoming" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
-                        {{self.unreadRequestsCount()}}
-                        Incoming Request{{ self.unreadRequestsCount() > 1 ? 's' : ''}}
+                        {{self.unreadRequestsCount}}
+                        Incoming Request{{ self.unreadRequestsCount > 1 ? 's' : ''}}
                     </span>
                 </a>
             </div>
@@ -106,27 +100,28 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-
-            window.fi4dbg = this;
-
             this.labels = labels;
 
             const self = this;
-
             this.maxNrOfItemsShown = 3;
+
             const selectFromState = (state) => {
-                const ownNeeds = selectAllOwnNeeds(state);
                 const lastUpdated = selectLastUpdateTime(state);
 
-                const unreadCountsByNeedAndType = selectUnreadCountsByNeedAndType(state);
-                const ownNeed = ownNeeds && ownNeeds.get(self.needUri);
+                const ownNeed = state.getIn(["needs", "allNeeds", self.needUri]);
+                const connections = ownNeed.get("connections");
+
+                const unreadMatchesCount = connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.Suggested).size;
+                const unreadRequestsCount = connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.RequestReceived).size;
 
                 return {
                     ownNeed,
-                    connections: ownNeed.get("connections").toArray(),
+                    connectionsArray: connections.toArray(),
+                    connectionsSize: connections.size,
                     WON: won.WON,
                     createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('creationDate')),
-                    unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
+                    unreadMatchesCount,
+                    unreadRequestsCount,
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
@@ -134,24 +129,6 @@ function genComponentConf() {
         }
         showMore() {
             this.maxNrOfItemsShown += 6;
-        }
-        unreadXCount(type) {
-            return !this.unreadCounts?
-                undefined : //ensure existence of count object
-                this.unreadCounts.get(type)
-        }
-        unreadMatchesCount() {
-            return this.unreadXCount(won.WONMSG.hintMessage)
-        }
-        unreadRequestsCount() {
-            return this.unreadXCount(won.WONMSG.connectMessage);
-        }
-        getTextForConnectionState(state){
-            let stateText = this.labels.connectionState[state];
-            if (!stateText) {
-                stateText = "unknown connection state";
-            }
-            return stateText;
         }
     }
     Controller.$inject = serviceDependencies;

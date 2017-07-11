@@ -5,24 +5,21 @@
 
 
 import angular from 'angular';
-import Immutable from 'immutable';
 import squareImageModule from '../components/square-image';
-import won from '../won-es6';
 import { actionCreators }  from '../actions/actions';
 import {
     attach,
-    msStringToDate,
 } from '../utils';
 import {
     labels,
     relativeTime,
 } from '../won-label-utils';
 import {
+    selectLastUpdateTime,
     selectAllTheirNeeds,
 } from '../selectors';
 
 import {
-    connectionLastUpdatedAt,
     connect2Redux,
 } from '../won-utils';
 
@@ -30,7 +27,7 @@ const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
         <won-square-image
-            src="cnct.get('titleImg')"
+            src="self.remoteNeed && self.remoteNeed.get('titleImg')"
             title="self.remoteNeed && self.remoteNeed.get('title')"
             uri="self.remoteNeedUri">
         </won-square-image>
@@ -64,23 +61,16 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state) => {
+                const lastUpdated = selectLastUpdateTime(state);
                 const connection = state.getIn(["needs", "allNeeds", this.needUri, "connections", this.connectionUri]);
                 const remoteNeedUri = connection && connection.get('remoteNeedUri');
                 const remoteNeed = remoteNeedUri && selectAllTheirNeeds(state).get(remoteNeedUri);
-
-                //Problem: lastUpdated atm is only calculable, after the connection is viewed and the events loaded
-                const lastUpdated = relativeTime(
-                    state.get('lastUpdateTime'),
-                    connectionLastUpdatedAt(state, connection) //TODO: UPDATE/REFACTOR THIS
-                );
-
-                // const unreadCounts = TODO
 
                 return {
                     connection,
                     remoteNeedUri,
                     remoteNeed,
-                    lastUpdated,
+                    lastUpdated: connection && relativeTime(lastUpdated, connection.get('creationDate')),
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);

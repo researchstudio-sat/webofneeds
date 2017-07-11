@@ -5,7 +5,6 @@ import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
 
 import {
-    selectUnreadCountsByNeedAndType,
     selectAllOwnNeeds,
 } from '../../selectors';
 
@@ -16,17 +15,10 @@ class FeedController {
         this.selection = 0;
 
         const selectFromState = (state) => {
-            //TODO attach events
-
-            // sort by newest event (excluding matches)
-
-            // wenn sich die sortierung aufgrund neuer events verändern wuerde, wird ein button/link angezeigt ("new messages/requests. click to update")
-            // always show latest message in a line
-            const ownNeeds = selectAllOwnNeeds(state);
+            const ownActiveNeeds = selectAllOwnNeeds(state).filter(need => need.get("state") === won.WON.ActiveCompacted);
 
             return {
-                ownNeedUris: ownNeeds && ownNeeds.filter(need => need.get("state") === won.WON.ActiveCompacted).map(need => need.get('uri')).toArray(),
-                unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
+                ownNeedUris: ownActiveNeeds && ownActiveNeeds.map(need => need.get('uri')).toArray(),
             }
         };
         const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
