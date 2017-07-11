@@ -15,13 +15,9 @@ import connectionSelectionModule from '../connection-selection';
 import postInfoModule from '../post-info';
 import matchesModule from '../matches';
 import {
-    selectAllByConnections,
     selectOpenPostUri,
     selectOpenConnectionUri,
-    selectOpenPost,
-    selectOwningOpenPost
 } from '../../selectors';
-import { relativeTime } from '../../won-label-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 class Controller {
@@ -33,31 +29,23 @@ class Controller {
 
         const selectFromState = (state)=>{
             const postUri = selectOpenPostUri(state);
-            const allByConnectionsAndPostUri = selectAllByConnections(state)
-                .filter(connectionRelated => connectionRelated.getIn(['ownNeed', '@id']) === postUri)
-                .toList();
-            
-            const hasMatches = allByConnectionsAndPostUri
-                .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested)
-                .toList()
+            const post = state.getIn(["needs", "allNeeds", postUri]);
+
+            const hasReceivedRequests = post && post.get('connections')
+                .filter(conn => conn.get('state') === won.WON.RequestReceived)
                 .size > 0;
-            const hasReceivedRequests = allByConnectionsAndPostUri
-                .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived)
-                .toList()
+            const hasSentRequests= post && post.get('connections')
+                .filter(conn => conn.get('state') === won.WON.RequestSent)
                 .size > 0;
-            const hasSentRequests = allByConnectionsAndPostUri
-                .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestSent)
-                .toList()
+            const hasMatches= post && post.get('connections')
+                .filter(conn => conn.get('state') === won.WON.Suggested)
                 .size > 0;
-            const hasConversations = allByConnectionsAndPostUri
-                    .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected)
-                    .toList()
-                    .size > 0;
+            const hasConversations = post && post.get('connections')
+                .filter(conn => conn.get('state') === won.WON.Connected)
+                .size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
-            const actualConnectionType = state.getIn([
-                'connections', connectionUri, 'hasConnectionState'
-            ]);
+            const actualConnectionType = state.getIn(['connections', connectionUri, 'hasConnectionState']);
 
             const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
 
@@ -66,9 +54,10 @@ class Controller {
                 actualConnectionType == connectionTypeInParams;
 
             return {
-                postUri: selectOpenPostUri(state),
-                post: selectOpenPost(state),
-                owningPost: selectOwningOpenPost(state),
+                connectionOpen: !!connectionUri,
+                postUri,
+                post,
+                isOwnPost: post && post.get("ownNeed"),
                 connectionUri,
                 hasMatches,
                 hasReceivedRequests,
@@ -82,7 +71,7 @@ class Controller {
                 showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
                 won: won.WON,
             };
-        }
+        };
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);

@@ -124,7 +124,7 @@ function genComponentConf() {
                     address: location && location.get('s:name'),
                     friendlyTimestamp: relativeTime(
                         selectLastUpdateTime(state),
-                        post && post.get('dct:created')
+                        post.get('creationDate')
                     ),
                     debugmode: won.debugmode
                 }

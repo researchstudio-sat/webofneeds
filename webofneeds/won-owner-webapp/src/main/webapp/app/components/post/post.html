@@ -3,13 +3,13 @@
     <won-topnav></won-topnav>
     <won-owner-title-bar
             selection="self.selection"
-            ng-show="self.owningPost"
+            ng-if="self.isOwnPost"
             ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
     </won-owner-title-bar>
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
-            ng-show="!self.owningPost"
+            ng-if="self.post && !self.isOwnPost"
             ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
     </won-visitor-title-bar>
 </header>
@@ -17,12 +17,12 @@
 
 
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-post-info ng-show="!self.connectionType || !self.owningPost"></won-post-info>
+    <won-post-info ng-if="self.post" ng-show="!self.connectionType || !self.isOwnPost"></won-post-info>
 
     <!-- Matches: -->
-    <won-matches ng-if="self.showMatches && self.owningPost"></won-matches>
+    <won-matches ng-if="self.showMatches && self.isOwnPost"></won-matches>
 
-    <div class="opc__inner empty" ng-if="self.owningPost && self.connectionType === self.won.Suggested && !self.hasMatches">
+    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Suggested && !self.hasMatches">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <img src="generated/icon-sprite.svg#ico36_match_grey" class="opc__empty__description__icon">
@@ -32,7 +32,7 @@
             </div>
         </div>
     </div>
-    <div class="opc__inner empty" ng-if="self.owningPost && self.connectionType === self.won.Connected && !self.hasConversations">
+    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Connected && !self.hasConversations">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <img src="generated/icon-sprite.svg#ico36_message_grey" class="opc__empty__description__icon">
@@ -44,7 +44,7 @@
             </a>
         </div>
     </div>
-    <div class="opc__inner empty" ng-if="self.owningPost && self.connectionType === self.won.RequestReceived && !self.hasReceivedRequests">
+    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestReceived && !self.hasReceivedRequests">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <img src="generated/icon-sprite.svg#ico36_incoming_grey" class="opc__empty__description__icon">
@@ -60,7 +60,7 @@
             </a>
         </div>
     </div>
-    <div class="opc__inner empty" ng-if="self.owningPost && self.connectionType === self.won.RequestSent && !self.hasSentRequests">
+    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestSent && !self.hasSentRequests">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <img src="generated/icon-sprite.svg#ico36_outgoing_grey" class="opc__empty__description__icon">
@@ -80,7 +80,7 @@
     <!-- left column for connection-typed tabs -->
     <won-connection-selection
             class="owner__messages"
-            ng-if="self.owningPost && self.showConnectionSelection && (
+            ng-if="self.isOwnPost && self.showConnectionSelection && (
                       (connectionTypeInParams === won.WON.Connected && self.hasConversations)
                    || (connectionTypeInParams === won.WON.RequestReceived && self.hasReceivedRequests)
                    || (connectionTypeInParams === won.WON.RequestSent && self.hasSentRequests)
@@ -96,8 +96,9 @@
     <!-- Conversations: -->
     <div
         class="post-messages"
+        ng-if="self.post && self.connectionOpen"
         ng-class="{'post-messages--connected': self.showConversationDetails}"
-        ng-show="self.showConversationDetails && self.owningPost">
+        ng-show="self.showConversationDetails && self.isOwnPost">
             <div class="post-messages__inner">
                 <won-post-messages></won-post-messages>
             </div>
@@ -106,14 +107,16 @@
     <!-- Incoming Requests: -->
     <div
         class="post-messages"
-        ng-show="self.showIncomingRequestDetails && self.owningPost">
+        ng-if="self.post && self.connectionOpen"
+        ng-show="self.showIncomingRequestDetails && self.isOwnPost">
             <won-open-request></won-open-request>
     </div>
 
     <!-- Sent Requests: -->
     <div
         class="post-messages"
-        ng-show="self.showSentRequestDetails && self.owningPost">
+        ng-if="self.post && self.connectionOpen"
+        ng-show="self.showSentRequestDetails && self.isOwnPost && self.connectionOpen">
             <won-open-request></won-open-request>
     </div>
     <!-- /right column -->

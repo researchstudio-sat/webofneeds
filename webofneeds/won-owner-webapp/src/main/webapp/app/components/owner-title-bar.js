@@ -2,13 +2,12 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-import { attach, mapToMatches, decodeUriComponentProperly } from '../utils';
+import { attach, decodeUriComponentProperly } from '../utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
 import {
-    selectUnreadEventsByNeedAndType,
-    selectAllByConnections,
     selectOpenPostUri,
+    selectAllMessagesByNeedUri,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 
@@ -125,34 +124,30 @@ function genComponentConf() {
             this.settingsOpen = false;
 
             const selectFromState = (state)=>{
-                const unreadCounts = selectUnreadEventsByNeedAndType(state);
-                const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", "allNeeds", postUri]);
+
+                const connections = post && post.get("connections");
+
+                const sentRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestSent);
+                const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
+                const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);
+                const messages = selectAllMessagesByNeedUri(state, postUri);
 
                 return {
                     selectedTab: decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType'])) || 'Info',
                     WON: won.WON,
                     postUri: postUri,
                     post: post,
-                    hasIncomingRequests: post.get('connections')
-                        .filter(conn => conn.get('state') === won.WON.RequestReceived)
-                        .size > 0,
-                    hasSentRequests: post.get('connections')
-                        .filter(conn => conn.get('state') === won.WON.RequestSent)
-                        .size > 0,
-                    hasMatches: post.get('connections')
-                        .filter(conn => conn.get('state') === won.WON.Suggested)
-                        .size > 0,
-                    hasMessages: post.get('connections')
-                        .filter(conn => conn.get('state') === won.WON.Connected)
-                        .size > 0,
-                    unreadMessages: unreadCounts.getIn([postUri, won.WONMSG.connectionMessage]),
-                    unreadIncomingRequests: unreadCounts.getIn([postUri, won.WONMSG.connectMessage]),
-                    unreadSentRequests: unreadCounts.getIn([postUri, won.WONMSG.connectSentMessage]),
-                    unreadMatches: unreadCounts.getIn([postUri, won.WONMSG.hintMessage]),
-                    isActive: post && post.get(['state']) === won.WON.ActiveCompacted,
+                    hasIncomingRequests: incomingRequests.size > 0,
+                    hasSentRequests: sentRequests.size > 0,
+                    hasMatches: matches.size > 0,
+                    hasMessages: messages.size > 0,
+                    unreadMessages: messages.filter(msg => msg.get('newMessage')).size,
+                    unreadIncomingRequests: incomingRequests.filter(conn => conn.get("newConnection")).size,
+                    unreadSentRequests: sentRequests.filter(conn => conn.get("newConnection")).size,
+                    unreadMatches:  matches.filter(conn => conn.get("newConnection")).size,
+                    isActive: post.get('state') === won.WON.ActiveCompacted,
                 };
             };
 
@@ -161,15 +156,15 @@ function genComponentConf() {
         }
 
         closePost() {
-            console.log("CLOSING THE POST: "+this.post.get("uri"));
+            console.log("CLOSING THE POST: "+this.postUri);
             this.settingsOpen = false;
-            this.needs__close(this.post.get("uri"));
+            this.needs__close(this.postUri);
         }
 
         reOpenPost() {
-            console.log("RE-OPENING THE POST: "+this.post.get("uri"));
+            console.log("RE-OPENING THE POST: "+this.postUri);
             this.settingsOpen = false;
-            this.needs__reopen(this.post.get("uri"));
+            this.needs__reopen(this.postUri);
         }
     }
     Controller.$inject = serviceDependencies;

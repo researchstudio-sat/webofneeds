@@ -12,7 +12,6 @@ import {
     attach,
 } from '../utils.js'
 import {
-    seeksOrIs,
     connect2Redux,
 } from '../won-utils'
 
@@ -21,10 +20,10 @@ function genComponentConf() {
     let template = `
         <div
           class="pc__text"
-          ng-show="self.needContent.getIn(['won:hasLocation', 's:name'])">
+          ng-show="self.need.getIn(['location', 's:name'])">
             <img class="pc__icon"
               src="generated/icon-sprite.svg#ico16_indicator_location"/>
-            <span>{{ self.needContent.getIn(['won:hasLocation', 's:name']) }}</span>
+            <span>{{ self.need.getIn(['location', 's:name']) }}</span>
         </div>
       <!--
       <div class="pc__images" ng-show="self.need.get('images')">
@@ -43,12 +42,12 @@ function genComponentConf() {
         </div>
         -->
         <div class="pc__text"
-          ng-show="!!self.needContent.get('dc:description')">
+          ng-show="!!self.need.get('description')">
           <img
             class="pc__icon"
             src="generated/icon-sprite.svg#ico16_indicator_description"/>
           <span>
-            {{ self.needContent.get('dc:description') }}
+            {{ self.need.get('description') }}
           </span>
         </div>
         <div class="pc__text"
@@ -67,13 +66,8 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pc4dbg = this;
             const selectFromState = (state) => {
-                const need =
-                    state.getIn(['needs', 'ownNeeds', this.needUri]) ||
-                    state.getIn(['needs', 'theirNeeds', this.needUri]);
-
                 return {
-                    need,
-                    needContent: need && seeksOrIs(need),
+                    need: state.getIn(['needs', 'allNeeds', this.needUri]),
                 }
             };
             /*
