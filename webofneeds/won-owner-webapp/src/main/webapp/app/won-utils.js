@@ -5,12 +5,8 @@
 import Immutable from 'immutable';
 import L from './leaflet-bundleable';
 import {
-    msStringToDate,
     arrEq,
 } from './utils';
-import {
-    selectEvents,
-} from './selectors';
 
 export function initLeaflet(mapMount) {
     if(!L) {
@@ -92,29 +88,6 @@ export function selectEventsOfConnection(state, connectionUri) {
     return Immutable.Map(eventUrisAndEvents);
 }
 
-
-export function connectionLastUpdatedAt(state, connection) {
-    if(!connection) return Immutable.List();
-    const events = selectEvents(state);
-    const eventUris = connection.get('hasEvents');
-    if(!eventUris) return Immutable.List();
-
-    const timestamp = (event) =>
-        //msStringToDate(selectTimestamp(event, connectionUri))
-        msStringToDate(selectTimestamp(event));
-
-    const timestamps = eventUris
-        .map(eventUri => events.get(eventUri))
-        .filter(event => event) // filter out events for which we have uris but no data.
-        .map(event => timestamp(event));
-
-    const latestTimestamp = timestamps.reduce((t1, t2) =>
-        t1 > t2 ? t1 : t2,
-        undefined // returned if there's no timestamps
-    ); // calculate maximum
-
-    return latestTimestamp;
-}
 
 /**
  * Makes sure the select-statement is reevaluated, should
