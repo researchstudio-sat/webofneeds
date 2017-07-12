@@ -6,9 +6,8 @@
 import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
 import openRequestModule from '../open-request';
-import { attach,mapToMatches } from '../../utils';
+import { attach } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
-import { selectAllByConnections } from '../../selectors';
 
 import connectionsOverviewModule from  '../connections-overview';
 
