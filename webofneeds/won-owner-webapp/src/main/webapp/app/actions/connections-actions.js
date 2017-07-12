@@ -8,8 +8,6 @@ import Immutable from 'immutable';
 
 import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
 
-import { getRandomPosInt } from '../utils';
-
 import {
     selectAllByConnections,
     selectOpenConnectionUri,
@@ -19,11 +17,9 @@ import {
 
 import {
     selectEventsOfConnection,
-    selectTimestamp,
 } from '../won-utils';
 
 import {
-    checkHttpStatus,
     is,
     urisToLookupMap,
     msStringToDate,
@@ -34,17 +30,14 @@ import {
 import {
     actionTypes,
     actionCreators,
-    getConnectionRelatedData,
 } from './actions';
 
 import {
-    buildCreateMessage,
     buildOpenMessage,
     buildCloseMessage,
     buildChatMessage,
     buildRateMessage,
     buildConnectMessage,
-    setCommStateFromResponseForLocalNeedMessage,
     getEventsFromMessage,
 } from '../won-message-utils';
 
