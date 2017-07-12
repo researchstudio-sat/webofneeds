@@ -12,11 +12,6 @@ import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
 import toastReducer from './toast-reducer';
 import connectionReducer from './connection-reducer';
-import {
-    selectAllConnections,
-    selectNeedByConnectionUri,
-    selectAllOwnNeeds
-} from '../selectors';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -83,7 +78,7 @@ const reducers = {
                 return config;
         }
     },
-}
+};
 
 
 export default reduceReducers( //passes on the state from one reducer to another
