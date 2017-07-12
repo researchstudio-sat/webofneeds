@@ -45,7 +45,7 @@ class Controller {
                 .size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
-            const actualConnectionType = state.getIn(['connections', connectionUri, 'hasConnectionState']);
+            const actualConnectionType = post && post.getIn(['connections', connectionUri, 'state']);
 
             const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
 

@@ -125,7 +125,7 @@ function genComponentConf() {
                     relativeCreationDate: need ?
                         relativeTime(state.get('lastUpdateTime'), need.get('creationDate')) :
                         "",
-                    hasConversations: converstations && conversations.size > 0,
+                    hasConversations: conversations && conversations.size > 0,
                     hasRequests: requests && requests.size > 0,
                     hasMatches: matches && matches.size > 0,
                     unreadConversationsCount: conversations && conversations.filter(conn => conn.get("newConnection")).size,
