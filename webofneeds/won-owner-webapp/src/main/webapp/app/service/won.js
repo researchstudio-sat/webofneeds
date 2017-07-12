@@ -42,8 +42,8 @@
     won.WON.Closed = won.WON.baseUri + "Closed";
     won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 
-    won.WON.Inactive = won.WON.baseUri + "Inactive"
-    won.WON.InactiveCompacted = won.WON.prefix + ":Inactive"
+    won.WON.Inactive = won.WON.baseUri + "Inactive";
+    won.WON.InactiveCompacted = won.WON.prefix + ":Inactive";
 
     won.WON.isInState = won.WON.baseUri+"isInState";
     won.WON.isInStateCompacted = won.WON.prefix+":isInState";
@@ -190,7 +190,7 @@
     won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
     won.WONMSG.hasMessageType = won.WONMSG.baseUri + ":hasMessageType";
     won.WONMSG.hasMessageTypeCompacted = won.WONMSG.prefix + ":hasMessageType";
-    won.WONMSG.hasTimestamp = won.WONMSG.baseUri + "hasTimestamp"
+    won.WONMSG.hasTimestamp = won.WONMSG.baseUri + "hasTimestamp";
     won.WONMSG.hasTimestampCompacted = won.WONMSG.prefix + ":hasTimestamp";
     won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
     won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
@@ -207,13 +207,13 @@
     won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
     won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
     won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
-    won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem"
+    won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem";
 
     //message types
     won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
     won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
     won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
-    won.WONMSG.activateNeedMessageCompacted = won.WONMSG.prefix + ":ActivateMessage"
+    won.WONMSG.activateNeedMessageCompacted = won.WONMSG.prefix + ":ActivateMessage";
     won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
     won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
     won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri +"DeactivateSentMessage";
@@ -259,10 +259,10 @@
     won.EVENT.CONNECT_SENT ="ConnectSentEvent";
     won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
     won.EVENT.OPEN_SENT = "OpenSentEvent";
-    won.EVENT.ACTIVATE_NEED_SENT = "ActivateNeedSentEvent"
-    won.EVENT.ACTIVATE_NEED_RECEIVED = "ActivateNeedReceivedEvent"
+    won.EVENT.ACTIVATE_NEED_SENT = "ActivateNeedSentEvent";
+    won.EVENT.ACTIVATE_NEED_RECEIVED = "ActivateNeedReceivedEvent";
     won.EVENT.CLOSE_NEED_SENT = "DeactivateSentEvent";
-    won.EVENT.CLOSE_NEED_RECEIVED = "Deactivate_Received_Event"
+    won.EVENT.CLOSE_NEED_RECEIVED = "Deactivate_Received_Event";
     won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
     won.EVENT.CLOSE_SENT = "CloseSentEvent";
     won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
