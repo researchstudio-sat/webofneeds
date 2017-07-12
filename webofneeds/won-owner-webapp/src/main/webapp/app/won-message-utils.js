@@ -67,54 +67,54 @@ messageService.sendMessage = function(msg) {
 */
 
 export function buildRateMessage(msgToRateFor, rating){
-    let deferred = Q.defer();
-    var buildMessage = function(envelopeData, eventToRateFor) {
-        //TODO: use event URI pattern specified by WoN node
-        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
-        var message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
-            .eventURI(eventUri)
-            .hasOwnerDirection()
-            .forEnvelopeData(envelopeData)
-            .hasSentTimestamp(new Date().getTime().toString())
-            .addRating(rating, msgToRateFor.connection.uri)
-            .build();
-        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
-        return {eventUri:eventUri,message:message};
-    };
+    return new Promise((resolve, reject) => {
+        var buildMessage = function(envelopeData, eventToRateFor) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+            var message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
+                .eventURI(eventUri)
+                .hasOwnerDirection()
+                .forEnvelopeData(envelopeData)
+                .hasSentTimestamp(new Date().getTime().toString())
+                .addRating(rating, msgToRateFor.connection.uri)
+                .build();
+            //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
+            return {eventUri:eventUri,message:message};
+        };
 
-    //fetch all data needed
-    won.getEnvelopeDataforConnection(msgToRateFor.connection.uri)
-        .then(function(envelopeData){
-            deferred.resolve(buildMessage(envelopeData, msgToRateFor.event));
-        },
-        won.reportError("cannot open connection " + msgToRateFor.connection.uri)
-    );
-    return deferred.promise;
+        //fetch all data needed
+        won.getEnvelopeDataforConnection(msgToRateFor.connection.uri)
+            .then(function(envelopeData){
+                resolve(buildMessage(envelopeData, msgToRateFor.event));
+            },
+            won.reportError("cannot open connection " + msgToRateFor.connection.uri)
+        );
+    });
 }
 
 export function buildCloseMessage(msgToConnectFor){
-    let deferred = Q.defer();
-    var buildMessage = function(envelopeData, eventToConnectFor) {
-        //TODO: use event URI pattern specified by WoN node
-        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
-        var message = new won.MessageBuilder(won.WONMSG.closeMessage)
-            .eventURI(eventUri)
-            .forEnvelopeData(envelopeData)
-            .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime().toString())
-            .build();
-        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
-        return {eventUri:eventUri,message:message};
-    }
+    return new Promise((resolve, reject) => {
+        var buildMessage = function (envelopeData, eventToConnectFor) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
+            var message = new won.MessageBuilder(won.WONMSG.closeMessage)
+                .eventURI(eventUri)
+                .forEnvelopeData(envelopeData)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime().toString())
+                .build();
+            //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
+            return {eventUri: eventUri, message: message};
+        }
 
-    //fetch all data needed
-    won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
-        .then(function(envelopeData){
-            deferred.resolve(buildMessage(envelopeData, msgToConnectFor.event));
-        },
-        won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
-    );
-    return deferred.promise;
+        //fetch all data needed
+        won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
+            .then(function (envelopeData) {
+                resolve(buildMessage(envelopeData, msgToConnectFor.event));
+            },
+            won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
+        );
+    });
 
 }
 export function buildCloseNeedMessage(needUri, wonNodeUri){
@@ -162,31 +162,31 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
 
 
 export function buildConnectMessage(msgToConnectFor, textMessage){
-    let deferred = Q.defer();
-    var buildMessage = function(envelopeData, eventToConnectFor) {
-        //TODO: use event URI pattern specified by WoN node
-        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
-        var message = new won.MessageBuilder(won.WONMSG.connectMessage)
-            .eventURI(eventUri)
-            .forEnvelopeData(envelopeData)
-            .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
-            .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
-            .hasTextMessage(textMessage)
-            .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime().toString())
-            .build();
-        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
-        return {eventUri:eventUri,message:message};
-    }
+    return new Promise((resolve, reject) => {
+        var buildMessage = function(envelopeData, eventToConnectFor) {
+            //TODO: use event URI pattern specified by WoN node
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+            var message = new won.MessageBuilder(won.WONMSG.connectMessage)
+                .eventURI(eventUri)
+                .forEnvelopeData(envelopeData)
+                .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+                .hasTextMessage(textMessage)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime().toString())
+                .build();
+            //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
+            return {eventUri:eventUri,message:message};
+        }
 
-    //fetch all data needed
-    won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
-        .then(function(envelopeData){
-            deferred.resolve(buildMessage(envelopeData, msgToConnectFor.event));
-        },
-        won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
-    );
-    return deferred.promise;
+        //fetch all data needed
+        won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
+            .then(function(envelopeData){
+                resolve(buildMessage(envelopeData, msgToConnectFor.event));
+            },
+            won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
+        );
+    })
 
 }
 

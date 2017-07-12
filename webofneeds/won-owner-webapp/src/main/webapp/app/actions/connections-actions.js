@@ -172,14 +172,17 @@ export function connectionsClose(connectionUri) {
         const eventData = selectAllByConnections(state).get(connectionUri).toJS();// TODO avoid toJS
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
-        let deferred = Q.defer();
-        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection};
-            buildCloseMessage(msgToOpenFor).then(messageData=> {
-                deferred.resolve(messageData);
-            })
+
+        const promise = new Promise((resolve, defer) => {
+            won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
+                let msgToOpenFor = {event: eventData, connection: connection};
+                buildCloseMessage(msgToOpenFor).then(messageData=> {
+                    resolve(messageData);
+                })
+            });
         });
-        deferred.promise.then((action)=> {
+
+        promise.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
             dispatch({
                 type: actionTypes.connections.close,
@@ -198,16 +201,19 @@ export function connectionsRate(connectionUri,rating) {
         const eventData = selectAllByConnections(state).get(connectionUri).toJS();// TODO avoid toJS
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
-        let deferred = Q.defer();
-        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
-            let msgToRateFor = {event: eventData, connection: connection};
-            buildRateMessage(msgToRateFor, rating).then(messageData=> {
-                deferred.resolve(messageData);
-            })
-        });
-        deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
-        })
+
+        won.getConnectionWithEventUris(eventData.connection.uri)
+            .then(connection=> {
+                let msgToRateFor = {event: eventData, connection: connection};
+                return buildRateMessage(msgToRateFor, rating)
+            }).then(action =>
+                dispatch(
+                    actionCreators.messages__send({
+                        eventUri: action.eventUri,
+                        message: action.message
+                    })
+                )
+            );
     }
 }
 

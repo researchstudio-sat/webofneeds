@@ -17,7 +17,7 @@ import {
 import postHeaderModule from './post-header';
 import postContentModule from './post-content';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
+const serviceDependencies = ['$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div class="mgi__description clickable"

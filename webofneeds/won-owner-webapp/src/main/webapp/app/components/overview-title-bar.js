@@ -14,7 +14,7 @@ import {
 import won from '../won-es6';
 
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">

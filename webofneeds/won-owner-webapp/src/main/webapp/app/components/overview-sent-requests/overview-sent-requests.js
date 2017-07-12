@@ -13,7 +13,7 @@ import { selectAllByConnections } from '../../selectors';
 import connectionsOverviewModule from  '../connections-overview';
 
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 class SentRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);

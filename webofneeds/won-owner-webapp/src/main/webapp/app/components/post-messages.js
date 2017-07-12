@@ -120,7 +120,7 @@ function genComponentConf() {
 
             const self = this;
 
-            this.scrollContainerNg().bind('scroll', e => this.onScroll(e));
+            this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
 
             //this.postmsg = this;
             const selectFromState = state => {
@@ -230,13 +230,13 @@ function genComponentConf() {
             this._programmaticallyScrolling = false
         }
         scrollContainerNg() {
-            if(!this._scrollContainer) {
-                this._scrollContainer = this.$element.find('.pm__content');
-            }
-            return this._scrollContainer;
+            return angular.element(this.scrollContainer());
         }
         scrollContainer() {
-            return this.scrollContainerNg()[0];
+            if(!this._scrollContainer) {
+                this._scrollContainer = this.$element[0].querySelector('.pm__content');
+            }
+            return this._scrollContainer;
         }
 
         input(userInput) {

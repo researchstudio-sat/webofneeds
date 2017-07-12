@@ -8,7 +8,7 @@ import { actionCreators }  from '../actions/actions';
 
 import { selectUnreadEvents } from '../selectors';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
             <div class="ril clickable" ng-click="self.toggleRequest()">

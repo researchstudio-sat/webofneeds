@@ -11,7 +11,7 @@ import {
     selectOwnNeeds,
 } from '../../selectors';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 class FeedController {
     constructor() {
         attach(this, serviceDependencies, arguments);

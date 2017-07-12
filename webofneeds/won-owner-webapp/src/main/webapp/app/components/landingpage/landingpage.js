@@ -13,7 +13,7 @@ import {
 } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
 const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
     {imageSrc: 'generated/icon-sprite.svg#ico36_match', text: 'Get matches', detail: 'Based on the' +
