@@ -5,25 +5,17 @@
 
 import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData } from './actions';
-import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
 import Immutable from 'immutable';
 
 import {
-    checkHttpStatus,
-    contains,
     clone,
     jsonld2simpleFormat,
     getIn,
 } from '../utils';
 
 import {
-    buildCreateMessage,
-    buildOpenMessage,
-    buildCloseMessage,
-    buildRateMessage,
-    buildConnectMessage,
-    isSuccessMessage,
     fetchDataForOwnedNeeds
 } from '../won-message-utils';
 
