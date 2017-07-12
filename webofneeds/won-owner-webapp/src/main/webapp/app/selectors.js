@@ -207,10 +207,10 @@ export const selectAllByConnections = createSelector(
 );
 const allByConnection = (connection) => (state) => {
     const ownNeedUri = connection.get('belongsToNeed');
-    const ownNeed = state.getIn(['needs', 'ownNeeds', ownNeedUri]);
+    const ownNeed = state.getIn(['needs', 'allNeeds', ownNeedUri]);
 
     const remoteNeedUri = connection.get('hasRemoteNeed');
-    const remoteNeed = state.getIn(['needs', 'theirNeeds', remoteNeedUri]);
+    const remoteNeed = state.getIn(['needs', 'allNeeds', remoteNeedUri]);
 
     const events = connection
         .get('hasEvents')
