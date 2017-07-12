@@ -7,7 +7,6 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, } from '../won-label-utils';
 import {
-    selectUnreadCountsByNeedAndType,
     selectAllOwnNeeds,
 } from '../selectors';
 
@@ -47,13 +46,13 @@ function genComponentConf() {
                     ng-show="self.hasConversations"
                     ui-sref="post({postUri: self.needUri, connectionType: self.WON.Connected})">
                         <img src="generated/icon-sprite.svg#ico36_message_light"
-                             ng-show="!self.unreadConversationsCount()"
+                             ng-show="!self.unreadConversationsCount"
                              class="pil__indicators__item__icon">
                         <img src="generated/icon-sprite.svg#ico36_message"
-                             ng-show="self.unreadConversationsCount()"
+                             ng-show="self.unreadConversationsCount"
                              class="pil__indicators__item__icon">
                         <span class="pil__indicators__item__caption">
-                            {{ self.unreadConversationsCount() }}
+                            {{ self.unreadConversationsCount }}
                         </span>
                 </a>
                 <div class="pil__indicators__item" ng-show="!self.hasConversations">
@@ -66,13 +65,13 @@ function genComponentConf() {
                     ng-show="self.hasRequests"
                     ui-sref="post({postUri: self.needUri, connectionType: self.WON.RequestReceived})">
                         <img src="generated/icon-sprite.svg#ico36_incoming_light"
-                                 ng-show="!self.unreadRequestsCount()"
+                                 ng-show="!self.unreadRequestsCount"
                                  class="pil__indicators__item__icon">
                         <img src="generated/icon-sprite.svg#ico36_incoming"
-                             ng-show="self.unreadRequestsCount()"
+                             ng-show="self.unreadRequestsCount"
                              class="pil__indicators__item__icon">
                         <span class="pil__indicators__item__caption">
-                            {{ self.unreadRequestsCount() }}
+                            {{ self.unreadRequestsCount }}
                         </span>
                 </a>
                 <div class="pil__indicators__item" ng-show="!self.hasRequests">
@@ -85,13 +84,13 @@ function genComponentConf() {
                     ng-show="self.hasMatches"
                     ui-sref="post({postUri: self.needUri, connectionType: self.WON.Suggested})">
                         <img src="generated/icon-sprite.svg#ico36_match_light"
-                             ng-show="!self.unreadMatchesCount()"
+                             ng-show="!self.unreadMatchesCount"
                              class="pil__indicators__item__icon">
                         <img src="generated/icon-sprite.svg#ico36_match"
-                             ng-show="self.unreadMatchesCount()"
+                             ng-show="self.unreadMatchesCount"
                              class="pil__indicators__item__icon">
                         <span class="pil__indicators__item__caption">
-                            {{ self.unreadMatchesCount() }}
+                            {{ self.unreadMatchesCount }}
                         </span>
                 </a>
                 <div class="pil__indicators__item" ng-show="!self.hasMatches">
@@ -109,19 +108,16 @@ function genComponentConf() {
 
             window.pil4dbg = this; //TODO deletme
             this.labels = labels;
-            //this.EVENT = won.EVENT;
-
             const self = this;
 
             const selectFromState = (state) => {
-
                 const ownNeeds = selectAllOwnNeeds(state);
                 const need = ownNeeds && ownNeeds.get(self.needUri);
-
                 const allConnectionsByNeedUri = need.get("connections");
 
-                const unreadCounts = selectUnreadCountsByNeedAndType(state).get(self.needUri);
-
+                const conversations = allConnectionsByNeedUri.filter(conn =>conn.get("state") === won.WON.Connected);
+                const requests = allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.RequestReceived);
+                const matches = allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
 
                 return {
                     need,
@@ -129,20 +125,14 @@ function genComponentConf() {
                     relativeCreationDate: need ?
                         relativeTime(state.get('lastUpdateTime'), need.get('creationDate')) :
                         "",
-                    hasConversations: allConnectionsByNeedUri
-                        .filter(conn =>
-                            conn.get("state") === won.WON.Connected
-                        ).size > 0,
-                    hasRequests: allConnectionsByNeedUri
-                        .filter(conn =>
-                            conn.get("state") === won.WON.RequestReceived
-                        ).size > 0,
-                    hasMatches: allConnectionsByNeedUri.filter(conn =>
-                            conn.get("state") === won.WON.Suggested
-                        ).size > 0,
+                    hasConversations: converstations && conversations.size > 0,
+                    hasRequests: requests && requests.size > 0,
+                    hasMatches: matches && matches.size > 0,
+                    unreadConversationsCount: conversations && conversations.filter(conn => conn.get("newConnection")).size,
+                    unreadRequestsCount: requests && requests.filter(conn => conn.get("newConnection")).size,
+                    unreadMatchesCount: matches && matches.filter(conn => conn.get("newConnection")).size,
                     WON: won.WON,
                     debugmode: won.debugmode,
-                    unreadCounts,
                 };
             };
 
@@ -153,22 +143,6 @@ function genComponentConf() {
         isActive() {
             return this.ownNeed && this.ownNeed.get("state") === won.WON.ActiveCompacted;
         }
-
-        unreadXCount(type) {
-            return !this.unreadCounts?
-                undefined : //ensure existence of count object
-                this.unreadCounts.get(type)
-        }
-        unreadMatchesCount() {
-            return this.unreadXCount(won.WONMSG.hintMessage);
-        }
-        unreadRequestsCount() {
-            return this.unreadXCount(won.WONMSG.connectMessage);
-        }
-        unreadConversationsCount() {
-            return this.unreadXCount(won.WONMSG.connectionMessage);
-        }
-
     }
     Controller.$inject = serviceDependencies;
 
