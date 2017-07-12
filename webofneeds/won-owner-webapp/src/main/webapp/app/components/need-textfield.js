@@ -48,7 +48,8 @@ function genComponentConf() {
             titleParagraphNg.addClass("medium_title");
 
             let description;
-            if(paragraphsDom && paragraphsDom.size > 1){
+            if(paragraphsNg && paragraphsNg.length > 1){
+
                 const descriptionParagraphs = paragraphsNg.slice(1);
                 description = descriptionParagraphs.map(p =>
                         p.text()
