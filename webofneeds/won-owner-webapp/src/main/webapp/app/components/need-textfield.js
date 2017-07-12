@@ -48,7 +48,7 @@ function genComponentConf() {
             titleParagraphNg.addClass("medium_title");
 
             let description;
-            if(paragraphsDom && paragraphsDom.length > 1){
+            if(paragraphsDom && paragraphsDom.size > 1){
                 const descriptionParagraphs = paragraphsNg.slice(1);
                 description = descriptionParagraphs.map(p =>
                         p.text()
@@ -86,7 +86,7 @@ function genComponentConf() {
             let tags = titleTags.merge(descriptionTags).map(tag => tag.substr(1));
 
 
-            tags = tags && tags.size > 0? tags : undefined;
+            tags = tags && tags.size > 0? tags.toJS() : undefined;
 
             const draft = {title, description, tags};
             this.$scope.$apply(() => this.onDraftChange({draft}));
