@@ -8,7 +8,6 @@ import won from '../won-es6';
 import { msStringToDate } from '../utils';
 
 const initialState = Immutable.fromJS({
-    allNeeds: {},
 });
 
 export default function(state = initialState, action = {}) {
@@ -145,7 +144,7 @@ function addNeed(needs, jsonldNeed, ownNeed) {
     let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
     if(parsedNeed && parsedNeed.get("uri")) {
-        newState = setIfNew(newState, ["allNeeds", parsedNeed.get("uri")], parsedNeed);
+        newState = setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
     } else {
         console.error('Tried to add invalid need-object: ', jsonldNeedImm);
         newState = needs;
@@ -349,12 +348,12 @@ function addConnectionFull(state, connection, newConnection) {
 
     if(parsedConnection){
         const needUri = parsedConnection.get("belongsToUri");
-        let connections = state.getIn(['allNeeds', needUri, 'connections']);
+        let connections = state.getIn([needUri, 'connections']);
 
         if(connections){
             connections = connections.set(parsedConnection.getIn(["data", "uri"]), parsedConnection.get("data"));
 
-            return state.setIn(["allNeeds", needUri, "connections"], connections);
+            return state.setIn([needUri, "connections"], connections);
         }else{
             console.error("Couldnt add valid connection - missing need data in state", needUri);
         }
@@ -369,10 +368,10 @@ function addMessage(state, message, outgoingMessage, newMessage) {
         const connectionUri = parsedMessage.get("belongsToUri");
         let need = getNeedForConnectionUri(state, connectionUri);
         if(need){
-            let messages = state.getIn(['allNeeds', need.get("uri"), "connections", connectionUri, "messages"]);
+            let messages = state.getIn([need.get("uri"), "connections", connectionUri, "messages"]);
             messages = messages.set(parsedMessage.getIn(["data", "uri"]), parsedMessage.get("data"));
 
-            return state.setIn(["allNeeds", need.get("uri"), "connections", connectionUri, "messages"], messages);
+            return state.setIn([need.get("uri"), "connections", connectionUri, "messages"], messages);
         }
     }
     return state;
@@ -400,7 +399,7 @@ function addMessages(state, messages) {
 
 
 function setIfNew(state, path, obj){
-    return state.updateIn(path, val => val ?
+    return state.update(path, val => val ?
         //we've seen this need before, no need to overwrite it
         val :
         //it's the first time we see this need -> add it
@@ -418,16 +417,15 @@ function changeConnectionState(state, connectionUri, newState) {
     const needUri = need.get("uri");
 
     return state
-            .setIn(["allNeeds", needUri, "connections", connectionUri, "state"], newState)
-            .setIn(["allNeeds", needUri, "connections", connectionUri, "newConnection"], true);
+            .setIn([needUri, "connections", connectionUri, "state"], newState)
+            .setIn([needUri, "connections", connectionUri, "newConnection"], true);
 }
 
 function changeNeedState(state, needUri, newState) {
     return state
-        .setIn(["allNeeds", needUri, "state", newState]);
+        .setIn([needUri, "state", newState]);
 }
 
 function getNeedForConnectionUri(state, connectionUri){
-    let needs = state.get("allNeeds");
-    return needs.filter(need => need.get("connections").has(connectionUri)).first();
+    return state.filter(need => need.get("connections").has(connectionUri)).first();
 }

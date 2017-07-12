@@ -115,7 +115,7 @@ function genComponentConf() {
 
                 const eventUris = connection.get('hasEvents');
                 const eventsLoaded = eventUris && eventUris.size > 0;
-                const theirNeed = state.getIn(["needs", "allNeeds", connection.get('remoteNeedUri')]);
+                const theirNeed = state.getIn(["needs", connection.get('remoteNeedUri')]);
 
                 return {
                     ownNeed,

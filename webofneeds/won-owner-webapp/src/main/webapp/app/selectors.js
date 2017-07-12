@@ -19,7 +19,7 @@ export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
 
-export const selectAllNeeds = state => state.getIn(["needs", "allNeeds"]);
+export const selectAllNeeds = state => state.get("needs");
 export const selectAllOwnNeeds = state => selectAllNeeds(state).filter(need =>
     need.get("ownNeed")
 );
@@ -63,7 +63,7 @@ export function selectAllMessages(state) {
 }
 
 export function selectAllMessagesByNeedUri(state, needUri) {
-    const connections = state.getIn(["needs", "allNeeds", needUri, "connections"]);
+    const connections = state.getIn(["needs", needUri, "connections"]);
     let messages = Immutable.Map();
 
     if(connections){
@@ -207,10 +207,10 @@ export const selectAllByConnections = createSelector(
 );
 const allByConnection = (connection) => (state) => {
     const ownNeedUri = connection.get('belongsToNeed');
-    const ownNeed = state.getIn(['needs', 'allNeeds', ownNeedUri]);
+    const ownNeed = state.getIn(['needs', ownNeedUri]);
 
     const remoteNeedUri = connection.get('hasRemoteNeed');
-    const remoteNeed = state.getIn(['needs', 'allNeeds', remoteNeedUri]);
+    const remoteNeed = state.getIn(['needs', remoteNeedUri]);
 
     const events = connection
         .get('hasEvents')

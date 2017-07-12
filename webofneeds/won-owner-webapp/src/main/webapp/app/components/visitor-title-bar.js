@@ -55,7 +55,7 @@ function genComponentConf() {
             window.vtb4dbg = this;
             const selectFromState = state => {
                 const postUri = selectOpenPostUri(state);
-                const theirPost = state.getIn(["needs", "allNeeds", postUri]);
+                const theirPost = state.getIn(["needs", postUri]);
                 return {
                     theirPost,
                     labels,

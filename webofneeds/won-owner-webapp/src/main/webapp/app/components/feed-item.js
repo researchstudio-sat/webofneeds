@@ -108,7 +108,7 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const lastUpdated = selectLastUpdateTime(state);
 
-                const ownNeed = state.getIn(["needs", "allNeeds", self.needUri]);
+                const ownNeed = state.getIn(["needs", self.needUri]);
                 const connections = ownNeed.get("connections");
 
                 const unreadMatchesCount = connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.Suggested).size;

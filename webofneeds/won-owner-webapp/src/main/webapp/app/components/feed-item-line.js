@@ -62,7 +62,7 @@ function genComponentConf() {
             const self = this;
             const selectFromState = (state) => {
                 const lastUpdated = selectLastUpdateTime(state);
-                const connection = state.getIn(["needs", "allNeeds", this.needUri, "connections", this.connectionUri]);
+                const connection = state.getIn(["needs", this.needUri, "connections", this.connectionUri]);
                 const remoteNeedUri = connection && connection.get('remoteNeedUri');
                 const remoteNeed = remoteNeedUri && selectAllTheirNeeds(state).get(remoteNeedUri);
 

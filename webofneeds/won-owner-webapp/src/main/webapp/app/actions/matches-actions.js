@@ -10,7 +10,7 @@ export function matchesLoad(data) {
         const state = getState();
         for (let needUri in data) {
             won.getConnectionInStateForNeedWithRemoteNeed(needUri, "won:Suggested").then(function (results) {
-                let needData = state.getIn(['needs', 'allNeeds', needUri]).toJS();
+                let needData = state.getIn(['needs', needUri]).toJS();
                 let data = {ownNeed: needData, connections: results};
                 //TODO only one action should be dispatched for every interaction! (reducers should be able to handle arrays)
                 results.forEach(function (entry) {

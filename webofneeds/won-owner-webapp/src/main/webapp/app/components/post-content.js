@@ -67,7 +67,7 @@ function genComponentConf() {
             window.pc4dbg = this;
             const selectFromState = (state) => {
                 return {
-                    need: state.getIn(['needs', 'allNeeds', this.needUri]),
+                    need: state.getIn(['needs', this.needUri]),
                 }
             };
             /*

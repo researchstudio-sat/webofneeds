@@ -110,14 +110,14 @@ class Controller {
             if(isOverview) { //overview
                 matches = selectAllConnections(state).filter(conn => conn.get("state") === won.WON.Suggested);
             } else { // post-owner view
-                matches = state.getIn(["needs", "allNeeds", postUri, "connections"]).filter(conn => conn.get("state") === won.WON.Suggested);
+                matches = state.getIn(["needs", postUri, "connections"]).filter(conn => conn.get("state") === won.WON.Suggested);
             }
 
             return {
                 isOverview,
                 layout,
                 //LAYOUT,
-                connection: state.getIn(["needs", "allNeeds", postUri, 'connections', connectionUri]),
+                connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
                 matchesArray: matches.toArray(),
                 hasMatches: matches.size > 0,
             };

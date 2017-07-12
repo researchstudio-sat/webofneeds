@@ -62,7 +62,7 @@ function genComponentConf() {
             window.ph4dbg = this;
             this.labels = labels;
             const selectFromState = (state) => {
-                const need = state.getIn(['needs', 'allNeeds', this.needUri]);
+                const need = state.getIn(['needs', this.needUri]);
 
                 return {
                     need,

@@ -153,7 +153,7 @@ window.ImmutableFoo = Immutable;
 //TODO: DELETE CONNECTIONS BETWEEN OWNED
 function deleteConnectionsBetweenOwnNeeds(state) {
     //TODO: REMOVE CONNECTION
-    //remove all connections (['needs','allNeeds', needUri, 'connections', connectionUri, 'remoteNeedUri']) that have a remoteNeedId that is also an ownNeed (['needs','allNeeds', needUri, 'ownNeed'] == true)
+    //remove all connections (['needs', needUri, 'connections', connectionUri, 'remoteNeedUri']) that have a remoteNeedId that is also an ownNeed (['needs', needUri, 'ownNeed'] == true)
 
     return state;
 }

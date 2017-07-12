@@ -43,7 +43,7 @@ function loadingWhileSignedOut(dispatch, getState) {
     const state = getState();
     const postUri = selectOpenPostUri(state);
     let dataPromise;
-    if(postUri && !state.getIn(["needs", "allNeeds", postUri])) { //got an uri but no post loaded yet
+    if(postUri && !state.getIn(["needs", postUri])) { //got an uri but no post loaded yet
         dataPromise = fetchDataForNonOwnedNeedOnly(postUri);
     } else {
         dataPromise = Promise.resolve(Immutable.Map());

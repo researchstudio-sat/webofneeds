@@ -29,7 +29,7 @@ class Controller {
 
         const selectFromState = (state)=>{
             const postUri = selectOpenPostUri(state);
-            const post = state.getIn(["needs", "allNeeds", postUri]);
+            const post = state.getIn(["needs", postUri]);
 
             const hasReceivedRequests = post && post.get('connections')
                 .filter(conn => conn.get('state') === won.WON.RequestReceived)

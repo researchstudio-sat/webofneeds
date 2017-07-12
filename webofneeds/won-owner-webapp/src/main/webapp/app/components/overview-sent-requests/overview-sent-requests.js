@@ -31,7 +31,7 @@ class SentRequestsController {
                 };
             }else{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
-                const post = state.getIn(["needs", "allNeeds", postId]);
+                const post = state.getIn(["needs", postId]);
 
                 return {
                     WON: won.WON,

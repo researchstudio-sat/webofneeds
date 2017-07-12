@@ -116,7 +116,7 @@ function genComponentConf() {
 
             const selectFromState = (state) => {
                 const postUri = selectOpenPostUri(state);
-                const post = state.getIn(["needs", "allNeeds", postUri]);
+                const post = state.getIn(["needs", postUri]);
                 const location = post && post.get('location');
                 return {
                     post,
