@@ -41,25 +41,14 @@ import  won from '../won-es6';
 
 import {
     tree2constants,
-    deepFreeze,
-    reduceAndMapTreeKeys,
-    flattenTree,
-    delay,
-    checkHttpStatus,
-    watchImmutableRdxState,
     entries,
 } from '../utils';
 import { hierarchy2Creators } from './action-utils';
-import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
     buildCloseNeedMessage,
     buildOpenNeedMessage
 } from '../won-message-utils';
-
-import {
-    selectConnectionUris,
-} from '../won-utils';
 
 // </utils>
 
@@ -321,9 +310,7 @@ export function needsOpen(needUri) {
                     type: actionTypes.needs.reopen,
                     payload: {
                         ownNeedUri: needUri,
-                        affectedConnections: selectConnectionUris(
-                                getState().getIn(['needs', 'ownNeeds', needUri])
-                            )
+                        affectedConnections: getState().getIn(['needs', 'allNeeds', needUri], 'connections').map(conn => conn.get("uri")),
                     }
                 })
         )
@@ -349,9 +336,7 @@ export function needsClose(needUri) {
                 type: actionTypes.needs.close,
                 payload: {
                     ownNeedUri: needUri,
-                    affectedConnections: selectConnectionUris(
-                        getState().getIn(['needs', 'ownNeeds', needUri])
-                    )
+                    affectedConnections: getState().getIn(['needs', 'allNeeds', needUri], 'connections').map(conn => conn.get("uri")),
                 }
             })
         )
