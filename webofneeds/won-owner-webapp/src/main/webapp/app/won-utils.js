@@ -72,12 +72,6 @@ export function selectTimestamp(event, ownNeedUri) {
     return event.get('hasReceivedTimestamp') || event.get('hasSentTimestamp');
 };
 
-export function selectConnectionUris(need) {
-    return need
-        .getIn(['won:hasConnections', 'rdfs:member'])
-        .map(c => c.get('@id'));
-}
-
 export function selectEventsOfConnection(state, connectionUri) {
     const eventUris = state.getIn(['connections', connectionUri, 'hasEvents']);
     const eventUrisAndEvents = eventUris &&

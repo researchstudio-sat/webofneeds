@@ -11,14 +11,8 @@ import {
 } from './selectors';
 
 import {
-    fetchDataForNonOwnedNeedOnly,
-} from './won-message-utils';
-
-import {
-    delay,
     decodeUriComponentProperly,
     checkHttpStatus,
-    getRandomPosInt,
 } from './utils';
 
 
