@@ -8,8 +8,6 @@ import won from '../won-es6';
 import { msStringToDate } from '../utils';
 
 const initialState = Immutable.fromJS({
-    ownNeeds: {},
-    theirNeeds: {},
     allNeeds: {},
 });
 
@@ -68,8 +66,7 @@ export default function(state = initialState, action = {}) {
         case actionTypes.messages.connectMessageReceived:
             const {ownNeedUri, remoteNeed, updatedConnection, connection } = action.payload;
             const stateWithBothNeeds = addNeed(state, remoteNeed, false); // guarantee that remoteNeed is in state
-            const stateWithBothNeedsAndConnection = addConnection(stateWithBothNeeds, ownNeedUri, updatedConnection);
-            return addConnectionFull(stateWithBothNeedsAndConnection, connection, true);
+            return addConnectionFull(stateWithBothNeeds, connection, true);
 
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(state, action.payload);
@@ -137,20 +134,17 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     const stateWithOwnNeed = addNeed(state, ownNeed, true); // guarantee that ownNeed is in state
     const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
-    const stateWithConnection = addConnection(stateWithBothNeeds, ownNeed["@id"], connection.uri);
 
-    return addConnectionFull(stateWithConnection, connection, false);
+    return addConnectionFull(stateWithBothNeeds, connection, false);
 }
 
 function addNeed(needs, jsonldNeed, ownNeed) {
     const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
-    const mapName = ownNeed? "ownNeeds" : "theirNeeds";
 
     let newState;
     let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
     if(parsedNeed && parsedNeed.get("uri")) {
-        newState = setIfNew(needs, [mapName, parsedNeed.get("uri")], jsonldNeedImm);
         newState = setIfNew(newState, ["allNeeds", parsedNeed.get("uri")], parsedNeed);
     } else {
         console.error('Tried to add invalid need-object: ', jsonldNeedImm);
@@ -344,38 +338,6 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
 }
 
 /**
- * Add's the connectionUri to the needs connections. Makes
- * sure the same uri doesn't get added twice.
- * NOTE: As this function goes through all previous connections
- * to make sure that there are no duplicates, avoid using it
- * when adding a bunch of connections at once.
- * @param state
- * @param needUri
- * @param connectionUri
- * @return {*}
- */
-function addConnection(state, needUri, connectionUri) {
-    const pathToConnections = ['ownNeeds', needUri, 'won:hasConnections', 'rdfs:member'];
-
-    if(!state.getIn(pathToConnections)) {
-        state = state.setIn(pathToConnections, Immutable.List());
-    }
-
-    const connections = state.getIn(pathToConnections);
-    if( connections.filter(c => c && c.get('@id') === connectionUri).size == 0) {
-        // new connection, add it to the need
-        state = state.updateIn(
-            pathToConnections,
-            connections => connections.push(
-                Immutable.fromJS({ '@id': connectionUri })
-            )
-        );
-    }
-
-    return state;
-}
-
-/**
  * Add's the connection to the needs connections.
  * @param state
  * @param connection
@@ -462,8 +424,7 @@ function changeConnectionState(state, connectionUri, newState) {
 
 function changeNeedState(state, needUri, newState) {
     return state
-        .setIn(["ownNeeds", action.payload.ownNeedUri, 'won:isInState'], newState)
-        .setIn(["allNeeds", action.payload.ownNeedUri, "state", newState]);
+        .setIn(["allNeeds", needUri, "state", newState]);
 }
 
 function getNeedForConnectionUri(state, connectionUri){
