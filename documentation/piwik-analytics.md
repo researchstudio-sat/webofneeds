@@ -1,12 +1,14 @@
 
-This is a ...
+This documents provides the basic information on our Piwik/WoN implementation. 
 
+In general, we use event tracking feature of Piwik for our analytics. 
 
-Event documentation:
+You can find the event documentation of Piwik here:
 https://piwik.org/docs/event-tracking/
 
-An example JavaScript Tracking Code:
+As it is described in the documentation of Piwik a JavaScript Tracking Code has to be added to every page that uses Piwik. Since Won consists of only one page, this has only used once.
 
+An example JavaScript Tracking Code:
 ```HTML
 <!-- Piwik -->
 <script type="text/javascript">
@@ -25,7 +27,7 @@ An example JavaScript Tracking Code:
 <!-- End Piwik Code -->
 ```
 
-Some examples:
+Here are some examples of event tracking by Piwik:
 
 ```HTML
 <a href="http://localhost/test1/" onclick="javascript:_paq.push(['trackEvent', 'Menu', 'Freedom']);">Freedom page</a>

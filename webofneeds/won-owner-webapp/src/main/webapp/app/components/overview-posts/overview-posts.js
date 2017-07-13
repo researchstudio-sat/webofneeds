@@ -16,7 +16,7 @@ const ZERO_UNSEEN = Object.freeze({
     conversations: 0,
 });
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 class OverviewPostsController {
 
     constructor() {

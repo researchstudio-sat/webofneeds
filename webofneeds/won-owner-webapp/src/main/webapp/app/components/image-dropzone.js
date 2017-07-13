@@ -33,7 +33,7 @@ function genComponentConf() {
 
             this.imageDataUrl = undefined;
 
-            this.$element.find('input[type="file"]').bind('change', (e) =>
+            this.$element[0].querySelector('input[type="file"]').addEventListener('change', (e) =>
                 this.fileDropped(e.target.files[0])
             );
         }

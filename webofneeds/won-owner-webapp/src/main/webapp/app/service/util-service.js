@@ -18,7 +18,7 @@
  * Created by LEIH-NB on 27.08.2014.
  */
 
-angular.module('won.owner').factory('utilService', function ($http, $q) {
+angular.module('won.owner').factory('utilService', function ($http) {
     var utilService = {};
     utilService.removeAllProperties = function (obj){
         Object.keys(obj).forEach(function(element,index,array){
@@ -41,20 +41,12 @@ angular.module('won.owner').factory('utilService', function ($http, $q) {
     }
 
     utilService.readAsDataURL  = function(file) {
-        var deferred = $q.defer();
-
-        var reader = new FileReader();
-
-        reader.onload = function() {
-            deferred.resolve(reader.result);
-        };
-        reader.onerror = function() {
-            deferred.reject(f);
-        };
-
-        reader.readAsDataURL(file);
-
-        return deferred.promise;
+        return new Promise((resolve, reject) => {
+            var reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(f);
+            reader.readAsDataURL(file);
+        });
     };
 
     utilService.concatTags = function(tags) {

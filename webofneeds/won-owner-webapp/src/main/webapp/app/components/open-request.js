@@ -20,7 +20,7 @@ import {
 import postContentModule from './post-content';
 import postHeaderModule from './post-header';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <div class="or__header">

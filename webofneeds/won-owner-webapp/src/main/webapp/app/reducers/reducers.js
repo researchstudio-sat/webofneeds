@@ -148,7 +148,7 @@ export default reduceReducers( //passes on the state from one reducer to another
     //-------------------- </cross-cutting-reducer> -------------------
 )
 
-window.ImmutableFoo = Immutable;
+window.Immutable4dbg = Immutable;
 
 //TODO: DELETE CONNECTIONS BETWEEN OWNED
 function deleteConnectionsBetweenOwnNeeds(state) {

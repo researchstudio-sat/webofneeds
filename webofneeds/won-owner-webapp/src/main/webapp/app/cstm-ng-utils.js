@@ -1,6 +1,10 @@
 /**
+ *
  * Created by ksinger on 02.09.2015.
  */
+
+import angular from 'angular';
+
 /**
  * Expects an object with a $scope and/or $element variable (e.g. a controller
  * with those two bound two it) and publishes an event to both of these, yielding
@@ -48,12 +52,12 @@ export class DomCache {
     }
 
     ng(selector){
-        if(!this._elementsNg[selector]) {
-            this._elementsNg[selector] = this.$element.find(selector);
-        }
-        return this._elementsNg[selector];
+        return angular.element(this.dom(selector));
     }
     dom(selector) {
-        return this.ng(selector)[0];
+        if(!this._elementsNg[selector]) {
+            this._elementsNg[selector] = this.$element[0].querySelector(selector);
+        }
+        return this._elementsNg[selector];
     }
 }

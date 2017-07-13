@@ -19,8 +19,8 @@
             <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
         </div>
 
-        <hr ng-show="self.draft.tags"/>
-        <div class="cp__tags" ng-show="self.draft.tags">
+        <hr ng-show="self.draft.tags && self.draft.tags.length > 0"/>
+        <div class="cp__tags" ng-show="self.draft.tags && self.draft.tags.length > 0">
             <div class="cp__header tags">Tags</div>
             <span class="cp__tags__tag" ng-repeat="tag in self.draft.tags">{{tag}}</span>
         </div>

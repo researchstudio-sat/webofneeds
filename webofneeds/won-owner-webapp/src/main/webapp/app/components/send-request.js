@@ -8,7 +8,7 @@ import { selectNeedByConnectionUri } from '../selectors';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `

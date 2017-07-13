@@ -6,6 +6,7 @@ import angular from 'angular';
 import {
     attach,
     delay,
+    dispatchEvent,
 } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
@@ -58,7 +59,7 @@ function genLoginConf() {
                         </a>
                     </div>`;
 
-    const serviceDependencies = ['$q', '$ngRedux', '$scope', '$element' /*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$element' /*'$routeParams' /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
@@ -93,10 +94,10 @@ function genLoginConf() {
          * so we do this here manually to make sure the ng-model updates itself.
          */
         autofillHack() {
-            const triggerInputEvents = () => {
-                this.$element.find('#loginEmail').trigger('input');
-                this.$element.find('#loginPassword').trigger('input');
-            };
+            const triggerInputEvents = () =>
+                ['#loginEmail', '#loginPassword']
+                .map(id => this.$element[0].querySelector(id)) // select #<id>
+                .forEach(el => dispatchEvent(el, 'input' ));
 
             delay(0).then(triggerInputEvents);
 

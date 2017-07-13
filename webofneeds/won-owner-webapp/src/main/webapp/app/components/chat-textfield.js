@@ -160,24 +160,24 @@ function genComponentConf() {
         }
 
         mediumMountNg() {
+            return angular.element(this.mediumMount());
+        }
+
+        mediumMount() {
             if(!this._mediumMount) {
-                this._mediumMount = this.textFieldNg().find('.medium-mount')
+                this._mediumMount = this.textField().querySelector('.medium-mount')
             }
             return this._mediumMount;
         }
 
-        mediumMount() {
-            return this.mediumMountNg()[0];
-        }
-
         textFieldNg() {
-            if(!this._textField) {
-                this._textField = this.$element.find('.wdt__text');
-            }
-            return this._textField;
+            return angular.element(this.textField())
         }
         textField() {
-            return this.textFieldNg()[0];
+            if(!this._textField) {
+                this._textField = this.$element[0].querySelector('.wdt__text');
+            }
+            return this._textField;
         }
     }
     Controller.$inject = serviceDependencies;

@@ -5,7 +5,7 @@ import 'ng-redux';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
             <a class="feedback clickable" ng-click="self.rateMatch(0)" ui-sref="{connectionUri : self.connectionUri}">

@@ -25,6 +25,7 @@ import {
     clone,
     contains,
     camel2Hyphen,
+    somePromises,
 } from '../utils';
 import * as q from 'q';
 
@@ -127,50 +128,6 @@ import won from './won';
     }
 
     /**
-     * Similar to q.all, takes an array of promises and returns a promise.
-     * That promise will resolve if at least one of the promises succeeds.
-     * The value with which it resolves it is an array of equal length as the input
-     * containing either the resolve value of the promise or null if rejected.
-     * If an errorHandler is specified, it is called with ([array key], [reject value]) of
-     * each rejected promise.
-     * @param promises
-     */
-    var somePromises = function(promises, errorHandler){
-        var deferred = q.defer(),
-            numPromises = promises.length,
-            successes = 0,
-            failures = 0,
-            results = Array.isArray(promises) ? [] : {},
-            handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
-
-        if (promises.length == 0) {
-            deferred.reject(results);
-        }
-
-        promises.forEach(function(promise, key) {
-            promise.then(function(value) {
-                successes++;
-                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-                results[key] = value;
-                if (failures + successes >= numPromises) deferred.resolve(results);
-            }, function(reason) {
-                failures ++;
-                //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
-                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-                results[key] = null;
-                handler(key, reason);
-                if (failures >= numPromises) {
-                    deferred.reject(results);
-                } else if (failures + successes >= numPromises) {
-                    deferred.resolve(results);
-                }
-            });
-        });
-
-        return deferred.promise;
-    }
-
-    /**
      * An emulation of a lock that can be acquired by any number of readers
      * as long as there is no updater trying to acquire it. An updater that tries
      * to acquire the lock is blocked until all readers have released their lock.
@@ -208,7 +165,8 @@ import won from './won';
                 + "]";
         },
         acquireReadLock: function(){
-            var deferred = q.defer();
+            let deferred = {};
+            let promise = new Promise((resolve, reject) => { deferred = {resolve, reject} });
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
                 //console.log("linkeddata-service-won.js: rul:read:block:  " + this.uri + " " + this.getLockStatusString());
@@ -222,10 +180,11 @@ import won from './won';
                 this.blockedReaders.push(deferred);
                 this.grantLockToReaders();
             }
-            return deferred.promise;
+            return promise;
         },
         acquireUpdateLock: function(){
-            var deferred = q.defer();
+            let deferred = {};
+            let promise = new Promise((resolve, reject) => {deferred = {resolve, reject}});
 
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
@@ -239,7 +198,7 @@ import won from './won';
                 this.grantLockToUpdaters();
             }
 
-            return deferred.promise;
+            return promise;
         },
         releaseReadLock: function(){
             //console.log("linkeddata-service-won.js: rul:read:release:" + this.uri + " " + this.getLockStatusString());
@@ -1485,7 +1444,7 @@ import won from './won';
                         for (let key in uris){
                             eventPromises.push(won.ensureLoaded(uris[key]));
                         }
-                        return q.all(eventPromises);
+                        return Promise.all(eventPromises);
                     }
                 );
             }
@@ -1568,7 +1527,7 @@ import won from './won';
                                         conData.connection.value,
                                         requesterWebId
                                 ).then(function(eventUriResult){
-                                            return q.all(
+                                            return Promise.all(
                                                 [won.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
                                                  won.getNodeWithAttributes(conData.connection.value),
                                                  won.getTheirNeed(conData.remoteNeed.value)
@@ -1883,47 +1842,45 @@ import won from './won';
     //TODO refactor this method.
     won.getConnectionInStateForNeedWithRemoteNeed = function(needUri,connectionState) {
 
-        return won.getconnectionUrisOfNeed(needUri).then(function(connectionUris){
-            let promises=[];
-            connectionUris.forEach(function(connection){
-                let resultObject = {}
-                let data = Q.defer()
-                promises.push(data.promise)
-                won.getConnectionWithEventUris(connection).then(function(connectionData){
-                    resultObject.connection = connectionData;
-                    let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
-                        "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                        "select ?remoteNeed \n" +
-                        " where { \n" +
-                        "<"+connectionData.uri+"> a won:Connection; \n" +
-                        "              won:belongsToNeed <" +needUri +"> ; \n" +
-                        "              won:hasRemoteNeed ?remoteNeed; \n"+
-                        "              won:hasConnectionState "+ connectionState +". \n"+
-                        "} \n"
+        return won.getconnectionUrisOfNeed(needUri).then(connectionUris => {
 
-                    privateData.store.execute(query,[],[],function(success,results){
-                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
-                            return;
-                        }
-                        let needs = []
-                        let ownNeedPromise = won.getNeedWithConnectionUris(needUri);
-                        needs.push(ownNeedPromise);
-                        let remoteNeedPromise = won.getTheirNeed(results[0].remoteNeed.value)
-                         needs.push(remoteNeedPromise)
-                        Q.all(needs).then(function(needData){
-                            resultObject.ownNeed = needData[0]
-                            resultObject.remoteNeed=needData[1]
-                            return data.resolve(resultObject );
+
+
+            const promises = connectionUris.map(connectionUri =>
+                new Promise((resolve, reject) => {
+                    let resultObject = {};
+                    won.getConnectionWithEventUris(connectionUri).then(connectionData => {
+                        resultObject.connection = connectionData;
+                        let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                            "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                            "select ?remoteNeed \n" +
+                            " where { \n" +
+                            "<"+connectionData.uri+"> a won:Connection; \n" +
+                            "              won:belongsToNeed <" +needUri +"> ; \n" +
+                            "              won:hasRemoteNeed ?remoteNeed; \n"+
+                            "              won:hasConnectionState "+ connectionState +". \n"+
+                            "} \n"
+
+                        privateData.store.execute(query,[],[],function(success,results){
+                            if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
+                                return;
+                            }
+                            Promise.all([
+                                won.getNeedWithConnectionUris(needUri),
+                                won.getTheirNeed(results[0].remoteNeed.value)
+                            ]).then(needData => {
+                                resultObject.ownNeed = needData[0];
+                                resultObject.remoteNeed = needData[1];
+                                return resolve(resultObject );
+                            })
                         })
-
-
-
                     })
                 })
-            })
-            return Q.all(promises)
+            );
+            return Promise.all(promises)
         })
+
 
     }
 
@@ -1941,7 +1898,7 @@ import won from './won';
             //console.log("linkeddata-service-won.js: executing query: \n"+query);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
-            return q.all(promises).then(
+            return Promise.all(promises).then(
                 function () {
                     var resultObject = {};
                     try {
@@ -1971,7 +1928,7 @@ import won from './won';
             //console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
-            return q.all(promises).then(
+            return Promise.all(promises).then(
                 function () {
                     try {
                         var resolvedUris = [];
@@ -2014,7 +1971,7 @@ import won from './won';
                 //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
                 var loadedPromises = relevantResources.map(x => won.ensureLoaded(x, { requesterWebId }) );
-                return q.all(loadedPromises)
+                return Promise.all(loadedPromises)
                     .then(
                         function (x) {
                             return resolvePropertyPathsFromBaseUri(crawlableQuery.propertyPaths, baseUri, relevantResources);

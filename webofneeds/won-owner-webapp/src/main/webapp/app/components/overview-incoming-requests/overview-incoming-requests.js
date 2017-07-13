@@ -10,7 +10,7 @@ import {
     selectNeedByConnectionUri,
     selectAllConnections
 } from '../../selectors';
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 
 class IncomingRequestsController {
     constructor() {

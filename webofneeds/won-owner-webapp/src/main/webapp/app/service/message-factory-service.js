@@ -17,7 +17,7 @@
 /**
  * Created by LEIH-NB on 19.08.2014.
  */
-angular.module('won.owner').factory('messageBuilderService', function ($http, $q) {
+angular.module('won.owner').factory('messageBuilderService', function ($http) {
     var messageGeneratorService = {};
     var wonMessage = {};
     wonMessage.messageEvent = {};
