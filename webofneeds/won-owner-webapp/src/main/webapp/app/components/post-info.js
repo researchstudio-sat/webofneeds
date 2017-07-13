@@ -122,7 +122,7 @@ function genComponentConf() {
                     post,
                     location: location,
                     address: location && location.get('s:name'),
-                    friendlyTimestamp: relativeTime(
+                    friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
                         post.get('creationDate')
                     ),

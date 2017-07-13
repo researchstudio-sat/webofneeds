@@ -56,11 +56,10 @@ export default function(state = initialState, action = {}) {
             return addNeed(state, action.payload.need, true);
 
         case actionTypes.connections.load:
-            var updatedNeeds =  action.payload.reduce(
+            return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
                 state);
-            return updatedNeeds;
 
         case actionTypes.messages.connectMessageReceived:
             const {ownNeedUri, remoteNeed, updatedConnection, connection } = action.payload;
@@ -74,9 +73,7 @@ export default function(state = initialState, action = {}) {
         case actionTypes.connections.close:
             return changeConnectionState(state, action.payload.connectionUri, won.WON.Closed);
 
-        case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
-        case actionTypes.messages.hintMessageReceived:
             return addConnectionFull(state, action.payload.connection, true);
 
         case actionTypes.connections.connect: // user has sent a request

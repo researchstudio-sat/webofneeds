@@ -77,9 +77,9 @@ function genComponentConf() {
 
                 return {
                     connectionUri,
-                    remoteNeedUri: connection.get("remoteNeedUri"),
-                    isSentRequest: connection.get('state') === won.WON.RequestSent,
-                    isReceivedRequest: connection.get('state') === won.WON.RequestReceived,
+                    remoteNeedUri: connection && connection.get("remoteNeedUri"),
+                    isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
+                    isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
 
                     lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
                     lastUpdated: lastUpdatedPerConnection &&
