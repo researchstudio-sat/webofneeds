@@ -6,8 +6,6 @@ import postItemLineModule from '../post-item-line';
 import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
 import {
-    selectUnreadEvents,
-    selectUnreadCountsByNeedAndType,
     selectAllOwnNeeds,
 } from '../../selectors';
 import won from '../../won-es6';
@@ -29,27 +27,6 @@ class OverviewPostsController {
         this.closedPostsOpen = false;
 
         const selectFromState = (state) => {
-            const unreadEvents = selectUnreadEvents(state);
-            const receivedHintEvents = unreadEvents.filter(e=> e && e.get('eventType')===won.EVENT.HINT_RECEIVED);
-            let unseenMatchesCounts = Immutable.Map();
-            receivedHintEvents.forEach(e => {
-                const receiverNeed = e.get('hasReceiverNeed');
-                let count = unseenMatchesCounts.get(receiverNeed);
-                if(!count){
-                    unseenMatchesCounts = unseenMatchesCounts.set(receiverNeed, 1);
-                }
-                else{
-                    unseenMatchesCounts = unseenMatchesCounts.set(receiverNeed, count + 1);
-                }
-            });
-
-            //won.EVENT.HINT_RECEIVED -> matches
-            //won.EVENT.WON_MESSAGE_RECEIVED -> convoMessages (!= convos with new messages <- we want this)
-            //won.EVENT.CONNECT_RECEIVED -> incomingRequests
-
-            //goal: unseenCounts = { <uri> : { matches: 11, conversations: 0, incomingRequests: 2 }, <uri>:...}
-            //TODO use memoized selector to avoid running this calculation on every tick
-
             const ownNeeds = selectAllOwnNeeds(state);
 
             let activePosts = ownNeeds.filter(post =>
@@ -67,8 +44,6 @@ class OverviewPostsController {
                 activePostsCount: activePosts.length,
                 inactivePostsUris: inactivePosts.map(p => p.get('uri')),
                 inactivePostsCount: inactivePosts.length,
-                unreadEvents,
-                unreadCounts: selectUnreadCountsByNeedAndType(state),
             }
         };
 

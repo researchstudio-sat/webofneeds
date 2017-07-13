@@ -93,100 +93,13 @@ export const selectRemoteEvents = createSelector(
             .filter(uriAndEvent => uriAndEvent); // filter out `undefined`s
         return Immutable.Map(remoteUrisAndEvents)
     }
-)
+);
 
 export const selectUnreadEvents = createSelector(
     selectEvents,
     selectUnreadEventUris,
     (events, unreadEventUris) =>
         unreadEventUris.map(eventUri => events.get(eventUri))
-);
-
-//const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
-
-/**
- * @param {object} state
- * @return {object} events grouped by need.
- *      `unreadEventsByNeed.get(needUri)`, e.g.:
- *      `unreadEventsByNeed.get('http://example.org/won/resource/need/1234')`
- */
-export const selectUnreadEventsByNeed = createSelector(
-    selectUnreadEvents, selectConnections,
-    // group by need, resulting in:  `{ <needUri>: { <cnctUri>: e1, <cnctUri>: e2, ...}, <needUri>: ...}`
-    //TODO hasReceiverNeed is not guaranteed to exist.
-    (unreadEvents, connections) => unreadEvents.groupBy(e => {
-        const connectionUri = e.get('hasReceiver');
-        return connections.getIn([connectionUri, 'belongsToNeed']);
-    })
-);
-
-/**
- * from: state.events.unreadEventUris  of "type" ~Map<connection,latestevent>
- * to: ~Map<receiverneeduri, Map<connection,latestevent>>, e.g.:
- *     { <needUri>: { <eventType> : { <cnctUri>: e1, <cnctUri>: e2, ...}, <eventType> :... }, <needUri>: ...}
- *
- * access events as `const event = groupedEvents.getIn([needUri, eventType, cnctUri])`
- *
- * @param {object} state
- * @return {object} events grouped primarily by need and secondarily by type
- */
-export const selectUnreadEventsByNeedAndType = createSelector(
-    selectUnreadEventsByNeed,
-    eventsGroupedByNeed =>
-        // group by event-type
-        eventsGroupedByNeed.map(groupByType)
-);
-
-function groupByType(events) {
-    return events.groupBy(e =>
-        e.get('hasMessageType') ||
-        e.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType'])
-    )
-}
-
-export const selectUnreadEventsByConnectionAndType = createSelector(
-    selectUnreadEvents,
-    unreadEvents => unreadEvents
-        .groupBy(e =>  e.get('hasReceiver')) // we're only interested in new message received (we know the ones we send)
-        .map(groupByType)
-);
-
-/**
- * @param {object} state
- * @return {object} event counts for each connection. access via
- *      `unreadCounts.getIn([cnctUri, eventType])`, e.g.:
- *      `unreadCounts.getIn(['http://example.org/won/resource/connection/1234', won.EVENT.HINT_RECEIVED])`
- */
-export const selectUnreadCountsByConnectionAndType = createSelector(
-    selectUnreadEventsByConnectionAndType,
-    unreadEvents => unreadEvents.map(eventsByType => eventsByType.map(events => events.size))
-);
-
-/**
- * @param {object} state
- * @return {object} event counts for each need. access via
- *      `unreadCounts.getIn([needUri, eventType])`, e.g.:
- *      `unreadCounts.getIn(['http://example.org/won/resource/need/1234', won.EVENT.HINT_RECEIVED])`
- */
-export const selectUnreadCountsByNeedAndType = createSelector(
-    selectUnreadEventsByNeedAndType,
-    unreadEventsByNeedAndType =>
-        unreadEventsByNeedAndType.map(eventsByType => //looking at single need's events grouped by type
-            eventsByType.map(evnts => evnts.size) // looking at specific need and type -> just count now
-        )
-
-);
-
-/**
- * @param {object} state
- * @return {object} event counts for each event type. access via
- *      `unreadCountsByType.get(eventType)`, e.g.:
- *      `unreadCountsByType.getIn(won.EVENT.HINT_RECEIVED)`
- */
-export const selectUnreadCountsByType = createSelector(
-    selectUnreadEvents,
-    unreadEvents => groupByType(unreadEvents)
-        .map(eventsOfType => eventsOfType.size)
 );
 
 /**
