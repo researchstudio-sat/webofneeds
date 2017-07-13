@@ -71,11 +71,11 @@ function genComponentConf() {
 
                 return {
                     hasPosts: ownNeeds && ownNeeds.size > 0,
-                    hasRequests: allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
-                    hasMatches: allConnections.filter(conn => conn.get("state") === won.WON.Suggested).size > 0,
-                    nrOfUnreadMessages: allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size, //only count incoming messages
-                    nrOfUnreadIncomingRequests: allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived && conn.get("newConnection")).size,
-                    nrOfUnreadMatches: allConnections.filter(conn => conn.get("state") === won.WON.Suggested && conn.get("newConnection")).size,
+                    hasRequests: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
+                    hasMatches: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.Suggested).size > 0,
+                    nrOfUnreadMessages: allMessages && allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size, //only count incoming messages
+                    nrOfUnreadIncomingRequests: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived && conn.get("newConnection")).size,
+                    nrOfUnreadMatches: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.Suggested && conn.get("newConnection")).size,
                     nrOfNeedsWithUnreadEvents: undefined, //TODO: COUNT HOW MANY NEEDS HAVE AT LEAST ONE NEW CONNECTION OR ONE NEW MESSAGE
                 };
             };
