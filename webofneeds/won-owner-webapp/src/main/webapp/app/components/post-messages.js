@@ -110,21 +110,17 @@ function genComponentConf() {
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
                 const ownNeed = selectNeedByConnectionUri(state, connectionUri);
-                const connection = ownNeed.getIn(["connections", connectionUri]);
+                const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
-
-                const eventUris = connection.get('hasEvents');
-                const eventsLoaded = eventUris && eventUris.size > 0;
-                const theirNeed = state.getIn(["needs", connection.get('remoteNeedUri')]);
+                const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
 
                 return {
                     ownNeed,
                     theirNeed,
                     connection,
-                    eventsLoaded,
+                    eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE ALREADY LOADED
                     lastUpdateTime: state.get('lastUpdateTime'),
-                    chatMessages: connection.get("messages").toArray(), //toArray needed as ng-repeat won't work otherwise :| //TODO: SORTING MIGHT NOT BE IMPLEMENTED CORRECTLY
-                    state4dbg: state,
+                    chatMessages: connection && connection.get("messages").toArray(), //toArray needed as ng-repeat won't work otherwise :| //TODO: SORTING MIGHT NOT BE IMPLEMENTED CORRECTLY
                     debugmode: won.debugmode,
 
                     // if the connect-message is here, everything else should be as well
@@ -158,8 +154,8 @@ function genComponentConf() {
                 // make sure latest messages are loaded
                 if (
                     this.connection &&
-                    !this.connection.get('loadingEvents') &&
-                    !this.eventsLoaded
+                    !this.connection.get('loadingEvents')
+                    //&& !this.eventsLoaded
                 ) {
                     this.connections__showLatestMessages(this.connection.get('uri'), 4);
                 }
