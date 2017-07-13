@@ -162,7 +162,7 @@ function parseNeed(jsonldNeed, ownNeed) {
                 location: undefined,
                 connections: Immutable.Map(),
                 creationDate: undefined,
-                ownNeed: ownNeed};
+                ownNeed: !!ownNeed};
 
     if(jsonldNeedImm){
         const uri = jsonldNeedImm.get("@id");
@@ -240,7 +240,7 @@ function parseConnection(jsonldConnection, newConnection) {
                                     messages: Immutable.Map(),
                                     remoteNeedUri: undefined,
                                     creationDate: undefined,
-                                    newConnection: newConnection
+                                    newConnection: !!newConnection
                                 }
                             };
 
@@ -289,7 +289,7 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
             text: undefined,
             date: undefined,
             outgoingMessage: outgoingMessage,
-            newMessage: newMessage
+            newMessage: !!newMessage
         }
     };
 
