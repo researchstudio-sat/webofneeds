@@ -75,9 +75,6 @@ export function selectAllMessagesByNeedUri(state, needUri) {
     return messages;
 }
 
-export const selectUnreadEventUris = state => state
-    .getIn(['events', 'unreadEventUris']);
-
 export const selectRemoteEvents = createSelector(
     selectEvents,
     events => {
@@ -93,13 +90,6 @@ export const selectRemoteEvents = createSelector(
             .filter(uriAndEvent => uriAndEvent); // filter out `undefined`s
         return Immutable.Map(remoteUrisAndEvents)
     }
-);
-
-export const selectUnreadEvents = createSelector(
-    selectEvents,
-    selectUnreadEventUris,
-    (events, unreadEventUris) =>
-        unreadEventUris.map(eventUri => events.get(eventUri))
 );
 
 /**
