@@ -194,28 +194,75 @@ function parseNeed(jsonldNeed, ownNeed) {
         let type = undefined;
         let description = undefined;
         let tags = undefined;
+        let location = undefined;
 
         if(is){
             type = seeks ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
             description = is.get("dc:description");
             tags = is.get("won:hasTag");
+            location = parseLocation(is.get("won:hasLocation"));
         }else if(seeks){
             type = won.WON.BasicNeedTypeDemandCompacted;
             description = seeks.get("dc:description");
             tags = seeks.get("won:hasTag");
+            location = parseLocation(seeks.get("won:hasLocation"));
         }
 
         parsedNeed.tags = tags ? tags : undefined;
         parsedNeed.description = description ? description : undefined;
         parsedNeed.type = type;
-
-        //TODO: LOCATION IS STILL MISSING
+        parsedNeed.location = location;
     }else{
         console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm.toJS());
         return undefined;
     }
 
     return Immutable.fromJS(parsedNeed);
+}
+
+function parseLocation(jsonldLocation) {
+    if(!jsonldLocation) return undefined; //NO LOCATION PRESENT
+
+    const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
+
+    let location = {
+        address: undefined,
+        lat: undefined,
+        lng: undefined,
+        nwCorner: {
+                lat: undefined,
+                lng: undefined,
+        },
+        seCorner: {
+                lat: undefined,
+                lng: undefined
+        }
+    };
+
+    location.address = jsonldLocationImm.get("s:name");
+
+    location.lat = Number.parseFloat(jsonldLocationImm.getIn(["s:geo", "s:latitude"]));
+    location.lng = Number.parseFloat(jsonldLocationImm.getIn(["s:geo", "s:longitude"]));
+
+    location.nwCorner.lat = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner", "s:latitude"]));
+    location.nwCorner.lng = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner", "s:longitude"]));
+    location.seCorner.lat = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner", "s:latitude"]));
+    location.seCorner.lng = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner", "s:longitude"]));
+
+    if(
+        location.address &&
+        location.lat &&
+        location.lng &&
+        location.nwCorner.lat &&
+        location.nwCorner.lng &&
+        location.seCorner.lat &&
+        location.seCorner.lng
+    ){
+        return Immutable.fromJS(location);
+    }
+
+    console.error('Cant parse location, data is an invalid location-object: ', jsonldLocationImm.toJS());
+    return undefined;
 }
 
 function storeConnectionsData(state, connectionsToStore, newConnections) {

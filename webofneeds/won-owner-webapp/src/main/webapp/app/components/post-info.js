@@ -121,7 +121,7 @@ function genComponentConf() {
                 return {
                     post,
                     location: location,
-                    address: location && location.get('s:name'),
+                    address: location && location.get('address'),
                     friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
                         post.get('creationDate')
@@ -144,31 +144,21 @@ function genComponentConf() {
                 return;
             }
 
-            const nw = location.getIn(['won:hasBoundingBox', 'won:hasNorthWestCorner']);
-            const se = location.getIn(['won:hasBoundingBox', 'won:hasSouthEastCorner']);
-            const lat = Number.parseFloat(location.getIn(['s:geo', 's:latitude']));
-            const lon = Number.parseFloat(location.getIn(['s:geo', 's:longitude']));
-            const name = location.get('s:name');
-
-            if(!nw || !se || !lat || !lon || !name ) {
-                return;
-            }
-
             this.map.fitBounds([
                 [
-                    Number.parseFloat(nw.get('s:latitude')),
-                    Number.parseFloat(nw.get('s:longitude')),
+                    location.getIn(["nwCorner", "lat"]),
+                    location.getIn(["nwCorner", "lng"])
                 ],
                 [
-                    Number.parseFloat(se.get('s:latitude')),
-                    Number.parseFloat(se.get('s:longitude')),
+                    location.getIn(["seCorner", "lat"]),
+                    location.getIn(["seCorner", "lng"])
                 ]
             ]);
 
             if(this.marker) {
                this.map.removeLayer(this.marker);
             }
-            this.marker = L.marker([lat, lon]).bindPopup(name);
+            this.marker = L.marker([location.get("lat"), location.get("lng")]).bindPopup(location.get("address"));
             this.map.addLayer(this.marker);
 
             this.mapAlreadyInitialized = true;
