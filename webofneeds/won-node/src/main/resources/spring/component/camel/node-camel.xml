@@ -224,6 +224,9 @@
     <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
         <constructor-arg ref="signatureAddingProcessor" />
     </bean>
+  <!-- outbound message creating processor -->
+    <bean name="outboundMessageCreator" class="won.node.camel.processor.general.OutboundMessageCreatingProcessor" />
+
   <!-- persisting messages -->
   <bean name="persister" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
