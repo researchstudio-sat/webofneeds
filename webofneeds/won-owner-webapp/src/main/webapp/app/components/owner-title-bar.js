@@ -79,7 +79,7 @@ function genComponentConf() {
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}">
 
                                 <a ui-sref="post({connectionType: self.WON.Connected, openConversation: null, connectionUri: null, postUri: self.postUri})"
-                                    ng-class="{'disabled' : !self.hasMessages || !self.isActive}">
+                                    ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
                                     Messages
                                     <span class="ntb__tabs__unread">{{ self.unreadMessages.size }}</span>
                                 </a>
@@ -132,6 +132,7 @@ function genComponentConf() {
                 const sentRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestSent);
                 const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
                 const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);
+                const connected = connections && connections.filter(conn => conn.get("state") === won.WON.Connected);
                 const messages = selectAllMessagesByNeedUri(state, postUri);
 
                 return {
@@ -142,7 +143,7 @@ function genComponentConf() {
                     hasIncomingRequests: incomingRequests && incomingRequests.size > 0,
                     hasSentRequests: sentRequests && sentRequests.size > 0,
                     hasMatches: matches && matches.size > 0,
-                    hasMessages: messages && messages.size > 0,
+                    hasConnected: connected && connected.size > 0,
                     unreadMessages: messages && messages.filter(msg => msg.get('newMessage')).size,
                     unreadIncomingRequests: incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size,
                     unreadSentRequests: sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size,
