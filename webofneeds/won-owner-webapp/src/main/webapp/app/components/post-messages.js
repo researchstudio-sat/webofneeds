@@ -113,19 +113,27 @@ function genComponentConf() {
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
                 const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
+                const chatMessages = connection && connection.get("messages");
+                const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
+
+                let sortedMessages = chatMessages.toArray();
+                sortedMessages.sort(function(a,b) {
+                    return a.get("date").getTime() - b.get("date").getTime();
+                });
+                //TODO: SET RELATIVE TIMESTAMPS
+
 
                 return {
                     ownNeed,
                     theirNeed,
                     connection,
-                    eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE ALREADY LOADED
+                    eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     lastUpdateTime: state.get('lastUpdateTime'),
-                    chatMessages: connection && connection.get("messages").toArray(), //toArray needed as ng-repeat won't work otherwise :| //TODO: SORTING MIGHT NOT BE IMPLEMENTED CORRECTLY
+                    chatMessages: sortedMessages,
                     debugmode: won.debugmode,
 
                     // if the connect-message is here, everything else should be as well
-                    allLoaded: false, /*chatMessages
-                        .some(m => m.get('hasMessageType') === won.WONMSG.connectMessage),*/ //TODO: ALL MESSAGES LOADED
+                    allLoaded,
                 }
             };
 

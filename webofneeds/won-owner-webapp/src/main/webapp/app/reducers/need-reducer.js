@@ -240,7 +240,7 @@ function parseConnection(jsonldConnection, newConnection) {
                                     messages: Immutable.Map(),
                                     remoteNeedUri: undefined,
                                     creationDate: undefined,
-                                    newConnection: !!newConnection
+                                    newConnection: !!newConnection,
                                 }
                             };
 
@@ -289,7 +289,8 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
             text: undefined,
             date: undefined,
             outgoingMessage: outgoingMessage,
-            newMessage: !!newMessage
+            newMessage: !!newMessage,
+            connectMessage: false,
         }
     };
 
@@ -297,7 +298,7 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
         parsedMessage.belongsToUri = jsonldMessageImm.get("hasSender");
         parsedMessage.data.uri = jsonldMessageImm.get("uri");
         parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
-        parsedMessage.data.date = jsonldMessageImm.get("hasSentTimestamp");
+        parsedMessage.data.date = msStringToDate(jsonldMessageImm.get("hasSentTimestamp"));
     }else{
         const fromOwner = jsonldMessageImm.get("msg:FromOwner");
 
@@ -312,10 +313,14 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
 
             if(fromCorrespondingMessage){
                 //if message comes within the events of showLatestMessages/showMoreMessages action
-                parsedMessage.belongsToUri = fromCorrespondingMessage.get("hasReceiver");
+                parsedMessage.belongsToUri = jsonldMessageImm.get("hasReceiver");
                 parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
                 parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
                 parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
+
+                if(fromCorrespondingMessage.get("hasMessageType") === won.WONMSG.connectMessage){
+                    parsedMessage.data.connectMessage = true;
+                }
             }
         }
     }
