@@ -45,7 +45,7 @@ function genComponentConf() {
         </div>
         <won-connection-selection-item
           ng-show="self.isOpen(need.get('uri'))"
-          ng-repeat="conn in getConnectionsArrayFilteredByType(need)"
+          ng-repeat="conn in self.getConnectionsArrayFilteredByType(need)"
           on-selected-connection="self.selectConnection(connectionUri)"
           connection-uri="conn.get('uri')">
         </won-connection-selection-item>
@@ -62,8 +62,7 @@ function genComponentConf() {
             const self = this;
             const selectFromState = (state)=> {
                 //Select all needs with at least one connection
-                const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").size > 0);
-
+                const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").filter(conn => conn.get("state") === this.connectionType).size > 0);
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams.get('connectionUri'));
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);

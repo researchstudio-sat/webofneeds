@@ -17,6 +17,7 @@ import {
     selectOpenPostUri,
     displayingOverview,
     selectAllConnections,
+    selectNeedByConnectionUri,
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -96,7 +97,7 @@ class Controller {
         this.labels = labels;
 
         const selectFromState = (state) => {
-            const postUri = selectOpenPostUri(state);
+            let postUri = selectOpenPostUri(state);
             const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
 
             // either of 'tiles', 'grid', 'list'
@@ -111,6 +112,11 @@ class Controller {
                 matches = selectAllConnections(state).filter(conn => conn.get("state") === won.WON.Suggested);
             } else { // post-owner view
                 matches = state.getIn(["needs", postUri, "connections"]).filter(conn => conn.get("state") === won.WON.Suggested);
+            }
+
+            if(!postUri && connectionUri){
+                const needByConnection = selectNeedByConnectionUri(state, connectionUri);
+                postUri = needByConnection && needByConnection.get("uri");
             }
 
             return {
