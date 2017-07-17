@@ -69,7 +69,7 @@ public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor
 
 
   private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
-    Dataset needDataset = need.getDatatsetHolder().getDataset();
+    Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
     return WonMessageBuilder
       .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
                                                       need.getNeedURI(), need.getWonNodeURI())
