@@ -32,11 +32,14 @@ public class TrustStoreService
   }
 
   public Certificate getCertificate(String alias) {
+    logger.debug("Fetching certificate for alias {}", alias);
     return serviceImpl.getCertificate(alias);
   }
 
   public boolean isCertKnown(Certificate cert) {
-    return (serviceImpl.getCertificateAlias(cert) != null);
+    boolean isKnown =  serviceImpl.getCertificateAlias(cert) != null;
+    logger.debug("Presented certificate is known: {}", isKnown );
+    return isKnown;
   }
 
 //  public boolean isAliasKnown(String alias) {
@@ -48,6 +51,7 @@ public class TrustStoreService
 //  }
 
   public void addCertificate(String alias, Certificate cert, boolean replace) throws IOException {
+    logger.debug("adding certificate for alias {}, replace: {}", alias, replace);
     serviceImpl.putCertificate(alias, cert, replace);
   }
 
