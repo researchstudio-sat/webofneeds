@@ -295,10 +295,6 @@ public class WonMessageRoutes extends RouteBuilder
             .transacted("PROPAGATION_NEVER")
             .routeId("activemq:queue:MatcherProtocol.in")
             .to("bean:wonMessageIntoCamelProcessor")
-            
-
-
-            .to("bean:parentLocker")
             .choice()
                 //we only handle hint messages
                 .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(URI.create(WONMSG.TYPE_HINT.getURI().toString())))
