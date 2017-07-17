@@ -91,33 +91,42 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
    */
   public synchronized void register(URI wonNodeURI, MessagingService messagingService) throws Exception {
     CamelConfiguration camelConfiguration = null;
-    logger.debug("setting up communication with won node: " + wonNodeURI);
+    logger.debug("setting up communication with won node {} ", wonNodeURI);
 
     String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
+    logger.debug("using ownerApplicationId: {}", ownerApplicationId );
     WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
 
     if (wonNode != null) {
-      logger.debug("we're already registered. Connecting with WoN node: " + wonNodeURI);
-      configureCamelEndpoint(wonNodeURI, ownerApplicationId);
-      configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-        (wonNodeURI), messagingService);
-      logger.debug("connected with WoN node: " + wonNodeURI);
-    } else {
-      logger.info("we're not yet registered. Registering with WoN node:" + wonNodeURI);
-      String nodeGeneratedOwnerApplicationId = registrationClient.register(wonNodeURI.toString());
-      if (!ownerApplicationId.equals(nodeGeneratedOwnerApplicationId) ){
-        throw new java.lang.IllegalStateException("WoN node " + wonNodeURI +" generated an ownerApplicationId that differs from" +
-                                          " ours. Node generated: " + nodeGeneratedOwnerApplicationId + ", we " +
-                                          "generated: " + ownerApplicationId);
-      }
-      logger.debug("registered with WoN node: " + wonNodeURI +",  ownerappID: " + ownerApplicationId);
-      camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
-      storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
-      configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-        (wonNodeURI), messagingService);
-      logger.info("connected with WoN node: : " + wonNodeURI);
+      //we think we are registered. Try to connect. If that fails, we'll try to re register further below
+      try {
+          logger.debug("we're already registered. Connecting with WoN node: " + wonNodeURI);
+          configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+          configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
+            (wonNodeURI), messagingService);
+          logger.debug("connected with WoN node: " + wonNodeURI);
+          return;
+        } catch (Exception e){
+          logger.info("connecting to {} failed. Trying to re-register. Full reason logged on loglevel 'DEBUG'", wonNodeURI);
+          logger.debug("We thought we were already registerd, but connecting failed With an exception. We'll try to re-register", e);
+        }
+      //we'll try to re-register now, see below. This is necessary if the WoN node forgets about us for whatever
+      //reason.
     }
 
+    logger.info("we're not yet registered. Registering with WoN node {} under ownerApplicationId {}", wonNodeURI, ownerApplicationId);
+    String nodeGeneratedOwnerApplicationId = registrationClient.register(wonNodeURI.toString());
+    if (!ownerApplicationId.equals(nodeGeneratedOwnerApplicationId) ){
+      throw new java.lang.IllegalStateException("WoN node " + wonNodeURI +" generated an ownerApplicationId that differs from" +
+                                        " ours. Node generated: " + nodeGeneratedOwnerApplicationId + ", we " +
+                                        "generated: " + ownerApplicationId);
+    }
+    logger.debug("registered with WoN node: " + wonNodeURI +",  ownerappID: " + ownerApplicationId);
+    camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+    storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
+    configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
+      (wonNodeURI), messagingService);
+    logger.info("connected with WoN node: : " + wonNodeURI);
 
   }
 
