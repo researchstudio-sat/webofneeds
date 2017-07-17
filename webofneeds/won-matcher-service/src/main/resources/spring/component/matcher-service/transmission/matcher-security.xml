@@ -33,7 +33,7 @@
      it is a string, the processor uses the same key pair for all needs and storese it under the specified
      alias -->
     <bean id="keyPairAliasDerivationStrategyFactory" class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
-        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
+        <property name="predefinedAlias" value="${matcher.uri}" />
     </bean>
 
 
