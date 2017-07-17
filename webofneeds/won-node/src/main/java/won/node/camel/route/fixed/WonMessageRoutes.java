@@ -315,7 +315,7 @@ public class WonMessageRoutes extends RouteBuilder
 
         from("direct:processHintAndStore")
             .transacted("PROPAGATION_REQUIRES_NEW")
-            .routeId("direct:executeAndStoreMessage")
+            .routeId("direct:processHintAndStore")
             .to("bean:parentLocker")
             //call the default implementation, which may alter the message.
             .to("bean:hintMessageProcessor?method=process")
