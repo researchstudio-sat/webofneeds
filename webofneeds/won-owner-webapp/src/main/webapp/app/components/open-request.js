@@ -11,8 +11,6 @@ import {
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
-    selectLastUpdateTime,
-    selectConnectMessageOfOpenConnection,
     selectLastUpdatedPerConnection,
     selectNeedByConnectionUri,
 } from '../selectors';
@@ -69,29 +67,17 @@ function genComponentConf() {
                 const ownNeed = selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
-                const connectMsg = selectConnectMessageOfOpenConnection(state); //TODO: CHANGE THIS
+                const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage") && !msg.get("outgoingMessage"));
 
                 const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
-
-                const lastStateUpdate = selectLastUpdateTime(state);
 
                 return {
                     connectionUri,
                     remoteNeedUri: connection && connection.get("remoteNeedUri"),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
                     isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
-
                     lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
-                    lastUpdated: lastUpdatedPerConnection &&
-                        relativeTime(
-                            lastStateUpdate,
-                            lastUpdatedPerConnection.get(connectionUri)
-                        ),
-
-                    textMsg: connectMsg && (
-                        connectMsg.get('hasTextMessage') ||
-                        connectMsg.getIn(['hasCorrespondingRemoteMessage', 'hasTextMessage'])
-                    ),
+                    textMsg: connectMsg && connectMsg.get("text"),
                     debugmode: won.debugmode,
                 }
             };

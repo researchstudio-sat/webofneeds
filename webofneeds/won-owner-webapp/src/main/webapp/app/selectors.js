@@ -29,7 +29,8 @@ export const selectAllTheirNeeds = state => selectAllNeeds(state).filter(need =>
 
 /**
  * Get the need for a given connectionUri
- * @param connectionUri
+ * @param state to retrieve data from
+ * @param connectionUri to find corresponding need for
  */
 export function selectNeedByConnectionUri(state, connectionUri){
     let needs = selectAllOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
@@ -81,7 +82,7 @@ export const selectRemoteEvents = createSelector(
         const remoteUrisAndEvents = events
             .toList()
             .map(e => {
-                let remote = e.get('hasCorrespondingRemoteMessage') // select remote
+                let remote = e.get('hasCorrespondingRemoteMessage'); // select remote
                 if(is('String', remote)) remote = events.get(remote); // for those rare cases where remote is only a uri
                 if(!remote) return undefined;
                 remote = remote.set('correspondsToOwnMsg', e); //add back-reference to it
@@ -160,27 +161,6 @@ export const selectOpenConnection = createSelector(
     selectOpenConnectionUri, selectConnections,
     (uri, connections) =>
         connections.get(uri)
-);
-
-export const selectEventsOfOpenConnection = createSelector(
-    selectOpenConnection, selectEvents,
-    (connection, allEvents) => connection && connection
-        .get('hasEvents')
-        .map(eventUri => allEvents.get(eventUri))
-);
-
-export const selectConnectMessageOfOpenConnection = createSelector(
-    selectEventsOfOpenConnection,
-    events => events && events
-        .filter(event => {
-            if(!event) return;
-            const messageType =
-                event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) ||
-                event.get('hasMessageType') === won.WONMSG.connectMessage;
-            return messageType === won.WONMSG.connectMessage ||
-                messageType === won.WONMSG.connectMessageCompacted;
-        })
-        .first()
 );
 
 export const selectOpenPostUri = createSelector(
