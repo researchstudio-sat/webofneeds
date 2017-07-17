@@ -42,7 +42,7 @@ function piwikCall(args) {
 piwikCall(['trackPageView']);
 piwikCall(['enableLinkTracking']);
 piwikCall(['setTrackerUrl', trackerUrl]);
-piwikCall(['setSiteId', '2']);
+piwikCall(['setSiteId', '1']);
 
 
 
