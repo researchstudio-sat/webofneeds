@@ -28,6 +28,15 @@
         <constructor-arg type="java.lang.String" value="${truststore.location}" />
         <constructor-arg type="java.lang.String" value="${truststore.password}" />
     </bean>
+
+    <!-- if the fixedPrivateKeyAlias is empty or null, the processor generates a new Keypair for every need, if
+     it is a string, the processor uses the same key pair for all needs and storese it under the specified
+     alias -->
+    <bean id="keyPairAliasDerivationStrategyFactory" class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
+        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
+    </bean>
+
+
     <!-- the service from which one should get all the necessary interfaces to do transmission over network in WON,
     such as accessing the linked data, registering with Node, signing data for transmission, sending messages with JMS-->
     <bean id="wonTransmissionService" class="won.cryptography.service.DefaultSecurityWonTransmissionService">
@@ -36,6 +45,10 @@
         <property name="trustStoreService" ref="trustStoreService" />
         <property name="clientKeyStoreService" ref="keyStoreService" />
         <property name="registrationQuery" value="?register=node"></property>
+        <property name="keyPairAliasDerivationStrategy">
+            <bean factory-bean="keyPairAliasDerivationStrategyFactory" factory-method="create" />
+        </property>
+
     </bean>
 
 
