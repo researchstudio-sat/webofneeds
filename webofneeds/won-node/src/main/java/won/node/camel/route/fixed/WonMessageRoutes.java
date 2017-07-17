@@ -183,6 +183,9 @@ public class WonMessageRoutes extends RouteBuilder
                   //call the default implementation, which may alter the message.
                   // Also, it puts any outbound message in the respective header
                   .to("direct:storeAndRespond")
+                  // use the OutboundMessageFactoryProcessor that is expected to be in a header to create
+                  // the outbound message based on the now-saved current message
+                  .to("bean:outboundMessageCreator")
                   //swap: outbound becomes 'normal' message, 'normal' becomes 'original' - note: in some cases (create, activate,
                   // deactivate) there is no outbound message, hence no 'normal' message after this step.
                   .setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, header(WonCamelConstants.MESSAGE_HEADER))

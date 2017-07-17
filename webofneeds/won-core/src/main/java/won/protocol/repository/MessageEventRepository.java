@@ -58,7 +58,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     public void lockNeedAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select con,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Connection con on c.parentUri = con.needURI where msg.messageURI = :messageUri")
+    @Query("select con,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Connection con on c.parentUri = con.connectionURI where msg.messageURI = :messageUri")
     public void lockConnectionAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
 
 

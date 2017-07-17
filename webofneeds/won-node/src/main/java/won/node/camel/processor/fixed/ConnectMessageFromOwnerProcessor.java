@@ -5,10 +5,12 @@ import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
@@ -51,15 +53,20 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con);
     //prepare the message to pass to the remote node
-    final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
+    URI remoteMessageUri = wonNodeInformationService
+            .generateEventURI(wonMessage.getReceiverNodeURI());
+
     //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
     wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
     //add the information about the new local connection to the original message
-    wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+    wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
     //the persister will pick it up later
 
-    //put the new message into the 'modified message' header (so the persister doesn't pick up the wrong one).
-    message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
+    //put the factory into the outbound message factory header. It will be used to generate the outbound message
+    //after the wonMessage has been processed and saved, to make sure that the outbound message contains
+    //all the data that we also store locally
+    OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
+    message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
@@ -91,5 +98,25 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     // and forward it only to the owner. Add an explanation (a reference to the failure response and some
     // expplanation text.
     logger.warn("The remote end responded with a failure message. Our behaviour is now undefined.");
+  }
+
+  private class OutboundMessageFactory extends OutboundMessageFactoryProcessor
+  {
+    private Connection connection;
+
+    public OutboundMessageFactory(URI messageURI, Connection connection) {
+      super(messageURI);
+      this.connection = connection;
+    }
+
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+      return WonMessageBuilder
+              .setPropertiesForPassingMessageToRemoteNode(
+                      message,
+                      getMessageURI())
+              .setSenderURI(connection.getConnectionURI())
+              .build();
+    }
   }
 }
