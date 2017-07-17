@@ -3,7 +3,6 @@
 import angular from 'angular';
 import {
     labels,
-    relativeTime
 } from '../won-label-utils';
 import {
     attach,
