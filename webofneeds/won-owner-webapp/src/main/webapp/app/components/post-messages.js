@@ -116,7 +116,7 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
 
-                let sortedMessages = chatMessages.toArray();
+                let sortedMessages = chatMessages && chatMessages.toArray();
                 sortedMessages.sort(function(a,b) {
                     return a.get("date").getTime() - b.get("date").getTime();
                 });
@@ -220,11 +220,6 @@ function genComponentConf() {
 
         input(userInput) {
             this.chatMessage = userInput;
-
-            this.connections__typedAtChatMessage({
-                message: userInput ,
-                connectionUri: this.connection.get('uri'),
-            });
         }
 
         send() {

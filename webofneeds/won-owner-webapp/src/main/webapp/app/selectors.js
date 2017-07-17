@@ -10,11 +10,6 @@ import {
     is,
 } from './utils';
 
-import {
-    selectTimestamp,
-} from './won-utils';
-
-export const selectConnections = state => state.getIn(['connections']);
 export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
@@ -93,74 +88,32 @@ export const selectRemoteEvents = createSelector(
     }
 );
 
-/**
- * selects a map of `connectionUri -> { connection, events, ownNeed, remoteNeed }`
- * - thus: everything a connection has direct references to. Use this selector
- * when you're needing connection-centric data (e.g. for a view with a strong
- * focus on the connection)
- *
- * NOTE: the app-state used to have events and needs stored in this fashion.
- * Thus, this selector is also used to allow older code to use the new
- * state-structure with minimal changes.
- */
-export const selectAllByConnections = createSelector(
-    state => state, //reselect's createSelector always needs a dependency
-    state => state
-        .getIn(['connections'])
-        .map(connection => allByConnection(connection)(state))
-);
-const allByConnection = (connection) => (state) => {
-    const ownNeedUri = connection.get('belongsToNeed');
-    const ownNeed = state.getIn(['needs', ownNeedUri]);
+export function selectAllByConnectionUri(state, connectionUri) {
+    const ownNeed = selectNeedByConnectionUri(state, connectionUri);
+    const connection = ownNeed && state.getIn(["needs", ownNeed.get("uri"), "connections", connectionUri]);
+    const remoteNeedUri = connection && connection.get("remoteNeedUri");
+    const remoteNeed = remoteNeedUri && state.getIn(["needs", remoteNeedUri]);
 
-    const remoteNeedUri = connection.get('hasRemoteNeed');
-    const remoteNeed = state.getIn(['needs', remoteNeedUri]);
+    const events = state.getIn(["events", "events"]).filter(event => event.get("hasReveiver") === connectionUri || event.get("hasSender") === connectionUri); //TODO: MAKE THIS BETTER AND CHECK FOR CORRECTNESS
 
-    const events = connection
-        .get('hasEvents')
-        .map(eventUri => state.getIn(['events', 'events', eventUri]))
-        .filter(event => !!event);
-
-
-    return Immutable.Map({ connection, events, ownNeed, remoteNeed });
-};
+    return Immutable.Map({connection, events, ownNeed, remoteNeed});
+}
 
 export const selectOpenConnectionUri = createSelector(
     selectRouterParams,
-    selectConnections,
-    (routerParams, connections) => {
+    (routerParams) => {
         //de-escaping is lost in transpiling if not done in two steps :|
         const openConnectionUri = decodeUriComponentProperly(
             routerParams.get('connectionUri') ||
             routerParams.get('openConversation')
         );
 
-        const myUri = decodeUriComponentProperly(routerParams.get('myUri')); //TODO deprecated parameter
-
-        const theirUri = decodeUriComponentProperly(routerParams.get('theirUri')); //TODO deprecated parameter
-
         if(openConnectionUri) {
             return openConnectionUri;
-        } else if (myUri && theirUri) {
-            /*
-             returns undefined when there's no
-             connection like that in the state.
-             */
-            return connections
-                .filter(c =>
-                    c.get('belongsToNeed') === myUri  &&
-                    c.get('hasRemoteNeed') === theirUri
-                ).keySeq().first()
         } else {
             return undefined;
         }
     }
-);
-
-export const selectOpenConnection = createSelector(
-    selectOpenConnectionUri, selectConnections,
-    (uri, connections) =>
-        connections.get(uri)
 );
 
 export const selectOpenPostUri = createSelector(
@@ -176,27 +129,4 @@ export const selectOpenPostUri = createSelector(
 export const displayingOverview = createSelector(
     selectOpenPostUri,
     postUri => !postUri //if there's a postUri, this is almost certainly a detail view
-);
-
-/**
- * @deprecated doesn't use daisy-chaining yet.
- */
-export const selectLastUpdatedPerConnection = createSelector(
-    selectAllByConnections,
-    allByConnections => allByConnections.map(connectionAndRelated =>
-        connectionAndRelated.get('events')
-        .map( event =>
-            //selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
-            selectTimestamp(event)
-        )
-        /*
-         * don't use events without timestamp
-         * NOTE if there's no events with timestamps
-         * for the connection:
-         * `Immutable.List([]).max() === undefined`
-         */
-        .filter(timestamp => timestamp)
-        .map(timestamp => Number.parseInt(timestamp))
-        .max()
-    )
 );

@@ -36,8 +36,6 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/overview/sent-requests?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
-        //{ path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
-        //{ path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
 
     ].forEach( ({path, component, as}) => {
 

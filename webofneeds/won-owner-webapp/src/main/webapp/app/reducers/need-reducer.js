@@ -472,7 +472,7 @@ function changeConnectionState(state, connectionUri, newState) {
 
 function changeNeedState(state, needUri, newState) {
     return state
-        .setIn([needUri, "state", newState]);
+        .setIn([needUri, "state"], newState);
 }
 
 function getNeedForConnectionUri(state, connectionUri){

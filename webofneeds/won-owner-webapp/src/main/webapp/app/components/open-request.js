@@ -10,7 +10,6 @@ import {
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
-    selectLastUpdatedPerConnection,
     selectNeedByConnectionUri,
 } from '../selectors';
 
@@ -65,17 +64,14 @@ function genComponentConf() {
 
                 const ownNeed = selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-
                 const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage") && !msg.get("outgoingMessage"));
-
-                const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
 
                 return {
                     connectionUri,
                     remoteNeedUri: connection && connection.get("remoteNeedUri"),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
                     isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
-                    lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
+                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
                     textMsg: connectMsg && connectMsg.get("text"),
                     debugmode: won.debugmode,
                 }

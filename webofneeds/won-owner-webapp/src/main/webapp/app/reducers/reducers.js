@@ -11,7 +11,6 @@ import needReducer from './need-reducer';
 import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
 import toastReducer from './toast-reducer';
-import connectionReducer from './connection-reducer';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -32,8 +31,6 @@ const reducers = {
     },
     */
 
-
-    connections: connectionReducer,
     events: eventReducer,
     user: userReducer,
     needs: needReducer,

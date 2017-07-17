@@ -11,7 +11,6 @@ import { attach } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
-    selectLastUpdatedPerConnection,
     selectNeedByConnectionUri,
     selectAllTheirNeeds
 } from '../selectors';
@@ -66,8 +65,6 @@ function genComponentConf() {
                 const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
                 const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
-
-                const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
 
                 return {
                     openConnectionUri: selectOpenConnectionUri(state),
