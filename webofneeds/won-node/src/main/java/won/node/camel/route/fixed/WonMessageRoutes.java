@@ -16,7 +16,8 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-  /**
+
+/**
   * User: syim
   * Date: 02.03.2015
   */
@@ -291,7 +292,7 @@ public class WonMessageRoutes extends RouteBuilder
           * Matcher protocol, incoming
           */
         from("activemq:queue:MatcherProtocol.in?concurrentConsumers=5")
-            .transacted("PROPAGATION_REQUIRED")
+            .transacted("PROPAGATION_NEVER")
             .routeId("activemq:queue:MatcherProtocol.in")
             .to("bean:wonMessageIntoCamelProcessor")
             
@@ -307,11 +308,20 @@ public class WonMessageRoutes extends RouteBuilder
                     .to("bean:envelopeAdder")
                     .to("bean:directionFromExternalAdder")
                     .to("bean:receivedTimestampAdder")
-                    .to("bean:hintMessageProcessor?method=process")
-                    .to("direct:reference-sign-persist")
+                    .to("direct:processHintAndStore")
                     .to("bean:toOwnerSender")   //--> seda:OwnerProtocolOut
                 .otherwise()
                     .log(LoggingLevel.INFO, "could not route message");
+
+        from("direct:processHintAndStore")
+            .transacted("PROPAGATION_REQUIRES_NEW")
+            .routeId("direct:executeAndStoreMessage")
+            .to("bean:parentLocker")
+            //call the default implementation, which may alter the message.
+            .to("bean:hintMessageProcessor?method=process")
+            .to("direct:reference-sign-persist");
+
+
           /**
           * Matcher protocol, outgoing
           */
