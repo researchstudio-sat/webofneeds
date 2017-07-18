@@ -24,10 +24,8 @@ public class TensorMatchingData {
     private static final Logger logger = LoggerFactory.getLogger(TensorMatchingData.class);
 
     private static final int MAX_DIMENSION = 1000000;
-
-    public static final String NEED_PREFIX = "Need: ";
-    public static final String ATTRIBUTE_PREFIX = "Attr: ";
     public static final String HEADERS_FILE = "headers.txt";
+    public static final String NEED_INDICES_FILE = "needIndices.txt";
 
     public static final String CONNECTION_SLICE_NAME = "connection";
 
@@ -246,7 +244,7 @@ public class TensorMatchingData {
     }
 
     public ArrayList<String> getNeedHeaders() {
-        return needs;
+        return (ArrayList<String>) needs.clone();
     }
 
     public List<String> getNeeds() {
@@ -347,8 +345,18 @@ public class TensorMatchingData {
         OutputStreamWriter os = new OutputStreamWriter(fos, "UTF-8");
 
         for (int i = 0; i < nextIndex; i++) {
-            String entity = (needs.get(i) != null) ? NEED_PREFIX + needs.get(i) : ATTRIBUTE_PREFIX + attributes.get(i);
+            String entity = (needs.get(i) != null) ? needs.get(i) : attributes.get(i);
             os.append(entity + "\n");
+        }
+        os.close();
+
+        // write the need indices file
+        fos = new FileOutputStream(new File(folder + "/" + NEED_INDICES_FILE));
+        os = new OutputStreamWriter(fos, "UTF-8");
+        for (int i = 0; i < nextIndex; i++) {
+            if (needs.get(i) != null) {
+                os.append(i + "\n");
+            }
         }
         os.close();
 

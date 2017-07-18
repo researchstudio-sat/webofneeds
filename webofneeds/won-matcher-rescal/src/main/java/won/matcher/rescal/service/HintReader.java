@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used to read a hint matrix mtx file and create (bulk) hint event objects from it.
@@ -40,10 +41,7 @@ public class HintReader {
         String line = null;
         int i = 0;
         while ((line = br.readLine()) != null) {
-            if (line.startsWith(TensorMatchingData.NEED_PREFIX)) {
-                String originalHeaderEntry = line.substring(TensorMatchingData.NEED_PREFIX.length());
-                needHeaders.add(i, originalHeaderEntry);
-            }
+            needHeaders.add(i, line);
             i++;
         }
         br.close();
@@ -99,7 +97,10 @@ public class HintReader {
 
             String needUri1 = needUris.get(i);
             String needUri2 = needUris.get(j);
-            if (needUri1 != null && needUri2 != null) {
+
+            List<String> matchingDataNeeds = matchingData.getNeeds();
+
+            if (needUri1 != null && needUri2 != null && matchingDataNeeds.contains(needUri1) && matchingDataNeeds.contains(needUri2)) {
 
                 // wonNodeUri must have been set as attribute before to be able to read it here
                 String fromWonNodeUri = matchingData.getFirstAttributeOfNeed(needUri1, "wonNodeUri");
@@ -107,6 +108,8 @@ public class HintReader {
                 HintEvent hint = new HintEvent(fromWonNodeUri, needUri1, toWonNodeUri,
                         needUri2, config.getPublicMatcherUri(), value);
                 hints.addHintEvent(hint);
+            } else {
+                throw new IllegalStateException("MatchingData does not contain needs with URI " + needUri1 + " or " + needUri2);
             }
         }
 
