@@ -79,6 +79,92 @@ $ngRedux.getState().get('router')
 
 Also see: [Routing and Redux](https://github.com/researchstudio-sat/webofneeds/issues/344)
 
+## State Structure
+ ```javascript
+$ngRedux.getState()
+/* =>
+{
+  config: {
+    defaultNodeUri: [nodeuri]
+  },
+  events: {
+    events: {...},
+    unreadEventUris: {...},
+  },
+  initialLoadFinished: true|false,
+  lastUpdateTime: timeinmillis,
+  loginVisible: false,
+  messages: {
+    enqueued: {...},
+    lostConnection: true|false,
+    reconnecting: true|false,
+    waitingForAnswer: {...}
+  },
+  needs: {
+    [needUri]: {
+        connections: { //Immutable.Map() containing all corresponding Connections to this need
+            [connectionUri]: {
+                creationDate: date, //creationDate of the connection
+                messages: { //Immutable.Map() of all the TextMessages sent over this connection
+                    [messageUri]: {
+                        connectMessage: true|false, //whether or not this was the connectMessage(a.k.a firstMessage)
+                        date: date, //creation Date of this message
+                        newMessage: true|false, //whether or not this message is new (or already seen if you will)
+                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
+                        text: string, //message text
+                        uri: string //unique identifier of this message
+                    }
+                    ...
+                },
+                newConnection: true|false, //whether or not this connection is new (or already seen if you will)
+                remoteNeedUri: string, //corresponding remote Need identifier
+                state: string, //state of the connection
+                uri: string //unique identifier of this connection
+            }
+            ...
+        },
+        creationDate: Date, //creationDate of this need
+        description: string, //description of the need as a string (non mandatory, empty if not present)
+        location: { //non mandatory but if present it contains all elements below
+            address: string, //address as human readable string
+            lat: float, //latitude of address
+            lng: float, //longitude of address
+            nwCorner: { //north west corner of the boundingbox
+                lat: float,
+                lng: float,
+            },
+            seCorner: { //south east corner of the boundingbox
+                lat: float,
+                lng: float,
+            }
+        },
+        ownNeed: true|false, //whether this need is owned or not
+        state: "won:Active" | "won:Inactive", //state of the need
+        tags: Array of strings, //array of strings (non mandatory, empty if not present)
+        title: string, //title of the need
+        type: "won:Supply" | "won:Demand" | "won:Offer", //type of the need
+        uri: string //unique identifier of this need
+    },
+    ...
+  },
+  router: {
+    currentParams: {...},
+    currentState: {...},
+    prevParams: {...},
+    prevState: {...}
+  },
+  toasts: {...},
+  user: {...}
+}
+*/
+```
+As you can see in this State all "visible" Data is stored within the needs and the corresponding connections and messages are stored within this tree.
+Example: If you want to retrieve all present connections for a given need you will access it by ````$ngRedux.getState().getIn(["needs", [needUri], "connections"])````.
+
+All The DataParsing happens within the ```need-reducer.js``` and should only be implemented here, in their respective Methods ```parseNeed(jsonLdNeed, ownNeed)```, ```parseConnection(jsonLdConnection, newConnection)``` and ```parseMessage(jsonLdMessage, outgoingMessage, newMessage)```.
+It is very important to not parse needs/connections/messages in any other place or in any other way to make sure that the structure of the corresponding items is always the same, and so that the Views don't have to implement fail-safes when accessing elements, e.g. a Location is only present if the whole location data can be parsed/stored within the state, otherwise the location will stay empty.
+This is also true for every message connection and need, as soon as the data is in the state you can be certain that all the mandatory values are set correctly.
+
 ## Server-Interaction
 
 If it's **REST**-style, just use `fetch(...).then(...dispatch...)` in an action-creator.
