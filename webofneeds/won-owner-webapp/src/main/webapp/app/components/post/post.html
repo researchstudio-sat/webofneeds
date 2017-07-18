@@ -9,7 +9,7 @@
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
-            ng-if="self.post && !self.isOwnPost"
+            ng-if="!self.isOwnPost"
             ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
     </won-visitor-title-bar>
 </header>

@@ -40,7 +40,6 @@ export default function(state = initialState, action = {}) {
             return addNeed(state, action.payload.get('theirNeed'), false);
 
         case actionTypes.needs.fetch:
-            //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
                 (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
                 state
@@ -428,8 +427,6 @@ function addMessage(state, message, outgoingMessage, newMessage) {
 
 function addMessages(state, messages) {
     if(messages && messages.size > 0){
-        //TODO: load all events that have a ["hasCorrespondingRemoteMessage", "hasTextMessage"] (AT LEAST THAT)
-        //TODO: IMPLEMENT MESSAGE STORING OF MESSAGES
 
         messages.map(function(message, key){
             const outgoingMessage = !!message.get("hasTextMessage");
