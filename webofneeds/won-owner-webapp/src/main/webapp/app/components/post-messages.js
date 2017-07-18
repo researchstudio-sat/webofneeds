@@ -117,9 +117,11 @@ function genComponentConf() {
                 const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
 
                 let sortedMessages = chatMessages && chatMessages.toArray();
-                sortedMessages.sort(function(a,b) {
-                    return a.get("date").getTime() - b.get("date").getTime();
-                });
+                if(sortedMessages){
+                    sortedMessages.sort(function(a,b) {
+                        return a.get("date").getTime() - b.get("date").getTime();
+                    });
+                }
                 //TODO: SET RELATIVE TIMESTAMPS
 
 
