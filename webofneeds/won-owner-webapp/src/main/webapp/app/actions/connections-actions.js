@@ -279,10 +279,11 @@ export function showLatestMessages(connectionUri, numberOfEvents){
  * @return {*}
  */
 function getEvents(connectionUri, params) {
-    const eventContainerUri = connectionUri + "/events";//TODO: REFAC THIS METHOD TO WORK WITH CONNECTIONURI AND search eventContainerUri after retrieving it from the connectionURI
-
     const eventP = won
-        .getNode(eventContainerUri, params)
+        .getNode(connectionUri, params)
+        .then(cnct =>
+            won.getNode(cnct.hasEventContainer, params)
+        )
         .then(eventContainer => is('Array', eventContainer.member) ?
             eventContainer.member :
             [eventContainer.member]
