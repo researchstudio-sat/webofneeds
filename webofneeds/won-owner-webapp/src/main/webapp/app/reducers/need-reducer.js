@@ -419,7 +419,7 @@ function addMessage(state, message, outgoingMessage, newMessage) {
 
     if(parsedMessage){
         const connectionUri = parsedMessage.get("belongsToUri");
-        let need = getNeedForConnectionUri(state, connectionUri);
+        let need = getNeedForConnectionUri(state, connectionUri); //TODO: can surely be retrieved from the message as well
         if(need){
             let messages = state.getIn([need.get("uri"), "connections", connectionUri, "messages"]);
             messages = messages.set(parsedMessage.getIn(["data", "uri"]), parsedMessage.get("data"));
