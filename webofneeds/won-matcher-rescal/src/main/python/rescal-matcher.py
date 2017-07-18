@@ -13,7 +13,7 @@ _log = logging.getLogger()
 
 
 from tools.tensor_utils import read_input_tensor, SparseTensor, execute_extrescal, \
-    predict_rescal_hints_by_threshold, create_hint_mask_matrix
+    predict_rescal_hints_by_threshold, test_create_hint_mask_matrix, test_predict_rescal_hints_by_threshold
 
 
 # ==========================================================================
@@ -41,6 +41,7 @@ if __name__ == '__main__':
 
     # load the tensor
     header_file = "headers.txt"
+    need_indices_file = "needIndices.txt"
 
     slice_files = []
     for file in os.listdir(args.inputfolder):
@@ -48,18 +49,19 @@ if __name__ == '__main__':
             slice_files.append(file)
 
     header_input = args.inputfolder + "/" + header_file
+    need_indices_input = args.inputfolder + "/" + need_indices_file
     data_input = []
     for slice in slice_files:
         data_input.append(args.inputfolder + "/" + slice)
-    input_tensor = read_input_tensor(header_input, data_input, True)
+    input_tensor = read_input_tensor(header_input, need_indices_input, data_input, True)
 
     # execute rescal
     A,R = execute_extrescal(input_tensor, args.rank)
 
     # predict new hints
     _log.info("predict hints with threshold: %f" % args.threshold)
-    mask_matrix = create_hint_mask_matrix(input_tensor)
-    connection_prediction = predict_rescal_hints_by_threshold(A, R, args.threshold, mask_matrix)
+    connection_prediction = predict_rescal_hints_by_threshold(A, R, args.threshold, input_tensor)
+
     _log.info("number of hints created: %d" % len(connection_prediction.nonzero()[0]))
 
     # write the hint output matrix

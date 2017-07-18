@@ -21,9 +21,11 @@ import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
+import won.node.camel.processor.general.OutboundMessageFactoryProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
@@ -60,19 +62,20 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
       //TODO: we could introduce SYSTEM_CLOSE here
     con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
     //if the connection was in suggested state, don't send a close message to the remote need
-    if (originalState != ConnectionState.SUGGESTED) {
-      //prepare the message to pass to the remote node
-      final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
-      //abort if there is no remote connection
-      if (newWonMessage == null) {
-        return;
-      }
-      //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
-      exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
+    if (originalState != ConnectionState.SUGGESTED && con.getRemoteConnectionURI() != null) {
+      URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getRemoteConnectionURI());
+      URI remoteMessageUri = wonNodeInformationService.generateEventURI(remoteNodeURI);
+
+      //put the factory into the outbound message factory header. It will be used to generate the outbound message
+      //after the wonMessage has been processed and saved, to make sure that the outbound message contains
+      //all the data that we also store locally
+      OutboundMessageFactory outboundMessageFactory = new OutboundMessageFactory(remoteMessageUri, con);
+      message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_FACTORY_HEADER, outboundMessageFactory);
+
       //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
       wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
       //add the information about the corresponding message to the local one
-      wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+      wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, remoteMessageUri);
       //the persister will pick it up later
     }
 
@@ -83,24 +86,34 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
     // sent to the remote connection.
   }
 
-  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
-    //there need not be a remote connection. Don't create a message if this is the case.
-    if (con.getRemoteConnectionURI() == null) return null;
-    URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getRemoteConnectionURI());
-    URI localNodeURI = wonNodeInformationService.getWonNodeUri(con.getConnectionURI());
-    //create the message to send to the remote node
-    return WonMessageBuilder
-      .setPropertiesForPassingMessageToRemoteNode(
-        wonMessage,
-        wonNodeInformationService
-          .generateEventURI(remoteNodeURI))
-      .setSenderNodeURI(localNodeURI)
-      .setSenderURI(con.getConnectionURI())
-      .setSenderNeedURI(con.getNeedURI())
-      .setReceiverNodeURI(remoteNodeURI)
-      .setReceiverURI(con.getRemoteConnectionURI())
-      .setReceiverNeedURI(con.getRemoteNeedURI())
-      .build();
+  private class OutboundMessageFactory extends OutboundMessageFactoryProcessor
+  {
+    private Connection connection;
+
+    public OutboundMessageFactory(URI messageURI, Connection connection) {
+      super(messageURI);
+      this.connection = connection;
+    }
+
+    @Override
+    public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+      //there need not be a remote connection. Don't create a message if this is the case.
+      if (connection.getRemoteConnectionURI() == null) return null;
+      URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(connection.getRemoteConnectionURI());
+      URI localNodeURI = wonNodeInformationService.getWonNodeUri(connection.getConnectionURI());
+      //create the message to send to the remote node
+      return WonMessageBuilder
+              .setPropertiesForPassingMessageToRemoteNode(
+                      message,
+                      getMessageURI())
+              .setSenderNodeURI(localNodeURI)
+              .setSenderURI(connection.getConnectionURI())
+              .setSenderNeedURI(connection.getNeedURI())
+              .setReceiverNodeURI(remoteNodeURI)
+              .setReceiverURI(connection.getRemoteConnectionURI())
+              .setReceiverNeedURI(connection.getRemoteNeedURI())
+              .build();
+    }
   }
 
 
