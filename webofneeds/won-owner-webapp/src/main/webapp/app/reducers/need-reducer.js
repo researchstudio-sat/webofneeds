@@ -109,10 +109,6 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.connections.showLatestMessages:
         case actionTypes.connections.showMoreMessages:
-            /*var updatedNeeds =  action.payload.reduce(
-                (updatedState, connectionWithRelatedData) =>
-                    addMessage(updatedState, )storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
-                state);*/
             var loadedEvents = action.payload.get('events');
             if(loadedEvents){
                 state = addMessages(state, loadedEvents);
@@ -282,6 +278,7 @@ function storeConnectionsData(state, connectionsToStore, newConnections) {
 
 function parseConnection(jsonldConnection, newConnection) {
     const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
+    console.log("Connection to parse: ", jsonldConnectionImm.toJS());
 
     let parsedConnection = {
                                 belongsToUri: undefined,
@@ -397,9 +394,12 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
  * @return {*}
  */
 function addConnectionFull(state, connection, newConnection) {
+    console.log("Adding Full Connection");
     let parsedConnection = parseConnection(connection, newConnection);
 
     if(parsedConnection){
+        console.log("parsedConnection: ", parsedConnection.toJS(), "immutable ", parsedConnection);
+
         const needUri = parsedConnection.get("belongsToUri");
         let connections = state.getIn([needUri, 'connections']);
 
@@ -408,8 +408,10 @@ function addConnectionFull(state, connection, newConnection) {
 
             return state.setIn([needUri, "connections"], connections);
         }else{
-            console.error("Couldnt add valid connection - missing need data in state", needUri);
+            console.error("Couldnt add valid connection - missing need data in state", needUri, "parsedConnection: ", parsedConnection.toJS());
         }
+    }else{
+        console.log("No connection parsed, add no connection to this state: ", state);
     }
     return state;
 }
