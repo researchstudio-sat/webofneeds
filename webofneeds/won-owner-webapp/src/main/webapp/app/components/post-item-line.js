@@ -113,11 +113,11 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const ownNeeds = selectAllOwnNeeds(state);
                 const need = ownNeeds && ownNeeds.get(self.needUri);
-                const allConnectionsByNeedUri = need.get("connections");
+                const allConnectionsByNeedUri = need && need.get("connections");
 
-                const conversations = allConnectionsByNeedUri.filter(conn =>conn.get("state") === won.WON.Connected);
-                const requests = allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.RequestReceived);
-                const matches = allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
+                const conversations = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn =>conn.get("state") === won.WON.Connected);
+                const requests = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.RequestReceived);
+                const matches = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
 
                 const unreadConversationsCount = conversations && conversations.filter(conn => conn.get("newConnection")).size;
                 const unreadRequestsCount = requests && requests.filter(conn => conn.get("newConnection")).size;
