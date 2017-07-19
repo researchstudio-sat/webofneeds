@@ -1,4 +1,4 @@
-##WoN Message Signatures and their usage
+## WoN Message Signatures and their usage
 
 
 All the messages in WoN are issued by Node, Need, or Matcher. The messages issued by Need and Node are signed by them.
