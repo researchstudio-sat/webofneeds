@@ -1,5 +1,9 @@
 # PIWIK
 
+piwik can be accessed at: www.matchat.org/piwik
+
+NOTE: if you log in to piwik you are falsely redirected to www.matchat.org/owner, to come to the piwik page just reload www.matchat.org/piwik in the browser again
+
 piwik is deployed only on satvm01 together with the other live containers of won. 
 the docker-compose script specifies the files mounted from the host ($base_folder/piwik/config). 
 Here is the piwik config saved that is kept during all redeployments of the live environment. 
