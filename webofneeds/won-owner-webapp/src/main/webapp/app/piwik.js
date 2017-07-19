@@ -22,6 +22,10 @@ const trackerUrl = baseUrl + 'piwik.php'
  * calls to the `_paq` array, that the tracker reads from
  * when starting up. After that startup it calls the functions
  * directly on the tracker (as the `_paq` array isn't read then anymore)
+ *
+ * available calls can be found at:
+ * https://developer.piwik.org/api-reference/tracking-javascript
+ *
  * @param args
  */
 function piwikCall(args) {
