@@ -109,15 +109,15 @@ function genComponentConf() {
                 const lastUpdated = selectLastUpdateTime(state);
 
                 const ownNeed = state.getIn(["needs", self.needUri]);
-                const connections = ownNeed.get("connections");
+                const connections = ownNeed && ownNeed.get("connections");
 
-                const unreadMatchesCount = connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.Suggested).size;
-                const unreadRequestsCount = connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.RequestReceived).size;
+                const unreadMatchesCount = connections && connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.Suggested).size;
+                const unreadRequestsCount = connections && connections.filter(conn => conn.get("newConnection") && conn.get("state") === won.WON.RequestReceived).size;
 
                 return {
                     ownNeed,
-                    connectionsArray: connections.toArray(),
-                    connectionsSize: connections.size,
+                    connectionsArray: connections && connections.toArray(),
+                    connectionsSize: connections && connections.size,
                     WON: won.WON,
                     createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('creationDate')),
                     unreadMatchesCount,
