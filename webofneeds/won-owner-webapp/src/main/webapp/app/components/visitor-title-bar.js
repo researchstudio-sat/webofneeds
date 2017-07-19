@@ -15,7 +15,7 @@ function genComponentConf() {
         <nav class="visitor-title-bar">
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
-                    <a ng-click="self.back()">
+                    <a ng-click="self.back()" class="clickable">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="vtb__icon">
                     </a>
                     <won-square-image 
