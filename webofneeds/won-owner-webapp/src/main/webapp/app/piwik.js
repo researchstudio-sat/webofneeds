@@ -38,13 +38,13 @@ function piwikCall(args) {
 }
 
 
-/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-piwikCall(['trackPageView']);
-piwikCall(['enableLinkTracking']);
 piwikCall(['setTrackerUrl', trackerUrl]);
 piwikCall(['setSiteId', '1']);
 
 
+/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+piwikCall(['trackPageView']); // log that page has loaded
+//piwikCall(['enableLinkTracking']);
 
 //_paq.push(['setUserId', 'USER_ID_HERE']);
 //_paq.push(['enableHeartBeatTimer']); // track time spent with the page open and in focus in 15s increments
