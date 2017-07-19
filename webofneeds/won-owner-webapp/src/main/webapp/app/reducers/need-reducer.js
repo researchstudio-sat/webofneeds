@@ -141,7 +141,7 @@ function addNeed(needs, jsonldNeed, ownNeed) {
 
     if(parsedNeed && parsedNeed.get("uri")) {
         if(ownNeed && needs.get(parsedNeed.get("uri"))){ //If need is already present and the need is claimed as an own need we set have to set it
-            newState = needs.setIn(["needs", parsedNeed.get("uri"), "ownNeed"], ownNeed);
+            newState = needs.setIn([parsedNeed.get("uri"), "ownNeed"], ownNeed);
         }else{
             newState = setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
         }
