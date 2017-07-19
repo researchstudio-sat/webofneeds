@@ -11,6 +11,7 @@ Here is the piwik config saved that is kept during all redeployments of the live
 ## How PIWIK was setup first time:
 
  * went manually through the piwik setup (creating user 'piwik' with password, etc)
+ * set in the dashboard in Settings => Keep URL fragments and Save
  * add the following lines in piwik config.ini.php:
 
 ```
