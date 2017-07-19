@@ -65,8 +65,8 @@ function genComponentConf() {
 
             const selectFromState = (state) => {
                 const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
-                const ownNeed = selectNeedByConnectionUri(state, connectionUri);
-                const connection = ownNeed.getIn(["connections", connectionUri]);
+                const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+                const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
                 return {
                     connection,
