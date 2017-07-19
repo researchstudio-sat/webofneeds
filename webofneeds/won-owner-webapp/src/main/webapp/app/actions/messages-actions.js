@@ -220,15 +220,17 @@ export function connectMessageReceived(events) {
 
         Promise.all([
             connectionP,
-            won.getTheirNeed(theirNeedUri)
+            won.getTheirNeed(theirNeedUri),
+            won.getOwnNeed(ownNeedUri),
         ])
-        .then(([connection, theirNeed]) => {
+        .then(([connection, theirNeed, ownNeed]) => {
             dispatch({
                 type: actionTypes.messages.connectMessageReceived,
                 payload: {
                     updatedConnection: ownConnectionUri,
                     connection: connection.set('hasConnectionState', won.WON.RequestReceived),
                     ownNeedUri: ownNeedUri,
+                    ownNeed: ownNeed,
                     remoteNeed: theirNeed,
                     receivedEvent: eventOnOwn.uri, // the more relevant event. used for unread-counter.
                     events: [

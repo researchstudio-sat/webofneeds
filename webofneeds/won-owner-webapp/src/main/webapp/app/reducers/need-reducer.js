@@ -61,8 +61,12 @@ export default function(state = initialState, action = {}) {
                 state);
 
         case actionTypes.messages.connectMessageReceived:
-            const {ownNeedUri, remoteNeed, updatedConnection, connection } = action.payload;
-            const stateWithBothNeeds = addNeed(state, remoteNeed, false); // guarantee that remoteNeed is in state
+            const {ownNeedUri, ownNeed, remoteNeed, updatedConnection, connection } = action.payload;
+            const ownNeedFromState = state.get(ownNeedUri);
+
+            const stateWithOwnNeed = ownNeedFromState ? state : addNeed(state, ownNeed, true);
+            const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
+
             return addConnectionFull(stateWithBothNeeds, connection, true);
 
         case actionTypes.messages.hintMessageReceived:
