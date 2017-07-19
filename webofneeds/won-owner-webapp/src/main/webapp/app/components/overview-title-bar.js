@@ -69,14 +69,19 @@ function genComponentConf() {
                 const allConnections = selectAllConnections(state);
                 const allMessages = selectAllMessages(state);
 
+                const nrOfUnreadMessages= allMessages && allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size; //only count incoming messages
+                const nrOfUnreadIncomingRequests= allConnections && allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived && conn.get("newConnection")).size;
+                const nrOfUnreadMatches= allConnections && allConnections.filter(conn => conn.get("state") === won.WON.Suggested && conn.get("newConnection")).size;
+                const nrOfNeedsWithUnreadEvents= undefined; //TODO: COUNT HOW MANY NEEDS HAVE AT LEAST ONE NEW CONNECTION OR ONE NEW MESSAGE
+
                 return {
                     hasPosts: ownNeeds && ownNeeds.size > 0,
                     hasRequests: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
                     hasMatches: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.Suggested).size > 0,
-                    nrOfUnreadMessages: allMessages && allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size, //only count incoming messages
-                    nrOfUnreadIncomingRequests: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.RequestReceived && conn.get("newConnection")).size,
-                    nrOfUnreadMatches: allConnections && allConnections.filter(conn => conn.get("state") === won.WON.Suggested && conn.get("newConnection")).size,
-                    nrOfNeedsWithUnreadEvents: undefined, //TODO: COUNT HOW MANY NEEDS HAVE AT LEAST ONE NEW CONNECTION OR ONE NEW MESSAGE
+                    nrOfUnreadMessages: nrOfUnreadMessages ? nrOfUnreadMessages : undefined,
+                    nrOfUnreadIncomingRequests: nrOfUnreadIncomingRequests ? nrOfUnreadIncomingRequests : undefined,
+                    nrOfUnreadMatches: nrOfUnreadMatches ? nrOfUnreadMatches : undefined,
+                    nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnreadEvents ? nrOfNeedsWithUnreadEvents : undefined,
                 };
             };
 
