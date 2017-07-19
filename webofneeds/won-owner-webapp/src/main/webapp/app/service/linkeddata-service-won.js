@@ -1075,7 +1075,7 @@ import won from './won';
                     complexJsonLd :
                     {'@graph': complexJsonLd};
 
-                console.log('complexJsonLd_: ', complexJsonLd_);
+                //console.log('complexJsonLd_: ', complexJsonLd_);
                 return jsonld.promises.frame(complexJsonLd_, frame);
             })
             .then(framed => {
