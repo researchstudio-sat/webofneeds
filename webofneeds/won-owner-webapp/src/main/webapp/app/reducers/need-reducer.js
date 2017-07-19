@@ -57,7 +57,7 @@ export default function(state = initialState, action = {}) {
         case actionTypes.connections.load:
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
-                    storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
+                    storeConnectionAndRelatedData(updatedState, connectionWithRelatedData, false),
                 state);
 
         case actionTypes.messages.connectMessageReceived:
@@ -70,7 +70,7 @@ export default function(state = initialState, action = {}) {
             return addConnectionFull(stateWithBothNeeds, connection, true);
 
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionAndRelatedData(state, action.payload);
+            return storeConnectionAndRelatedData(state, action.payload, true);
 
         //NEW CONNECTIONS STATE UPDATES
         case actionTypes.connections.close:
@@ -125,12 +125,12 @@ export default function(state = initialState, action = {}) {
     }
 }
 
-function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
+function storeConnectionAndRelatedData(state, connectionWithRelatedData, newConnection) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     const stateWithOwnNeed = addNeed(state, ownNeed, true); // guarantee that ownNeed is in state
     const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
 
-    return addConnectionFull(stateWithBothNeeds, connection, false);
+    return addConnectionFull(stateWithBothNeeds, connection, newConnection);
 }
 
 function addNeed(needs, jsonldNeed, ownNeed) {
