@@ -119,6 +119,10 @@ function genComponentConf() {
                 const requests = allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.RequestReceived);
                 const matches = allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
 
+                const unreadConversationsCount = conversations && conversations.filter(conn => conn.get("newConnection")).size;
+                const unreadRequestsCount = requests && requests.filter(conn => conn.get("newConnection")).size;
+                const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
+
                 return {
                     need,
                     ownNeed: need,
@@ -128,9 +132,9 @@ function genComponentConf() {
                     hasConversations: conversations && conversations.size > 0,
                     hasRequests: requests && requests.size > 0,
                     hasMatches: matches && matches.size > 0,
-                    unreadConversationsCount: conversations && conversations.filter(conn => conn.get("newConnection")).size,
-                    unreadRequestsCount: requests && requests.filter(conn => conn.get("newConnection")).size,
-                    unreadMatchesCount: matches && matches.filter(conn => conn.get("newConnection")).size,
+                    unreadConversationsCount: unreadConversationsCount > 0 ? unreadConversationsCount : undefined,
+                    unreadRequestsCount: unreadRequestsCount > 0 ? unreadRequestsCount : undefined,
+                    unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
                     WON: won.WON,
                     debugmode: won.debugmode,
                 };

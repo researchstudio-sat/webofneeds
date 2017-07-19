@@ -81,28 +81,28 @@ function genComponentConf() {
                                 <a ui-sref="post({connectionType: self.WON.Connected, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
                                     Messages
-                                    <span class="ntb__tabs__unread">{{ self.unreadMessages.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadMessagesCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}">
                                 <a ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
                                     Matches
-                                    <span class="ntb__tabs__unread">{{ self.unreadMatches.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadMatchesCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}">
                                 <a ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
                                     Requests
-                                    <span class="ntb__tabs__unread">{{ self.unreadIncomingRequests.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadIncomingRequestsCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}">
                                 <a ui-sref="post({connectionType: self.WON.RequestSent, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
                                     Sent Requests
-                                    <span class="ntb__tabs__unread">{{ self.unreadSentRequests.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadSentRequestsCount }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -135,6 +135,11 @@ function genComponentConf() {
                 const connected = connections && connections.filter(conn => conn.get("state") === won.WON.Connected);
                 const messages = selectAllMessagesByNeedUri(state, postUri);
 
+                const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
+                const unreadSentRequestsCount = sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size;
+                const unreadIncomingRequestsCount = incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size;
+                const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage')).size ;
+
                 return {
                     selectedTab: decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType'])) || 'Info',
                     WON: won.WON,
@@ -144,10 +149,10 @@ function genComponentConf() {
                     hasSentRequests: sentRequests && sentRequests.size > 0,
                     hasMatches: matches && matches.size > 0,
                     hasConnected: connected && connected.size > 0,
-                    unreadMessages: messages && messages.filter(msg => msg.get('newMessage')).size,
-                    unreadIncomingRequests: incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size,
-                    unreadSentRequests: sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size,
-                    unreadMatches:  matches && matches.filter(conn => conn.get("newConnection")).size,
+                    unreadMessagesCount: unreadMessagesCount > 0 ? unreadMessagesCount : undefined,
+                    unreadIncomingRequestsCount: unreadIncomingRequestsCount > 0 ? unreadIncomingRequestsCount : undefined,
+                    unreadSentRequestsCount: unreadSentRequestsCount > 0 ? unreadSentRequestsCount : undefined,
+                    unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
                     isActive: post && post.get('state') === won.WON.ActiveCompacted,
                 };
             };
