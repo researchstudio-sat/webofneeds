@@ -243,6 +243,25 @@ services:
       - wonnode
       - mongodb
 
+  # MySQL database for piwik
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - $base_folder/mysql/data:/var/lib/mysql
+    environment:
+      - "MYSQL_ROOT_PASSWORD=$mysql_passwd"
+
+  # piwik tool for analytics
+  piwik:
+    image: piwik:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - $base_folder/piwik/config:/var/www/html/config
+    depends_on:
+      - mysql
 
 
 
