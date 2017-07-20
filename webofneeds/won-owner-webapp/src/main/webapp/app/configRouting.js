@@ -161,6 +161,9 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
                 });
             break;
 
+        case 'createNeed':
+            return; // can always access this page.
+
         default: //FOR ALL OTHER ROUTES
             if ( state.get('initialLoadFinished') ) {
                 if(state.getIn(['user', 'loggedIn'])) {
