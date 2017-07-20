@@ -138,7 +138,7 @@ function genComponentConf() {
                 const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
                 const unreadSentRequestsCount = sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size;
                 const unreadIncomingRequestsCount = incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size;
-                const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage')).size ;
+                const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;
 
                 return {
                     selectedTab: decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType'])) || 'Info',
