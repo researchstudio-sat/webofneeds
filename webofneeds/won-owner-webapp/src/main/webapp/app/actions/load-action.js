@@ -8,6 +8,10 @@ import { actionTypes, actionCreators } from './actions';
 import { selectOpenPostUri } from '../selectors';
 
 import {
+    checkLoginStatus,
+} from '../won-utils';
+
+import {
     checkHttpStatus,
 } from '../utils';
 
@@ -22,9 +26,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
     * initial page-load-speed.
     * TODO fetch config data here as well
     */
-    fetch('rest/users/isSignedIn', {credentials: 'include'})
-    .then(checkHttpStatus)
-    .then(resp => resp.json())
+    checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data => loadingWhileSignedIn(dispatch, data.username))
     /* handle: not-logged-in */

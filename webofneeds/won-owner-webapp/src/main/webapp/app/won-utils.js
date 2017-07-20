@@ -6,6 +6,7 @@ import Immutable from 'immutable';
 import L from './leaflet-bundleable';
 import {
     arrEq,
+    checkHttpStatus,
 } from './utils';
 
 export function initLeaflet(mapMount) {
@@ -124,4 +125,41 @@ export function connect2Redux(selectFromState, actionCreators, properties, ctrl)
         disconnectRdx();
         disconnectProps();
     });
+}
+
+/**
+ * Checks whether the user has a logged-in session.
+ * Returns a promise with the user-object if successful
+ * or a failing promise if an error has occured.
+ *
+ * @returns {*}
+ */
+export function checkLoginStatus() {
+    return fetch('rest/users/isSignedIn', {credentials: 'include'})
+        .then(checkHttpStatus) // will reject if not logged in
+        .then(resp => resp.json());
+}
+
+/**
+ * Registers the account with the server.
+ * The returned promise fails if something went
+ * wrong during creation.
+ *
+ * @param username
+ * @param password
+ * @returns {*}
+ */
+export function registerAccount(username, password) {
+    return fetch('/owner/rest/users/', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({username: username, password: password})
+    })
+    .then(
+        checkHttpStatus
+    );
 }

@@ -6,6 +6,7 @@ import  won from '../won-es6';
 import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
 import { fetchOwnedData } from '../won-message-utils';
+import { registerAccount } from '../won-utils';
 
 import {
     checkHttpStatus,
@@ -94,29 +95,16 @@ export function accountLogout() {
 
 export function accountRegister(username, password) {
     return (dispatch) =>
-        fetch('/owner/rest/users/', {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({username: username, password: password})
+        registerAccount(username, password)
+        .then(response => {
+            /* TODO shouldn't we already have a valid
+            * session at this point and thus just need
+            * to execute the data-fetching part of login
+            * (the fetchDataForOwnedNeeds, redirect
+            * and wsReset)
+            */
+            dispatch(actionCreators.login(username, password));
         })
-        .then(
-            checkHttpStatus
-        )
-        .then(
-                response => {
-                    /* TODO shouldn't we already have a valid
-                    * session at this point and thus just need
-                    * to execute the data-fetching part of login
-                    * (the fetchDataForOwnedNeeds, redirect
-                    * and wsReset)
-                    */
-                    dispatch(actionCreators.login(username, password));
-                }
-            )
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>

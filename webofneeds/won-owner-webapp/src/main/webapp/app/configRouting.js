@@ -7,6 +7,10 @@ import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions/actions';
 
 import {
+    checkLoginStatus,
+} from './won-utils';
+
+import {
     selectAllNeeds,
 } from './selectors';
 
@@ -28,14 +32,14 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
     //$urlRouterProvider.when('/create-need/', [() => '/create-need/' + getRandomPosInt()]);
 
     [
-        { path: '/landingpage?:focusSignup', component: 'landingpage' },
-        { path: '/create-need/:draftId', component: 'create-need' },
+        { path: '/landingpage?:focusSignup?privateId', component: 'landingpage' },
+        { path: '/create-need/?privateId', component: 'create-need' },
         { path: '/feed', component: 'feed' },
-        { path: '/overview/matches?layout?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
-        { path: '/overview/incoming-requests?myUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
-        { path: '/overview/sent-requests?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
-        { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
-        { path: '/post/?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
+        { path: '/overview/matches?privateId?layout?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
+        { path: '/overview/incoming-requests?privateId?myUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
+        { path: '/overview/sent-requests?privateId?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
+        { path: '/overview/posts?privateId', component: 'overview-posts', as: 'overviewPosts' },
+        { path: '/post/?privateId?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
 
     ].forEach( ({path, component, as}) => {
 
@@ -151,14 +155,14 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
             break;
 
         case 'landingpage': //Route the 'landingpage' view at all times
-            fetch('rest/users/isSignedIn', {credentials: 'include'})
-                .then(checkHttpStatus) // will reject if not logged in
-                .then(() => {//logged in -- re-initiate route-change
-                    console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the feed");
-                    $ngRedux.dispatch(
-                        actionCreators.router__stateGo('feed', toParams)
-                    )
-                });
+
+            checkLoginStatus()
+            .then(() => {//logged in -- re-initiate route-change
+                console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the feed");
+                $ngRedux.dispatch(
+                    actionCreators.router__stateGo('feed', toParams)
+                )
+            });
             break;
 
         case 'createNeed':

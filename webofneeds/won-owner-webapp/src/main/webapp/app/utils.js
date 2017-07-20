@@ -280,6 +280,28 @@ export function isString(o) {
     return typeof o == "string" || (typeof o == "object" && o.constructor === String);
 }
 
+/**
+ * Generate string of [a-z0-9] with specified length
+ * @param length
+ * @returns {*}
+ */
+export function generateIdString(length) {
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    return arrayOfRandoms(length)
+        .map(randomFloat => Math.floor(randomFloat * characters.length))
+        .map(randomPosition => characters.charAt(randomPosition))
+        .join('');
+}
+
+/**
+ * Generate array of random numbers.
+ * @param length
+ * @returns {*}
+ */
+export function arrayOfRandoms(length) {
+    return Array.apply(null, Array(length)).map(() => Math.random());
+}
+
 export function readAsDataURL(file) {
     return new Promise((resolve, reject) => {
         var reader = new FileReader();

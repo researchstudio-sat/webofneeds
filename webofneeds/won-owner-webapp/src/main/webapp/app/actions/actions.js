@@ -36,12 +36,14 @@
  */
 
 import  won from '../won-es6';
+import Immutable from 'immutable';
 
 // <utils>
 
 import {
     tree2constants,
     entries,
+    generateIdString,
 } from '../utils';
 import { hierarchy2Creators } from './action-utils';
 import {
@@ -49,6 +51,10 @@ import {
     buildCloseNeedMessage,
     buildOpenNeedMessage
 } from '../won-message-utils';
+import {
+    checkLoginStatus,
+    registerAccount,
+} from '../won-utils';
 
 // </utils>
 
@@ -252,11 +258,52 @@ export function startTicking() {
 
 
 export function needCreate(draft, nodeUri) {
-    const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-    return {
-        type: actionTypes.needs.create,
-        payload: { eventUri, message, needUri }
-    };
+    return (dispatch, getState) => {
+        const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
+
+
+        const state = getState();
+        let email = state.getIn(['user', 'email']);
+        let hasAccountPromise;
+
+        if(state.getIn(['user', 'loggedIn'])){
+            hasAccountPromise = Promise.resolve();
+        } else {
+            const usernameFragment = generateIdString(8);
+            email = usernameFragment + '@matchat.org'; // generate random account-name
+            const password = generateIdString(8);
+            const tmpUserId = usernameFragment + '-' + password;
+            hasAccountPromise =
+                registerAccount(email, password)
+                .then(() => {
+                    //TODO custom action-creator and -type for this?
+                    const currentState = state.getIn(['router', 'currentState', 'name']); // e.g. "createNeed"
+                    dispatch(actionCreators.router__stateGo(currentState, { privateId: tmpUserId })); // add anonymous id to query-params
+                    dispatch({
+                        type: actionTypes.login,
+                        payload: Immutable.fromJS({
+                            email,
+                            loggedIn: true,
+                            events: {},
+                            ownNeeds: {},
+                            theirNeeds: {},
+                        })
+                    })
+                });
+        }
+
+        hasAccountPromise
+        .then(() => {
+            dispatch({
+                type: actionTypes.needs.create,
+                payload: {eventUri, message, needUri}
+            });
+        })
+        .catch(err => {
+            //TODO user-visible error message / error recovery mechanisms
+            console.error(`Creating temporary account ${email} has failed due to `, err);
+        })
+    }
 }
 
 /**
