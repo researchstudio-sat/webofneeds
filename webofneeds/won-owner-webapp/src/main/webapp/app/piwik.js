@@ -13,7 +13,7 @@ import {
 let _paq = _paq || [];
 window._paq = _paq; // export required for interaction with piwik
 
-const baseUrl = "//matchat-tmp.innocraft.cloud/";
+const baseUrl = "//matchat.org/piwik/";
 const trackerUrl = baseUrl + 'piwik.php'
 
 /**
