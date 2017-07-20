@@ -782,7 +782,7 @@ import won from './won';
     function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
         let requestUri = queryString(uri, params);
 
-        console.log("linkeddata-service-won.js: fetching:        " + requestUri);
+        //console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
         const datasetP = fetch(requestUri, {
             method: 'get',
@@ -840,7 +840,7 @@ import won from './won';
         return new Promise((resolve, reject) =>
             privateData.store.load("application/ld+json", data, function (success, results) {
                 if (success) {
-                    console.log('linkeddata-serice-won.js: finished storing triples ', data);
+                    //console.log('linkeddata-serice-won.js: finished storing triples ', data);
                     resolve(uri);
                 } else {
                     console.error('Failed to store json-ld data for ' + uri);
@@ -1062,7 +1062,7 @@ import won from './won';
             }))
         };
 
-        console.log('jsonldjsQuads: ', jsonldjsQuads);
+        //console.log('jsonldjsQuads: ', jsonldjsQuads);
 
         const context = frame['@context']? clone(frame['@context']) : {}; //TODO
         context.useNativeTypes = true; //do some of the parsing from strings to numbers
@@ -1075,7 +1075,7 @@ import won from './won';
                     complexJsonLd :
                     {'@graph': complexJsonLd};
 
-                console.log('complexJsonLd_: ', complexJsonLd_);
+                //console.log('complexJsonLd_: ', complexJsonLd_);
                 return jsonld.promises.frame(complexJsonLd_, frame);
             })
             .then(framed => {

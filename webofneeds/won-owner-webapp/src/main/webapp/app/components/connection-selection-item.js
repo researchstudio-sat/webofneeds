@@ -4,28 +4,17 @@
 
 import won from '../won-es6';
 import angular from 'angular';
-import squareImageModule from './square-image';
 import {
     labels,
-    relativeTime,
 } from '../won-label-utils';
-import { attach, decodeUriComponentProperly } from '../utils.js';
+import { attach } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
-    selectAllByConnections,
-    selectOpenPost,
-    selectOpenPostUri,
-    selectLastUpdatedPerConnection,
-    selectLastUpdateTime,
-    selectUnreadCountsByConnectionAndType,
+    selectNeedByConnectionUri,
+    selectAllTheirNeeds
 } from '../selectors';
 
-import {
-    selectTimestamp,
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils'
 import postHeaderModule from './post-header';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -35,8 +24,8 @@ function genComponentConf() {
       class="conn__inner"
       ng-class="self.isOpen() ? 'selected' : ''">
         <won-post-header
-          need-uri="self.theirNeed.get('@id')"
-          timestamp="self.lastUpdateTimestamp"
+          need-uri="self.theirNeed.get('uri')"
+          timestamp="self.theiNeed.get('creationDate')"
           ng-click="self.setOpen()"
           class="clickable">
         </won-post-header>
@@ -66,55 +55,23 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
-            window.connSelItm4dbg = this;
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
             //this.settingsOpen = false;
 
-            this.cnctState2MessageType = won.cnctState2MessageType;
-
             const self = this;
 
             const selectFromState = (state)=> {
+                const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
+                const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+                const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
-                const connectionData = selectAllByConnections(state).get(this.connectionUri);
-                const connectionUri = connectionData && connectionData.getIn(['connection', 'uri']);
-                const ownNeed = connectionData && connectionData.get('ownNeed');
-                const theirNeed = connectionData && connectionData.get('remoteNeed');
-
-                const lastStateUpdate = selectLastUpdateTime(state);
-                const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
-
-                const connectionType = connectionData && connectionData
-                    .getIn(['connection','hasConnectionState']);
-
-                const unreadCounts = selectUnreadCountsByConnectionAndType(state);
-                const messageType = won.cnctState2MessageType[connectionType];
                 return {
                     openConnectionUri: selectOpenConnectionUri(state),
-
-                    ownNeed,
-                    ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
-                    ownNeedContent: ownNeed && seeksOrIs(ownNeed),
-
                     theirNeed,
-                    theirNeedType: theirNeed && inferLegacyNeedType(theirNeed),
-                    theirNeedContent: theirNeed && seeksOrIs(theirNeed),
-                    theirNeedCreatedOn: theirNeed && relativeTime(
-                        lastStateUpdate,
-                        theirNeed.get('dct:created')
-                    ),
-                    lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
-                    lastUpdated: lastUpdatedPerConnection &&
-                        relativeTime(
-                            lastStateUpdate,
-                            lastUpdatedPerConnection.get(connectionUri)
-                        ),
-
-                    unreadCount: unreadCounts && unreadCounts
-                        .getIn([connectionUri, messageType])
+                    unreadCount: undefined //TODO: WHAT SHOULD BE HERE?
                 }
-            }
+            };
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);

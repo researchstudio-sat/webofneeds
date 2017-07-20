@@ -41,25 +41,14 @@ import  won from '../won-es6';
 
 import {
     tree2constants,
-    deepFreeze,
-    reduceAndMapTreeKeys,
-    flattenTree,
-    delay,
-    checkHttpStatus,
-    watchImmutableRdxState,
     entries,
 } from '../utils';
 import { hierarchy2Creators } from './action-utils';
-import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
     buildCloseNeedMessage,
     buildOpenNeedMessage
 } from '../won-message-utils';
-
-import {
-    selectConnectionUris,
-} from '../won-utils';
 
 // </utils>
 
@@ -105,11 +94,9 @@ const actionHierarchy = {
         connect: cnct.connectionsConnect,
         close: cnct.connectionsClose,
         rate: cnct.connectionsRate,
-        typedAtChatMessage: INJ_DEFAULT,
         sendChatMessage: cnct.connectionsChatMessage,
         showLatestMessages: cnct.showLatestMessages,
         showMoreMessages: cnct.showMoreMessages,
-        reset:INJ_DEFAULT,
     },
     needs: {
         received: INJ_DEFAULT,
@@ -321,9 +308,7 @@ export function needsOpen(needUri) {
                     type: actionTypes.needs.reopen,
                     payload: {
                         ownNeedUri: needUri,
-                        affectedConnections: selectConnectionUris(
-                                getState().getIn(['needs', 'ownNeeds', needUri])
-                            )
+                        affectedConnections: getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri")),
                     }
                 })
         )
@@ -349,9 +334,7 @@ export function needsClose(needUri) {
                 type: actionTypes.needs.close,
                 payload: {
                     ownNeedUri: needUri,
-                    affectedConnections: selectConnectionUris(
-                        getState().getIn(['needs', 'ownNeeds', needUri])
-                    )
+                    affectedConnections: getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri")),
                 }
             })
         )

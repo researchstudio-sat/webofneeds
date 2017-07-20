@@ -4,77 +4,48 @@ import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
 import openRequestModule from '../open-request';
 import connectionsOverviewModule from '../connections-overview';
-import { attach,mapToMatches } from '../../utils';
+import { attach, } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
-import { selectAllByConnections } from '../../selectors';
+import {
+    selectNeedByConnectionUri,
+    selectAllConnections
+} from '../../selectors';
 const serviceDependencies = ['$ngRedux', '$scope'];
 
 class IncomingRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
-        window.oireq = this;
         this.WON = won.WON;
 
         this.selection = 2;
         this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
 
         const selectFromState = (state)=>{
-            const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
             const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+            const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+            const connection = need && need.getIn(["connections", connectionUri]);
 
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
+                const connections = selectAllConnections(state);
+
                 return {
                     WON: won.WON,
-                    connection: state.getIn(['connections', connectionUri]),
-                    /*
-                    incomingRequests: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived &&
-                            state.getIn(['events', conn.connection.uri]) !== undefined
-                        ),
-                    incomingRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived
-                        )
-                    ),
-                    */
-
-                    hasRequests: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.RequestReceived){
-                                return true
-                            }
-                        }).length > 0,
+                    connection,
+                    hasRequests: connections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
                 };
             }else{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                const post = state.getIn(["needs", postId]);
+
                 return {
                     WON: won.WON,
-                    post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    connection: state.getIn(['connections', connectionUri]),
-                    /*
-                    incomingRequests: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived &&
-                            state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed['@id'] === postId
-                        ),
-                    incomingRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed['@id'] === postId
-                        )
-                    )
-                    */
+                    post,
+                    connection,
                 };
             }
-        }
+        };
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
 

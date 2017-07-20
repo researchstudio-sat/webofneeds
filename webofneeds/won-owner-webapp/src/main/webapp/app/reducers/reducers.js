@@ -10,9 +10,7 @@ import reduceReducers from 'reduce-reducers';
 import needReducer from './need-reducer';
 import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
-import matchReducer from './match-reducer';
 import toastReducer from './toast-reducer';
-import connectionReducer from './connection-reducer';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -33,12 +31,9 @@ const reducers = {
     },
     */
 
-
-    connections:connectionReducer,
     events: eventReducer,
     user: userReducer,
-    needs:needReducer,
-    matches: matchReducer,
+    needs: needReducer,
     messages: messagesReducer,
     toasts: toastReducer,
 
@@ -80,7 +75,7 @@ const reducers = {
                 return config;
         }
     },
-}
+};
 
 
 export default reduceReducers( //passes on the state from one reducer to another
@@ -133,7 +128,7 @@ export default reduceReducers( //passes on the state from one reducer to another
              case actionTypes.login:
              case actionTypes.messages.connectMessageReceived:
              case actionTypes.messages.hintMessageReceived:
-                 return deleteCnctBetweenOwned(state);
+                 return deleteConnectionsBetweenOwnNeeds(state);
 
              /*
               * TODO try to resolve a lot of the AC-dispatching so only
@@ -152,43 +147,10 @@ export default reduceReducers( //passes on the state from one reducer to another
 
 window.Immutable4dbg = Immutable;
 
-function deleteCnctBetweenOwned(state) {
-    var cnctBetweenOwned = selectCnctUrisBetweenOwnedNeeds(state);
-    return cnctBetweenOwned.reduce(purgeConnection, state); //remove all those connections
-}
+//TODO: DELETE CONNECTIONS BETWEEN OWNED
+function deleteConnectionsBetweenOwnNeeds(state) {
+    //TODO: REMOVE CONNECTION
+    //remove all connections (['needs', needUri, 'connections', connectionUri, 'remoteNeedUri']) that have a remoteNeedId that is also an ownNeed (['needs', needUri, 'ownNeed'] == true)
 
-function selectCnctUrisBetweenOwnedNeeds(state) {
-
-    const ownedNeedsUris = state
-        .getIn(['needs', 'ownNeeds'])
-        .keySeq().toSet();
-
-    const cnctBetweenOwned = state
-        .get('connections')
-        .filter(connection =>
-            ownedNeedsUris.contains(
-                connection.get('hasRemoteNeed')
-            )
-    );
-
-    return cnctBetweenOwned.keySeq().toSet();
-}
-
-function purgeConnection(state, cnctUri) {
-    const cnct = state.getIn(['connections', cnctUri]);
-    state = state.deleteIn(['connections', cnctUri]);
-    cnct.get('hasEvents').forEach(eventUri => {
-        state = state.deleteIn(['events', 'events', eventUri]);
-    })
-    const needUri = cnct.get('belongsToNeed');
-
-    const path = [
-        'needs', 'ownNeeds', needUri,
-        'hasConnections'
-    ];
-
-    state = state.updateIn(path, connections =>
-        connections && connections.delete(cnctUri)
-    );
     return state;
 }

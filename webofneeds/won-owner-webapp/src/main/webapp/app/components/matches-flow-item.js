@@ -11,17 +11,10 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import {
     labels,
-    relativeTime,
 } from '../won-label-utils';
 
 import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
-
-import {
-    selectAllByConnections,
-    selectLastUpdateTime,
+    selectNeedByConnectionUri
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$interval'];
@@ -35,8 +28,8 @@ function genComponentConf() {
                 ng-show="self.images.length > 0">
             </won-extended-gallery>
             <won-square-image 
-                title="self.remoteNeedContent.get('dc:title')"
-                uri="self.remoteNeed.get('@id')"
+                title="self.remoteNeed.get('title')"
+                uri="self.remoteNeed.get('uri')"
                 ng-show="self.images.length == 0">
             </won-square-image>
         </div>
@@ -45,12 +38,12 @@ function genComponentConf() {
               ng-click="self.toggleFeedback()">
 
             <won-post-header
-              need-uri="self.remoteNeed.get('@id')"
+              need-uri="self.remoteNeed.get('uri')"
               hide-image="true">
             </won-post-header>
             <hr/>
             <won-post-content
-              need-uri="self.remoteNeed.get('@id')">
+              need-uri="self.remoteNeed.get('uri')">
             </won-post-content>
         </div>
 
@@ -60,16 +53,16 @@ function genComponentConf() {
             ng-click="self.showFeedback()">
                 <div class="mfi__match__description">
                     <div class="mfi__match__description__title">
-                        {{ self.ownNeedContent.get('dc:title') }}
+                        {{ self.ownNeed.get('title') }}
                     </div>
                     <div class="mfi__match__description__type">
-                        {{ self.labels.type[ self.ownNeedType ] }}
+                        {{ self.labels.type[ self.ownNeed.get("type") ] }}
                     </div>
                 </div>
                 <won-square-image
-                    src="self.ownNeedContent.get('titleImgSrc')"
-                    title="self.ownNeedContent.get('dc:title')"
-                    uri="self.ownNeed.get('@id')">
+                    src="self.ownNeed.get('titleImgSrc')"
+                    title="self.ownNeed.get('title')"
+                    uri="self.ownNeed.get('uri')">
                 </won-square-image>
         </div>
         <won-feedback-grid
@@ -84,29 +77,15 @@ function genComponentConf() {
             this.feedbackVisible = false;
             this.maxThumbnails = 4;
             this.images=[];
-
-            window.mfi4dbg = this;
-
-
+            const self = this;
             const selectFromState = (state) => {
-                const connectionData = selectAllByConnections(state).get(this.connectionUri);
-                const ownNeed = connectionData && connectionData.get('ownNeed');
-                const remoteNeed = connectionData && connectionData.get('remoteNeed');
+                const ownNeed = selectNeedByConnectionUri(state, self.connectionUri);
+                const connectionData = state.getIn(["needs", ownNeed.get("uri"), "connections", self.connectionUri]);
+                const remoteNeed = state.getIn(["needs", connectionData.get("remoteNeedUri")]);
 
                 return {
-                    connectionData,
-
                     ownNeed,
-                    ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
-                    ownNeedContent: ownNeed && seeksOrIs(ownNeed),
-
                     remoteNeed,
-                    remoteNeedType: remoteNeed && inferLegacyNeedType(remoteNeed),
-                    remoteNeedContent: remoteNeed && seeksOrIs(remoteNeed),
-                    remoteCreatedOn: remoteNeed && relativeTime(
-                        selectLastUpdateTime(state),
-                        remoteNeed.get('dct:created')
-                    ),
                 };
             };
 
@@ -134,7 +113,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionUri: "="
+            connectionUri: "=",
         },
         template: template
     }

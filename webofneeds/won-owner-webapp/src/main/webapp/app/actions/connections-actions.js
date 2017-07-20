@@ -4,26 +4,15 @@
 
 import  won from '../won-es6';
 import Immutable from 'immutable';
-
-
 import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
 
-import { getRandomPosInt } from '../utils';
-
 import {
-    selectAllByConnections,
+    selectAllByConnectionUri,
     selectOpenConnectionUri,
-    selectOpenConnection,
     selectRemoteEvents,
 } from '../selectors';
 
 import {
-    selectEventsOfConnection,
-    selectTimestamp,
-} from '../won-utils';
-
-import {
-    checkHttpStatus,
     is,
     urisToLookupMap,
     msStringToDate,
@@ -34,17 +23,14 @@ import {
 import {
     actionTypes,
     actionCreators,
-    getConnectionRelatedData,
 } from './actions';
 
 import {
-    buildCreateMessage,
     buildOpenMessage,
     buildCloseMessage,
     buildChatMessage,
     buildRateMessage,
     buildConnectMessage,
-    setCommStateFromResponseForLocalNeedMessage,
     getEventsFromMessage,
 } from '../won-message-utils';
 
@@ -129,7 +115,7 @@ export function connectionsOpen(connectionUri, message) {
 export function connectionsConnect(connectionUri,message) {
     return (dispatch, getState) => {
         const state = getState();
-        const eventData = selectAllByConnections(state).get(connectionUri).toJS(); // TODO avoid toJS;
+        const eventData = selectAllByConnectionUri(state, connectionUri).toJS(); // TODO avoid toJS; UPDATE TO NEW STRUCTURE
         const messageDataP = won
             .getConnectionWithEventUris(eventData.connection.uri)
             .then(connection=> {
@@ -169,7 +155,7 @@ export function connectionsConnect(connectionUri,message) {
 export function connectionsClose(connectionUri) {
     return (dispatch, getState) => {
         const state = getState();
-        const eventData = selectAllByConnections(state).get(connectionUri).toJS();// TODO avoid toJS
+        const eventData = selectAllByConnectionUri(state, connectionUri).toJS();// TODO avoid toJS; UPDATE TO NEW STRUCTURE
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
 
@@ -198,8 +184,7 @@ export function connectionsRate(connectionUri,rating) {
         console.log(rating);
 
         const state = getState();
-        const eventData = selectAllByConnections(state).get(connectionUri).toJS();// TODO avoid toJS
-        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        const eventData = selectAllByConnectionUri(state, connectionUri).toJS();// TODO avoid toJS; UPDATE TO NEW STRUCTURE
         let messageData = null;
 
         won.getConnectionWithEventUris(eventData.connection.uri)
@@ -232,12 +217,14 @@ export function showLatestMessages(connectionUri, numberOfEvents){
     return (dispatch, getState) => {
         const state = getState();
         const connectionUri = selectOpenConnectionUri(state);
-        const connection = selectOpenConnection(state);
+        const allByConnectionUri = connectionUri && selectAllByConnectionUri(state, connectionUri);
+
+        const connection = allByConnectionUri && allByConnectionUri.get("connection"); //TODO: UPDATE METHOD ACCORDING TO NEW STRUCTURE
 
         if (!connectionUri || !connection) return;
 
-        const eventUris = connection.get('hasEvents');
-        if (connection.get('loadingEvents') || !eventUris || eventUris.size > 0) return; // only start loading once.
+        const events = allByConnectionUri && allByConnectionUri.get("events");
+        if (connection.get('loadingEvents') || !events || events.size > 0) return; // only start loading once. //TODO: PENDING IS CURRENTLY NOT IMPLEMENTED IN THE NEW STATE
 
         //TODO a `return` here might be a race condition that results in this function never being called.
         //TODO the delay solution is super-hacky (idle-waiting)
@@ -251,10 +238,10 @@ export function showLatestMessages(connectionUri, numberOfEvents){
             payload: Immutable.fromJS({connectionUri, pending: true}),
         });
 
-        const requesterWebId = connection.get('belongsToNeed');
+        const requesterWebId = allByConnectionUri && allByConnectionUri.getIn(["ownNeed", "uri"]);
 
         getEvents(
-            connection.get('hasEventContainer'),
+            connection.get('uri'),
             {
                 requesterWebId,
                 pagingSize: numOfEvts2pageSize(numberOfEvents),
@@ -283,8 +270,7 @@ export function showLatestMessages(connectionUri, numberOfEvents){
     }
 }
 
-//TODO replace the won.getEventsOfConnection with this version (and make sure it works
-// for all previous uses).
+//TODO replace the won.getEventsOfConnection with this version (and make sure it works for all previous uses).
 /**
  * Gets the events and uses the paging-parameters
  * in a meaningful fashion.
@@ -292,9 +278,12 @@ export function showLatestMessages(connectionUri, numberOfEvents){
  * @param params
  * @return {*}
  */
-function getEvents(eventContainerUri, params) {
+function getEvents(connectionUri, params) {
     const eventP = won
-        .getNode(eventContainerUri, params)
+        .getNode(connectionUri, params)
+        .then(cnct =>
+            won.getNode(cnct.hasEventContainer, params)
+        )
         .then(eventContainer => is('Array', eventContainer.member) ?
             eventContainer.member :
             [eventContainer.member]
@@ -323,12 +312,12 @@ function getEvents(eventContainerUri, params) {
  */
 export function showMoreMessages(connectionUri, numberOfEvents) {
     return (dispatch, getState) => {
-
         const state = getState();
         const connectionUri = selectOpenConnectionUri(state);
-        const connection = selectOpenConnection(state);
-        const requesterWebId = connection.get('belongsToNeed');
-        const ownEvents = selectEventsOfConnection(state, connectionUri);
+        const allByConnectionUri = connectionUri && selectAllByConnectionUri(state, connectionUri);
+        const connection = allByConnectionUri && allByConnectionUri.get("connection"); //TODO: UPDATE METHOD ACCORDING TO NEW STRUCTURE
+        const requesterWebId = allByConnectionUri && allByConnectionUri.getIn(["ownNeed", "uri"]);
+        const ownEvents = allByConnectionUri.get("events");
         const remoteEvents =
             selectRemoteEvents(state)
             .filter(e =>
@@ -345,7 +334,6 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
          */
         // determine the oldest loaded event
         //alternative approach sort everything together
-        //getOldestEventInChain(state, connectionUri)
 
         // determine the oldest loaded event
         const sortByTime = (someEvents, pathToMsString) =>
@@ -373,7 +361,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
         });
 
         getEvents(
-            connection.get('hasEventContainer'),
+            connection.get('uri'),
             {
                 requesterWebId,
                 pagingSize: numOfEvts2pageSize(numberOfEvents),
@@ -400,68 +388,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
                 })
             })
         });
-
-
-
-
-
-
     }
-}
-
-function getOldestEventInChain(state, connectionUri) {
-
-    const ownEvents = selectEventsOfConnection(state, connectionUri);
-    const remoteEvents =
-        selectRemoteEvents(state)
-            .filter(e =>
-            e.get('hasReceiver') === connectionUri ||
-            e.get('hasSender') === connectionUri
-        );
-
-    const sortByTime = (someEvents, pathToMsString) =>
-        someEvents.sort((e1, e2) =>
-            msStringToDate(e1.getIn(pathToMsString)) -
-            msStringToDate(e2.getIn(pathToMsString))
-        );
-
-    const sortedOwnEvents = sortByTime(ownEvents, ['hasReceivedTimestamp']);
-    const sortedRemoteEvents = sortByTime(remoteEvents, ['correspondsToOwnMsg', 'hasReceivedTimestamp']);
-
-    const timestamp = e => msStringToDate(
-        e.getIn(['correspondsToOwnMsg', 'hasReceivedTimestamp']) || //remoteEvent
-        e.get('hasReceivedTimestamp') // ownEvent
-    );
-    const allEvents = ownEvents.merge(remoteEvents);
-    const allEventsSorted = allEvents.sort((e1, e2) => timestamp(e1) - timestamp(e2));
-
-    //start with the latest event
-    const latestEvent = allEventsSorted.last();
-    let latestEvents = Immutable.Map()
-        .set(latestEvent.get('uri'), latestEvent);
-
-    const prevMsgs = e => {
-        const prev =
-            e.getIn(['correspondsToOwnMsg', 'hasPreviousMessage']) || //remoteEvent
-            e.get('hasPreviousMessage'); // ownEvent or remote's own predecessors
-        //make sure we get an array
-        if(is('Array', prev)) {
-            return prev;
-        } else {
-            return [prev];
-        }
-    };
-
-    //recursively add all connected events
-    //let frontier = Immutable.Set()
-    let acc = Immutable.Map()
-        .add('frontier', Immutable.Set())
-        .add('earliestLoaded', Immutable.Set());
-    for(let [uri, e] of latestEvents.entries()) {
-        const previous = prevMsgs(e);
-        if(!previous) continue;
-    }
-
 }
 
 function numOfEvts2pageSize(numberOfEvents) {

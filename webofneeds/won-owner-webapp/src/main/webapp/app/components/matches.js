@@ -1,5 +1,6 @@
 ;
 
+import Immutable from 'immutable';
 import won from '../won-es6';
 import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
@@ -9,19 +10,15 @@ import sendRequestModule from './send-request';
 import connectionsOverviewModule from './connections-overview';
 import connectionSelectionModule from './connection-selection';
 
-import { attach, mapToMatches, decodeUriComponentProperly} from '../utils';
+import { attach, decodeUriComponentProperly} from '../utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
 import {
-    selectAllByConnections,
     selectOpenPostUri,
     displayingOverview,
-    selectOwnNeeds,
+    selectAllConnections,
+    selectNeedByConnectionUri,
 } from '../selectors';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 let template = `
@@ -58,14 +55,14 @@ let template = `
         </div>
         <div ng-if="self.hasMatches && self.layout === 'tiles'" class="omc__content__flow">
             <won-matches-flow-item
-                    connection-uri="m.getIn(['connection','uri'])"
-                    ng-repeat="m in self.matches">
+                    connection-uri="match.get('uri')"
+                    ng-repeat="match in self.matchesArray">
             </won-matches-flow-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
-                    connection-uri="m.getIn(['connection','uri'])"
-                    ng-repeat="m in self.matches">
+                    connection-uri="match.get('uri')"
+                    ng-repeat="match in self.matchesArray">
             </won-matches-grid-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'list'" class="omc__content__list">
@@ -100,12 +97,8 @@ class Controller {
         this.labels = labels;
 
         const selectFromState = (state) => {
-            const allMatchesByConnections = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
-
-            const postUri = selectOpenPostUri(state);
+            let postUri = selectOpenPostUri(state);
             const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
-
 
             // either of 'tiles', 'grid', 'list'
             let layout = state.getIn(['router','currentParams','layout']);
@@ -114,35 +107,29 @@ class Controller {
             }
 
             const isOverview = displayingOverview(state);
-            let matchesByConnectionUri;
+            let matches;
             if(isOverview) { //overview
-                matchesByConnectionUri = allMatchesByConnections
-                    .toList();
+                matches = selectAllConnections(state).filter(conn => conn.get("state") === won.WON.Suggested);
             } else { // post-owner view
-                matchesByConnectionUri = allMatchesByConnections
-                    .filter(connectionRelated => connectionRelated.getIn(['ownNeed', '@id']) === postUri)
-                    .toList();
+                matches = state.getIn(["needs", postUri, "connections"]).filter(conn => conn.get("state") === won.WON.Suggested);
+            }
+
+            if(!postUri && connectionUri){
+                const needByConnection = selectNeedByConnectionUri(state, connectionUri);
+                postUri = needByConnection && needByConnection.get("uri");
             }
 
             return {
                 isOverview,
                 layout,
                 //LAYOUT,
-                connection: state.getIn(['connections', connectionUri]),
-                matches: matchesByConnectionUri.toArray(),
-                hasMatches: matchesByConnectionUri.size > 0,
-                post: state.getIn(['needs','ownNeeds', postUri]),
+                connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
+                matchesArray: matches.toArray(),
+                hasMatches: matches.size > 0,
             };
         };
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-      //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
-    }
-
-    loadMatches(){
-        this.matches__load(
-            this.$ngRedux.getState().getIn(['needs','ownNeeds']).toJS()
-        )
     }
 
     selectedConnection(connectionUri) {

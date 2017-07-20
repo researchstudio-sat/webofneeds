@@ -5,14 +5,10 @@
 import  won from '../won-es6';
 import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
-import { selectOpenPostUri, selectOpenPost } from '../selectors';
+import { selectOpenPostUri } from '../selectors';
 
 import {
     checkHttpStatus,
-    entries,
-    flatten,
-    flattenObj,
-    urisToLookupMap
 } from '../utils';
 
 import {
@@ -47,7 +43,7 @@ function loadingWhileSignedOut(dispatch, getState) {
     const state = getState();
     const postUri = selectOpenPostUri(state);
     let dataPromise;
-    if(postUri && !selectOpenPost(state)) { //got an uri but no post loaded yet
+    if(postUri && !state.getIn(["needs", postUri])) { //got an uri but no post loaded yet
         dataPromise = fetchDataForNonOwnedNeedOnly(postUri);
     } else {
         dataPromise = Promise.resolve(Immutable.Map());

@@ -12,13 +12,8 @@ import {
 } from '../won-label-utils';
 import {
     attach,
-    msStringToDate,
 } from '../utils.js'
 import {
-    selectTimestamp,
-    seeksOrIs,
-    inferLegacyNeedType,
-    reduxSelectDependsOnProperties,
     connect2Redux,
 } from '../won-utils'
 import {
@@ -30,15 +25,15 @@ function genComponentConf() {
     let template = `
       <won-square-image
         ng-class="{'bigger' : self.biggerImage}"
-        src="self.needContent.get('TODO')"
-        title="self.needContent.get('dc:title')"
+        src="self.need.get('TODO')"
+        title="self.need.get('title')"
         uri="self.needUri"
         ng-show="!self.hideImage">
       </won-square-image>
       <div class="ph__right">
         <div class="ph__right__topline">
           <div class="ph__right__topline__title">
-            {{ self.needContent.get('dc:title') }}
+            {{ self.need.get('title') }}
           </div>
           <div class="ph__right__topline__date">
             {{ self.friendlyTimestamp }}
@@ -55,7 +50,7 @@ function genComponentConf() {
           </span>
           -->
           <span class="ph__right__subtitle__type">
-            {{ self.labels.type[self.needType] }}
+            {{ self.labels.type[self.need.get('type')] }}
           </span>
         </div>
       </div>
@@ -67,27 +62,16 @@ function genComponentConf() {
             window.ph4dbg = this;
             this.labels = labels;
             const selectFromState = (state) => {
-                const need = state.getIn(['needs', 'ownNeeds', this.needUri]) ||
-                    state.getIn(['needs', 'theirNeeds', this.needUri]);
+                const need = state.getIn(['needs', this.needUri]);
 
                 return {
                     need,
-                    needType: need && inferLegacyNeedType(need),
-                    needContent: need && seeksOrIs(need),
                     friendlyTimestamp: need && relativeTime(
                         selectLastUpdateTime(state),
-                        this.timestamp || need.get('dct:created')
+                        this.timestamp || need.get('creationDate')
                     ),
                 }
             };
-            /*
-            const disconnectRdx = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            const disconnectProps = reduxSelectDependsOnProperties(
-                ['self.needUri', 'self.timestamp'],
-                selectFromState, this
-            );
-            this.$scope.$on('$destroy', () => { disconnectRdx(); disconnectProps()});
-            */
 
             connect2Redux(
                 selectFromState, actionCreators,

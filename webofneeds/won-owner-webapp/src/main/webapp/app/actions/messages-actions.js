@@ -5,25 +5,17 @@
 
 import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData } from './actions';
-import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
 import Immutable from 'immutable';
 
 import {
-    checkHttpStatus,
-    contains,
     clone,
     jsonld2simpleFormat,
     getIn,
 } from '../utils';
 
 import {
-    buildCreateMessage,
-    buildOpenMessage,
-    buildCloseMessage,
-    buildRateMessage,
-    buildConnectMessage,
-    isSuccessMessage,
     fetchDataForOwnedNeeds
 } from '../won-message-utils';
 
@@ -228,15 +220,17 @@ export function connectMessageReceived(events) {
 
         Promise.all([
             connectionP,
-            won.getTheirNeed(theirNeedUri)
+            won.getTheirNeed(theirNeedUri),
+            won.getOwnNeed(ownNeedUri),
         ])
-        .then(([connection, theirNeed]) => {
+        .then(([connection, theirNeed, ownNeed]) => {
             dispatch({
                 type: actionTypes.messages.connectMessageReceived,
                 payload: {
                     updatedConnection: ownConnectionUri,
                     connection: connection.set('hasConnectionState', won.WON.RequestReceived),
                     ownNeedUri: ownNeedUri,
+                    ownNeed: ownNeed,
                     remoteNeed: theirNeed,
                     receivedEvent: eventOnOwn.uri, // the more relevant event. used for unread-counter.
                     events: [

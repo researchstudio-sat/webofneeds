@@ -14,15 +14,13 @@ import {
     relativeTime,
 } from '../won-label-utils';
 import {
-    selectOpenPost,
+    selectOpenPostUri,
     selectLastUpdateTime,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 import L from '../leaflet-bundleable';
 import {
     initLeaflet,
-    initLeafletBaseMaps,
-    seeksOrIs,
 } from '../won-utils';
 
 import {
@@ -47,21 +45,21 @@ function genComponentConf() {
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.postContent.get('dc:description')">
+                    ng-show="self.post.get('description')">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.postContent.get('dc:description')">
-                    {{ self.postContent.get('dc:description')}}
+                    ng-show="self.post.get('description')">
+                    {{ self.post.get('description')}}
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.postContent.get('won:hasTag')">
+                    ng-show="self.post.get('tags')">
                     Tags
                 </h2>
                 <div class="post-info__details post-info__tags"
-                    ng-show="self.postContent.get('won:hasTag')">
-                        <span class="post-info__tags__tag" ng-repeat="tag in self.postContent.get('won:hasTag').toJS()">{{tag}}</span>
+                    ng-show="self.post.get('tags')">
+                        <span class="post-info__tags__tag" ng-repeat="tag in self.post.get('tags').toJS()">{{tag}}</span>
                 </div>
 
                 <h2 class="post-info__heading"
@@ -76,7 +74,7 @@ function genComponentConf() {
                     </a>
                 </p>
                 <p ng-show="self.debugmode">
-                    <a class="debuglink" target="_blank" href="{{self.post.get('@id')}}">[DATA]</a>
+                    <a class="debuglink" target="_blank" href="{{self.post.get('uri')}}">[DATA]</a>
                 </p>
                 <div class="post-info__mapmount"
                      id="post-info__mapmount"
@@ -117,17 +115,16 @@ function genComponentConf() {
 
 
             const selectFromState = (state) => {
-                const post = selectOpenPost(state);
-                const postContent = post && seeksOrIs(post);
-                const location = postContent && postContent.get('won:hasLocation');
+                const postUri = selectOpenPostUri(state);
+                const post = state.getIn(["needs", postUri]);
+                const location = post && post.get('location');
                 return {
                     post,
-                    postContent,
                     location: location,
-                    address: location && location.get('s:name'),
-                    friendlyTimestamp: relativeTime(
+                    address: location && location.get('address'),
+                    friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
-                        post && post.get('dct:created')
+                        post.get('creationDate')
                     ),
                     debugmode: won.debugmode
                 }
@@ -147,31 +144,21 @@ function genComponentConf() {
                 return;
             }
 
-            const nw = location.getIn(['won:hasBoundingBox', 'won:hasNorthWestCorner']);
-            const se = location.getIn(['won:hasBoundingBox', 'won:hasSouthEastCorner']);
-            const lat = Number.parseFloat(location.getIn(['s:geo', 's:latitude']));
-            const lon = Number.parseFloat(location.getIn(['s:geo', 's:longitude']));
-            const name = location.get('s:name');
-
-            if(!nw || !se || !lat || !lon || !name ) {
-                return;
-            }
-
             this.map.fitBounds([
                 [
-                    Number.parseFloat(nw.get('s:latitude')),
-                    Number.parseFloat(nw.get('s:longitude')),
+                    location.getIn(["nwCorner", "lat"]),
+                    location.getIn(["nwCorner", "lng"])
                 ],
                 [
-                    Number.parseFloat(se.get('s:latitude')),
-                    Number.parseFloat(se.get('s:longitude')),
+                    location.getIn(["seCorner", "lat"]),
+                    location.getIn(["seCorner", "lng"])
                 ]
             ]);
 
             if(this.marker) {
                this.map.removeLayer(this.marker);
             }
-            this.marker = L.marker([lat, lon]).bindPopup(name);
+            this.marker = L.marker([location.get("lat"), location.get("lng")]).bindPopup(location.get("address"));
             this.map.addLayer(this.marker);
 
             this.mapAlreadyInitialized = true;

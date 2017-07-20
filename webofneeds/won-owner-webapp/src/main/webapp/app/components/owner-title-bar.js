@@ -2,20 +2,14 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-import { attach, mapToMatches, decodeUriComponentProperly } from '../utils';
+import { attach, decodeUriComponentProperly } from '../utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
 import {
-    selectUnreadEventsByNeedAndType,
-    selectAllByConnections,
-    selectOpenPost,
     selectOpenPostUri,
+    selectAllMessagesByNeedUri,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
-import {
-    seeksOrIs,
-    inferLegacyNeedType,
-} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -31,8 +25,8 @@ function genComponentConf() {
                     <won-square-image
                         ng-class="{'inactive' : !self.isActive}"
                         src="self.post.get('titleImgSrc')"
-                        title="self.postContent.get('dc:title')"
-                        uri="self.post.get('@id')">
+                        title="self.post.get('title')"
+                        uri="self.post.get('uri')">
                     </won-square-image>
                 </div>
 
@@ -42,8 +36,8 @@ function genComponentConf() {
 
                     <div class ="ntb__inner__right__upper">
                         <hgroup>
-                            <h1 class="ntb__title">{{ self.postContent.get('dc:title') }}</h1>
-                            <div class="ntb__titles__type">{{self.labels.type[self.postType]}}</div>
+                            <h1 class="ntb__title">{{ self.post.get('title') }}</h1>
+                            <div class="ntb__titles__type">{{self.labels.type[self.post.get('type')]}}</div>
                         </hgroup>
                         <img
                             class="ntb__icon clickable"
@@ -85,30 +79,30 @@ function genComponentConf() {
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}">
 
                                 <a ui-sref="post({connectionType: self.WON.Connected, openConversation: null, connectionUri: null, postUri: self.postUri})"
-                                    ng-class="{'disabled' : !self.hasMessages || !self.isActive}">
+                                    ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
                                     Messages
-                                    <span class="ntb__tabs__unread">{{ self.unreadMessages.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadMessagesCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}">
                                 <a ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
                                     Matches
-                                    <span class="ntb__tabs__unread">{{ self.unreadMatches.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadMatchesCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}">
                                 <a ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
                                     Requests
-                                    <span class="ntb__tabs__unread">{{ self.unreadIncomingRequests.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadIncomingRequestsCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}">
                                 <a ui-sref="post({connectionType: self.WON.RequestSent, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
                                     Sent Requests
-                                    <span class="ntb__tabs__unread">{{ self.unreadSentRequests.size }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadSentRequestsCount }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -130,46 +124,36 @@ function genComponentConf() {
             this.settingsOpen = false;
 
             const selectFromState = (state)=>{
-                const unreadCounts = selectUnreadEventsByNeedAndType(state);
-                const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-
                 const postUri = selectOpenPostUri(state);
-                const post = selectOpenPost(state);
+                const post = state.getIn(["needs", postUri]);
 
-                const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
+                const connections = post && post.get("connections");
+
+                const sentRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestSent);
+                const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
+                const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);
+                const connected = connections && connections.filter(conn => conn.get("state") === won.WON.Connected);
+                const messages = selectAllMessagesByNeedUri(state, postUri);
+
+                const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
+                const unreadSentRequestsCount = sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size;
+                const unreadIncomingRequestsCount = incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size;
+                const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;
 
                 return {
-                    selectedTab: connectionTypeInParams || 'Info',
+                    selectedTab: decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType'])) || 'Info',
                     WON: won.WON,
                     postUri: postUri,
                     post: post,
-                    postContent: post && seeksOrIs(post) ,
-                    postType: post && inferLegacyNeedType(post),
-                    hasIncomingRequests: state.getIn(['connections'])
-                        .filter(conn =>
-                            conn.get('hasConnectionState') === won.WON.RequestReceived
-                            && conn.get('belongsToNeed') === postUri
-                        ).size > 0,
-                    hasSentRequests: state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.RequestSent
-                        && conn.get('belongsToNeed') === postUri
-                    ).size > 0,
-                    hasMatches: state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.Suggested
-                        && conn.get('belongsToNeed') === postUri
-                    ).size > 0,
-                    hasMessages: state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.Connected
-                        && conn.get('belongsToNeed') === postUri
-                    ).size > 0,
-                    unreadMessages: unreadCounts.getIn([postUri, won.WONMSG.connectionMessage]),
-                    unreadIncomingRequests: unreadCounts.getIn([postUri, won.WONMSG.connectMessage]),
-                    unreadSentRequests: unreadCounts.getIn([postUri, won.WONMSG.connectSentMessage]),
-                    unreadMatches: unreadCounts.getIn([postUri, won.WONMSG.hintMessage]),
-                    isActive: post && post.getIn(['won:isInState', '@id']) === won.WON.ActiveCompacted,
+                    hasIncomingRequests: incomingRequests && incomingRequests.size > 0,
+                    hasSentRequests: sentRequests && sentRequests.size > 0,
+                    hasMatches: matches && matches.size > 0,
+                    hasConnected: connected && connected.size > 0,
+                    unreadMessagesCount: unreadMessagesCount > 0 ? unreadMessagesCount : undefined,
+                    unreadIncomingRequestsCount: unreadIncomingRequestsCount > 0 ? unreadIncomingRequestsCount : undefined,
+                    unreadSentRequestsCount: unreadSentRequestsCount > 0 ? unreadSentRequestsCount : undefined,
+                    unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
+                    isActive: post && post.get('state') === won.WON.ActiveCompacted,
                 };
             };
 
@@ -178,15 +162,15 @@ function genComponentConf() {
         }
 
         closePost() {
-            console.log("CLOSING THE POST: "+this.post.get("@id"));
+            console.log("CLOSING THE POST: "+this.postUri);
             this.settingsOpen = false;
-            this.needs__close(this.post.get("@id"));
+            this.needs__close(this.postUri);
         }
 
         reOpenPost() {
-            console.log("RE-OPENING THE POST: "+this.post.get("@id"));
+            console.log("RE-OPENING THE POST: "+this.postUri);
             this.settingsOpen = false;
-            this.needs__reopen(this.post.get("@id"));
+            this.needs__reopen(this.postUri);
         }
     }
     Controller.$inject = serviceDependencies;

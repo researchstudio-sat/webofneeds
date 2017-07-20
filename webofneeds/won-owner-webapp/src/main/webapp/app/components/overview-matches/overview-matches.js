@@ -13,9 +13,6 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 class OverviewMatchesController {
     constructor() {
         attach(this, serviceDependencies, arguments);
-
-        window.omc=this;
-
         const selectFromState = (state) => ({ });
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
