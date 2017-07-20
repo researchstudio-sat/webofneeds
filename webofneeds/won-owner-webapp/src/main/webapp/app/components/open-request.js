@@ -41,7 +41,6 @@ function genComponentConf() {
       </div>
 
       <div class="or__footer" ng-show="self.isReceivedRequest">
-        {{self.textMsg}}
         <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
         <div class="flexbuttons">
           <button
