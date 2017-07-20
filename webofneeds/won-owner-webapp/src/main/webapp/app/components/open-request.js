@@ -41,6 +41,7 @@ function genComponentConf() {
       </div>
 
       <div class="or__footer" ng-show="self.isReceivedRequest">
+        {{self.textMsg}}
         <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
         <div class="flexbuttons">
           <button
@@ -64,7 +65,7 @@ function genComponentConf() {
 
                 const ownNeed = selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-                const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage") && !msg.get("outgoingMessage"));
+                const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage") && !msg.get("outgoingMessage")).first();
 
                 return {
                     connectionUri,
