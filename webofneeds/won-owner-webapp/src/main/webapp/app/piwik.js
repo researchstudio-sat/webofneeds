@@ -22,6 +22,10 @@ const trackerUrl = baseUrl + 'piwik.php'
  * calls to the `_paq` array, that the tracker reads from
  * when starting up. After that startup it calls the functions
  * directly on the tracker (as the `_paq` array isn't read then anymore)
+ *
+ * available calls can be found at:
+ * https://developer.piwik.org/api-reference/tracking-javascript
+ *
  * @param args
  */
 function piwikCall(args) {
@@ -38,13 +42,13 @@ function piwikCall(args) {
 }
 
 
-/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-piwikCall(['trackPageView']);
-piwikCall(['enableLinkTracking']);
 piwikCall(['setTrackerUrl', trackerUrl]);
 piwikCall(['setSiteId', '1']);
 
 
+/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+piwikCall(['trackPageView']); // log that page has loaded
+//piwikCall(['enableLinkTracking']);
 
 //_paq.push(['setUserId', 'USER_ID_HERE']);
 //_paq.push(['enableHeartBeatTimer']); // track time spent with the page open and in focus in 15s increments
