@@ -61,14 +61,24 @@ export default function(state = initialState, action = {}) {
                 state);
 
         case actionTypes.messages.connectMessageReceived:
-            const {ownNeedUri, ownNeed, remoteNeed, updatedConnection, connection } = action.payload;
+            const {ownNeedUri, ownNeed, remoteNeed, updatedConnection, connection, events } = action.payload;
             const ownNeedFromState = state.get(ownNeedUri);
 
             const stateWithOwnNeed = ownNeedFromState ? state : addNeed(state, ownNeed, true);
             const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
+            const stateWithBothNeedsAndConnection = addConnectionFull(stateWithBothNeeds, connection, true);
 
-            return addConnectionFull(stateWithBothNeeds, connection, true);
+            let stateWithEverything = stateWithBothNeedsAndConnection;
+            if(events){
+                events.map(function(event, key){
+                    const evnt = Immutable.fromJS(event);
+                    if(evnt.get("hasCorrespondingRemoteMessage")) {
+                        stateWithEverything = addMessage(stateWithEverything, event, false, true);
+                    }
+                });
+            }
 
+            return stateWithEverything;
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(state, action.payload, true);
 
@@ -98,7 +108,6 @@ export default function(state = initialState, action = {}) {
         case actionTypes.messages.connectionMessageReceived:
             //ADD RECEIVED CHAT MESSAGES
             //payload; { events }
-            console.log("connectionMessageReceived: ", action.payload.events);
             return addMessage(state, action.payload.events, false, true);
 
         case actionTypes.connections.sendChatMessage:
@@ -171,10 +180,12 @@ function parseNeed(jsonldNeed, ownNeed) {
     if(jsonldNeedImm){
         const uri = jsonldNeedImm.get("@id");
 
+        const isPresent = !!jsonldNeedImm.getIn(["won:is", "dc:title"]);
+        const seeksPresent = !!jsonldNeedImm.getIn(["won:seeks", "dc:title"]);
         const is = jsonldNeedImm.get("won:is");
         const seeks = jsonldNeedImm.get("won:seeks");
 
-        const title = (is && is.get("dc:title")) ? is.get("dc:title") : ((seeks && seeks.get("dc:title")) ? seeks.get("dc:title") : undefined);
+        const title = isPresent ? is.get("dc:title") : (seeksPresent ? seeks.get("dc:title") : undefined);
 
         if(!!uri && !!title){
             parsedNeed.uri = uri;
@@ -200,12 +211,12 @@ function parseNeed(jsonldNeed, ownNeed) {
         let tags = undefined;
         let location = undefined;
 
-        if(is){
-            type = seeks ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+        if(isPresent){
+            type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
             description = is.get("dc:description");
             tags = is.get("won:hasTag");
             location = parseLocation(is.get("won:hasLocation"));
-        }else if(seeks){
+        }else if(seeksPresent){
             type = won.WON.BasicNeedTypeDemandCompacted;
             description = seeks.get("dc:description");
             tags = seeks.get("won:hasTag");
