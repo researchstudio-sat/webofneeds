@@ -7,6 +7,9 @@ import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
 import { fetchOwnedData } from '../won-message-utils';
 import { registerAccount } from '../won-utils';
+import {
+   resetParams,
+} from '../configRouting';
 
 import {
     checkHttpStatus,
@@ -41,7 +44,7 @@ export function accountLogin(username, password) {
              * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
              */
             dispatch(actionCreators.reconnect());
-            dispatch(actionCreators.router__stateGo("feed"));
+            dispatch(actionCreators.router__stateGoResetParams("feed"));
         })
         .catch(error => {
             console.log("accountLogin ErrorObject", error);
@@ -89,7 +92,7 @@ export function accountLogout() {
             dispatch(actionCreators.reconnect());
         })
         .then(() => { /* finally */
-            dispatch(actionCreators.router__stateGo("landingpage"));
+            dispatch(actionCreators.router__stateGoResetParams("landingpage"));
         })
 }
 

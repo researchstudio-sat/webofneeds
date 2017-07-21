@@ -2,7 +2,7 @@
     <won-topnav></won-topnav>
 </header>
 <main class="landingpage" id="allSections">
-    <a class="curtain" ng-show="self.focusSignup" ui-sref="landingpage({focusSignup: false})"></a>
+    <a class="curtain" ng-show="self.focusSignup" ng-click="self.router__stateGoCurrent({focusSignup: false})"></a>
     <div class="welcome">
         <div class="title">Welcome to the Web of Needs</div>
         <won-flex-grid items="::self.peopleGrid"></won-flex-grid>

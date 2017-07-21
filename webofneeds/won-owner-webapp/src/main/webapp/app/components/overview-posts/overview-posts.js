@@ -10,6 +10,10 @@ import {
 } from '../../selectors';
 import won from '../../won-es6';
 
+import {
+    resetParams,
+} from '../../configRouting';
+
 const ZERO_UNSEEN = Object.freeze({
     matches: 0,
     incomingRequests: 0,
@@ -23,6 +27,7 @@ class OverviewPostsController {
         attach(this, serviceDependencies, arguments);
         this.selection = 1;
         window.ovp4dbg = this;
+        this.resetParams = resetParams;
         this.activePostsOpen = true;
         this.closedPostsOpen = false;
 

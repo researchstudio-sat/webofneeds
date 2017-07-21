@@ -19,6 +19,11 @@ import {
     fetchDataForOwnedNeeds
 } from '../won-message-utils';
 
+import {
+    makeParams,
+    resetParams,
+} from '../configRouting';
+
 export function successfulCloseNeed(event) {
     return (dispatch, getState) => {
         console.log("got response for DEACTIVATE: " + event.hasMessageType);
@@ -127,7 +132,7 @@ export function successfulOpen({ events }){
             }
         });
 
-        dispatch(actionCreators.router__stateGo("post", {
+        dispatch(actionCreators.router__stateGoAbs("post", {
             postUri: event.hasReceiverNeed,
             connectionType: won.WON.Connected,
             connectionUri: event.hasReceiver,
@@ -165,7 +170,7 @@ export function successfulCreate(event) {
         // dispatch routing change
         //TODO back-button doesn't work for returning to the draft
         //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
-        dispatch(actionCreators.router__stateGo('feed'));
+        dispatch(actionCreators.router__stateGoResetParams('feed'));
 
         //TODO add to own needs
         //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?

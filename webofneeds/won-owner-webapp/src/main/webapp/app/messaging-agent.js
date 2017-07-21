@@ -25,6 +25,11 @@ import {
     checkHttpStatus,
     is,
 } from './utils';
+
+import {
+    makeParams,
+} from './configRouting';
+
 import { actionTypes, actionCreators } from './actions/actions';
 //import './message-service'; //TODO still uses es5
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
@@ -178,7 +183,7 @@ export function runMessagingAgent(redux) {
                      * case (see connection-actions.js) and go back if it fails.
                      */
                     const acceptEvent = events['msg:FromSystem'];
-                    redux.dispatch(actionCreators.router__stateGo("post", {
+                    redux.dispatch(actionCreators.router__stateGoAbs("post", {
                         postUri: acceptEvent.hasSenderNeed,
                         connectionType: won.WON.RequestReceived,
                         connectionUri: acceptEvent.hasSender,

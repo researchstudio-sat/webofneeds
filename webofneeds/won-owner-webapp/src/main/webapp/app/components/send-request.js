@@ -14,7 +14,7 @@ function genComponentConf() {
     let template = `
       <div class="sr__caption">
         <div class="sr__caption__title">Send Conversation Request</div>
-        <a ui-sref="{connectionUri: null}">
+        <a ng-click="self.router__stateGoCurrent({connectionUri: null})">
           <img
             class="sr__caption__icon clickable"
             src="generated/icon-sprite.svg#ico36_close"/>
@@ -37,13 +37,13 @@ function genComponentConf() {
         <div class="flexbuttons">
           <button
             class="won-button--filled black"
-            ui-sref="{connectionUri: null}">
+            ng-click="self.router__stateGoCurrent({connectionUri: null})">
               Cancel
           </button>
           <button
             class="won-button--filled red"
             ng-click="self.sendRequest(self.message)"
-            ui-sref="{connectionUri: null}">
+            ng-click="self.router__stateGoCurrent({connectionUri: null})">
               Request Contact
           </button>
         </div>

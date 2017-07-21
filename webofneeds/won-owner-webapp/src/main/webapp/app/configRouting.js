@@ -21,6 +21,35 @@ import {
 
 
 /**
+ * As we have configured our router to keep parameters unchanged,
+ * that aren't mentioned in the `stateGo`-calls, you can use this
+ * array to reset them explicitly (or merge anything else on top,
+ * by using the `makeParams`-function).
+ *
+ * NOTE: WHEN INTRODUCING NEW PARAMETERS, ADD THEM HERE
+ * AS WELL.
+ */
+export const resetParams = Object.freeze({
+    connectionType: undefined,
+    connectionUri: undefined,
+    focusSignup: undefined,
+    layout: undefined,
+    myUri: undefined,
+    postUri: undefined,
+    // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
+});
+
+/**
+ * These should not accidentally be removed from the state. See the `stateGo*`-action creators
+ * in `actions.js`
+ * @type {string[]}
+ */
+export const constantParams = [
+    'privateId',
+]
+
+
+/**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
  * @param $urlRouterProvider
  * @param $stateProvider
@@ -34,7 +63,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
     [
         { path: '/landingpage?:focusSignup?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
-        { path: '/feed', component: 'feed' },
+        { path: '/feed?privateId', component: 'feed' },
         { path: '/overview/matches?privateId?layout?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests?privateId?myUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/sent-requests?privateId?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
@@ -132,7 +161,7 @@ function back(hasPreviousState, $ngRedux) {
                         // while this promise evaluated
     } else {
         $ngRedux.dispatch(
-            actionCreators.router__stateGo('landingpage')
+            actionCreators.router__stateGoResetParams('landingpage')
         );
 
     }
@@ -160,7 +189,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
             .then(() => {//logged in -- re-initiate route-change
                 console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the feed");
                 $ngRedux.dispatch(
-                    actionCreators.router__stateGo('feed', toParams)
+                    actionCreators.router__stateGoAbs('feed', toParams)
                 )
             });
             break;
@@ -188,7 +217,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
                     .then(checkHttpStatus) // will reject if not logged in
                     .then(() => //logged in -- re-initiate route-change
                         $ngRedux.dispatch(
-                            actionCreators.router__stateGo(toState, toParams)
+                            actionCreators.router__stateGoAbs(toState, toParams)
                         )
                     )
                     .catch(error => {
@@ -196,10 +225,36 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
                         console.error(errorString, error)
                         if (!hasPreviousState) {
                             $ngRedux.dispatch(
-                                actionCreators.router__stateGo('landingpage')
+                                actionCreators.router__stateGoResetParams('landingpage')
                             );
                         }
                     });
             }
     }
 }
+
+export function addConstParams(params, paramsInState){
+    const currentConstParams = Immutable.Map(
+        constantParams.map(p => [p, paramsInState.get(p)]) // [ [ paramName, paramValue] ]
+    );
+    return currentConstParams.merge(params).toJS();
+}
+
+/**
+ * As we have configured our router to keep parameters unchanged,
+ * that aren't mentioned in the `stateGo`-calls, you can use this
+ * function to reset all parameters not mentioned in the arguments
+ * and set those to their values.
+ * @param params: object with params that should be placed
+ * in the url.
+ */
+//export function makeParams(params) {
+//    const currentParams = getState().getIn(['router', 'currentParams']);
+//    const currentConstParams = Immutable.Map(
+//        constantParams.map(p => [p, currentParams.get(p)]) // [ [ paramName, paramValue] ]
+//    );
+//    return Immutable.Map().merge(params).merge(currentConstParams).toJS();
+//    //let resetParamsCopy = Object.assign({}, resetParams);
+//    //return Object.assign(resetParamsCopy, params);
+//}
+export const makeParams = undefined

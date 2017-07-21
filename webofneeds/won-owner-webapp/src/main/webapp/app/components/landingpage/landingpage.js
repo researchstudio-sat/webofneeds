@@ -12,6 +12,9 @@ import {
     delay,
 } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
+import {
+    makeParams,
+} from '../../configRouting.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
@@ -97,6 +100,8 @@ class LandingpageController {
     constructor(/* arguments <- serviceDependencies */){
         attach(this, serviceDependencies, arguments);
         const self = this;
+
+        this.makeParams = makeParams;
 
         const signup = (state) => ({
             focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",

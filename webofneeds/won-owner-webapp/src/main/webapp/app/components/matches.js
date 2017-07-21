@@ -31,7 +31,7 @@ let template = `
                  You cannot influence the matching process. It might take some time, or maybe there is nothing to
                     be found for you, yet. Check back later or post more needs!</span>
             </div>
-            <a ui-sref="createNeed" class="omc__empty__link">
+            <a ng-click="self.router__stateGoResetParams('createNeed')" class="omc__empty__link">
                 <img src="generated/icon-sprite.svg#ico36_plus" class="omc__empty__link__icon">
                 <span class="omc__empty__link__caption">Create a Need</span>
             </a>
@@ -39,15 +39,15 @@ let template = `
         <div class="omc__header" ng-if="self.hasMatches">
             <div class="title">Matches to your post{{ self.isOverview? 's' : '' }}</div>
             <div class="omc__header__viewtype">
-                <a ui-sref="{layout: self.LAYOUT.TILES}">
+                <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.TILES})">
                     <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                <a ui-sref="{layout: self.LAYOUT.GRID}">
+                <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.GRID})">
                     <img ng-src="{{self.layout === 'grid' ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                <a ui-sref="{layout: self.LAYOUT.LIST}">
+                <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.LIST})">
                     <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
@@ -133,11 +133,7 @@ class Controller {
     }
 
     selectedConnection(connectionUri) {
-        if(this.isOverview) {
-            this.router__stateGo('overviewMatches', {connectionUri});
-        } else {
-            this.router__stateGo('post', {connectionUri});
-        }
+        this.router__stateGoCurrent({connectionUri});
     }
 }
 Controller.$inject = serviceDependencies;

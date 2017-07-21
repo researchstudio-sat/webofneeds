@@ -14,7 +14,7 @@ const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
             <div class="pil__information">
-                <a ui-sref="post({postUri: self.needUri})">
+                <a ng-click="self.router__stateGoAbs('post', {postUri: self.needUri})">
                     <won-square-image  
                         ng-class="{'inactive' : !self.isActive()}" 
                         src="self.ownNeed.get('titleImgSrc')"
@@ -22,7 +22,7 @@ function genComponentConf() {
                         uri="self.needUri">
                     </won-square-image>
                 </a>
-                <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
+                <a class="pil__description clickable" ng-click="self.router__stateGoAbs('post', {postUri: self.needUri})">
                     <div class="pil__description__topline">
                         <div class="pil__description__topline__title">{{self.need.get('title')}}</div>
                         <div class="pil__description__topline__creationdate">{{self.relativeCreationDate}}</div>
@@ -44,7 +44,7 @@ function genComponentConf() {
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasConversations"
-                    ui-sref="post({postUri: self.needUri, connectionType: self.WON.Connected})">
+                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})">
                         <img src="generated/icon-sprite.svg#ico36_message_light"
                              ng-show="!self.unreadConversationsCount"
                              class="pil__indicators__item__icon">
@@ -63,7 +63,7 @@ function genComponentConf() {
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasRequests"
-                    ui-sref="post({postUri: self.needUri, connectionType: self.WON.RequestReceived})">
+                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.RequestReceived})">
                         <img src="generated/icon-sprite.svg#ico36_incoming_light"
                                  ng-show="!self.unreadRequestsCount"
                                  class="pil__indicators__item__icon">
@@ -82,7 +82,7 @@ function genComponentConf() {
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasMatches"
-                    ui-sref="post({postUri: self.needUri, connectionType: self.WON.Suggested})">
+                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Suggested})">
                         <img src="generated/icon-sprite.svg#ico36_match_light"
                              ng-show="!self.unreadMatchesCount"
                              class="pil__indicators__item__icon">

@@ -33,7 +33,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">
+                    <a  ng-click="self.router__stateGoResetParams(self.loggedIn ? 'feed' : 'landingpage')" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">
                             Web of Needs &ndash; Beta
@@ -41,7 +41,7 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center" ng-show="self.loggedIn">
-                    <a ui-sref="createNeed" class="topnav__button">
+                    <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button">
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
@@ -50,7 +50,7 @@ function genTopnavConf() {
                     <ul class="topnav__list">
                         <li ng-show="!self.loggedIn">
                             <button
-                                ui-sref="landingpage({focusSignup: true})"
+                                ng-click="self.router__stateGoAbs('landingpage', {focusSignup: true})"
                                 class="topnav__button won-button--filled lighterblue"
                                 ng-show="!self.open">
                                     Sign up

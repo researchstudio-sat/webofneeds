@@ -54,7 +54,7 @@ function genLoginConf() {
                     </div>-->
                     <div class="wl__register">
                         No Account yet?
-                        <a ui-sref="landingpage({focusSignup: true})">
+                        <a ng-click="self.router__stateGoCurrent({focusSignup: true})">
                             Sign up
                         </a>
                     </div>`;

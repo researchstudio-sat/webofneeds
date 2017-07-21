@@ -8,7 +8,7 @@ import { actionCreators }  from '../actions/actions';
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-            <a class="feedback clickable" ng-click="self.rateMatch(0)" ui-sref="{connectionUri : self.connectionUri}">
+            <a class="feedback clickable" ng-click="self.rateMatch(0)" ng-click="self.router__stateGoCurrent({connectionUri : self.connectionUri})">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_good"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_good_white"/>
                 <span class="feedback__text">Good - request conversation</span>

@@ -19,6 +19,10 @@ import {
     selectOpenConnectionUri,
 } from '../../selectors';
 
+import {
+   makeParams,
+} from '../../configRouting';
+
 const serviceDependencies = ['$ngRedux', '$scope'];
 class Controller {
     constructor() {
@@ -78,11 +82,11 @@ class Controller {
     }
 
     openConnection(connectionUri) {
-        this.router__stateGo('post', {
+        this.router__stateGoAbs('post', {
             postUri: decodeURIComponent(this.postUri),
             connectionUri: connectionUri,
             connectionType: this.connectionType,
-        })
+        });
     }
 }
 

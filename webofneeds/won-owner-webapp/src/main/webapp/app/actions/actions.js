@@ -1,5 +1,5 @@
 /**
- * Created by ksinger on 23.09.2015.
+ h Created by ksinger on 23.09.2015.
  *
  * Contains a list of actions to be used with the dispatcher and documentation
  * for their expected payloads.
@@ -55,6 +55,13 @@ import {
     checkLoginStatus,
     registerAccount,
 } from '../won-utils';
+
+import {
+    makeParams,
+    resetParams,
+    constantParams,
+    addConstParams,
+} from '../configRouting';
 
 // </utils>
 
@@ -115,9 +122,13 @@ const actionHierarchy = {
         failed: INJ_DEFAULT
     },
     router: {
-        stateGo,
+        stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
+        stateGoAbs, // reset's all parameters but the one passed as arguments
+        stateGoResetParams, // goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
+        stateGoKeepParams, // goes to new state and keeps listed parameters at their current values
+        stateGoCurrent,
         stateReload,
-        stateTransitionTo,
+        //stateTransitionTo, // should not be used directly
         back: stateBack,
         accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
     },
@@ -277,8 +288,7 @@ export function needCreate(draft, nodeUri) {
                 registerAccount(email, password)
                 .then(() => {
                     //TODO custom action-creator and -type for this?
-                    const currentState = state.getIn(['router', 'currentState', 'name']); // e.g. "createNeed"
-                    dispatch(actionCreators.router__stateGo(currentState, { privateId: tmpUserId })); // add anonymous id to query-params
+                    dispatch(actionCreators.router__stateGoCurrent({ privateId: tmpUserId })); // add anonymous id to query-params
                     dispatch({
                         type: actionTypes.login,
                         payload: Immutable.fromJS({
@@ -387,7 +397,7 @@ export function needsClose(needUri) {
         )
         .then(() =>
             // go back to overview
-            dispatch(actionCreators.router__stateGo('overviewPosts'))
+            dispatch(actionCreators.router__stateGoResetParams('overviewPosts'))
         )
     }
 }
@@ -404,7 +414,70 @@ function stateBack() {
         if (hasPreviousState) {
             history.back();
         } else {
-            dispatch(actionCreators.router__stateGo('landingpage'));
+            dispatch(actionCreators.router__stateGoResetParams('landingpage'));
         }
     }
+}
+
+/**
+ * reset's all parameters but the one passed as arguments
+ */
+function stateGoAbs(state, queryParams) {
+    return (dispatch, getState) => {
+        const currentParams = getState().getIn(['router', 'currentParams']);
+        dispatch(actionCreators.router__stateGo(
+            state,
+            addConstParams(queryParams, currentParams)
+        ))
+    }
+}
+
+/**
+ * goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
+ */
+function stateGoResetParams(state) {
+    return (dispatch, getState) => {
+        const currentParams = getState().getIn(['router', 'currentParams']);
+        console.log('routing to ', state, addConstParams(resetParams, currentParams));
+
+        dispatch(actionCreators.router__stateGo(
+            state,
+            addConstParams(resetParams, currentParams)
+        ))
+    }
+}
+
+/**
+ * goes to new state and keeps listed parameters at their current values
+ */
+function stateGoKeepParams(state, queryParamsList) {
+    return (dispatch, getState) => {
+        const currentParams = getState().getIn(['router', 'currentParams']);
+        const params = Immutable.Map( // [[k,v]] -> Map
+            queryParamsList.map(
+                    p => [p, currentParams.get(p)] // get value per param
+            )
+        );
+        dispatch(actionCreators.router__stateGo(
+            state,
+            addConstParams(params, currentParams)
+        ))
+    }
+}
+
+/**
+ * goes to current state, but changes the parameters
+ * passed to this function.
+ * @param queryParams
+ */
+function stateGoCurrent(queryParams) {
+    return (dispatch, getState) => {
+        const currentState = getState().getIn(['router', 'currentState', 'name']);
+        const currentParams = getState().getIn(['router', 'currentParams']);
+        dispatch(actionCreators.router__stateGo(
+            currentState,
+            addConstParams(queryParams, currentParams)
+        ));
+    }
+
 }
