@@ -40,7 +40,7 @@ function genTopnavConf() {
                         </span>
                     </a>
                 </div>
-                <div class="topnav__inner__center" ng-show="self.loggedIn">
+                <div class="topnav__inner__center">
                     <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button">
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
