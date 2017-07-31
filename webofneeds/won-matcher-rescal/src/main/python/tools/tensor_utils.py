@@ -57,7 +57,7 @@ class SparseTensor:
             if self.shape != matrix.shape:
                 raise Exception("Bad shape of added slices of tensor, is (%d,%d) but should be (%d,%d)!" %
                                 (matrix.shape[0], matrix.shape[1], self.shape[0], self.shape[1]))
-            self.data.append(csr_matrix(matrix))
+            self.data.insert(slice, csr_matrix(matrix))
 
         def getHeaders(self):
             return list(self.headers)
@@ -176,7 +176,7 @@ def adjust_mm_dimension(data_file, dim):
     file.close()
     return True
 
-def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0):
+def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0.0):
 
     temp_tensor = [input_tensor.getPureNeedConnectionMatrix()]
     D = input_tensor.getNeedAttributeMatrix()
