@@ -55,7 +55,23 @@ export const constantParams = [
  * @param $stateProvider
  */
 export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
-    $urlRouterProvider.otherwise('/landingpage');
+    //$urlRouterProvider.otherwise('/landingpage');
+    $urlRouterProvider.otherwise(($injector, $location) => {
+        console.log('otherwise ', $injector, $location)
+
+        //let updatedRoute =  $location.replace()
+        //    .path('/landingpage') // change route to landingpage
+        $location.path('/landingpage') // change route to landingpage
+
+        const origParams = $location.search();
+        if(origParams) {
+            const onlyConstParams = addConstParams({}, origParams);
+            //updatedRoute.search(onlyConstParams); // strip all but "constant" parameters
+            $location.search(onlyConstParams);
+        }
+
+        //return updatedRoute;
+    });
 
     //make sure create-need is called with a draftId
     //$urlRouterProvider.when('/create-need/', [() => '/create-need/' + getRandomPosInt()]);
@@ -233,9 +249,18 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
     }
 }
 
+/**
+ * Merges any "constant"-parameters (e.g. `privateId`) that are contained in `paramsInState`
+ * with the `params` object and returns the result.
+ *
+ * @param params
+ * @param paramsInState
+ * @returns {*}
+ */
 export function addConstParams(params, paramsInState){
+    const paramsInStateImm = Immutable.fromJS(paramsInState); // ensure that they're immutable
     const currentConstParams = Immutable.Map(
-        constantParams.map(p => [p, paramsInState.get(p)]) // [ [ paramName, paramValue] ]
+        constantParams.map(p => [p, paramsInStateImm.get(p)]) // [ [ paramName, paramValue] ]
     );
     return currentConstParams.merge(params).toJS();
 }
