@@ -6,7 +6,10 @@ import  won from '../won-es6';
 import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
 import { fetchOwnedData } from '../won-message-utils';
-import { registerAccount } from '../won-utils';
+import {
+    registerAccount,
+    login,
+} from '../won-utils';
 import {
    resetParams,
 } from '../configRouting';
@@ -17,18 +20,7 @@ import {
 
 export function accountLogin(username, password) {
     return (dispatch) =>
-        fetch('/owner/rest/users/signin', {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({username: username, password: password})
-        })
-        .then(
-            checkHttpStatus
-        )
+        login(username, password)
         .then( response =>
             fetchOwnedData(username)
         )

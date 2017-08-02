@@ -9,10 +9,13 @@ import { selectOpenPostUri } from '../selectors';
 
 import {
     checkLoginStatus,
+    privateId2Credentials,
+    login,
 } from '../won-utils';
 
 import {
     checkHttpStatus,
+    getParameterByName,
 } from '../utils';
 
 import {
@@ -29,8 +32,23 @@ export const pageLoadAction = () => (dispatch, getState) => {
     checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data => loadingWhileSignedIn(dispatch, data.username))
-    /* handle: not-logged-in */
-    .catch(error => loadingWhileSignedOut(dispatch, getState));
+    .catch(error => {
+        const privateId = getParameterByName('privateId'); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
+        console.log('privateId deleteme: ', privateId);
+
+        if(privateId) {
+            /*
+             * we don't have a valid session. however the url might contain `privateId`, which means
+             * we're accessing an "accountless"-account and need to sign in with that
+             */
+            loadingWithAnonymousAccount(dispatch, privateId);
+        } else {
+            /*
+             * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
+             */
+            loadingWhileSignedOut(dispatch, getState)
+        }
+    });
 }
 
 function loadingWhileSignedIn(dispatch, username) {
@@ -41,10 +59,28 @@ function loadingWhileSignedIn(dispatch, username) {
     fetchOwnedData(username, curriedDispatch);
 }
 
+function loadingWithAnonymousAccount(dispatch, privateId) {
+    // using an anonymous account. need to log in.
+    const {email, password} = privateId2Credentials(privateId);
+    return login(email, password)
+    .then(response =>
+        fetchOwnedData(email)
+    ).then(allThatData => {
+        dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: allThatData
+        });
+    }).catch(e => {
+        console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
+    });
+    //dispatch(actionCreators.login(email, password));
+    //return; // the login action should fetch the required data, so we're done here.
+}
+
 function loadingWhileSignedOut(dispatch, getState) {
+    let dataPromise;
     const state = getState();
     const postUri = selectOpenPostUri(state);
-    let dataPromise;
     if(postUri && !state.getIn(["needs", postUri])) { //got an uri but no post loaded yet
         dataPromise = fetchDataForNonOwnedNeedOnly(postUri);
     } else {

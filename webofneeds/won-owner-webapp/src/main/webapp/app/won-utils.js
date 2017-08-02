@@ -7,6 +7,7 @@ import L from './leaflet-bundleable';
 import {
     arrEq,
     checkHttpStatus,
+    generateIdString,
 } from './utils';
 
 export function initLeaflet(mapMount) {
@@ -163,3 +164,46 @@ export function registerAccount(username, password) {
         checkHttpStatus
     );
 }
+
+
+export function login(username, password) {
+    return fetch('/owner/rest/users/signin', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({username: username, password: password})
+    })
+    .then(
+        checkHttpStatus
+    );
+}
+
+/**
+ * Generates a random email, password and a composite id, that can be parsed via privateId2Credentials later.
+ *
+ * @returns {{email: string, password: *, privateId: string}}
+ */
+export function generateAccountCredentials() {
+    const usernameFragment = generateIdString(8);
+    const email = usernameFragment + '@matchat.org'; // generate random account-name
+    const password = generateIdString(8);
+    const privateId = usernameFragment + '-' + password;
+    return {
+        email,
+        password,
+        privateId,
+    }
+}
+
+export function privateId2Credentials(privateId) {
+    const [usernameFragment, password] = privateId.split('-');
+    const email = usernameFragment + '@matchat.org';
+    return {
+        email,
+        password,
+    }
+}
+

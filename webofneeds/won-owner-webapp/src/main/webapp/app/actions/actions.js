@@ -54,6 +54,7 @@ import {
 import {
     checkLoginStatus,
     registerAccount,
+    generateAccountCredentials,
 } from '../won-utils';
 
 import {
@@ -280,15 +281,12 @@ export function needCreate(draft, nodeUri) {
         if(state.getIn(['user', 'loggedIn'])){
             hasAccountPromise = Promise.resolve();
         } else {
-            const usernameFragment = generateIdString(8);
-            email = usernameFragment + '@matchat.org'; // generate random account-name
-            const password = generateIdString(8);
-            const tmpUserId = usernameFragment + '-' + password;
+            const {email, password, privateId} = generateAccountCredentials()
             hasAccountPromise =
                 registerAccount(email, password)
                 .then(() => {
                     //TODO custom action-creator and -type for this?
-                    dispatch(actionCreators.router__stateGoCurrent({ privateId: tmpUserId })); // add anonymous id to query-params
+                    dispatch(actionCreators.router__stateGoCurrent({ privateId })); // add anonymous id to query-params
                     dispatch({
                         type: actionTypes.login,
                         payload: Immutable.fromJS({
@@ -438,7 +436,11 @@ function stateGoAbs(state, queryParams) {
 function stateGoResetParams(state) {
     return (dispatch, getState) => {
         const currentParams = getState().getIn(['router', 'currentParams']);
-        console.log('routing to ', state, addConstParams(resetParams, currentParams));
+
+        console.log('routing from',
+            getState().getIn(['router', 'currentState', 'name']), currentParams,
+            ' to ', state, addConstParams(resetParams, currentParams)
+        );
 
         dispatch(actionCreators.router__stateGo(
             state,
