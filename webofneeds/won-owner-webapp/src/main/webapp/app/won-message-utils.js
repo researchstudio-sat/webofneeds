@@ -380,17 +380,6 @@ export function getEventsFromMessage(msgJson) {
     return simplifiedEvents;
 }
 
-const emptyDataset = Immutable.fromJS({
-    ownNeeds: {},
-    connections: {},
-    events: {},
-    theirNeeds: {},
-});
-
-function wellFormedPayload(payload) {
-    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
-}
-
 export function fetchDataForNonOwnedNeedOnly(needUri) {
     return won.getNeedWithConnectionUris(needUri)
     .then(need =>
@@ -415,10 +404,6 @@ export function fetchDataForOwnedNeeds(needUris, email, curriedDispatch) {
         });
 
     if(email) {
-        const userData = {loggedIn: true, email};
-        if(curriedDispatch) {
-            curriedDispatch(wellFormedPayload(userData));
-        }
         return dataPromise.then(allThatData =>
             allThatData.merge(Immutable.fromJS(userData))
         )
@@ -447,7 +432,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
         return Promise.resolve(emptyDataset);
     }
 
-    dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
+    dispatchWellFormed = (payload) => curriedDispatch(payload);
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
@@ -515,7 +500,11 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
     return allDataRawPromise
         .then(([ ownNeeds, connections, /* events, */ theirNeeds ]) =>
-            wellFormedPayload({ ownNeeds, connections, /* events, STARTING with selective loading*/ theirNeeds, })
+            wellFormedPayload({
+                ownNeeds, connections,
+                events: {/* will be loaded later when connection is accessed */},
+                theirNeeds,
+            })
         );
 
     /**

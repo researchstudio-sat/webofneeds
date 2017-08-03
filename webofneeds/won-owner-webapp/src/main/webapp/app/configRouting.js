@@ -188,7 +188,7 @@ function back(hasPreviousState, $ngRedux) {
 
 }
 
-function accessControl({event, toState, toParams, fromState, fromParams, options, dispatch, getState}){
+export function accessControl({event, toState, toParams, fromState, fromParams, options, dispatch, getState}){
     const hasPreviousState = !!fromState.name;
     const state = getState();
 
@@ -224,32 +224,34 @@ function accessControl({event, toState, toParams, fromState, fromParams, options
                     return; // logged in. continue route-change as intended.
                 } else {
                     //sure to be logged out
-                    event.preventDefault();
+                    event && event.preventDefault();
                     console.error(errorString);
                 }
             } else { // still loading
-                if(hasPreviousState) {
-                    event.preventDefault();
-                    console.log('Not sure about login-status -- ' +
-                        'will reinitialize route-change once it\'s been clarified.');
-                }
+                return; // no access control while loading. the page-load actions will call `accessControl` once the logged-in status has been checked
 
-                fetch('rest/users/isSignedIn', {credentials: 'include'})
-                    .then(checkHttpStatus) // will reject if not logged in
-                    .then(() => //logged in -- re-initiate route-change
-                        dispatch(
-                            actionCreators.router__stateGoAbs(toState, toParams)
-                        )
-                    )
-                    .catch(error => {
-                        //now certainly not logged in.
-                        console.error(errorString, error)
-                        if (!hasPreviousState) {
-                            dispatch(
-                                actionCreators.router__stateGoResetParams('landingpage')
-                            );
-                        }
-                    });
+                //if(hasPreviousState) {
+                //    event && event.preventDefault();
+                //    console.log('Not sure about login-status -- ' +
+                //        'will reinitialize route-change once it\'s been clarified.');
+                //}
+                //
+                //fetch('rest/users/isSignedIn', {credentials: 'include'})
+                //    .then(checkHttpStatus) // will reject if not logged in
+                //    .then(() => //logged in -- re-initiate route-change
+                //        dispatch(
+                //            actionCreators.router__stateGoAbs(toState, toParams)
+                //        )
+                //    )
+                //    .catch(error => {
+                //        //now certainly not logged in.
+                //        console.error(errorString, error)
+                //        if (!hasPreviousState) {
+                //            dispatch(
+                //                actionCreators.router__stateGoResetParams('landingpage')
+                //            );
+                //        }
+                //    });
             }
     }
 }

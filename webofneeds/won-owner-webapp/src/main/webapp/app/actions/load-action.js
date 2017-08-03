@@ -8,6 +8,10 @@ import { actionTypes, actionCreators } from './actions';
 import { selectOpenPostUri } from '../selectors';
 
 import {
+    accessControl,
+} from '../configRouting';
+
+import {
     checkLoginStatus,
     privateId2Credentials,
     login,
@@ -25,6 +29,13 @@ import {
     fetchDataForNonOwnedNeedOnly,
 } from '../won-message-utils';
 
+const emptyDataset = Immutable.fromJS({
+    ownNeeds: {},
+    connections: {},
+    events: {},
+    theirNeeds: {},
+});
+
 export const pageLoadAction = () => (dispatch, getState) => {
     /* TODO the data fetched here should be baked into
     * the send html thus significantly improving the
@@ -33,17 +44,15 @@ export const pageLoadAction = () => (dispatch, getState) => {
     */
     checkLoginStatus()
     /* handle data, dispatch actions */
-    .then(data => loadingWhileSignedIn(dispatch, data.username))
+    .then(data => loadingWhileSignedIn(dispatch, getState, data.username))
     .catch(error => {
         const privateId = getParameterByName('privateId'); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
-        console.log('privateId deleteme: ', privateId);
-
         if(privateId) {
             /*
              * we don't have a valid session. however the url might contain `privateId`, which means
              * we're accessing an "accountless"-account and need to sign in with that
              */
-            loadingWithAnonymousAccount(dispatch, privateId);
+            loadingWithAnonymousAccount(dispatch, getState, privateId);
         } else {
             /*
              * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
@@ -51,20 +60,24 @@ export const pageLoadAction = () => (dispatch, getState) => {
             loadingWhileSignedOut(dispatch, getState)
         }
     });
+};
+
+function loadingWhileSignedIn(dispatch, getState, username) {
+    loginSuccess(username, true, dispatch, getState);
+    fetchOwnedData(username, curriedDispatch(dispatch));
 }
 
-function loadingWhileSignedIn(dispatch, username) {
-    const curriedDispatch = (payload) => dispatch({
-        type: actionTypes.initialPageLoad,
-        payload
-    });
-    fetchOwnedData(username, curriedDispatch);
-}
-
-function loadingWithAnonymousAccount(dispatch, privateId) {
+function loadingWithAnonymousAccount(dispatch, getState, privateId) {
     // using an anonymous account. need to log in.
     const {email, password} = privateId2Credentials(privateId);
     return login(email, password)
+    /* quickly dispatch log-in status, even before loading data, to
+     * allow making correct access-control decisions
+     */
+    .then(response => {
+        loginSuccess(email, true, dispatch, getState);
+        return response;
+    })
     .then(response =>
         fetchOwnedData(email)
     ).then(allThatData => {
@@ -84,6 +97,27 @@ function loadingWithAnonymousAccount(dispatch, privateId) {
     //return; // the login action should fetch the required data, so we're done here.
 }
 
+function loginSuccess(username, loginStatus, dispatch, getState) {
+
+    /* quickly dispatch log-in status, even before loading data, to
+     * allow making correct access-control decisions
+     */
+    curriedDispatch(dispatch)({email: username, loggedIn: loginStatus});
+
+    const appState = getState();
+    const routingState = appState.getIn(['router','currentState', 'name'])
+    const params = appState.getIn(['router','currentParams']).toJS();
+    accessControl({
+        toState: routingState,
+        fromState: routingState,
+        toParams: params,
+        fromParams: params,
+        dispatch,
+        getState,
+    });
+
+}
+
 function loadingWhileSignedOut(dispatch, getState) {
     let dataPromise;
     const state = getState();
@@ -100,6 +134,17 @@ function loadingWhileSignedOut(dispatch, getState) {
         })
     );
 
+}
+
+function wellFormedPayload (payload) {
+    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
+}
+
+function curriedDispatch(dispatch) {
+    return payload => dispatch({
+        type: actionTypes.initialPageLoad,
+        payload: wellFormedPayload(payload),
+    });
 }
 
 
