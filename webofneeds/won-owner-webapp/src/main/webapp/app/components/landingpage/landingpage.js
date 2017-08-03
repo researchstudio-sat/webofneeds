@@ -6,6 +6,7 @@ import overviewTitleBarModule from '../visitor-title-bar';
 import compareToModule from '../../directives/compareTo';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
+import config from '../../config';
 import {
     attach,
     scrollTo,
@@ -99,8 +100,11 @@ const questions = [
 class LandingpageController {
     constructor(/* arguments <- serviceDependencies */){
         attach(this, serviceDependencies, arguments);
-        const self = this;
 
+        window.lp4dbg = this;
+
+        const self = this;
+        this.config = config;
         this.makeParams = makeParams;
 
         const signup = (state) => ({
