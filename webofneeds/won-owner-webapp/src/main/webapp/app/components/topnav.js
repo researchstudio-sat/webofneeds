@@ -8,6 +8,7 @@ import loginComponent from 'app/components/login';
 import logoutComponent from 'app/components/logout';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import config from '../config';
 
 function genTopnavConf() {
     let template = `
@@ -111,7 +112,14 @@ function genTopnavConf() {
                     class="topnav__toasts__element__close clickable"
                     ng-click="self.toasts__delete(toast)"
                     src="generated/icon-sprite.svg#ico27_close"/>
-                <div class="topnav__toasts__element__text">{{toast.get('msg')}}</div>
+                <div class="topnav__toasts__element__text">
+                    <p>{{toast.get('msg')}}</p>
+                    <p ng-show="toast.get('type') === self.WON.errorToast">
+                        If the problem persists please contact
+                        <a href="mailto:{{::self.config.adminEmail}}">{{::self.config.adminEmail}}</a>
+                    </p>
+                </div>
+
             </div>
         </div>
     `;
@@ -121,6 +129,8 @@ function genTopnavConf() {
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
+            this.config = config;
+
             window.tnc4dbg = this;
 
             const selectFromState = (state) => ({

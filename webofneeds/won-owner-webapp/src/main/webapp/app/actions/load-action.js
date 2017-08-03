@@ -13,6 +13,8 @@ import {
     login,
 } from '../won-utils';
 
+import config from '../config';
+
 import {
     checkHttpStatus,
     getParameterByName,
@@ -71,7 +73,12 @@ function loadingWithAnonymousAccount(dispatch, privateId) {
             payload: allThatData
         });
     }).catch(e => {
-        console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
+        //console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
+        dispatch({
+            type: actionTypes.loginFailed,
+            payload: { loginError: 'invalid privateId', privateId }
+        });
+        //dispatch(actionCreators.router__stateGoCurrent({privateId: undefined})); // remove invalid privateId
     });
     //dispatch(actionCreators.login(email, password));
     //return; // the login action should fetch the required data, so we're done here.

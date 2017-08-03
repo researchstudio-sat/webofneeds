@@ -2,6 +2,11 @@ import { actionTypes } from '../actions/actions';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import won from '../won-es6';
+import {
+    getIn,
+    generateIdString,
+} from '../utils';
+import config from '../config';
 
 const initialState = Immutable.fromJS({
 });
@@ -17,6 +22,18 @@ export default function(allToasts = initialState, action = {}) {
 
         case actionTypes.logout:
             return initialState;
+
+        case actionTypes.loginFailed:
+            if(getIn(action, ['payload', 'loginError']) === 'invalid privateId') {
+                return pushNewToast(
+                    allToasts,
+                    'Sorry, we couldn\'t find the private ID ' + getIn(action, ['payload', 'privateId']) +
+                    ' (the one in your url-bar). Try reloading or removing it.',
+                    won.WON.errorToast
+                )
+            } else {
+                return allToasts;
+            }
 
         case actionTypes.lostConnection:
             return pushNewToast(allToasts, "Lost connection - progress " +
@@ -46,13 +63,7 @@ function pushNewToast(allToasts, msg, type) {
     if(!toastType){
         toastType = won.WON.infoToast;
     }
-
-    var id="";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for( var i=0; i < 5; i++ )
-        id += possible.charAt(Math.floor(Math.random() * possible.length));
-
+    const id = generateIdString(6);
     return allToasts.setIn([id], Immutable.fromJS({id: id, type: toastType, msg: msg}));
 }
 
