@@ -125,16 +125,20 @@ export const runAccessControl = [ '$rootScope', '$ngRedux', '$urlRouter',
     ($rootScope, $ngRedux, $urlRouter) => {
         $rootScope.$on('$stateChangeStart',
             (event, toState, toParams, fromState, fromParams, options) =>
-                accessControl(event, toState, toParams, fromState, fromParams, options, $ngRedux)
+                accessControl({
+                    event, toState, toParams, fromState, fromParams, options,
+                    dispatch: $ngRedux.dispatch,
+                    getState: $ngRedux.getState,
+                })
         );
     }
 ];
 
 
-function postViewEnsureLoaded($ngRedux, encodedPostUri) {
+function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
     console.log('in postViewEnsureLoaded');
     const postUri = decodeUriComponentProperly(encodedPostUri);
-    const state = $ngRedux.getState();
+    const state = getState();
 
     if (postUri && !selectAllNeeds(state).has(postUri)) {
 
@@ -151,7 +155,7 @@ function postViewEnsureLoaded($ngRedux, encodedPostUri) {
          */
         won.getNeedWithConnectionUris(postUri)
             .then(need =>
-                $ngRedux.dispatch({
+                dispatch({
                     type: actionTypes.router.accessedNonLoadedPost,
                     payload: Immutable.fromJS({ theirNeed: need })
                 })
@@ -162,9 +166,9 @@ function postViewEnsureLoaded($ngRedux, encodedPostUri) {
                     `Reverting to previous router-state.`,
                     `Error: `, error
                 );
-                $ngRedux.dispatch(
+                dispatch(
                     actionCreators.router__back()
-                )
+                );
             });
     }
 }
@@ -184,17 +188,18 @@ function back(hasPreviousState, $ngRedux) {
 
 }
 
-function accessControl(event, toState, toParams, fromState, fromParams, options, $ngRedux){
+function accessControl({event, toState, toParams, fromState, fromParams, options, dispatch, getState}){
     const hasPreviousState = !!fromState.name;
-    const state = $ngRedux.getState();
-    
+    const state = getState();
+
     const errorString = "Tried to access view \"" + (toState && toState.name) + "\" that won't work" +
         "without logging in. Blocking route-change.";
 
     switch(toState.name) {
         case 'post': //Route the 'post' no matter if you are logged in or not since it is accessible at all times
             postViewEnsureLoaded(
-                $ngRedux,
+                dispatch,
+                getState,
                 toParams.postUri
             );
             break;
@@ -204,7 +209,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
             checkLoginStatus()
             .then(() => {//logged in -- re-initiate route-change
                 console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the feed");
-                $ngRedux.dispatch(
+                dispatch(
                     actionCreators.router__stateGoAbs('feed', toParams)
                 )
             });
@@ -222,7 +227,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
                     event.preventDefault();
                     console.error(errorString);
                 }
-            } else {
+            } else { // still loading
                 if(hasPreviousState) {
                     event.preventDefault();
                     console.log('Not sure about login-status -- ' +
@@ -232,7 +237,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
                 fetch('rest/users/isSignedIn', {credentials: 'include'})
                     .then(checkHttpStatus) // will reject if not logged in
                     .then(() => //logged in -- re-initiate route-change
-                        $ngRedux.dispatch(
+                        dispatch(
                             actionCreators.router__stateGoAbs(toState, toParams)
                         )
                     )
@@ -240,7 +245,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
                         //now certainly not logged in.
                         console.error(errorString, error)
                         if (!hasPreviousState) {
-                            $ngRedux.dispatch(
+                            dispatch(
                                 actionCreators.router__stateGoResetParams('landingpage')
                             );
                         }
