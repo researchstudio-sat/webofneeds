@@ -4,7 +4,7 @@
 
 This software is for people who need something, have something to offer, want to discuss something etc. - in short: who wish to connect with others for some reason.
 1. They publish a posting about it online 
-2. They get recommendations on matching postings by others
+2. They get recommendations on matching postings created by other people
 3. They start chatting with some of the creators of these other postings
 4. Maybe they'll meet. Maybe one will buy from the other. Maybe they will start a company, plant a tree, get married, found a party...
 
