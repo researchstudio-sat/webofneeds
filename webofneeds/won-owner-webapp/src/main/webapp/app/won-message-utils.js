@@ -23,52 +23,6 @@ import {
 
 import jsonld from 'jsonld';
 
-/*
-    fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
-        .then(checkStatus)
-        .then(resp => resp.json())
-        .then(data =>
-            dispatch(actionCreators.user__receive({
-                loggedIn: true,
-                email: data.username
-            }))
-    )
-*/
-//TODO cached/memoized promise?
-/*
-var ret = buildCreateMessage(need, state.getIn['config', 'defaultNodeUri']);
-var message = ret[0];
-var eventUri = ret[1];
-
-send(message);
-
-callback.shouldHandleTest = function (event, msg) {
-    var ret = event.isResponseTo == eventUri;
-    $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-    return ret;
-};
-
-messageService.sendMessage = function(msg) {
-    var jsonMsg = JSON.stringify(msg);
-    if (isConnected()) {
-        privateData.socket.send(jsonMsg);
-    } else {
-        if (!isConnecting()) {
-            createSocket();
-        }
-
-        if (isConnected()) {
-            $log.debug("sending message instead of enqueueing");
-            //just to be sure, test if the connection is established now and send instead of enqueue
-            privateData.socket.send(jsonMsg);
-        } else {
-            $log.warn("socket not connected yet, enqueueing");
-            privateData.pendingOutMessages.push(jsonMsg);
-        }
-    }
-};
-
-*/
 export const emptyDataset = Immutable.fromJS({
     ownNeeds: {},
     connections: {},
