@@ -300,7 +300,11 @@ export function needCreate(draft, nodeUri) {
                             theirNeeds: {},
                         })
                     })
-                });
+                })
+                .catch(err => {
+                    //TODO user-visible error message / error recovery mechanisms
+                    console.error(`Creating temporary account ${email} has failed due to `, err);
+                })
         }
 
         hasAccountPromise
@@ -309,10 +313,6 @@ export function needCreate(draft, nodeUri) {
                 type: actionTypes.needs.create,
                 payload: {eventUri, message, needUri}
             });
-        })
-        .catch(err => {
-            //TODO user-visible error message / error recovery mechanisms
-            console.error(`Creating temporary account ${email} has failed due to `, err);
         })
     }
 }
