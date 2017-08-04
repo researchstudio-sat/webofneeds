@@ -17,6 +17,10 @@ import {
     getIn,
 } from './utils';
 
+import {
+    actionTypes,
+} from './actions/actions';
+
 import jsonld from 'jsonld';
 
 /*
@@ -65,6 +69,16 @@ messageService.sendMessage = function(msg) {
 };
 
 */
+export const emptyDataset = Immutable.fromJS({
+    ownNeeds: {},
+    connections: {},
+    events: {},
+    theirNeeds: {},
+});
+
+export function wellFormedPayload (payload) {
+    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
+}
 
 export function buildRateMessage(msgToRateFor, rating){
     return new Promise((resolve, reject) => {
@@ -432,8 +446,6 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
         return Promise.resolve(emptyDataset);
     }
 
-    dispatchWellFormed = (payload) => curriedDispatch(payload);
-
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
     );
@@ -479,16 +491,16 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
                     urisToLookupMap(theirNeedUris, won.getTheirNeed));
 
         //dispatch to the curried-in action as soon as any part of the data arrives
-        const ownNeedsDispatchedP = allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
+        const ownNeedsDispatchedP = allOwnNeedsPromise.then(ownNeeds => curriedDispatch({ownNeeds}));
 
         //Is needed for the reducer to make sure that all needs have already been put in the state
         Promise.all([
             ownNeedsDispatchedP,
             allConnectionsPromise,
-        ]).then(([x, connections]) => dispatchWellFormed({connections}));
+        ]).then(([x, connections]) => curriedDispatch({connections}));
 
         //allEventsPromise.then(events => dispatchWellFormed({events})); // STARTING with selective loading
-        allTheirNeedsPromise.then(theirNeeds => dispatchWellFormed({theirNeeds}));
+        allTheirNeedsPromise.then(theirNeeds => curriedDispatch({theirNeeds}));
 
         return Promise.all([
             allOwnNeedsPromise,

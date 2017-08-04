@@ -27,14 +27,10 @@ import {
 import {
     fetchOwnedData,
     fetchDataForNonOwnedNeedOnly,
+    emptyDataset,
+    wellFormedPayload,
 } from '../won-message-utils';
 
-const emptyDataset = Immutable.fromJS({
-    ownNeeds: {},
-    connections: {},
-    events: {},
-    theirNeeds: {},
-});
 
 export const pageLoadAction = () => (dispatch, getState) => {
     /* TODO the data fetched here should be baked into
@@ -64,7 +60,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
 
 function loadingWhileSignedIn(dispatch, getState, username) {
     loginSuccess(username, true, dispatch, getState);
-    fetchOwnedData(username, curriedDispatch(dispatch));
+    fetchOwnedData(username, dispatchInitialPageLoad(dispatch));
 }
 
 function loadingWithAnonymousAccount(dispatch, getState, privateId) {
@@ -86,7 +82,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
             payload: allThatData
         });
     }).catch(e => {
-        //console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
+        console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
         dispatch({
             type: actionTypes.loginFailed,
             payload: { loginError: 'invalid privateId', privateId }
@@ -102,7 +98,7 @@ function loginSuccess(username, loginStatus, dispatch, getState) {
     /* quickly dispatch log-in status, even before loading data, to
      * allow making correct access-control decisions
      */
-    curriedDispatch(dispatch)({email: username, loggedIn: loginStatus});
+    dispatchInitialPageLoad(dispatch)({email: username, loggedIn: loginStatus});
 
     const appState = getState();
     const routingState = appState.getIn(['router','currentState', 'name'])
@@ -136,17 +132,12 @@ function loadingWhileSignedOut(dispatch, getState) {
 
 }
 
-function wellFormedPayload (payload) {
-    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
-}
-
-function curriedDispatch(dispatch) {
+function dispatchInitialPageLoad(dispatch) {
     return payload => dispatch({
         type: actionTypes.initialPageLoad,
         payload: wellFormedPayload(payload),
     });
 }
-
 
 /////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF PAGELOAD
 
