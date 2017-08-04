@@ -59,6 +59,10 @@ import {
 } from '../won-utils';
 
 import {
+    needCreate,
+} from './create-need-action';
+
+import {
     makeParams,
     resetParams,
     constantParams,
@@ -269,53 +273,6 @@ export function startTicking() {
         );
 }
 
-
-export function needCreate(draft, nodeUri) {
-    return (dispatch, getState) => {
-        const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-
-
-        const state = getState();
-        let email = state.getIn(['user', 'email']);
-        let hasAccountPromise;
-
-        if(state.getIn(['user', 'loggedIn'])){
-            hasAccountPromise = Promise.resolve();
-        } else {
-            const {email, password, privateId} = generateAccountCredentials()
-            hasAccountPromise =
-                registerAccount(email, password)
-                .then(() =>
-                    login(email, password))
-                .then(() => {
-                    //TODO custom action-creator and -type for this?
-                    dispatch(actionCreators.router__stateGoCurrent({ privateId })); // add anonymous id to query-params
-                    dispatch({
-                        type: actionTypes.login,
-                        payload: Immutable.fromJS({
-                            email,
-                            loggedIn: true,
-                            events: {},
-                            ownNeeds: {},
-                            theirNeeds: {},
-                        })
-                    })
-                })
-                .catch(err => {
-                    //TODO user-visible error message / error recovery mechanisms
-                    console.error(`Creating temporary account ${email} has failed due to `, err);
-                })
-        }
-
-        hasAccountPromise
-        .then(() => {
-            dispatch({
-                type: actionTypes.needs.create,
-                payload: {eventUri, message, needUri}
-            });
-        })
-    }
-}
 
 /**
  * @deprecated used for keeping old code.
