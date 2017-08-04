@@ -360,25 +360,15 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 export function fetchOwnedData(email, curriedDispatch) {
     return fetchOwnedNeedUris()
         .then(needUris =>
-            fetchDataForOwnedNeeds(needUris, email, curriedDispatch)
+            fetchDataForOwnedNeeds(needUris, curriedDispatch)
         );
 }
-export function fetchDataForOwnedNeeds(needUris, email, curriedDispatch) {
-
-    const dataPromise =
-        fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
-        .catch(error => {
-            throw({msg: 'user needlist retrieval failed', error});
-        });
-
-    if(email) {
-        return dataPromise.then(allThatData =>
-            allThatData.merge(Immutable.fromJS(userData))
-        )
-    } else {
-        return dataPromise;
-    }
-}
+//export function fetchDataForOwnedNeeds(needUris, curriedDispatch) {
+//    return fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
+//        .catch(error => {
+//            throw({msg: 'user needlist retrieval failed', error});
+//        });
+//}
 function fetchOwnedNeedUris() {
     return fetch('/owner/rest/needs/', {
             method: 'get',
@@ -395,6 +385,7 @@ function fetchOwnedNeedUris() {
 }
 
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
+export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => undefined) {
     if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
         return Promise.resolve(emptyDataset);
