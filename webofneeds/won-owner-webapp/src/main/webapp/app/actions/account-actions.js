@@ -27,7 +27,7 @@ export function accountLogin(username, password) {
         .then(allThatData =>
             dispatch({
                 type: actionTypes.login,
-                payload: allThatData
+                payload: allThatData.merge({email: username, loggedIn: true})
             })
         )
         .then(() => {
