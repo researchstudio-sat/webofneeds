@@ -8,7 +8,7 @@ This software is for people who need something, have something to offer, want to
 3. They start chatting with some of the creators of these other postings
 4. Maybe they'll meet. Maybe one will buy from the other. Maybe they will start a company, plant a tree, get married, found a party...
 
-That's it, basically. Try our demo on [matchat.org](http://matchat.org)!
+That's it, basically. Try our demo on [matchat.org](http://matchat.org)! And then [run your own servers](webofneeds/won-docker/README.md)!
 
 ## Overview
 
