@@ -21,7 +21,6 @@ export function needCreate(draft, nodeUri) {
     return (dispatch, getState) => {
         const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
 
-
         const state = getState();
         let email = state.getIn(['user', 'email']);
         let hasAccountPromise;
@@ -34,9 +33,11 @@ export function needCreate(draft, nodeUri) {
                 registerAccount(email, password)
                     .then(() =>
                         login(email, password))
+                    .then(() =>
+                        dispatch(actionCreators.router__stateGoCurrent({ privateId })) // add anonymous id to query-params
+                    )
                     .then(() => {
                         //TODO custom action-creator and -type for this?
-                        dispatch(actionCreators.router__stateGoCurrent({ privateId })); // add anonymous id to query-params
                         dispatch({
                             type: actionTypes.login,
                             payload: Immutable.fromJS({
