@@ -90,6 +90,9 @@ export function accountLogout() {
         })
         .then(() => { /* finally */
             dispatch(actionCreators.router__stateGoResetParams("landingpage"));
+
+            // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
+            dispatch(actionCreators.router__stateGoCurrent({privateId: undefined}));
         })
 }
 
