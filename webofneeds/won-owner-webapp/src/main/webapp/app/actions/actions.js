@@ -74,6 +74,7 @@ import {
 // <action-creators>
 
 import {
+    anonAccountLogin,
     accountLogin,
     accountLogout,
     accountRegister,
@@ -195,6 +196,7 @@ const actionHierarchy = {
     },
     hideLogin: INJ_DEFAULT,
     showLogin: INJ_DEFAULT,
+    anonymousLogin: anonAccountLogin,
     login: accountLogin,
     logout: accountLogout,
     register: accountRegister,

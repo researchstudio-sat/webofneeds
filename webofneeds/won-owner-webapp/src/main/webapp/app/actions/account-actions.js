@@ -9,6 +9,7 @@ import { fetchOwnedData } from '../won-message-utils';
 import {
     registerAccount,
     login,
+    privateId2Credentials,
 } from '../won-utils';
 import {
    resetParams,
@@ -18,6 +19,10 @@ import {
     checkHttpStatus,
 } from '../utils';
 
+export function anonAccountLogin(privateId) {
+    const {email, password} = privateId2Credentials(privateId);
+    return accountLogin(email, password);
+}
 export function accountLogin(username, password) {
     return (dispatch) =>
         login(username, password)

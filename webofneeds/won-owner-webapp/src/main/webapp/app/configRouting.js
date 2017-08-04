@@ -195,6 +195,15 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
     const errorString = "Tried to access view \"" + (toState && toState.name) + "\" that won't work" +
         "without logging in. Blocking route-change.";
 
+    if(!fromParams['privateId'] && toParams['privateId']) {
+        // privateId was added, log in
+        dispatch(actionCreators.anonymousLogin(toParams['privateId']));
+    } else if(fromParams['privateId'] && !toParams['privateId']) {
+        //privateId was removed, log out
+        dispatch(actionCreators.logout());
+    }
+
+
     switch(toState.name) {
         case 'post': //Route the 'post' no matter if you are logged in or not since it is accessible at all times
             postViewEnsureLoaded(
