@@ -54,6 +54,7 @@ import {
 import {
     checkLoginStatus,
     registerAccount,
+    login,
     generateAccountCredentials,
 } from '../won-utils';
 
@@ -284,6 +285,8 @@ export function needCreate(draft, nodeUri) {
             const {email, password, privateId} = generateAccountCredentials()
             hasAccountPromise =
                 registerAccount(email, password)
+                .then(() =>
+                    login(email, password))
                 .then(() => {
                     //TODO custom action-creator and -type for this?
                     dispatch(actionCreators.router__stateGoCurrent({ privateId })); // add anonymous id to query-params
