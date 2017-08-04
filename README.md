@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This software is for people who need something, have something to offer, want to connect with people etc. - in short: who wish to connect with others for some reason.
+This software is for people who need something, have something to offer, want to discuss something etc. - in short: who wish to connect with others for some reason.
 1. They publish a posting about it online 
 2. They get recommendations on matching postings by others
 3. They start chatting with some of the creators of these other postings
