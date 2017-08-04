@@ -3,9 +3,9 @@
 [![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This software is for people who need something.
-1. They post their need online
-2. They get matches to other needs that may be useful for their situation
-3. They start chatting with creator of that other need.
+1. They publish a posting about it online 
+2. They get recommendations on postings by others that may be useful for their situation
+3. They start chatting with some of the creators of these other postings
 4. Maybe they'll meet. Maybe one will buy from the other. Maybe they will start a company, plant a tree, get married, found a party...
 
 That's it, basically. Try our demo on [matchat.org](http://matchat.org)!
