@@ -19,6 +19,10 @@ import {
     login,
 } from '../won-utils';
 
+import {
+    delay,
+} from '../utils';
+
 export function needCreate(draft, nodeUri) {
     return (dispatch, getState) => {
         const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
@@ -48,9 +52,17 @@ export function needCreate(draft, nodeUri) {
                                 theirNeeds: {},
                             })
                         })
+
+                        // reset websocket to make sure it's using the logged-in session
+                        return dispatch(actionCreators.reconnect());
                     })
                     .then(() =>
                         dispatch(actionCreators.router__stateGoCurrent({ privateId })) // add anonymous id to query-params
+                    )
+                    .then(() =>
+                        // wait for the server to process the login and the reconnect to
+                        // go through, before proceeding to need-creation.
+                        delay(500)
                     )
                     .catch(err => {
                         //TODO user-visible error message / error recovery mechanisms
