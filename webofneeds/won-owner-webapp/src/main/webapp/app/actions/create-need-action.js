@@ -2,6 +2,8 @@
  * Created by ksinger on 04.08.2017.
  */
 
+import Immutable from 'immutable';
+
 import {
     buildCreateMessage,
 } from '../won-message-utils';
