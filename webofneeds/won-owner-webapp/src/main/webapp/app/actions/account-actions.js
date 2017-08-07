@@ -46,7 +46,12 @@ export function accountLogin(username, password) {
         })
         .catch(error => {
             console.log("accountLogin ErrorObject", error);
-            return dispatch(actionCreators.loginFailed({loginError: error.msg? error.msg : "Unknown Username/Password Combination", error}))
+            return dispatch(actionCreators.loginFailed({
+                loginError: error.msg?
+                    error.msg :
+                    "Unknown Username/Password Combination",
+                error
+            }))
         })
 }
 
