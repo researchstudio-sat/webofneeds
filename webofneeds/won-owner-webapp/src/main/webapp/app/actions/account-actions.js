@@ -51,7 +51,7 @@ export function accountLogin(username, password) {
                 type: actionTypes.login,
                 payload: Immutable.fromJS({loggedIn: false})
             })
-            dispatch(actionCreators.loginFailed({loginError: error.msg? error.msg : "Unknown Username/Password Combination", error}))
+            return dispatch(actionCreators.loginFailed({loginError: error.msg? error.msg : "Unknown Username/Password Combination", error}))
         })
 }
 

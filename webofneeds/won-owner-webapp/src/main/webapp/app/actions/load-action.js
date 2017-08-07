@@ -82,13 +82,13 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
     .then(response =>
         fetchOwnedData(email)
     ).then(allThatData => {
-        dispatch({
+        return dispatch({
             type: actionTypes.initialPageLoad,
             payload: allThatData
         });
     }).catch(e => {
         console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
-        dispatch({
+        return dispatch({
             type: actionTypes.loginFailed,
             payload: { loginError: 'invalid privateId', privateId }
         });

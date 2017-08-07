@@ -57,7 +57,7 @@ export function needCreate(draft, nodeUri) {
                     })
         }
 
-        hasAccountPromise
+        return hasAccountPromise
             .then(() => {
                 dispatch({
                     type: actionTypes.needs.create,
