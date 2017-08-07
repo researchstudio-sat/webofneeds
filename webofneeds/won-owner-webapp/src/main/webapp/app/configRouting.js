@@ -233,7 +233,16 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
                     return; // logged in. continue route-change as intended.
                 } else {
                     //sure to be logged out
-                    event && event.preventDefault();
+                    if(event) {
+                        // block any route change that is currently happening
+                        event.preventDefault();
+                    } else {
+                        // this is a check with a route that's already fixed, redirect to landing page instead.
+                        dispatch(
+                            actionCreators.router__stateGoResetParams('landingpage')
+                        )
+                    }
+
                     console.error(errorString);
                 }
             } else { // still loading
@@ -264,6 +273,29 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
             }
     }
 }
+
+/**
+ * Checks if the current route should be accessible
+ * and redirects if not.
+ * @param dispatch
+ * @param getState
+ * @returns {*}
+ */
+export function checkAccessToCurrentRoute(dispatch, getState) {
+    const appState = getState();
+    const routingState = appState.getIn(['router','currentState']).toJS();
+    const params = appState.getIn(['router','currentParams']).toJS();
+    return accessControl({
+        toState: routingState,
+        fromState: routingState,
+        toParams: params,
+        fromParams: params,
+        dispatch,
+        getState,
+    });
+}
+
+
 
 /**
  * Merges any "constant"-parameters (e.g. `privateId`) that are contained in `paramsInState`

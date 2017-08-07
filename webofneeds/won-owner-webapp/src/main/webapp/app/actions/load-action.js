@@ -9,6 +9,7 @@ import { selectOpenPostUri } from '../selectors';
 
 import {
     accessControl,
+    checkAccessToCurrentRoute,
 } from '../configRouting';
 
 import {
@@ -100,18 +101,7 @@ function loginSuccess(username, loginStatus, dispatch, getState) {
      */
     dispatchInitialPageLoad(dispatch)({email: username, loggedIn: loginStatus});
 
-    const appState = getState();
-    const routingState = appState.getIn(['router','currentState', 'name'])
-    const params = appState.getIn(['router','currentParams']).toJS();
-    accessControl({
-        toState: routingState,
-        fromState: routingState,
-        toParams: params,
-        fromParams: params,
-        dispatch,
-        getState,
-    });
-
+    checkAccessToCurrentRoute(dispatch, getState);
 }
 
 function loadingWhileSignedOut(dispatch, getState) {
@@ -128,6 +118,8 @@ function loadingWhileSignedOut(dispatch, getState) {
             type: actionTypes.initialPageLoad,
             payload: publicData
         })
+    ).then(() =>
+        checkAccessToCurrentRoute(dispatch, getState)
     );
 
 }
