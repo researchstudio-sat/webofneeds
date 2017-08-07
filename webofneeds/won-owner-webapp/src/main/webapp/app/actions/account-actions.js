@@ -12,7 +12,8 @@ import {
     privateId2Credentials,
 } from '../won-utils';
 import {
-   resetParams,
+    resetParams,
+    checkAccessToCurrentRoute,
 } from '../configRouting';
 
 import {
@@ -55,7 +56,7 @@ export function accountLogin(username, password) {
 }
 
 export function accountLogout() {
-    return (dispatch) =>
+    return (dispatch, getState) =>
         fetch('/owner/rest/users/signout', {
             method: 'post',
             headers: {
@@ -89,10 +90,10 @@ export function accountLogout() {
             dispatch(actionCreators.reconnect());
         })
         .then(() => { /* finally */
-            dispatch(actionCreators.router__stateGoResetParams("landingpage"));
-
             // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
             dispatch(actionCreators.router__stateGoCurrent({privateId: undefined}));
+
+            checkAccessToCurrentRoute(dispatch, getState);
         })
 }
 
