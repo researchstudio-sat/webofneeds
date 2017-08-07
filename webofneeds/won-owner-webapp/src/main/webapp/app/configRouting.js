@@ -195,9 +195,13 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
     const errorString = "Tried to access view \"" + (toState && toState.name) + "\" that won't work" +
         "without logging in. Blocking route-change.";
 
-    if(!fromParams['privateId'] && toParams['privateId']) {
+    if( !fromParams['privateId'] && toParams['privateId'] // <-- privateId was added (e.g. by user pasting an url), we need to log in
+        // v--- only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
+        && state.get('initialLoadFinished') && !state.getIn(['user', 'loggedIn'])
+    ) {
         // privateId was added, log in
         dispatch(actionCreators.anonymousLogin(toParams['privateId']));
+
     } else if(fromParams['privateId'] && !toParams['privateId']) {
         //privateId was removed, log out
         dispatch(actionCreators.logout());
