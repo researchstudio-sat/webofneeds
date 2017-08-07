@@ -28,7 +28,7 @@ export default function(allToasts = initialState, action = {}) {
                 return pushNewToast(
                     allToasts,
                     'Sorry, we couldn\'t find the private ID ' + getIn(action, ['payload', 'privateId']) +
-                    ' (the one in your url-bar). Try reloading or removing it.',
+                    ' (the one in your url-bar). Try reloading the page or removing the ID.',
                     won.WON.errorToast
                 )
             } else {
