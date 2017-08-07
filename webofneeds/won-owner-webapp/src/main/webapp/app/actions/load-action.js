@@ -49,12 +49,16 @@ export const pageLoadAction = () => (dispatch, getState) => {
              * we don't have a valid session. however the url might contain `privateId`, which means
              * we're accessing an "accountless"-account and need to sign in with that
              */
-            loadingWithAnonymousAccount(dispatch, getState, privateId);
+            loadingWithAnonymousAccount(dispatch, getState, privateId)
+            .catch(e =>
+                loadingWhileSignedOut(dispatch, getState)
+            );
+
         } else {
             /*
              * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
              */
-            loadingWhileSignedOut(dispatch, getState)
+            loadingWhileSignedOut(dispatch, getState);
         }
     });
 };
@@ -88,6 +92,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
             type: actionTypes.loginFailed,
             payload: { loginError: 'invalid privateId', privateId }
         });
+        throw e;
         //dispatch(actionCreators.router__stateGoCurrent({privateId: undefined})); // remove invalid privateId
     });
     //dispatch(actionCreators.login(email, password));

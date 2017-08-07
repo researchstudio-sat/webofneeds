@@ -134,6 +134,7 @@ const actionHierarchy = {
         stateGoResetParams, // goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
         stateGoKeepParams, // goes to new state and keeps listed parameters at their current values
         stateGoCurrent,
+        stateGoDefault,
         stateReload,
         //stateTransitionTo, // should not be used directly
         back: stateBack,
@@ -411,6 +412,18 @@ function stateGoResetParams(state) {
     }
 }
 
+function stateGoDefault() {
+    return (dispatch, getState) => {
+        if ( state.get('initialLoadFinished') ) {
+            if (state.getIn(['user', 'loggedIn'])) {
+                dispatch(actionCreators.router__stateGoResetParams('feed'));
+            } else {
+                dispatch(actionCreators.router__stateGoResetParams('landingpage'));
+            }
+        }
+    }
+}
+
 /**
  * goes to new state and keeps listed parameters at their current values
  */
@@ -443,5 +456,4 @@ function stateGoCurrent(queryParams) {
             addConstParams(queryParams, currentParams)
         ));
     }
-
 }
