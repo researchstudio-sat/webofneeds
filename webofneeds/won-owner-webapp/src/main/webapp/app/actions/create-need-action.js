@@ -14,6 +14,10 @@ import {
 } from './actions';
 
 import {
+   accountRegister,
+} from './account-actions';
+
+import {
     registerAccount,
     generateAccountCredentials,
     login,
@@ -34,28 +38,8 @@ export function needCreate(draft, nodeUri) {
         if(state.getIn(['user', 'loggedIn'])){
             hasAccountPromise = Promise.resolve();
         } else {
-            const {email, password, privateId} = generateAccountCredentials()
-            hasAccountPromise =
-                registerAccount(email, password)
-                    .then(() =>
-                        login(email, password))
-                    .then(() => {
-                        //TODO custom action-creator and -type for this?
-                        // TODO unnecessary as adding the privateId will already trigger a login action
-                        dispatch({
-                            type: actionTypes.login,
-                            payload: Immutable.fromJS({
-                                email,
-                                loggedIn: true,
-                                events: {},
-                                ownNeeds: {},
-                                theirNeeds: {},
-                            })
-                        })
-
-                        // reset websocket to make sure it's using the logged-in session
-                        return dispatch(actionCreators.reconnect());
-                    })
+            const {email, password, privateId} = generateAccountCredentials();
+            hasAccountPromise = accountRegister(email, password)(dispatch)
                     .then(() =>
                         dispatch(actionCreators.router__stateGoCurrent({ privateId })) // add anonymous id to query-params
                     )

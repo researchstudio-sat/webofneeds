@@ -24,11 +24,11 @@ export function anonAccountLogin(privateId) {
     const {email, password} = privateId2Credentials(privateId);
     return accountLogin(email, password);
 }
-export function accountLogin(username, password) {
+export function accountLogin(username, password, fetchData = true) {
     return (dispatch) =>
         login(username, password)
         .then( response =>
-            fetchOwnedData(username)
+            fetchData ? fetchOwnedData(username) : Immutable.Map() // only need to fetch data for non-new accounts
         )
         .then(allThatData =>
             dispatch({
@@ -36,14 +36,16 @@ export function accountLogin(username, password) {
                 payload: allThatData.merge({email: username, loggedIn: true})
             })
         )
-        .then(() => {
+        .then(() =>
             /**
              * TODO this action is part of the session-upgrade hack documented in:
              * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
              */
-            dispatch(actionCreators.reconnect());
-            dispatch(actionCreators.router__stateGoResetParams("feed"));
-        })
+            dispatch(actionCreators.reconnect())
+        )
+        .then(() =>
+            dispatch(actionCreators.router__stateGoResetParams("feed"))
+        )
         .catch(error => {
             console.log("accountLogin ErrorObject", error);
             return dispatch(actionCreators.loginFailed({
@@ -107,7 +109,7 @@ export function accountRegister(username, password) {
             * (the fetchDataForOwnedNeeds, redirect
             * and wsReset)
             */
-            dispatch(actionCreators.login(username, password));
+            accountLogin(username, password, false)(dispatch);
         })
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
