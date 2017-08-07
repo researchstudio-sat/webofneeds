@@ -12,6 +12,7 @@ import {
 import {
     makeParams,
     resetParams,
+    resetParamsImm,
     constantParams,
     addConstParams,
 } from '../configRouting';
@@ -41,7 +42,7 @@ export function stateGoAbs(state, queryParams) {
         const currentParams = getState().getIn(['router', 'currentParams']);
         dispatch(actionCreators.router__stateGo(
             state,
-            addConstParams(queryParams, currentParams)
+            addConstParams(resetParamsImm.merge(queryParams), currentParams)
         ))
     }
 }
@@ -52,12 +53,6 @@ export function stateGoAbs(state, queryParams) {
 export function stateGoResetParams(state) {
     return (dispatch, getState) => {
         const currentParams = getState().getIn(['router', 'currentParams']);
-
-        console.log('routing from',
-            getState().getIn(['router', 'currentState', 'name']), currentParams,
-            ' to ', state, addConstParams(resetParams, currentParams)
-        );
-
         dispatch(actionCreators.router__stateGo(
             state,
             addConstParams(resetParams, currentParams)

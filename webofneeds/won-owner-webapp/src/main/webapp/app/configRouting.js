@@ -39,6 +39,8 @@ export const resetParams = Object.freeze({
     // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
 });
 
+export const resetParamsImm = Immutable.fromJS(resetParams);
+
 /**
  * These should not accidentally be removed from the state. See the `stateGo*`-action creators
  * in `actions.js`
