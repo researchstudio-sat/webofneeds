@@ -77,5 +77,8 @@ export function needCreate(draft, nodeUri) {
                     payload: {eventUri, message, needUri}
                 });
             })
+            .then(() =>
+                dispatch(actionCreators.router__stateGoResetParams('feed'))
+            );
     }
 }
