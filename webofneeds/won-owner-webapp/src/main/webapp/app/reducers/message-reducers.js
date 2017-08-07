@@ -19,8 +19,10 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
     switch(action.type) {
+        case actionTypes.loginFailed:
         case actionTypes.logout:
             return initialState;
+
         case actionTypes.needs.create:
             return messages.setIn(
                 ['enqueued', action.payload.eventUri],

@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
 export default function(state = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.logout:
+        case actionTypes.loginFailed:
         case actionTypes.needs.clean:
             return initialState;
 

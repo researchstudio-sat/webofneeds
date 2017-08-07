@@ -29,6 +29,7 @@ export default function(userData = initialState, action = {}) {
                 return userData;
             }
 
+        case actionTypes.loginFailed:
         case actionTypes.logout:
             return Immutable.fromJS({loggedIn: false});
 

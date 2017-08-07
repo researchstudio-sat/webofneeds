@@ -46,11 +46,6 @@ export function accountLogin(username, password) {
         })
         .catch(error => {
             console.log("accountLogin ErrorObject", error);
-            //TODO load data of non-owned need!!!
-            dispatch({
-                type: actionTypes.login,
-                payload: Immutable.fromJS({loggedIn: false})
-            })
             return dispatch(actionCreators.loginFailed({loginError: error.msg? error.msg : "Unknown Username/Password Combination", error}))
         })
 }
