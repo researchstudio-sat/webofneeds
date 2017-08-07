@@ -40,6 +40,7 @@ export function needCreate(draft, nodeUri) {
                     )
                     .then(() => {
                         //TODO custom action-creator and -type for this?
+                        // TODO unnecessary as adding the privateId will already trigger a login action
                         dispatch({
                             type: actionTypes.login,
                             payload: Immutable.fromJS({
