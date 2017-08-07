@@ -121,7 +121,7 @@ function loadingWhileSignedOut(dispatch, getState) {
     } else {
         dataPromise = Promise.resolve(Immutable.Map());
     }
-    dataPromise.then(publicData =>
+    return dataPromise.then(publicData =>
         dispatch({
             type: actionTypes.initialPageLoad,
             payload: publicData
