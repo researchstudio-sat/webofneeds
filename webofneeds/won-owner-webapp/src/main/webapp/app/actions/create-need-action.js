@@ -35,9 +35,6 @@ export function needCreate(draft, nodeUri) {
                 registerAccount(email, password)
                     .then(() =>
                         login(email, password))
-                    .then(() =>
-                        dispatch(actionCreators.router__stateGoCurrent({ privateId })) // add anonymous id to query-params
-                    )
                     .then(() => {
                         //TODO custom action-creator and -type for this?
                         // TODO unnecessary as adding the privateId will already trigger a login action
@@ -52,6 +49,9 @@ export function needCreate(draft, nodeUri) {
                             })
                         })
                     })
+                    .then(() =>
+                        dispatch(actionCreators.router__stateGoCurrent({ privateId })) // add anonymous id to query-params
+                    )
                     .catch(err => {
                         //TODO user-visible error message / error recovery mechanisms
                         console.error(`Creating temporary account ${email} has failed due to `, err);
