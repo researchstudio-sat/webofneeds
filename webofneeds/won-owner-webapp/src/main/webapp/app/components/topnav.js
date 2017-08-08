@@ -113,7 +113,12 @@ function genTopnavConf() {
                     ng-click="self.toasts__delete(toast)"
                     src="generated/icon-sprite.svg#ico27_close"/>
                 <div class="topnav__toasts__element__text">
-                    <p>{{toast.get('msg')}}</p>
+                    <p ng-show="!toast.get('htmlEnabled')">
+                        {{toast.get('msg')}}
+                    </p>
+                    <p ng-show="toast.get('htmlEnabled')"
+                        ng-bind-html="self.foo">
+                    </p>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
                         <a href="mailto:{{::self.config.adminEmail}}">{{::self.config.adminEmail}}</a>
@@ -124,12 +129,14 @@ function genTopnavConf() {
         </div>
     `;
 
-    const serviceDependencies = ['$ngRedux', '$scope', /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$sanitize', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
             this.config = config;
+
+            self.foo = '<a href="http://example.org">test test</a> test'
 
             window.tnc4dbg = this;
 
@@ -162,6 +169,7 @@ function genTopnavConf() {
 }
 
 export default angular.module('won.owner.components.topnav', [
+        'ngSanitize',
         loginComponent,
         logoutComponent
     ])

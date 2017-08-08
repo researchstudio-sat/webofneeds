@@ -27,9 +27,15 @@ export default function(allToasts = initialState, action = {}) {
             if(getIn(action, ['payload', 'loginError']) === 'invalid privateId') {
                 return pushNewToast(
                     allToasts,
-                    'Sorry, we couldn\'t find the private ID ' + getIn(action, ['payload', 'privateId']) +
-                    ' (the one in your url-bar). Try reloading the page or removing the ID.',
-                    won.WON.errorToast
+                    'Sorry, we couldn\'t find the private ID (the one in your url-bar). ' +
+                    'Try reloading the page or ' +
+
+                    '<a href="http://example.org/">' +
+                    //'<a ng-click="self.router__stateGoCurrent({privateId: undefined})">' +
+                      'removing the ID' +
+                    '</a>.',
+                    won.WON.errorToast,
+                    {htmlEnabled: true}
                 )
             } else {
                 return allToasts;
@@ -58,12 +64,33 @@ export default function(allToasts = initialState, action = {}) {
     }
 }
 
-function pushNewToast(allToasts, msg, type) {
-    var toastType = type;
+/**
+ *
+ * @param allToasts
+ * @param msg
+ * @param type
+ * @param options
+ *   * htmlEnabled: set this to true only if it's really necessary and never
+ *   with non-static text (e.g. never use this with toasts that show need-contents
+ *   as this would open the possibility for XSS-attacks)
+ * @returns {*}
+ */
+function pushNewToast(allToasts, msg, type, options) {
+    const options_ = Object.assign({
+        htmlEnabled: false,
+    }, options);
+
+    let toastType = type;
     if(!toastType){
         toastType = won.WON.infoToast;
     }
+
     const id = generateIdString(6);
-    return allToasts.setIn([id], Immutable.fromJS({id: id, type: toastType, msg: msg}));
+    return allToasts.setIn([id], Immutable.fromJS({
+        id: id,
+        type: toastType,
+        msg: msg,
+        htmlEnabled: _options.htmlEnabled,
+    }));
 }
 
