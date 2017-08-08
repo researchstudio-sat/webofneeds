@@ -16,7 +16,7 @@ function genLoginConf() {
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <!-- <div ng-form="loginForm">-->
-                    <form ng-submit="::self.login(self.email, self.password)" id="loginForm" class="loginForm">
+                    <form ng-submit="::self.login(self.email, self.password, {fetchData: true, redirectToFeed: true})" id="loginForm" class="loginForm">
                         <input
                             id="loginEmail"
                             placeholder="Email address"

@@ -20,15 +20,41 @@ import {
     checkHttpStatus,
 } from '../utils';
 
-export function anonAccountLogin(privateId) {
+/**
+ * @param privateId
+ * @param options see `accountLogin`
+ * @returns {*}
+ */
+export function anonAccountLogin(privateId, options) {
     const {email, password} = privateId2Credentials(privateId);
-    return accountLogin(email, password);
+    return accountLogin(email, password, options);
 }
-export function accountLogin(username, password, fetchData = true) {
-    return (dispatch) =>
+/**
+ *
+ * @param username
+ * @param password
+ * @param options
+ *    * fetchData: whether or not to fetch a users owned needs. If the account
+ *    signing in is new, there's no need to fetch this and `false` can be passed here
+ *    * redirectToFeed: whether or not to redirect to the feed after signing in.
+ *
+ *
+ * @returns {Function}
+ */
+export function accountLogin(username, password, options) {
+    const options_ = Object.assign(
+        { // defaults
+            fetchData: true,
+            redirectToFeed: false,
+        },
+        options
+    );
+
+     //= { fetchData = true
+    return (dispatch, getState) =>
         login(username, password)
         .then( response =>
-            fetchData ? fetchOwnedData(username) : Immutable.Map() // only need to fetch data for non-new accounts
+            options_.fetchData ? fetchOwnedData(username) : Immutable.Map() // only need to fetch data for non-new accounts
         )
         .then(allThatData =>
             dispatch({
@@ -43,8 +69,9 @@ export function accountLogin(username, password, fetchData = true) {
              */
             dispatch(actionCreators.reconnect())
         )
-        .then(() =>
-            dispatch(actionCreators.router__stateGoResetParams("feed"))
+        .then(() => options_.redirectToFeed ?
+            dispatch(actionCreators.router__stateGoResetParams("feed")) :
+            checkAccessToCurrentRoute(dispatch, getState)
         )
         .catch(error => {
             console.log("accountLogin ErrorObject", error);
@@ -109,7 +136,10 @@ export function accountRegister(username, password) {
             * (the fetchDataForOwnedNeeds, redirect
             * and wsReset)
             */
-            accountLogin(username, password, false)(dispatch);
+            accountLogin(username, password, {
+                fetchData: false,
+                redirectToFeed: true,
+            })(dispatch);
         })
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
