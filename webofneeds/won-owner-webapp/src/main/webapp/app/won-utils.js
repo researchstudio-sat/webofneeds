@@ -181,6 +181,21 @@ export function login(username, password) {
     );
 }
 
+export function logout() {
+    return fetch('/owner/rest/users/signout', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({})
+    })
+        .then(
+        checkHttpStatus
+    )
+}
+
 /**
  * Generates a random email, password and a composite id, that can be parsed via privateId2Credentials later.
  *

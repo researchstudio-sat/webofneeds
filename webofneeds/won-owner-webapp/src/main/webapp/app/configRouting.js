@@ -5,6 +5,11 @@
 import won from './won-es6';
 import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions/actions';
+import {
+    accountLogin,
+    accountLogout,
+    anonAccountLogin,
+} from './actions/account-actions';
 
 import {
     checkLoginStatus,
@@ -187,29 +192,17 @@ function back(hasPreviousState, $ngRedux) {
         );
 
     }
-
 }
 
+
 export function accessControl({event, toState, toParams, fromState, fromParams, options, dispatch, getState}){
+
+    reactToPrivateIdChanges(fromParams['privateId'], toParams['privateId'], dispatch, getState);
+
     const hasPreviousState = !!fromState.name;
     const state = getState();
-
     const errorString = "Tried to access view \"" + (toState && toState.name) + "\" that won't work" +
         "without logging in. Blocking route-change.";
-
-    if( !fromParams['privateId'] && toParams['privateId'] // <-- privateId was added (e.g. by user pasting an url), we need to log in
-        // v--- only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
-        && state.get('initialLoadFinished') && !state.getIn(['user', 'loggedIn'])
-    ) {
-        // privateId was added, log in
-        dispatch(actionCreators.anonymousLogin(toParams['privateId']));
-
-    } else if(fromParams['privateId'] && !toParams['privateId']) {
-        //privateId was removed, log out
-        dispatch(actionCreators.logout());
-    }
-
-
     switch(toState.name) {
         case 'post': //Route the 'post' no matter if you are logged in or not since it is accessible at all times
             postViewEnsureLoaded(
@@ -299,6 +292,21 @@ export function checkAccessToCurrentRoute(dispatch, getState) {
         dispatch,
         getState,
     });
+}
+
+function reactToPrivateIdChanges(fromPrivateId, toPrivateId, dispatch, getState){
+    const state = getState();
+    if(fromPrivateId && !toPrivateId) {
+        //privateId was removed, log out
+        return accountLogout()(dispatch, getState)
+        //dispatch(actionCreators.logout());
+
+    // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
+    } else if (state.get('initialLoadFinished')) {
+        if(fromPrivateId !== toPrivateId) { // privateId has changed or was added
+            return anonAccountLogin(toPrivateId)(dispatch, getState)
+        }
+    }
 }
 
 
