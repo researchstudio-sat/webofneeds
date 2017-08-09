@@ -11,6 +11,7 @@ import {
     login,
     privateId2Credentials,
     logout,
+    parseCredentials,
 } from '../won-utils';
 import {
     stateGoCurrent,
@@ -30,10 +31,41 @@ import {
  * @param options see `accountLogin`
  * @returns {*}
  */
-export function anonAccountLogin(privateId, options) {
-    const {email, password} = privateId2Credentials(privateId);
-    return accountLogin(email, password, options);
-}
+//export function anonAccountLogin(privateId, options) {
+//    const {email, password} = privateId2Credentials(privateId);
+//    return (dispatch, getState) => {
+//        const state = getState();
+//        const options_ = Object.assign(
+//            { // defaults
+//                fetchData: true,
+//                redirectToFeed: false,
+//                relogIfNecessary: true, // if there's a valid session or privateId, log out from that first.
+//                wasLoggedIn: false,
+//            },
+//            options
+//        );
+//
+//        let loggedOutPromise;
+//        if(
+//            options_.relogIfNecessary &&
+//            // v--- do any re-login-actions only after initialPageLoad. The latter should handle any necessary logins itself.
+//            state.get('initialLoadFinished') &&
+//            state.getIn(['router', 'currentParams', 'privateId']) !== privateId
+//        ) {
+//            // privateId has changed, need to relog
+//            options_.wasLoggedIn = true;
+//            loggedOutPromise = logoutAndResetPrivateId(dispatch, getState)
+//        } else {
+//            loggedOutPromise = Promise.resolve();
+//        }
+//        options_.relogIfNecessary = false; // any necessary logout has been handled
+//
+//        return loggedOutPromise.then(() =>
+//            accountLogin(email, password, options_)(dispatch, getState)
+//        );
+//    }
+//}
+
 /**
  *
  * @param username
@@ -44,10 +76,10 @@ export function anonAccountLogin(privateId, options) {
  *    * redirectToFeed(false): whether or not to redirect to the feed after signing in.
  *    * relogIfNecessary(true):  if there's a valid session or privateId, log out from that first.
  *
- *
+ * @param credentials either {email, password} or {privateId}
  * @returns {Function}
  */
-export function accountLogin(username, password, options) {
+export function accountLogin(credentials, options) {
     const options_ = Object.assign(
         { // defaults
             fetchData: true,
@@ -56,32 +88,94 @@ export function accountLogin(username, password, options) {
         },
         options
     );
-
      //= { fetchData = true
     return (dispatch, getState) => {
         const state = getState();
+
+        const {email} = parseCredentials(credentials);
+
+        const prevPrivateId = state.getIn(['router', 'currentParams', 'privateId']);
+        const prevEmail = state.getIn(['user', 'email']);
+
+        //let wasLoggedIn = false;
+        //if(state.get('initialLoadFinished')) { // do any re-login-actions only after initialPageLoad. The latter should handle any necessary logins itself.
+        //
+        //    const actuallyWasLoggedIn = prevPrivateId || prevEmail;
+        //    const needToRelog; // is actual flag. if false, we can straight out abort here.
+        //
+        //
+        //    if( prevPrivateId ) {
+        //        // previously logged in with privateId
+        //        if (credentials.email) {
+        //            // switching to regular account
+        //            wasLoggedIn = true;
+        //        } else if(credentials.privateId !== prevPrivateId) {
+        //            // privateId has changed
+        //            wasLoggedIn = true;
+        //        }
+        //    } else if (prevEmail) {
+        //        // previously logged in with normal account
+        //        if(credentials.privateId) {
+        //            // switching to privateId-account
+        //            wasLoggedIn = true;
+        //        } else if (credentials.email !== prevEmail) {
+        //            // switching to different, regular account
+        //            wasLoggedIn = true;
+        //        }
+        //    } else {
+        //        // not previously logged in
+        //    }
+        //}
+
+
+
+
+        const wasLoggedIn = state.get('initialLoadFinished') && (prevPrivateId || prevEmail);
+
+        if(state.get('loginInProcessFor') === email) {
+            console.info('Already logging in as ', email, '. Canceling redundant attempt.');
+            return;
+        }
+
+        if(state.get('initialLoadFinished') && (
+             credentials.privateId && credentials.privateId === prevPrivateId ||
+             credentials.email && credentials.email === prevEmail
+           )
+        ) {
+                console.info(
+                    'Already logged into this account (' +
+                    (credentials.privateId || credentials.email) +
+                    '). Aborting second login attempt.');
+                return;
+        }
+
+
+
         return Promise.resolve()
+        .then(() =>
+            dispatch({
+                type: actionTypes.loginStarted,
+                payload: { email }
+            })
+        )
         .then(() => {
-            if (
-                options_.relogIfNecessary &&
-                // v--- do any re-login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
-                state.get('initialLoadFinished') &&
-                state.getIn(['user', 'email']) &&
-                state.getIn(['user', 'email']) !== username
-            ) {
-                return logoutAndResetPrivateId(dispatch, getState)
+            if (wasLoggedIn) {
+                //console.log('wasLoggedIn ', wasLoggedIn);
+                return logoutAndResetPrivateId(dispatch, getState);
+            } else {
+                //console.log('wasNotLoggedIn ', wasLoggedIn);
             }
         })
         .then(() =>
-            login(username, password)
+            login(credentials)
         )
         .then(response =>
-            options_.fetchData ? fetchOwnedData(username) : Immutable.Map() // only need to fetch data for non-new accounts
+            options_.fetchData ? fetchOwnedData(email) : Immutable.Map() // only need to fetch data for non-new accounts
         )
         .then(allThatData =>
             dispatch({
                 type: actionTypes.login,
-                payload: allThatData.merge({email: username, loggedIn: true})
+                payload: allThatData.merge({email: email, loggedIn: true})
             })
         )
         .then(() =>
@@ -98,6 +192,14 @@ export function accountLogin(username, password, options) {
         .catch(error => {
             console.log("accountLogin ErrorObject", error);
             return Promise.resolve()
+                .then(() => {
+                    if(wasLoggedIn) {
+                        return dispatch({
+                            type: actionTypes.logout,
+                            payload: Immutable.fromJS({loggedIn: false})
+                        })
+                    }
+                })
                 .then(() => dispatch(actionCreators.loginFailed({
                     loginError: error.msg ?
                         error.msg :
@@ -113,22 +215,23 @@ export function accountLogin(username, password, options) {
 
 function logoutAndResetPrivateId(dispatch, getState) {
     return logout()
-    .then(() =>
-        stateGoCurrent({privateId: ""})(dispatch, getState)
-    )
-
+    .then(() => {
+        const state = getState();
+        if(state.getIn(['router', 'currentParams', 'privateId'])) {
+            return stateGoCurrent({privateId: ""})(dispatch, getState);
+        }
+    })
 }
 
 export function accountLogout() {
     return (dispatch, getState) =>
         logoutAndResetPrivateId(dispatch, getState)
-        .catch(
+        .catch( error => {
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-                error => {
-                console.log(error);
+                console.log('Error while trying to log out: ', error);
             }
         )
-        .then(response =>
+        .then(() =>
             dispatch({
                 type: actionTypes.logout,
                 payload: Immutable.fromJS({loggedIn: false})
@@ -142,29 +245,27 @@ export function accountLogout() {
              */
             dispatch(actionCreators.reconnect());
         })
-        .then(() => { /* finally */
+        .then(() =>  /* finally */
             // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
             //dispatch(actionCreators.router__stateGoCurrent({privateId: undefined}));
 
-            checkAccessToCurrentRoute(dispatch, getState);
-        })
+            checkAccessToCurrentRoute(dispatch, getState)
+        )
 }
 
-export function accountRegister(username, password) {
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {Function}
+ */
+export function accountRegister(credentials) {
     return (dispatch) =>
-        registerAccount(username, password)
-        .then(response => {
-            /* TODO shouldn't we already have a valid
-            * session at this point and thus just need
-            * to execute the data-fetching part of login
-            * (the fetchDataForOwnedNeeds, redirect
-            * and wsReset)
-            */
-            accountLogin(username, password, {
+        registerAccount(credentials)
+        .then(response =>
+            accountLogin(credentials, {
                 fetchData: false,
                 redirectToFeed: true,
-            })(dispatch);
-        })
+            })(dispatch)
+        )
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>

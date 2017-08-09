@@ -55,7 +55,6 @@ import {
     checkLoginStatus,
     registerAccount,
     login,
-    generateAccountCredentials,
 } from '../won-utils';
 
 import {
@@ -83,7 +82,7 @@ import {
 // <action-creators>
 
 import {
-    anonAccountLogin,
+    //anonAccountLogin,
     accountLogin,
     accountLogout,
     accountRegister,
@@ -206,11 +205,13 @@ const actionHierarchy = {
     },
     hideLogin: INJ_DEFAULT,
     showLogin: INJ_DEFAULT,
-    anonymousLogin: anonAccountLogin,
-    login: accountLogin,
+    //anonymousLogin: anonAccountLogin,
+    loginStarted: INJ_DEFAULT,
+    login: accountLogin, //loginSuccess
+    loginFailed: INJ_DEFAULT,
+    logoutStarted: INJ_DEFAULT,
     logout: accountLogout,
     register: accountRegister,
-    loginFailed: INJ_DEFAULT,
     loginReset: INJ_DEFAULT,
     registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,

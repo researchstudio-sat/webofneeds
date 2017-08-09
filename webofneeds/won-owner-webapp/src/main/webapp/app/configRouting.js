@@ -8,11 +8,11 @@ import { actionTypes, actionCreators } from './actions/actions';
 import {
     accountLogin,
     accountLogout,
-    anonAccountLogin,
 } from './actions/account-actions';
 
 import {
     checkLoginStatus,
+    privateId2Credentials,
 } from './won-utils';
 
 import {
@@ -296,15 +296,31 @@ export function checkAccessToCurrentRoute(dispatch, getState) {
 
 function reactToPrivateIdChanges(fromPrivateId, toPrivateId, dispatch, getState){
     const state = getState();
+
+    const {email} = toPrivateId? privateId2Credentials(toPrivateId) : {};
+    const loginInProcessFor = state.get('loginInProcessFor');
+    if(loginInProcessFor && loginInProcessFor === email) {
+        console.info(
+            'There\'s already a login in process with the email '
+            + email + ' derived from the privateId ' + toPrivateId + '.'
+        );
+        return Promise.resolve();
+    }
+
+    if(state.get('logoutInProcess')) {
+        // already logging out
+        return;
+    }
+
     if(fromPrivateId && !toPrivateId) {
         //privateId was removed, log out
-        return accountLogout()(dispatch, getState)
+        return accountLogout()(dispatch, getState);
         //dispatch(actionCreators.logout());
 
     // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
     } else if (state.get('initialLoadFinished')) {
         if(fromPrivateId !== toPrivateId) { // privateId has changed or was added
-            return anonAccountLogin(toPrivateId)(dispatch, getState)
+            return accountLogin({privateId: toPrivateId})(dispatch, getState)
         }
     }
 }

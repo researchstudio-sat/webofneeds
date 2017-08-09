@@ -146,11 +146,11 @@ export function checkLoginStatus() {
  * The returned promise fails if something went
  * wrong during creation.
  *
- * @param username
- * @param password
+ * @param credentials either {email, password} or {privateId}
  * @returns {*}
  */
-export function registerAccount(username, password) {
+export function registerAccount(credentials) {
+    const {email, password} = parseCredentials(credentials);
     return fetch('/owner/rest/users/', {
         method: 'post',
         headers: {
@@ -158,7 +158,7 @@ export function registerAccount(username, password) {
             'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({username: username, password: password})
+        body: JSON.stringify({username: email, password: password})
     })
     .then(
         checkHttpStatus
@@ -166,7 +166,12 @@ export function registerAccount(username, password) {
 }
 
 
-export function login(username, password) {
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {*}
+ */
+export function login(credentials) {
+    const {email, password} = parseCredentials(credentials);
     return fetch('/owner/rest/users/signin', {
         method: 'post',
         headers: {
@@ -174,7 +179,7 @@ export function login(username, password) {
             'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({username: username, password: password})
+        body: JSON.stringify({username: email, password: password})
     })
     .then(
         checkHttpStatus
@@ -197,22 +202,18 @@ export function logout() {
 }
 
 /**
- * Generates a random email, password and a composite id, that can be parsed via privateId2Credentials later.
- *
- * @returns {{email: string, password: *, privateId: string}}
+ * Generates a privateId of `[usernameFragment]-[password]`
+ * @returns {string}
  */
-export function generateAccountCredentials() {
-    const usernameFragment = generateIdString(8);
-    const email = usernameFragment + '@matchat.org'; // generate random account-name
-    const password = generateIdString(8);
-    const privateId = usernameFragment + '-' + password;
-    return {
-        email,
-        password,
-        privateId,
-    }
+export function generatePrivateId() {
+    return generateIdString(8) + '-' + generateIdString(8); //<usernameFragment>-<password>
 }
 
+/**
+ * Parses a given privateId into a fake email address and a password.
+ * @param privateId
+ * @returns {{email: string, password: *}}
+ */
 export function privateId2Credentials(privateId) {
     const [usernameFragment, password] = privateId.split('-');
     const email = usernameFragment + '@matchat.org';
@@ -222,3 +223,12 @@ export function privateId2Credentials(privateId) {
     }
 }
 
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {email, password}
+ */
+export function parseCredentials(credentials) {
+    return credentials.privateId ?
+        privateId2Credentials(credentials.privateId) :
+        credentials;
+}
