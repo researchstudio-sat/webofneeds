@@ -117,7 +117,7 @@ function genTopnavConf() {
                         {{toast.get('msg')}}
                     </p>
                     <p ng-show="toast.get('htmlEnabled')"
-                        ng-bind-html="self.foo">
+                        ng-bind-html="toast.get('msg')">
                     </p>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
@@ -135,8 +135,6 @@ function genTopnavConf() {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
             this.config = config;
-
-            self.foo = '<a href="http://example.org">test test</a> test'
 
             window.tnc4dbg = this;
 

@@ -27,13 +27,13 @@ export default function(allToasts = initialState, action = {}) {
             if(getIn(action, ['payload', 'loginError']) === 'invalid privateId') {
                 return pushNewToast(
                     allToasts,
-                    'Sorry, we couldn\'t find the private ID (the one in your url-bar). ' +
-                    'Try reloading the page or ' +
-
-                    '<a href="http://example.org/">' +
-                    //'<a ng-click="self.router__stateGoCurrent({privateId: undefined})">' +
-                      'removing the ID' +
-                    '</a>.',
+                    'Sorry, we couldn\'t find the private ID (the one in your url-bar). If ' +
+                    'you copied this address make sure you <strong>copied everything</strong> and try ' +
+                    '<strong>reloading the page</strong>. ' +
+                    'If this doesn\'t work you can try ' +
+                    '<a href="#">' +
+                      'removing it' +
+                    '</a> to start fresh.',
                     won.WON.errorToast,
                     {htmlEnabled: true}
                 )
