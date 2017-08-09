@@ -90,7 +90,7 @@ function pushNewToast(allToasts, msg, type, options) {
         id: id,
         type: toastType,
         msg: msg,
-        htmlEnabled: _options.htmlEnabled,
+        htmlEnabled: options_.htmlEnabled,
     }));
 }
 
