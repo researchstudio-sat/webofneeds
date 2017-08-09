@@ -114,8 +114,7 @@ export function accountLogin(username, password, options) {
 function logoutAndResetPrivateId(dispatch, getState) {
     return logout()
     .then(() =>
-        stateGoCurrent({privateId: undefined})(dispatch, getState)
-        //dispatch(actionCreators.router__stateGoCurrent({privateId: undefined}))
+        stateGoCurrent({privateId: ""})(dispatch, getState)
     )
 
 }
