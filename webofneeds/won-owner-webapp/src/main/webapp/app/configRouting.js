@@ -298,8 +298,7 @@ function reactToPrivateIdChanges(fromPrivateId, toPrivateId, dispatch, getState)
     const state = getState();
 
     const {email} = toPrivateId? privateId2Credentials(toPrivateId) : {};
-    const loginInProcessFor = state.get('loginInProcessFor');
-    if(loginInProcessFor && loginInProcessFor === email) {
+    if(state.get('loginInProcessFor')) {
         console.info(
             'There\'s already a login in process with the email '
             + email + ' derived from the privateId ' + toPrivateId + '.'
@@ -309,18 +308,20 @@ function reactToPrivateIdChanges(fromPrivateId, toPrivateId, dispatch, getState)
 
     if(state.get('logoutInProcess')) {
         // already logging out
-        return;
+        return Promise.resolve();
     }
 
     if(fromPrivateId && !toPrivateId) {
         //privateId was removed, log out
-        return accountLogout()(dispatch, getState);
+        return accountLogout({doRedirects: false})(dispatch, getState);
         //dispatch(actionCreators.logout());
 
     // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
     } else if (state.get('initialLoadFinished')) {
         if(fromPrivateId !== toPrivateId) { // privateId has changed or was added
-            return accountLogin({privateId: toPrivateId})(dispatch, getState)
+            const credentials = {privateId: toPrivateId};
+            const options = {doRedirects: false};
+            return accountLogin(credentials, options)(dispatch, getState)
         }
     }
 }

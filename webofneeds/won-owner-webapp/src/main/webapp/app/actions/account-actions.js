@@ -66,6 +66,7 @@ import {
 //    }
 //}
 
+let _loginInProcessFor;
 /**
  *
  * @param username
@@ -73,7 +74,8 @@ import {
  * @param options
  *    * fetchData(true): whether or not to fetch a users owned needs. If the account
  *    signing in is new, there's no need to fetch this and `false` can be passed here
- *    * redirectToFeed(false): whether or not to redirect to the feed after signing in.
+ *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
+ *    * redirectToFeed(false): whether or not to redirect to the feed after signing in (needs `redirects` to be true)
  *    * relogIfNecessary(true):  if there's a valid session or privateId, log out from that first.
  *
  * @param credentials either {email, password} or {privateId}
@@ -83,6 +85,7 @@ export function accountLogin(credentials, options) {
     const options_ = Object.assign(
         { // defaults
             fetchData: true,
+            doRedirects: true,
             redirectToFeed: false,
             relogIfNecessary: true, // if there's a valid session or privateId, log out from that first.
         },
@@ -98,7 +101,7 @@ export function accountLogin(credentials, options) {
 
         const wasLoggedIn = state.get('initialLoadFinished') && (prevPrivateId || prevEmail);
 
-        if(state.get('loginInProcessFor') === email) {
+        if(state.get('loginInProcessFor') === email || _loginInProcessFor === email) {
             console.info('Already logging in as ', email, '. Canceling redundant attempt.');
             return;
         }
@@ -118,20 +121,29 @@ export function accountLogin(credentials, options) {
 
 
         return Promise.resolve()
-        .then(() =>
-            dispatch({
+        .then(() => {
+            _loginInProcessFor = email;
+            return dispatch({
                 type: actionTypes.loginStarted,
-                payload: { email }
+                payload: {email}
             })
-        )
+        })
         .then(() => {
             if (wasLoggedIn) {
-                //console.log('wasLoggedIn ', wasLoggedIn);
-                return logoutAndResetPrivateId(dispatch, getState);
-            } else {
-                //console.log('wasNotLoggedIn ', wasLoggedIn);
+                return logout()
+                .then(() => {
+                    if (options_.doRedirects && state.getIn(['router', 'currentParams', 'privateId'])) {
+                        return stateGoCurrent({privateId: ""})(dispatch, getState);
+                    }
+                });
             }
         })
+        .then(() => {
+            if(options_.doRedirects && credentials.privateId) {
+                return stateGoCurrent({privateId: credentials.privateId})(dispatch, getState);
+            }
+        })
+
         .then(() =>
             login(credentials)
         )
@@ -151,12 +163,17 @@ export function accountLogin(credentials, options) {
          */
             dispatch(actionCreators.reconnect())
         )
-        .then(() => options_.redirectToFeed ?
-            dispatch(actionCreators.router__stateGoResetParams("feed")) :
-            checkAccessToCurrentRoute(dispatch, getState)
-        )
+        .then(() => {
+            if(!options_.doRedirects) {
+                return;
+            } else if (options_.redirectToFeed) {
+                return dispatch(actionCreators.router__stateGoResetParams("feed"))
+            } else {
+                return checkAccessToCurrentRoute(dispatch, getState);
+            }
+        })
         .catch(error => {
-            console.log("accountLogin ErrorObject", error);
+            console.error("accountLogin ErrorObject", error);
             return Promise.resolve()
                 .then(() => {
                     if(wasLoggedIn) {
@@ -166,37 +183,70 @@ export function accountLogin(credentials, options) {
                         })
                     }
                 })
-                .then(() => dispatch(actionCreators.loginFailed({
-                    loginError: error.msg ?
-                        error.msg :
-                        "Unknown Username/Password Combination",
-                    error
-                })))
+                .then(() => {
+                    const loginError = credentials.privateId ?
+                        'invalid privateId' :
+                        'unknown username/password combination';
+
+                    dispatch(actionCreators.loginFailed({
+                        loginError,
+                        error,
+                        credentials
+                    }));
+                })
                 .then(() =>
-                    checkAccessToCurrentRoute(dispatch, getState)
+                    options_.doRedirects && checkAccessToCurrentRoute(dispatch, getState)
                 )
+        })
+        .then(() => {
+            _loginInProcessFor = undefined;
         })
     }
 }
 
-function logoutAndResetPrivateId(dispatch, getState) {
-    return logout()
-    .then(() => {
+let _logoutInProcess;
+/**
+ *
+ * @param options
+ *    * doRedirects(true): whether or not to do any redirects at all (e.g. if an invalid route was accessed)
+ *
+ * @returns {Function}
+ */
+export function accountLogout(options) {
+    const options_ = {
+        doRedirects: true,
+        ...options,
+    };
+    return (dispatch, getState) => {
         const state = getState();
-        if(state.getIn(['router', 'currentParams', 'privateId'])) {
-            return stateGoCurrent({privateId: ""})(dispatch, getState);
-        }
-    })
-}
 
-export function accountLogout() {
-    return (dispatch, getState) =>
-        logoutAndResetPrivateId(dispatch, getState)
-        .catch( error => {
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-                console.log('Error while trying to log out: ', error);
-            }
+        if(state.get('logoutInProcess') || _logoutInProcess) {
+            console.info('There\'s already a logout in process. Aborting redundant attempt.');
+            return;
+        }
+        _logoutInProcess = true;
+
+        return Promise.resolve()
+        .then(() =>
+            dispatch({
+                type: actionTypes.logoutStarted,
+                payload: {}
+            })
         )
+        .then(() =>
+            logout()
+        )
+        .catch(error => {
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+            console.log('Error while trying to log out: ', error);
+        })
+        .then(() => {
+            // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
+            if (options_.doRedirects && state.getIn(['router', 'currentParams', 'privateId'])) {
+                return stateGoCurrent({privateId: null})(dispatch, getState);
+            }
+        })
+        /* finally */
         .then(() =>
             dispatch({
                 type: actionTypes.logout,
@@ -211,12 +261,13 @@ export function accountLogout() {
              */
             dispatch(actionCreators.reconnect());
         })
-        .then(() =>  /* finally */
-            // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-            //dispatch(actionCreators.router__stateGoCurrent({privateId: undefined}));
-
-            checkAccessToCurrentRoute(dispatch, getState)
+        .then(() =>
+            options_.doRedirects && checkAccessToCurrentRoute(dispatch, getState)
         )
+        .then(() => {
+            _logoutInProcess = false;
+        })
+    }
 }
 
 /**
@@ -224,17 +275,20 @@ export function accountLogout() {
  * @returns {Function}
  */
 export function accountRegister(credentials) {
-    return (dispatch) =>
+    return (dispatch, getState) =>
         registerAccount(credentials)
         .then(response =>
             accountLogin(credentials, {
                 fetchData: false,
                 redirectToFeed: true,
-            })(dispatch)
+            })(dispatch, getState)
         )
         .catch(
-            //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
-                error =>
-                    dispatch(actionCreators.registerFailed({registerError: "Registration failed (E-Mail might already be used)", error}))
+            error => {
+                //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
+                const registerError = "Registration failed (E-Mail might already be used)";
+                console.error(registerError, error);
+                dispatch(actionCreators.registerFailed({ registerError, error }));
+            }
         )
 }

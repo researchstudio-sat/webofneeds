@@ -39,10 +39,7 @@ export function needCreate(draft, nodeUri) {
             hasAccountPromise = Promise.resolve();
         } else {
             const privateId = generatePrivateId();
-            hasAccountPromise = accountRegister({privateId})(dispatch)
-                    .then(() =>
-                        dispatch(actionCreators.router__stateGoCurrent({ privateId })) // add anonymous id to query-params
-                    )
+            hasAccountPromise = accountRegister({privateId})(dispatch, getState)
                     .then(() =>
                         // wait for the server to process the login and the reconnect to
                         // go through, before proceeding to need-creation.

@@ -40,7 +40,7 @@ export function stateBack() {
 export function stateGoAbs(state, queryParams) {
     return (dispatch, getState) => {
         const currentParams = getState().getIn(['router', 'currentParams']);
-        dispatch(actionCreators.router__stateGo(
+        return dispatch(actionCreators.router__stateGo(
             state,
             addConstParams(resetParamsImm.merge(queryParams), currentParams)
         ))
@@ -53,7 +53,7 @@ export function stateGoAbs(state, queryParams) {
 export function stateGoResetParams(state) {
     return (dispatch, getState) => {
         const currentParams = getState().getIn(['router', 'currentParams']);
-        dispatch(actionCreators.router__stateGo(
+        return dispatch(actionCreators.router__stateGo(
             state,
             addConstParams(resetParams, currentParams)
         ))
@@ -65,9 +65,9 @@ export function stateGoDefault() {
         const appState = getState();
         if ( appState.get('initialLoadFinished') ) {
             if (appState.getIn(['user', 'loggedIn'])) {
-                dispatch(actionCreators.router__stateGoResetParams('feed'));
+                return dispatch(actionCreators.router__stateGoResetParams('feed'));
             } else {
-                dispatch(actionCreators.router__stateGoResetParams('landingpage'));
+                return dispatch(actionCreators.router__stateGoResetParams('landingpage'));
             }
         }
     }
@@ -84,7 +84,7 @@ export function stateGoKeepParams(state, queryParamsList) {
                     p => [p, currentParams.get(p)] // get value per param
             )
         );
-        dispatch(actionCreators.router__stateGo(
+        return dispatch(actionCreators.router__stateGo(
             state,
             addConstParams(params, currentParams)
         ))
@@ -100,7 +100,7 @@ export function stateGoCurrent(queryParams) {
     return (dispatch, getState) => {
         const currentState = getState().getIn(['router', 'currentState', 'name']);
         const currentParams = getState().getIn(['router', 'currentParams']);
-        dispatch(actionCreators.router__stateGo(
+        return dispatch(actionCreators.router__stateGo(
             currentState,
             addConstParams(queryParams, currentParams)
         ));
