@@ -90,7 +90,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
         return dispatch({
             type: actionTypes.loginFailed,
-            payload: { loginError: 'invalid privateId', privateId }
+            payload: { loginError: 'invalid privateId', credentials: { privateId }}
         });
         throw e;
     });
