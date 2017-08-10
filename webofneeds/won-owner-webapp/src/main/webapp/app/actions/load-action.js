@@ -93,7 +93,6 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
             payload: { loginError: 'invalid privateId', privateId }
         });
         throw e;
-        //dispatch(actionCreators.router__stateGoCurrent({privateId: undefined})); // remove invalid privateId
     });
     //dispatch(actionCreators.login(email, password));
     //return; // the login action should fetch the required data, so we're done here.

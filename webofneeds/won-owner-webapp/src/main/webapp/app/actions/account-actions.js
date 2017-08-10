@@ -88,7 +88,6 @@ export function accountLogin(credentials, options) {
         },
         options
     );
-     //= { fetchData = true
     return (dispatch, getState) => {
         const state = getState();
 
@@ -96,39 +95,6 @@ export function accountLogin(credentials, options) {
 
         const prevPrivateId = state.getIn(['router', 'currentParams', 'privateId']);
         const prevEmail = state.getIn(['user', 'email']);
-
-        //let wasLoggedIn = false;
-        //if(state.get('initialLoadFinished')) { // do any re-login-actions only after initialPageLoad. The latter should handle any necessary logins itself.
-        //
-        //    const actuallyWasLoggedIn = prevPrivateId || prevEmail;
-        //    const needToRelog; // is actual flag. if false, we can straight out abort here.
-        //
-        //
-        //    if( prevPrivateId ) {
-        //        // previously logged in with privateId
-        //        if (credentials.email) {
-        //            // switching to regular account
-        //            wasLoggedIn = true;
-        //        } else if(credentials.privateId !== prevPrivateId) {
-        //            // privateId has changed
-        //            wasLoggedIn = true;
-        //        }
-        //    } else if (prevEmail) {
-        //        // previously logged in with normal account
-        //        if(credentials.privateId) {
-        //            // switching to privateId-account
-        //            wasLoggedIn = true;
-        //        } else if (credentials.email !== prevEmail) {
-        //            // switching to different, regular account
-        //            wasLoggedIn = true;
-        //        }
-        //    } else {
-        //        // not previously logged in
-        //    }
-        //}
-
-
-
 
         const wasLoggedIn = state.get('initialLoadFinished') && (prevPrivateId || prevEmail);
 
