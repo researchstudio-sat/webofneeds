@@ -42,8 +42,7 @@ function genComponentConf() {
           </button>
           <button
             class="won-button--filled red"
-            ng-click="self.sendRequest(self.message)"
-            ng-click="self.router__stateGoCurrent({connectionUri: null})">
+            ng-click="self.sendRequest(self.message)">
               Request Contact
           </button>
         </div>
@@ -79,6 +78,7 @@ function genComponentConf() {
 
         sendRequest(message) {
             this.connections__connect(this.connection.get('uri'), message);
+            this.router__stateGoCurrent({connectionUri: null})
         }
     }
     Controller.$inject = serviceDependencies;
