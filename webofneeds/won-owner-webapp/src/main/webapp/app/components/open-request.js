@@ -45,7 +45,6 @@ function genComponentConf() {
         <div class="flexbuttons">
           <button
             class="won-button--filled black"
-            ng-click="self.router__stateGoCurrent({connectionUri: null})"
             ng-click="self.closeRequest()">Decline</button>
           <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
         </div>
@@ -89,6 +88,7 @@ function genComponentConf() {
         }
         closeRequest(){
             this.connections__close(this.connectionUri);
+            this.router__stateGoCurrent({connectionUri: null});
         }
     }
     Controller.$inject = serviceDependencies;
