@@ -232,10 +232,7 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
                     return; // logged in. continue route-change as intended.
                 } else {
                     //sure to be logged out
-                    if(event) {
-                        // block any route change that is currently happening
-                        event.preventDefault();
-                    } else {
+                    if(!event) {
                         // this is a check with a route that's already fixed, redirect to landing page instead.
                         dispatch(
                             actionCreators.router__stateGoResetParams('landingpage')
