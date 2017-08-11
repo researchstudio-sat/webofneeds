@@ -13,6 +13,10 @@ import {
 } from '../configRouting';
 
 import {
+    stateGoCurrent,
+} from './cstm-router-actions';
+
+import {
     checkLoginStatus,
     privateId2Credentials,
     login,
@@ -39,27 +43,27 @@ export const pageLoadAction = () => (dispatch, getState) => {
     * initial page-load-speed.
     * TODO fetch config data here as well
     */
+
+    const privateId = getParameterByName('privateId'); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
+    if(privateId) {
+        /*
+         * we don't have a valid session. however the url might contain `privateId`, which means
+         * we're accessing an "accountless"-account and need to sign in with that
+         */
+        return loadingWithAnonymousAccount(dispatch, getState, privateId)
+            .catch(e =>
+                loadingWhileSignedOut(dispatch, getState)
+        );
+    }
+
     checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data => loadingWhileSignedIn(dispatch, getState, data.username))
     .catch(error => {
-        const privateId = getParameterByName('privateId'); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
-        if(privateId) {
-            /*
-             * we don't have a valid session. however the url might contain `privateId`, which means
-             * we're accessing an "accountless"-account and need to sign in with that
-             */
-            loadingWithAnonymousAccount(dispatch, getState, privateId)
-            .catch(e =>
-                loadingWhileSignedOut(dispatch, getState)
-            );
-
-        } else {
-            /*
-             * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
-             */
-            loadingWhileSignedOut(dispatch, getState);
-        }
+        /*
+         * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
+         */
+        loadingWhileSignedOut(dispatch, getState);
     });
 };
 
