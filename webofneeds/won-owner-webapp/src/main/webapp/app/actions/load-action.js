@@ -75,7 +75,7 @@ function loadingWhileSignedIn(dispatch, getState, username) {
 function loadingWithAnonymousAccount(dispatch, getState, privateId) {
     // using an anonymous account. need to log in.
     const {email, password} = privateId2Credentials(privateId);
-    return login(email, password)
+    return login({privateId})
     /* quickly dispatch log-in status, even before loading data, to
      * allow making correct access-control decisions
      */
