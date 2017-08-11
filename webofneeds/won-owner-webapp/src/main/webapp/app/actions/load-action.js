@@ -20,6 +20,7 @@ import {
     checkLoginStatus,
     privateId2Credentials,
     login,
+    logout,
 } from '../won-utils';
 
 import config from '../config';
@@ -58,16 +59,26 @@ export const pageLoadAction = () => (dispatch, getState) => {
 
     checkLoginStatus()
     /* handle data, dispatch actions */
-    .then(data => loadingWhileSignedIn(dispatch, getState, data.username))
+    .then(data => {
+        if(data.username.endsWith('@matchat.org')) {
+            // session-cookie is from privateId-session, but there's no privateId in the url-bar => logout to have consistent state again
+            return logout().then(() =>
+                loadingWhileSignedOut(dispatch, getState)
+            );
+        }
+        return loadingWhileSignedIn(dispatch, getState, data.username)
+    })
     .catch(error => {
         /*
          * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
          */
-        loadingWhileSignedOut(dispatch, getState);
+        return loadingWhileSignedOut(dispatch, getState);
     });
 };
 
 function loadingWhileSignedIn(dispatch, getState, username) {
+
+
     loginSuccess(username, true, dispatch, getState);
     fetchOwnedData(username, dispatchInitialPageLoad(dispatch));
 }
