@@ -17,7 +17,7 @@ import feedItemLineModule from './feed-item-line';
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
-        <div class="fi clickable" ui-sref="post({postUri: self.ownNeed.get('uri')})">
+        <div class="fi clickable" ng-click="self.router__stateGoAbs('post', {postUri: self.ownNeed.get('uri')})">
             <won-square-image
                 src="self.ownNeed.get('titleImg')"
                 title="self.ownNeed.get('title')"
@@ -54,7 +54,7 @@ function genComponentConf() {
                 connection-uri="conn.get('uri')"
                 need-uri="self.ownNeed.get('uri')"
                 ng-show="$index < self.maxNrOfItemsShown"
-                ui-sref="post({
+                ng-click="self.router__stateGoAbs('post', {
                     postUri: self.ownNeed.get('uri'),
                     connectionUri: conn.get('uri'),
                     connectionType: conn.get('state')
@@ -76,7 +76,7 @@ function genComponentConf() {
         <div class="fi__footer" ng-show="self.unreadMatchesCount || self.unreadRequestsCount">
             <div class="fi__footer__indicators">
                 <a class="fi__footer__indicators__item clickable"
-                   ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.needUri})"
+                   ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Suggested, postUri: self.needUri})"
                    ng-show="self.unreadMatchesCount">
                     <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
@@ -85,7 +85,7 @@ function genComponentConf() {
                     </span>
                 </a>
                 <a class="fi__footer__indicators__item clickable"
-                   ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.needUri})"
+                   ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestReceived, postUri: self.needUri})"
                    ng-show="self.unreadRequestsCount">
                     <img src="generated/icon-sprite.svg#ico36_incoming" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">

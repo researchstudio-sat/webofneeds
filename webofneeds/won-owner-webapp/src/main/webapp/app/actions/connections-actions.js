@@ -21,6 +21,10 @@ import {
 } from '../utils';
 
 import {
+   makeParams,
+} from '../configRouting';
+
+import {
     actionTypes,
     actionCreators,
 } from './actions';
@@ -101,7 +105,7 @@ export function connectionsOpen(connectionUri, message) {
                 }
             });
 
-            dispatch(actionCreators.router__stateGo("post", {
+            dispatch(actionCreators.router__stateGoAbs("post", {
                 postUri: optimisticEvent.hasSenderNeed,
                 connectionType: won.WON.Connected,
                 connectionUri: optimisticEvent.hasSender,

@@ -5,6 +5,10 @@ import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
 
 import {
+    resetParams,
+} from '../../configRouting';
+
+import {
     selectAllOwnNeeds,
 } from '../../selectors';
 
@@ -13,6 +17,8 @@ class FeedController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.selection = 0;
+
+        this.resetParams = resetParams;
 
         const selectFromState = (state) => {
             const ownActiveNeeds = selectAllOwnNeeds(state).filter(need => need.get("state") === won.WON.ActiveCompacted);
@@ -26,7 +32,6 @@ class FeedController {
 
         window.fc4dbg = this;
     }
-
 }
 
 export default angular.module('won.owner.components.feed', [

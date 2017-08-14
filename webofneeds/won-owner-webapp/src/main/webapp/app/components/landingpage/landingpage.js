@@ -6,12 +6,16 @@ import overviewTitleBarModule from '../visitor-title-bar';
 import compareToModule from '../../directives/compareTo';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
+import config from '../../config';
 import {
     attach,
     scrollTo,
     delay,
 } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
+import {
+    makeParams,
+} from '../../configRouting.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
@@ -96,7 +100,12 @@ const questions = [
 class LandingpageController {
     constructor(/* arguments <- serviceDependencies */){
         attach(this, serviceDependencies, arguments);
+
+        window.lp4dbg = this;
+
         const self = this;
+        this.config = config;
+        this.makeParams = makeParams;
 
         const signup = (state) => ({
             focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",

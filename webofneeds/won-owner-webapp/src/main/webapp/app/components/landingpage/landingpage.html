@@ -2,7 +2,7 @@
     <won-topnav></won-topnav>
 </header>
 <main class="landingpage" id="allSections">
-    <a class="curtain" ng-show="self.focusSignup" ui-sref="landingpage({focusSignup: false})"></a>
+    <a class="curtain" ng-show="self.focusSignup" ng-click="self.router__stateGoCurrent({focusSignup: false})"></a>
     <div class="welcome">
         <div class="title">Welcome to the Web of Needs</div>
         <won-flex-grid items="::self.peopleGrid"></won-flex-grid>
@@ -31,16 +31,41 @@
         <div class="trygrid">
             <div class="tg__signup">
                 <div class="block" ng-form name="registerForm">
-                    <div class="header">Sign up here.</div>
-                    <input id="registerEmail" name="email" placeholder="Email address" ng-model="self.email" ng-class="{'ng-invalid': self.registerError}" required type="email" ng-keyup="self.registerReset() || ($event.keyCode == 13 && self.passwordAgain === self.password && self.register(self.email, self.password))"/>
-                    <span class="tg__errormsg" ng-show="registerForm.email.$error.email">Not a valid E-Mail address</span>
-                    <span class="tg__errormsg" ng-show="self.registerError">{{self.registerError}}</span>
-                    <input name="password" placeholder="Password" ng-minlength="6" ng-model="self.password" required type="password" ng-keyup="self.registerReset() || ($event.keyCode == 13 && self.passwordAgain === self.password && self.register(self.email, self.password))"/>
-                    <span class="tg__errormsg" ng-show="registerForm.password.$error.minlength">Password too short, must be at least 6 Characters</span>
-                    <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6" ng-model="self.passwordAgain" required type="password" compare-to="self.password" ng-keyup="self.registerReset() || ($event.keyCode == 13 && self.passwordAgain === self.password && self.register(self.email, self.password))"/>
-                    <span class="tg__errormsg" ng-show="registerForm.password_repeat.$error.compareTo">Password is not equal</span>
+                    <div class="header">
+                        Sign up here.
+                    </div>
+
+                    <input id="registerEmail" name="email" placeholder="Email address"
+                           ng-model="self.email" ng-class="{'ng-invalid': self.registerError}" required type="email"
+                           ng-keyup="self.registerReset() || ($event.keyCode == 13 && self.passwordAgain === self.password && self.register({email: self.email, password: self.password}))"/>
+
+                    <span class="tg__errormsg" ng-show="registerForm.email.$error.email">
+                        Not a valid E-Mail address
+                    </span>
+                    <span class="tg__errormsg" ng-show="self.registerError">
+                        {{self.registerError}}
+                    </span>
+
+                    <input name="password" placeholder="Password" ng-minlength="6"
+                           ng-model="self.password" required type="password"
+                           ng-keyup="self.registerReset() || ($event.keyCode == 13 && self.passwordAgain === self.password && self.register({email: self.email, password: self.password}))"/>
+
+                    <span class="tg__errormsg" ng-show="registerForm.password.$error.minlength">
+                        Password too short, must be at least 6 Characters
+                    </span>
+
+                    <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6"
+                           ng-model="self.passwordAgain" required type="password" compare-to="self.password"
+                           ng-keyup="self.registerReset() || ($event.keyCode == 13 && self.passwordAgain === self.password && self.register({email: self.email, password: self.password}))"/>
+
+                    <span class="tg__errormsg" ng-show="registerForm.password_repeat.$error.compareTo">
+                        Password is not equal
+                    </span>
                 </div>
-                <button id="signup" class="won-button--filled darkgray" ng-disabled="registerForm.$invalid" ng-click="::self.register(self.email, self.password)">That’s all we need. Let’s go!</button>
+                <button id="signup" class="won-button--filled darkgray"
+                        ng-disabled="registerForm.$invalid" ng-click="::self.register({email: self.email, password: self.password})">
+                    That’s all we need. Let’s go!
+                </button>
             </div>
             <!--div class="tg__anonymous">
                 <div class="block">
@@ -62,8 +87,7 @@
             Thurngasse 8/16<br/>
             1090 Vienna<br/>
             Austria</p>
-            <a href="mailto:office.sat@researchstudio.at" style="text-decoration: none; color: white">office.sat
-                @researchstudio.at</a>
+            <a href="mailto:{{::self.config.adminEmail}}" style="text-decoration: none; color: white">{{::self.config.adminEmail}}</a>
         </div>
     </div>
 </main>

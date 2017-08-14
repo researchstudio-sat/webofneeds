@@ -10,12 +10,19 @@ import {
     selectNeedByConnectionUri,
     selectAllConnections
 } from '../../selectors';
+import {
+    resetParams,
+} from '../../configRouting';
+
+
 const serviceDependencies = ['$ngRedux', '$scope'];
 
 class IncomingRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.WON = won.WON;
+
+        this.resetParams = resetParams;
 
         this.selection = 2;
         this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
@@ -50,7 +57,7 @@ class IncomingRequestsController {
     }
 
     selectedConnection(connectionUri) {
-        this.router__stateGo('overviewIncomingRequests', {connectionUri});
+        this.router__stateGoCurrent({connectionUri});
     }
 }
 

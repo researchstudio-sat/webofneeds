@@ -17,54 +17,22 @@ import {
     getIn,
 } from './utils';
 
+import {
+    actionTypes,
+} from './actions/actions';
+
 import jsonld from 'jsonld';
 
-/*
-    fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
-        .then(checkStatus)
-        .then(resp => resp.json())
-        .then(data =>
-            dispatch(actionCreators.user__receive({
-                loggedIn: true,
-                email: data.username
-            }))
-    )
-*/
-//TODO cached/memoized promise?
-/*
-var ret = buildCreateMessage(need, state.getIn['config', 'defaultNodeUri']);
-var message = ret[0];
-var eventUri = ret[1];
+export const emptyDataset = Immutable.fromJS({
+    ownNeeds: {},
+    connections: {},
+    events: {},
+    theirNeeds: {},
+});
 
-send(message);
-
-callback.shouldHandleTest = function (event, msg) {
-    var ret = event.isResponseTo == eventUri;
-    $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-    return ret;
-};
-
-messageService.sendMessage = function(msg) {
-    var jsonMsg = JSON.stringify(msg);
-    if (isConnected()) {
-        privateData.socket.send(jsonMsg);
-    } else {
-        if (!isConnecting()) {
-            createSocket();
-        }
-
-        if (isConnected()) {
-            $log.debug("sending message instead of enqueueing");
-            //just to be sure, test if the connection is established now and send instead of enqueue
-            privateData.socket.send(jsonMsg);
-        } else {
-            $log.warn("socket not connected yet, enqueueing");
-            privateData.pendingOutMessages.push(jsonMsg);
-        }
-    }
-};
-
-*/
+export function wellFormedPayload (payload) {
+    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
+}
 
 export function buildRateMessage(msgToRateFor, rating){
     return new Promise((resolve, reject) => {
@@ -380,17 +348,6 @@ export function getEventsFromMessage(msgJson) {
     return simplifiedEvents;
 }
 
-const emptyDataset = Immutable.fromJS({
-    ownNeeds: {},
-    connections: {},
-    events: {},
-    theirNeeds: {},
-});
-
-function wellFormedPayload(payload) {
-    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
-}
-
 export function fetchDataForNonOwnedNeedOnly(needUri) {
     return won.getNeedWithConnectionUris(needUri)
     .then(need =>
@@ -403,29 +360,15 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 export function fetchOwnedData(email, curriedDispatch) {
     return fetchOwnedNeedUris()
         .then(needUris =>
-            fetchDataForOwnedNeeds(needUris, email, curriedDispatch)
+            fetchDataForOwnedNeeds(needUris, curriedDispatch)
         );
 }
-export function fetchDataForOwnedNeeds(needUris, email, curriedDispatch) {
-
-    const dataPromise =
-        fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
-        .catch(error => {
-            throw({msg: 'user needlist retrieval failed', error});
-        });
-
-    if(email) {
-        const userData = {loggedIn: true, email};
-        if(curriedDispatch) {
-            curriedDispatch(wellFormedPayload(userData));
-        }
-        return dataPromise.then(allThatData =>
-            allThatData.merge(Immutable.fromJS(userData))
-        )
-    } else {
-        return dataPromise;
-    }
-}
+//export function fetchDataForOwnedNeeds(needUris, curriedDispatch) {
+//    return fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
+//        .catch(error => {
+//            throw({msg: 'user needlist retrieval failed', error});
+//        });
+//}
 function fetchOwnedNeedUris() {
     return fetch('/owner/rest/needs/', {
             method: 'get',
@@ -442,12 +385,11 @@ function fetchOwnedNeedUris() {
 }
 
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
+export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => undefined) {
     if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
         return Promise.resolve(emptyDataset);
     }
-
-    dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
@@ -494,16 +436,16 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
                     urisToLookupMap(theirNeedUris, won.getTheirNeed));
 
         //dispatch to the curried-in action as soon as any part of the data arrives
-        const ownNeedsDispatchedP = allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
+        const ownNeedsDispatchedP = allOwnNeedsPromise.then(ownNeeds => curriedDispatch({ownNeeds}));
 
         //Is needed for the reducer to make sure that all needs have already been put in the state
         Promise.all([
             ownNeedsDispatchedP,
             allConnectionsPromise,
-        ]).then(([x, connections]) => dispatchWellFormed({connections}));
+        ]).then(([x, connections]) => curriedDispatch({connections}));
 
         //allEventsPromise.then(events => dispatchWellFormed({events})); // STARTING with selective loading
-        allTheirNeedsPromise.then(theirNeeds => dispatchWellFormed({theirNeeds}));
+        allTheirNeedsPromise.then(theirNeeds => curriedDispatch({theirNeeds}));
 
         return Promise.all([
             allOwnNeedsPromise,
@@ -515,7 +457,11 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
     return allDataRawPromise
         .then(([ ownNeeds, connections, /* events, */ theirNeeds ]) =>
-            wellFormedPayload({ ownNeeds, connections, /* events, STARTING with selective loading*/ theirNeeds, })
+            wellFormedPayload({
+                ownNeeds, connections,
+                events: {/* will be loaded later when connection is accessed */},
+                theirNeeds,
+            })
         );
 
     /**

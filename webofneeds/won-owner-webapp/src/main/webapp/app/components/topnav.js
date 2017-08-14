@@ -8,6 +8,7 @@ import loginComponent from 'app/components/login';
 import logoutComponent from 'app/components/logout';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import config from '../config';
 
 function genTopnavConf() {
     let template = `
@@ -33,15 +34,15 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">
+                    <a  ng-click="self.router__stateGoResetParams(self.loggedIn ? 'feed' : 'landingpage')" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">
                             Web of Needs &ndash; Beta
                         </span>
                     </a>
                 </div>
-                <div class="topnav__inner__center" ng-show="self.loggedIn">
-                    <a ui-sref="createNeed" class="topnav__button">
+                <div class="topnav__inner__center">
+                    <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button">
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
@@ -50,7 +51,7 @@ function genTopnavConf() {
                     <ul class="topnav__list">
                         <li ng-show="!self.loggedIn">
                             <button
-                                ui-sref="landingpage({focusSignup: true})"
+                                ng-click="self.router__stateGoAbs('landingpage', {focusSignup: true})"
                                 class="topnav__button won-button--filled lighterblue"
                                 ng-show="!self.open">
                                     Sign up
@@ -111,16 +112,30 @@ function genTopnavConf() {
                     class="topnav__toasts__element__close clickable"
                     ng-click="self.toasts__delete(toast)"
                     src="generated/icon-sprite.svg#ico27_close"/>
-                <div class="topnav__toasts__element__text">{{toast.get('msg')}}</div>
+                <div class="topnav__toasts__element__text">
+                    <p ng-show="!toast.get('htmlEnabled')">
+                        {{toast.get('msg')}}
+                    </p>
+                    <p ng-show="toast.get('htmlEnabled')"
+                        ng-bind-html="toast.get('msg')">
+                    </p>
+                    <p ng-show="toast.get('type') === self.WON.errorToast">
+                        If the problem persists please contact
+                        <a href="mailto:{{::self.config.adminEmail}}">{{::self.config.adminEmail}}</a>
+                    </p>
+                </div>
+
             </div>
         </div>
     `;
 
-    const serviceDependencies = ['$ngRedux', '$scope', /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$sanitize', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
+            this.config = config;
+
             window.tnc4dbg = this;
 
             const selectFromState = (state) => ({
@@ -152,6 +167,7 @@ function genTopnavConf() {
 }
 
 export default angular.module('won.owner.components.topnav', [
+        'ngSanitize',
         loginComponent,
         logoutComponent
     ])

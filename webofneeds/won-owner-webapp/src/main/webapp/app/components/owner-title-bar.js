@@ -19,7 +19,7 @@ function genComponentConf() {
 
 
                 <div class="ntb__inner__left">
-                    <a ui-sref="overviewPosts">
+                    <a ng-click="self.router__stateGoResetParams('overviewPosts')">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
                     <won-square-image
@@ -72,34 +72,34 @@ function genComponentConf() {
                     <div class ="ntb__inner__right__lower">
                         <ul class="ntb__tabs">
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === 'Info'}">
-                                <a ui-sref="post({connectionType: null, openConversation: null, connectionUri: null, postUri: self.postUri})">
+                                <a ng-click="self.router__stateGoAbs('post', {postUri: self.postUri})">
                                     Post Info
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}">
 
-                                <a ui-sref="post({connectionType: self.WON.Connected, openConversation: null, connectionUri: null, postUri: self.postUri})"
+                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Connected, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
                                     Messages
                                     <span class="ntb__tabs__unread">{{ self.unreadMessagesCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}">
-                                <a ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.postUri})"
+                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Suggested, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
                                     Matches
                                     <span class="ntb__tabs__unread">{{ self.unreadMatchesCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}">
-                                <a ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.postUri})"
+                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestReceived, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
                                     Requests
                                     <span class="ntb__tabs__unread">{{ self.unreadIncomingRequestsCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}">
-                                <a ui-sref="post({connectionType: self.WON.RequestSent, openConversation: null, connectionUri: null, postUri: self.postUri})"
+                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestSent, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
                                     Sent Requests
                                     <span class="ntb__tabs__unread">{{ self.unreadSentRequestsCount }}</span>

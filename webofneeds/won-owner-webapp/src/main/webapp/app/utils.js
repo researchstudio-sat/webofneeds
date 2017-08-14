@@ -280,6 +280,28 @@ export function isString(o) {
     return typeof o == "string" || (typeof o == "object" && o.constructor === String);
 }
 
+/**
+ * Generate string of [a-z0-9] with specified length
+ * @param length
+ * @returns {*}
+ */
+export function generateIdString(length) {
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    return arrayOfRandoms(length)
+        .map(randomFloat => Math.floor(randomFloat * characters.length))
+        .map(randomPosition => characters.charAt(randomPosition))
+        .join('');
+}
+
+/**
+ * Generate array of random numbers.
+ * @param length
+ * @returns {*}
+ */
+export function arrayOfRandoms(length) {
+    return Array.apply(null, Array(length)).map(() => Math.random());
+}
+
 export function readAsDataURL(file) {
     return new Promise((resolve, reject) => {
         var reader = new FileReader();
@@ -852,4 +874,30 @@ export function somePromises(promises, errorHandler) {
 
         })
     )
+}
+
+/**
+ *
+ * Adapted from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+ *
+ * Usage:
+ * ```
+ * // query string: ?foo=lorem&bar=&baz
+ * var foo = getParameterByName('foo'); // "lorem"
+ * var bar = getParameterByName('bar'); // "" (present with empty value)
+ * var baz = getParameterByName('baz'); // "" (present with no value)
+ * var qux = getParameterByName('qux'); // null (absent)
+ * ```
+ * @param name
+ * @param url
+ * @returns {*}
+ */
+export function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    const results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }

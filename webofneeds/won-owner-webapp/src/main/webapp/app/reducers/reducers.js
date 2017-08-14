@@ -11,6 +11,9 @@ import needReducer from './need-reducer';
 import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
 import toastReducer from './toast-reducer';
+import {
+    getIn,
+} from '../utils';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -39,6 +42,34 @@ const reducers = {
 
     // contains the Date.now() of the last action
     lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
+
+    loginInProcessFor: (loginInProcessFor = undefined, action = {}) => {
+        switch(action.type) {
+            case actionTypes.loginStarted:
+                return getIn(action, ['payload', 'email']);
+
+            case actionTypes.login:
+            case actionTypes.loginFailed:
+                return undefined;
+
+            default:
+                return loginInProcessFor;
+        }
+    },
+
+    logoutInProcess: (logoutInProcess = undefined, action = {}) => {
+        switch(action.type) {
+            case actionTypes.logoutStarted:
+                return true;
+
+            case actionTypes.logout:
+                return undefined;
+
+            default:
+                return logoutInProcess;
+        }
+    },
+
 
     initialLoadFinished: (state = false, action = {}) =>
         state || action.type === actionTypes.initialPageLoad,

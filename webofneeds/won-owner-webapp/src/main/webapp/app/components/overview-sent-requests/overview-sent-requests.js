@@ -45,7 +45,7 @@ class SentRequestsController {
         this.$scope.$on('$destroy', disconnect);
     }
     selectedConnection(connectionUri) {
-        this.router__stateGo('overviewSentRequests', {connectionUri});
+        this.router__stateGoCurrent({connectionUri});
     }
 }
 

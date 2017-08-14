@@ -11,7 +11,7 @@
                 <span class="opc__empty__description__text">Here you will see all incoming requests for your needs, but
                     currently there are none. Check again later!</span>
             </div>
-            <a ui-sref="createNeed" class="opc__empty__link">
+            <a ng-click="self.router__stateGoResetParams('createNeed')" class="opc__empty__link">
                 <img src="generated/icon-sprite.svg#ico36_plus" class="opc__empty__link__icon">
                 <span class="opc__empty__link__caption">Create a Need</span>
             </a>

@@ -6,6 +6,8 @@ import Immutable from 'immutable';
 import L from './leaflet-bundleable';
 import {
     arrEq,
+    checkHttpStatus,
+    generateIdString,
 } from './utils';
 
 export function initLeaflet(mapMount) {
@@ -124,4 +126,109 @@ export function connect2Redux(selectFromState, actionCreators, properties, ctrl)
         disconnectRdx();
         disconnectProps();
     });
+}
+
+/**
+ * Checks whether the user has a logged-in session.
+ * Returns a promise with the user-object if successful
+ * or a failing promise if an error has occured.
+ *
+ * @returns {*}
+ */
+export function checkLoginStatus() {
+    return fetch('rest/users/isSignedIn', {credentials: 'include'})
+        .then(checkHttpStatus) // will reject if not logged in
+        .then(resp => resp.json());
+}
+
+/**
+ * Registers the account with the server.
+ * The returned promise fails if something went
+ * wrong during creation.
+ *
+ * @param credentials either {email, password} or {privateId}
+ * @returns {*}
+ */
+export function registerAccount(credentials) {
+    const {email, password} = parseCredentials(credentials);
+    return fetch('/owner/rest/users/', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({username: email, password: password})
+    })
+    .then(
+        checkHttpStatus
+    );
+}
+
+
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {*}
+ */
+export function login(credentials) {
+    const {email, password} = parseCredentials(credentials);
+    return fetch('/owner/rest/users/signin', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({username: email, password: password})
+    })
+    .then(
+        checkHttpStatus
+    );
+}
+
+export function logout() {
+    return fetch('/owner/rest/users/signout', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({})
+    })
+        .then(
+        checkHttpStatus
+    )
+}
+
+/**
+ * Generates a privateId of `[usernameFragment]-[password]`
+ * @returns {string}
+ */
+export function generatePrivateId() {
+    return generateIdString(8) + '-' + generateIdString(8); //<usernameFragment>-<password>
+}
+
+/**
+ * Parses a given privateId into a fake email address and a password.
+ * @param privateId
+ * @returns {{email: string, password: *}}
+ */
+export function privateId2Credentials(privateId) {
+    const [usernameFragment, password] = privateId.split('-');
+    const email = usernameFragment + '@matchat.org';
+    return {
+        email,
+        password,
+    }
+}
+
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {email, password}
+ */
+export function parseCredentials(credentials) {
+    return credentials.privateId ?
+        privateId2Credentials(credentials.privateId) :
+        credentials;
 }

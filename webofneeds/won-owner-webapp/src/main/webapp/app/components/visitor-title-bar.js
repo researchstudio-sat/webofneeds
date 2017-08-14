@@ -34,12 +34,12 @@ function genComponentConf() {
                         <li class="clickable"
                             ng-class="self.selection == 0? 'vtb__tabs__selected' : ''"
                             ng-click="self.selection = 0">
-                        <a ui-sref="post({ERROR: 'Messages tab not implemented yet'})">
+                        <a ng-click="self.router__stateGoAbs('post', {ERROR: 'Messages tab not implemented yet'})">
                             Messages
                             <span class="vtb__tabs__unread">{{self.theirPost.get('messages').length}}</span>
                         </a></li>
                         <li class="clickable" ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
-                        <a ui-sref="postVisitor({myUri: 'http://example.org/121337345'})">
+                        <a ng-click="self.router__stateGoAbs('postVisitor', {myUri: 'http://example.org/121337345'})">
                             Post Info
                         </a></li>
                     </ul>

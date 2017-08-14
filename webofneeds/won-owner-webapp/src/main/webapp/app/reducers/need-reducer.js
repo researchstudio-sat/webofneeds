@@ -16,6 +16,15 @@ export default function(state = initialState, action = {}) {
         case actionTypes.needs.clean:
             return initialState;
 
+        case actionTypes.loginStarted:
+            // starting a new login process. this could mean switching
+            // to a different session. we need to mark any needs
+            // that are already loaded as non-owned.
+            return state.map(need => need
+                .set('ownNeed', false)
+                .set('connections', Immutable.Map())
+            );
+
         case actionTypes.initialPageLoad:
         case actionTypes.login:
             let ownNeeds = action.payload.get('ownNeeds');
@@ -33,6 +42,7 @@ export default function(state = initialState, action = {}) {
             );
 
             return storeConnectionsData(stateWithOwnAndTheirNeeds, action.payload.get('connections'), false);
+
         case actionTypes.messages.closeNeed.failed:
             return storeConnectionsData(state, action.payload.get('connections'), false);
 

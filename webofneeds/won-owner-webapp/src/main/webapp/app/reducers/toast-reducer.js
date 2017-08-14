@@ -2,6 +2,11 @@ import { actionTypes } from '../actions/actions';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import won from '../won-es6';
+import {
+    getIn,
+    generateIdString,
+} from '../utils';
+import config from '../config';
 
 const initialState = Immutable.fromJS({
 });
@@ -17,6 +22,24 @@ export default function(allToasts = initialState, action = {}) {
 
         case actionTypes.logout:
             return initialState;
+
+        case actionTypes.loginFailed:
+            if(getIn(action, ['payload', 'loginError']) === 'invalid privateId') {
+                return pushNewToast(
+                    allToasts,
+                    'Sorry, we couldn\'t find the private ID (the one in your url-bar). If ' +
+                    'you copied this address make sure you <strong>copied everything</strong> and try ' +
+                    '<strong>reloading the page</strong>. ' +
+                    'If this doesn\'t work you can try ' +
+                    '<a href="#">' +
+                      'removing it' +
+                    '</a> to start fresh.',
+                    won.WON.errorToast,
+                    {htmlEnabled: true}
+                )
+            } else {
+                return allToasts;
+            }
 
         case actionTypes.lostConnection:
             return pushNewToast(allToasts, "Lost connection - progress " +
@@ -41,18 +64,33 @@ export default function(allToasts = initialState, action = {}) {
     }
 }
 
-function pushNewToast(allToasts, msg, type) {
-    var toastType = type;
+/**
+ *
+ * @param allToasts
+ * @param msg
+ * @param type
+ * @param options
+ *   * htmlEnabled: set this to true only if it's really necessary and never
+ *   with non-static text (e.g. never use this with toasts that show need-contents
+ *   as this would open the possibility for XSS-attacks)
+ * @returns {*}
+ */
+function pushNewToast(allToasts, msg, type, options) {
+    const options_ = Object.assign({
+        htmlEnabled: false,
+    }, options);
+
+    let toastType = type;
     if(!toastType){
         toastType = won.WON.infoToast;
     }
 
-    var id="";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for( var i=0; i < 5; i++ )
-        id += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return allToasts.setIn([id], Immutable.fromJS({id: id, type: toastType, msg: msg}));
+    const id = generateIdString(6);
+    return allToasts.setIn([id], Immutable.fromJS({
+        id: id,
+        type: toastType,
+        msg: msg,
+        htmlEnabled: options_.htmlEnabled,
+    }));
 }
 

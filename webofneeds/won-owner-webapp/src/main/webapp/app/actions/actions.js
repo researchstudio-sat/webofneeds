@@ -1,5 +1,5 @@
 /**
- * Created by ksinger on 23.09.2015.
+ h Created by ksinger on 23.09.2015.
  *
  * Contains a list of actions to be used with the dispatcher and documentation
  * for their expected payloads.
@@ -36,12 +36,14 @@
  */
 
 import  won from '../won-es6';
+import Immutable from 'immutable';
 
 // <utils>
 
 import {
     tree2constants,
     entries,
+    generateIdString,
 } from '../utils';
 import { hierarchy2Creators } from './action-utils';
 import {
@@ -49,12 +51,38 @@ import {
     buildCloseNeedMessage,
     buildOpenNeedMessage
 } from '../won-message-utils';
+import {
+    checkLoginStatus,
+    registerAccount,
+    login,
+} from '../won-utils';
+
+import {
+    needCreate,
+} from './create-need-action';
+
+import {
+    makeParams,
+    resetParams,
+    constantParams,
+    addConstParams,
+} from '../configRouting';
+
+import {
+    stateBack,
+    stateGoAbs,
+    stateGoCurrent,
+    stateGoDefault,
+    stateGoKeepParams,
+    stateGoResetParams,
+} from './cstm-router-actions';
 
 // </utils>
 
 // <action-creators>
 
 import {
+    //anonAccountLogin,
     accountLogin,
     accountLogout,
     accountRegister,
@@ -109,9 +137,14 @@ const actionHierarchy = {
         failed: INJ_DEFAULT
     },
     router: {
-        stateGo,
+        stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
+        stateGoAbs, // reset's all parameters but the one passed as arguments
+        stateGoResetParams, // goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
+        stateGoKeepParams, // goes to new state and keeps listed parameters at their current values
+        stateGoCurrent,
+        stateGoDefault,
         stateReload,
-        stateTransitionTo,
+        //stateTransitionTo, // should not be used directly
         back: stateBack,
         accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
     },
@@ -172,10 +205,13 @@ const actionHierarchy = {
     },
     hideLogin: INJ_DEFAULT,
     showLogin: INJ_DEFAULT,
-    login: accountLogin,
+    //anonymousLogin: anonAccountLogin,
+    loginStarted: INJ_DEFAULT,
+    login: accountLogin, //loginSuccess
+    loginFailed: INJ_DEFAULT,
+    logoutStarted: INJ_DEFAULT,
     logout: accountLogout,
     register: accountRegister,
-    loginFailed: INJ_DEFAULT,
     loginReset: INJ_DEFAULT,
     registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,
@@ -250,14 +286,6 @@ export function startTicking() {
         );
 }
 
-
-export function needCreate(draft, nodeUri) {
-    const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-    return {
-        type: actionTypes.needs.create,
-        payload: { eventUri, message, needUri }
-    };
-}
 
 /**
  * @deprecated used for keeping old code.
@@ -340,24 +368,7 @@ export function needsClose(needUri) {
         )
         .then(() =>
             // go back to overview
-            dispatch(actionCreators.router__stateGo('overviewPosts'))
+            dispatch(actionCreators.router__stateGoResetParams('overviewPosts'))
         )
-    }
-}
-
-/**
- * Action-Creator that goes back in the browser history
- * without leaving the app.
- * @param dispatch
- * @param getState
- */
-function stateBack() {
-    return (dispatch, getState) => {
-        const hasPreviousState = !!getState().getIn(['router', 'prevState', 'name']);
-        if (hasPreviousState) {
-            history.back();
-        } else {
-            dispatch(actionCreators.router__stateGo('landingpage'));
-        }
     }
 }
