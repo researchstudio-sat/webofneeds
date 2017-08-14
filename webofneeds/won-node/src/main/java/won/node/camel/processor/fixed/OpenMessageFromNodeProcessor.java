@@ -31,22 +31,41 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
     URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
     Connection con = null;
     if (connectionURIFromWonMessage == null) {
-      //the opener didn't know about the connection - maybe it doesn't exist
+      //the opener didn't know about the connection
+      // this happens, for example, when both parties get a hint. Both create a connection, but they don't know
+      // about each other.
+      // That's why we first try to find a connection with the same needs and facet:
+
+      //let's extract the facet, we'll need it multiple times here
       URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
-      URI connectionUri = wonNodeInformationService.generateConnectionURI(wonMessage.getReceiverNodeURI());
-      con = dataService.createConnection(connectionUri, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI(),
-                                         wonMessage.getSenderURI(), facet,
-                                         ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+
+
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(
+              wonMessage.getReceiverNeedURI(),
+              wonMessage.getSenderNeedURI(),
+              facet);
+      if (con == null) {
+        //ok, we really do not know about the connection. create it.
+        URI connectionUri = wonNodeInformationService.generateConnectionURI(wonMessage.getReceiverNodeURI());
+        con = dataService.createConnection(connectionUri, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI(),
+                wonMessage.getSenderURI(), facet,
+                ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+      }
     } else {
+      //the opener knew about the connection. just load it.
       con = connectionRepository.findOneByConnectionURIForUpdate(connectionURIFromWonMessage);
     }
-    assert con != null;
-    assert con.getRemoteNeedURI() != null;
-    assert con.getRemoteNeedURI().equals(wonMessage.getSenderNeedURI());
-    assert con.getRemoteConnectionURI() != null;
-    if (wonMessage.getSenderURI() != null){
-      assert con.getRemoteConnectionURI().equals(wonMessage.getSenderURI());
-    } else {
+    //now perform checks
+    if (con == null) throw new IllegalStateException("connection must not be null");
+    if (con.getRemoteNeedURI() == null) throw new IllegalStateException("remote need uri must not be null");
+    if (!con.getRemoteNeedURI().equals(wonMessage.getSenderNeedURI())) throw new IllegalStateException("the remote need uri of the connection must be equal to the sender need uri of the message");
+    if (con.getRemoteConnectionURI() == null) throw  new IllegalStateException("the remote connection uri must not be null");
+    if (wonMessage.getSenderURI() == null) throw new IllegalStateException("the sender uri must not be null");
+    if (!con.getRemoteConnectionURI().equals(wonMessage.getSenderURI())) throw new IllegalStateException("the sender uri of the message must be equal to the remote connection uri");
+
+    //it is possible that we didn't store the reference to the remote conneciton yet. Now we can do it.
+    if (con.getRemoteConnectionURI() == null) {
+      // Set it from the message (it's the sender of the message)
       con.setRemoteConnectionURI(wonMessage.getSenderURI());
     }
     con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
