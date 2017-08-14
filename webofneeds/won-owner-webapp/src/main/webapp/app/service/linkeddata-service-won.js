@@ -1610,7 +1610,7 @@ import won from './won';
                                 "?container rdfs:member ?eventUri. \n" +
                                 "?eventUri won:hasMessageType ?msgType. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasReceivedTimestamp ?timestamp .\n" +
                                 " } \n" +
                                 filterPart + //" filter ( ?timestamp > " + timestamp + " ) \n" +
                                 "} order by desc(?timestamp) ";//limit " + limit;

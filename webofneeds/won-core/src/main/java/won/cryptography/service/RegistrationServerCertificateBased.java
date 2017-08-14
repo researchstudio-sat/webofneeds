@@ -9,6 +9,7 @@ import won.cryptography.ssl.AliasGenerator;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.service.ApplicationManagementService;
 
+import javax.transaction.Transactional;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -33,6 +34,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer
     this.trustStrategy = trustStrategy;
   }
 
+  @Transactional
   public String registerOwner(Object certificateChainObj) throws WonProtocolException {
     String alias = null;
     X509Certificate[] ownerCertChain = new X509Certificate[]{(X509Certificate) certificateChainObj};
