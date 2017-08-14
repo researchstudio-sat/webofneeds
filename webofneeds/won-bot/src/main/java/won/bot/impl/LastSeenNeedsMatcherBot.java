@@ -95,6 +95,9 @@ public class LastSeenNeedsMatcherBot extends EventBot
                 ctx.getMatcherProtocolNeedServiceClient().hint(currentNeedURI, lastNeedURI, 0.5, originator,
                                                                null, createWonMessage(
                     currentNeedURI, lastNeedURI, 0.5, originator));
+                ctx.getMatcherProtocolNeedServiceClient().hint(lastNeedURI, currentNeedURI, 0.5, originator,
+                        null, createWonMessage(
+                                lastNeedURI, currentNeedURI, 0.5, originator));
               }
             }));
   }
