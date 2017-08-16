@@ -1,0 +1,38 @@
+<header>
+    <won-topnav></won-topnav>
+</header>
+<main class="landingpage" id="allSections">
+    <div class="welcome">
+        <div class="title">Welcome to the Web of Needs</div>
+        <won-flex-grid items="::self.peopleGrid"></won-flex-grid>
+        <div class="w__description">
+            <span class="wd__title">What is a &laquo;need&raquo;?</span>
+            <span class="wd__text">A need helps you find people who can help you - or who share your interest.</span>
+            <span class="wd__more clickable" ng-click="::self.toggleMoreInfo()">Read more</span>
+            <img class="wd__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="!self.moreInfo" src="generated/icon-sprite.svg#ico16_arrow_down"/>
+            <img class="wd__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="self.moreInfo" src="generated/icon-sprite.svg#ico16_arrow_up"/>
+            <span class="wd__text"  ng-show="self.moreInfo" >A need is much like an automatic classified ad. You say
+                what you are looking for, and other such ads will be matched with yours. You could think of it as
+            of a long-lived search query that can itself be found by others. Once you found a useful match, you can
+                connect to it and start to chat.</span>
+        </div>
+    </div>
+    <div class="howto">
+        <div class="title">How it works</div>
+        <won-flex-grid items="::self.workGrid"></won-flex-grid>
+    </div>
+    <div class="faq">
+        <div class="title">FAQs</div>
+        <won-accordion items="::self.questions"></won-accordion>
+    </div>
+    <div class="try">
+        <div class="title">Imprint</div>
+        <div class="sub title" >
+            <p>Research Studio Smart Agent Technologies<br/>
+                Thurngasse 8/16<br/>
+                1090 Vienna<br/>
+                Austria</p>
+            <a href="mailto:{{::self.config.adminEmail}}" style="text-decoration: none; color: white">{{::self.config.adminEmail}}</a>
+        </div>
+    </div>
+</main>

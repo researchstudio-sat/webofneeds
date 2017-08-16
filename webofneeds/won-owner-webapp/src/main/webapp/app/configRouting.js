@@ -84,6 +84,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
     //$urlRouterProvider.when('/create-need/', [() => '/create-need/' + getRandomPosInt()]);
 
     [
+        { path: '/about?privateId', component: 'about' },
         { path: '/landingpage?:focusSignup?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
         { path: '/feed?privateId', component: 'feed' },
