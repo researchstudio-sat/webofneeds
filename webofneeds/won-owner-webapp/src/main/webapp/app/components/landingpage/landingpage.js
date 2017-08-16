@@ -7,6 +7,7 @@ import compareToModule from '../../directives/compareTo';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
 import config from '../../config';
+import createPostModule from '../create-post';
 import {
     attach,
     scrollTo,
@@ -153,7 +154,8 @@ export default angular.module('won.owner.components.landingpage', [
     accordionModule,
     topNavModule,
     flexGridModule,
-    compareToModule
+    compareToModule,
+    createPostModule,
 ])
     .controller('LandingpageController', [...serviceDependencies, LandingpageController])
     .name;

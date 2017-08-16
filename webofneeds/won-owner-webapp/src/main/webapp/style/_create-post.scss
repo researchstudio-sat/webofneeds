@@ -3,34 +3,45 @@
 @import 'needtextfield';
 @import 'locationpicker';
 
+
 .create-post {
-  hr {
-    border: 0;
-    border-top: $thinBorderWidth solid $won-line-gray;
-    width: 100%;
-  }
 
-  //@include flex-column;
-  //max-width: 20rem;
+}
+
+won-create-post {
+
   width: 100%;
+  display: block;
 
-  //$createPostMaxContentWidth: 46.25rem;
-  $createPostMaxContentWidth: 35rem;
-  @media (max-width: $responsivenessBreakPoint){
-    @include max-content-width($createPostMaxContentWidth, 0, 'cp');
-  }
-  @media (min-width: $responsivenessBreakPoint){
-    @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
-  }
-
-  > .cp__inner {
+  & > .cp__inner {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
 
     padding: $minContentPadding;
+
+    max-width: 35rem;
+
+    // center
+    margin-left: auto;
+    margin-right: auto;
   }
+
+  hr {
+    border: 0;
+    border-top: $thinBorderWidth solid $won-line-gray;
+    width: 100%;
+  }
+
+  //$createPostMaxContentWidth: 35rem;
+  //@media (max-width: $responsivenessBreakPoint){
+  //  @include max-content-width($createPostMaxContentWidth, 0, 'cp');
+  //}
+  //@media (min-width: $responsivenessBreakPoint){
+  //  @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
+  //}
+
 
   .cp__icon {
     @include fixed-square($bigiconSize);
