@@ -71,34 +71,39 @@ function genComponentConf() {
 
                     <div class ="ntb__inner__right__lower">
                         <ul class="ntb__tabs">
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === 'Info'}">
-                                <a ng-click="self.router__stateGoAbs('post', {postUri: self.postUri})">
+                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === 'Info'}"
+                                class="clickable">
+                                <a ng-click="self.router__stateGoAbs('post', {postUri: self.postUri})"
+                                    class="clickable">
                                     Post Info
                                 </a>
                             </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}">
-
+                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}"
+                                class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Connected, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
                                     Messages
                                     <span class="ntb__tabs__unread">{{ self.unreadMessagesCount }}</span>
                                 </a>
                             </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}">
+                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}"
+                                class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Suggested, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
                                     Matches
                                     <span class="ntb__tabs__unread">{{ self.unreadMatchesCount }}</span>
                                 </a>
                             </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}">
+                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}"
+                                class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestReceived, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
                                     Requests
                                     <span class="ntb__tabs__unread">{{ self.unreadIncomingRequestsCount }}</span>
                                 </a>
                             </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}">
+                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}"
+                                class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestSent, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
                                     Sent Requests
