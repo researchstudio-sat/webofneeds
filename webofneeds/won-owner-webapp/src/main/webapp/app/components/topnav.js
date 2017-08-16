@@ -34,7 +34,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ng-click="self.router__stateGoResetParams(self.loggedIn ? 'feed' : 'landingpage')" class="topnav__button">
+                    <a  ng-click="self.router__stateGoResetParams(self.loggedIn ? 'feed' : 'landingpage')" class="topnav__button clickable">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">
                             Web of Needs &ndash; Beta
@@ -42,7 +42,7 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center">
-                    <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button">
+                    <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button clickable">
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
