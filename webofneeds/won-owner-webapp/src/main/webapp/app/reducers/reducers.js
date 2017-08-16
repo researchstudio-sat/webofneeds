@@ -14,10 +14,6 @@ import toastReducer from './toast-reducer';
 import {
     getIn,
 } from '../utils';
-import {
-    selectNeedByConnectionUri,
-    selectAllConnections
-} from '../selectors';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -183,21 +179,19 @@ export default reduceReducers( //passes on the state from one reducer to another
 window.Immutable4dbg = Immutable;
 
 function deleteConnectionsBetweenOwnNeeds(state) {
-    const connections = selectAllConnections(state);
+    let needs = state.get("needs");
 
-    let connectionsToDelete = connections.filter(function(conn){
-        return !!state.getIn(["needs", conn.get("remoteNeedUri"), ownNeed]);
-    });
+    if(needs){
+        needs = needs.map(function(need) {
+            let connections = need.get("connections");
 
-    connectionsToDelete.map(function(conn){
-        const connUri = conn.get("uri");
-        const need = selectNeedByConnectionUri(state, connUri);
-
-        if(need){
-            const needUri = need.get("uri");
-            state = state.deleteIn(["needs", needUri, "connections", connUri]);
-        }
-    });
+            connections = connections.filter(function(conn){
+                return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
+            });
+            return need.set("connections", connections);
+        });
+        return state.set("needs", needs);
+    }
 
     return state;
 }
