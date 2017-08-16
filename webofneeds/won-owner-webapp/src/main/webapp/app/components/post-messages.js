@@ -21,12 +21,13 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 function genComponentConf() {
     let template = `
         <div class="pm__header">
-            <a ng-click="self.router__stateGoCurrent({connectionUri : null})">
+            <a class="clickable"
+                ng-click="self.router__stateGoCurrent({connectionUri : null})">
                 <img class="pm__header__icon clickable"
                      src="generated/icon-sprite.svg#ico36_close"/>
             </a>
-            <div class="pm__header__title"
-              ng-click="self.router__stateGoAbs('post', { postUri: self.theirNeed.get('uri')})">
+            <div class="pm__header__title clickable"
+                ng-click="self.router__stateGoAbs('post', { postUri: self.theirNeed.get('uri')})">
                 {{ self.theirNeed.get('title') }}
             </div>
         </div>

@@ -20,7 +20,8 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <div class="or__header">
-        <a ng-click="self.router__stateGoCurrent({connectionUri: null})">
+        <a ng-click="self.router__stateGoCurrent({connectionUri: null})"
+           class="clickable">
           <img class="or__header__icon clickable" src="generated/icon-sprite.svg#ico36_close"/>
         </a>
 
