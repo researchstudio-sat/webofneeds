@@ -115,8 +115,6 @@ class LandingpageController {
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
-
-
         this.$scope.$on('$destroy',disconnect);
 
         this.$scope.$watch('self.focusSignup', (oldval, newval) => {
