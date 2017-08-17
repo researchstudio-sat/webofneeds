@@ -224,6 +224,7 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
             });
             break;
 
+        case 'about':
         case 'createNeed':
             return; // can always access this page.
 
