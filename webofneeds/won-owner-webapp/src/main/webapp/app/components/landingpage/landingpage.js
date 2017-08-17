@@ -18,6 +18,14 @@ import {
     makeParams,
 } from '../../configRouting.js';
 
+
+
+import {
+    absUiRef,
+} from '../../actions/cstm-router-actions'; //TODO deleteme
+
+
+
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
 const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
@@ -111,7 +119,10 @@ class LandingpageController {
         const signup = (state) => ({
             focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
             loggedIn: state.getIn(['user','loggedIn']),
-            registerError: state.getIn(['user','registerError'])
+            registerError: state.getIn(['user','registerError']),
+
+            deletme: absUiRef('post', {postUri: 'http://example.org/123'}, state),
+            state,
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
