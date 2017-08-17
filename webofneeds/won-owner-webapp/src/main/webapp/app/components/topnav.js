@@ -42,7 +42,9 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center">
-                    <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button">
+                    <a ng-click="self.router__stateGoResetParams('createNeed')"
+                       class="topnav__button"
+                       ng-show="!self.isLandingPage"> <!-- landingpage has post-creation embedded -->
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
@@ -148,6 +150,7 @@ function genTopnavConf() {
                 toastsArray: state.getIn(['toasts']).toArray(),
                 connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
                 reconnecting: state.getIn(['messages', 'reconnecting']),
+                isLandingPage: state.getIn(['router', 'currentState', 'name']) === 'landingpage',
             });
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
