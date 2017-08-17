@@ -25,11 +25,15 @@ main.landingpage {
     align-items: flex-end;
     align-self: center;
     display: flex;
-    max-width: 35rem;
+    max-width: $maxContentWidth / 2;
     flex-direction: column;
-    font-size: 0.8rem;
-    color: #a9a7a7;
-    border-top: 1px solid #b3b3b3;
+    //font-size: 0.8rem;
+    //font-size: $smallFontSize;
+    font-size: $normalFontSize;
+    //color: #a9a7a7;
+    color: $won-line-gray;
+    //border-top: 1px solid #b3b3b3;
+    border-top: 1px solid $won-line-gray;
     padding-top: 1rem;
   }
 }

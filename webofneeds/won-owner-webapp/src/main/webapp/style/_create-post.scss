@@ -21,7 +21,7 @@ won-create-post {
 
     padding: $minContentPadding;
 
-    max-width: 35rem;
+    max-width: $maxContentWidth / 2;
 
     // center
     margin-left: auto;
@@ -34,7 +34,7 @@ won-create-post {
     width: 100%;
   }
 
-  //$createPostMaxContentWidth: 35rem;
+  //$createPostMaxContentWidth: $maxContentWidth / 2;
   //@media (max-width: $responsivenessBreakPoint){
   //  @include max-content-width($createPostMaxContentWidth, 0, 'cp');
   //}

@@ -12,7 +12,7 @@
   .oir__openrequest,
   .owner__messages{
     flex-grow: 1;
-    max-width: 35rem;
+    max-width: $maxContentWidth / 2;
   }
 
   @media (max-width: $responsivenessBreakPoint){

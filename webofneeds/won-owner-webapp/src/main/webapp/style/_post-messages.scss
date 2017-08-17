@@ -23,12 +23,12 @@
   border-right: $thinGrayBorder;
   border-bottom: $thinGrayBorder;
   width: 100%;
-  max-width: 35rem;
+  max-width: $maxContentWidth / 2;
   //margin-ri: 0.5rem;
 
   box-sizing: border-box;
 
-  @include max-content-width(35rem, $minContentPadding, 'post-messages');
+  @include max-content-width($maxContentWidth / 2, $minContentPadding, 'post-messages');
 
   .post-messages__inner {
     display: flex;
