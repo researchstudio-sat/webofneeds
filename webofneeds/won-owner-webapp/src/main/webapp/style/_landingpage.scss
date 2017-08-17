@@ -2,6 +2,8 @@
 @import 'sizing-utils';
 @import 'fonts';
 
+@import 'won-config';
+
 
 
 .curtain {
@@ -13,6 +15,7 @@
   background: $won-light-blue;
   opacity: 0.5;
   z-index: 100;
+
 }
 
 main.landingpage {
@@ -20,6 +23,8 @@ main.landingpage {
     width: calc(100% - #{$minContentPadding} *2); //we do have to remove the 2rem padding for each subdiv otherwise we would have a horizontal scrollbar
     //box-sizing: border-box did not work (the height property was faulty then
   }
+
+  padding-top: 1.5rem;
 
   .lp__footnote {
     align-items: flex-end;
@@ -34,6 +39,8 @@ main.landingpage {
     color: $won-line-gray;
     //border-top: 1px solid #b3b3b3;
     border-top: 1px solid $won-line-gray;
+    margin-top: 1.5rem;
     padding-top: 1rem;
+
   }
 }
