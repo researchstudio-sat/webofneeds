@@ -46,7 +46,7 @@ function genTopnavConf() {
                        class="topnav__button"
                        ng-show="!self.isLandingPage"> <!-- landingpage has post-creation embedded -->
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
-                        <span class="topnav__button__caption">New Need</span>
+                        <span class="topnav__button__caption">New Post</span>
                     </a>
                 </div>
                 <div class="topnav__inner__right">
