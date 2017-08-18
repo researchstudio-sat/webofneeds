@@ -14,7 +14,8 @@ const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
             <div class="pil__information">
-                <a ng-click="self.router__stateGoAbs('post', {postUri: self.needUri})">
+                <a ng-click="self.router__stateGoAbs('post', {postUri: self.needUri})"
+                    class="clickable">
                     <won-square-image  
                         ng-class="{'inactive' : !self.isActive()}" 
                         src="self.ownNeed.get('titleImgSrc')"

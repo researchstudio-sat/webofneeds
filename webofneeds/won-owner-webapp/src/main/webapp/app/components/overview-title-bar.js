@@ -20,27 +20,32 @@ function genComponentConf() {
         <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
             <div class="mtb__inner">
                 <ul class="mtb__inner__center mtb__tabs">
-                    <li ng-class="{'mtb__tabs__selected' : self.selection == 0}">
+                    <li ng-class="{'mtb__tabs__selected' : self.selection == 0}"
+                        class="clickable">
                         <a ng-click="self.router__stateGoResetParams('feed')"
                             ng-class="{'disabled' : !self.hasPosts}">
                             Feed
                         </a>
                     </li>
-                    <li ng-class="{'mtb__tabs__selected' : self.selection == 1}">
+                    <li ng-class="{'mtb__tabs__selected' : self.selection == 1}"
+                        class="clickable">
                         <a ng-click="self.router__stateGoResetParams('overviewPosts')"
-                            ng-class="{'disabled' : !self.hasPosts}">
+                            ng-class="{'disabled' : !self.hasPosts}"
+                            class="clickable">
                             Posts
                             <span class="mtb__tabs__unread">{{ self.nrOfNeedsWithUnreadEvents }}</span>
                         </a>
                     </li>
-                    <li ng-class="{'mtb__tabs__selected' : self.selection == 2}">
+                    <li ng-class="{'mtb__tabs__selected' : self.selection == 2}"
+                        class="clickable">
                         <a ng-click="self.router__stateGoResetParams('overviewIncomingRequests')"
                             ng-class="{'disabled' : !self.hasRequests}">
                             Incoming Requests
                             <span class="mtb__tabs__unread">{{ self.nrOfUnreadIncomingRequests }}</span>
                         </a>
                     </li>
-                    <li ng-class="{'mtb__tabs__selected' : self.selection == 3}">
+                    <li ng-class="{'mtb__tabs__selected' : self.selection == 3}"
+                        class="clickable">
                         <a ng-click="self.router__stateGoResetParams('overviewMatches')"
                             ng-class="{'disabled' : !self.hasMatches}">
                             Matches
