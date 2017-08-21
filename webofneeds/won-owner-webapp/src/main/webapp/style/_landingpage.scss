@@ -32,10 +32,14 @@ main.landingpage {
     display: flex;
     max-width: $maxContentWidth / 2;
     flex-direction: column;
-    font-size: $normalFontSize;
-    color: $won-line-gray;
     border-top: 1px solid $won-line-gray;
     margin-top: 1.5rem;
     padding-top: 1rem;
+
+    a {
+      font-size: $normalFontSize;
+      color: $won-line-gray;
+      text-decoration: none;
+    }
   }
 }

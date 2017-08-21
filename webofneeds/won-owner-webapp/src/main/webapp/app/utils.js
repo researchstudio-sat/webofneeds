@@ -901,3 +901,29 @@ export function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+/**
+ * Retrieves parameters from the url-bar or parses them from a passed url.
+ * @param url
+ * @returns {{}}
+ */
+export function getParameters(url) {
+    const url_ = url? url : window.location.href; // e.g. url_ = "http://example.org/?privateId=5kpskm09-ocri63&foo=bar&asdf"
+    const [, paramsString] = url_.split('?') // e.g. paramsString = "privateId=5kpskm09-ocri63&foo=bar&asdf"
+
+    if(!paramsString) {
+        // no parameters present
+        return {};
+    }
+
+    const paramsKVArray = paramsString
+        .split('&')  // e.g. ["privateId=5kpskm09-ocri63", "foo=bar", "asdf"]
+        .map(p => p.split('=')) // e.g. [["privateId", "5kpskm09-ocri63"], ["foo", "bar"], ["asdf"]]
+        .filter(p => p.length === 2); // filter out parameter that's not a proper key-value pair, e.g. "asdf"
+
+    // create object from kv-pairs
+    var params = {};
+    paramsKVArray.forEach(kv => params[kv[0]] = kv[1]);
+
+    return params;
+}

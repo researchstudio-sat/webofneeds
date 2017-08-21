@@ -19,12 +19,7 @@ import {
 } from '../../configRouting.js';
 
 
-
-import {
-    absUiRef,
-} from '../../actions/cstm-router-actions'; //TODO deleteme
-
-
+import * as srefUtils from '../../sref-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
@@ -109,6 +104,7 @@ const questions = [
 class LandingpageController {
     constructor(/* arguments <- serviceDependencies */){
         attach(this, serviceDependencies, arguments);
+        Object.assign(this, srefUtils); // bind srefUtils to scope
 
         window.lp4dbg = this;
 
@@ -121,7 +117,6 @@ class LandingpageController {
             loggedIn: state.getIn(['user','loggedIn']),
             registerError: state.getIn(['user','registerError']),
 
-            deletme: absUiRef('post', {postUri: 'http://example.org/123'}, state),
             state,
         });
 

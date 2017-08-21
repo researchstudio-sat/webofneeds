@@ -48,27 +48,6 @@ export function stateGoAbs(state, queryParams) {
 }
 
 /**
- * e.g. `absUiRef('post', {postUri: 'http://...'}, <Immutable.Map(...)>)` + pre-existing private Id =>
- *     `"post({postUri: 'http://..', privatId: '...'})"`
- * @param toRouterState
- * @param queryParams
- * @param appState
- * @returns {string} a string that can be used with `ui-sref` and then the same
- *                   behaviour as e.g. `ng-click="self.router__stateGoAbs('post', {postUri: '...'})"`
- *                   except that it supports middle-mouse-button clicks and shows
- *                   the right cursor by default (i.e. it is a regular link)
- */
-export function absUiRef(toRouterState, queryParams, appState) {
-    if(!appState) return "";
-
-    const currentParams = appState.getIn(['router', 'currentParams']);
-    const paramsWithConst = addConstParams(resetParamsImm.merge(queryParams), currentParams);
-    const paramsString = JSON.stringify(paramsWithConst);
-    const srefString = toRouterState + '(' + paramsString + ')';
-    return srefString;
-}
-
-/**
  * goes to new state and resets all parameters (except for "pervasive" ones like `privateId`)
  */
 export function stateGoResetParams(state) {
