@@ -32,6 +32,13 @@ main.about {
         padding: 2rem $minContentPadding;
       }
 
+
+      background-image: url('../images/network_left-upper-corner.svg'), url('../images/network_right-lower-corner.svg');
+      background-size: auto 26rem, auto 37rem;
+      //background-size: auto 70%, auto 100%;
+      background-position: left top, right bottom;
+      background-repeat: no-repeat;
+
       .title{ color: white; }
 
       .w__description {
