@@ -114,10 +114,6 @@ class AboutController {
     toggleMoreInfo(){
         this.moreInfo = !this.moreInfo;
     }
-
-    scrollToSignup(){
-        console.error("TODO scrollToSignup not yet implemented");
-    }
 }
 
 export default angular.module('won.owner.components.about', [
