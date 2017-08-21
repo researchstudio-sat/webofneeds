@@ -9,13 +9,8 @@ import flexGridModule from '../flexgrid';
 import config from '../../config';
 import {
     attach,
-    scrollTo,
-    delay,
 } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
-import {
-    makeParams,
-} from '../../configRouting.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
@@ -103,7 +98,6 @@ class AboutController {
 
         const self = this;
         this.config = config;
-        this.makeParams = makeParams;
 
         const select = (state) => ({ });
         const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
