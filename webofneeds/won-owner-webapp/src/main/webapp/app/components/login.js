@@ -10,6 +10,8 @@ import {
 } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
+import * as srefUtils from '../sref-utils';
+
 function genLoginConf() {
     let template = `<a class="wl__button" ng-click="self.hideLogin()">
                         <span class="wl__button__caption">Sign in</span>
@@ -54,7 +56,7 @@ function genLoginConf() {
                     </div>-->
                     <div class="wl__register">
                         No Account yet?
-                        <a ng-click="self.router__stateGoAbs('landingpage', {focusSignup: true})">
+                        <a ui-sref="{{ self.absSRef('signup') }}">
                             Sign up
                         </a>
                     </div>`;
@@ -64,6 +66,7 @@ function genLoginConf() {
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
+            Object.assign(this, srefUtils); // bind srefUtils to scope
 
             window.lic4dbg = this;
 

@@ -10,6 +10,8 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import config from '../config';
 
+import * as srefUtils from '../sref-utils';
+
 function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
@@ -34,7 +36,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ng-click="self.router__stateGoResetParams(self.loggedIn ? 'feed' : 'landingpage')" class="topnav__button">
+                    <a  ui-sref="{{ self.resetParamsSRef(self.loggedIn ? 'feed' : 'landingpage') }}" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">
                             Web of Needs &ndash; Beta
@@ -42,7 +44,7 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center">
-                    <a ng-click="self.router__stateGoResetParams('createNeed')"
+                    <a ui-sref="{{ self.resetParamsSRef('createNeed') }}"
                        class="topnav__button"
                        ng-show="!self.isLandingPage"> <!-- landingpage has post-creation embedded -->
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
@@ -52,12 +54,11 @@ function genTopnavConf() {
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
                         <li ng-show="!self.loggedIn">
-                            <button
-                                ng-click="self.router__stateGoAbs('landingpage', {focusSignup: true})"
+                            <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__button won-button--filled lighterblue"
                                 ng-show="!self.open">
                                     Sign up
-                            </button>
+                            </a>
                         </li>
                         <li ng-show="!self.loggedIn">
                             <a class="topnav__button"
@@ -136,6 +137,7 @@ function genTopnavConf() {
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
+            Object.assign(this, srefUtils); // bind srefUtils to scope
             this.config = config;
 
             window.tnc4dbg = this;

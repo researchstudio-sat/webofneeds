@@ -1,0 +1,51 @@
+<header>
+    <won-topnav></won-topnav>
+</header>
+<main class="signup" id="signupSection">
+    <div class="su__inner">
+        <div class="title">Sign Up</div>
+        <div class="sub title">We hope you like this beta version of the
+            <a ui-sref="{{ self.absSRef('about') }}">Web of Needs</a>! Please note that we are experimenting a lot and
+            from time to time we wipe our database - which then leads to the complete loss of your account and all the data
+            associated with it.
+        </div>
+        <div class="trygrid">
+            <div class="tg__signup">
+                <div class="block" ng-form name="registerForm">
+                    <input id="registerEmail" name="email" placeholder="Email address"
+                           ng-model="self.email" ng-class="{'ng-invalid': self.registerError}" required type="email"
+                           ng-keyup="self.formKeyup($event)"/>
+
+                    <span class="tg__errormsg" ng-show="registerForm.email.$error.email">
+                        Not a valid E-Mail address
+                    </span>
+                    <span class="tg__errormsg" ng-show="self.registerError">
+                        {{self.registerError}}
+                    </span>
+
+                    <input name="password" placeholder="Password" ng-minlength="6"
+                           ng-model="self.password" required type="password"
+                           ng-keyup="self.formKeyup($event)"/>
+
+                    <span class="tg__errormsg" ng-show="registerForm.password.$error.minlength">
+                        Password too short, must be at least 6 Characters
+                    </span>
+
+                    <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6"
+                           ng-model="self.passwordAgain" required type="password" compare-to="self.password"
+                           ng-keyup="self.formKeyup($event)"/>
+
+                    <span class="tg__errormsg"
+                          ng-show="registerForm.password_repeat.$error.compareTo">
+                        Password is not equal
+                    </span>
+                </div>
+                <button id="signup" class="won-button--filled darkgray"
+                        ng-disabled="registerForm.$invalid"
+                        ng-click="::self.register({email: self.email, password: self.password})">
+                    That’s all we need. Let’s go!
+                </button>
+            </div>
+        </div>
+    </div>
+</main>

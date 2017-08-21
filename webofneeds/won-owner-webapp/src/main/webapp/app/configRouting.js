@@ -37,7 +37,6 @@ import {
 export const resetParams = Object.freeze({
     connectionType: undefined,
     connectionUri: undefined,
-    focusSignup: undefined,
     layout: undefined,
     myUri: undefined,
     postUri: undefined,
@@ -85,7 +84,8 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
 
     [
         { path: '/about?privateId', component: 'about' },
-        { path: '/landingpage?:focusSignup?privateId', component: 'landingpage' },
+        { path: '/signup?privateId', component: 'signup' },
+        { path: '/landingpage?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
         { path: '/feed?privateId', component: 'feed' },
         { path: '/overview/matches?privateId?layout?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
@@ -224,6 +224,7 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
             });
             break;
 
+        case 'signup':
         case 'about':
         case 'createNeed':
             return; // can always access this page.
