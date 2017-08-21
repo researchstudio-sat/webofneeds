@@ -52,9 +52,9 @@ export const pageLoadAction = () => (dispatch, getState) => {
          * we're accessing an "accountless"-account and need to sign in with that
          */
         return loadingWithAnonymousAccount(dispatch, getState, privateId)
-            .catch(e =>
+            .catch(e => {
                 loadingWhileSignedOut(dispatch, getState)
-        );
+            });
     }
 
     checkLoginStatus()
@@ -103,7 +103,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         });
     }).catch(e => {
         console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
-        return dispatch({
+        dispatch({
             type: actionTypes.loginFailed,
             payload: { loginError: 'invalid privateId', credentials: { privateId }}
         });
