@@ -17,8 +17,10 @@ function genLoginConf() {
                         <span class="wl__button__caption">Sign in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
-                    <!-- <div ng-form="loginForm">-->
-                    <form ng-submit="::self.login({email: self.email, password: self.password}, {redirectToFeed: true})" id="loginForm" class="loginForm">
+                    <form ng-submit="::self.login({email: self.email, password: self.password}, {redirectToFeed: true})"
+                        id="loginForm"
+                        class="loginForm"
+                    >
                         <input
                             id="loginEmail"
                             placeholder="Email address"
@@ -26,7 +28,7 @@ function genLoginConf() {
                             type="email"
                             required
                             autofocus
-                            ng-keyup="self.loginReset() || ($event.keyCode == 13 && self.login({email: self.email, password: self.password}, {redirectToFeed: true}))"/>
+                            ng-keyup="self.formKeyUp($event)"/>
                         <span class="wl__errormsg">
                             {{self.loginError}}
                         </span>
@@ -36,7 +38,7 @@ function genLoginConf() {
                             ng-model="self.password"
                             type="password"
                             required
-                            ng-keyup="self.loginReset() || ($event.keyCode == 13 && self.login({email: self.email, password: self.password}, {redirectToFeed: true}))"/>
+                            ng-keyup="self.formKeyUp($event)"/>
 
                         <!-- <input type="submit" value="LOGIN"/>-->
                         <button
@@ -90,6 +92,18 @@ function genLoginConf() {
                 this.autofillHack();
                 //}
             });
+        }
+
+        formKeyUp(event) {
+            this.loginReset();
+            if(event.keyCode == 13) {
+               this.login({
+                   email: this.email,
+                   password: this.password
+               }, {
+                   redirectToFeed: true
+               });
+            }
         }
 
         /**
