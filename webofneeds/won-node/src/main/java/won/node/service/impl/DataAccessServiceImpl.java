@@ -79,7 +79,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
       throw new IllegalMessageForNeedStateException(needURI, connectionEventType.name(), need.getState());
 
     //TODO: create a proper exception if a facet is not supported by a need
-    if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
+    if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet '" + facetURI +"' is not supported by Need: '" + needURI + "'");
   /* Create connection */
     Connection con = new Connection();
     //create and set new uri
