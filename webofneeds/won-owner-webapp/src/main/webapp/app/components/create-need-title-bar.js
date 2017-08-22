@@ -9,7 +9,7 @@ function genComponentConf() {
                 <a class="cnt__inner__left clickable" ng-click="self.back()">
                     <img  src="generated/icon-sprite.svg#ico27_close" class="cnt__icon">
                 </a>
-                <h1 class="cnt__inner__center cnt__title">What is your need?</div>
+                <h1 class="cnt__inner__center cnt__title">{{ self.title }}</div>
             </div>
         </nav>
     `;
@@ -27,7 +27,10 @@ function genComponentConf() {
         controllerAs: 'self',
         template: template,
         bindToController: true, //scope-bindings -> ctrl
-        scope: {}
+        scope: {
+            title: '=',
+            //tailPosition: '=',
+        }
     }
 }
 
