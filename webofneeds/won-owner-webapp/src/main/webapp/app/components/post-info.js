@@ -80,7 +80,7 @@ function genComponentConf() {
                      id="post-info__mapmount"
                      in-view="$inview && self.mapInView($inviewInfo)"
                      ng-show="self.location">
-                 </div>
+                </div>
             </div>
         </div>
     `;

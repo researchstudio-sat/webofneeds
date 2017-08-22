@@ -6,6 +6,7 @@ import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
 import matchesFlowItemModule from './matches-flow-item';
 import matchesGridItemModule from './matches-grid-item';
+import connectionsMapModule from './connection-map';
 import sendRequestModule from './send-request';
 import connectionsOverviewModule from './connections-overview';
 import connectionSelectionModule from './connection-selection';
@@ -53,6 +54,12 @@ let template = `
                    class="clickable">
                     <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                      class="omc__header__viewtype__icon clickable"/>
+                </a>                
+                <a ng-if="self.debugmode" 
+                   ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
+                   class="clickable">
+                    <img ng-src="{{self.layout === 'map' ? 'generated/icon-sprite.svg#ico36_area_circle_hi' : 'generated/icon-sprite.svg#ico36_area_circle'}}"
+                     class="omc__header__viewtype__icon clickable"/>
                 </a>
             </div>
         </div>
@@ -81,13 +88,16 @@ let template = `
                 on-selected-connection="self.selectedConnection(connectionUri)">
             </won-connection-selection>
         </div>
+        <div ng-if="self.debugmode && self.hasMatches && self.layout === 'map'" class="omc__content__list">
+            <won-connections-map connection-type="::self.WON.Suggested" on-selected-connection="self.selectedConnection(connectionUri)"></won-connections-map>
+        </div>
     </div>
     <div class="omc__sendrequest" ng-if="self.hasMatches && self.connection">
         <won-send-request></won-send-request>
     </div>
-`
+`;
 
-const LAYOUT = Object.freeze({ TILES: 'tiles', GRID: 'grid', LIST: 'list'});
+const LAYOUT = Object.freeze({ TILES: 'tiles', GRID: 'grid', LIST: 'list', MAP: 'map'});
 
 class Controller {
     constructor() {
@@ -112,9 +122,11 @@ class Controller {
             const isOverview = displayingOverview(state);
             let matches;
             if(isOverview) { //overview
-                matches = selectAllConnections(state).filter(conn => conn.get("state") === won.WON.Suggested);
+                const allConnections = selectAllConnections(state);
+                matches = allConnections && allConnections.filter(conn => conn.get("state") === won.WON.Suggested);
             } else { // post-owner view
-                matches = state.getIn(["needs", postUri, "connections"]).filter(conn => conn.get("state") === won.WON.Suggested);
+                const postConnections = state.getIn(["needs", postUri, "connections"]);
+                matches = postConnections && postConnections.filter(conn => conn.get("state") === won.WON.Suggested);
             }
 
             if(!postUri && connectionUri){
@@ -129,6 +141,7 @@ class Controller {
                 connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
                 matchesArray: matches.toArray(),
                 hasMatches: matches.size > 0,
+                debugmode: won.debugmode,
             };
         };
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -159,6 +172,7 @@ export default angular.module('won.owner.components.matches', [
         sendRequestModule,
         connectionsOverviewModule,
         connectionSelectionModule,
+        connectionsMapModule,
     ])
     .directive('wonMatches', genComponentConf)
     //.controller('OverviewMatchesController', [...serviceDependencies,OverviewMatchesController])

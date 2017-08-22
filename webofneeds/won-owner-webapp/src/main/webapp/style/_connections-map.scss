@@ -1,0 +1,15 @@
+@import 'won-config';
+@import 'sizing-utils';
+
+won-connections-map {
+  width: 100%;
+
+  .connections-map__mapmount {
+    width: 100%;
+    height: 31rem;
+
+    @media (max-width : $responsivenessBreakPoint) {
+      height: 15rem;
+    }
+  }
+}
