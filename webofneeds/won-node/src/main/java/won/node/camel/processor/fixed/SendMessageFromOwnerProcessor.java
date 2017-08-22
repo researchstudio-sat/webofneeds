@@ -72,7 +72,6 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
               .setPropertiesForPassingMessageToRemoteNode(
                       message,
                       getMessageURI())
-              .setReceiverURI(connection.getRemoteConnectionURI())
               .build();
     }
   }
