@@ -21,23 +21,55 @@ main.about {
     //box-sizing: border-box did not work (the height property was faulty then
   }
 
+  .fourimgs {
+    margin-left: auto;
+    margin-right: auto;
+
+    $fourPortraitsWidth: 59rem;
+    width: $fourPortraitsWidth;
+    @media(max-width: $fourPortraitsWidth) {
+      width: $fourPortraitsWidth / 2;
+    }
+    @media(max-width: $responsivenessBreakPoint) {
+      width: $fourPortraitsWidth / 4;
+    }
+    @media(max-width: $fourPortraitsWidth / 2) {
+      width: $fourPortraitsWidth / 4;
+    }
+  }
+
   .welcome {
       background-color: $won-blue;
       color: white;
       font-family: $font-family-sans-serif;
       font-weight: 300;
-      padding: 5rem $minContentPadding;
 
+      padding-left: $minContentPadding;
+      padding-right: $minContentPadding;
+      padding-top: 7rem;
+      padding-bottom: 4rem;
       @media (max-width: $responsivenessBreakPoint) {
-        padding: 2rem $minContentPadding;
+        padding-top: 4rem;
+        padding-bottom: 2rem;
       }
 
-
       background-image: url('../images/network_left-upper-corner.svg'), url('../images/network_right-lower-corner.svg');
-      background-size: auto 26rem, auto 37rem;
-      //background-size: auto 70%, auto 100%;
       background-position: left top, right bottom;
       background-repeat: no-repeat;
+
+      /*
+       * @ background-size:
+       * values have been determined via fiddling/experimenting and should provide
+       * a smooth transition with a relative size for the background up to a
+       * maximum size.
+       */
+      background-size: auto 70%, auto 100%;
+      @media(max-width: 85rem) {
+        background-size: auto 70%, 31.7% auto;
+      }
+      @media(max-width: 63rem) {
+        background-size: 60% auto, 31.7% auto;
+      }
 
       .title{ color: white; }
 
