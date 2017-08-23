@@ -46,7 +46,7 @@ function genTopnavConf() {
                 <div class="topnav__inner__center">
                     <a ui-sref="{{ self.resetParamsSRef('createNeed') }}"
                        class="topnav__button"
-                       ng-show="!self.isLandingPage"> <!-- landingpage has post-creation embedded -->
+                       ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Post</span>
                     </a>
