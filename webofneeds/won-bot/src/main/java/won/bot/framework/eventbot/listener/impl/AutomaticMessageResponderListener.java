@@ -20,6 +20,7 @@ import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.AbstractHandleFirstNEventsListener;
 import won.protocol.exception.WonMessageBuilderException;
@@ -78,9 +79,17 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
       @Override
       public void run()
       {
-        String message = createMessage();
+        String incomingMessage = "cannot extract message";
+        if (messageEvent instanceof MessageFromOtherNeedEvent){
+          WonMessage wonMessage = ((MessageFromOtherNeedEvent) messageEvent).getWonMessage();
+          incomingMessage = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+        }
+        String message = createMessage(messageEvent);
         URI connectionUri = messageEvent.getConnectionURI();
-        logger.debug("sending message " + message);
+        if (logger.isDebugEnabled()){
+          logger.debug("connection {}: received message: {}", connectionUri, incomingMessage);
+          logger.debug("connection {}: sending  message: {}", connectionUri, message);
+        }
         try {
           getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, message));
         } catch (Exception e) {
@@ -90,13 +99,14 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
     }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
 
-  private String createMessage()
+  private String createMessage(ConnectionSpecificEvent event)
   {
     String message = "auto reply no " + (getCount());
     if (getTargetCount() > 0){
       message += " of " + getTargetCount();
     }
-    message +=  "(delay: "+ millisTimeoutBeforeReply + " millis)";
+    message +=  "(delay: "+ millisTimeoutBeforeReply + " millis) from " +
+    event.getConnectionURI();
     return message;
   }
 
