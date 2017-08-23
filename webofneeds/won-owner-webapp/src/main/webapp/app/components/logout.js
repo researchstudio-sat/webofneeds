@@ -21,9 +21,15 @@ function genLogoutConf() {
                         <img src="generated/icon-sprite.svg#ico16_arrow_up" class="mrb__carret">
                         <img src="generated/icon-sprite.svg#ico36_person" class="mrb__icon">
                     </a>
-                    <ul class="menu-entries">
-                        <a ui-sref="{{ self.absSRef('about') }}">About</a>
-                    </ul>
+                    <!--<ul class="menu-entries">-->
+                        <!--<a ui-sref="{{ self.absSRef('about') }}">About</a>-->
+                    <!--</ul>-->
+                    <div style="width: 100%;" class="wl__button">
+                        <a class="wl__button"
+                            style="margin-left: auto; margin-right: auto; color: #f04646;">
+                                About
+                        </a>
+                    </div>
                     <button class="won-button--filled lighterblue" ng-click="::self.logout()">Sign out</button>`;
 
     const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
