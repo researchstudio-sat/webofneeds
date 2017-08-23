@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
 
 /**
@@ -284,25 +285,34 @@ public class WonRdfUtils
      * @return
      */
     public static String getTextMessage(final WonMessage wonMessage){
-      return RdfUtils.findFirst(wonMessage.getCompleteDataset(), new RdfUtils.ModelVisitor<String>() {
-        @Override
-        public String visit(Model model) {
-          Statement stmt = model.getProperty(model.getResource(wonMessage.getMessageURI().toString()), WON.HAS_TEXT_MESSAGE);
-          if (stmt != null) {
-            return stmt.getObject().asLiteral().getLexicalForm();
-          }
-          URI remoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
-          if (remoteMessageURI != null){
-            stmt = model.getProperty(model.getResource(remoteMessageURI.toString()), WON.HAS_TEXT_MESSAGE);
-            if (stmt != null) {
-              return stmt.getObject().asLiteral().getLexicalForm();
-            }
-          }
-          return null;
+      Dataset dataset = wonMessage.getCompleteDataset();
+      RDFNode node = getTextMessageForResource(dataset, wonMessage.getMessageURI());
+      if (node != null) return node.asLiteral().toString();
+      node = getTextMessageForResource(dataset, wonMessage.getCorrespondingRemoteMessageURI());
+      if (node != null) return node.asLiteral().toString();
+      URI forwardedMessageURI = wonMessage.getForwardedMessageURI();
+      if (forwardedMessageURI != null){
+        node = getTextMessageForResource(dataset, forwardedMessageURI);
+        if (node != null) return node.asLiteral().toString();
+        //get the remote message for the forwarded message
+        RDFNode msgNode = RdfUtils.findOnePropertyFromResource(dataset, forwardedMessageURI, WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE);
+        if (msgNode != null && msgNode.isResource()){
+          node = getTextMessageForResource(dataset, msgNode.asResource());
+          if (node != null) return node.asLiteral().toString();
         }
-      });
+      }
+      return null;
     }
 
+    private static RDFNode getTextMessageForResource(Dataset dataset, URI uri){
+      if (uri == null) return  null;
+      return RdfUtils.findFirstPropertyFromResource(dataset, uri, WON.HAS_TEXT_MESSAGE);
+    }
+
+    private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource){
+      if (resource == null) return null;
+      return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.HAS_TEXT_MESSAGE);
+    }
     /**
      * Converts the specified hint message into a Match object.
      * @param wonMessage
@@ -317,12 +327,12 @@ public class WonRdfUtils
 
       Dataset messageContent = wonMessage.getMessageContent();
 
-      RDFNode score = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+      RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
         WON.HAS_MATCH_SCORE);
       if (!score.isLiteral()) return null;
       match.setScore(score.asLiteral().getDouble());
 
-      RDFNode counterpart = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+      RDFNode counterpart = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
                                                                  WON.HAS_MATCH_COUNTERPART);
       if (!counterpart.isResource()) return null;
       match.setToNeed(URI.create(counterpart.asResource().getURI()));
@@ -343,7 +353,12 @@ public class WonRdfUtils
   public static class FacetUtils {
 
 
-
+    /**
+     * Returns the facet in a connect message. Attempts to get it from the specified message itself.
+     * If no such facet is found there, the remoteFacet of the correspondingRemoteMessage is used.
+     * @param message
+     * @return
+       */
     public static URI getFacet(WonMessage message){
       URI uri = getObjectOfMessageProperty(message, WON.HAS_FACET);
       if (uri == null) {
@@ -352,6 +367,12 @@ public class WonRdfUtils
       return uri;
     }
 
+    /**
+     * Returns the remoteFacet in a connect message. Attempts to get it from the specified message itself.
+     * If no such facet is found there, the facet of the correspondingRemoteMessage is used.
+     * @param message
+     * @return
+     */
     public static URI getRemoteFacet(WonMessage message) {
       URI uri = getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
       if (uri == null) {
@@ -479,22 +500,22 @@ public class WonRdfUtils
      * @return <code>URI</code> of the need
      */
     public static URI getLocalNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.BELONGS_TO_NEED).asResource().getURI());
     }
 
     public static URI getRemoteNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_NEED).asResource().getURI());
     }
 
     public static URI getWonNodeURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_WON_NODE).asResource().getURI());
     }
 
     public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
   }
@@ -566,7 +587,7 @@ public class WonRdfUtils
       }
 
     public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
     }
   }

@@ -51,6 +51,7 @@ public class WonMessage implements Serializable {
     private List<String> contentGraphNames;
     private WonMessageType isResponseToMessageType;
     private URI correspondingRemoteMessageURI;
+    private URI forwardedMessageURI;
     private List<AttachmentHolder> attachmentHolders;
 
     //private Resource msgBnode;
@@ -471,6 +472,13 @@ public class WonMessage implements Serializable {
             this.correspondingRemoteMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE);
         }
         return this.correspondingRemoteMessageURI;
+    }
+
+    public synchronized URI getForwardedMessageURI() {
+        if (this.forwardedMessageURI == null) {
+            this.forwardedMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_FORWARDED_MESSAGE);
+        }
+        return this.forwardedMessageURI;
     }
 
     public synchronized WonMessageType getIsResponseToMessageType() {

@@ -3,6 +3,7 @@ package won.node.camel.route.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.ExpressionBuilder;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -10,12 +11,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
 import won.node.camel.predicate.IsResponseMessagePredicate;
+import won.node.camel.predicate.IsSystemMessageToOwnerPredicate;
 import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+
+import static org.apache.camel.builder.PredicateBuilder.isNotEqualTo;
+import static org.apache.camel.builder.PredicateBuilder.not;
 
 /**
   * User: syim
@@ -56,21 +61,24 @@ public class WonMessageRoutes extends RouteBuilder
             .redeliveryDelay(100)
             .routeId("retryAfterConcurrentUpdate")
             ;
-        
+
         onException(Exception.class)
                 .routeId("onException")
                 .handled(true)
                 .to("direct:sendFailureResponse");
 
+
         //sends the failure response, using the current transaction
         from("direct:sendFailureResponse")
                 .routeId("direct:sendFailureResponse")
-                .transacted("PROPAGATION_NEVER")
+                .transacted("PROPAGATION_REQUIRES_NEW")
+                .to("bean:parentLocker")
                 .to("bean:failResponder");
         //sends the success response, using the current transaction
         from("direct:sendSuccessResponse")
                 .routeId("direct:sendSuccessResponse")
-                .transacted("PROPAGATION_NEVER")
+                .transacted("PROPAGATION_REQUIRES_NEW")
+                .to("bean:parentLocker")
                 .to("bean:successResponder");   //--> seda:systemMessageIn or seda:SystemMessageToOwner
         //checks message, throws exception if something is wrong
         from("direct:checkMessage")
@@ -96,7 +104,7 @@ public class WonMessageRoutes extends RouteBuilder
                 .choice()
                 .when(PredicateBuilder.and(
                             header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                            PredicateBuilder.not(new IsResponseMessagePredicate())))
+                            not(new IsResponseMessagePredicate())))
                     .to("direct:sendSuccessResponse")
                     .endChoice()
                  .end();
@@ -112,11 +120,36 @@ public class WonMessageRoutes extends RouteBuilder
         //adds message references, signature and persists the message, in the current transaction
         from("direct:reference-sign-persist")
             .errorHandler(noErrorHandler()) //let the exception bubble up
-            .transacted("PROPAGATION_REQUIRED")
+            .transacted("PROPAGATION_REQUIRES_NEW")
             .routeId("direct:reference-sign-persist")
+            .to("bean:parentLocker")
             .to("bean:referenceAdder")
             .to("bean:signatureAdder")
             .to("bean:persister");
+
+        from("direct:sendToOwner")
+                .transacted("PROPAGATION_REQUIRES_NEW")
+                .routeId("direct:sendToOwner")
+                // we wait until we obtain a lock on the message's parent
+                // so that we can be sure that processing the message is finished before we send it to the owner
+                // if we did not do that, the owner may respond before processing the current message is finished,
+                // which, in case of a connect/open/connectionmesssage sequence may lead to a failure that is not
+                // expected by the client.
+                .to("bean:parentLocker")
+                //now, we expect the message we want to pass on to the owner in the exchange's in header.
+                .to("bean:toOwnerSender");    //--> seda:OwnerProtocolOut
+
+        from("direct:sendToNode")
+                .transacted("PROPAGATION_REQUIRES_NEW")
+                .routeId("direct:sendToNode")
+                // we wait until we obtain a lock on the message's parent
+                // so that we can be sure that processing the message is finished before we send it to the remote node
+                // if we did not do that, the other node may respond before processing the current message is finished,
+                // which, may lead to a failure that is not expected by the client.
+                .to("bean:parentLocker")
+                //now, we expect the message we want to pass on to the node in the exchange's in header.
+                .to("bean:toNodeSender");
+
         /**
          * owner protocol, incoming
          */
@@ -175,12 +208,12 @@ public class WonMessageRoutes extends RouteBuilder
             .to("bean:receivedTimestampAdder")
             .to("direct:reference-sign-persist")
             .to("bean:toOwnerSender");   //--> seda:OwnerProtocolOut
+
           /**
            * Owner protocol logic: expects messages from OwnerProtocolIn and SystemIntoOwnerProtocol routes.
            */
           from("direct:OwnerProtocolLogic")
                   .routeId("direct:OwnerProtocolLogic")
-                  .transacted("PROPAGATION_NEVER")
                   //call the default implementation, which may alter the message.
                   // Also, it puts any outbound message in the respective header
                   .to("direct:storeAndRespond")
@@ -201,24 +234,19 @@ public class WonMessageRoutes extends RouteBuilder
                             header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER).isNotNull())
                             //swap back: outbound into normal
                             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
-                            .to("bean:toNodeSender")  // --> seda:NeedProtocolOut
+                            .to("direct:sendToNode")  // --> seda:NeedProtocolOut
                             .endChoice()
                   .end()
                   .choice()
                         .when(
-                            //check if the direction of the original message is 'FromSystem'.
-                            //If this is the case, we want to send it to the owner (so they know it happened)
-                            // BUT: we don't do this for response messages: the owner does not need to know we sent
-                            // a response message to the remote end.
+                            // we want to send a FROM_SYSTEM message to the owner if it is addressed at the owner.
+                            // this is the case if senderURI equals receiverURI and both are non-null.
                             PredicateBuilder.and(
-                                PredicateBuilder.and(
                                     header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                                    PredicateBuilder.not(new IsResponseMessagePredicate())),
-                                    header(WonCamelConstants.DIRECTION_HEADER).isEqualTo(WONMSG.TYPE_FROM_SYSTEM_STRING)
-                            ))
+                                    new IsSystemMessageToOwnerPredicate()))
                             //swap back: original into normal
                             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-                            .multicast().to("bean:toOwnerSender")  //--> seda:OwnerProtocolOut
+                            .to("direct:sendToOwner")  //--> seda:OwnerProtocolOut
                             .endChoice()
                 .end()
                 //if we didn't raise an exception so far, send a success response
@@ -235,23 +263,39 @@ public class WonMessageRoutes extends RouteBuilder
                         .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
                                           new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
                                                                                                               URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
-                        //look into the db to find the facet we are using
-                        .to("bean:facetExtractor")
-                        .routingSlip(method("facetTypeSlip"))
+
+                        .to("direct:invokeFacetLogic")
                         .endChoice() //end choice
                     .end()
-                    .to("direct:reactToMessage");
+                      .choice()
+                        .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_REACTION), ExpressionBuilder.constantExpression(Boolean.TRUE)))
+                            .to("direct:reactToMessage")
+                        .otherwise()
+                            .log(LoggingLevel.INFO, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                        .endChoice()
+                      .end();
+
+
+          from("direct:invokeFacetLogic")
+                  .transacted("PROPAGATION_REQUIRES_NEW")
+                  .routeId("direct:invokeFacetLogic")
+                  //look into the db to find the facet we are using
+                  .to("bean:parentLocker")
+                  .to("bean:facetExtractor")
+                  //find and execute the facet-specific processor
+                  .routingSlip(method("facetTypeSlip"));
 
           from("direct:reactToMessage")
               .transacted("PROPAGATION_REQUIRES_NEW")
               .routeId("direct:reactToMessage")
+              .to("bean:parentLocker")
               .routingSlip(method("fixedMessageReactionProcessorSlip"));
+
           /**
           * Need protocol, incoming
           */
         from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
             .routeId("WonMessageNodeRoute")
-            .transacted("PROPAGATION_NEVER")
             .choice()
                         // (won nodes register the same way as owner applications do)
                   .when(header("methodName").isEqualTo("register"))
@@ -269,15 +313,21 @@ public class WonMessageRoutes extends RouteBuilder
                         .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
                                         new GetEnvelopePropertyExpression(WonCamelConstants.MESSAGE_HEADER,
                                                         URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString())))
-                          //look into the db to find the facet we are using
-                        .to("bean:facetExtractor")
-                        //inbound messages are always passed to facet implementations as they
-                        //are always directed at connections
-                        .routingSlip(method("facetTypeSlip"))
-                        //now, we have the message we want to pass on to the owner in the exchange's in header.
-                        //do we want to send a response back? only if we're not currently processing a respon
-                        .to("bean:toOwnerSender")    //--> seda:OwnerProtocolOut
-                        .to("direct:reactToMessage");
+                        .to("direct:invokeFacetLogic")
+                        .choice()
+                            .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER), ExpressionBuilder.constantExpression(Boolean.TRUE)))
+                                .to("direct:sendToOwner")
+                            .otherwise()
+                                .log(LoggingLevel.INFO, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                            .endChoice()
+                        .end()
+                        .choice()
+                            .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_REACTION), ExpressionBuilder.constantExpression(Boolean.TRUE)))
+                                .to("direct:reactToMessage")
+                            .otherwise()
+                                .log(LoggingLevel.INFO, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                            .endChoice()
+                        .end();
           /**
            * Need protocol, outgoing
            * We add our signature, but we can't persist the message in this form

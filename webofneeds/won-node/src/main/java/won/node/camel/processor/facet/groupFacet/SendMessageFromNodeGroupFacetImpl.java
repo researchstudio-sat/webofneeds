@@ -14,6 +14,7 @@ import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -44,20 +45,28 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
   @Override
   public void process(final Exchange exchange) throws Exception {
     final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    final Connection con = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI()).get(0);
-    final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
-      ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
+    final Connection conOfIncomingMessage = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI()).get(0);
 
-    for (final Connection c : cons) {
+    final List<Connection> consInGroup = connectionRepository.findByNeedURIAndStateAndTypeURI(conOfIncomingMessage.getNeedURI(),
+      ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
+    exchange.getIn().setHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER, Boolean.TRUE);
+    if (consInGroup == null || consInGroup.size() < 2) return;
+    if (logger.isDebugEnabled()) {
+      logger.debug("sending group message {} from need {} to {} other needs in group (text message: '{}'}", new Object[]{wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), consInGroup.size() - 1, WonRdfUtils.MessageUtils.getTextMessage(wonMessage)});
+    }
+    for (final Connection conToSendTo : consInGroup) {
       try {
-        if (!c.equals(con)) {
+        if (!conToSendTo.equals(conOfIncomingMessage)) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("sending group message {} from need {} to need {}", new Object[]{wonMessage.getMessageURI(), wonMessage.getSenderNeedURI(), conToSendTo.getRemoteNeedURI()});
+          }
           URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-          URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
+          URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(conOfIncomingMessage.getRemoteConnectionURI(),
             linkedDataSource);
           WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
             forwardedMessageURI, wonMessage,
-            con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
-            con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
+                  conToSendTo.getConnectionURI(), conToSendTo.getNeedURI(), wonMessage.getReceiverNodeURI(),
+                  conToSendTo.getRemoteConnectionURI(), conToSendTo.getRemoteNeedURI(), remoteWonNodeUri);
           sendSystemMessage(newWonMessage);
         }
       } catch (Exception e) {
