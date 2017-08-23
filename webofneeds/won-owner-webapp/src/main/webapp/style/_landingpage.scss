@@ -10,7 +10,8 @@ main.landingpage {
     //box-sizing: border-box did not work (the height property was faulty then
   }
 
-  padding-top: 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid $won-line-gray;
 
   .lp__footnote {
     align-items: flex-end;
