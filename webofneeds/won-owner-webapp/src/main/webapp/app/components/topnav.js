@@ -60,24 +60,17 @@ function genTopnavConf() {
                                     Sign up
                             </a>
                         </li>
-                        <li ng-show="!self.loggedIn">
+                        <li>
                             <a class="topnav__button"
                                 ng-click="self.showLogin()"
                                 ng-class="{'open' : !self.focusSignup && self.open}">
-                                    <span class="topnav__button__caption__always">Sign in</span>
+                                    <span class="topnav__button__caption__always">
+                                        {{ self.loggedIn? self.email : "Sign In" }}
+                                    </span>
                                     <img src="generated/icon-sprite.svg#ico16_arrow_down"
                                         ng-show="!self.open" class="topnav__carret">
                                     <img src="generated/icon-sprite.svg#ico16_arrow_up_hi"
                                         ng-show="self.open" class="topnav__carret">
-                            </a>
-                        </li>
-                        <li ng-show="self.loggedIn" class="clickable" ng-click="self.showLogin()">
-                            <a class="topnav__button">
-                                <span class="topnav__button__caption">{{self.email}}</span>
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down"
-                                    class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_person"
-                                    class="topnav__button__icon">
                             </a>
                         </li>
                     </ul>
