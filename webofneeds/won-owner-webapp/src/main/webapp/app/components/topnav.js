@@ -63,7 +63,7 @@ function genTopnavConf() {
                         <li>
                             <a class="topnav__button"
                                 ng-click="self.showLogin()"
-                                ng-class="{'open' : !self.focusSignup && self.open}">
+                                ng-class="{'open' : self.open}">
                                     <span class="topnav__button__caption__always">
                                         {{ self.loggedIn? self.email : "Sign In" }}
                                     </span>
@@ -144,7 +144,6 @@ function genTopnavConf() {
                 toastsArray: state.getIn(['toasts']).toArray(),
                 connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
                 reconnecting: state.getIn(['messages', 'reconnecting']),
-                isLandingPage: state.getIn(['router', 'currentState', 'name']) === 'landingpage',
             });
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
