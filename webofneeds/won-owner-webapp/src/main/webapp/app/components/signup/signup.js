@@ -11,7 +11,7 @@ import {
     actionCreators
 }  from '../../actions/actions';
 
-import createNeedTitleBarModule from '../create-need-title-bar';
+import signupTitleBarModule from '../signup-title-bar';
 
 import topNavModule from '../topnav';
 
@@ -48,7 +48,7 @@ class SignupController {
 export default angular.module('won.owner.components.signup', [
     //overviewTitleBarModule,
     //accordionModule,
-    createNeedTitleBarModule,
+    signupTitleBarModule,
     topNavModule,
     //flexGridModule,
     //compareToModule,
