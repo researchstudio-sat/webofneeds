@@ -271,7 +271,7 @@ public class WonMessageRoutes extends RouteBuilder
                         .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_REACTION), ExpressionBuilder.constantExpression(Boolean.TRUE)))
                             .to("direct:reactToMessage")
                         .otherwise()
-                            .log(LoggingLevel.INFO, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                            .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
                         .endChoice()
                       .end();
 
@@ -318,14 +318,14 @@ public class WonMessageRoutes extends RouteBuilder
                             .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER), ExpressionBuilder.constantExpression(Boolean.TRUE)))
                                 .to("direct:sendToOwner")
                             .otherwise()
-                                .log(LoggingLevel.INFO, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                                .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
                             .endChoice()
                         .end()
                         .choice()
                             .when(isNotEqualTo(header(WonCamelConstants.SUPPRESS_MESSAGE_REACTION), ExpressionBuilder.constantExpression(Boolean.TRUE)))
                                 .to("direct:reactToMessage")
                             .otherwise()
-                                .log(LoggingLevel.INFO, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
+                                .log(LoggingLevel.DEBUG, "suppressing sending of message to owner because the header '" + WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER + "' is 'true'")
                             .endChoice()
                         .end();
           /**
