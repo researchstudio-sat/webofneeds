@@ -86,7 +86,7 @@ function genTopnavConf() {
         </nav>
 
 
-        <nav class="loginOverlay" ng-show="!self.focusSignup && self.open && !self.loggedIn">
+        <nav class="loginOverlay" ng-show="self.open && !self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-login open="self.open"></won-login>
@@ -95,7 +95,7 @@ function genTopnavConf() {
         </nav>
 
 
-        <nav class="loginOverlay" ng-show="!self.focusSignup && self.open && self.loggedIn">
+        <nav class="loginOverlay" ng-show="self.open && self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-logout open="self.open"></won-logout>
@@ -147,7 +147,6 @@ function genTopnavConf() {
                 loginVisible: state.get('loginVisible'),
                 open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")
                 loggedIn: state.getIn(['user', 'loggedIn']),
-                focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
                 email: state.getIn(['user','email']),
                 toastsArray: state.getIn(['toasts']).toArray(),
                 connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
