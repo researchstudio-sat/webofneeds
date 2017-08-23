@@ -1,7 +1,5 @@
 package won.protocol.message.processor.exception;
 
-import java.net.URI;
-
 /**
  * Indicates that the uri (of event or need) is malformed from the point
  * of view of the node that is supposed to store it. (e.g. the domain
@@ -15,20 +13,19 @@ public class UriNodePathException extends WonMessageProcessingException
   public UriNodePathException() {
   }
 
-  public UriNodePathException(final URI uri) {
-    super(uri.toString());
+  public UriNodePathException(String message) {
+    super(message);
   }
 
-  public UriNodePathException(final URI uri, final Throwable cause) {
-    super(uri.toString(), cause);
+  public UriNodePathException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public UriNodePathException(final Throwable cause) {
+  public UriNodePathException(Throwable cause) {
     super(cause);
   }
 
-  public UriNodePathException(final URI uri, final Throwable cause, final boolean enableSuppression,
-                              final boolean writableStackTrace) {
-    super(uri.toString(), cause, enableSuppression, writableStackTrace);
+  public UriNodePathException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
   }
 }
