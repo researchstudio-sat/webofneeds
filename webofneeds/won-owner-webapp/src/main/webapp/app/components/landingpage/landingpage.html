@@ -5,7 +5,12 @@
     <won-create-post></won-create-post>
 
     <div class="lp__footnote">
-        <!--<a ui-sref="{{ self.absSRef('post', {postUri: 'http://example.org/456'}) }}" class="clickable">This is just a test!</a>-->
-        <a ui-sref="{{ self.absSRef('about', {}) }}" class="clickable">What is this page? &gt;</a>
+        <a ng-click="self.openAboutInNewTab()"
+           class="clickable">
+            What is this page?
+            <img src="generated/icon-sprite.svg#ico36_newtab_grey"
+                 class="lp__footnote__icon"
+                 style="height:0.9rem; vertical-align: -1px;">
+        </a>
     </div>
 </main>
