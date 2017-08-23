@@ -71,7 +71,11 @@ public class RespondToMessageAction extends BaseEventBotAction
       {
         String message = createMessage();
         URI connectionUri = messageEvent.getConnectionURI();
-        logger.debug("sending message " + message);
+        if (logger.isDebugEnabled()){
+          logger.debug("connection {}: received message: {}", connectionUri, messageEvent.getClass().getSimpleName());
+          logger.debug("connection {}: sending  message: {}", connectionUri, message);
+        }
+
         try {
           getEventListenerContext().getWonMessageSender().sendWonMessage(
             BotActionUtils.createWonMessage(
