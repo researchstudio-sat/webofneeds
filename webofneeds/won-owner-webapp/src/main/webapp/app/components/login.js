@@ -87,10 +87,7 @@ function genLoginConf() {
             this.autofillHack();
 
             this.$scope.$watch(() => this.loginVisible, (newVis, oldVis) => {
-                console.log('lic4dbg loginVisible: ', oldVis, newVis);
-                //if(newVis && !oldVis) {
                 this.autofillHack();
-                //}
             });
         }
 

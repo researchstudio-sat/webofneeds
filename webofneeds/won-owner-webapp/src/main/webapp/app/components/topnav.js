@@ -149,6 +149,10 @@ function genTopnavConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy',disconnect);
         }
+
+        showLogin() {
+            this.open = true;
+        }
     }
     Controller.$inject = serviceDependencies;
 
