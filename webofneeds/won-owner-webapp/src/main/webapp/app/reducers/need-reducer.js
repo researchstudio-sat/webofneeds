@@ -405,7 +405,8 @@ function parseNeed(jsonldNeed, ownNeed) {
         location: undefined,
         connections: Immutable.Map(),
         creationDate: undefined,
-        ownNeed: !!ownNeed
+        ownNeed: !!ownNeed,
+        isWhatsAround: false,
     };
 
     if(jsonldNeedImm){
@@ -424,6 +425,22 @@ function parseNeed(jsonldNeed, ownNeed) {
         }else{
             return undefined;
         }
+
+        /*
+        The following code-snippet is solely to determine if the parsed need is a special "whats around"-need,
+        in order to do this we have to make sure that the won:hasFlag is checked in two forms, both as a string
+        and an immutable object
+        */
+        const wonHasFlags = jsonldNeedImm.get("won:hasFlag");
+        const isWhatsAround = wonHasFlags && wonHasFlags
+                .filter(function(flag) {
+                    if(flag instanceof Immutable.Map){
+                        return flag.get("@id") === "won:WhatsAround";
+                    } else {
+                        return flag === "won:WhatsAround";
+                    }
+                })
+                .size > 0;
 
         const creationDate = jsonldNeedImm.get("dct:created");
         if(creationDate){
@@ -458,6 +475,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         parsedNeed.description = description ? description : undefined;
         parsedNeed.type = type;
         parsedNeed.location = location;
+        parsedNeed.isWhatsAround = isWhatsAround;
     }else{
         console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm.toJS());
         return undefined;
