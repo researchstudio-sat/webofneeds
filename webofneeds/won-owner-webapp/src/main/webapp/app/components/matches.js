@@ -55,7 +55,7 @@ let template = `
                     <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>                
-                <a ng-if="self.debugmode" 
+                <a ng-if="self.isWhatsAround" 
                    ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
                    class="clickable">
                     <img ng-src="{{self.layout === 'map' ? 'generated/icon-sprite.svg#ico36_area_circle_hi' : 'generated/icon-sprite.svg#ico36_area_circle'}}"
@@ -88,7 +88,7 @@ let template = `
                 on-selected-connection="self.selectedConnection(connectionUri)">
             </won-connection-selection>
         </div>
-        <div ng-if="self.debugmode && self.hasMatches && self.layout === 'map'" class="omc__content__list">
+        <div ng-if="self.hasMatches && self.layout === 'map'" class="omc__content__list">
             <won-connections-map connection-type="::self.WON.Suggested" on-selected-connection="self.selectedConnection(connectionUri)"></won-connections-map>
         </div>
     </div>
@@ -112,14 +112,17 @@ class Controller {
         const selectFromState = (state) => {
             let postUri = selectOpenPostUri(state);
             const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
+            const isWhatsAround= state.getIn(["needs", postUri, "isWhatsAround"]);
 
             // either of 'tiles', 'grid', 'list'
             let layout = state.getIn(['router','currentParams','layout']);
             if(!layout) {
-                layout = 'tiles';
+                layout = isWhatsAround? 'map' : 'tiles';
             }
 
             const isOverview = displayingOverview(state);
+
+
             let matches;
             if(isOverview) { //overview
                 const allConnections = selectAllConnections(state);
@@ -138,6 +141,7 @@ class Controller {
                 isOverview,
                 layout,
                 //LAYOUT,
+                isWhatsAround: state.getIn(["needs", postUri, "isWhatsAround"]),
                 connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
                 matchesArray: matches.toArray(),
                 hasMatches: matches.size > 0,

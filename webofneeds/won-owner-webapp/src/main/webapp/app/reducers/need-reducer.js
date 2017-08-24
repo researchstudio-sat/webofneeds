@@ -473,7 +473,7 @@ function parseNeed(jsonldNeed, ownNeed) {
 
         parsedNeed.tags = tags ? tags : undefined;
         parsedNeed.description = description ? description : undefined;
-        parsedNeed.isWhatsAround = isWhatsAround;
+        parsedNeed.isWhatsAround = !!isWhatsAround;
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
         parsedNeed.location = location;
     }else{

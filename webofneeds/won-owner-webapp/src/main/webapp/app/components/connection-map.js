@@ -77,11 +77,13 @@ function genComponentConf() {
                     state.getIn(['router', 'currentParams', 'connectionType'])
                 );
                 const postUri = selectOpenPostUri(state);
-                const post = state.getIn(["needs", postUri]);
+                const post = postUri && state.getIn(["needs", postUri]);
+                const isWhatsAround = post && post.get("isWhatsAround");
                 const location = post && post.get('location');
                 const connectionType = connectionTypeInParams || self.connectionType;
                 return {
-                    post,
+                    post: post,
+                    isWhatsAround: isWhatsAround,
                     needs: state.get("needs"),
                     location: location,
                     connections: post && post.get("connections").filter(conn => conn.get("state") === connectionType),
@@ -100,6 +102,7 @@ function genComponentConf() {
         }
 
         updateMap(location, connections, needs) {
+            console.log("Call an update on the map for location: ", location, "connections: ", connections, "needs: ", needs);
             this.markers.forEach(marker => this.map.removeLayer(marker)); //Remove all existing markers
             this.markers = []; //RESET MARKERS
 
@@ -120,7 +123,11 @@ function genComponentConf() {
                                 .bindPopup(need.get("title" + " - " + need.getIn(["location", "address"])))
                                 .on("click",
                                     function() {
-                                        this.onSelectedConnection({connectionUri: conn.get("uri")})
+                                        if(this.isWhatsAround){
+                                            this.router__stateGoAbs('post', {postUri: need.get("uri")});
+                                        }else{
+                                            this.onSelectedConnection({connectionUri: conn.get("uri")})
+                                        }
                                     },
                                     this
                                 )
@@ -132,10 +139,12 @@ function genComponentConf() {
             }
 
             this.markers.forEach(marker => this.map.addLayer(marker));
-            var markerGroup = new L.featureGroup(this.markers);
-            this.map.fitBounds(markerGroup.getBounds());
 
-            this.mapAlreadyInitialized = true;
+            if(this.markers.length > 0){
+                var markerGroup = new L.featureGroup(this.markers);
+                this.map.fitBounds(markerGroup.getBounds());
+                this.mapAlreadyInitialized = true;
+            }
         }
 
         mapMountNg() { return this.domCache.ng('.connections-map__mapmount'); }

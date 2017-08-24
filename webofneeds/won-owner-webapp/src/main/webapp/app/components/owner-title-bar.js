@@ -79,7 +79,8 @@ function genComponentConf() {
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}"
-                                class="clickable">
+                                class="clickable"
+                                ng-if="!self.post.get('isWhatsAround')">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Connected, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
                                     Messages
@@ -95,7 +96,8 @@ function genComponentConf() {
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}"
-                                class="clickable">
+                                class="clickable"
+                                ng-if="!self.post.get('isWhatsAround')">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestReceived, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
                                     Requests
@@ -103,7 +105,8 @@ function genComponentConf() {
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}"
-                                class="clickable">
+                                class="clickable"
+                                ng-if="!self.post.get('isWhatsAround')">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestSent, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
                                     Sent Requests
