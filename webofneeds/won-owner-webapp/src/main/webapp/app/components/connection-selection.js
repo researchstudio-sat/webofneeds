@@ -5,6 +5,9 @@
 
 import angular from 'angular';
 import {
+    getIn,
+} from '../utils';
+import {
     labels,
 } from '../won-label-utils';
 import { attach, decodeUriComponentProperly } from '../utils.js';
@@ -37,10 +40,10 @@ function genComponentConf() {
 
             const selectFromState = (state)=>{
                 const postUri = selectOpenPostUri(state);
-                const ownNeed = state.getIn(["needs", postUri]);
+                const ownNeed = getIn(state, ["needs", postUri]);
 
                 const connectionTypeInParams = decodeUriComponentProperly(
-                    state.getIn(['router', 'currentParams', 'connectionType'])
+                    getIn(state, ['router', 'currentParams', 'connectionType'])
                 );
                 const connectionType = connectionTypeInParams || self.connectionType;
                 const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);

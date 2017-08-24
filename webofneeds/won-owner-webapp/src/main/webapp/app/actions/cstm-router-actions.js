@@ -5,6 +5,10 @@
 import Immutable from 'immutable';
 
 import {
+    getIn,
+} from '../utils';
+
+import {
     actionCreators,
     actionTypes
 } from './actions';
@@ -25,7 +29,7 @@ import {
  */
 export function stateBack() {
     return (dispatch, getState) => {
-        const hasPreviousState = !!getState().getIn(['router', 'prevState', 'name']);
+        const hasPreviousState = !!getIn(getState(), ['router', 'prevState', 'name']);
         if (hasPreviousState) {
             history.back();
         } else {
@@ -39,7 +43,7 @@ export function stateBack() {
  */
 export function stateGoAbs(state, queryParams) {
     return (dispatch, getState) => {
-        const currentParams = getState().getIn(['router', 'currentParams']);
+        const currentParams = getIn(getState(), ['router', 'currentParams']);
         return dispatch(actionCreators.router__stateGo(
             state,
             addConstParams(resetParamsImm.merge(queryParams), currentParams)
@@ -52,7 +56,7 @@ export function stateGoAbs(state, queryParams) {
  */
 export function stateGoResetParams(state) {
     return (dispatch, getState) => {
-        const currentParams = getState().getIn(['router', 'currentParams']);
+        const currentParams = getIn(getState(), ['router', 'currentParams']);
         return dispatch(actionCreators.router__stateGo(
             state,
             addConstParams(resetParams, currentParams)
@@ -78,7 +82,7 @@ export function stateGoDefault() {
  */
 export function stateGoKeepParams(state, queryParamsList) {
     return (dispatch, getState) => {
-        const currentParams = getState().getIn(['router', 'currentParams']);
+        const currentParams = getIn(getState(), ['router', 'currentParams']);
         const params = Immutable.Map( // [[k,v]] -> Map
             queryParamsList.map(
                     p => [p, currentParams.get(p)] // get value per param
@@ -98,8 +102,8 @@ export function stateGoKeepParams(state, queryParamsList) {
  */
 export function stateGoCurrent(queryParams) {
     return (dispatch, getState) => {
-        const currentState = getState().getIn(['router', 'currentState', 'name']);
-        const currentParams = getState().getIn(['router', 'currentParams']);
+        const currentState = getIn(getState(), ['router', 'currentState', 'name']);
+        const currentParams = getIn(getState(), ['router', 'currentParams']);
         return dispatch(actionCreators.router__stateGo(
             currentState,
             addConstParams(queryParams, currentParams)

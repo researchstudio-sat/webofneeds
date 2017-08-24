@@ -22,6 +22,7 @@ import {
 import {
     decodeUriComponentProperly,
     checkHttpStatus,
+    getIn,
 } from './utils';
 
 
@@ -52,7 +53,7 @@ export const resetParamsImm = Immutable.fromJS(resetParams);
  */
 export const constantParams = [
     'privateId',
-]
+];
 
 
 /**
@@ -282,8 +283,8 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
  */
 export function checkAccessToCurrentRoute(dispatch, getState) {
     const appState = getState();
-    const routingState = appState.getIn(['router','currentState']).toJS();
-    const params = appState.getIn(['router','currentParams']).toJS();
+    let routingState = getIn(appState, ['router','currentState']);
+    let params = getIn(appState, ['router','currentParams']);
     return accessControl({
         toState: routingState,
         fromState: routingState,

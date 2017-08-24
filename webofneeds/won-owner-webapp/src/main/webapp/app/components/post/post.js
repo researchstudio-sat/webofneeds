@@ -7,7 +7,12 @@ import angular from 'angular';
 import ownerTitleBarModule from '../owner-title-bar';
 //import galleryModule from '../gallery';
 import postMessagesModule from '../post-messages';
-import { attach, mapToMatches, decodeUriComponentProperly } from '../../utils';
+import {
+    attach,
+    mapToMatches,
+    decodeUriComponentProperly,
+    getIn,
+} from '../../utils';
 import won from '../../won-es6';
 import { actionCreators }  from '../../actions/actions';
 import openRequestModule from '../open-request';
@@ -51,7 +56,9 @@ class Controller {
             const connectionUri = selectOpenConnectionUri(state);
             const actualConnectionType = post && post.getIn(['connections', connectionUri, 'state']);
 
-            const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
+            const connectionTypeInParams = decodeUriComponentProperly(
+                getIn(state, ['router', 'currentParams', 'connectionType'])
+            );
 
             const connectionIsOpen = !!connectionUri &&
                 //make sure we don't get a mismatch between supposed type and actual type:

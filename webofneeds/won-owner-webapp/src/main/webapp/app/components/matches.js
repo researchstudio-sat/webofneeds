@@ -10,7 +10,11 @@ import sendRequestModule from './send-request';
 import connectionsOverviewModule from './connections-overview';
 import connectionSelectionModule from './connection-selection';
 
-import { attach, decodeUriComponentProperly} from '../utils';
+import {
+    attach,
+    decodeUriComponentProperly,
+    getIn,
+} from '../utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
 import {
@@ -101,10 +105,10 @@ class Controller {
 
         const selectFromState = (state) => {
             let postUri = selectOpenPostUri(state);
-            const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
+            const connectionUri = decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionUri']));
 
             // either of 'tiles', 'grid', 'list'
-            let layout = state.getIn(['router','currentParams','layout']);
+            let layout = getIn(state, ['router','currentParams','layout']);
             if(!layout) {
                 layout = 'tiles';
             }

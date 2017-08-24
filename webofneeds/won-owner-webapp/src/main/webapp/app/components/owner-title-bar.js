@@ -2,7 +2,11 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-import { attach, decodeUriComponentProperly } from '../utils';
+import {
+    attach,
+    decodeUriComponentProperly,
+    getIn,
+} from '../utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
 import {
@@ -146,7 +150,7 @@ function genComponentConf() {
                 const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;
 
                 return {
-                    selectedTab: decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType'])) || 'Info',
+                    selectedTab: decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionType'])) || 'Info',
                     WON: won.WON,
                     postUri: postUri,
                     post: post,
