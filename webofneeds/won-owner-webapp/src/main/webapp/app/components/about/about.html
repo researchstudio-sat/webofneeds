@@ -2,7 +2,7 @@
     <won-topnav></won-topnav>
 </header>
 <main class="about" id="allSections">
-    <div class="welcome">
+    <section class="welcome">
         <div class="title">What is the Web of Needs?</div>
         <won-flex-grid class="fourimgs" items="::self.peopleGrid"></won-flex-grid>
         <div class="w__description">
@@ -16,16 +16,19 @@
             of a long-lived search query that can itself be found by others. Once you found a useful match, you can
                 connect to it and start to chat.</span>
         </div>
-    </div>
-    <div class="howto">
-        <div class="title">How it works</div>
-        <won-flex-grid class="fourimgs" items="::self.workGrid"></won-flex-grid>
-    </div>
-    <div class="faq">
-        <div class="title">FAQs</div>
-        <won-accordion items="::self.questions"></won-accordion>
-    </div>
-    <div class="imprint">
+    </section>
+    <section>
+        <div class="howto">
+            <div class="title">How it works</div>
+            <won-flex-grid class="fourimgs" items="::self.workGrid"></won-flex-grid>
+        </div>
+        <hr class="splitter-within-section"/>
+        <div class="faq">
+            <div class="title">FAQs</div>
+            <won-accordion items="::self.questions"></won-accordion>
+        </div>
+    </section>
+    <section class="imprint">
         <div class="title">Imprint</div>
         <div class="sub title" >
             <p>Research Studio Smart Agent Technologies<br/>
@@ -34,5 +37,5 @@
                 Austria</p>
             <a href="mailto:{{::self.config.adminEmail}}" style="text-decoration: none; color: white">{{::self.config.adminEmail}}</a>
         </div>
-    </div>
+    </section>
 </main>

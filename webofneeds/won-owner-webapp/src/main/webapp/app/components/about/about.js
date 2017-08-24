@@ -17,9 +17,8 @@ const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections
 const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
     {imageSrc: 'generated/icon-sprite.svg#ico36_match', text: 'Get matches', detail: 'Based on the' +
     ' information you provide, we will try to connect you with others'},
-    {imageSrc: 'generated/icon-sprite.svg#ico36_incoming', text: 'Request contact', detail: 'If you\'re interested,' +
-    ' make a contact request - or get one if your counterpart is faster than you', separatorText: 'or', text2: 'Be' +
-    ' contacted'},
+    {imageSrc: 'generated/icon-sprite.svg#ico36_incoming', text: 'Request contact – or be contacted', detail: 'If you\'re interested,' +
+    ' make a contact request - or get one if your counterpart is faster than you' },
     {imageSrc: 'generated/icon-sprite.svg#ico36_message', text: 'Interact and exchange', detail: 'You found someone' +
     ' who has what you need, wants to meet or change something in your common environment? Go chat with them! '}];
 
