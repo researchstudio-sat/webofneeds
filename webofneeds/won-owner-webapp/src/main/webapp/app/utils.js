@@ -696,13 +696,28 @@ export function clone(obj) {
  * @return {*}
  */
 export function getIn(obj, path) {
-    switch(path.length){
-        case 0:
-            return undefined;
-        case 1:
-            return obj[path[0]];
-        default:
-            return obj && obj[path[0]] && getIn( obj[path[0]] , path.slice(1) )
+    if(!path || !obj || path.length === 0) {
+        return undefined;
+    } else {
+        let child;
+        if(obj.toJS && obj.get) {
+            /* obj is an immutabljs-object
+             * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+             * but that would require including immutable as dependency her and it'd be better
+             * to keep this library independent of anything.
+             */
+            child = obj.get(path[0])
+        } else {
+            /* obj is a vanilla object */
+            child = obj[path[0]]
+        }
+        if(path.length === 1) {
+            /* end of the path */
+            return child;
+        } else {
+            /* recurse */
+            return getIn(child, path.slice(1));
+        }
     }
 }
 
