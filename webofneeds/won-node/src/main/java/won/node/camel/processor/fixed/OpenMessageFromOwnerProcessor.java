@@ -15,6 +15,7 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+import java.util.Objects;
 
 /**
  * User: syim
@@ -32,16 +33,24 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     logger.debug("OPEN received from the owner side for connection {}", wonMessage.getSenderURI());
 
     Connection con = dataService.nextConnectionState(wonMessage.getSenderURI(), ConnectionEventType.OWNER_OPEN);
-    assert con != null;
-    assert con.getRemoteNeedURI() != null;
-    assert con.getRemoteNeedURI().equals(wonMessage.getReceiverNeedURI());
-    assert con.getConnectionURI() != null;
-    assert con.getConnectionURI().equals(wonMessage.getSenderURI());
-    if (wonMessage.getReceiverURI() != null){
-      assert con.getRemoteConnectionURI().equals(wonMessage.getReceiverURI());
+    Objects.requireNonNull(con);
+    Objects.requireNonNull(con.getRemoteNeedURI());
+
+    if (!con.getRemoteNeedURI().equals(wonMessage.getReceiverNeedURI())) throw new IllegalStateException("remote need uri must be equal to receiver need uri");
+    if (con.getConnectionURI() == null) throw new IllegalStateException("connection uri must not be null");
+    if (!con.getConnectionURI().equals(wonMessage.getSenderURI())) throw new IllegalStateException("connection uri must be equal to sender uri");
+    if (wonMessage.getReceiverURI() != null) {
+      if (!wonMessage.getReceiverURI().equals(con.getRemoteConnectionURI()))
+        throw new IllegalStateException("remote connection uri must be equal to receiver uri");
+      if (con.getRemoteConnectionURI() == null) {
+        //we didn't have it before, now we do:
+        con.setRemoteConnectionURI(wonMessage.getReceiverURI());
+      }
     } else {
-      con.setRemoteConnectionURI(wonMessage.getReceiverURI());
+      // do nothing. it's not clean, but easier to implement on the client side
+      // TODO: refactor connection state and open/connect
     }
+
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con);
 

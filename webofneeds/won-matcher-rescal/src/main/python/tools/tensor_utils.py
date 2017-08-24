@@ -57,7 +57,7 @@ class SparseTensor:
             if self.shape != matrix.shape:
                 raise Exception("Bad shape of added slices of tensor, is (%d,%d) but should be (%d,%d)!" %
                                 (matrix.shape[0], matrix.shape[1], self.shape[0], self.shape[1]))
-            self.data.append(csr_matrix(matrix))
+            self.data.insert(slice, csr_matrix(matrix))
 
         def getHeaders(self):
             return list(self.headers)
@@ -176,7 +176,7 @@ def adjust_mm_dimension(data_file, dim):
     file.close()
     return True
 
-def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0):
+def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0.0):
 
     temp_tensor = [input_tensor.getPureNeedConnectionMatrix()]
     D = input_tensor.getNeedAttributeMatrix()
@@ -211,7 +211,7 @@ def matrix_to_array(m, indices):
 # - input_tensor: tensor for which the predictions are computed
 # - symmetric: are connections between needs symmentric? then only the half of the predictions have to be computed
 # - keepConnections: if true keep the predictions between the needs where a connection existed before
-def predict_rescal_hints_by_threshold(A, R, threshold, input_tensor, symmetric=False, keepConnections=False):
+def predict_rescal_hints_by_threshold(A, R, threshold, input_tensor, symmetric=True, keepConnections=False):
 
     rows = []
     cols = []
@@ -225,7 +225,7 @@ def predict_rescal_hints_by_threshold(A, R, threshold, input_tensor, symmetric=F
         rounds = rounds + 1
         colPred = np.dot(R[SparseTensor.CONNECTION_SLICE], A_T[:,j])
         for i in input_tensor.getNeedIndices():
-            if (symmetric or j < i):
+            if ((not symmetric) or j < i):
                 x = np.dot(A[i], colPred)
                 if (x > threshold):
                     if (keepConnections or (not input_tensor.hasConnection(i,j))):

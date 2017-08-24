@@ -14,7 +14,8 @@ function genComponentConf() {
     let template = `
       <div class="sr__caption">
         <div class="sr__caption__title">Send Conversation Request</div>
-        <a ng-click="self.router__stateGoCurrent({connectionUri: null})">
+        <a ng-click="self.router__stateGoCurrent({connectionUri: null})"
+            class="clickable">
           <img
             class="sr__caption__icon clickable"
             src="generated/icon-sprite.svg#ico36_close"/>

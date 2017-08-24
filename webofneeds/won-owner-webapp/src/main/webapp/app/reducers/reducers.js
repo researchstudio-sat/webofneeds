@@ -178,10 +178,20 @@ export default reduceReducers( //passes on the state from one reducer to another
 
 window.Immutable4dbg = Immutable;
 
-//TODO: DELETE CONNECTIONS BETWEEN OWNED
 function deleteConnectionsBetweenOwnNeeds(state) {
-    //TODO: REMOVE CONNECTION
-    //remove all connections (['needs', needUri, 'connections', connectionUri, 'remoteNeedUri']) that have a remoteNeedId that is also an ownNeed (['needs', needUri, 'ownNeed'] == true)
+    let needs = state.get("needs");
+
+    if(needs){
+        needs = needs.map(function(need) {
+            let connections = need.get("connections");
+
+            connections = connections.filter(function(conn){
+                return !state.getIn(["needs", conn.get("remoteNeedUri"), "ownNeed"]);
+            });
+            return need.set("connections", connections);
+        });
+        return state.set("needs", needs);
+    }
 
     return state;
 }

@@ -13,7 +13,7 @@ import { actionCreators }  from '../actions/actions';
 import * as srefUtils from '../sref-utils';
 
 function genLoginConf() {
-    let template = `<a class="wl__button" ng-click="self.hideLogin()">
+    let template = `<a class="wl__button clickable" ng-click="self.hideLogin()">
                         <span class="wl__button__caption">Sign in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
