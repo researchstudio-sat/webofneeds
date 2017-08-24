@@ -9,6 +9,7 @@ import {
     attach,
     searchNominatim,
     reverseSearchNominatim,
+    nominatim2draftLocation,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import {
@@ -243,24 +244,6 @@ function jsonLd2draftLocation(location) {
                 Number.parseFloat(se.get('s:longitude')),
             ]
         ]
-    }
-}
-
-/**
- * drop info not stored in rdf, thus info that we
- * couldn't restore for previously used locations
- */
-function nominatim2draftLocation(searchResult) {
-    const b = searchResult.boundingbox;
-    return {
-        name: searchResult.display_name,
-        lon: Number.parseFloat(searchResult.lon),
-        lat: Number.parseFloat(searchResult.lat),
-        //importance: searchResult.importance,
-        bounds: [
-            [ Number.parseFloat(b[0]), Number.parseFloat(b[2]) ], //north-western point
-            [ Number.parseFloat(b[1]), Number.parseFloat(b[3]) ] //south-eastern point
-        ],
     }
 }
 
