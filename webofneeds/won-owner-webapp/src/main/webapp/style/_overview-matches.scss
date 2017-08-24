@@ -28,7 +28,7 @@ won-matches {
       background: white;
       margin: 0 auto;
       top: 15rem;
-      max-width: 35rem;
+      max-width: $maxContentWidth / 2;
       position: relative;
     }
   }
@@ -104,7 +104,7 @@ won-matches {
 
     won-connections-overview,
     won-connection-selection {
-      max-width: 35rem;
+      max-width: $maxContentWidth / 2;
 
       //flex-grow: 1;
       // crude centering:

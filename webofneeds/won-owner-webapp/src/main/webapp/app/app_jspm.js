@@ -40,6 +40,9 @@ import landingPageComponent from './components/landingpage/landingpage';
 import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
+import aboutComponent from './components/about/about';
+import signupComponent from './components/signup/signup';
+
 
 //settings
 import settingsTitleBarModule from './components/settings-title-bar';
@@ -74,6 +77,8 @@ let app = angular.module('won.owner', [
     overviewPostsComponent,
     feedComponent,
     overviewMatchesComponent,
+    aboutComponent,
+    signupComponent,
 
     //views.settings
     settingsTitleBarModule,

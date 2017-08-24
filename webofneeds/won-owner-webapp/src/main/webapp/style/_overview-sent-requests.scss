@@ -11,7 +11,7 @@
   .oir__openrequest,
   .oir__requests{
     flex-grow: 1;
-    max-width: 35rem;
+    max-width: $maxContentWidth / 2;
     margin: 0.5rem;
   }
   @media (max-width: $responsivenessBreakPoint){

@@ -11,7 +11,8 @@
                     there are no recent events for any of your needs. You will
                     find new matches, conversation requests, and messages in one condensed list here.</span>
             </div>
-            <a ng-click="self.router__stateGoResetParams('createNeed')" class="fc__empty__link clickable">
+
+            <a ui-sref="{{ self.resetParamsSRef('createNeed') }}" class="fc__empty__link">
                 <img src="generated/icon-sprite.svg#ico36_plus" class="fc__empty__link__icon">
                 <span class="fc__empty__link__caption">Create a Need</span>
             </a>

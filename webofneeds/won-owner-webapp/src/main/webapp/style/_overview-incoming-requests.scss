@@ -20,7 +20,7 @@
   .oir__openrequest,
   .oir__requests{
     flex-grow: 1;
-    max-width: 35rem;
+    max-width: $maxContentWidth / 2;
   }
   @media (max-width: $responsivenessBreakPoint){
     .oir__requests.hidden {
