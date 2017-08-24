@@ -85,7 +85,7 @@ export function stateGoKeepParams(state, queryParamsList) {
         const currentParams = getIn(getState(), ['router', 'currentParams']);
         const params = Immutable.Map( // [[k,v]] -> Map
             queryParamsList.map(
-                    p => [p, currentParams.get(p)] // get value per param
+                    p => [p, currentParams[p]] // get value per param
             )
         );
         return dispatch(actionCreators.router__stateGo(

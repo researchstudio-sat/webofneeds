@@ -64,7 +64,7 @@ function genComponentConf() {
                 //Select all needs with at least one connection
                 const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").filter(conn => conn.get("state") === this.connectionType).size > 0);
                 const routerParams = selectRouterParams(state);
-                const connUriInRoute = routerParams && decodeURIComponent(routerParams.get('connectionUri'));
+                const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
 
                 return {

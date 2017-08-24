@@ -239,7 +239,7 @@ export function watch(subscribe, select, callback) {
 export function watchImmutableRdxState(redux, path, callback) {
     return watch(
         redux.subscribe,
-        () => redux.getState().getIn(path),
+        () => getIn(redux.getState(), path),
         callback
     );
 }

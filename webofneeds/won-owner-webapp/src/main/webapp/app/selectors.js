@@ -105,8 +105,8 @@ export const selectOpenConnectionUri = createSelector(
     (routerParams) => {
         //de-escaping is lost in transpiling if not done in two steps :|
         const openConnectionUri = decodeUriComponentProperly(
-            routerParams.get('connectionUri') ||
-            routerParams.get('openConversation')
+            routerParams['connectionUri'] ||
+            routerParams['openConversation']
         );
 
         if(openConnectionUri) {
