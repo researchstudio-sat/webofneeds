@@ -54,7 +54,9 @@ class CreateNeedController {
         window.cnc = this;
 
         const selectFromState = (state) => {
-            return {}
+            return {
+                existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+            }
         };
 
         // Using actionCreators like this means that every action defined there is available in the template.
@@ -135,6 +137,10 @@ class CreateNeedController {
                                     thumbnail: undefined,
                                     whatsAround: true
                                 };
+
+                                this.existingWhatsAroundNeeds.map(
+                                    need => this.needs__close(need.get("uri"))
+                                );
 
                                 console.log("Creating Whats around with data: ", whatsAround);
 
