@@ -4,6 +4,17 @@
 </header>
 <main class="create-post">
     <div class="cp__inner">
+        <button type="submit"
+                class="won-button--filled red"
+                ng-click="::self.createWhatsAround()">
+            <span ng-show="!self.pendingPublishing">
+                See What's Around
+            </span>
+            <span ng-show="self.pendingPublishing">
+                Retrieving What's Around&nbsp;&hellip;
+            </span>
+        </button>
+        <won-labelled-hr label="::'or create your own'"></won-labelled-hr>
 
         <won-posttype-select
                 options="::self.postTypeTexts"

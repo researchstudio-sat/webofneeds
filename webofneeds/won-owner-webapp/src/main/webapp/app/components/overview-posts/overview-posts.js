@@ -6,8 +6,6 @@ import postItemLineModule from '../post-item-line';
 import { actionCreators }  from '../../actions/actions';
 import {
     attach,
-    reverseSearchNominatim,
-    nominatim2draftLocation,
 } from '../../utils.js';
 import {
     selectAllOwnNeeds,
@@ -61,58 +59,6 @@ class OverviewPostsController {
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
     }
-
-    createWhatsAround(){
-        console.log("Create Whats Around");
-
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                currentLocation => {
-                   console.log(currentLocation);
-                    const lat = currentLocation.coords.latitude;
-                    const lng = currentLocation.coords.longitude;
-                    const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
-
-                    const degreeConstant = 1.0;
-
-                    // center map around current location
-
-                    reverseSearchNominatim(lat, lng, zoom)
-                        .then(searchResult => {
-                            const location = nominatim2draftLocation(searchResult);
-
-                            let whatsAround = {
-                                title: "What's Around?",
-                                type: "http://purl.org/webofneeds/model#DoTogether",
-                                description: "Automatically created Need to see what's happening in your Area",
-                                tags: undefined,
-                                location: location,
-                                thumbnail: undefined,
-                                whatsAround: true
-                            };
-
-                            console.log("Creating Whats around with data: ", whatsAround);
-
-                            this.needs__create(
-                                whatsAround,
-                                this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
-                            );
-                        });
-                },
-                err => { //error handler
-                    if(err.code === 2 ) {
-                        console.log("create whats around not possible due to error")
-                    }
-                },
-                { //options
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
-                }
-            );
-        }
-    }
-
 }
 
 OverviewPostsController.$inject = [];
