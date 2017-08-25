@@ -99,6 +99,16 @@ won-matches {
     }
   }
 
+  .omc__content__map {
+    @include omc__content;
+    display: flex;
+
+    won-connections-map {
+      display: flex;
+      flex-grow: 1;
+    }
+  }
+
   .omc__content__list {
     @include omc__content;
 
