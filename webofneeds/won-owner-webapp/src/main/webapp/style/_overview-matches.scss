@@ -18,7 +18,7 @@ won-matches {
 
   .omc__sendrequest {
     position: absolute;
-    z-index: 101;
+    z-index: 1010; //OTHERWISE LEAFLET MESSES UP THE OVERLAY
     top: 0;
     left: 0;
     width: 100%;

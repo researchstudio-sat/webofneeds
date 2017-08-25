@@ -12,7 +12,7 @@
   height: 100%;
   background: $won-light-blue;
   opacity: 0.5;
-  z-index: 100;
+  z-index: 1001; //so leaflet does not mess with the curtain
 }
 
 main.landingpage {
