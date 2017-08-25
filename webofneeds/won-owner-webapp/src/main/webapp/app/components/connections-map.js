@@ -123,7 +123,7 @@ function genComponentConf() {
                                 .bindPopup(need.get("title" + " - " + need.getIn(["location", "address"])))
                                 .on("click",
                                     function() {
-                                        if(this.isWhatsAround){
+                                        if(false && this.isWhatsAround){
                                             this.router__stateGoAbs('post', {postUri: need.get("uri")});
                                         }else{
                                             this.onSelectedConnection({connectionUri: conn.get("uri")})
