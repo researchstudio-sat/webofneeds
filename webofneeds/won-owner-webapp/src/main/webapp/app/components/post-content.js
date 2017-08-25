@@ -51,6 +51,15 @@ function genComponentConf() {
           </span>
         </div>
         <div class="pc__text"
+          ng-show="!!self.need.get('location')">
+          <img
+            class="pc__icon"
+            src="generated/icon-sprite.svg#ico16_indicator_location"/>
+          <span>
+            {{ self.need.getIn(['location','address']) }}
+          </span>
+        </div>
+        <div class="pc__text"
           ng-show="!!self.textMessage">
           <img
             class="pc__icon"
