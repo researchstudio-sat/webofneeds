@@ -45,7 +45,7 @@ let template = `
                     <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.GRID})"
+                <a ng-if="false" ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.GRID})"
                    class="clickable">
                     <img ng-src="{{self.layout === 'grid' ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
                      class="omc__header__viewtype__icon clickable"/>
@@ -55,8 +55,7 @@ let template = `
                     <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>                
-                <a ng-if="self.isWhatsAround" 
-                   ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
+                <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
                    class="clickable">
                     <img ng-src="{{self.layout === 'map' ? 'generated/icon-sprite.svg#ico36_area_circle_hi' : 'generated/icon-sprite.svg#ico36_area_circle'}}"
                      class="omc__header__viewtype__icon clickable"/>
@@ -69,7 +68,7 @@ let template = `
                     ng-repeat="match in self.matchesArray">
             </won-matches-flow-item>
         </div>
-        <div ng-if="self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
+        <div ng-if="false && self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
                     connection-uri="match.get('uri')"
                     ng-repeat="match in self.matchesArray">
@@ -88,7 +87,7 @@ let template = `
                 on-selected-connection="self.selectedConnection(connectionUri)">
             </won-connection-selection>
         </div>
-        <div ng-if="self.hasMatches && self.layout === 'map'" class="omc__content__list">
+        <div ng-if="self.hasMatches && self.layout === 'map'" class="omc__content__map">
             <won-connections-map connection-type="::self.WON.Suggested" on-selected-connection="self.selectedConnection(connectionUri)"></won-connections-map>
         </div>
     </div>
