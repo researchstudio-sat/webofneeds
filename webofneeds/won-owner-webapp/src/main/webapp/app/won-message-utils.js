@@ -255,7 +255,8 @@ export function buildCreateMessage(needData, wonNodeUri) {
         longitude: getIn(needData, ['location', 'lon']),
         latitude: getIn(needData, ['location', 'lat']),
         address: getIn(needData, ['location', 'name']),
-        bounds: getIn(needData, ['location', 'bounds'])
+        bounds: getIn(needData, ['location', 'bounds']),
+        whatsAround: needData.whatsAround,
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {

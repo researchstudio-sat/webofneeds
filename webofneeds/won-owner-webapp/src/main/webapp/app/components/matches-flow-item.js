@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import squareImageModule from './square-image';
+import needMapModule from './need-map';
 import extendedGalleryModule from './extended-gallery';
 import feedbackGridModule from './feedback-grid';
 import postHeaderModule from './post-header';
@@ -25,18 +26,21 @@ function genComponentConf() {
                 max-thumbnails="self.maxThumbnails"
                 items="self.images"
                 class="horizontal"
-                ng-show="self.images.length > 0">
+                ng-show="!self.remoteNeed.get('location') && self.images.length > 0">
             </won-extended-gallery>
             <won-square-image 
                 title="self.remoteNeed.get('title')"
                 uri="self.remoteNeed.get('uri')"
-                ng-show="self.images.length == 0">
+                ng-show="!self.remoteNeed.get('location') && self.images.length == 0">
             </won-square-image>
+            <won-need-map
+                uri="self.remoteNeed.get('uri')"
+                ng-if="self.remoteNeed.get('location') && self.images.length == 0">
+            </won-need-map>
         </div>
 
         <div class="mfi__description clickable"
               ng-click="self.toggleFeedback()">
-
             <won-post-header
               need-uri="self.remoteNeed.get('uri')"
               hide-image="true">
@@ -125,6 +129,7 @@ export default angular.module('won.owner.components.matchesFlowItem', [
         feedbackGridModule,
         postHeaderModule,
         postContentModule,
+        needMapModule
     ])
     .directive('wonMatchesFlowItem', genComponentConf)
     .name;

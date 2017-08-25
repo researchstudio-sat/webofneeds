@@ -13,7 +13,8 @@ import imageDropzoneModule from './image-dropzone';
 import locationPickerModule from './location-picker';
 import {
     attach,
-    clone,
+    reverseSearchNominatim,
+    nominatim2draftLocation,
 } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import won from '../won-es6';
@@ -44,6 +45,17 @@ const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections a
 function genComponentConf() {
     const template = `
         <div class="cp__inner">
+            <button type="submit"
+                    class="won-button--filled red"
+                    ng-click="::self.createWhatsAround()">
+                <span ng-show="!self.pendingPublishing">
+                    See What's Around
+                </span>
+                <span ng-show="self.pendingPublishing">
+                    Retrieving What's Around&nbsp;&hellip;
+                </span>
+            </button>
+            <won-labelled-hr label="::'or create your own'"></won-labelled-hr>
             <won-posttype-select
                     options="::self.postTypeTexts"
                     on-select="::self.selectType(idx)"
@@ -99,7 +111,9 @@ function genComponentConf() {
             window.cnc = this;
 
             const selectFromState = (state) => {
-                return {}
+                return {
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+                }
             };
 
             // Using actionCreators like this means that every action defined there is available in the template.
@@ -147,6 +161,66 @@ function genComponentConf() {
 
         pickImage(image) {
             this.draft.thumbnail = image;
+        }
+
+        createWhatsAround(){
+            if (!this.pendingPublishing) {
+                this.pendingPublishing = true;
+                console.log("Create Whats Around");
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        currentLocation => {
+                            console.log(currentLocation);
+                            const lat = currentLocation.coords.latitude;
+                            const lng = currentLocation.coords.longitude;
+                            const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
+
+                            const degreeConstant = 1.0;
+
+                            // center map around current location
+
+                            reverseSearchNominatim(lat, lng, zoom)
+                                .then(searchResult => {
+                                    const location = nominatim2draftLocation(searchResult);
+
+                                    let whatsAround = {
+                                        title: "What's Around?",
+                                        type: "http://purl.org/webofneeds/model#DoTogether",
+                                        description: "Automatically created Need to see what's happening in your Area",
+                                        tags: undefined,
+                                        location: location,
+                                        thumbnail: undefined,
+                                        whatsAround: true
+                                    };
+
+                                    this.existingWhatsAroundNeeds.map(
+                                        need => this.needs__close(need.get("uri"))
+                                    );
+
+                                    console.log("Creating Whats around with data: ", whatsAround);
+
+                                    this.needs__create(
+                                        whatsAround,
+                                        this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
+                                    );
+                                });
+                        },
+                        err => { //error handler
+                            if (err.code === 2) {
+                                console.log("create whats around not possible due to error");
+                                //TODO: SHOW TOAST FOR ERROR
+                                this.pendingPublishing = false;
+                            }
+                        },
+                        { //options
+                            enableHighAccuracy: true,
+                            timeout: 5000,
+                            maximumAge: 0
+                        }
+                    );
+                }
+            }
         }
     }
     Controller.$inject = serviceDependencies;

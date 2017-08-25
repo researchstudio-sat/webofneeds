@@ -116,6 +116,7 @@
     won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
     won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
     won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
+    won.WON.BasicNeedTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
     won.WON.OwnerFacet = won.WON.baseUri +"OwnerFacet";
     won.WON.OwnerFacetCompacted = won.WON.prefix +":OwnerFacet";
     won.WON.GroupFacet = won.WON.baseUri +"GroupFacet";

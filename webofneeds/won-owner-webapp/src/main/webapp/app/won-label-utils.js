@@ -8,6 +8,7 @@ export const labels = deepFreeze({
         [won.WON.BasicNeedTypeSupplyCompacted]: 'I offer something',
         [won.WON.BasicNeedTypeDotogetherCompacted]: 'I want to do something together',
         [won.WON.BasicNeedTypeCritiqueCompacted]: 'I want to change something',
+        [won.WON.BasicNeedTypeWhatsAroundCompacted]: 'What\'s Around',
     },
     connectionState: {
         [won.WON.Suggested]: 'Conversation suggested. You can send a request.',

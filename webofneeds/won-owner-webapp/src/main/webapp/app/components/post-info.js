@@ -6,7 +6,7 @@
 ;
 
 import angular from 'angular';
-import inviewModule from 'angular-inview';
+import needMapModule from './need-map';
 
 import { attach, } from '../utils';
 import won from '../won-es6';
@@ -18,14 +18,6 @@ import {
     selectLastUpdateTime,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
-import L from '../leaflet-bundleable';
-import {
-    initLeaflet,
-} from '../won-utils';
-
-import {
-    DomCache,
-} from '../cstm-ng-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 function genComponentConf() {
@@ -69,18 +61,14 @@ function genComponentConf() {
                 <p class="post-info__details"
                     ng-show="self.address">
                     {{ self.address }}
-                    <a href="" ng-click="self.updateMap(self.location)">
-                        (show)
-                    </a>
-                </p>
+                </p>                
+                <won-need-map 
+                    uri="self.post.get('uri')"
+                    ng-show="self.location">
+                </won-need-map>
                 <p ng-show="self.debugmode">
                     <a class="debuglink" target="_blank" href="{{self.post.get('uri')}}">[DATA]</a>
                 </p>
-                <div class="post-info__mapmount"
-                     id="post-info__mapmount"
-                     in-view="$inview && self.mapInView($inviewInfo)"
-                     ng-show="self.location">
-                 </div>
             </div>
         </div>
     `;
@@ -89,30 +77,8 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            this.domCache = new DomCache(this.$element);
 
             window.pi4dbg = this;
-
-            this.map = initLeaflet(this.mapMount());
-            // this.determineCurrentLocation(); show in reference
-
-
-            //TODO custom icons
-            //TODO for the bounding box: make sure location-bb as well as own location-bb fit into the view.
-            //TODO use different marker for own location
-            //TODO need to resize page for map to render correctly
-
-            this.$scope.$watch(
-                'self.location',
-                (location, previousLocationValue) => {
-                    console.log('in location watch: ', location, previousLocationValue);
-                    if(location && !this._mapHasBeenAutoCentered) {
-                        this.updateMap(location);
-                        this._mapHasBeenAutoCentered = true;
-                    }
-                }
-            );
-
 
             const selectFromState = (state) => {
                 const postUri = selectOpenPostUri(state);
@@ -132,40 +98,6 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
-
-        mapInView(inviewInfo) {
-            if(inviewInfo.changed) {
-                this.map.invalidateSize();
-            }
-        }
-
-        updateMap(location) {
-            if(!location) {
-                return;
-            }
-
-            this.map.fitBounds([
-                [
-                    location.getIn(["nwCorner", "lat"]),
-                    location.getIn(["nwCorner", "lng"])
-                ],
-                [
-                    location.getIn(["seCorner", "lat"]),
-                    location.getIn(["seCorner", "lng"])
-                ]
-            ]);
-
-            if(this.marker) {
-               this.map.removeLayer(this.marker);
-            }
-            this.marker = L.marker([location.get("lat"), location.get("lng")]).bindPopup(location.get("address"));
-            this.map.addLayer(this.marker);
-
-            this.mapAlreadyInitialized = true;
-        }
-
-        mapMountNg() { return this.domCache.ng('.post-info__mapmount'); }
-        mapMount() { return this.domCache.dom('.post-info__mapmount'); }
 }
 Controller.$inject = serviceDependencies;
 return {
@@ -178,6 +110,6 @@ return {
 }
 }
 
-export default angular.module('won.owner.components.postInfo', [ inviewModule.name ])
+export default angular.module('won.owner.components.postInfo', [ needMapModule ])
     .directive('wonPostInfo', genComponentConf)
     .name;

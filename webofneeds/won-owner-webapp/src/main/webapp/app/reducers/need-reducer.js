@@ -173,122 +173,6 @@ function addNeed(needs, jsonldNeed, ownNeed) {
     return newState;
 }
 
-function parseNeed(jsonldNeed, ownNeed) {
-    const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
-
-    let parsedNeed = {uri: undefined,
-                title: undefined,
-                description: undefined,
-                type: undefined,
-                state: undefined,
-                tags: undefined,
-                location: undefined,
-                connections: Immutable.Map(),
-                creationDate: undefined,
-                ownNeed: !!ownNeed};
-
-    if(jsonldNeedImm){
-        const uri = jsonldNeedImm.get("@id");
-
-        const isPresent = !!jsonldNeedImm.getIn(["won:is", "dc:title"]);
-        const seeksPresent = !!jsonldNeedImm.getIn(["won:seeks", "dc:title"]);
-        const is = jsonldNeedImm.get("won:is");
-        const seeks = jsonldNeedImm.get("won:seeks");
-
-        const title = isPresent ? is.get("dc:title") : (seeksPresent ? seeks.get("dc:title") : undefined);
-
-        if(!!uri && !!title){
-            parsedNeed.uri = uri;
-            parsedNeed.title = title;
-        }else{
-            return undefined;
-        }
-
-        const creationDate = jsonldNeedImm.get("dct:created");
-        if(creationDate){
-            parsedNeed.creationDate = creationDate;
-        }
-
-        const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);
-        if(state === won.WON.ActiveCompacted){ //we use to check for active state and everything else will be inactive
-            parsedNeed.state = state;
-        } else {
-            parsedNeed.state = won.WON.InactiveCompacted;
-        }
-
-        let type = undefined;
-        let description = undefined;
-        let tags = undefined;
-        let location = undefined;
-
-        if(isPresent){
-            type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
-            description = is.get("dc:description");
-            tags = is.get("won:hasTag");
-            location = parseLocation(is.get("won:hasLocation"));
-        }else if(seeksPresent){
-            type = won.WON.BasicNeedTypeDemandCompacted;
-            description = seeks.get("dc:description");
-            tags = seeks.get("won:hasTag");
-            location = parseLocation(seeks.get("won:hasLocation"));
-        }
-
-        parsedNeed.tags = tags ? tags : undefined;
-        parsedNeed.description = description ? description : undefined;
-        parsedNeed.type = type;
-        parsedNeed.location = location;
-    }else{
-        console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm.toJS());
-        return undefined;
-    }
-
-    return Immutable.fromJS(parsedNeed);
-}
-
-function parseLocation(jsonldLocation) {
-    if(!jsonldLocation) return undefined; //NO LOCATION PRESENT
-
-    const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
-
-    let location = {
-        address: undefined,
-        lat: undefined,
-        lng: undefined,
-        nwCorner: {
-                lat: undefined,
-                lng: undefined,
-        },
-        seCorner: {
-                lat: undefined,
-                lng: undefined
-        }
-    };
-
-    location.address = jsonldLocationImm.get("s:name");
-
-    location.lat = Number.parseFloat(jsonldLocationImm.getIn(["s:geo", "s:latitude"]));
-    location.lng = Number.parseFloat(jsonldLocationImm.getIn(["s:geo", "s:longitude"]));
-
-    location.nwCorner.lat = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner", "s:latitude"]));
-    location.nwCorner.lng = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner", "s:longitude"]));
-    location.seCorner.lat = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner", "s:latitude"]));
-    location.seCorner.lng = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner", "s:longitude"]));
-
-    if(
-        location.address &&
-        location.lat &&
-        location.lng &&
-        location.nwCorner.lat &&
-        location.nwCorner.lng &&
-        location.seCorner.lat &&
-        location.seCorner.lng
-    ){
-        return Immutable.fromJS(location);
-    }
-
-    console.error('Cant parse location, data is an invalid location-object: ', jsonldLocationImm.toJS());
-    return undefined;
-}
 
 function storeConnectionsData(state, connectionsToStore, newConnections) {
     newConnections = newConnections ? newConnections : Immutable.Set();
@@ -299,116 +183,6 @@ function storeConnectionsData(state, connectionsToStore, newConnections) {
         });
     }
     return state;
-}
-
-function parseConnection(jsonldConnection, newConnection) {
-    const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
-    console.log("Connection to parse: ", jsonldConnectionImm.toJS());
-
-    let parsedConnection = {
-                                belongsToUri: undefined,
-                                data: {
-                                    uri: undefined,
-                                    state: undefined,
-                                    messages: Immutable.Map(),
-                                    remoteNeedUri: undefined,
-                                    creationDate: undefined,
-                                    newConnection: !!newConnection,
-                                }
-                            };
-
-    const belongsToUri = jsonldConnectionImm.get("belongsToNeed");
-    const remoteNeedUri = jsonldConnectionImm.get("hasRemoteNeed");
-    const uri = jsonldConnectionImm.get("uri");
-
-    if(!!uri && !!belongsToUri && !!remoteNeedUri){
-        parsedConnection.belongsToUri = belongsToUri;
-        parsedConnection.data.uri = uri;
-        parsedConnection.data.remoteNeedUri = remoteNeedUri;
-
-        const creationDate = jsonldConnectionImm.get("dct:created"); //THIS IS NOT IN THE DATA
-        if(creationDate){
-            parsedConnection.data.creationDate = creationDate;
-        }
-
-        const state = jsonldConnectionImm.get("hasConnectionState");
-        if(
-            (state === won.WON.RequestReceived) ||
-            (state === won.WON.RequestSent) ||
-            (state === won.WON.Suggested) ||
-            (state === won.WON.Connected) ||
-            (state === won.WON.Closed)
-        ) {
-            parsedConnection.data.state = state;
-        }else{
-            console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
-            return undefined; //FOR UNKNOWN STATES
-        }
-
-        return Immutable.fromJS(parsedConnection);
-    }else{
-        console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
-        return undefined;
-    }
-}
-
-function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
-    const jsonldMessageImm = Immutable.fromJS(jsonldMessage);
-
-    let parsedMessage = {
-        belongsToUri: undefined,
-        data: {
-            uri: undefined,
-            text: undefined,
-            date: undefined,
-            outgoingMessage: outgoingMessage,
-            newMessage: !!newMessage,
-            connectMessage: false,
-        }
-    };
-
-    if(outgoingMessage){
-        parsedMessage.belongsToUri = jsonldMessageImm.get("hasSender");
-        parsedMessage.data.uri = jsonldMessageImm.get("uri");
-        parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
-        parsedMessage.data.date = msStringToDate(jsonldMessageImm.get("hasSentTimestamp"));
-    }else{
-        const fromOwner = jsonldMessageImm.get("msg:FromOwner");
-
-        if(fromOwner){
-            //If message is received directly
-            parsedMessage.belongsToUri = fromOwner.get("hasReceiver");
-            parsedMessage.data.uri = fromOwner.get("uri");
-            parsedMessage.data.text = fromOwner.get("hasTextMessage");
-            parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["msg:FromExternal", "hasReceivedTimestamp"]));
-        }else{
-            const fromCorrespondingMessage = jsonldMessageImm.get("hasCorrespondingRemoteMessage");
-
-            if(fromCorrespondingMessage){
-                //if message comes within the events of showLatestMessages/showMoreMessages action
-                parsedMessage.belongsToUri = jsonldMessageImm.get("hasReceiver");
-                parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
-                parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
-                parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
-
-                if(fromCorrespondingMessage.get("hasMessageType") === won.WONMSG.connectMessage){
-                    parsedMessage.data.connectMessage = true;
-                }
-            }
-        }
-    }
-
-    if(
-        !parsedMessage.data.uri ||
-        !parsedMessage.belongsToUri ||
-        !parsedMessage.data.text ||
-        !parsedMessage.data.date
-    ) {
-        console.error('Cant parse chat-message, data is an invalid message-object: ', jsonldMessageImm.toJS());
-        return undefined;
-    } else {
-        return Immutable.fromJS(parsedMessage);
-    }
 }
 
 /**
@@ -506,4 +280,251 @@ function changeNeedState(state, needUri, newState) {
 
 function getNeedForConnectionUri(state, connectionUri){
     return state.filter(need => need.get("connections").has(connectionUri)).first();
+}
+
+function parseConnection(jsonldConnection, newConnection) {
+    const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
+    console.log("Connection to parse: ", jsonldConnectionImm.toJS());
+
+    let parsedConnection = {
+        belongsToUri: undefined,
+        data: {
+            uri: undefined,
+            state: undefined,
+            messages: Immutable.Map(),
+            remoteNeedUri: undefined,
+            creationDate: undefined,
+            newConnection: !!newConnection,
+        }
+    };
+
+    const belongsToUri = jsonldConnectionImm.get("belongsToNeed");
+    const remoteNeedUri = jsonldConnectionImm.get("hasRemoteNeed");
+    const uri = jsonldConnectionImm.get("uri");
+
+    if(!!uri && !!belongsToUri && !!remoteNeedUri){
+        parsedConnection.belongsToUri = belongsToUri;
+        parsedConnection.data.uri = uri;
+        parsedConnection.data.remoteNeedUri = remoteNeedUri;
+
+        const creationDate = jsonldConnectionImm.get("dct:created"); //THIS IS NOT IN THE DATA
+        if(creationDate){
+            parsedConnection.data.creationDate = creationDate;
+        }
+
+        const state = jsonldConnectionImm.get("hasConnectionState");
+        if(
+            (state === won.WON.RequestReceived) ||
+            (state === won.WON.RequestSent) ||
+            (state === won.WON.Suggested) ||
+            (state === won.WON.Connected) ||
+            (state === won.WON.Closed)
+        ) {
+            parsedConnection.data.state = state;
+        }else{
+            console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
+            return undefined; //FOR UNKNOWN STATES
+        }
+
+        return Immutable.fromJS(parsedConnection);
+    }else{
+        console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
+        return undefined;
+    }
+}
+
+function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
+    const jsonldMessageImm = Immutable.fromJS(jsonldMessage);
+
+    let parsedMessage = {
+        belongsToUri: undefined,
+        data: {
+            uri: undefined,
+            text: undefined,
+            date: undefined,
+            outgoingMessage: outgoingMessage,
+            newMessage: !!newMessage,
+            connectMessage: false,
+        }
+    };
+
+    if(outgoingMessage){
+        parsedMessage.belongsToUri = jsonldMessageImm.get("hasSender");
+        parsedMessage.data.uri = jsonldMessageImm.get("uri");
+        parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
+        parsedMessage.data.date = msStringToDate(jsonldMessageImm.get("hasSentTimestamp"));
+    }else{
+        const fromOwner = jsonldMessageImm.get("msg:FromOwner");
+
+        if(fromOwner){
+            //If message is received directly
+            parsedMessage.belongsToUri = fromOwner.get("hasReceiver");
+            parsedMessage.data.uri = fromOwner.get("uri");
+            parsedMessage.data.text = fromOwner.get("hasTextMessage");
+            parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["msg:FromExternal", "hasReceivedTimestamp"]));
+        }else{
+            const fromCorrespondingMessage = jsonldMessageImm.get("hasCorrespondingRemoteMessage");
+
+            if(fromCorrespondingMessage){
+                //if message comes within the events of showLatestMessages/showMoreMessages action
+                parsedMessage.belongsToUri = jsonldMessageImm.get("hasReceiver");
+                parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
+                parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
+                parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
+
+                if(fromCorrespondingMessage.get("hasMessageType") === won.WONMSG.connectMessage){
+                    parsedMessage.data.connectMessage = true;
+                }
+            }
+        }
+    }
+
+    if(
+        !parsedMessage.data.uri ||
+        !parsedMessage.belongsToUri ||
+        !parsedMessage.data.text ||
+        !parsedMessage.data.date
+    ) {
+        console.error('Cant parse chat-message, data is an invalid message-object: ', jsonldMessageImm.toJS());
+        return undefined;
+    } else {
+        return Immutable.fromJS(parsedMessage);
+    }
+}
+
+function parseNeed(jsonldNeed, ownNeed) {
+    const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
+
+    let parsedNeed = {
+        uri: undefined,
+        title: undefined,
+        description: undefined,
+        type: undefined,
+        state: undefined,
+        tags: undefined,
+        location: undefined,
+        connections: Immutable.Map(),
+        creationDate: undefined,
+        ownNeed: !!ownNeed,
+        isWhatsAround: false,
+    };
+
+    if(jsonldNeedImm){
+        const uri = jsonldNeedImm.get("@id");
+
+        const isPresent = !!jsonldNeedImm.getIn(["won:is", "dc:title"]);
+        const seeksPresent = !!jsonldNeedImm.getIn(["won:seeks", "dc:title"]);
+        const is = jsonldNeedImm.get("won:is");
+        const seeks = jsonldNeedImm.get("won:seeks");
+
+        const title = isPresent ? is.get("dc:title") : (seeksPresent ? seeks.get("dc:title") : undefined);
+
+        if(!!uri && !!title){
+            parsedNeed.uri = uri;
+            parsedNeed.title = title;
+        }else{
+            return undefined;
+        }
+
+        /*
+        The following code-snippet is solely to determine if the parsed need is a special "whats around"-need,
+        in order to do this we have to make sure that the won:hasFlag is checked in two forms, both as a string
+        and an immutable object
+        */
+        const wonHasFlags = jsonldNeedImm.get("won:hasFlag");
+        const isWhatsAround = wonHasFlags && wonHasFlags
+                .filter(function(flag) {
+                    if(flag instanceof Immutable.Map){
+                        return flag.get("@id") === "won:WhatsAround";
+                    } else {
+                        return flag === "won:WhatsAround";
+                    }
+                })
+                .size > 0;
+
+        const creationDate = jsonldNeedImm.get("dct:created");
+        if(creationDate){
+            parsedNeed.creationDate = creationDate;
+        }
+
+        const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);
+        if(state === won.WON.ActiveCompacted){ //we use to check for active state and everything else will be inactive
+            parsedNeed.state = state;
+        } else {
+            parsedNeed.state = won.WON.InactiveCompacted;
+        }
+
+        let type = undefined;
+        let description = undefined;
+        let tags = undefined;
+        let location = undefined;
+
+        if(isPresent){
+            type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+            description = is.get("dc:description");
+            tags = is.get("won:hasTag");
+            location = parseLocation(is.get("won:hasLocation"));
+        }else if(seeksPresent){
+            type = won.WON.BasicNeedTypeDemandCompacted;
+            description = seeks.get("dc:description");
+            tags = seeks.get("won:hasTag");
+            location = parseLocation(seeks.get("won:hasLocation"));
+        }
+
+        parsedNeed.tags = tags ? tags : undefined;
+        parsedNeed.description = description ? description : undefined;
+        parsedNeed.isWhatsAround = !!isWhatsAround;
+        parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
+        parsedNeed.location = location;
+    }else{
+        console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm.toJS());
+        return undefined;
+    }
+
+    return Immutable.fromJS(parsedNeed);
+}
+
+function parseLocation(jsonldLocation) {
+    if(!jsonldLocation) return undefined; //NO LOCATION PRESENT
+
+    const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
+
+    let location = {
+        address: undefined,
+        lat: undefined,
+        lng: undefined,
+        nwCorner: {
+            lat: undefined,
+            lng: undefined,
+        },
+        seCorner: {
+            lat: undefined,
+            lng: undefined
+        }
+    };
+
+    location.address = jsonldLocationImm.get("s:name");
+
+    location.lat = Number.parseFloat(jsonldLocationImm.getIn(["s:geo", "s:latitude"]));
+    location.lng = Number.parseFloat(jsonldLocationImm.getIn(["s:geo", "s:longitude"]));
+
+    location.nwCorner.lat = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner", "s:latitude"]));
+    location.nwCorner.lng = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner", "s:longitude"]));
+    location.seCorner.lat = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner", "s:latitude"]));
+    location.seCorner.lng = Number.parseFloat(jsonldLocationImm.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner", "s:longitude"]));
+
+    if(
+        location.address &&
+        location.lat &&
+        location.lng &&
+        location.nwCorner.lat &&
+        location.nwCorner.lng &&
+        location.seCorner.lat &&
+        location.seCorner.lng
+    ){
+        return Immutable.fromJS(location);
+    }
+
+    console.error('Cant parse location, data is an invalid location-object: ', jsonldLocationImm.toJS());
+    return undefined;
 }
