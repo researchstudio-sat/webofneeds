@@ -424,6 +424,11 @@ It specifies a content - what the need is about, which may be something that is 
             rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this need completely."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+###  http://purl.org/webofneeds/model#WhatsAround
+:WhatsAround rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "A Need specifying this flag indicates that matchers should not match with anything but the location within this need. The intention of this Flag is to simply find other needs around a certain location."@en ;
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
 ###  http://purl.org/webofneeds/model#GroupFacet
 :GroupFacet rdf:type owl:NamedIndividual ,
                      :Facet ;
