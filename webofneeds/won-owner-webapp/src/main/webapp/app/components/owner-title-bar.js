@@ -19,7 +19,7 @@ function genComponentConf() {
 
 
                 <div class="ntb__inner__left">
-                    <a ng-click="self.router__stateGoResetParams('overviewPosts')">
+                    <a ng-click="self.router__stateGoResetParams('overviewPosts')" class="clickable">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
                     <won-square-image
