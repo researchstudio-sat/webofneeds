@@ -6,7 +6,7 @@ import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
 import matchesFlowItemModule from './matches-flow-item';
 import matchesGridItemModule from './matches-grid-item';
-import connectionsMapModule from './connection-map';
+import connectionsMapModule from './connections-map';
 import sendRequestModule from './send-request';
 import connectionsOverviewModule from './connections-overview';
 import connectionSelectionModule from './connection-selection';
