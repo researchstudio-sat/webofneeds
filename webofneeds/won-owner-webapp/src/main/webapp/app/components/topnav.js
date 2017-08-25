@@ -10,6 +10,8 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import config from '../config';
 
+import * as srefUtils from '../sref-utils';
+
 function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
@@ -34,7 +36,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ng-click="self.router__stateGoResetParams(self.loggedIn ? 'feed' : 'landingpage')" class="topnav__button clickable">
+                    <a  ui-sref="{{ self.resetParamsSRef(self.loggedIn ? 'feed' : 'landingpage') }}" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">
                             Web of Needs &ndash; Beta
@@ -42,39 +44,33 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center">
-                    <a ng-click="self.router__stateGoResetParams('createNeed')" class="topnav__button clickable">
+                    <a ui-sref="{{ self.resetParamsSRef('createNeed') }}"
+                       class="topnav__button"
+                       ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
-                        <span class="topnav__button__caption">New Need</span>
+                        <span class="topnav__button__caption">New Post</span>
                     </a>
                 </div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
                         <li ng-show="!self.loggedIn">
-                            <button
-                                ng-click="self.router__stateGoAbs('landingpage', {focusSignup: true})"
+                            <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__button won-button--filled lighterblue"
                                 ng-show="!self.open">
                                     Sign up
-                            </button>
+                            </a>
                         </li>
-                        <li ng-show="!self.loggedIn">
+                        <li>
                             <a class="topnav__button"
                                 ng-click="self.showLogin()"
-                                ng-class="{'open' : !self.focusSignup && self.open}">
-                                    <span class="topnav__button__caption__always">Sign in</span>
+                                ng-class="{'open' : self.open}">
+                                    <span class="topnav__button__caption__always">
+                                        {{ self.loggedIn? self.email : "Sign In" }}
+                                    </span>
                                     <img src="generated/icon-sprite.svg#ico16_arrow_down"
                                         ng-show="!self.open" class="topnav__carret">
                                     <img src="generated/icon-sprite.svg#ico16_arrow_up_hi"
                                         ng-show="self.open" class="topnav__carret">
-                            </a>
-                        </li>
-                        <li ng-show="self.loggedIn" class="clickable" ng-click="self.showLogin()">
-                            <a class="topnav__button">
-                                <span class="topnav__button__caption">{{self.email}}</span>
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down"
-                                    class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_person"
-                                    class="topnav__button__icon">
                             </a>
                         </li>
                     </ul>
@@ -83,7 +79,7 @@ function genTopnavConf() {
         </nav>
 
 
-        <nav class="loginOverlay" ng-show="!self.focusSignup && self.open && !self.loggedIn">
+        <nav class="loginOverlay" ng-show="self.open && !self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-login open="self.open"></won-login>
@@ -92,7 +88,7 @@ function genTopnavConf() {
         </nav>
 
 
-        <nav class="loginOverlay" ng-show="!self.focusSignup && self.open && self.loggedIn">
+        <nav class="loginOverlay" ng-show="self.open && self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-logout open="self.open"></won-logout>
@@ -134,6 +130,7 @@ function genTopnavConf() {
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
+            Object.assign(this, srefUtils); // bind srefUtils to scope
             this.config = config;
 
             window.tnc4dbg = this;
@@ -143,7 +140,6 @@ function genTopnavConf() {
                 loginVisible: state.get('loginVisible'),
                 open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")
                 loggedIn: state.getIn(['user', 'loggedIn']),
-                focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
                 email: state.getIn(['user','email']),
                 toastsArray: state.getIn(['toasts']).toArray(),
                 connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
@@ -152,6 +148,10 @@ function genTopnavConf() {
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy',disconnect);
+        }
+
+        showLogin() {
+            this.open = true;
         }
     }
     Controller.$inject = serviceDependencies;

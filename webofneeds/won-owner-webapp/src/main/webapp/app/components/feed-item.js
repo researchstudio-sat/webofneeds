@@ -12,12 +12,18 @@ import {
     selectLastUpdateTime,
 } from '../selectors';
 
+import * as srefUtils from '../sref-utils';
+
 import feedItemLineModule from './feed-item-line';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
-        <div class="fi clickable" ng-click="self.router__stateGoAbs('post', {postUri: self.ownNeed.get('uri')})">
+
+        <a
+            class="fi clickable"
+            ui-sref="{{ self.absSRef('post', {postUri: self.ownNeed.get('uri')}) }}"
+        >
             <won-square-image
                 src="self.ownNeed.get('titleImg')"
                 title="self.ownNeed.get('title')"
@@ -45,7 +51,7 @@ function genComponentConf() {
                     </span>
                 </div>
             </div>
-        </div>
+        </a>
         <div class="fmil">
 
             <won-feed-item-line
@@ -76,7 +82,7 @@ function genComponentConf() {
         <div class="fi__footer" ng-show="self.unreadMatchesCount || self.unreadRequestsCount">
             <div class="fi__footer__indicators">
                 <a class="fi__footer__indicators__item clickable"
-                   ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Suggested, postUri: self.needUri})"
+                   ui-sref="{{ self.absSRef('post', { connectionType: self.WON.Suggested, postUri: self.needUri }) }}"
                    ng-show="self.unreadMatchesCount">
                     <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
@@ -100,6 +106,7 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            Object.assign(this, srefUtils); // bind srefUtils to scope
             this.labels = labels;
 
             const self = this;

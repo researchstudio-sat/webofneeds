@@ -12,10 +12,14 @@ import {
     selectAllOwnNeeds,
 } from '../../selectors';
 
+import * as srefUtils from '../../sref-utils';
+
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 class FeedController {
     constructor() {
         attach(this, serviceDependencies, arguments);
+        Object.assign(this, srefUtils); // bind srefUtils to scope
+
         this.selection = 0;
 
         this.resetParams = resetParams;

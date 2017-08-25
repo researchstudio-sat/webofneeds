@@ -1,0 +1,73 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+
+.signup {
+  font-weight: 300;
+
+  @include max-content-width($maxContentWidth / 2, $minContentPadding, 'su');
+
+  .su__inner {
+    padding-top: 3rem;
+  }
+
+  .title {
+    text-align: center;
+    font-size: $bigFontSize;
+    padding-bottom: 2rem;
+  }
+  .title {
+    position: relative;
+  }
+
+  .sub {
+    font-size: $normalFontSize;
+  }
+
+  .trygrid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+
+    .block{
+      padding-bottom: 1rem;
+    }
+
+    .tg__signup {
+      position: relative;
+      z-index: 101;
+      padding: 0 4rem;
+      margin: 0 1rem;
+    }
+
+    .tg__signup {
+      max-width: 18rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        max-width: 18rem;
+        padding: 0.5rem;
+        border: 0;
+        margin: 0;
+      }
+    }
+
+    .tg__errormsg {
+      font-size: $smallFontSize;
+    }
+
+    input[type=text],
+    input[type=password],
+    input[type=email] {
+      margin: 1rem 0;
+      width: 100%;
+    }
+
+    input.ng-invalid {
+      margin: 1rem 0 0 0;
+    }
+  }
+}

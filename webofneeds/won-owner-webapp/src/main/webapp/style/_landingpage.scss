@@ -2,7 +2,7 @@
 @import 'sizing-utils';
 @import 'fonts';
 
-
+@import 'won-config';
 
 .curtain {
   position: fixed;
@@ -21,158 +21,23 @@ main.landingpage {
     //box-sizing: border-box did not work (the height property was faulty then
   }
 
-  .welcome {
-      background-color: $won-blue;
-      color: white;
-      font-family: $font-family-sans-serif;
-      font-weight: 300;
-      padding: 5rem $minContentPadding;
+  padding-top: 2rem;
+  border-top: 1px solid $won-line-gray;
 
-      @media (max-width: $responsivenessBreakPoint) {
-        padding: 2rem $minContentPadding;
-      }
+  .lp__footnote {
+    align-items: flex-end;
+    align-self: center;
+    display: flex;
+    max-width: $maxContentWidth / 2;
+    flex-direction: column;
+    border-top: 1px solid $won-line-gray;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
 
-      .title{ color: white; }
-
-      .w__description {
-          margin: 0 auto;
-          max-width: 30rem;
-          text-align: center;
-          padding: 1rem;
-          font-size: $smallFontSize;
-          font-weight: 500;
-
-          .wd__title {
-            display: block;
-            color: $won-red;
-            font-size: $normalFontSize;
-            border-top: $thinBorderWidth solid $won-light-blue;
-            padding-top: 0.5rem;
-            max-width: 22rem;
-            margin: 0 auto;
-          }
-
-          .wd__text {
-            padding-top: 1rem;
-            padding-bottom: 0.5rem;
-            text-align: left;
-            display: block;
-          }
-
-          .wd__more {
-            color: $won-red;
-          }
-
-          .wd__arrow {
-            display: block;
-            margin: 0 auto;
-            width: 1rem;
-          }
-      }
-  }
-
-  .howto {
-      font-weight: 300;
-      border-top: $thinGrayBorder;
-      padding: $minContentPadding;
-  }
-
-  .faq {
-      font-weight: 300;
-      border-top: $thinGrayBorder;
-      padding: $minContentPadding;
-      background-color: $won-lighter-gray;
-
-      won-accordion {
-        display: block;
-        max-width: 30rem;
-        margin: 0 auto;
-      }
-  }
-
-  .try {
-      font-weight: 300;
-      padding: $minContentPadding;
-      background-color: $won-red;
-
-      .title {
-        position: relative;
-        z-index: 101;
-        color: white;
-      }
-
-      .sub {
-        font-size: $normalFontSize;
-      }
-
-      .trygrid {
-        display: flex;
-        justify-content: center;
-        align-items: stretch;
-        flex-wrap: wrap;
-
-        .block{
-          padding-bottom: 1rem;
-        }
-
-        .tg__signup {
-          position: relative;
-          z-index: 101;
-          background-color: $won-red;
-          padding: 1rem 4rem;
-          margin: 0 1rem;
-        }
-
-        .tg__anonymous,
-        .tg__signup {
-          width: 18rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-
-          @media (max-width: $responsivenessBreakPoint) {
-              width: 18rem;
-              padding: 0.5rem;
-              border: 0;
-              margin: 0;
-          }
-        }
-
-        .tg__errormsg {
-          font-size: $smallFontSize;
-          color: white;
-        }
-
-        .tg__anonymous {
-          padding: 1rem 5rem;
-          border-left: $thinBorderWidth solid $won-light-gray;
-        }
-
-        .tg__anonymous {
-          .description {
-            color: white;
-            padding: 1rem 0;
-          }
-        }
-
-
-
-        input[type=text],
-        input[type=password],
-        input[type=email] {
-          margin: 1rem 0;
-          width: 100%;
-        }
-
-        input.ng-invalid {
-          margin: 1rem 0 0 0;
-        }
-      }
-  }
-
-  .title {
-    text-align: center;
-    font-size: $bigFontSize;
-    padding-bottom: 2rem;
+    a {
+      font-size: $normalFontSize;
+      color: $won-line-gray;
+      text-decoration: none;
+    }
   }
 }

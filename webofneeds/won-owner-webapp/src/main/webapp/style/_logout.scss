@@ -2,8 +2,19 @@
 @import 'flex-layout';
 @import 'sizing-utils';
 
+won-logout2 {
+  .mrb__icon {
+    @include fixed-square($bigiconSize);
+  }
+
+  .mrb__carret {
+    // with svg-included margins
+    @include carretSized;
+  }
+
+}
+
 won-logout {
-  $responsivenessBreakPoint: 31rem;
 
   background: white;
   display: block;
