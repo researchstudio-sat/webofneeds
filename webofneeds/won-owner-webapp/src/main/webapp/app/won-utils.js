@@ -17,6 +17,7 @@ export function initLeaflet(mapMount) {
 
     const baseMaps = initLeafletBaseMaps();
 
+    console.log("Mounting map into: ", mapMount);
     const map = L.map(mapMount,{
         center: [37.44, -42.89], //centered on north-west africa
         zoom: 1, //world-map
