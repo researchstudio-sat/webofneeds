@@ -116,7 +116,7 @@ public class NeedIndexer {
         if (config.isCommitIndexedNeedImmediately()) {
             indexUri += "?commit=" + config.isCommitIndexedNeedImmediately();
         }
-        log.debug("Post needto solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
+        log.debug("Post need to solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
         httpService.postJsonRequest(indexUri, needJson);
     }
 }

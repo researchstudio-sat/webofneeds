@@ -24,9 +24,7 @@ import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.DefaultMatcherQueryExecuter;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.CreationDateQueryFactory;
-import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
-import won.matcher.solr.query.factory.NeedStateQueryFactory;
+import won.matcher.solr.query.factory.*;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
 
@@ -38,107 +36,178 @@ import java.time.temporal.ChronoUnit;
  */
 @Component
 @Scope("prototype")
-public abstract class SolrMatcherActor extends UntypedActor
-{
-  private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+public class SolrMatcherActor extends UntypedActor {
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-  @Autowired
-  private SolrMatcherConfig config;
+    @Autowired
+    private SolrMatcherConfig config;
 
-  @Autowired
-  private HintBuilder hintBuilder;
+    @Autowired
+    private HintBuilder hintBuilder;
 
-  @Autowired
-  private NeedIndexer needIndexer;
+    @Autowired
+    private NeedIndexer needIndexer;
 
-  @Autowired
-  @Qualifier("defaultMatcherQueryExecuter")
-  DefaultMatcherQueryExecuter defaultQueryExecuter;
+    @Autowired
+    @Qualifier("defaultMatcherQueryExecuter")
+    DefaultMatcherQueryExecuter defaultQueryExecuter;
 
-  @Autowired
-  TestMatcherQueryExecutor testQueryExecuter;
+    @Autowired
+    TestMatcherQueryExecutor testQueryExecuter;
 
-  @Override
-  public void onReceive(final Object o) throws Exception {
+    @Override
+    public void onReceive(final Object o) throws Exception {
 
-    if (o instanceof NeedEvent) {
-        NeedEvent needEvent = (NeedEvent) o;
-        processNeedEvent(needEvent);
-    } else if (o instanceof BulkNeedEvent) {
-        log.info("received bulk need event, processing {} need events ...", ((BulkNeedEvent) o).getNeedEvents().size());
-        for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
-          processNeedEvent(event);
+        if (o instanceof NeedEvent) {
+            NeedEvent needEvent = (NeedEvent) o;
+            processNeedEvent(needEvent);
+        } else if (o instanceof BulkNeedEvent) {
+            log.info("received bulk need event, processing {} need events ...", ((BulkNeedEvent) o).getNeedEvents().size());
+            for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
+                processNeedEvent(event);
+            }
+        } else {
+            unhandled(o);
         }
-    } else {
-      unhandled(o);
-    }
-  }
-
-  protected void processNeedEvent(NeedEvent needEvent)
-    throws IOException, SolrServerException, JsonLdError {
-
-    log.info("Start processing need event {}", needEvent);
-
-    // check if the need has doNotMatch flag, then do not use it for querying or indexing
-    Dataset dataset = needEvent.deserializeNeedDataset();
-    NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
-    if (needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
-      log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}", needEvent);
-      return;
     }
 
-    // check if need is usedForTesting only
-    boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
-    SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
+    protected void processNeedEvent(NeedEvent needEvent)
+            throws IOException, SolrServerException, JsonLdError {
 
+        log.info("Start processing need event {}", needEvent);
 
-    // default query matches content terms (of fields title, description and tags) with different weights
-    // and gives an additional multiplicative boost for geographically closer needs
-    DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
-    String queryString = needQueryFactory.createQuery();
-
-    // add filters to the query: need status active and creation date overlap 1 month
-    String[] filterQueries = new String[2];
-    filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
-    filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-
-    log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-    SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
-
-      // publish hints
-    if (docs != null) {
-      BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper);
-        log.info("Create {} hints for need {}", events.getHintEvents().size(), needEvent);
-        if (events.getHintEvents().size() != 0) {
-            log.debug("Publish bulk hint event: " + events);
-            getSender().tell(events, getSelf());
+        // check if the need has doNotMatch flag, then do not use it for querying or indexing
+        Dataset dataset = needEvent.deserializeNeedDataset();
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
+        if (needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+            log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}", needEvent);
+            return;
         }
-    } else {
-      log.warning("No results found for query of need ", needEvent);
+
+        // check if need is usedForTesting only
+        boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
+        SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
+
+        // create another query depending if the current need is "WhatsAround" or a default need
+        String queryString = null;
+        if (needModelWrapper.hasFlag(WON.WHATS_AROUND)) {
+            // WhatsAround doesnt match on terms only other needs in close location are boosted
+            WhatsAroundQueryFactory qf = new WhatsAroundQueryFactory(dataset);
+            queryString = qf.createQuery();
+        } else {
+            // default query matches content terms (of fields title, description and tags) with different weights
+            // and gives an additional multiplicative boost for geographically closer needs
+            DefaultNeedQueryFactory qf = new DefaultNeedQueryFactory(dataset);
+            queryString = qf.createQuery();
+        }
+
+        // add filters to the query: default filters are need status active and creation date overlap 1 month
+        String[] filterQueries = null;
+
+        // now create three slightly different queries for different lists of needs:
+        // 1) needs without NoHintForCounterpart => hints for current need
+        // 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
+        // 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+        // to achieve this use a different filters for these queries
+
+        // case 1) needs without NoHintForCounterpart => hints for current need
+        filterQueries = new String[3];
+        filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
+        filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+        filterQueries[2] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery();
+        if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME)) {
+
+            // execute the query
+            log.info("query Solr endpoint {} for need {} and need list 1 (without NoHintForCounterpart)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
+            if (docs != null) {
+
+                // generate hints for current need
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true);
+                log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)", events.getHintEvents().size(), needEvent);
+
+                // publish hints to current need
+                if (events.getHintEvents().size() != 0) {
+                    getSender().tell(events, getSelf());
+                }
+            } else {
+                log.warning("No results found for need list 1 (without NoHintForCounterpart) query of need ", needEvent);
+            }
+        }
+
+        // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
+        filterQueries = new String[4];
+        filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
+        filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+        filterQueries[2] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery();
+        filterQueries[3] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery();
+        if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+
+            // execute the query
+            log.info("query Solr endpoint {} for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
+            if (docs != null) {
+
+                // generate hints for matched needs
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false);
+                log.info("Create {} hints for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", events.getHintEvents().size(), needEvent);
+
+                // publish hints to current need
+                if (events.getHintEvents().size() != 0) {
+                    getSender().tell(events, getSelf());
+                }
+            } else {
+                log.warning("No results found for need list 2 (without NoHintForSelf, excluding WhatsAround needs) query of need ", needEvent);
+            }
+        }
+
+        // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
+        filterQueries = new String[4];
+        filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
+        filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+        filterQueries[2] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery();
+        filterQueries[3] = new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND).createQuery();
+        if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+
+            // execute the query
+            log.info("query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
+            if (docs != null) {
+
+                // generate hints for matched needs
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false);
+                log.info("Create {} hints for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", events.getHintEvents().size(), needEvent);
+
+                // publish hints to current need
+                if (events.getHintEvents().size() != 0) {
+                    getSender().tell(events, getSelf());
+                }
+            } else {
+                log.warning("No results found for need list 3 (without NoHintForSelf that are only WhatsAround needs) query of need ", needEvent);
+            }
+        }
+
+        // index need
+        log.info("Add need event content {} to solr index", needEvent);
+        needIndexer.index(dataset);
     }
 
-      // index need
-      log.info("Add need event content {} to solr index", needEvent);
-      needIndexer.index(dataset);
-  }
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
 
-  @Override
-  public SupervisorStrategy supervisorStrategy() {
+        SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
+                0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>() {
 
-    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
-    {
+            @Override
+            public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-      @Override
-      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+                log.warning("Actor encountered error: {}", t);
+                // default behaviour
+                return SupervisorStrategy.escalate();
+            }
+        });
 
-        log.warning("Actor encountered error: {}", t);
-        // default behaviour
-        return SupervisorStrategy.escalate();
-      }
-    });
-
-    return supervisorStrategy;
-  }
+        return supervisorStrategy;
+    }
 
 }

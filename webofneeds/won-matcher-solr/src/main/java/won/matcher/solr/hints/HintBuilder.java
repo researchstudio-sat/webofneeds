@@ -99,7 +99,7 @@ public class HintBuilder {
         return matches;
     }
 
-    public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need, NeedModelWrapper needModelWrapper) {
+    public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need, NeedModelWrapper needModelWrapper, boolean doSuppressHintForNeed, boolean doSuppressHintForMatchedNeeds) {
 
         // generate hints from query result documents
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
@@ -111,7 +111,7 @@ public class HintBuilder {
         for (SolrDocument doc : newDocs) {
             //NOTE: not the whole document is loaded here. The fields that are selected are defined
             //in won.matcher.solr.query.DefaultMatcherQueryExecuter - if additional fields are required, the field list
-            //has to be exended in that class.
+            //has to be extended in that class.
 
             String matchedNeedUri = doc.getFieldValue("id").toString();
             if (matchedNeedUri == null) {
@@ -121,14 +121,19 @@ public class HintBuilder {
             List<String> flags = getValueList(doc, HAS_FLAG_SOLR_FIELD);
             boolean matchedNeedNoHintForMe = flags.contains(WON.NO_HINT_FOR_ME.toString());
             boolean matchedNeedNoHintForCounterpart = flags.contains(WON.NO_HINT_FOR_COUNTERPART.toString());
-            boolean doSuppressHintForNeed = noHintForMe || matchedNeedNoHintForCounterpart;
-            boolean doSuppressHintForMatchedNeed = noHintForCounterpart || matchedNeedNoHintForMe;
+
+            // suppress hints for current if its flags or its counterparts flags say so or if it was specified in the calling parameters
+            doSuppressHintForNeed = noHintForMe || matchedNeedNoHintForCounterpart || doSuppressHintForNeed;
+
+            // suppress hints for matched need if its flags or its counterparts flags say so or if it was specified in the calling parameters
+            doSuppressHintForMatchedNeeds = noHintForCounterpart || matchedNeedNoHintForMe || doSuppressHintForMatchedNeeds;
+
             if (log.isDebugEnabled()) {
                 log.debug("matched need has NoHintForMe: {}, NoHintForCounterpart: {}", matchedNeedNoHintForMe, matchedNeedNoHintForCounterpart);
                 log.debug("need will receive a hint: {} (uri: {})", !doSuppressHintForNeed, need.getUri());
-                log.debug("matched need need will receive a hint: {} (uri: {})", !doSuppressHintForMatchedNeed, matchedNeedUri);
+                log.debug("matched need need will receive a hint: {} (uri: {})", !doSuppressHintForMatchedNeeds, matchedNeedUri);
             }
-            if (doSuppressHintForNeed && doSuppressHintForMatchedNeed) {
+            if (doSuppressHintForNeed && doSuppressHintForMatchedNeeds) {
                 log.debug("no hints to be sent because of Suppress settings");
                 continue;
             }
@@ -141,7 +146,6 @@ public class HintBuilder {
 
             // normalize the final score
             double score = Double.valueOf(doc.getFieldValue("score").toString()) * config.getScoreNormalizationFactor();
-
             score = Math.max(0, Math.min(1, score));
 
             log.debug("generate hint for match {} with normalized score {}", matchedNeedUri, score);
@@ -153,7 +157,7 @@ public class HintBuilder {
             }
 
             // also send the same hints to the other side (remote need and wonnode)?
-            if (!doSuppressHintForMatchedNeed) {
+            if (!doSuppressHintForMatchedNeeds) {
                 bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, matchedNeedUri, need.getWonNodeUri(), need.getUri(),
                         config.getSolrServerPublicUri(), score));
             }

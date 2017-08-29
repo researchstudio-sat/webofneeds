@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
  * Created by hfriedrich on 15.09.2015.
  */
 @Configuration
-@ImportResource({"classpath:/spring/component/monitoring/monitoring-recorder.xml", "classpath:/spring/component/scheduling/matcher-service-scheduling.xml"})
+@ImportResource({"classpath:/spring/component/scheduling/matcher-service-scheduling.xml"})
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-solr.properties")
 public class SolrMatcherConfig
 {
