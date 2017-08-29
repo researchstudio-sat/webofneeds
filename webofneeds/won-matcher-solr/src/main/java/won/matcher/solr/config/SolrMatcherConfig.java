@@ -28,9 +28,6 @@ public class SolrMatcherConfig
   @Value("${matcher.solr.query.maxHints}")
   private int maxHints;
 
-  @Value("${matcher.solr.monitoring}")
-  private boolean monitoringEnabled;
-
   @Value("${matcher.solr.index.commit}")
   private boolean commitIndexedNeedImmediately;
 
@@ -39,9 +36,6 @@ public class SolrMatcherConfig
 
   @Value("${matcher.solr.query.cutAfterIthElbowInScore}")
   private int cutAfterIthElbowInScore;
-
-  @Value("${matcher.solr.createHintsForBothNeeds}")
-  private boolean createHintsForBothNeeds;
 
   @Value("${matcher.solr.query.score.normalizationFactor}")
   private float scoreNormalizationFactor;
@@ -64,14 +58,6 @@ public class SolrMatcherConfig
 
   public String getSolrServerPublicUri() {
     return solrServerPublicUri;
-  }
-
-  public boolean isMonitoringEnabled() {
-    return monitoringEnabled;
-  }
-
-  public boolean isCreateHintsForBothNeeds() {
-    return createHintsForBothNeeds;
   }
 
   public int getCutAfterIthElbowInScore() {
