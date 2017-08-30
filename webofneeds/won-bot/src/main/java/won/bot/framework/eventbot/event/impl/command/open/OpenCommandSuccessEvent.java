@@ -43,4 +43,9 @@ public class OpenCommandSuccessEvent extends AbstractMessageCommandResultEvent i
     public OpenCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
         super(originalCommandEvent, con, message);
     }
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

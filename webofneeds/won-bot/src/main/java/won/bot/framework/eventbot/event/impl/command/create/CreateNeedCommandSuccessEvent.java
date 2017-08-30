@@ -56,4 +56,9 @@ public class CreateNeedCommandSuccessEvent extends BaseNeedSpecificEvent impleme
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

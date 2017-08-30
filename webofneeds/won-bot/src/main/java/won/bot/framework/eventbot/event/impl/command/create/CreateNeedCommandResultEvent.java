@@ -18,8 +18,11 @@ package won.bot.framework.eventbot.event.impl.command.create;
 
 import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 
+import java.net.URI;
+
 /**
  * Tags a result event of a CreateNeedCommand.
  */
 public interface CreateNeedCommandResultEvent extends MessageCommandResultEvent {
+    URI getNeedURI();
 }

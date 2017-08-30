@@ -16,12 +16,8 @@
 
 package won.bot.framework.eventbot.event.impl.command.connectionmessage;
 
-import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
-import won.protocol.model.Connection;
-
-import java.net.URI;
 
 
 /**
@@ -31,5 +27,10 @@ public class ConnectionMessageCommandFailureEvent extends AbstractMessageCommand
 
     public ConnectionMessageCommandFailureEvent(ConnectionMessageCommandEvent originalCommandEvent) {
         super(originalCommandEvent, originalCommandEvent.getCon());
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
     }
 }
