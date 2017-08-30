@@ -17,6 +17,8 @@
 package won.bot.framework.eventbot.action.impl.counter;
 
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
  * User: fkleedorfer
@@ -81,5 +83,16 @@ public class TargetCounterDecorator implements Counter
     this.context.getEventBus().publish(new TargetCountReachedEvent(this));
   }
 
+  public EventFilter makeEventFilter(){
+      return new EventFilter() {
+          @Override
+          public boolean accept(Event event) {
+              if (! (event instanceof TargetCountReachedEvent)) {
+                  return false;
+              }
+              return ((TargetCountReachedEvent)event).getCounter() == TargetCounterDecorator.this;
+          }
+      };
+  }
 
 }
