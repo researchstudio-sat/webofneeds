@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
+import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,30 +280,92 @@ public class WonRdfUtils
       return null;
     }
 
-    /**
-     * Returns the first won:hasTextMessage object, or null if none is found.
-     * @param wonMessage
-     * @return
-     */
-    public static String getTextMessage(final WonMessage wonMessage){
-      Dataset dataset = wonMessage.getCompleteDataset();
-      RDFNode node = getTextMessageForResource(dataset, wonMessage.getMessageURI());
-      if (node != null) return node.asLiteral().toString();
-      node = getTextMessageForResource(dataset, wonMessage.getCorrespondingRemoteMessageURI());
-      if (node != null) return node.asLiteral().toString();
-      URI forwardedMessageURI = wonMessage.getForwardedMessageURI();
-      if (forwardedMessageURI != null){
-        node = getTextMessageForResource(dataset, forwardedMessageURI);
-        if (node != null) return node.asLiteral().toString();
-        //get the remote message for the forwarded message
-        RDFNode msgNode = RdfUtils.findOnePropertyFromResource(dataset, forwardedMessageURI, WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE);
-        if (msgNode != null && msgNode.isResource()){
-          node = getTextMessageForResource(dataset, msgNode.asResource());
-          if (node != null) return node.asLiteral().toString();
-        }
+
+      /**
+       * Returns the first won:hasTextMessage object, or null if none is found.
+       * tries the message, its corresponding remote message, and any forwarded message,
+       * if any of those are contained in the dataset
+       *
+       * @param wonMessage
+       * @return
+       */
+      public static String getTextMessage(final WonMessage wonMessage) {
+          URI messageURI = wonMessage.getMessageURI();
+
+          //find the text message in the message, the remote message, or any forwarded message
+          String queryString =
+                  "prefix msg: <http://purl.org/webofneeds/message#>\n" +
+                          "prefix won: <http://purl.org/webofneeds/model#>\n" +
+                          "\n" +
+                          "SELECT distinct ?txt WHERE {\n" +
+                          "  {\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
+                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
+                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gE { ?msg5 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
+                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gF { ?msg6 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
+                          "    graph ?gE { ?msg5 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
+                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gG { ?msg7 msg:hasForwardedMessage ?msg6 }\n" +
+                          "    graph ?gF { ?msg6 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
+                          "    graph ?gE { ?msg5 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
+                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  }\n" +
+                          "\n" +
+                          "}";
+          Query query = QueryFactory.create(queryString);
+
+          QuerySolutionMap initialBinding = new QuerySolutionMap();
+          Model tmpModel = ModelFactory.createDefaultModel();
+          initialBinding.add("msg", tmpModel.getResource(messageURI.toString()));
+          try (QueryExecution qexec = QueryExecutionFactory
+                  .create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String textMessage = rdfNodeToString(qs.get("txt"));
+                  if (rs.hasNext()) {
+                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
+                      throw new IllegalArgumentException("wonMessage has more than one text messages");
+                  }
+                  return textMessage;
+              }
+          }
+          return null;
       }
-      return null;
-    }
+
+      private static String rdfNodeToString(RDFNode node) {
+          if (node.isLiteral()) {
+              return node.asLiteral().getString();
+          } else if (node.isResource()) {
+              return node.asResource().getURI();
+          }
+          return null;
+      }
 
     private static RDFNode getTextMessageForResource(Dataset dataset, URI uri){
       if (uri == null) return  null;
