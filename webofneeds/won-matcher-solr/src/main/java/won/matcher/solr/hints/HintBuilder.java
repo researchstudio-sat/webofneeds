@@ -99,11 +99,15 @@ public class HintBuilder {
         return matches;
     }
 
-    public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need, NeedModelWrapper needModelWrapper, boolean doSuppressHintForNeed, boolean doSuppressHintForMatchedNeeds) {
+    public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need, NeedModelWrapper needModelWrapper, boolean doSuppressHintForNeed, boolean doSuppressHintForMatchedNeeds, boolean kneeDetection) {
 
-        // generate hints from query result documents
+        // check if knee detection should be performed
+        SolrDocumentList newDocs = docs;
+        if (kneeDetection) {
+            newDocs = calculateMatchingResults(docs);
+        }
+
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
-        SolrDocumentList newDocs = calculateMatchingResults(docs);
         log.info("Received {} matches as query result for need {}, keeping the top {} ", new Object[]{(docs != null) ? docs.size() : 0, need, newDocs.size()});
         boolean noHintForMe = needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME);
         boolean noHintForCounterpart = needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART);

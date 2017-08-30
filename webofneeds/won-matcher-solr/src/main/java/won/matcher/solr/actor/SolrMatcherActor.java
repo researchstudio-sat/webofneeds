@@ -122,8 +122,15 @@ public class SolrMatcherActor extends UntypedActor {
             SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
             if (docs != null) {
 
-                // generate hints for current need
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true);
+                // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
+                // perform knee detection depending on current need is WhatsAround or not)
+                BulkHintEvent events = null;
+                if (needModelWrapper.hasFlag(WON.WHATS_AROUND)) {
+                    events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, false);
+                } else {
+                    events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, true);
+                }
+
                 log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)", events.getHintEvents().size(), needEvent);
 
                 // publish hints to current need
@@ -148,8 +155,8 @@ public class SolrMatcherActor extends UntypedActor {
             SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
             if (docs != null) {
 
-                // generate hints for matched needs
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false);
+                // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, perform knee detection)
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, true);
                 log.info("Create {} hints for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", events.getHintEvents().size(), needEvent);
 
                 // publish hints to current need
@@ -174,8 +181,8 @@ public class SolrMatcherActor extends UntypedActor {
             SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
             if (docs != null) {
 
-                // generate hints for matched needs
-                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false);
+                // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, do not perform knee detection)
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, true, false, false);
                 log.info("Create {} hints for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", events.getHintEvents().size(), needEvent);
 
                 // publish hints to current need
