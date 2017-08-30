@@ -32,7 +32,12 @@ public class IsSystemMessageToOwnerPredicate implements Predicate {
     public boolean matches(Exchange exchange) {
         WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
         if (message == null) return false;
-        return message.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM
-                && message.getSenderURI() != null && message.getSenderURI().equals(message.getReceiverURI());
+        if (message.getEnvelopeType() != WonMessageDirection.FROM_SYSTEM) return false;
+        if (message.getSenderURI() != null) {
+            return message.getSenderURI().equals(message.getReceiverURI());
+        } else {
+            if (message.getSenderNeedURI() == null) return false;
+            return message.getSenderNeedURI().equals(message.getReceiverNeedURI());
+        }
     }
 }
