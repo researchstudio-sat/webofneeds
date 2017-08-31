@@ -15,6 +15,9 @@ import {
     decodeUriComponentProperly,
     getIn,
 } from '../utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
 import {
@@ -135,8 +138,7 @@ class Controller {
                 hasMatches: matches.size > 0,
             };
         };
-        const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        this.$scope.$on('$destroy', disconnect);
+        connect2Redux(selectFromState, actionCreators, [], this);
     }
 
     selectedConnection(connectionUri) {

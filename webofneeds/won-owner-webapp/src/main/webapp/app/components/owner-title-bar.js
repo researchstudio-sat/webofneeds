@@ -7,6 +7,9 @@ import {
     decodeUriComponentProperly,
     getIn,
 } from '../utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
 import {
@@ -166,8 +169,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         closePost() {

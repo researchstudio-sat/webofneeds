@@ -21,6 +21,7 @@ import { actionCreators }  from '../actions/actions';
 import L from '../leaflet-bundleable';
 import {
     initLeaflet,
+    connect2Redux,
 } from '../won-utils';
 
 import {
@@ -129,8 +130,7 @@ function genComponentConf() {
                     debugmode: won.debugmode
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         mapInView(inviewInfo) {

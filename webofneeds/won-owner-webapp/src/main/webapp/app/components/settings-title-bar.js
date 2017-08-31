@@ -9,6 +9,9 @@ import {
     getIn,
 } from '../utils';
 import { actionCreators } from '../actions/actions';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 function genComponentConf() {
     let template = `
@@ -42,8 +45,7 @@ function genComponentConf() {
             const selectFromState = (state) => ({
                 routerState: getIn(state, ['router','currentState','name']),
             });
-            const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', unsubscribe);
+            connect2Redux(selectFromState, actionCreators, [], this);
 
         }
         back() { window.history.back() }

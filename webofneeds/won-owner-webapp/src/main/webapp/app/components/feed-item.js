@@ -11,6 +11,9 @@ import {
 import {
     selectLastUpdateTime,
 } from '../selectors';
+import {
+   connect2Redux,
+} from '../won-utils';
 
 import * as srefUtils from '../sref-utils';
 
@@ -108,6 +111,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             Object.assign(this, srefUtils); // bind srefUtils to scope
             this.labels = labels;
+            window.lastfi4dbg = this;
 
             const self = this;
             this.maxNrOfItemsShown = 3;
@@ -131,8 +135,7 @@ function genComponentConf() {
                     unreadRequestsCount,
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.needUri'], this);
         }
         showMore() {
             this.maxNrOfItemsShown += 6;

@@ -9,6 +9,9 @@ import {
     dispatchEvent,
 } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 import * as srefUtils from '../sref-utils';
 
@@ -81,8 +84,7 @@ function genLoginConf() {
                 loginError: state.getIn(['user','loginError'])
             });
 
-            const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
-            this.$scope.$on('$destroy',disconnect);
+            connect2Redux(login, actionCreators, [], this);
 
             this.autofillHack();
 

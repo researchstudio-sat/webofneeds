@@ -12,6 +12,9 @@ import { actionCreators }  from '../actions/actions';
 import {
     labels,
 } from '../won-label-utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 import {
     selectNeedByConnectionUri
@@ -89,8 +92,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
         }
 
         showFeedback() {

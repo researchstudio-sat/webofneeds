@@ -5,6 +5,9 @@
 
 import angular from 'angular';
 import { attach } from '../utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectAllOwnNeeds,
@@ -90,8 +93,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
     }
     Controller.$inject = serviceDependencies;

@@ -9,6 +9,9 @@ import { labels, relativeTime, } from '../won-label-utils';
 import {
     selectAllOwnNeeds,
 } from '../selectors';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
@@ -141,8 +144,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.needUri'], this);
         }
 
         isActive() {

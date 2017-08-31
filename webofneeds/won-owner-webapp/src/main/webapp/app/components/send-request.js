@@ -6,6 +6,9 @@ import postContentModule from './post-content';
 import postHeaderModule from './post-header';
 import { selectNeedByConnectionUri } from '../selectors';
 import {
+    connect2Redux,
+} from '../won-utils';
+import {
     attach,
     getIn,
 } from '../utils';
@@ -76,8 +79,7 @@ function genComponentConf() {
                     debugmode: won.debugmode,
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         sendRequest(message) {

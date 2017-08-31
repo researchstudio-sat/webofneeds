@@ -6,11 +6,15 @@
 import angular from 'angular';
 import {
     getIn,
+    attach,
+    decodeUriComponentProperly,
 } from '../utils';
 import {
     labels,
 } from '../won-label-utils';
-import { attach, decodeUriComponentProperly } from '../utils.js';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenPostUri,
@@ -52,8 +56,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionType'], this);
         }
 
         setOpen(connectionUri) {

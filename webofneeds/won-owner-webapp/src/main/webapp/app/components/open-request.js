@@ -7,6 +7,9 @@ import {
 import {
     attach,
 } from '../utils.js'
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
@@ -76,8 +79,7 @@ function genComponentConf() {
                     debugmode: won.debugmode,
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         closeRequestItemUrl() {

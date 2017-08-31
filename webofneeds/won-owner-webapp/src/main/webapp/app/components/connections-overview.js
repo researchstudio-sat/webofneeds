@@ -16,6 +16,9 @@ import {
 } from '../won-label-utils';
 
 import { attach } from '../utils.js';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 
 import {
@@ -72,8 +75,7 @@ function genComponentConf() {
                     relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionType'], this);
         }
         toggleConnections(ownNeedUri) {
             this.open[ownNeedUri] = !this.open[ownNeedUri]

@@ -6,6 +6,9 @@
 import angular from 'angular';
 import { attach, } from '../utils';
 import { labels } from '../won-label-utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { selectOpenPostUri } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 
@@ -62,8 +65,7 @@ function genComponentConf() {
                     hasConnectionWithOwnPost: false,
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
         back() { window.history.back() }
     }
