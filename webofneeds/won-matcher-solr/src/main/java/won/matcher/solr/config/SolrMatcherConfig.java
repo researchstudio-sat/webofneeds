@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
  * Created by hfriedrich on 15.09.2015.
  */
 @Configuration
-@ImportResource({"classpath:/spring/component/monitoring/monitoring-recorder.xml", "classpath:/spring/component/scheduling/matcher-service-scheduling.xml"})
+@ImportResource({"classpath:/spring/component/scheduling/matcher-service-scheduling.xml"})
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-solr.properties")
 public class SolrMatcherConfig
 {
@@ -28,9 +28,6 @@ public class SolrMatcherConfig
   @Value("${matcher.solr.query.maxHints}")
   private int maxHints;
 
-  @Value("${matcher.solr.monitoring}")
-  private boolean monitoringEnabled;
-
   @Value("${matcher.solr.index.commit}")
   private boolean commitIndexedNeedImmediately;
 
@@ -39,9 +36,6 @@ public class SolrMatcherConfig
 
   @Value("${matcher.solr.query.cutAfterIthElbowInScore}")
   private int cutAfterIthElbowInScore;
-
-  @Value("${matcher.solr.createHintsForBothNeeds}")
-  private boolean createHintsForBothNeeds;
 
   @Value("${matcher.solr.query.score.normalizationFactor}")
   private float scoreNormalizationFactor;
@@ -64,14 +58,6 @@ public class SolrMatcherConfig
 
   public String getSolrServerPublicUri() {
     return solrServerPublicUri;
-  }
-
-  public boolean isMonitoringEnabled() {
-    return monitoringEnabled;
-  }
-
-  public boolean isCreateHintsForBothNeeds() {
-    return createHintsForBothNeeds;
   }
 
   public int getCutAfterIthElbowInScore() {

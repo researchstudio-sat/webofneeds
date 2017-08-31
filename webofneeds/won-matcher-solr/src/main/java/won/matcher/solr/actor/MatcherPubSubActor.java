@@ -57,13 +57,8 @@ public class MatcherPubSubActor extends UntypedActor
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
 
     // create the querying and indexing actors that do the actual work
-    if (config.isMonitoringEnabled()) {
       matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
-        getContext().system()).fromConfigProps(SolrMonitoringMatcherActor.class), "SolrMatcherPool");
-    } else {
-      matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
-        getContext().system()).fromConfigProps(SolrMonitoringMatcherActor.class), "SolrMatcherPool");
-    }
+        getContext().system()).fromConfigProps(SolrMatcherActor.class), "SolrMatcherPool");
 
     // Create a scheduler to request missing need events from matching service while this matcher was not available
     getContext().system().scheduler().schedule(
