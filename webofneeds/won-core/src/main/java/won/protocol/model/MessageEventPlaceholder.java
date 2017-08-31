@@ -14,7 +14,8 @@ import java.util.Date;
         //indices for this class have the name prefix "IDX_ME"
         @Index(name = "IDX_ME_PARENT_URI", columnList = "parentURI"),
         @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
-        @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage")
+        @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage"),
+        @Index(name = "IDX_ME_INNERMOST_MESSAGE_URI_RECEIVER_NEED_URI", columnList = "messageURI, receiverNeedURI, innermostMessageURI, correspondingRemoteMessageURI")
 }, uniqueConstraints = {
         @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
         @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
@@ -40,6 +41,7 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
         this.creationDate = new Date();
         this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
         this.referencedByOtherMessage = false;
+        this.innermostMessageURI = wonMessage.getInnermostMessageURI();
         this.eventContainer = eventContainer;
     }
 
@@ -107,6 +109,10 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
 
     @Column(name = "referencedByOtherMessage")
     private boolean referencedByOtherMessage;
+
+    @Column(name = "innermostMessageURI")
+    @Convert(converter = URIConverter.class)
+    private URI innermostMessageURI;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private DatasetHolder datasetHolder;
@@ -241,6 +247,14 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer> {
 
     public void setResponseMessageURI(final URI responseMessageURI) {
         this.responseMessageURI = responseMessageURI;
+    }
+
+    public URI getInnermostMessageURI() {
+        return innermostMessageURI;
+    }
+
+    public void setInnermostMessageURI(URI innermostMessageURI) {
+        this.innermostMessageURI = innermostMessageURI;
     }
 
     public DatasetHolder getDatasetHolder() {

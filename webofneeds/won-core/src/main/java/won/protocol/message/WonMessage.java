@@ -52,6 +52,7 @@ public class WonMessage implements Serializable {
     private WonMessageType isResponseToMessageType;
     private URI correspondingRemoteMessageURI;
     private URI forwardedMessageURI;
+    private URI innermostMessageURI;
     private List<AttachmentHolder> attachmentHolders;
 
     //private Resource msgBnode;
@@ -302,7 +303,12 @@ public class WonMessage implements Serializable {
                 currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
                 //check if the envelope contains references to 'contained' envelopes and remember their names
                 List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);
-                envelopesContainedInOthers.addAll(containedEnvelopes);
+                if (containedEnvelopes.isEmpty()){
+                    //we found the innermost envelope. Remember the respective innermost message uri
+                    this.innermostMessageURI = currentMessageURI;
+                } else {
+                    envelopesContainedInOthers.addAll(containedEnvelopes);
+                }
                 if (currentMessageURI != null) {
                     for (NodeIterator it = getContentGraphReferences(envelopeGraph,
                             envelopeGraph.getResource(currentMessageURI.toString())); it
@@ -479,6 +485,14 @@ public class WonMessage implements Serializable {
             this.forwardedMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_FORWARDED_MESSAGE);
         }
         return this.forwardedMessageURI;
+    }
+
+    public synchronized URI getInnermostMessageURI() {
+        if (this.innermostMessageURI == null){
+            //also sets the innermostMessageURI
+            getEnvelopeGraphs();
+        }
+        return this.innermostMessageURI;
     }
 
     public synchronized WonMessageType getIsResponseToMessageType() {
