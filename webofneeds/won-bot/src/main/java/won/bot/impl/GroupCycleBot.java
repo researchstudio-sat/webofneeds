@@ -65,7 +65,7 @@ import java.util.Set;
  * links them to each other and sends a message on behalf of one of the members, potentially causing an
  * endless echo. Used for verifying that the group facet suppresses echos.
  */
-public class GroupCircleBot extends EventBot {
+public class GroupCycleBot extends EventBot {
     private final int NUMBER_OF_GROUPMEMBERS = 3;
     private final int NUMBER_OF_GROUPS = 10;
     private final ConnectionHolder connectionForFirstMessage = new ConnectionHolder();

@@ -23,7 +23,7 @@
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
     <import resource="classpath:/spring/component/needproducer/needproducer-mixed.xml"/>
 
-    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.GroupCircleBot">
+    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.GroupCycleBot">
         <!-- optional property, by default one echo need per each need will be created -->
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="botContextWrapper" ref="botContextWrapper"/>

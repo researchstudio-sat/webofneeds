@@ -22,11 +22,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * App for EchoBot
  */
-public class GroupCircleBotApp
+public class GroupCycleBotApp
 {
     public static void main(String[] args) throws Exception {
         SpringApplication app = new SpringApplication(
-                new Object[]{"classpath:/spring/app/groupCircleBotApp.xml"}
+                new Object[]{"classpath:/spring/app/groupCycleBotApp.xml"}
         );
         app.setWebEnvironment(false);
         ConfigurableApplicationContext applicationContext =  app.run(args);
