@@ -45,7 +45,7 @@
     <!-- the runner -->
     <import resource="classpath:/spring/app/botRunner.xml"/>
     <!-- the bots to run -->
-    <import resource="classpath:/spring/bot/GroupCircleBot.xml"/>
+    <import resource="classpath:/spring/bot/GroupCycleBot.xml"/>
 
 
 </beans>
