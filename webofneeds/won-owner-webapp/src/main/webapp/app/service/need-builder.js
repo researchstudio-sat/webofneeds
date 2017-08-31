@@ -108,6 +108,16 @@ import won from './won';
             putIntoBoth ||
             args.type === won.WON.BasicNeedTypeDemandCompacted;
 
+        const hasFlag = [];
+
+        if(!!won.debugmode) {
+            hasFlag.push("won:UsedForTesting");
+        }
+
+        if(!!args.whatsAround){
+            hasFlag.push("won:WhatsAround");
+            hasFlag.push("won:NoHintForCounterpart");
+        }
 
         var graph = [
             {
@@ -116,9 +126,10 @@ import won from './won';
                 'won:is': putIntoIs? { '@id': '_:needContent' } : undefined,
                 'won:seeks': putIntoSeeks? { '@id': '_:needContent' } : undefined,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'won:hasFlag': !!won.debugmode ? 'won:UsedForTesting' : undefined,
+                'won:hasFlag': hasFlag,
             },
             {
+
                 '@id': '_:needContent',
                 'dc:title': args.title,
                 'dc:description': args.description,

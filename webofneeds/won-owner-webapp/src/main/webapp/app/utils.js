@@ -619,6 +619,24 @@ export function reverseSearchNominatim(lat, lon, zoom) {
     return fetchJSON(url);
 }
 
+/**
+ * drop info not stored in rdf, thus info that we
+ * couldn't restore for previously used locations
+ */
+export function nominatim2draftLocation(searchResult) {
+    const b = searchResult.boundingbox;
+    return {
+        name: searchResult.display_name,
+        lon: Number.parseFloat(searchResult.lon),
+        lat: Number.parseFloat(searchResult.lat),
+        //importance: searchResult.importance,
+        bounds: [
+            [ Number.parseFloat(b[0]), Number.parseFloat(b[2]) ], //north-western point
+            [ Number.parseFloat(b[1]), Number.parseFloat(b[3]) ] //south-eastern point
+        ],
+    }
+}
+
 function fetchJSON(url) {
     return fetch(url, {
         method: 'get',

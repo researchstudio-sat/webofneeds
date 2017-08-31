@@ -13,14 +13,13 @@ System.config({
   },
 
   meta: {
-    "rdfstore-js" : {
-      format: 'global',
-      exports: 'rdfstore',
-    },
+    "rdfstore-js": {
+      "format": "global",
+      "exports": "rdfstore"
+    }
   },
 
   map: {
-    "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
     "angular": "npm:angular@1.6.6",
     "angular-inview": "npm:angular-inview@2.1.0",
     "angular-route": "npm:angular-route@1.6.6",
@@ -34,6 +33,7 @@ System.config({
     "jsonld": "npm:jsonld@0.4.12",
     "leaflet": "npm:leaflet@0.7.7",
     "ng-redux": "npm:ng-redux@3.4.1",
+    "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
     "redux": "npm:redux@3.7.2",
     "redux-immutablejs": "npm:redux-immutablejs@0.0.8",
@@ -43,6 +43,9 @@ System.config({
     "sockjs": "bower:sockjs@0.3.4",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
+    },
+    "github:jspm/nodelibs-buffer@0.1.0": {
+      "buffer": "npm:buffer@3.6.0"
     },
     "github:jspm/nodelibs-buffer@0.1.1": {
       "buffer": "npm:buffer@5.0.7"
@@ -97,6 +100,14 @@ System.config({
     "npm:babel-runtime@5.8.35": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
+    "npm:buffer@3.6.0": {
+      "base64-js": "npm:base64-js@0.0.8",
+      "child_process": "github:jspm/nodelibs-child_process@0.1.0",
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "ieee754": "npm:ieee754@1.1.8",
+      "isarray": "npm:isarray@1.0.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
     "npm:buffer@5.0.7": {
       "base64-js": "npm:base64-js@1.2.1",
       "ieee754": "npm:ieee754@1.1.8"
@@ -108,12 +119,13 @@ System.config({
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:core-util-is@1.0.2": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.1"
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
-    "npm:es6-promise@2.3.0": {
-      "assert": "github:jspm/nodelibs-assert@0.1.0",
+    "npm:es6-promise@2.0.1": {
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "util": "github:jspm/nodelibs-util@0.1.0"
+      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
     "npm:immutable@3.7.5": {
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
@@ -125,8 +137,11 @@ System.config({
       "loose-envify": "npm:loose-envify@1.3.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
+    "npm:isarray@1.0.0": {
+      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+    },
     "npm:jsonld@0.4.12": {
-      "es6-promise": "npm:es6-promise@2.3.0",
+      "es6-promise": "npm:es6-promise@2.0.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:lodash._baseassign@3.2.0": {
@@ -225,7 +240,7 @@ System.config({
       "readable-stream": "npm:readable-stream@1.1.14"
     },
     "npm:string_decoder@0.10.31": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.1"
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
     "npm:util@0.10.3": {
       "inherits": "npm:inherits@2.0.1",

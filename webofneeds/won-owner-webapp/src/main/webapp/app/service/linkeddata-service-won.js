@@ -902,8 +902,10 @@ import won from './won';
                 } UNION {
                      <${needUri}> won:isInState ?c.
                      <${needUri}> ?b ?c.
-                 }
-
+                } UNION {
+                     <${needUri}> won:hasFlag ?c.
+                     <${needUri}> ?b ?c.
+                }
 
                 UNION
 
