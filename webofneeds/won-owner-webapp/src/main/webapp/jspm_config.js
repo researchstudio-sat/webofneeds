@@ -12,7 +12,15 @@ System.config({
     "bower:*": "jspm_packages/bower/*"
   },
 
+  meta: {
+    "rdfstore-js" : {
+      format: 'global',
+      exports: 'rdfstore',
+    },
+  },
+
   map: {
+    "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
     "angular": "npm:angular@1.6.6",
     "angular-inview": "npm:angular-inview@2.1.0",
     "angular-route": "npm:angular-route@1.6.6",
@@ -23,7 +31,7 @@ System.config({
     "core-js": "npm:core-js@1.2.6",
     "fetch": "github:github/fetch@0.10.1",
     "immutable": "npm:immutable@3.7.5",
-    "jsonld": "npm:jsonld@0.4.2",
+    "jsonld": "npm:jsonld@0.4.12",
     "leaflet": "npm:leaflet@0.7.7",
     "ng-redux": "npm:ng-redux@3.4.1",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
@@ -102,11 +110,10 @@ System.config({
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.1"
     },
-    "npm:es6-promise@2.0.1": {
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "path": "github:jspm/nodelibs-path@0.1.0",
+    "npm:es6-promise@2.3.0": {
+      "assert": "github:jspm/nodelibs-assert@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
+      "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:immutable@3.7.5": {
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
@@ -118,8 +125,8 @@ System.config({
       "loose-envify": "npm:loose-envify@1.3.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:jsonld@0.4.2": {
-      "es6-promise": "npm:es6-promise@2.0.1",
+    "npm:jsonld@0.4.12": {
+      "es6-promise": "npm:es6-promise@2.3.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:lodash._baseassign@3.2.0": {
