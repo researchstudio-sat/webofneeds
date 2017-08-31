@@ -4,8 +4,9 @@
 ;
 import won from '../won-es6';
 import angular from 'angular';
-import loginComponent from 'app/components/login';
-import logoutComponent from 'app/components/logout';
+import loginComponent from './login';
+import logoutComponent from './logout';
+import dropdownModule from './covering-dropdown';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import config from '../config';
@@ -56,6 +57,17 @@ function genTopnavConf() {
                 </div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
+                        <li>
+                            <won-dropdown style="position:relative; display:block;">
+                                <won-dd-header> Test Header </won-dd-header>
+                                <won-dd-menu>
+                                    <ul>
+                                        <li>Test</li>
+                                        <li>Menu</li>
+                                    </ul>
+                                </won-dd-menu>
+                            </won-dropdown>
+                        </li>
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__button won-button--filled lighterblue"
@@ -171,7 +183,8 @@ function genTopnavConf() {
 export default angular.module('won.owner.components.topnav', [
         'ngSanitize',
         loginComponent,
-        logoutComponent
+        logoutComponent,
+        dropdownModule,
     ])
     .directive('wonTopnav', genTopnavConf)
     .name;
