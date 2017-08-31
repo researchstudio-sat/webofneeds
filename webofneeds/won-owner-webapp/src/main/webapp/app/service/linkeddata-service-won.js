@@ -1083,7 +1083,7 @@ import won from './won';
                 return framed;
             })
             .catch(err => {
-                console.error(err);
+                console.error('Failed to frame need-data.', needUri, err);
                 throw err;
             });
 
