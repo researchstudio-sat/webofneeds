@@ -28,9 +28,8 @@ import {
     somePromises,
 } from '../utils';
 
-import '../../scripts/rdfstore-js/rdf_store';
-const rdfstore = window.rdfstore;
-import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
+import rdfstore from 'rdfstore-js';
+import jld from 'jsonld';
 import won from './won';
 (function(){
 
@@ -1069,7 +1068,7 @@ import won from './won';
         const context = frame['@context']? clone(frame['@context']) : {}; //TODO
         context.useNativeTypes = true; //do some of the parsing from strings to numbers
 
-        const jsonLdP = jsonld.promises
+        const jsonLdP = jld.promises
             .fromRDF(jsonldjsQuads, context)
             .then(complexJsonLd => {
                 //the framing algorithm expects an js-object with an `@graph`-property
@@ -1078,14 +1077,14 @@ import won from './won';
                     {'@graph': complexJsonLd};
 
                 //console.log('complexJsonLd_: ', complexJsonLd_);
-                return jsonld.promises.frame(complexJsonLd_, frame);
+                return jld.promises.frame(complexJsonLd_, frame);
             })
             .then(framed => {
                 console.log('framed: ', framed);
                 return framed;
             })
             .catch(err => {
-                console.error(err);
+                console.error('Failed to frame need-data.', needUri, err);
                 throw err;
             });
 

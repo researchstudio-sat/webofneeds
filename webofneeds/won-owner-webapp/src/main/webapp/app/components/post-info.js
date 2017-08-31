@@ -14,6 +14,9 @@ import {
     relativeTime,
 } from '../won-label-utils';
 import {
+    connect2Redux,
+} from '../won-utils';
+import {
     selectOpenPostUri,
     selectLastUpdateTime,
 } from '../selectors';
@@ -95,8 +98,7 @@ function genComponentConf() {
                     debugmode: won.debugmode
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 }
 Controller.$inject = serviceDependencies;

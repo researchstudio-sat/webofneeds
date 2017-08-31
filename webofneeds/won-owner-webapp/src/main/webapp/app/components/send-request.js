@@ -5,7 +5,13 @@ import 'ng-redux';
 import postContentModule from './post-content';
 import postHeaderModule from './post-header';
 import { selectNeedByConnectionUri } from '../selectors';
-import { attach } from '../utils';
+import {
+    connect2Redux,
+} from '../won-utils';
+import {
+    attach,
+    getIn,
+} from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -64,7 +70,7 @@ function genComponentConf() {
             window.openMatch4dbg = this;
 
             const selectFromState = (state) => {
-                const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+                const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
                 const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
@@ -73,8 +79,7 @@ function genComponentConf() {
                     debugmode: won.debugmode,
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         sendRequest(message) {

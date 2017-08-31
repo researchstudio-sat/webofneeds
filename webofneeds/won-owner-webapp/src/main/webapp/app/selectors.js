@@ -8,11 +8,12 @@ import won from './won-es6';
 import {
     decodeUriComponentProperly,
     is,
+    getIn,
 } from './utils';
 
 export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
-export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
+export const selectRouterParams = state => getIn(state, ['router', 'currentParams']);
 
 export const selectAllNeeds = state => state.get("needs");
 export const selectAllOwnNeeds = state => selectAllNeeds(state).filter(need =>
@@ -104,8 +105,8 @@ export const selectOpenConnectionUri = createSelector(
     (routerParams) => {
         //de-escaping is lost in transpiling if not done in two steps :|
         const openConnectionUri = decodeUriComponentProperly(
-            routerParams.get('connectionUri') ||
-            routerParams.get('openConversation')
+            routerParams['connectionUri'] ||
+            routerParams['openConversation']
         );
 
         if(openConnectionUri) {
@@ -120,8 +121,8 @@ export const selectOpenPostUri = createSelector(
     state => state,
     state => {
         const encodedPostUri =
-            state.getIn(['router', 'currentParams', 'postUri']) ||
-            state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
+            getIn(state, ['router', 'currentParams', 'postUri']) ||
+            getIn(state, ['router', 'currentParams', 'myUri']); //deprecated parameter
         return decodeUriComponentProperly(encodedPostUri);
     }
 );

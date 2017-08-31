@@ -4,8 +4,14 @@
 ;
 
 import angular from 'angular';
-import { attach } from '../utils';
+import {
+    attach,
+    getIn,
+} from '../utils';
 import { actionCreators } from '../actions/actions';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 function genComponentConf() {
     let template = `
@@ -37,10 +43,9 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
 
             const selectFromState = (state) => ({
-                routerState: state.getIn(['router','currentState','name']),
+                routerState: getIn(state, ['router','currentState','name']),
             });
-            const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', unsubscribe);
+            connect2Redux(selectFromState, actionCreators, [], this);
 
         }
         back() { window.history.back() }

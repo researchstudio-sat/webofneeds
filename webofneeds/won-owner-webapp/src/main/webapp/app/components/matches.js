@@ -11,7 +11,14 @@ import sendRequestModule from './send-request';
 import connectionsOverviewModule from './connections-overview';
 import connectionSelectionModule from './connection-selection';
 
-import { attach, decodeUriComponentProperly} from '../utils';
+import {
+    attach,
+    decodeUriComponentProperly,
+    getIn,
+} from '../utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
 import {
@@ -110,11 +117,11 @@ class Controller {
 
         const selectFromState = (state) => {
             let postUri = selectOpenPostUri(state);
-            const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
-            const isWhatsAround= state.getIn(["needs", postUri, "isWhatsAround"]);
+            const connectionUri = decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionUri']));
+            const isWhatsAround= getIn(state, ["needs", postUri, "isWhatsAround"]);
 
             // either of 'tiles', 'grid', 'list'
-            let layout = state.getIn(['router','currentParams','layout']);
+            let layout = getIn(state, ['router','currentParams','layout']);
             if(!layout) {
                 layout = isWhatsAround? 'map' : 'tiles';
             }
@@ -147,8 +154,7 @@ class Controller {
                 debugmode: won.debugmode,
             };
         };
-        const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        this.$scope.$on('$destroy', disconnect);
+        connect2Redux(selectFromState, actionCreators, [], this);
     }
 
     selectedConnection(connectionUri) {

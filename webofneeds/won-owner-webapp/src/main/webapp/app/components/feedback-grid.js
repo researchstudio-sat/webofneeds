@@ -4,6 +4,9 @@ import angular from 'angular';
 import 'ng-redux';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -28,8 +31,7 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         rateMatch(rating) {

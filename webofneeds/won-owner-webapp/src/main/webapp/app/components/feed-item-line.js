@@ -73,7 +73,7 @@ function genComponentConf() {
                     lastUpdated: connection && relativeTime(lastUpdated, connection.get('creationDate')),
                 }
             };
-            connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
+            connect2Redux(selectFromState, actionCreators, ['self.needUri', 'self.connectionUri'], this);
         }
 
         getTextForConnectionState(state){

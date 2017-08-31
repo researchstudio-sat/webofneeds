@@ -16,6 +16,9 @@ import {
 } from '../won-label-utils';
 
 import { attach } from '../utils.js';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 
 import {
@@ -64,7 +67,7 @@ function genComponentConf() {
                 //Select all needs with at least one connection
                 const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").filter(conn => conn.get("state") === this.connectionType).size > 0);
                 const routerParams = selectRouterParams(state);
-                const connUriInRoute = routerParams && decodeURIComponent(routerParams.get('connectionUri'));
+                const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
 
                 return {
@@ -72,8 +75,7 @@ function genComponentConf() {
                     relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionType'], this);
         }
         toggleConnections(ownNeedUri) {
             this.open[ownNeedUri] = !this.open[ownNeedUri]

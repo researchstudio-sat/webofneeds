@@ -5,6 +5,9 @@ import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import chatTextFieldModule from './chat-textfield';
 import {
+    connect2Redux,
+} from '../won-utils';
+import {
     attach,
     delay,
 } from '../utils.js'
@@ -140,8 +143,7 @@ function genComponentConf() {
                 }
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
 
             this.snapToBottom();
 
