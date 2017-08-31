@@ -301,38 +301,38 @@ public class WonRdfUtils
                           "  {\n" +
                           "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
                           "  } union {\n" +
-                          "    graph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
-                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "    graph ?gB { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n" +
+                          "    graph ?gA { ?msg2 won:hasTextMessage ?txt }\n" +
                           "  } union {\n" +
-                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
-                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
-                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "    graph ?gC { ?msg msg:hasForwardedMessage ?msg2 }\n" +
+                          "    graph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gA { ?msg3 won:hasTextMessage ?txt }\n" +
                           "  } union {\n" +
-                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
-                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
-                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
-                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "    graph ?gD { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n" +
+                          "    graph ?gC { ?msg2 msg:hasForwardedMessage ?msg3 }\n" +
+                          "    graph ?gB { ?msg3 msg:hasCorrespondingRemoteMessage ?msg4 }\n" +
+                          "    graph ?gA { ?msg4 won:hasTextMessage ?txt }\n" +
                           "  } union {\n" +
-                          "    graph ?gE { ?msg5 msg:hasForwardedMessage ?msg4 }\n" +
-                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
-                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
-                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
-                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "    graph ?gE { ?msg msg:hasForwardedMessage ?msg2 }\n" +
+                          "    graph ?gD { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gB { ?msg4 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
+                          "    graph ?gA { ?msg5 won:hasTextMessage ?txt }\n" +
                           "  } union {\n" +
-                          "    graph ?gF { ?msg6 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
-                          "    graph ?gE { ?msg5 msg:hasForwardedMessage ?msg4 }\n" +
-                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
-                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
-                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
-                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "    graph ?gF { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n" +
+                          "    graph ?gE { ?msg2 msg:hasForwardedMessage ?msg3 }\n" +
+                          "    graph ?gD { ?msg3 msg:hasCorrespondingRemoteMessage ?msg4 }\n" +
+                          "    graph ?gC { ?msg4 msg:hasForwardedMessage ?msg5 }\n" +
+                          "    graph ?gB { ?msg5 msg:hasCorrespondingRemoteMessage ?msg6 }\n" +
+                          "    graph ?gA { ?msg6 won:hasTextMessage ?txt }\n" +
                           "  } union {\n" +
-                          "    graph ?gG { ?msg7 msg:hasForwardedMessage ?msg6 }\n" +
-                          "    graph ?gF { ?msg6 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
-                          "    graph ?gE { ?msg5 msg:hasForwardedMessage ?msg4 }\n" +
-                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
-                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg2 }\n" +
-                          "\tgraph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg }\n" +
-                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "    graph ?gG { ?msg msg:hasForwardedMessage ?msg2 }\n" +
+                          "    graph ?gF { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gE { ?msg3 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
+                          "    graph ?gC { ?msg5 msg:hasForwardedMessage ?msg6 }\n" +
+                          "    graph ?gB { ?msg6 msg:hasCorrespondingRemoteMessage ?msg7 }\n" +
+                          "    graph ?gA { ?msg7 won:hasTextMessage ?txt }\n" +
                           "  }\n" +
                           "\n" +
                           "}";
