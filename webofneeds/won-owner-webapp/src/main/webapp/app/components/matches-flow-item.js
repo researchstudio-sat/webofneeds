@@ -84,7 +84,7 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const ownNeed = selectNeedByConnectionUri(state, self.connectionUri);
                 const connectionData = ownNeed && state.getIn(["needs", ownNeed.get("uri"), "connections", self.connectionUri]);
-                const remoteNeed = state.getIn(["needs", connectionData.get("remoteNeedUri")]);
+                const remoteNeed = connectionData && state.getIn(["needs", connectionData.get("remoteNeedUri")]);
 
                 return {
                     ownNeed,
