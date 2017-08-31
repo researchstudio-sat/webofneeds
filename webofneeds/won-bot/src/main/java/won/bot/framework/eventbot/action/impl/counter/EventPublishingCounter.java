@@ -16,7 +16,10 @@
 
 package won.bot.framework.eventbot.action.impl.counter;
 
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.filter.EventFilter;
 
 /**
  * Counter that publishes a CountEvent each time it counts.
@@ -24,14 +27,14 @@ import won.bot.framework.eventbot.bus.EventBus;
 public class EventPublishingCounter extends CounterImpl {
     private EventBus eventBus;
 
-    public EventPublishingCounter(String name, int initialCount, EventBus eventBus) {
+    public EventPublishingCounter(String name, int initialCount, EventListenerContext context) {
         super(name, initialCount);
-        this.eventBus = eventBus;
+        this.eventBus = context.getEventBus();
     }
 
-    public EventPublishingCounter(String name, EventBus eventBus) {
+    public EventPublishingCounter(String name, EventListenerContext context) {
         super(name);
-        this.eventBus = eventBus;
+        this.eventBus = context.getEventBus();
     }
 
     @Override
@@ -50,5 +53,17 @@ public class EventPublishingCounter extends CounterImpl {
             eventBus.publish(new CountEvent(this, count));
         }
         return count;
+    }
+
+    public EventFilter makeEventFilter(){
+        return new EventFilter() {
+            @Override
+            public boolean accept(Event event) {
+                if (! (event instanceof CountEvent)) {
+                    return false;
+                }
+                return ((CountEvent)event).getCounter() == EventPublishingCounter.this;
+            }
+        };
     }
 }

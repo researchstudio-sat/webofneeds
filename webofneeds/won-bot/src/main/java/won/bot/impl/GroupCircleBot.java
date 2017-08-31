@@ -22,12 +22,12 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
-import won.bot.framework.eventbot.action.impl.counter.TargetCountReachedEvent;
-import won.bot.framework.eventbot.action.impl.counter.TargetCounterDecorator;
+import won.bot.framework.eventbot.action.impl.counter.*;
 import won.bot.framework.eventbot.behaviour.BehaviourBarrier;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
+import won.bot.framework.eventbot.event.BaseEvent;
+import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
@@ -61,18 +61,32 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Bot that creates three groupchats, links them to each other and causes an
+ * Bot that creates NUMBER_OF_GROUPS groupchats, adds NUMBER_OF_GROUPMEMBERS members to each,
+ * links them to each other and sends a message on behalf of one of the members, potentially causing an
  * endless echo. Used for verifying that the group facet suppresses echos.
  */
-public class GroupCircleBot extends EventBot
-{
+public class GroupCircleBot extends EventBot {
     private final int NUMBER_OF_GROUPMEMBERS = 3;
-    private final int NUMBER_OF_GROUPS = 3;
+    private final int NUMBER_OF_GROUPS = 10;
     private final ConnectionHolder connectionForFirstMessage = new ConnectionHolder();
 
     @Override
     protected void initializeEventListeners() {
         EventListenerContext ctx = getEventListenerContext();
+
+        //start with a friendly message
+        ctx.getEventBus().subscribe(InitializeEvent.class, new ActionOnFirstEventListener(ctx, new BaseEventBotAction(ctx) {
+            @Override
+            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                logger.info("");
+                logger.info("We will create {} groups with {} members each.", NUMBER_OF_GROUPS, NUMBER_OF_GROUPMEMBERS);
+                logger.info("The groups all be connected to each other, resulting in {} group-group connections", NUMBER_OF_GROUPS * (NUMBER_OF_GROUPS-1) / 2);
+                logger.info("Then, one group member will send a message to its group, which should reach all other group members exactly once");
+                logger.info("This will result in {} messages being received.", NUMBER_OF_GROUPS * NUMBER_OF_GROUPMEMBERS - 1);
+                logger.info("The groups will forward {} messages and suppress {} duplicates", NUMBER_OF_GROUPS * (NUMBER_OF_GROUPS + NUMBER_OF_GROUPMEMBERS - 2), (int) Math.pow(NUMBER_OF_GROUPS,2) - 3 * NUMBER_OF_GROUPS +2);
+                logger.info("");
+            }
+        }));
 
         // understand message commands
         BotBehaviour messageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
@@ -82,55 +96,53 @@ public class GroupCircleBot extends EventBot
         BotBehaviour logConnectionMessageBehaviour = new LogConnectionMessageBehaviour(ctx);
         logConnectionMessageBehaviour.activate();
 
-        // create group 1, its members, and connect them
-        CreateGroupBehaviour group1Create = new CreateGroupBehaviour(ctx);
-        OpenOnConnectBehaviour group1openOnConnect = new OpenOnConnectBehaviour(ctx);
-        CreateGroupMembersBehaviour group1Members = new CreateGroupMembersBehaviour(ctx);
-        group1Create.onDeactivateActivate(group1openOnConnect, group1Members);
-
-        // connect group 2, its members, and connect them
-        CreateGroupBehaviour group2Create = new CreateGroupBehaviour(ctx);
-        OpenOnConnectBehaviour group2openOnConnect = new OpenOnConnectBehaviour(ctx);
-        CreateGroupMembersBehaviour group2Members = new CreateGroupMembersBehaviour(ctx);
-        group2Create.onDeactivateActivate(group2openOnConnect, group2Members);
-
-        // connect group 3, its members, and connect them
-        CreateGroupBehaviour group3Create = new CreateGroupBehaviour(ctx);
-        OpenOnConnectBehaviour group3openOnConnect = new OpenOnConnectBehaviour(ctx);
-        CreateGroupMembersBehaviour group3Members = new CreateGroupMembersBehaviour(ctx);
-        group3Create.onDeactivateActivate(group3openOnConnect, group3Members);
+        // log other important events (group/member creation and conneciton)
+        BotBehaviour infoBehaviour = new OutputInfoMessagesBehaviour(ctx);
+        infoBehaviour.activate();
 
         // wait for both groups to finish being set up, then connect the groups
         BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+
+        for (int i = 0; i < NUMBER_OF_GROUPS; i++) {
+            // create group 1, its members, and connect them
+            CreateGroupBehaviour groupCreate = new CreateGroupBehaviour(ctx);
+            OpenOnConnectBehaviour groupOpenOnConnect = new OpenOnConnectBehaviour(ctx);
+            CreateGroupMembersBehaviour groupMembers = new CreateGroupMembersBehaviour(ctx);
+            groupCreate.onDeactivateActivate(groupOpenOnConnect, groupMembers);
+            barrier.waitFor(groupMembers);
+            // wait for the initialize event and trigger group creation
+            ctx.getEventBus().subscribe(InitializeEvent.class, new ActionOnFirstEventListener(ctx, new BaseEventBotAction(ctx) {
+                @Override
+                protected void doRun(Event event, EventListener executingListener) throws Exception {
+                    groupCreate.activate();
+                }
+            }));
+        }
+
         BotBehaviour connectGroupsBehaviour = new ConnectGroupsBehaviour(ctx);
-        barrier.waitFor(group2Members);
-        barrier.waitFor(group1Members);
-        barrier.waitFor(group3Members);
         barrier.thenStart(connectGroupsBehaviour);
         barrier.activate();
 
-        //after connecting the groups, send one message on behalf of one of the group members
+
+        // after connecting the groups, send one message on behalf of one of the group members
+        // and count the messages that group members receive
+
+        // when all groups are connected, start the count behaviour
+        CountReceivedMessagesBehaviour countReceivedMessagesBehaviour = new CountReceivedMessagesBehaviour(ctx);
+        connectGroupsBehaviour.onDeactivateActivate(countReceivedMessagesBehaviour);
+
+        // wait for the count behaviour to have started, then send the group message
         BotBehaviour sendInitialMessageBehaviour = new SendOneMessageBehaviour(ctx);
-        connectGroupsBehaviour.onDeactivateActivate(sendInitialMessageBehaviour);
+        countReceivedMessagesBehaviour.onActivateActivate(sendInitialMessageBehaviour);
 
 
-        // wait for the initialize event and trigger group creation
-        ctx.getEventBus().subscribe(InitializeEvent.class, new ActionOnFirstEventListener(ctx, new BaseEventBotAction(ctx) {
-            @Override
-            protected void doRun(Event event, EventListener executingListener) throws Exception {
-                group1Create.activate();
-                group2Create.activate();
-                group3Create.activate();
-            }
-        }));
     }
 
     /**
      * Creates a need with an owner facet and a group facet, then stops.
      * Its deactivate message is the URI of the created group need.
      */
-    private class CreateGroupBehaviour extends BotBehaviour
-    {
+    private class CreateGroupBehaviour extends BotBehaviour {
         public CreateGroupBehaviour(EventListenerContext context) {
             super(context);
         }
@@ -139,7 +151,7 @@ public class GroupCircleBot extends EventBot
         protected void onActivate(Optional<Object> message) {
             GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
             Model model = createNeedModel("Group Need", "Used for testing if groups suppress echos");
-            CommandEvent command = new CreateNeedCommandEvent(model, botContextWrapper.getGroupListName() , true, true, FacetType.OwnerFacet.getURI(), FacetType.GroupFacet.getURI());
+            CommandEvent command = new CreateNeedCommandEvent(model, botContextWrapper.getGroupListName(), true, true, FacetType.OwnerFacet.getURI(), FacetType.GroupFacet.getURI());
             subscribeWithAutoCleanup(
                     CreateNeedCommandResultEvent.class,
                     new ActionOnFirstEventListener(context, new CommandResultFilter(command), new BaseEventBotAction(context) {
@@ -148,6 +160,7 @@ public class GroupCircleBot extends EventBot
                             CreateNeedCommandResultEvent resultEvent = (CreateNeedCommandResultEvent) event;
                             logger.debug("creating group need succeeded: {}, need uri: {}", resultEvent.isSuccess(), resultEvent.getNeedURI());
                             Optional<Object> uriMessage = resultEvent.isSuccess() ? Optional.of(resultEvent.getNeedURI()) : Optional.empty();
+                            context.getEventBus().publish(new GroupCreatedEvent(resultEvent.getNeedURI()));
                             deactivate(uriMessage);
                         }
                     }));
@@ -155,8 +168,7 @@ public class GroupCircleBot extends EventBot
         }
     }
 
-    private class CreateGroupMembersBehaviour extends BotBehaviour
-    {
+    private class CreateGroupMembersBehaviour extends BotBehaviour {
         public CreateGroupMembersBehaviour(EventListenerContext context) {
             super(context);
         }
@@ -171,8 +183,8 @@ public class GroupCircleBot extends EventBot
             if (!message.isPresent()) return;
             GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
             URI groupNeedURI = (URI) message.get();
-            TargetCounterDecorator memberCreationCounter = new TargetCounterDecorator(context, new CounterImpl("memberCreationCounter", 0),NUMBER_OF_GROUPMEMBERS);
-            TargetCounterDecorator membersConnectedCounter = new TargetCounterDecorator(context, new CounterImpl("membersConnectedCounter", 0),NUMBER_OF_GROUPMEMBERS);
+            TargetCounterDecorator memberCreationCounter = new TargetCounterDecorator(context, new CounterImpl("memberCreationCounter", 0), NUMBER_OF_GROUPMEMBERS);
+            TargetCounterDecorator membersConnectedCounter = new TargetCounterDecorator(context, new CounterImpl("membersConnectedCounter", 0), NUMBER_OF_GROUPMEMBERS);
 
             Set<URI> members = new HashSet<URI>();
             //create N group members
@@ -186,10 +198,11 @@ public class GroupCircleBot extends EventBot
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
                                 CreateNeedCommandResultEvent resultEvent = (CreateNeedCommandResultEvent) event;
                                 logger.debug("creating group member succeeded: {}, need uri: {}", resultEvent.isSuccess(), resultEvent.getNeedURI());
-                                memberCreationCounter.increment();
-                                if (resultEvent.isSuccess()){
+                                if (resultEvent.isSuccess()) {
                                     members.add(resultEvent.getNeedURI());
+                                    context.getEventBus().publish(new GroupMemberCreatedEvent(resultEvent.getNeedURI()));
                                 }
+                                memberCreationCounter.increment();
                             }
                         }));
                 context.getEventBus().publish(command);
@@ -201,67 +214,68 @@ public class GroupCircleBot extends EventBot
                             context,
                             memberCreationCounter.makeEventFilter(),
                             new BaseEventBotAction(context) {
-                @Override
-                protected void doRun(Event event, EventListener executingListener) throws Exception {
-                    //make sure all members were created successfully
-                    if (members.size() != NUMBER_OF_GROUPMEMBERS){
-                        logger.error("expected {} members to be successfully created, but {} were", NUMBER_OF_GROUPMEMBERS, members.size());
-                        deactivate();
-                    }
-                    //now, connect all group members
-                    members.forEach( memberURI -> {
-                        //prepare the command
-                        ConnectCommandEvent connectCommandEvent =
-                                new ConnectCommandEvent(
-                                        memberURI,
-                                        groupNeedURI,
-                                        FacetType.OwnerFacet.getURI(),
-                                        FacetType.GroupFacet.getURI(),
-                                        "Hello from your latest would-be member!");
-                        //set up a listener for the result of the command
-                        subscribeWithAutoCleanup(
-                                ConnectCommandResultEvent.class,
-                                new ActionOnFirstEventListener(context, new CommandResultFilter(connectCommandEvent),
-                                        new BaseEventBotAction(context) {
-                                            @Override
-                                            protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                                ConnectCommandResultEvent resultEvent = (ConnectCommandResultEvent) event;
-                                                logger.debug("sending connect to group need {} on behalf of member {}, succeeded: {}", new Object[]{
-                                                        connectCommandEvent.getRemoteNeedURI(), connectCommandEvent.getNeedURI(), resultEvent.isSuccess()});
-                                            }
-                                        }));
-                        //set up a listener for the response from the group need
-                        subscribeWithAutoCleanup(
-                                OpenFromOtherNeedEvent.class,
-                                new ActionOnEventListener(context, new EventFilter() {
-                                    @Override
-                                    public boolean accept(Event event) {
-                                        if (!(event instanceof OpenFromOtherNeedEvent)) return false;
-                                        OpenFromOtherNeedEvent openEvent = (OpenFromOtherNeedEvent) event;
-                                        if (!groupNeedURI.equals(openEvent.getRemoteNeedURI())) return false;
-                                        if (!memberURI.equals(openEvent.getNeedURI())) return false;
-                                        return true;
+                                @Override
+                                protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                    //make sure all members were created successfully
+                                    if (members.size() != NUMBER_OF_GROUPMEMBERS) {
+                                        logger.error("expected {} members to be successfully created, but {} were", NUMBER_OF_GROUPMEMBERS, members.size());
+                                        deactivate();
                                     }
-                                },
-                                new BaseEventBotAction(context) {
-                                    @Override
-                                    protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                        OpenFromOtherNeedEvent openEvent = (OpenFromOtherNeedEvent) event;
-                                        logger.debug("received open from group need {} on behalf of member {}", new Object[]{
-                                                openEvent.getRemoteNeedURI(), openEvent.getNeedURI()});
-                                        membersConnectedCounter.increment();
-                                        // remember the connection of the first open
-                                        if (!connectionForFirstMessage.isSet()){
-                                            connectionForFirstMessage.set(openEvent.getCon());
-                                        }
-                                    }
-                                }));
-                        //publish the command
-                        context.getEventBus().publish(connectCommandEvent);
-                    });
+                                    //now, connect all group members
+                                    members.forEach(memberURI -> {
+                                        //prepare the command
+                                        ConnectCommandEvent connectCommandEvent =
+                                                new ConnectCommandEvent(
+                                                        memberURI,
+                                                        groupNeedURI,
+                                                        FacetType.OwnerFacet.getURI(),
+                                                        FacetType.GroupFacet.getURI(),
+                                                        "Hello from your latest would-be member!");
+                                        //set up a listener for the result of the command
+                                        subscribeWithAutoCleanup(
+                                                ConnectCommandResultEvent.class,
+                                                new ActionOnFirstEventListener(context, new CommandResultFilter(connectCommandEvent),
+                                                        new BaseEventBotAction(context) {
+                                                            @Override
+                                                            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                                                ConnectCommandResultEvent resultEvent = (ConnectCommandResultEvent) event;
+                                                                logger.debug("sending connect to group need {} on behalf of member {}, succeeded: {}", new Object[]{
+                                                                        connectCommandEvent.getRemoteNeedURI(), connectCommandEvent.getNeedURI(), resultEvent.isSuccess()});
+                                                            }
+                                                        }));
+                                        //set up a listener for the response from the group need
+                                        subscribeWithAutoCleanup(
+                                                OpenFromOtherNeedEvent.class,
+                                                new ActionOnEventListener(context, new EventFilter() {
+                                                    @Override
+                                                    public boolean accept(Event event) {
+                                                        if (!(event instanceof OpenFromOtherNeedEvent)) return false;
+                                                        OpenFromOtherNeedEvent openEvent = (OpenFromOtherNeedEvent) event;
+                                                        if (!groupNeedURI.equals(openEvent.getRemoteNeedURI()))
+                                                            return false;
+                                                        if (!memberURI.equals(openEvent.getNeedURI())) return false;
+                                                        return true;
+                                                    }
+                                                },
+                                                        new BaseEventBotAction(context) {
+                                                            @Override
+                                                            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                                                OpenFromOtherNeedEvent openEvent = (OpenFromOtherNeedEvent) event;
+                                                                logger.debug("received open from group need {} on behalf of member {}", new Object[]{
+                                                                        openEvent.getRemoteNeedURI(), openEvent.getNeedURI()});
+                                                                membersConnectedCounter.increment();
+                                                                // remember the connection of the first open
+                                                                if (!connectionForFirstMessage.isSet()) {
+                                                                    connectionForFirstMessage.set(openEvent.getCon());
+                                                                }
+                                                            }
+                                                        }));
+                                        //publish the command
+                                        context.getEventBus().publish(connectCommandEvent);
+                                    });
 
-                }
-            }));
+                                }
+                            }));
 
             //when all members are connected, finish the behaviour
             subscribeWithAutoCleanup(
@@ -271,15 +285,15 @@ public class GroupCircleBot extends EventBot
                             new BaseEventBotAction(context) {
                                 @Override
                                 protected void doRun(Event event, EventListener executingListener) throws Exception {
-                                    logger.debug("finished connecting all members to group {} ", groupNeedURI);
+                                    logger.debug("finished connecting all {} members to group {} ", NUMBER_OF_GROUPMEMBERS, groupNeedURI);
+                                    context.getEventBus().publish(new GroupMembersConnectedEvent());
                                     deactivate();
                                 }
                             }));
         }
     }
 
-    private class OpenOnConnectBehaviour extends BotBehaviour
-    {
+    private class OpenOnConnectBehaviour extends BotBehaviour {
         public OpenOnConnectBehaviour(EventListenerContext context) {
             super(context);
         }
@@ -297,17 +311,18 @@ public class GroupCircleBot extends EventBot
                     new ActionOnEventListener(context,
                             new NeedUriEventFilter(groupNeedURI),
                             new BaseEventBotAction(context) {
-                        @Override
-                        protected void doRun(Event event, EventListener executingListener) throws Exception {
-                            OpenCommandEvent openCommandEvent = new OpenCommandEvent(((ConnectFromOtherNeedEvent)event).getCon(),"Welcome from the group need");
-                            getEventBus().publish(openCommandEvent);
-                        }
-                    }));
+                                @Override
+                                protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                    Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
+                                    logger.debug("received connect from need {} on behalf of need {}, responding with OPEN.", con.getRemoteNeedURI(), con.getNeedURI());
+                                    OpenCommandEvent openCommandEvent = new OpenCommandEvent(con, "Welcome from the group need");
+                                    getEventBus().publish(openCommandEvent);
+                                }
+                            }));
         }
     }
 
-    private class ConnectGroupsBehaviour extends BotBehaviour
-    {
+    private class ConnectGroupsBehaviour extends BotBehaviour {
         public ConnectGroupsBehaviour(EventListenerContext context) {
             super(context);
         }
@@ -319,11 +334,49 @@ public class GroupCircleBot extends EventBot
         @Override
         protected void onActivate(Optional<Object> message) {
             GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
-            List<URI> groupNeeds = botContextWrapper.getBotContext().getNamedNeedUriList(botContextWrapper.getGroupListName());
+            List<URI> groupNeeds = botContextWrapper.getGroupNeedUris();
             if (groupNeeds == null || groupNeeds.size() != NUMBER_OF_GROUPS) {
                 logger.error("Expected {} group needs but found {}", NUMBER_OF_GROUPS, groupNeeds == null ? "null" : groupNeeds.size());
                 return;
             }
+
+
+            // use a target counter to know when we are finished (and use an EventPublishingCounter as the
+            // decorated counter so we can output status messages while counting
+            EventPublishingCounter eachGroupConnectionCounter =
+                    new EventPublishingCounter("eachGroupConnectionCounter", context);
+            TargetCounterDecorator groupConnectionCounter =
+                    new TargetCounterDecorator(
+                            context,
+                            eachGroupConnectionCounter,
+                            NUMBER_OF_GROUPS * (NUMBER_OF_GROUPS - 1) / 2
+                    );
+
+            // react to each connection separately
+            subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
+                    eachGroupConnectionCounter.makeEventFilter(),
+                    new BaseEventBotAction(context) {
+                        @Override
+                        protected void doRun(Event event, EventListener executingListener) throws Exception {
+                            logger.info("established group-group connection {} of {}", ((CountEvent) event).getCount(),
+                                    groupConnectionCounter.getTargetCount());
+                        }
+                    }));
+
+            // react to reaching the target count
+            subscribeWithAutoCleanup(TargetCountReachedEvent.class,
+                    new ActionOnEventListener(context,
+                            groupConnectionCounter.makeEventFilter(),
+                            new BaseEventBotAction(context) {
+                                @Override
+                                protected void doRun(Event event, EventListener executingListener) throws Exception {
+                                    if (!(event instanceof TargetCountReachedEvent)) return;
+                                    TargetCountReachedEvent countEvent = (TargetCountReachedEvent) event;
+                                    logger.info("successfully made {} connections between our {} groups", countEvent.getCount(), NUMBER_OF_GROUPS);
+                                    deactivate();
+                                }
+                            }));
+
 
             //connect each group to all other groups
             for (int i = 0; i < groupNeeds.size(); i++) {
@@ -370,9 +423,11 @@ public class GroupCircleBot extends EventBot
                                             OpenFromOtherNeedEvent openEvent = (OpenFromOtherNeedEvent) event;
                                             logger.debug("received open from group need {} on behalf of group need {}", new Object[]{
                                                     openEvent.getRemoteNeedURI(), openEvent.getNeedURI()});
-                                            deactivate();
+                                            groupConnectionCounter.increment();
                                         }
                                     }));
+
+
                     //publish the command
                     context.getEventBus().publish(connectCommandEvent);
                 } //inner loop
@@ -380,8 +435,7 @@ public class GroupCircleBot extends EventBot
         }
     }
 
-    private class LogConnectionMessageBehaviour extends BotBehaviour
-    {
+    private class LogConnectionMessageBehaviour extends BotBehaviour {
         public LogConnectionMessageBehaviour(EventListenerContext context) {
             super(context);
         }
@@ -401,14 +455,13 @@ public class GroupCircleBot extends EventBot
                             WonMessage message = ((MessageFromOtherNeedEvent) event).getWonMessage();
                             String textMessage = WonRdfUtils.MessageUtils.getTextMessage(message);
                             URI messageURI = message.getMessageURI();
-                            logger.info("need {} received message '{}', message uri: {}", new Object[]{messageEvent.getNeedURI(), textMessage, messageURI});
+                            logger.debug("need {} received message from need {}, text: '{}', message uri: {}", new Object[]{messageEvent.getNeedURI(), messageEvent.getRemoteNeedURI(), textMessage, messageURI});
                         }
                     }));
         }
     }
 
-    private class SendOneMessageBehaviour extends BotBehaviour
-    {
+    private class SendOneMessageBehaviour extends BotBehaviour {
         public SendOneMessageBehaviour(EventListenerContext context) {
             super(context);
         }
@@ -432,18 +485,17 @@ public class GroupCircleBot extends EventBot
      * remember the one connection we want to use to send the only
      * connection message in this bot.
      */
-    private class ConnectionHolder
-    {
+    private class ConnectionHolder {
         private Connection connection;
 
         public ConnectionHolder() {
         }
 
-        public boolean isSet(){
+        public boolean isSet() {
             return connection != null;
         }
 
-        public synchronized void set(Connection connection){
+        public synchronized void set(Connection connection) {
             if (isSet()) return;
             this.connection = connection;
         }
@@ -453,7 +505,158 @@ public class GroupCircleBot extends EventBot
         }
     }
 
-    private Model createNeedModel(String title, String description){
+    private class CountReceivedMessagesBehaviour extends BotBehaviour {
+        public CountReceivedMessagesBehaviour(EventListenerContext context) {
+            super(context);
+        }
+
+        public CountReceivedMessagesBehaviour(EventListenerContext context, String name) {
+            super(context, name);
+        }
+
+        @Override
+        protected void onActivate(Optional<Object> message) {
+            GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
+
+            EventPublishingCounter receivedMessagesCounter = new EventPublishingCounter("receivedMessagesCounter", context);
+            //count connection messages received by group members coming from groups
+            subscribeWithAutoCleanup(
+                    MessageFromOtherNeedEvent.class,
+                    new ActionOnEventListener(context,
+                            new EventFilter() {
+                                @Override
+                                public boolean accept(Event event) {
+                                    if (!(event instanceof MessageFromOtherNeedEvent)) return false;
+                                    MessageFromOtherNeedEvent messageEvent = (MessageFromOtherNeedEvent) event;
+                                    URI senderNeed = messageEvent.getRemoteNeedURI();
+                                    URI recipientNeed = messageEvent.getNeedURI();
+                                    if (!botContextWrapper.getGroupMemberNeedUris().contains(recipientNeed))
+                                        return false;
+                                    return botContextWrapper.getGroupNeedUris().contains(senderNeed);
+                                }
+                            }, new IncrementCounterAction(context, receivedMessagesCounter)));
+
+            // produce log messages about the actual and expeced number of messages
+            subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
+                    receivedMessagesCounter.makeEventFilter(),
+                    new BaseEventBotAction(context) {
+                        @Override
+                        protected void doRun(Event event, EventListener executingListener) throws Exception {
+                            if (!(event instanceof CountEvent)) return;
+                            CountEvent countEvent = (CountEvent) event;
+                            int currentCount = countEvent.getCount();
+                            int targetCount = NUMBER_OF_GROUPMEMBERS * NUMBER_OF_GROUPS - 1;
+                            if (currentCount < targetCount) {
+                                logger.info("received group message {} of {} ...", currentCount, targetCount);
+                            } else if (currentCount == targetCount) {
+                                logger.info("received group message {} of {}, target count reached", currentCount, targetCount);
+                            } else {
+                                logger.warn("received group message {} but only expected {} - something is wrong!", currentCount, targetCount);
+                            }
+                        }
+                    }));
+        }
+    }
+
+    private class OutputInfoMessagesBehaviour extends BotBehaviour {
+        public OutputInfoMessagesBehaviour(EventListenerContext context) {
+            super(context);
+        }
+
+        public OutputInfoMessagesBehaviour(EventListenerContext context, String name) {
+            super(context, name);
+        }
+
+        @Override
+        protected void onActivate(Optional<Object> message) {
+            GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
+
+            EventPublishingCounter counter = new EventPublishingCounter("groupCreationCounter", context);
+
+            // count group creations
+            subscribeWithAutoCleanup(
+                    GroupCreatedEvent.class,
+                    new ActionOnEventListener(context,
+                            new IncrementCounterAction(context, counter)));
+
+            // produce log messages about created groups
+            subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
+                    counter.makeEventFilter(),
+                    new BaseEventBotAction(context) {
+                        @Override
+                        protected void doRun(Event event, EventListener executingListener) throws Exception {
+                            if (!(event instanceof CountEvent)) return;
+                            CountEvent countEvent = (CountEvent) event;
+                            int currentCount = countEvent.getCount();
+                            int targetCount = NUMBER_OF_GROUPS;
+                            logger.info("created group {} of {} ", currentCount, targetCount);
+                        }
+                    }));
+
+            // count when all members are created
+            EventPublishingCounter membersCreatedCounter = new EventPublishingCounter("membersCreatedCounter", context);
+            subscribeWithAutoCleanup(
+                    GroupMemberCreatedEvent.class,
+                    new ActionOnEventListener(context,
+                            new IncrementCounterAction(context, membersCreatedCounter)));
+
+            // produce log messages about created members
+            subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
+                    membersCreatedCounter.makeEventFilter(),
+                    new BaseEventBotAction(context) {
+                        @Override
+                        protected void doRun(Event event, EventListener executingListener) throws Exception {
+                            if (!(event instanceof CountEvent)) return;
+                            CountEvent countEvent = (CountEvent) event;
+                            int currentCount = countEvent.getCount();
+                            int targetCount = NUMBER_OF_GROUPS * NUMBER_OF_GROUPMEMBERS;
+                            logger.info("created group member {} of {}", currentCount, targetCount);
+                        }
+                    }));
+
+            // count when all members are connected
+            EventPublishingCounter membersConnectedCounter = new EventPublishingCounter("membersConnectedCounter", context);
+            subscribeWithAutoCleanup(
+                    GroupMembersConnectedEvent.class,
+                    new ActionOnEventListener(context,
+                            new IncrementCounterAction(context, membersConnectedCounter)));
+
+            // produce log messages about connected members
+            subscribeWithAutoCleanup(CountEvent.class, new ActionOnEventListener(context,
+                    membersConnectedCounter.makeEventFilter(),
+                    new BaseEventBotAction(context) {
+                        @Override
+                        protected void doRun(Event event, EventListener executingListener) throws Exception {
+                            if (!(event instanceof CountEvent)) return;
+                            CountEvent countEvent = (CountEvent) event;
+                            int currentCount = countEvent.getCount();
+                            int targetCount = NUMBER_OF_GROUPS;
+                            logger.info("connected all group members to group {} of {}", currentCount, targetCount);
+                        }
+                    }));
+        }
+    }
+
+    private class GroupCreatedEvent extends BaseNeedSpecificEvent {
+        public GroupCreatedEvent(URI needURI) {
+            super(needURI);
+        }
+    }
+
+    private class GroupMembersConnectedEvent extends BaseEvent {
+        public GroupMembersConnectedEvent() {
+        }
+    }
+
+    private class GroupMemberCreatedEvent extends BaseNeedSpecificEvent {
+        public GroupMemberCreatedEvent(URI needURI) {
+            super(needURI);
+        }
+
+    }
+
+
+    private Model createNeedModel(String title, String description) {
         URI needURI = getEventListenerContext().getWonNodeInformationService().generateNeedURI();
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needURI.toString());
         needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.title, title);

@@ -41,6 +41,8 @@ public class TargetCounterDecorator implements Counter
     return delegate.getCount();
   }
 
+  public int getTargetCount() { return targetCount; }
+
   @Override
   public int increment() {
     boolean publishEvent = false;
