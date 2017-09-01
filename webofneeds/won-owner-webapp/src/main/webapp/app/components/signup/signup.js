@@ -17,7 +17,7 @@ import topNavModule from '../topnav';
 
 import * as srefUtils from '../../sref-utils';
 
-const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$ngRedux', '$scope', '$state', /*'$routeParams' /*injections as strings here*/];
 
 class SignupController {
 

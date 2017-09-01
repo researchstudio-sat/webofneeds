@@ -19,13 +19,17 @@ import * as srefUtils from '../sref-utils';
 
 import feedItemLineModule from './feed-item-line';
 
-const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
+const serviceDependencies = ['$scope', '$interval', '$ngRedux', '$state'];
 function genComponentConf() {
     let template = `
 
         <a
             class="fi clickable"
-            ui-sref="{{ self.absSRef('post', {postUri: self.ownNeed.get('uri')}) }}"
+            href="{{ self.absHRef(
+                self.$state,
+                'post',
+                { postUri: self.ownNeed.get('uri') }
+            ) }}"
         >
             <won-square-image
                 src="self.ownNeed.get('titleImg')"
@@ -85,7 +89,11 @@ function genComponentConf() {
         <div class="fi__footer" ng-show="self.unreadMatchesCount || self.unreadRequestsCount">
             <div class="fi__footer__indicators">
                 <a class="fi__footer__indicators__item clickable"
-                   ui-sref="{{ self.absSRef('post', { connectionType: self.WON.Suggested, postUri: self.needUri }) }}"
+                    href="{{ self.absHRef(
+                        self.$state,
+                        'post',
+                        { connectionType: self.WON.Suggested, postUri: self.needUri }
+                    ) }}"
                    ng-show="self.unreadMatchesCount">
                     <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
