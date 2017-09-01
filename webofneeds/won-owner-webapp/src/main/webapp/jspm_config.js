@@ -25,6 +25,7 @@ System.config({
     "angular-route": "npm:angular-route@1.6.6",
     "angular-sanitize": "npm:angular-sanitize@1.6.6",
     "angular-ui-router": "npm:angular-ui-router@1.0.3",
+    "angular-ui-router-shim": "npm:angular-ui-router@1.0.3/release/stateEvents.js",
     "babel": "npm:babel-core@5.8.35",
     "babel-runtime": "npm:babel-runtime@5.8.35",
     "core-js": "npm:core-js@1.2.6",
