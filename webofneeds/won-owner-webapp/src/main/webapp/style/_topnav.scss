@@ -146,6 +146,7 @@
   & .topnav__list {
     @include flex-row;
     list-style: none;
+    align-items: stretch;
   }
 }
 

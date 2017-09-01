@@ -16,24 +16,25 @@ const serviceDependencies = ['$scope', '$ngRedux'];
 function genComponentConf() {
     let template = `
       <div
-        class="dd--closed__inner"
+        ng-transclude="header"
+        class="dd__open-button clickable"
+        ng-class="{ 'dd--closed' : !self.ddOpen }"
         ng-click="self.ddOpen = true;"
-        style="border: 1px solid transparent;"
-        class="clickable"
-        ng-transclude="header" >
-      </div>
-      <div
-        class="dd--big__inner"
-        style="position: absolute; top:0; width: 400px; background-color: white; border: 1px solid #cbd2d1;"
-        ng-show="self.ddOpen"
       >
+      </div>
+      <div class="dd__dropdown" ng-show="self.ddOpen">
         <div
           ng-transclude="header"
-          class="clickable"
+          class="dd__close-button clickable"
+          ng-class="{ 'dd--open' : self.ddOpen }"
           ng-click="self.ddOpen = false;"
         >
         </div>
-        <div ng-transclude="menu"></div>
+        <div
+          class="dd__menu"
+          ng-transclude="menu"
+         >
+         </div>
       </div>
     `
 

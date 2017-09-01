@@ -2,13 +2,19 @@
 @import 'flex-layout';
 @import 'sizing-utils';
 
+/**
+ * won-login is it's own popup (as compared to won-login-form)
+ */
 won-login {
   background: white;
-  display: block;
   padding: 0 1rem 1rem 1rem;
   top: -3rem;
-  position: relative;
   border: $thinGrayBorder;
+  position: relative;
+}
+
+won-login, won-login-form {
+  display: block;
 
   button {
     width: 100%;

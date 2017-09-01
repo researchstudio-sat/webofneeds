@@ -1,0 +1,53 @@
+won-account-menu {
+  //display: block;
+  won-dd-header {
+    @include flex-row();
+    color: $won-red;
+  }
+
+  .dd--open .topnav__carret {
+    transform: rotate(180deg);
+  }
+
+  won-login-form {
+    display: block;
+  }
+}
+
+
+won-dropdown {
+  display: block;
+
+  position: relative; // to allow absolutely positioning won-dd-menu
+
+  & won-dd-header,
+  & won-dd-menu {
+    display: block;
+    box-sizing: border-box;
+  }
+
+  won-dd-menu {
+
+  }
+
+  > .dd__open-button {
+    //border: 1px solid transparent; // to align
+  }
+
+  > .dd__dropdown {
+
+    $padding: 1rem;
+    padding-left: $padding;
+    padding-right: $padding;
+    padding-bottom: $padding;
+
+    /* put it directly over the trigger-button (with aligned text) */
+    position: absolute;
+    top: -1px; //-1px to offset border
+    left: calc(-1px - #{$padding}); // offset border *and* left padding
+    z-index: 99;
+
+    background-color: white;
+    border: 1px solid #cbd2d1;
+  }
+}

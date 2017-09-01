@@ -4,9 +4,10 @@
 ;
 import won from '../won-es6';
 import angular from 'angular';
-import loginComponent from './login';
-import logoutComponent from './logout';
+//import loginComponent from './login';
+//import logoutComponent from './logout';
 import dropdownModule from './covering-dropdown';
+import accountMenuModule from './account-menu';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import config from '../config';
@@ -57,17 +58,7 @@ function genTopnavConf() {
                 </div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
-                        <li>
-                            <won-dropdown style="position:relative; display:block;">
-                                <won-dd-header> Test Header </won-dd-header>
-                                <won-dd-menu>
-                                    <ul>
-                                        <li>Test</li>
-                                        <li>Menu</li>
-                                    </ul>
-                                </won-dd-menu>
-                            </won-dropdown>
-                        </li>
+
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__button won-button--filled lighterblue"
@@ -75,19 +66,12 @@ function genTopnavConf() {
                                     Sign up
                             </a>
                         </li>
+
                         <li>
-                            <a class="topnav__button"
-                                ng-click="self.showLogin()"
-                                ng-class="{'open' : self.open}">
-                                    <span class="topnav__button__caption__always">
-                                        {{ self.loggedIn? self.email : "Sign In" }}
-                                    </span>
-                                    <img src="generated/icon-sprite.svg#ico16_arrow_down"
-                                        ng-show="!self.open" class="topnav__carret">
-                                    <img src="generated/icon-sprite.svg#ico16_arrow_up_hi"
-                                        ng-show="self.open" class="topnav__carret">
-                            </a>
+                            <won-account-menu>
+                            </won-account-menu>
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -182,9 +166,10 @@ function genTopnavConf() {
 
 export default angular.module('won.owner.components.topnav', [
         'ngSanitize',
-        loginComponent,
-        logoutComponent,
+        //loginComponent,
+        //logoutComponent,
         dropdownModule,
+        accountMenuModule,
     ])
     .directive('wonTopnav', genTopnavConf)
     .name;
