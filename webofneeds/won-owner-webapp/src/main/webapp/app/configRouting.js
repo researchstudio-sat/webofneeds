@@ -132,7 +132,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
 
 export const runAccessControl = [ '$rootScope', '$ngRedux', '$urlRouter',
     ($rootScope, $ngRedux, $urlRouter) => {
-        $rootScope.$on('$stateChangeStart',
+        $rootScope.$on('@@reduxUiRouter/onStart',
             (event, toState, toParams, fromState, fromParams, options) =>
                 accessControl({
                     event, toState, toParams, fromState, fromParams, options,
