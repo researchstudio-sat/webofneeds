@@ -18,6 +18,9 @@ import {
 } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import won from '../won-es6';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 const postTypeTexts = [
     {
@@ -117,8 +120,7 @@ function genComponentConf() {
             };
 
             // Using actionCreators like this means that every action defined there is available in the template.
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
         isValid(){
             return this.draft && this.draft.type && this.draft.title && this.draft.title.length < this.characterLimit;

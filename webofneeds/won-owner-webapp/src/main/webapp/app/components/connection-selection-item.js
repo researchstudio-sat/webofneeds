@@ -8,6 +8,9 @@ import {
     labels,
 } from '../won-label-utils';
 import { attach } from '../utils.js';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
@@ -73,8 +76,7 @@ function genComponentConf() {
                 }
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
         }
         isOpen() {
             return this.openConnectionUri === this.connectionUri;

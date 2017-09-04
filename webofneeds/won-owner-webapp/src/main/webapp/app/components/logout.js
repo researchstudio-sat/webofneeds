@@ -5,6 +5,9 @@
 import angular from 'angular';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 import * as srefUtils from '../sref-utils';
 
@@ -49,8 +52,7 @@ function genLogoutConf() {
                 email: state.getIn(['user','email'])
             });
 
-            const disconnect = this.$ngRedux.connect(logout, actionCreators)(this);
-            this.$scope.$on('$destroy',disconnect);
+            connect2Redux(logout, actionCreators, [], this);
         }
 
         hideLogin() {

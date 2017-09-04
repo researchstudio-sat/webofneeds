@@ -22,6 +22,7 @@ import {
 import {
     decodeUriComponentProperly,
     checkHttpStatus,
+    getIn,
 } from './utils';
 
 
@@ -52,7 +53,7 @@ export const resetParamsImm = Immutable.fromJS(resetParams);
  */
 export const constantParams = [
     'privateId',
-]
+];
 
 
 /**
@@ -129,20 +130,6 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
 
 }]
 
-export const runAccessControl = [ '$rootScope', '$ngRedux', '$urlRouter',
-    ($rootScope, $ngRedux, $urlRouter) => {
-        $rootScope.$on('$stateChangeStart',
-            (event, toState, toParams, fromState, fromParams, options) =>
-                accessControl({
-                    event, toState, toParams, fromState, fromParams, options,
-                    dispatch: $ngRedux.dispatch,
-                    getState: $ngRedux.getState,
-                })
-        );
-    }
-];
-
-
 function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
     console.log('in postViewEnsureLoaded');
     const postUri = decodeUriComponentProperly(encodedPostUri);
@@ -194,6 +181,21 @@ function back(hasPreviousState, $ngRedux) {
 
     }
 }
+
+export const runAccessControl = [ '$transitions', '$rootScope', '$ngRedux', '$urlRouter',
+    ($transitions, $rootScope, $ngRedux, $urlRouter) => {
+        console.log('transitions: ', $transitions);
+        //TODO use access-control provided by $transitions.onStart()
+        $rootScope.$on('$stateChangeStart',
+            (event, toState, toParams, fromState, fromParams, options) =>
+                accessControl({
+                    event, toState, toParams, fromState, fromParams, options,
+                    dispatch: $ngRedux.dispatch,
+                    getState: $ngRedux.getState,
+                })
+        );
+    }
+];
 
 
 export function accessControl({event, toState, toParams, fromState, fromParams, options, dispatch, getState}){
@@ -282,8 +284,8 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
  */
 export function checkAccessToCurrentRoute(dispatch, getState) {
     const appState = getState();
-    const routingState = appState.getIn(['router','currentState']).toJS();
-    const params = appState.getIn(['router','currentParams']).toJS();
+    let routingState = getIn(appState, ['router','currentState']);
+    let params = getIn(appState, ['router','currentParams']);
     return accessControl({
         toState: routingState,
         fromState: routingState,

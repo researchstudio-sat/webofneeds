@@ -16,6 +16,7 @@ import 'redux';
 import ngReduxModule from 'ng-redux';
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
+import uiRouterShimModule from 'angular-ui-router-shim';
 import {
     camel2Hyphen,
     hyphen2Camel,
@@ -61,6 +62,12 @@ window.won = won;
 import { runMessagingAgent } from './messaging-agent';
 
 let app = angular.module('won.owner', [
+    /* to enable legacy $stateChange* events in ui-router (see
+     * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
+     */
+    'ui.router.state.events',
+
+
     ngReduxModule,
     uiRouterModule,
     ngReduxRouterModule,

@@ -26,7 +26,7 @@ export default function(state = initialState, action = {}) {
             const allPreviousEvents = action.payload.get('events');
             return state.mergeIn(['events'], allPreviousEvents);
 
-        case '@@reduxUiRouter/$stateChangeSuccess':
+        case '@@reduxUiRouter/onSuccess':
             var uiRouterState = getIn(action, ['payload', 'currentState', 'name']);
             var connectionUri = getIn(action, ['payload', 'currentParams', 'connectionUri']);
 

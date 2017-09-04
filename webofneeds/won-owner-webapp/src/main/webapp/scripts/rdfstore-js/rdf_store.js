@@ -1986,7 +1986,7 @@ var _setMembers = function(self, obj)
 // define jsonld
 if(typeof(window) !== 'undefined')
 {
-   var jsonld = window.jsonld = window.jsonld || {};
+   var jsonld = {};
    Exception = function(obj)
    {
       _setMembers(this, obj);

@@ -9,6 +9,9 @@ import logoutComponent from 'app/components/logout';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import config from '../config';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 import * as srefUtils from '../sref-utils';
 
@@ -146,8 +149,7 @@ function genTopnavConf() {
                 reconnecting: state.getIn(['messages', 'reconnecting']),
             });
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy',disconnect);
+            connect2Redux(selectFromState, actionCreators, [], this);
         }
 
         showLogin() {

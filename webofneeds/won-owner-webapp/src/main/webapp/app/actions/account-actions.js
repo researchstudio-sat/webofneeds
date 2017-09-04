@@ -24,6 +24,7 @@ import {
 
 import {
     checkHttpStatus,
+    getIn,
 } from '../utils';
 
 /**
@@ -96,7 +97,7 @@ export function accountLogin(credentials, options) {
 
         const {email} = parseCredentials(credentials);
 
-        const prevPrivateId = state.getIn(['router', 'currentParams', 'privateId']);
+        const prevPrivateId = getIn(state, ['router', 'currentParams', 'privateId']);
         const prevEmail = state.getIn(['user', 'email']);
 
         const wasLoggedIn = state.get('initialLoadFinished') && (prevPrivateId || prevEmail);
@@ -132,7 +133,7 @@ export function accountLogin(credentials, options) {
             if (wasLoggedIn) {
                 return logout()
                 .then(() => {
-                    if (options_.doRedirects && state.getIn(['router', 'currentParams', 'privateId'])) {
+                    if (options_.doRedirects && getIn(state, ['router', 'currentParams', 'privateId'])) {
                         return stateGoCurrent({privateId: ""})(dispatch, getState);
                     }
                 });
@@ -242,7 +243,7 @@ export function accountLogout(options) {
         })
         .then(() => {
             // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-            if (options_.doRedirects && state.getIn(['router', 'currentParams', 'privateId'])) {
+            if (options_.doRedirects && getIn(state, ['router', 'currentParams', 'privateId'])) {
                 return stateGoCurrent({privateId: null})(dispatch, getState);
             }
         })

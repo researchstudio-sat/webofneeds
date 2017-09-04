@@ -6,7 +6,10 @@
 import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
 import openRequestModule from '../open-request';
-import { attach } from '../../utils';
+import {
+    attach,
+    getIn,
+} from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
 import connectionsOverviewModule from  '../connections-overview';
@@ -21,16 +24,16 @@ class SentRequestsController {
         this.ownerSelection = 3; //ONLY NECESSARY FOR VIEW WITH NEED
 
         const selectFromState = (state)=>{
-            const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+            const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
             const connection = need && need.getIn(["connections", connectionUri]);
 
-            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
+            if(getIn(state, ['router', 'currentParams', 'myUri']) === undefined) {
                 return {
                     connection,
                 };
             }else{
-                const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                const postId = decodeURIComponent(getIn(state, ['router', 'currentParams', 'myUri']));
                 const post = state.getIn(["needs", postId]);
 
                 return {

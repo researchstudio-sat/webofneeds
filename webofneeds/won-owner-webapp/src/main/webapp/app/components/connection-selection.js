@@ -5,9 +5,16 @@
 
 import angular from 'angular';
 import {
+    getIn,
+    attach,
+    decodeUriComponentProperly,
+} from '../utils';
+import {
     labels,
 } from '../won-label-utils';
-import { attach, decodeUriComponentProperly } from '../utils.js';
+import {
+    connect2Redux,
+} from '../won-utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenPostUri,
@@ -37,10 +44,10 @@ function genComponentConf() {
 
             const selectFromState = (state)=>{
                 const postUri = selectOpenPostUri(state);
-                const ownNeed = state.getIn(["needs", postUri]);
+                const ownNeed = getIn(state, ["needs", postUri]);
 
                 const connectionTypeInParams = decodeUriComponentProperly(
-                    state.getIn(['router', 'currentParams', 'connectionType'])
+                    getIn(state, ['router', 'currentParams', 'connectionType'])
                 );
                 const connectionType = connectionTypeInParams || self.connectionType;
                 const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);
@@ -49,8 +56,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionType'], this);
         }
 
         setOpen(connectionUri) {

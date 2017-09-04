@@ -8,6 +8,7 @@ import {
     arrEq,
     checkHttpStatus,
     generateIdString,
+    getIn,
 } from './utils';
 
 export function initLeaflet(mapMount) {
@@ -102,11 +103,23 @@ export function selectEventsOfConnection(state, connectionUri) {
 * @returns a function to unregister the watch
  */
 export function reduxSelectDependsOnProperties(properties, selectFromState, ctrl) {
+    const firstVals = properties.map(p => getIn(
+        ctrl.$scope,
+        p.split('.'))
+    );
+    let firstTime = true;
     return ctrl.$scope.$watchGroup(properties, (newVals, oldVals) => {
-        if(!arrEq(newVals, oldVals)) {
+
+        if(
+            (firstTime && !arrEq(newVals, firstVals)) ||
+            !arrEq(newVals, oldVals)
+        ) {
             const state = ctrl.$ngRedux.getState();
             const stateSlice = selectFromState(state);
             Object.assign(ctrl, stateSlice);
+        }
+        if(firstTime) {
+            firstTime = false;
         }
     });
 }

@@ -13,6 +13,9 @@ import { actionCreators }  from '../actions/actions';
 import {
     labels,
 } from '../won-label-utils';
+import {
+    connect2Redux,
+} from '../won-utils';
 
 import {
     selectNeedByConnectionUri
@@ -85,7 +88,7 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const ownNeed = selectNeedByConnectionUri(state, self.connectionUri);
                 const connectionData = ownNeed && state.getIn(["needs", ownNeed.get("uri"), "connections", self.connectionUri]);
-                const remoteNeed = state.getIn(["needs", connectionData.get("remoteNeedUri")]);
+                const remoteNeed = connectionData && state.getIn(["needs", connectionData.get("remoteNeedUri")]);
 
                 return {
                     ownNeed,
@@ -93,8 +96,7 @@ function genComponentConf() {
                 };
             };
 
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
         }
 
         showFeedback() {
