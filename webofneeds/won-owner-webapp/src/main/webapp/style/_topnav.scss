@@ -147,6 +147,10 @@
     @include flex-row;
     list-style: none;
     align-items: stretch;
+
+    > li {
+      @include flex-column;
+    }
   }
 }
 
