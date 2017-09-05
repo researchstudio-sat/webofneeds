@@ -22,18 +22,8 @@ won-account-menu {
   }
 }
 
-/**
- * won-login is it's own popup (as compared to won-login-form)
- */
-won-login {
-  background: white;
-  padding: 0 1rem 1rem 1rem;
-  top: -3rem;
-  border: $thinGrayBorder;
-  position: relative;
-}
 
-won-login, won-login-form {
+won-login-form {
   display: block;
   min-width: 10rem;
 
