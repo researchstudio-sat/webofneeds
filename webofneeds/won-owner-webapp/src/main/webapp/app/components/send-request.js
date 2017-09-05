@@ -106,7 +106,7 @@ function genComponentConf() {
                     this.connections__close(this.connectionUri);
                 }else{
                     console.log("sending adhoc request");
-                }#
+                }
 
                 //TODO: CREATE COUNTERPART NEED
                 //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
