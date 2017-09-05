@@ -32,11 +32,11 @@ function genComponentConf() {
       </div>
 
       <won-post-header
-        need-uri="self.postUri">
+        need-uri="self.postUriToConnectTo">
       </won-post-header>
 
       <won-post-content
-        need-uri="self.postUri">
+        need-uri="self.postUriToConnectTo">
       </won-post-content>
 
       <div class="sr__footer">
@@ -65,7 +65,7 @@ function genComponentConf() {
         <a ng-show="self.debugmode && self.sendAdHocRequest"
           class="debuglink"
           target="_blank"
-          href="{{self.postUri}}">
+          href="{{self.postUriToConnectTo}}">
             [NEEDDATA]
         </a>
       </div>
@@ -85,13 +85,13 @@ function genComponentConf() {
                 const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
-                const postUri = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
+                const postUriToConnectTo = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
 
                 return {
                     ownNeed,
                     sendAdHocRequest,
                     connectionUri,
-                    postUri,
+                    postUriToConnectTo,
                     debugmode: won.debugmode,
                 }
             };
@@ -106,7 +106,7 @@ function genComponentConf() {
                     this.connections__close(this.connectionUri);
                 }else{
                     console.log("sending adhoc request");
-                }
+                }#
 
                 //TODO: CREATE COUNTERPART NEED
                 //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
