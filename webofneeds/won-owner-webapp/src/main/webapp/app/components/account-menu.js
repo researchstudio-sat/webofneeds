@@ -11,7 +11,7 @@ import {
 
 import dropdownModule from './covering-dropdown';
 import loginFormModule from './login-form';
-import loggedInMenuModule from './logout';
+import loggedInMenuModule from './logged-in-menu';
 
 import * as srefUtils from '../sref-utils';
 
