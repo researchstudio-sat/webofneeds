@@ -68,7 +68,7 @@ function genTopnavConf() {
 
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__button won-button--filled lighterblue"
+                                class="topnav__button won-button--filled lighterblue hide-in-responsive"
                                 ng-show="!self.open">
                                     Sign up
                             </a>

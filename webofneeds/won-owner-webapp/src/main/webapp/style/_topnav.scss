@@ -55,20 +55,10 @@
     @include carretSized;
   }
 
-  .won-button--filled {
-    white-space: nowrap;
-
-    @media (max-width: $responsivenessBreakPoint) {
-      display: none;
-    }
-  }
-
+  .won-button--filled,
   .topnav__button,
   .topnav__button__caption {
     white-space: nowrap;
-    @media (max-width: $responsivenessBreakPoint) {
-      display: none;
-    }
   }
 
   & .topnav__button {
@@ -101,6 +91,12 @@
 
     > li {
       @include flex-column;
+    }
+  }
+
+  .hide-in-responsive {
+    @media (max-width: $responsivenessBreakPoint) {
+      display: none;
     }
   }
 }
