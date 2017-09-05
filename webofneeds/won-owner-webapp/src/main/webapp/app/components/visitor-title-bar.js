@@ -31,7 +31,7 @@ function genComponentConf() {
                         <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}</div>
                     </hgroup>
                 </div>
-                <div class="vtb__inner__right" ng-show="true">
+                <div class="vtb__inner__right" ng-show="!self.isWhatsAround">
                     <button class="won-button--filled red" ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})">Request Contact</button>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
@@ -66,6 +66,7 @@ function genComponentConf() {
                     postUri,
                     post,
                     labels,
+                    isWhatsAround: post && post.get("isWhatsAround"),
                     hasConnectionWithOwnPost: false,
                 }
             };
