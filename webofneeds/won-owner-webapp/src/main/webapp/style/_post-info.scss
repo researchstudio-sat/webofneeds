@@ -1,6 +1,23 @@
 @import 'won-config';
 @import 'sizing-utils';
 
+.post__sendrequest {
+  position: absolute;
+  z-index: 1010; //OTHERWISE LEAFLET MESSES UP THE OVERLAY
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  won-send-request {
+    background: white;
+    margin: 0 auto;
+    top: 15rem;
+    max-width: $maxContentWidth / 2;
+    position: relative;
+  }
+}
+
 won-post-info {
   @media (max-width: $responsivenessBreakPoint){
     @include max-content-width($maxContentWidth, 0, 'post-info');
