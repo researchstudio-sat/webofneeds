@@ -9,6 +9,10 @@ won-account-menu {
     transform: rotate(180deg);
   }
 
+  .dd__menu {
+    margin-top: -0.5rem; // compensate for margin on header/open-button in title-bar
+  }
+
   won-login-form {
     display: block;
   }
