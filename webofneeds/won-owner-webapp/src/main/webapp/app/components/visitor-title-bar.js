@@ -22,14 +22,17 @@ function genComponentConf() {
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="vtb__icon">
                     </a>
                     <won-square-image 
-                        title="self.theirPost.get('title')"
-                        src="self.theirPost.get('titleImgSrc')"
-                        uri="self.theirPost.get('@id')">
+                        title="self.post.get('title')"
+                        src="self.post.get('titleImgSrc')"
+                        uri="self.post.get('uri')">
                     </won-square-image>
                     <hgroup>
-                        <h1 class="vtb__title">{{ self.theirPost.get('title') }}</h1>
-                        <div class="vtb__titles__type">{{self.labels.type[self.theirPost.get("type")]}}</div>
+                        <h1 class="vtb__title">{{ self.post.get('title') }}</h1>
+                        <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}</div>
                     </hgroup>
+                </div>
+                <div class="vtb__inner__right" ng-show="true">
+                    <button class="won-button--filled red" ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})">Request Contact</button>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
                     <button class="won-button--filled red">Quit Contact</button>
@@ -39,7 +42,7 @@ function genComponentConf() {
                             ng-click="self.selection = 0">
                         <a ng-click="self.router__stateGoAbs('post', {ERROR: 'Messages tab not implemented yet'})">
                             Messages
-                            <span class="vtb__tabs__unread">{{self.theirPost.get('messages').length}}</span>
+                            <span class="vtb__tabs__unread">{{self.post.get('messages').length}}</span>
                         </a></li>
                         <li class="clickable" ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
                         <a ng-click="self.router__stateGoAbs('postVisitor', {myUri: 'http://example.org/121337345'})">
@@ -58,9 +61,10 @@ function genComponentConf() {
             window.vtb4dbg = this;
             const selectFromState = state => {
                 const postUri = selectOpenPostUri(state);
-                const theirPost = state.getIn(["needs", postUri]);
+                const post = state.getIn(["needs", postUri]);
                 return {
-                    theirPost,
+                    postUri,
+                    post,
                     labels,
                     hasConnectionWithOwnPost: false,
                 }
