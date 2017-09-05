@@ -116,6 +116,16 @@ hr {
   color: $won-line-gray;
 }
 
+a {
+  //color: $won-red;
+  color: $won-lighter-blue;
+  text-decoration: none;
+  &:visited {
+    //color: darken($won-red, 30%);
+    color: darken($won-lighter-blue, 15%);
+  }
+}
+
 @import 'gallery';
 @import 'post-info';
 @import 'post-messages';
