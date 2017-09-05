@@ -60,6 +60,8 @@ class Controller {
                 getIn(state, ['router', 'currentParams', 'connectionType'])
             );
 
+            const sendAdHocRequest = post && !post.get("ownNeed") && getIn(state, ['router', 'currentParams', 'sendAdHocRequest']);
+
             const connectionIsOpen = !!connectionUri &&
                 //make sure we don't get a mismatch between supposed type and actual type:
                 actualConnectionType == connectionTypeInParams;
@@ -74,6 +76,7 @@ class Controller {
                 hasReceivedRequests,
                 hasSentRequests,
                 hasConversations,
+                sendAdHocRequest,
                 connectionType: connectionTypeInParams,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
