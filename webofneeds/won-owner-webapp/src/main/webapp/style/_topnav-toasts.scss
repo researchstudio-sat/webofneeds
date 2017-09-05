@@ -1,0 +1,45 @@
+@import 'won-config';
+
+topnav {
+  &__toasts {
+    position: absolute;
+    z-index: 999;
+    right: 0rem;
+    max-width: 15rem;
+    min-width: 15rem;
+
+    &__element {
+      margin: 1rem;
+      padding: 0.5rem;
+      border: $thinBorderWidth solid $won-line-gray;
+      box-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
+      min-height: 2rem;
+
+      background-position: 0.5rem 0.5rem;
+      background-size: $toastIconSize;
+      background-color: white;
+      background-repeat: no-repeat;
+
+      &.warn {
+        background-image: url('icon-sprite.svg#ico16_indicator_warning');
+      }
+      &.error {
+        background-image: url('icon-sprite.svg#ico16_indicator_error');
+      }
+      &.info {
+        background-image: url('icon-sprite.svg#ico16_indicator_info');
+      }
+
+      &__text {
+        font-size: $smallFontSize;
+        padding-right: 1rem;
+        padding-left: 2.5rem;
+      }
+
+      &__close {
+        float: right;
+        @include fixed-square($toastIconCloseSize);
+      }
+    }
+  }
+}

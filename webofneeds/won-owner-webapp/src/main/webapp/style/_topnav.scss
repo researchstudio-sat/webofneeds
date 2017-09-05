@@ -3,54 +3,13 @@
 @import 'flex-layout';
 @import 'sizing-utils';
 @import 'slidein';
+@import 'topnav-toasts';
 
 .topnav { //TODO split into single-purpose-classes
 
   background-color: white;
 
   @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
-
-  &__toasts {
-    position: absolute;
-    z-index: 999;
-    right: 0rem;
-    max-width: 15rem;
-    min-width: 15rem;
-
-    &__element {
-      margin: 1rem;
-      padding: 0.5rem;
-      border: $thinBorderWidth solid $won-line-gray;
-      box-shadow: 0.1rem 0.1rem 0.5rem rgba(0,0,0,0.3);
-      min-height: 2rem;
-
-      background-position: 0.5rem 0.5rem;
-      background-size: $toastIconSize;
-      background-color: white;
-      background-repeat: no-repeat;
-
-      &.warn {
-        background-image: url('icon-sprite.svg#ico16_indicator_warning');
-      }
-      &.error {
-        background-image: url('icon-sprite.svg#ico16_indicator_error');
-      }
-      &.info {
-        background-image: url('icon-sprite.svg#ico16_indicator_info');
-      }
-
-      &__text {
-        font-size: $smallFontSize;
-        padding-right: 1rem;
-        padding-left: 2.5rem;
-      }
-
-      &__close {
-        float: right;
-        @include fixed-square($toastIconCloseSize);
-      }
-    }
-  }
 
   > .topnav__inner {
     //@include tri-aligned('topnav__inner', 1rem);
@@ -104,27 +63,19 @@
     }
   }
 
+  .topnav__button,
+  .topnav__button__caption {
+    white-space: nowrap;
+    @media (max-width: $responsivenessBreakPoint) {
+      display: none;
+    }
+  }
+
   & .topnav__button {
     @include flex-row;
 
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-
-    .topnav__button__caption {
-      white-space: nowrap;
-
-      @media (max-width: $responsivenessBreakPoint) {
-        display: none;
-      }
-    }
-
-    &.won-button--filled {
-      white-space: nowrap;
-
-      @media (max-width: $responsivenessBreakPoint) {
-        display: none;
-      }
-    }
 
     .topnav__button__caption__always {
       white-space: nowrap;
