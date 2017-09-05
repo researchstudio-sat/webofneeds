@@ -11,31 +11,22 @@ import {
 
 import * as srefUtils from '../sref-utils';
 
-function genLogoutConf() {
-    let template = `<a class="wl__button clickable" ng-click="self.hideLogin()">
-                        <span class="wl__button__caption">{{self.email}}</span>
-                        <img src="generated/icon-sprite.svg#ico16_arrow_up" class="wl__button__carret">
-                        <img src="generated/icon-sprite.svg#ico36_person" class="wl__button__icon">
-                    </a>
-                    <!--<a class="wl__button" ui-sref="{{ self.absSRef('about') }}">About</a>-->
-                    <button class="won-button--filled lighterblue" ng-click="::self.logout()">Sign out</button>`;
-    //let template = `<a class="menu-root-btn clickable" ng-click="self.hideLogin()">
-    //                    <span class="mrb__caption">{{self.email}}</span>
-    //                    <img src="generated/icon-sprite.svg#ico16_arrow_up" class="mrb__carret">
-    //                    <img src="generated/icon-sprite.svg#ico36_person" class="mrb__icon">
-    //                </a>
-    //                <!--<ul class="menu-entries">-->
-    //                    <!--<a ui-sref="{{ self.absSRef('about') }}">About</a>-->
-    //                <!--</ul>-->
-    //                <div style="width: 100%;" class="wl__button">
-    //                    <a class="wl__button"
-    //                        style="margin-left: auto; margin-right: auto; color: #f04646;">
-    //                            About
-    //                    </a>
-    //                </div>
-    //                <button class="won-button--filled lighterblue" ng-click="::self.logout()">Sign out</button>`;
+function genComponentConf() {
+let template = `
+    <a
+        href="{{ self.absHRef(self.$state, 'about') }}"
+        class="topnav__button red">
+            About
+    </a>
+    <button
+        class="won-button--filled lighterblue"
+        style="width:100%"
+        ng-click="::self.logout()">
+            Sign out
+    </button>
+    `;
 
-    const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$state',/*'$routeParams' /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
@@ -54,10 +45,6 @@ function genLogoutConf() {
 
             connect2Redux(logout, actionCreators, [], this);
         }
-
-        hideLogin() {
-            this.open = false;
-        }
     }
     Controller.$inject = serviceDependencies;
 
@@ -66,12 +53,12 @@ function genLogoutConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {open: '='},
+        scope: {},
         template: template
     }
 }
 
 export default angular.module('won.owner.components.logout', [])
-    .directive('wonLogout', genLogoutConf)
+    .directive('wonLoggedInMenu', genComponentConf)
     .name;
 

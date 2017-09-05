@@ -11,6 +11,7 @@ import {
 
 import dropdownModule from './covering-dropdown';
 import loginFormModule from './login-form';
+import loggedInMenuModule from './logout';
 
 import * as srefUtils from '../sref-utils';
 
@@ -35,19 +36,10 @@ function genLogoutConf() {
             <won-dd-menu>
 
 
-                <div class="am__menu--loggedin" ng-show="self.loggedIn">
-                    <a
-                        href="{{ self.absHRef(self.$state, 'about') }}"
-                        class="topnav__button red">
-                            About
-                    </a>
-                    <button
-                        class="won-button--filled lighterblue"
-                        style="width:100%"
-                        ng-click="::self.logout()">
-                            Sign out
-                    </button>
-                </div>
+                <won-logged-in-menu
+                    class="am__menu--loggedin"
+                    ng-show="self.loggedIn">
+                </won-logged-in-menu>
 
 
                 <won-login-form
@@ -79,10 +71,6 @@ function genLogoutConf() {
 
             connect2Redux(logout, actionCreators, [], this);
         }
-
-        hideLogin() {
-            this.open = false;
-        }
     }
     Controller.$inject = serviceDependencies;
 
@@ -99,6 +87,7 @@ function genLogoutConf() {
 export default angular.module('won.owner.components.accountMenu', [
     dropdownModule,
     loginFormModule,
+    loggedInMenuModule,
 ])
     .directive('wonAccountMenu', genLogoutConf)
     .name;
