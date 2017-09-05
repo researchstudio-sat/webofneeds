@@ -1,29 +1,3 @@
-won-account-menu {
-  //display: block;
-  won-dd-header {
-    @include flex-row();
-    color: $won-red;
-  }
-
-  .dd--open .topnav__carret {
-    transform: rotate(180deg);
-  }
-
-  .dd__menu {
-    margin-top: -0.5rem; // compensate for margin on header/open-button in title-bar
-  }
-
-  won-login-form {
-    display: block;
-  }
-}
-
-// TODO move all classes that aren't won-dropdown to their own file
-won-login-form {
-  min-width: 10rem;
-}
-
-
 won-dropdown {
   display: block;
 

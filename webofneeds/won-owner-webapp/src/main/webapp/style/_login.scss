@@ -2,6 +2,26 @@
 @import 'flex-layout';
 @import 'sizing-utils';
 
+won-account-menu {
+  //display: block;
+  won-dd-header {
+    @include flex-row();
+    color: $won-red;
+  }
+
+  .dd--open .topnav__carret {
+    transform: rotate(180deg);
+  }
+
+  .dd__menu {
+    margin-top: -0.5rem; // compensate for margin on header/open-button in title-bar
+  }
+
+  won-login-form {
+    display: block;
+  }
+}
+
 /**
  * won-login is it's own popup (as compared to won-login-form)
  */
@@ -15,6 +35,7 @@ won-login {
 
 won-login, won-login-form {
   display: block;
+  min-width: 10rem;
 
   button {
     width: 100%;
