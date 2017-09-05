@@ -14,6 +14,11 @@ won-account-menu {
   }
 }
 
+// TODO move all classes that aren't won-dropdown to their own file
+won-login-form {
+  min-width: 10rem;
+}
+
 
 won-dropdown {
   display: block;
@@ -34,20 +39,42 @@ won-dropdown {
     //border: 1px solid transparent; // to align
   }
 
-  > .dd__dropdown {
 
-    $padding: 1rem;
-    padding-left: $padding;
-    padding-right: $padding;
-    padding-bottom: $padding;
+  .dd__close-button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; // left-aligned
+  }
+  &.dd-right-aligned-header {
+    .dd__close-button {
+      align-items: flex-end; //right-aligned
+    }
+  }
+
+
+  $dropdownPadding: 1rem;
+  > .dd__dropdown {
+    padding-left: $dropdownPadding;
+    padding-right: $dropdownPadding;
+    padding-bottom: $dropdownPadding;
 
     /* put it directly over the trigger-button (with aligned text) */
     position: absolute;
     top: -1px; //-1px to offset border
-    left: calc(-1px - #{$padding}); // offset border *and* left padding
+    left: calc(-1px - #{$dropdownPadding}); // offset border *and* left padding
     z-index: 99;
 
     background-color: white;
     border: 1px solid #cbd2d1;
   }
+  &.dd-right-aligned-header {
+    .dd__dropdown {
+      left: auto;
+      right: calc(-1px - #{$dropdownPadding}); // offset border *and* left padding
+    }
+  }
+
+
+
 }
+

@@ -16,7 +16,7 @@ import * as srefUtils from '../sref-utils';
 
 function genLogoutConf() {
     let template = `
-        <won-dropdown>
+        <won-dropdown class="dd-right-aligned-header">
             <won-dd-header class="topnav__button">
 
 
