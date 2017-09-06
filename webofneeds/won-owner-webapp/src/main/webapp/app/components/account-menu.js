@@ -21,7 +21,7 @@ function genLogoutConf() {
             <won-dd-header class="topnav__button">
 
 
-                <span class="topnav__button__caption">
+                <span class="topnav__button__caption hide-in-responsive">
                     {{self.loggedIn? self.email : "Sign In"}}
                 </span>
                 <img

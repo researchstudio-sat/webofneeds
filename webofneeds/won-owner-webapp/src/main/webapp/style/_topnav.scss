@@ -39,6 +39,7 @@
 
   .topnav__signupbtn {
     @include won-button--filled(white, $won-lighter-blue);
+    @include hide-in-responsive;
   }
 
   a:not(.topnav__signupbtn),
@@ -104,11 +105,6 @@
     }
   }
 
-  .hide-in-responsive {
-    @media (max-width: $responsivenessBreakPoint) {
-      display: none;
-    }
-  }
 }
 
 
