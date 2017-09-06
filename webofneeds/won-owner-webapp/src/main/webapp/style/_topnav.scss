@@ -5,6 +5,7 @@
 @import 'slidein';
 @import 'topnav-toasts';
 @import 'button';
+@import 'responsiveness-utils';
 
 .topnav { //TODO split into single-purpose-classes
 
@@ -37,36 +38,17 @@
     }
   }
 
-  .topnav__signupbtn {
-    @include won-button--filled(white, $won-lighter-blue);
-    @include hide-in-responsive;
-  }
-
   a:not(.topnav__signupbtn),
   a:visited:not(.topnav__signupbtn) {
     color: $won-red;
   }
 
-  //.topnav__page-title {
-  //  color: $won-red;
-  //}
-
-  & .topnav__page-title {
-    font-weight: 700;
-  }
 
   & .topnav__carret {
-    /*
-    // without svg-included margins
-    @include fixed-height(0.5rem);
-    @include fixed-width(0.875rem);
-    */
-
     // with svg-included margins
     @include carretSized;
   }
 
-  .won-button--filled,
   .topnav__button,
   .topnav__button__caption {
     white-space: nowrap;
@@ -77,10 +59,6 @@
 
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-
-    .topnav__button__caption__always {
-      white-space: nowrap;
-    }
 
     .topnav__button__icon {
       @include fixed-square($bigiconSize);
@@ -103,6 +81,17 @@
     > li {
       @include flex-column;
     }
+  }
+
+  .topnav__page-title {
+    font-weight: 700;
+    @include hide-in-responsive;
+  }
+
+  .topnav__signupbtn {
+    @include won-button--filled(white, $won-lighter-blue);
+    @include hide-in-responsive;
+    @extend .topnav__button;
   }
 
 }
