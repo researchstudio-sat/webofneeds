@@ -30,7 +30,7 @@ function genTopnavConf() {
             <button
                 ng-show="self.connectionHasBeenLost && !self.reconnecting"
                 ng-click="self.reconnect()"
-                class="si__button won-button outline white">
+                class="si__button">
                     Reconnect
             </button>
 
@@ -68,7 +68,10 @@ function genTopnavConf() {
 
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__button won-button--filled lighterblue hide-in-responsive"
+                                class="
+                                    topnav__button
+                                    topnav__signupbtn
+                                    hide-in-responsive"
                                 ng-show="!self.open">
                                     Sign up
                             </a>

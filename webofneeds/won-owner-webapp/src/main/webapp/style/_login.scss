@@ -72,11 +72,6 @@ won-login-form {
     font-size: $smallFontSize;
   }
 
-  & a {
-    color: $won-red;
-    text-decoration: none;
-  }
-
   & .wl__button {
     @include flex-row;
     justify-content: flex-end;

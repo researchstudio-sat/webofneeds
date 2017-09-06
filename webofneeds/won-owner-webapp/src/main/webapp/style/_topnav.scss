@@ -4,6 +4,7 @@
 @import 'sizing-utils';
 @import 'slidein';
 @import 'topnav-toasts';
+@import 'button';
 
 .topnav { //TODO split into single-purpose-classes
 
@@ -35,10 +36,19 @@
       }
     }
   }
-  & a {
-    color: $won-red;
-    text-decoration: none;
+
+  .topnav__signupbtn {
+    @include won-button--filled(white, $won-lighter-blue);
   }
+
+  a:not(.topnav__signupbtn),
+  a:visited:not(.topnav__signupbtn) {
+    color: $won-red;
+  }
+
+  //.topnav__page-title {
+  //  color: $won-red;
+  //}
 
   & .topnav__page-title {
     font-weight: 700;

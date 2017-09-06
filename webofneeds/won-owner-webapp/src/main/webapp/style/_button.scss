@@ -36,26 +36,27 @@
   }
 }
 
-.won-button {
+@mixin won-button() {
   padding: 0.66em 2em;
   font-size: $normalFontSize;
   text-align: center;
   border-radius: 0.19rem;
   cursor: pointer;
 }
+.won-button {
+  @include won-button();
+}
 
-.won-button.outline {
 
-  @extend .won-button;
+@mixin won-button--outlined($color: "") {
+  @include won-button;
+
+  @if $color != "" {
+    @include outline-button-color($color);
+  }
 
   border-width: 1px;
   border-style: solid;
-
-  &.white { @include outline-button-color(white); }
-  &.red { @include outline-button-color($won-red); }
-  &.darkgray { @include outline-button-color($won-dark-gray); }
-  &.lighterblue { @include outline-button-color($won-lighter-blue); }
-  &.black { @include outline-button-color(black); }
 
   /*
   &.darkgray { @include button-color(white, $won-dark-gray); }
@@ -64,20 +65,38 @@
   */
 
 }
+.won-button--outlined {
+  @include won-button--outlined;
+
+  &.white { @include outline-button-color(white); }
+  &.red { @include outline-button-color($won-red); }
+  &.darkgray { @include outline-button-color($won-dark-gray); }
+  &.lighterblue { @include outline-button-color($won-lighter-blue); }
+  &.black { @include outline-button-color(black); }
+
+}
 
 /* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
-.won-button--filled {
-  @extend .won-button;
+@mixin won-button--filled($color: "", $bgColor: "") {
+  @include won-button;
+
+  @if $color != "" { @if $bgColor != "" {
+    @include flat-button-color($color, $bgColor);
+  }}
 
   border: 0;
+
+  &.thin {
+    padding: 0.4em 2em;
+  }
+}
+.won-button--filled {
+  @include won-button--filled;
 
   /*Button color definitions*/
   &.red { @include flat-button-color(white,$won-red); }
   &.darkgray { @include flat-button-color(white, $won-dark-gray); }
   &.lighterblue { @include flat-button-color(white, $won-lighter-blue); }
   &.black { @include flat-button-color(white, black); }
-
-  &.thin {
-    padding: 0.4em 2em;
-  }
 }
+
