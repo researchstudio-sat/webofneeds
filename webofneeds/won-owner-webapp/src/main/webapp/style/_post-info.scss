@@ -29,10 +29,17 @@ won-post-info {
   }
   width: 100%;
 
+  button {
+    width: 100%;
+  }
+
   .post-info__heading {
     font-size: $normalFontSize;
     font-weight: 700;
   }
+
+  won-need-map,
+  button,
   .post-info__details {
     margin-bottom: 1rem;
   }
@@ -50,12 +57,16 @@ won-post-info {
     }
   }
 
-  won-need-map .need-map__mapmount {
-    width: 100%;
-    height: 31rem;
+  won-need-map{
+    display: block;
 
-    @media (max-width : $responsivenessBreakPoint) {
-      height: 15rem;
+    .need-map__mapmount {
+      width: 100%;
+      height: 31rem;
+
+      @media (max-width : $responsivenessBreakPoint) {
+        height: 15rem;
+      }
     }
   }
 
