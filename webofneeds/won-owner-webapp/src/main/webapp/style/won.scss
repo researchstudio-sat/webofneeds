@@ -14,6 +14,7 @@
 @import 'speech-bubble';
 @import 'square-image';
 @import 'tri-aligned';
+@import 'responsiveness-utils';
 
 @import 'text';
 
@@ -71,19 +72,6 @@ input[type=email] {
 
 .clickable {
   cursor: pointer;
-}
-
-/// use to hide e.g. labels in responsive-mode. never(!) use this mixin
-/// to hide features (they still need to be accessible one way or another)
-@mixin hide-in-responsive {
-  @media (max-width: $responsivenessBreakPoint) {
-    display: none;
-  }
-}
-/// use to hide e.g. labels in responsive-mode. never(!) use this class
-/// to hide features (they still need to be accessible one way or another)
-.hide-in-responsive {
-  @include hide-in-responsive;
 }
 
 .hspinner {
