@@ -21,6 +21,9 @@
     <title>Web Of Needs</title>
     <link rel="stylesheet" href="./generated/won.css" />
     <link rel="icon" type="image/png" href="images/won-icons/won-icon64.png" />
+
+    <link rel="preload" src="./generated/app_jspm.bundle.js"> <!-- atm only chrome, opera -->
+    <link rel="prefetch" src="./generated/app_jspm.bundle.js"> <!-- fallback for other browsers -->
 </head>
 <body>
 <section ui-view></section>
