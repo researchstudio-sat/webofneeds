@@ -67,6 +67,8 @@
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
     <Connector port="8080" protocol="HTTP/1.1"
+               compression="on"
+               compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript"
                connectionTimeout="20000"
                redirectPort="8443" />
     <!-- A "Connector" using the shared thread pool-->
@@ -87,6 +89,8 @@
                clientAuth="false" sslProtocol="TLS" />
     -->
 	<Connector
+    compression="on"
+    compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript"
     clientAuth="wanted" port="8443" minSpareThreads="5" maxSpareThreads="75"
     enableLookups="true" disableUploadTimeout="true"
     acceptCount="100" maxThreads="200"
