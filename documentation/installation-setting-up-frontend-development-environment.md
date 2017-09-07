@@ -70,6 +70,6 @@ If you want to enable gzip-compression on you local tomcat (e.g. because you're 
 ```xml
 <Connector
     compression="on"
-    compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript"
+    compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/x-font-ttf"
    .../>
 ```
