@@ -2,13 +2,30 @@
 @import 'flex-layout';
 @import 'sizing-utils';
 
-won-login {
-  background: white;
+won-account-menu {
+  //display: block;
+  won-dd-header {
+    @include flex-row();
+    color: $won-red;
+  }
+
+  .dd--open .topnav__carret {
+    transform: rotate(180deg);
+  }
+
+  .dd__menu {
+    margin-top: -0.5rem; // compensate for margin on header/open-button in title-bar
+  }
+
+  won-login-form {
+    display: block;
+  }
+}
+
+
+won-login-form {
   display: block;
-  padding: 0 1rem 1rem 1rem;
-  top: -3rem;
-  position: relative;
-  border: $thinGrayBorder;
+  min-width: 10rem;
 
   button {
     width: 100%;
@@ -53,11 +70,6 @@ won-login {
     padding-top: 1rem;
     display: block;
     font-size: $smallFontSize;
-  }
-
-  & a {
-    color: $won-red;
-    text-decoration: none;
   }
 
   & .wl__button {

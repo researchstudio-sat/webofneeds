@@ -14,6 +14,7 @@
 @import 'speech-bubble';
 @import 'square-image';
 @import 'tri-aligned';
+@import 'responsiveness-utils';
 
 @import 'text';
 
@@ -51,7 +52,6 @@ body {
 
 @import 'topnav';
 @import 'login';
-@import 'logout';
 @import 'need-tab-bar';
 @import 'main-tab-bar';
 @import 'create-need-title-bar';
@@ -117,6 +117,16 @@ hr {
   color: $won-line-gray;
 }
 
+a {
+  //color: $won-red;
+  color: $won-lighter-blue;
+  text-decoration: none;
+  &:visited {
+    //color: darken($won-red, 30%);
+    color: darken($won-lighter-blue, 15%);
+  }
+}
+
 @import 'gallery';
 @import 'post-info';
 @import 'post-messages';
@@ -144,3 +154,4 @@ hr {
 @import 'send-request';
 @import 'post-owner';
 @import 'connections-map';
+@import 'covering-dropdown';

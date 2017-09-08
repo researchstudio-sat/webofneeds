@@ -4,8 +4,10 @@
 ;
 import won from '../won-es6';
 import angular from 'angular';
-import loginComponent from 'app/components/login';
-import logoutComponent from 'app/components/logout';
+//import loginComponent from './login';
+//import logoutComponent from './logout';
+import dropdownModule from './covering-dropdown';
+import accountMenuModule from './account-menu';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import config from '../config';
@@ -19,12 +21,16 @@ function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
-            <img class="si__icon" src="generated/icon-sprite.svg#ico16_indicator_warning_white"/>
-            <span class="si__text">Lost connection &ndash; make sure your internet-connection
-            is working, then click &ldquo;reconnect&rdquo;.</span>
+            <img class="si__icon"
+                src="generated/icon-sprite.svg#ico16_indicator_warning_white"/>
+            <span class="si__text">
+                Lost connection &ndash; make sure your internet-connection
+                is working, then click &ldquo;reconnect&rdquo;.
+            </span>
             <button
-                ng-show="self.connectionHasBeenLost && !self.reconnecting" ng-click="self.reconnect()"
-                class="si__button won-button outline white">
+                ng-show="self.connectionHasBeenLost && !self.reconnecting"
+                ng-click="self.reconnect()"
+                class="si__button">
                     Reconnect
             </button>
 
@@ -39,43 +45,40 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ui-sref="{{ self.resetParamsSRef(self.loggedIn ? 'feed' : 'landingpage') }}" class="topnav__button">
-                        <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
-                        <span class="topnav__page-title topnav__button__caption">
-                            Web of Needs &ndash; Beta
-                        </span>
+                    <a  ui-sref="{{ self.resetParamsSRef(self.loggedIn ? 'feed' : 'landingpage') }}"
+                        class="topnav__button">
+                            <img src="generated/icon-sprite.svg#WON_ico_header"
+                                class="topnav__button__icon">
+                            <span class="topnav__page-title topnav__button__caption">
+                                Web of Needs &ndash; Beta
+                            </span>
                     </a>
                 </div>
                 <div class="topnav__inner__center">
                     <a ui-sref="{{ self.resetParamsSRef('createNeed') }}"
                        class="topnav__button"
                        ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
-                        <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
+                        <img src="generated/icon-sprite.svg#ico36_plus"
+                            class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Post</span>
                     </a>
                 </div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
+
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__button won-button--filled lighterblue"
+                                class="topnav__signupbtn"
                                 ng-show="!self.open">
                                     Sign up
                             </a>
                         </li>
+
                         <li>
-                            <a class="topnav__button"
-                                ng-click="self.showLogin()"
-                                ng-class="{'open' : self.open}">
-                                    <span class="topnav__button__caption__always">
-                                        {{ self.loggedIn? self.email : "Sign In" }}
-                                    </span>
-                                    <img src="generated/icon-sprite.svg#ico16_arrow_down"
-                                        ng-show="!self.open" class="topnav__carret">
-                                    <img src="generated/icon-sprite.svg#ico16_arrow_up_hi"
-                                        ng-show="self.open" class="topnav__carret">
-                            </a>
+                            <won-account-menu>
+                            </won-account-menu>
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -120,7 +123,9 @@ function genTopnavConf() {
                     </p>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
-                        <a href="mailto:{{::self.config.adminEmail}}">{{::self.config.adminEmail}}</a>
+                        <a href="mailto:{{::self.config.adminEmail}}">
+                            {{::self.config.adminEmail}}
+                        </a>
                     </p>
                 </div>
 
@@ -170,8 +175,10 @@ function genTopnavConf() {
 
 export default angular.module('won.owner.components.topnav', [
         'ngSanitize',
-        loginComponent,
-        logoutComponent
+        //loginComponent,
+        //logoutComponent,
+        dropdownModule,
+        accountMenuModule,
     ])
     .directive('wonTopnav', genTopnavConf)
     .name;
