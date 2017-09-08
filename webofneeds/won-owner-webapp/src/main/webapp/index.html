@@ -42,16 +42,6 @@ loading after the other scripts it needs as dependencies
 <img src="./generated/icon-sprite.svg" style="display:none">
 
 <!--
-these static imports are necessary due to problems with bundling
-medium.js, as documented here:
-https://github.com/researchstudio-sat/webofneeds/issues/664
--->
-<!-- each of these has to be copied here manually by the gulp build task -->
-<script src="./generated/scripts/undo.js"></script>
-<script src="./generated/scripts/rangy-core.js"></script>
-<script src="./generated/scripts/medium.js"></script>
-
-<!--
 this line loads the bundled app. comment it out if you want
 jspm to dynamically load and compile the sources at runtime.
 this makes for easier debugging, as you get seperate

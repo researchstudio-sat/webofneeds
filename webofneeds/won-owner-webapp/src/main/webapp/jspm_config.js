@@ -33,6 +33,7 @@ System.config({
     "immutable": "npm:immutable@3.7.5",
     "jsonld": "npm:jsonld@0.4.12",
     "leaflet": "npm:leaflet@0.7.7",
+    "medium.js": "npm:medium.js@1.0.1",
     "ng-redux": "npm:ng-redux@3.4.1",
     "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
@@ -42,6 +43,7 @@ System.config({
     "redux-ui-router": "npm:redux-ui-router@0.7.2",
     "reselect": "npm:reselect@2.0.2",
     "sockjs": "bower:sockjs@0.3.4",
+    "undo.js": "npm:undo.js@0.2.0",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
     },
@@ -187,6 +189,10 @@ System.config({
       "systemjs-json": "github:systemjs/plugin-json@0.1.2",
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
+    "npm:medium.js@1.0.1": {
+      "rangy": "npm:rangy@1.3.0",
+      "undo.js": "npm:undo.js@0.2.0"
+    },
     "npm:ng-redux@3.4.1": {
       "invariant": "npm:invariant@2.2.2",
       "lodash.assign": "npm:lodash.assign@3.2.0",
@@ -242,6 +248,9 @@ System.config({
     },
     "npm:string_decoder@0.10.31": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
+    },
+    "npm:undo.js@0.2.0": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:util@0.10.3": {
       "inherits": "npm:inherits@2.0.1",
