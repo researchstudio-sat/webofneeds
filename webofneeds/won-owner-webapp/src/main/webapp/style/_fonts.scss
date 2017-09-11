@@ -17,6 +17,8 @@ $font-family-sans-serif:          "Open Sans", sans-serif !default;
   src:
   local('Open Sans Light'),
   local('OpenSans-Light'),
+  url("../fonts/open-sans/OpenSans-Light.woff2") format('woff2'),
+  url("../fonts/open-sans/OpenSans-Light.woff") format('woff'),
   url("../fonts/open-sans/OpenSans-Light.ttf") format('truetype');
 }
 //@font-face {
@@ -39,6 +41,8 @@ $font-family-sans-serif:          "Open Sans", sans-serif !default;
   src:
   local('Open Sans'),
   local('OpenSans-Regular'),
+  url("../fonts/open-sans/OpenSans-Regular.woff2") format('woff2'),
+  url("../fonts/open-sans/OpenSans-Regular.woff") format('woff'),
   url("../fonts/open-sans/OpenSans-Regular.ttf") format('truetype');
 }
 //@font-face {
@@ -82,6 +86,8 @@ $font-family-sans-serif:          "Open Sans", sans-serif !default;
   src:
   local('Open Sans Bold'),
   local('OpenSans-Bold'),
+  url("../fonts/open-sans/OpenSans-Bold.woff2") format('woff2'),
+  url("../fonts/open-sans/OpenSans-Bold.woff") format('woff'),
   url("../fonts/open-sans/OpenSans-Bold.ttf") format('truetype');
 }
 //@font-face {
