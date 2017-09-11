@@ -13,6 +13,7 @@ $font-family-sans-serif:          "Open Sans", sans-serif !default;
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 300; //light
+  font-display: swap; // display fallback font until open sans is loaded
   src:
   local('Open Sans Light'),
   local('OpenSans-Light'),
@@ -34,6 +35,7 @@ $font-family-sans-serif:          "Open Sans", sans-serif !default;
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 400; //normal
+  font-display: swap; // display fallback font until open sans is loaded
   src:
   local('Open Sans'),
   local('OpenSans-Regular'),
@@ -76,6 +78,7 @@ $font-family-sans-serif:          "Open Sans", sans-serif !default;
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 700; //bold
+  font-display: swap; // display fallback font until open sans is loaded
   src:
   local('Open Sans Bold'),
   local('OpenSans-Bold'),
