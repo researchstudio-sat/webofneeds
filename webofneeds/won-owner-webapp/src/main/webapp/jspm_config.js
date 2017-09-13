@@ -110,7 +110,8 @@ System.config({
     },
     "npm:buffer@5.0.7": {
       "base64-js": "npm:base64-js@1.2.1",
-      "ieee754": "npm:ieee754@1.1.8"
+      "ieee754": "npm:ieee754@1.1.8",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:core-js@1.2.6": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -244,7 +245,8 @@ System.config({
     },
     "npm:util@0.10.3": {
       "inherits": "npm:inherits@2.0.1",
-      "process": "github:jspm/nodelibs-process@0.1.2"
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:vm-browserify@0.0.4": {
       "indexof": "npm:indexof@0.0.1"
