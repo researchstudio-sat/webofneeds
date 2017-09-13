@@ -24,8 +24,6 @@ import {
     delay,
 } from './utils.js';
 
-import foobar from './deletme.js'
-
 //---------- Config -----------
 import { configRouting, runAccessControl } from './configRouting.js';
 import configRedux from './configRedux.js';
