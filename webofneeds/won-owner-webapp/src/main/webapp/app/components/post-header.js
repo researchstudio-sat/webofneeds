@@ -4,21 +4,21 @@
  */
 import angular from 'angular';
 import 'ng-redux';
-import squareImageModule from './square-image';
-import { actionCreators }  from '../actions/actions';
+import squareImageModule from './square-image.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     labels,
     relativeTime
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import {
     attach,
 } from '../utils.js'
 import {
     connect2Redux,
-} from '../won-utils'
+} from '../won-utils.js'
 import {
     selectLastUpdateTime,
-} from '../selectors';
+} from '../selectors.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

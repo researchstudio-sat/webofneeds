@@ -4,7 +4,7 @@
 
 import {
     deepFreeze,
-} from './utils';
+} from './utils.js';
 
 export default deepFreeze({
     adminEmail: 'office.sat@researchstudio.at',

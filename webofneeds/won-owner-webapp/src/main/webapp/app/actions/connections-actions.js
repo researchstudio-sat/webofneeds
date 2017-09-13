@@ -2,7 +2,7 @@
  * Created by ksinger on 19.02.2016.
  */
 
-import  won from '../won-es6';
+import  won from '../won-es6.js';
 import Immutable from 'immutable';
 import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
 
@@ -10,7 +10,7 @@ import {
     selectAllByConnectionUri,
     selectOpenConnectionUri,
     selectRemoteEvents,
-} from '../selectors';
+} from '../selectors.js';
 
 import {
     is,
@@ -18,16 +18,16 @@ import {
     msStringToDate,
     getIn,
     jsonld2simpleFormat,
-} from '../utils';
+} from '../utils.js';
 
 import {
    makeParams,
-} from '../configRouting';
+} from '../configRouting.js';
 
 import {
     actionTypes,
     actionCreators,
-} from './actions';
+} from './actions.js';
 
 import {
     buildOpenMessage,
@@ -36,7 +36,7 @@ import {
     buildRateMessage,
     buildConnectMessage,
     getEventsFromMessage,
-} from '../won-message-utils';
+} from '../won-message-utils.js';
 
 export function connectionsChatMessage(chatMessage, connectionUri) {
    return dispatch => {

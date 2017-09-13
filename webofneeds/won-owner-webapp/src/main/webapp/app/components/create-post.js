@@ -5,22 +5,22 @@
 
 import angular from 'angular'
 import 'ng-redux';
-import createNeedTitleBarModule from './create-need-title-bar';
-import posttypeSelectModule from './posttype-select';
-import labelledHrModule from './labelled-hr';
-import needTextfieldModule from './need-textfield';
-import imageDropzoneModule from './image-dropzone';
-import locationPickerModule from './location-picker';
+import createNeedTitleBarModule from './create-need-title-bar.js';
+import posttypeSelectModule from './posttype-select.js';
+import labelledHrModule from './labelled-hr.js';
+import needTextfieldModule from './need-textfield.js';
+import imageDropzoneModule from './image-dropzone.js';
+import locationPickerModule from './location-picker.js';
 import {
     attach,
     reverseSearchNominatim,
     nominatim2draftLocation,
-} from '../utils';
-import { actionCreators }  from '../actions/actions';
-import won from '../won-es6';
+} from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
+import won from '../won-es6.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 const postTypeTexts = [
     {

@@ -2,30 +2,30 @@
  * Created by ksinger on 19.02.2016.
  */
 
-import  won from '../won-es6';
+import  won from '../won-es6.js';
 import Immutable from 'immutable';
-import { actionTypes, actionCreators } from './actions';
-import { fetchOwnedData } from '../won-message-utils';
+import { actionTypes, actionCreators } from './actions.js';
+import { fetchOwnedData } from '../won-message-utils.js';
 import {
     registerAccount,
     login,
     privateId2Credentials,
     logout,
     parseCredentials,
-} from '../won-utils';
+} from '../won-utils.js';
 import {
     stateGoCurrent,
 
-} from './cstm-router-actions';
+} from './cstm-router-actions.js';
 import {
     resetParams,
     checkAccessToCurrentRoute,
-} from '../configRouting';
+} from '../configRouting.js';
 
 import {
     checkHttpStatus,
     getIn,
-} from '../utils';
+} from '../utils.js';
 
 /**
  * @param privateId

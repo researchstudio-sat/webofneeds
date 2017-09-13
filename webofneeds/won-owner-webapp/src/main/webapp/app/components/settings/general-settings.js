@@ -1,9 +1,9 @@
 ;
 
 import angular from 'angular';
-import accountSettingsModule from '../settings/account-settings';
-import addressSettingsModule from '../settings/address-settings';
-import notificationSettingsModule from '../settings/notification-settings';
+import accountSettingsModule from '../settings/account-settings.js';
+import addressSettingsModule from '../settings/address-settings.js';
+import notificationSettingsModule from '../settings/notification-settings.js';
 
 function genComponentConf() {
     let template = `

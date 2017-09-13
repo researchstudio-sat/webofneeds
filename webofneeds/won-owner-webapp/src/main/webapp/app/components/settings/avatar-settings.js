@@ -1,7 +1,7 @@
 ;
 
 import angular from 'angular';
-import avatarImageSelectorModule from '../settings/avatarimage-selector';
+import avatarImageSelectorModule from '../settings/avatarimage-selector.js';
 
 function genComponentConf() {
     let template = `

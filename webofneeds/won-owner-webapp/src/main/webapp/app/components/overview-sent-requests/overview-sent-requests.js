@@ -4,15 +4,15 @@
 ;
 
 import angular from 'angular';
-import overviewTitleBarModule from '../overview-title-bar';
-import openRequestModule from '../open-request';
+import overviewTitleBarModule from '../overview-title-bar.js';
+import openRequestModule from '../open-request.js';
 import {
     attach,
     getIn,
-} from '../../utils';
-import { actionCreators }  from '../../actions/actions';
+} from '../../utils.js';
+import { actionCreators }  from '../../actions/actions.js';
 
-import connectionsOverviewModule from  '../connections-overview';
+import connectionsOverviewModule from  '../connections-overview.js';
 
 
 const serviceDependencies = ['$ngRedux', '$scope'];

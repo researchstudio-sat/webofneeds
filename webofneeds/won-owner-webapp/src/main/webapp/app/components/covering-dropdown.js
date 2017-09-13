@@ -5,12 +5,12 @@
 
 import angular from 'angular';
 import Immutable from 'immutable';
-import won from '../won-es6';
-import { actionCreators }  from '../actions/actions';
-import { attach } from '../utils';
+import won from '../won-es6.js';
+import { actionCreators }  from '../actions/actions.js';
+import { attach } from '../utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 const serviceDependencies = ['$scope', '$ngRedux'];
 function genComponentConf() {

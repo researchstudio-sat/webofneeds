@@ -5,7 +5,7 @@
 import {
     getParameterByName,
     getParameters,
-} from './utils';
+} from './utils.js';
 
 import {
     makeParams,
@@ -13,7 +13,7 @@ import {
     resetParamsImm,
     constantParams,
     addConstParams,
-} from './configRouting';
+} from './configRouting.js';
 
 /**
  * e.g. `absSRef('post', {postUri: 'http://...'})` + pre-existing private Id =>

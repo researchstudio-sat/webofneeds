@@ -6,16 +6,16 @@
 import angular from 'angular';
 import {
     attach,
-} from '../../utils';
+} from '../../utils.js';
 import {
     actionCreators
-}  from '../../actions/actions';
+}  from '../../actions/actions.js';
 
-import signupTitleBarModule from '../signup-title-bar';
+import signupTitleBarModule from '../signup-title-bar.js';
 
-import topNavModule from '../topnav';
+import topNavModule from '../topnav.js';
 
-import * as srefUtils from '../../sref-utils';
+import * as srefUtils from '../../sref-utils.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$state', /*'$routeParams' /*injections as strings here*/];
 

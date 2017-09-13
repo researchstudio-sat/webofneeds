@@ -17,24 +17,24 @@
 * messages to the server via the service.
  */
 
-import won from './won-es6';
+import won from './won-es6.js';
 import {
     attach,
     delay,
     watchImmutableRdxState,
     checkHttpStatus,
     is,
-} from './utils';
+} from './utils.js';
 
 import {
     makeParams,
-} from './configRouting';
+} from './configRouting.js';
 
-import { actionTypes, actionCreators } from './actions/actions';
-//import './message-service'; //TODO still uses es5
-import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
+import { actionTypes, actionCreators } from './actions/actions.js';
+//import './message-service.js'; //TODO still uses es5
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils.js';
 import SockJS from 'sockjs';
-import * as messages from './actions/messages-actions';
+import * as messages from './actions/messages-actions.js';
 
 export function runMessagingAgent(redux) {
 

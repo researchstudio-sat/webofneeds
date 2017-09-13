@@ -5,8 +5,8 @@
 
 import angular from 'angular';
 import 'angular-sanitize';
-import enterModule from '../directives/enter';
-import { dispatchEvent, attach, readAsDataURL } from '../utils';
+import enterModule from '../directives/enter.js';
+import { dispatchEvent, attach, readAsDataURL } from '../utils.js';
 
 function genComponentConf() {
     let template = `

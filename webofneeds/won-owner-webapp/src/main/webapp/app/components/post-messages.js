@@ -2,22 +2,22 @@
 
 import angular from 'angular';
 import Immutable from 'immutable';
-import squareImageModule from './square-image';
-import chatTextFieldModule from './chat-textfield';
+import squareImageModule from './square-image.js';
+import chatTextFieldModule from './chat-textfield.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 import {
     attach,
     delay,
 } from '../utils.js'
 import {
     actionCreators
-}  from '../actions/actions';
+}  from '../actions/actions.js';
 import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
-} from '../selectors';
+} from '../selectors.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 

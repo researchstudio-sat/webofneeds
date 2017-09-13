@@ -4,13 +4,13 @@
 ;
 
 import angular from 'angular';
-import { attach, } from '../utils';
-import { labels } from '../won-label-utils';
+import { attach, } from '../utils.js';
+import { labels } from '../won-label-utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import { selectOpenPostUri } from '../selectors';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { selectOpenPostUri } from '../selectors.js';
+import { actionCreators }  from '../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

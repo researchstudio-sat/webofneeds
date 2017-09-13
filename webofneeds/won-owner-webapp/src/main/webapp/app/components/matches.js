@@ -1,32 +1,32 @@
 ;
 
 import Immutable from 'immutable';
-import won from '../won-es6';
+import won from '../won-es6.js';
 import angular from 'angular';
-import overviewTitleBarModule from './overview-title-bar';
-import matchesFlowItemModule from './matches-flow-item';
-import matchesGridItemModule from './matches-grid-item';
-import connectionsMapModule from './connections-map';
-import sendRequestModule from './send-request';
-import connectionsOverviewModule from './connections-overview';
-import connectionSelectionModule from './connection-selection';
+import overviewTitleBarModule from './overview-title-bar.js';
+import matchesFlowItemModule from './matches-flow-item.js';
+import matchesGridItemModule from './matches-grid-item.js';
+import connectionsMapModule from './connections-map.js';
+import sendRequestModule from './send-request.js';
+import connectionsOverviewModule from './connections-overview.js';
+import connectionSelectionModule from './connection-selection.js';
 
 import {
     attach,
     decodeUriComponentProperly,
     getIn,
-} from '../utils';
+} from '../utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import { labels } from '../won-label-utils';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { labels } from '../won-label-utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     selectOpenPostUri,
     displayingOverview,
     selectAllConnections,
     selectNeedByConnectionUri,
-} from '../selectors';
+} from '../selectors.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 let template = `

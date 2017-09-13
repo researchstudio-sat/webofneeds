@@ -2,23 +2,23 @@
  * Created by ksinger on 10.04.2017.
  */
 
-import won from '../won-es6';
+import won from '../won-es6.js';
 import angular from 'angular';
 import {
     labels,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import { attach } from '../utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
     selectAllTheirNeeds
-} from '../selectors';
+} from '../selectors.js';
 
-import postHeaderModule from './post-header';
+import postHeaderModule from './post-header.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

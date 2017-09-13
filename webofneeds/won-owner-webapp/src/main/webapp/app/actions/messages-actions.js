@@ -3,9 +3,9 @@
  */
 
 
-import  won from '../won-es6';
-import { actionTypes, actionCreators, getConnectionRelatedData } from './actions';
-import { setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import  won from '../won-es6.js';
+import { actionTypes, actionCreators, getConnectionRelatedData } from './actions.js';
+import { setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils.js';
 
 import Immutable from 'immutable';
 
@@ -13,16 +13,16 @@ import {
     clone,
     jsonld2simpleFormat,
     getIn,
-} from '../utils';
+} from '../utils.js';
 
 import {
     fetchDataForOwnedNeeds
-} from '../won-message-utils';
+} from '../won-message-utils.js';
 
 import {
     makeParams,
     resetParams,
-} from '../configRouting';
+} from '../configRouting.js';
 
 export function successfulCloseNeed(event) {
     return (dispatch, getState) => {

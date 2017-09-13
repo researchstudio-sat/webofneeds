@@ -4,29 +4,29 @@
 ;
 
 import angular from 'angular';
-import ownerTitleBarModule from '../owner-title-bar';
-//import galleryModule from '../gallery';
-import postMessagesModule from '../post-messages';
+import ownerTitleBarModule from '../owner-title-bar.js';
+//import galleryModule from '../gallery.js';
+import postMessagesModule from '../post-messages.js';
 import {
     attach,
     mapToMatches,
     decodeUriComponentProperly,
     getIn,
-} from '../../utils';
-import won from '../../won-es6';
-import { actionCreators }  from '../../actions/actions';
-import openRequestModule from '../open-request';
-import connectionSelectionModule from '../connection-selection';
-import postInfoModule from '../post-info';
-import matchesModule from '../matches';
+} from '../../utils.js';
+import won from '../../won-es6.js';
+import { actionCreators }  from '../../actions/actions.js';
+import openRequestModule from '../open-request.js';
+import connectionSelectionModule from '../connection-selection.js';
+import postInfoModule from '../post-info.js';
+import matchesModule from '../matches.js';
 import {
     selectOpenPostUri,
     selectOpenConnectionUri,
-} from '../../selectors';
+} from '../../selectors.js';
 
 import {
    makeParams,
-} from '../../configRouting';
+} from '../../configRouting.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 class Controller {

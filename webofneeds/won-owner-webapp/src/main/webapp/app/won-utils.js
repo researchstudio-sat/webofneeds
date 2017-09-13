@@ -3,13 +3,13 @@
  */
 
 import Immutable from 'immutable';
-import L from './leaflet-bundleable';
+import L from './leaflet-bundleable.js';
 import {
     arrEq,
     checkHttpStatus,
     generateIdString,
     getIn,
-} from './utils';
+} from './utils.js';
 
 export function initLeaflet(mapMount) {
     if(!L) {

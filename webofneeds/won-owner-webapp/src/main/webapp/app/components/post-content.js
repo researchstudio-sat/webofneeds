@@ -6,14 +6,14 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import extendedGalleryModule from '../components/extended-gallery';
-import { actionCreators }  from '../actions/actions';
+import extendedGalleryModule from '../components/extended-gallery.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     attach,
 } from '../utils.js'
 import {
     connect2Redux,
-} from '../won-utils'
+} from '../won-utils.js'
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

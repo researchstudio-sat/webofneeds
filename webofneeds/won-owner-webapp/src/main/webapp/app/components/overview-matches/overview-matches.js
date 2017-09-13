@@ -2,12 +2,12 @@
 
 import angular from 'angular';
 
-import overviewTitleBarModule from '../overview-title-bar';
-import matchesModule from  '../matches';
-import topnavModule from '../topnav';
+import overviewTitleBarModule from '../overview-title-bar.js';
+import matchesModule from  '../matches.js';
+import topnavModule from '../topnav.js';
 
-import { attach } from '../../utils';
-import { actionCreators }  from '../../actions/actions';
+import { attach } from '../../utils.js';
+import { actionCreators }  from '../../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 class OverviewMatchesController {

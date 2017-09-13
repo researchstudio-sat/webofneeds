@@ -11,7 +11,7 @@ import {
     attach,
     delay,
     dispatchEvent,
-} from '../utils';
+} from '../utils.js';
 
 function genComponentConf() {
     let template = `

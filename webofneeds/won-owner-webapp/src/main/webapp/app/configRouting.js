@@ -2,28 +2,28 @@
  * Created by ksinger on 08.10.2015.
  */
 
-import won from './won-es6';
+import won from './won-es6.js';
 import Immutable from 'immutable';
-import { actionTypes, actionCreators } from './actions/actions';
+import { actionTypes, actionCreators } from './actions/actions.js';
 import {
     accountLogin,
     accountLogout,
-} from './actions/account-actions';
+} from './actions/account-actions.js';
 
 import {
     checkLoginStatus,
     privateId2Credentials,
-} from './won-utils';
+} from './won-utils.js';
 
 import {
     selectAllNeeds,
-} from './selectors';
+} from './selectors.js';
 
 import {
     decodeUriComponentProperly,
     checkHttpStatus,
     getIn,
-} from './utils';
+} from './utils.js';
 
 
 /**

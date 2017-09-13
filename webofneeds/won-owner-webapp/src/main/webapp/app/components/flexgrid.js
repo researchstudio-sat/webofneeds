@@ -1,7 +1,7 @@
 ;
 
 import angular from 'angular';
-import labelledHrModule from 'app/components/labelled-hr';
+import labelledHrModule from './labelled-hr.js';
 
 function genComponentConf() {
     let template = `
