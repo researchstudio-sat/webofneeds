@@ -10,13 +10,14 @@
 import angular from 'angular';
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
-import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
+//import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
+//import 'whatwg-fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
 
 import 'redux';
 import ngReduxModule from 'ng-redux';
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
-import uiRouterShimModule from 'angular-ui-router-shim';
+//import uiRouterShimModule from 'angular-ui-router-shim';
 import {
     camel2Hyphen,
     hyphen2Camel,

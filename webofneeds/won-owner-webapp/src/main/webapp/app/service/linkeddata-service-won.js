@@ -28,7 +28,8 @@ import {
     somePromises,
 } from '../utils.js';
 
-import rdfstore from 'rdfstore-js';
+//import rdfstore from 'rdfstore-js';
+import rdfstore from '../../scripts/rdfstore-js/rdf_store.js';
 import jld from 'jsonld';
 import won from './won.js';
 (function(){

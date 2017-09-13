@@ -33,7 +33,7 @@ import {
 import { actionTypes, actionCreators } from './actions/actions.js';
 //import './message-service.js'; //TODO still uses es5
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils.js';
-import SockJS from 'sockjs';
+import SockJS from '../scripts/sockjs.min.js';
 import * as messages from './actions/messages-actions.js';
 
 export function runMessagingAgent(redux) {

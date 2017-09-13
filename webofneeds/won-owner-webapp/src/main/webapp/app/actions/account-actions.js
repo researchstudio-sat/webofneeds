@@ -214,10 +214,9 @@ let _logoutInProcess;
  * @returns {Function}
  */
 export function accountLogout(options) {
-    const options_ = {
+    const options_ = Object.assign({
         doRedirects: true,
-        ...options,
-    };
+    }, options);
     return (dispatch, getState) => {
         const state = getState();
 

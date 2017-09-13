@@ -22,6 +22,20 @@ gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], functi
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
 });
 
+var closureCompiler = require('google-closure-compiler-js').gulp();
+gulp.task('closure', function() {
+    return gulp.src('./app/app_jspm.js', {base: './'})
+        // your other steps here
+        .pipe(closureCompiler({
+            compilationLevel: 'SIMPLE',
+            warningLevel: 'VERBOSE',
+            outputWrapper: '(function(){\n%output%\n}).call(this)',
+            jsOutputFile: 'closure.bundle.min.js',  // outputs single file
+            createSourceMap: true,
+        }))
+        .pipe(gulp.dest('./generated'));
+});
+
 gulp.task('bundlejs', function(){
     return gulp.src('app/app_jspm.js')
         .pipe(sourcemaps.init())
