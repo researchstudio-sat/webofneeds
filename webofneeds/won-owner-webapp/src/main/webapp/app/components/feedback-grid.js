@@ -2,11 +2,11 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import { attach } from '../utils';
-import { actionCreators }  from '../actions/actions';
+import { attach } from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

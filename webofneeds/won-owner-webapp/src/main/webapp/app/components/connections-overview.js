@@ -5,27 +5,27 @@
  * Created by ksinger on 12.04.2017.
  */
 
-import won from '../won-es6';
+import won from '../won-es6.js';
 import angular from 'angular';
-import squareImageModule from './square-image';
-import connectionSelectionModule from './connection-selection';
-import postHeaderModule from './post-header';
+import squareImageModule from './square-image.js';
+import connectionSelectionModule from './connection-selection.js';
+import postHeaderModule from './post-header.js';
 
 import {
     labels,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 
 import { attach } from '../utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { actionCreators }  from '../actions/actions.js';
 
 import {
     selectAllOwnNeeds,
     selectRouterParams,
     selectNeedByConnectionUri,
-} from '../selectors';
+} from '../selectors.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

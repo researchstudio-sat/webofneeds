@@ -2,8 +2,8 @@
  * Created by ksinger on 19.02.2016.
  */
 
-import  won from '../won-es6';
-import { actionCreators, actionTypes } from './actions';
+import  won from '../won-es6.js';
+import { actionCreators, actionTypes } from './actions.js';
 
 export function matchesLoad(data) {
     return (dispatch, getState) => {

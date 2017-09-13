@@ -1,21 +1,21 @@
 ;
 
 import angular from 'angular';
-import overviewTitleBarModule from '../overview-title-bar';
-import openRequestModule from '../open-request';
-import connectionsOverviewModule from '../connections-overview';
+import overviewTitleBarModule from '../overview-title-bar.js';
+import openRequestModule from '../open-request.js';
+import connectionsOverviewModule from '../connections-overview.js';
 import {
     attach,
     getIn,
-} from '../../utils';
-import { actionCreators }  from '../../actions/actions';
+} from '../../utils.js';
+import { actionCreators }  from '../../actions/actions.js';
 import {
     selectNeedByConnectionUri,
     selectAllConnections
-} from '../../selectors';
+} from '../../selectors.js';
 import {
     resetParams,
-} from '../../configRouting';
+} from '../../configRouting.js';
 
 
 const serviceDependencies = ['$ngRedux', '$scope'];

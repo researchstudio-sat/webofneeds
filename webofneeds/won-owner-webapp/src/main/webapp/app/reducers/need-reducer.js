@@ -1,11 +1,11 @@
 /**
  * Created by syim on 11.12.2015.
  */
-import { actionTypes } from '../actions/actions';
+import { actionTypes } from '../actions/actions.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
-import won from '../won-es6';
-import { msStringToDate } from '../utils';
+import won from '../won-es6.js';
+import { msStringToDate } from '../utils.js';
 
 const initialState = Immutable.fromJS({
 });

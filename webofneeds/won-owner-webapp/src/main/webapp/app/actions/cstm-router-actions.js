@@ -6,12 +6,12 @@ import Immutable from 'immutable';
 
 import {
     getIn,
-} from '../utils';
+} from '../utils.js';
 
 import {
     actionCreators,
     actionTypes
-} from './actions';
+} from './actions.js';
 
 import {
     makeParams,
@@ -19,7 +19,7 @@ import {
     resetParamsImm,
     constantParams,
     addConstParams,
-} from '../configRouting';
+} from '../configRouting.js';
 
 /**
  * Action-Creator that goes back in the browser history

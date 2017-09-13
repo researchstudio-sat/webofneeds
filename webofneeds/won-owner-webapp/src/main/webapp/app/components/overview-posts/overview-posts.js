@@ -1,20 +1,20 @@
 ;
 import Immutable from 'immutable';
 import angular from 'angular';
-import overviewTitleBarModule from '../overview-title-bar';
-import postItemLineModule from '../post-item-line';
-import { actionCreators }  from '../../actions/actions';
+import overviewTitleBarModule from '../overview-title-bar.js';
+import postItemLineModule from '../post-item-line.js';
+import { actionCreators }  from '../../actions/actions.js';
 import {
     attach,
 } from '../../utils.js';
 import {
     selectAllOwnNeeds,
-} from '../../selectors';
+} from '../../selectors.js';
 
 import {
     resetParams,
-} from '../../configRouting';
-import won from '../../won-es6';
+} from '../../configRouting.js';
+import won from '../../won-es6.js';
 
 const ZERO_UNSEEN = Object.freeze({
     matches: 0,

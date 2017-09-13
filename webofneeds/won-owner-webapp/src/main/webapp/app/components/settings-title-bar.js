@@ -7,11 +7,11 @@ import angular from 'angular';
 import {
     attach,
     getIn,
-} from '../utils';
-import { actionCreators } from '../actions/actions';
+} from '../utils.js';
+import { actionCreators } from '../actions/actions.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 function genComponentConf() {
     let template = `

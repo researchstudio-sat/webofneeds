@@ -26,11 +26,11 @@ import {
     contains,
     camel2Hyphen,
     somePromises,
-} from '../utils';
+} from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
 import jld from 'jsonld';
-import won from './won';
+import won from './won.js';
 (function(){
 
     /**

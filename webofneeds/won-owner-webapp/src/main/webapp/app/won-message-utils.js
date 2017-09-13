@@ -3,7 +3,7 @@
  */
 
 
-import won from './won-es6';
+import won from './won-es6.js';
 import Immutable from 'immutable';
 import {
     getRandomPosInt,
@@ -15,11 +15,11 @@ import {
     entries,
     is,
     getIn,
-} from './utils';
+} from './utils.js';
 
 import {
     actionTypes,
-} from './actions/actions';
+} from './actions/actions.js';
 
 import jsonld from 'jsonld';
 

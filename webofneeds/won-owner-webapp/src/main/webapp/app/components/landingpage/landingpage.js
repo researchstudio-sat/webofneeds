@@ -1,14 +1,14 @@
 ;
 
 import angular from 'angular';
-import topNavModule from '../topnav';
-import createPostModule from '../create-post';
+import topNavModule from '../topnav.js';
+import createPostModule from '../create-post.js';
 import {
     attach,
-} from '../../utils';
-import { actionCreators }  from '../../actions/actions';
+} from '../../utils.js';
+import { actionCreators }  from '../../actions/actions.js';
 
-import * as srefUtils from '../../sref-utils';
+import * as srefUtils from '../../sref-utils.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$state' /*'$routeParams' /*injections as strings here*/];
 

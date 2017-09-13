@@ -2,17 +2,17 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import postContentModule from './post-content';
-import postHeaderModule from './post-header';
-import { selectNeedByConnectionUri } from '../selectors';
+import postContentModule from './post-content.js';
+import postHeaderModule from './post-header.js';
+import { selectNeedByConnectionUri } from '../selectors.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 import {
     attach,
     getIn,
-} from '../utils';
-import { actionCreators }  from '../actions/actions';
+} from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 

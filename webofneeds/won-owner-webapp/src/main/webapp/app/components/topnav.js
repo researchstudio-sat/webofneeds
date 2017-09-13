@@ -2,20 +2,20 @@
  * Created by ksinger on 20.08.2015.
  */
 ;
-import won from '../won-es6';
+import won from '../won-es6.js';
 import angular from 'angular';
-//import loginComponent from './login';
-//import logoutComponent from './logout';
-import dropdownModule from './covering-dropdown';
-import accountMenuModule from './account-menu';
-import { attach } from '../utils';
-import { actionCreators }  from '../actions/actions';
-import config from '../config';
+//import loginComponent from './login.js';
+//import logoutComponent from './logout.js';
+import dropdownModule from './covering-dropdown.js';
+import accountMenuModule from './account-menu.js';
+import { attach } from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
+import config from '../config.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
-import * as srefUtils from '../sref-utils';
+import * as srefUtils from '../sref-utils.js';
 
 function genTopnavConf() {
     let template = `

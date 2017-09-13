@@ -1,25 +1,25 @@
 ;
 
 import angular from 'angular';
-import squareImageModule from './square-image';
-import needMapModule from './need-map';
-import extendedGalleryModule from './extended-gallery';
-import feedbackGridModule from './feedback-grid';
-import postHeaderModule from './post-header';
-import postContentModule from './post-content';
+import squareImageModule from './square-image.js';
+import needMapModule from './need-map.js';
+import extendedGalleryModule from './extended-gallery.js';
+import feedbackGridModule from './feedback-grid.js';
+import postHeaderModule from './post-header.js';
+import postContentModule from './post-content.js';
 
-import { attach } from '../utils';
-import { actionCreators }  from '../actions/actions';
+import { attach } from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     labels,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 import {
     selectNeedByConnectionUri
-} from '../selectors';
+} from '../selectors.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$interval'];
 function genComponentConf() {

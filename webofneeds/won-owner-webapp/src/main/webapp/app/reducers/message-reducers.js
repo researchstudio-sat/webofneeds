@@ -2,12 +2,12 @@
  * Created by ksinger on 26.11.2015.
  */
 
-import { actionTypes } from '../actions/actions';
-import { repeatVar } from '../utils';
+import { actionTypes } from '../actions/actions.js';
+import { repeatVar } from '../utils.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
-import { combineReducersStable } from '../redux-utils';
-import { buildCreateMessage } from '../won-message-utils';
+import { combineReducersStable } from '../redux-utils.js';
+import { buildCreateMessage } from '../won-message-utils.js';
 
 /* TODO this fragment is part of an attempt to sketch a different
  * approach to asynchronity (Remove it or the thunk-based

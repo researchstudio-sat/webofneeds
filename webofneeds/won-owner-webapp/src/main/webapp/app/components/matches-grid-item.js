@@ -1,19 +1,19 @@
 ;
 
 import angular from 'angular';
-import squareImageModule from './square-image';
-import feedbackGridModule from './feedback-grid';
-import { attach } from '../utils';
-import { actionCreators }  from '../actions/actions';
-import { labels, } from '../won-label-utils';
+import squareImageModule from './square-image.js';
+import feedbackGridModule from './feedback-grid.js';
+import { attach } from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
+import { labels, } from '../won-label-utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 import {
     selectNeedByConnectionUri,
-} from '../selectors';
-import postHeaderModule from './post-header';
-import postContentModule from './post-content';
+} from '../selectors.js';
+import postHeaderModule from './post-header.js';
+import postContentModule from './post-content.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$interval'];
 function genComponentConf() {

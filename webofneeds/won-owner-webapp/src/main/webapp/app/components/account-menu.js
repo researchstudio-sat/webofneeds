@@ -3,17 +3,17 @@
  */
 ;
 import angular from 'angular';
-import { attach } from '../utils';
-import { actionCreators }  from '../actions/actions';
+import { attach } from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
-import dropdownModule from './covering-dropdown';
-import loginFormModule from './login-form';
-import loggedInMenuModule from './logged-in-menu';
+import dropdownModule from './covering-dropdown.js';
+import loginFormModule from './login-form.js';
+import loggedInMenuModule from './logged-in-menu.js';
 
-import * as srefUtils from '../sref-utils';
+import * as srefUtils from '../sref-utils.js';
 
 function genLogoutConf() {
     let template = `

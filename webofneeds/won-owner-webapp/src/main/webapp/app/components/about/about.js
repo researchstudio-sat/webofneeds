@@ -1,16 +1,16 @@
 ;
 
 import angular from 'angular';
-import topNavModule from '../topnav';
-import overviewTitleBarModule from '../visitor-title-bar';
-import compareToModule from '../../directives/compareTo';
-import accordionModule from '../accordion';
-import flexGridModule from '../flexgrid';
-import config from '../../config';
+import topNavModule from '../topnav.js';
+import overviewTitleBarModule from '../visitor-title-bar.js';
+import compareToModule from '../../directives/compareTo.js';
+import accordionModule from '../accordion.js';
+import flexGridModule from '../flexgrid.js';
+import config from '../../config.js';
 import {
     attach,
-} from '../../utils';
-import { actionCreators }  from '../../actions/actions';
+} from '../../utils.js';
+import { actionCreators }  from '../../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
