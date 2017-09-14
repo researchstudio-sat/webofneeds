@@ -3,16 +3,17 @@
  */
 
 @import 'won-config';
+@import 'fonts';
 
 @mixin default-font {
-  font-family: 'Open Sans';
+  font-family: $font-family-sans-serif;
   font-weight: 400;
   font-size: $normalFontSize;
   color: black;
 }
 
 @mixin fine-print {
-  font-family: 'Open Sans';
+  font-family: $font-family-sans-serif;
   font-weight: 400;
   font-size: $smallFontSize;
   color: darken($won-line-gray, 10%);
