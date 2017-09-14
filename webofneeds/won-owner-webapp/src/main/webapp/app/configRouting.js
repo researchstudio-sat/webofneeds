@@ -216,14 +216,20 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
             break;
 
         case 'landingpage': //Route the 'landingpage' view at all times
-
-            checkLoginStatus()
-            .then(() => {//logged in -- re-initiate route-change
+            if(
+                state.get('initialLoadFinished') &&  // no access control while still loading
+                getIn(state, ['user', 'loggedIn']))
+            {
+                //logged in -- re-initiate route-change
                 console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the feed");
-                dispatch(
-                    actionCreators.router__stateGoAbs('feed', toParams)
-                )
-            });
+                if(event) {
+                    event.preventDefault()
+                } else {
+                    dispatch(
+                        actionCreators.router__stateGoAbs('feed')
+                    )
+                }
+            }
             break;
 
         case 'signup':
@@ -237,7 +243,9 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
                     return; // logged in. continue route-change as intended.
                 } else {
                     //sure to be logged out
-                    if(!event) {
+                    if(event) {
+                        event.preventDefault();
+                    } else {
                         // this is a check with a route that's already fixed, redirect to landing page instead.
                         dispatch(
                             actionCreators.router__stateGoResetParams('landingpage')
@@ -248,29 +256,6 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
                 }
             } else { // still loading
                 return; // no access control while loading. the page-load actions will call `accessControl` once the logged-in status has been checked
-
-                //if(hasPreviousState) {
-                //    event && event.preventDefault();
-                //    console.log('Not sure about login-status -- ' +
-                //        'will reinitialize route-change once it\'s been clarified.');
-                //}
-                //
-                //fetch('rest/users/isSignedIn', {credentials: 'include'})
-                //    .then(checkHttpStatus) // will reject if not logged in
-                //    .then(() => //logged in -- re-initiate route-change
-                //        dispatch(
-                //            actionCreators.router__stateGoAbs(toState, toParams)
-                //        )
-                //    )
-                //    .catch(error => {
-                //        //now certainly not logged in.
-                //        console.error(errorString, error)
-                //        if (!hasPreviousState) {
-                //            dispatch(
-                //                actionCreators.router__stateGoResetParams('landingpage')
-                //            );
-                //        }
-                //    });
             }
     }
 }
