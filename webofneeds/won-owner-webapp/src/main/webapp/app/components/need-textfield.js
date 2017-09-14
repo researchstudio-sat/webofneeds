@@ -7,6 +7,7 @@
 import angular from 'angular';
 import 'angular-sanitize';
 import Immutable from 'immutable';
+import Medium from 'medium.js';
 import {
     attach,
     delay,

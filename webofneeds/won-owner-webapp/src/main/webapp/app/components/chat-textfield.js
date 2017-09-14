@@ -9,6 +9,7 @@ import angular from 'angular';
 import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
+import Medium from 'medium.js';
 import {
     dispatchEvent,
     attach,

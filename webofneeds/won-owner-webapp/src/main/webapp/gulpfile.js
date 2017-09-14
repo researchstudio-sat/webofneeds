@@ -77,11 +77,7 @@ gulp.task('copy-static-res', function(done) {
  */
 gulp.task('copy-static-scripts', function(done) {
     return gulp.src([
-        'node_modules/undo.js/undo.js',
-        'node_modules/rangy/lib/rangy-core.js',
-        'node_modules/medium.js/medium.js',
-        'scripts/jquery.10.2.js',
-        'scripts/jquery.fs.scroller.min.js',
+        //'node_modules/medium.js/medium.js',
     ])
         .pipe(gulp.dest('./generated/scripts/'))
 });
