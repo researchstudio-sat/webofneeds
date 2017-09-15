@@ -144,10 +144,24 @@ export function accountLogin(credentials, options) {
                 return stateGoCurrent({privateId: credentials.privateId})(dispatch, getState);
             }
         })
-
         .then(() =>
             login(credentials)
         )
+        .then(() =>
+            dispatch({
+                type: actionTypes.login,
+                payload: Immutable.fromJS({email: email, loggedIn: true})
+            })
+        )
+        .then(() => {
+            if(!options_.doRedirects) {
+                return;
+            } else if (options_.redirectToFeed) {
+                return dispatch(actionCreators.router__stateGoResetParams("feed"))
+            } else {
+                return checkAccessToCurrentRoute(dispatch, getState);
+            }
+        })
         .then(response =>
             options_.fetchData ? fetchOwnedData(email) : Immutable.Map() // only need to fetch data for non-new accounts
         )
@@ -164,15 +178,6 @@ export function accountLogin(credentials, options) {
          */
             dispatch(actionCreators.reconnect())
         )
-        .then(() => {
-            if(!options_.doRedirects) {
-                return;
-            } else if (options_.redirectToFeed) {
-                return dispatch(actionCreators.router__stateGoResetParams("feed"))
-            } else {
-                return checkAccessToCurrentRoute(dispatch, getState);
-            }
-        })
         .catch(error => {
             console.error("accountLogin ErrorObject", error);
             return Promise.resolve()
