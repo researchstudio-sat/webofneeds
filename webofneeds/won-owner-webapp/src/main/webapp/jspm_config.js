@@ -34,6 +34,7 @@ System.config({
     "leaflet": "npm:leaflet@0.7.7",
     "medium.js": "npm:medium.js@1.0.1",
     "ng-redux": "npm:ng-redux@3.4.1",
+    "rangy": "npm:rangy@1.3.0",
     "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
     "redux": "npm:redux@3.7.2",
