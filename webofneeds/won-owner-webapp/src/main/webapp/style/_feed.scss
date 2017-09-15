@@ -8,6 +8,22 @@
 
   @include empty-description('fc');
 
+  .fc__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+
+    .fc__loading__text {
+      color: $won-line-gray;
+    }
+
+    .hspinner {
+      opacity: 0.5;
+      margin-right: 0.5rem;
+    }
+  }
+
   .title {
     font-weight: 300;
     text-align: center;

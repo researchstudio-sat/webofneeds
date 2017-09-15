@@ -80,7 +80,12 @@ function loadingWhileSignedIn(dispatch, getState, username) {
 
 
     loginSuccess(username, true, dispatch, getState);
-    fetchOwnedData(username, dispatchInitialPageLoad(dispatch));
+    fetchOwnedData(username, dispatchInitialPageLoad(dispatch))
+    .then(() => dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: Immutable.fromJS({initialLoadFinished: true})
+        })
+    );
 }
 
 function loadingWithAnonymousAccount(dispatch, getState, privateId) {
@@ -99,7 +104,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
     ).then(allThatData => {
         return dispatch({
             type: actionTypes.initialPageLoad,
-            payload: allThatData
+            payload: allThatData.merge({initialLoadFinished: true})
         });
     }).catch(e => {
         console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
@@ -138,7 +143,7 @@ function loadingWhileSignedOut(dispatch, getState) {
     return dataPromise.then(publicData =>
         dispatch({
             type: actionTypes.initialPageLoad,
-            payload: publicData
+            payload: publicData.merge({initialLoadFinished: true})
         })
     ).then(() =>
         checkAccessToCurrentRoute(dispatch, getState)

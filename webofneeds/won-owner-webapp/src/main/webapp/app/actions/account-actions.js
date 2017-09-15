@@ -168,7 +168,7 @@ export function accountLogin(credentials, options) {
         .then(allThatData =>
             dispatch({
                 type: actionTypes.login,
-                payload: allThatData.merge({email: email, loggedIn: true})
+                payload: allThatData.merge({email: email, loggedIn: true, loginFinished: true})
             })
         )
         .then(() =>
