@@ -42,7 +42,7 @@ class FeedController {
             return {
                 showSpinner,
                 showPlaceholder: !showSpinner && !hasOwnNeeds,
-                showFeed: !showSpinner && hasOwnNeeds,
+                showFeed: hasOwnNeeds,
                 ownNeedUris,
             }
         };
