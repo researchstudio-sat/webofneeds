@@ -120,6 +120,10 @@ export function accountLogin(credentials, options) {
         }
 
 
+        const curriedDispatch = data => dispatch({
+            type: actionTypes.login,
+            payload: Immutable.fromJS(data).merge({email: email, loggedIn: true})
+        });
 
         return Promise.resolve()
         .then(() => {
@@ -148,10 +152,7 @@ export function accountLogin(credentials, options) {
             login(credentials)
         )
         .then(() =>
-            dispatch({
-                type: actionTypes.login,
-                payload: Immutable.fromJS({email: email, loggedIn: true})
-            })
+            curriedDispatch({})
         )
         .then(() => {
             if(!options_.doRedirects) {
@@ -162,14 +163,16 @@ export function accountLogin(credentials, options) {
                 return checkAccessToCurrentRoute(dispatch, getState);
             }
         })
-        .then(response =>
-            options_.fetchData ? fetchOwnedData(email) : Immutable.Map() // only need to fetch data for non-new accounts
+        .then(response => {
+                if(options_.fetchData) {
+                    return fetchOwnedData(email, curriedDispatch);
+                } else {
+                    return Immutable.Map(); // only need to fetch data for non-new accounts
+                }
+            }
         )
-        .then(allThatData =>
-            dispatch({
-                type: actionTypes.login,
-                payload: allThatData.merge({email: email, loggedIn: true, loginFinished: true})
-            })
+        .then(() =>
+            curriedDispatch({loginFinished: true})
         )
         .then(() =>
         /**
