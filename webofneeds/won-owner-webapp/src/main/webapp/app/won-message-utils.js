@@ -392,69 +392,45 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
         return Promise.resolve(emptyDataset);
     }
 
-    const allLoadedPromise = Promise.all(
-        ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
+    const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
+        fetchOwnNeedAndDispatch(uri, curriedDispatch)
     );
 
-    const allDataRawPromise = allLoadedPromise.then(() => {
-        const allOwnNeedsPromise = urisToLookupMap(ownNeedUris,
-            won.getNeedWithConnectionUris);
+    // wait for the own needs to be dispatched then load connections
+    const allConnectionsPromise = allOwnNeedsPromise.then(() =>
+        Promise.all(ownNeedUris.map(uri =>
+            won.getconnectionUrisOfNeed(uri)
+                .then(connectionUris =>
+                    urisToLookupMap(connectionUris, uri =>
+                            fetchConnectionAndDispatch(uri, curriedDispatch)
+                    )
+            )
+        ))
+    )
+    .then(connectionMaps /*[{ uri -> cnct }]*/ =>
+        // flatten into one lookup map
+        connectionMaps.reduce((a,b) => Object.assign(a,b), {})
+    );
 
-        const allConnectionUrisPromise =
-            Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
-                .then(connectionUrisPerNeed =>
-                    flatten(connectionUrisPerNeed));
+    const allTheirNeedsPromise =
+        allConnectionsPromise.then(connections => {
+            const theirNeedUris = Object.values(connections)
+                .map(cnct => cnct.hasRemoteNeed);
 
-        const allConnectionsPromise = allConnectionUrisPromise
-            .then(connectionUris => //delivers an obj<idx, string>
-                urisToLookupMap(connectionUris, won.getNode));
-
-        /*
-        // STARTING with selective loading
-        const allEventsPromise = allConnectionUrisPromise
-            .then(connectionUris => //expects an array
-                urisToLookupMap(connectionUris, connectionUri =>
-                        won.getConnectionWithEventUris(connectionUri)
-                            .then(connection =>
-                                won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
-                        )
-                )
-        ).then(eventsOfConnections =>
-                //eventsPerConnection[connectionUri][eventUri]
-                flattenObj(eventsOfConnections)
+            return Immutable.Set(theirNeedUris).toArray();
+        })
+        .then(theirNeedUris =>
+            urisToLookupMap(theirNeedUris, uri =>
+                fetchTheirNeedAndDispatch(uri, curriedDispatch)
+            )
         );
-        */
 
-        const allTheirNeedsPromise =
-            allConnectionsPromise.then(connections => {
-                const theirNeedUris = [];
-                for(const [connectionUri, connection] of entries(connections)) {
-                    theirNeedUris.push(connection.hasRemoteNeed);
-                }
-                return Immutable.Set(theirNeedUris).toArray();
-            })
-                .then(theirNeedUris =>
-                    urisToLookupMap(theirNeedUris, won.getTheirNeed));
-
-        //dispatch to the curried-in action as soon as any part of the data arrives
-        const ownNeedsDispatchedP = allOwnNeedsPromise.then(ownNeeds => curriedDispatch({ownNeeds}));
-
-        //Is needed for the reducer to make sure that all needs have already been put in the state
-        Promise.all([
-            ownNeedsDispatchedP,
-            allConnectionsPromise,
-        ]).then(([x, connections]) => curriedDispatch({connections}));
-
-        //allEventsPromise.then(events => dispatchWellFormed({events})); // STARTING with selective loading
-        allTheirNeedsPromise.then(theirNeeds => curriedDispatch({theirNeeds}));
-
-        return Promise.all([
+    const allDataRawPromise = Promise.all([
             allOwnNeedsPromise,
             allConnectionsPromise,
             //allEventsPromise, // STARTING with selective loading
             allTheirNeedsPromise
         ]);
-    });
 
     return allDataRawPromise
         .then(([ ownNeeds, connections, /* events, */ theirNeeds ]) =>
@@ -499,5 +475,39 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
         }
      }
      */
+}
+
+
+function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true})
+        .then(() =>
+            won.getNeedWithConnectionUris(needUri)
+        );
+    needP.then(need =>
+        curriedDispatch(
+            wellFormedPayload({ownNeeds: {[needUri]: need}})
+        )
+    );
+    return needP
+}
+
+function fetchConnectionAndDispatch(cnctUri, curriedDispatch = () => undefined) {
+    const cnctP = won.getNode(cnctUri);
+    cnctP.then(connection =>
+        curriedDispatch(
+            wellFormedPayload({connections: {[cnctUri]: connection}})
+        )
+    );
+    return cnctP;
+}
+
+function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+    const needP = won.getTheirNeed(needUri);
+    needP.then(need =>
+        curriedDispatch(
+            wellFormedPayload({theirNeeds: {[needUri]: need}})
+        )
+    );
+    return needP
 }
 

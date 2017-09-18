@@ -178,7 +178,7 @@ function storeConnectionsData(state, connectionsToStore, newConnections) {
     newConnections = newConnections ? newConnections : Immutable.Set();
 
     if(connectionsToStore && connectionsToStore.size > 0) {
-        connectionsToStore.map(function(connection){
+        connectionsToStore.forEach(connection => {
             state = addConnectionFull(state, connection, newConnections);
         });
     }
