@@ -166,14 +166,6 @@ export function successfulCreate(event) {
                     }));
                 });
             });
-
-        // dispatch routing change
-        //TODO back-button doesn't work for returning to the draft
-        //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
-        dispatch(actionCreators.router__stateGoResetParams('feed'));
-
-        //TODO add to own needs
-        //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
     }
 }
 
