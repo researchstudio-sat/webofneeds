@@ -23,6 +23,19 @@ export default function(allToasts = initialState, action = {}) {
         case actionTypes.logout:
             return initialState;
 
+        case actionTypes.registerFailed:
+            var privateId = getIn(action, ['payload', 'privateId']);
+            if(privateId) {
+                return pushNewToast(
+                    'Sorry, something failed when posting/generating a new private-ID (the one in ' +
+                    'your url-bar). Copy the text you\'ve written somewhere safe, then log out / remove ' +
+                    'the ID, then refresh the page and try posting again.',
+                    won.WON.errorToast, {}
+                )
+            } else {
+                return allToasts;
+            }
+
         case actionTypes.loginFailed:
             if(getIn(action, ['payload', 'loginError']) === 'invalid privateId') {
                 return pushNewToast(
