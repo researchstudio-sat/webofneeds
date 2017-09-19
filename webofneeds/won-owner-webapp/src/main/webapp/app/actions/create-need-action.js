@@ -52,14 +52,14 @@ export function needCreate(draft, nodeUri) {
         }
 
         return hasAccountPromise
-            .then(() => {
+            .then(() =>
+                dispatch(actionCreators.router__back())
+            )
+            .then(() =>
                 dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri}
-                });
-            })
-            .then(() =>
-                dispatch(actionCreators.router__stateGoResetParams('feed'))
+                })
             );
     }
 }
