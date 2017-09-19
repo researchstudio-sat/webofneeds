@@ -67,23 +67,6 @@
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
     <Connector port="8080" protocol="HTTP/1.1"
-               compression="on"
-               compressableMimeType="
-                   text/html,
-                   text/xml,
-                   text/plain,
-                   text/css,
-                   text/javascript,
-                   application/javascript,
-                   application/x-font-ttf,
-                   text/turtle,
-                   application/rdf+xml,
-                   application/x-turtle,
-                   text/rdf+n3,
-                   application/json,
-                   application/trig,
-                   application/ld+json,
-                   application/n-quads"
                connectionTimeout="20000"
                redirectPort="8443" />
     <!-- A "Connector" using the shared thread pool-->
@@ -113,6 +96,7 @@
                    text/javascript,
                    application/javascript,
                    application/x-font-ttf,
+                   image/svg+xml,
                    text/turtle,
                    application/rdf+xml,
                    application/x-turtle,
