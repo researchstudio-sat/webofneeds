@@ -53,7 +53,7 @@ export function needCreate(draft, nodeUri) {
 
         return hasAccountPromise
             .then(() =>
-                dispatch(actionCreators.router__back())
+                dispatch(actionCreators.router__stateGoAbs('feed'))
             )
             .then(() =>
                 dispatch({
