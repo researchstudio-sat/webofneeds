@@ -46,9 +46,9 @@ export function needCreate(draft, nodeUri) {
                         delay(500)
                     )
                     .catch(err => {
-                        //TODO user-visible error message / error recovery mechanisms
                         console.error(`Creating temporary account (${privateId}) has failed due to `, err);
-                    })
+                        dispatch(actionCreators.registerFailed({privateId}));
+                    });
         }
 
         return hasAccountPromise
