@@ -108,9 +108,9 @@ function genComponentConf() {
                     console.log("sending adhoc request");
                 }
 
-                //TODO: CREATE COUNTERPART NEED
-                //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
-                //TODO: SEND REQUEST FOR CREATED CONNECTION
+                if(this.postUriToConnectTo){
+                    this.connections__connectAdHoc(this.postUriToConnectTo);
+                }
 
                 this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
             }else{

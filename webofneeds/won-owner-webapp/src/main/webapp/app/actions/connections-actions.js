@@ -156,6 +156,16 @@ export function connectionsConnect(connectionUri,message) {
     }
 }
 
+export function connectionsConnectAdHoc(needUri) {
+    return (dispatch, getState) => {
+        const state = getState();
+
+        //TODO: CREATE COUNTERPART NEED
+        //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
+        //TODO: SEND REQUEST FOR CREATED CONNECTION
+    }
+}
+
 export function connectionsClose(connectionUri) {
     return (dispatch, getState) => {
         const state = getState();
