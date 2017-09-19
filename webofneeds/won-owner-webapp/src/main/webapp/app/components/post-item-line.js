@@ -1,17 +1,17 @@
 ;
 
 import angular from 'angular';
-import squareImageModule from '../components/square-image';
-import won from '../won-es6';
-import { attach } from '../utils';
-import { actionCreators }  from '../actions/actions';
-import { labels, relativeTime, } from '../won-label-utils';
+import squareImageModule from '../components/square-image.js';
+import won from '../won-es6.js';
+import { attach } from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
+import { labels, relativeTime, } from '../won-label-utils.js';
 import {
     selectAllOwnNeeds,
-} from '../selectors';
+} from '../selectors.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {

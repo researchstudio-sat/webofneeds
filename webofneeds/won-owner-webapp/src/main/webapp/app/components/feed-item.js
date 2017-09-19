@@ -1,23 +1,23 @@
 import angular from 'angular';
 import Immutable from 'immutable';
-import squareImageModule from '../components/square-image';
-import won from '../won-es6';
-import { actionCreators }  from '../actions/actions';
-import { attach } from '../utils';
+import squareImageModule from '../components/square-image.js';
+import won from '../won-es6.js';
+import { actionCreators }  from '../actions/actions.js';
+import { attach } from '../utils.js';
 import {
     labels,
     relativeTime,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import {
     selectLastUpdateTime,
-} from '../selectors';
+} from '../selectors.js';
 import {
    connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
-import * as srefUtils from '../sref-utils';
+import * as srefUtils from '../sref-utils.js';
 
-import feedItemLineModule from './feed-item-line';
+import feedItemLineModule from './feed-item-line.js';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux', '$state'];
 function genComponentConf() {

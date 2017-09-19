@@ -2,18 +2,18 @@
  * Created by ksinger on 24.09.2015.
  */
 
-import { actionTypes } from '../actions/actions';
+import { actionTypes } from '../actions/actions.js';
 import Immutable from 'immutable';
-import { combineReducersStable } from '../redux-utils';
-import { messagesReducer } from './message-reducers';
+import { combineReducersStable } from '../redux-utils.js';
+import { messagesReducer } from './message-reducers.js';
 import reduceReducers from 'reduce-reducers';
-import needReducer from './need-reducer';
-import eventReducer from './event-reducer';
-import userReducer from './user-reducer';
-import toastReducer from './toast-reducer';
+import needReducer from './need-reducer.js';
+import eventReducer from './event-reducer.js';
+import userReducer from './user-reducer.js';
+import toastReducer from './toast-reducer.js';
 import {
     getIn,
-} from '../utils';
+} from '../utils.js';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -49,6 +49,12 @@ const reducers = {
                 return getIn(action, ['payload', 'email']);
 
             case actionTypes.login:
+                if(getIn(action, ['payload', 'loginFinished'])) {
+                    return undefined;
+                } else {
+                    return loginInProcessFor;
+                }
+
             case actionTypes.loginFailed:
                 return undefined;
 
@@ -72,7 +78,10 @@ const reducers = {
 
 
     initialLoadFinished: (state = false, action = {}) =>
-        state || action.type === actionTypes.initialPageLoad,
+        state || (
+            action.type === actionTypes.initialPageLoad &&
+            getIn(action, ['payload', 'initialLoadFinished'])
+        ),
 
     loginVisible: (visible = false, action = {}) => {
         switch (action.type) {

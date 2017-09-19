@@ -2,30 +2,30 @@
  * Created by ksinger on 19.02.2016.
  */
 
-import  won from '../won-es6';
+import  won from '../won-es6.js';
 import Immutable from 'immutable';
-import { actionTypes, actionCreators } from './actions';
-import { fetchOwnedData } from '../won-message-utils';
+import { actionTypes, actionCreators } from './actions.js';
+import { fetchOwnedData } from '../won-message-utils.js';
 import {
     registerAccount,
     login,
     privateId2Credentials,
     logout,
     parseCredentials,
-} from '../won-utils';
+} from '../won-utils.js';
 import {
     stateGoCurrent,
 
-} from './cstm-router-actions';
+} from './cstm-router-actions.js';
 import {
     resetParams,
     checkAccessToCurrentRoute,
-} from '../configRouting';
+} from '../configRouting.js';
 
 import {
     checkHttpStatus,
     getIn,
-} from '../utils';
+} from '../utils.js';
 
 /**
  * @param privateId
@@ -120,6 +120,10 @@ export function accountLogin(credentials, options) {
         }
 
 
+        const curriedDispatch = data => dispatch({
+            type: actionTypes.login,
+            payload: Immutable.fromJS(data).merge({email: email, loggedIn: true})
+        });
 
         return Promise.resolve()
         .then(() => {
@@ -144,25 +148,11 @@ export function accountLogin(credentials, options) {
                 return stateGoCurrent({privateId: credentials.privateId})(dispatch, getState);
             }
         })
-
         .then(() =>
             login(credentials)
         )
-        .then(response =>
-            options_.fetchData ? fetchOwnedData(email) : Immutable.Map() // only need to fetch data for non-new accounts
-        )
-        .then(allThatData =>
-            dispatch({
-                type: actionTypes.login,
-                payload: allThatData.merge({email: email, loggedIn: true})
-            })
-        )
         .then(() =>
-        /**
-         * TODO this action is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-            dispatch(actionCreators.reconnect())
+            curriedDispatch({})
         )
         .then(() => {
             if(!options_.doRedirects) {
@@ -173,6 +163,24 @@ export function accountLogin(credentials, options) {
                 return checkAccessToCurrentRoute(dispatch, getState);
             }
         })
+        .then(response => {
+                if(options_.fetchData) {
+                    return fetchOwnedData(email, curriedDispatch);
+                } else {
+                    return Immutable.Map(); // only need to fetch data for non-new accounts
+                }
+            }
+        )
+        .then(() =>
+            curriedDispatch({loginFinished: true})
+        )
+        .then(() =>
+        /**
+         * TODO this action is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+            dispatch(actionCreators.reconnect())
+        )
         .catch(error => {
             console.error("accountLogin ErrorObject", error);
             return Promise.resolve()

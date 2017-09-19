@@ -7,11 +7,12 @@
 import angular from 'angular';
 import 'angular-sanitize';
 import Immutable from 'immutable';
+import Medium from 'medium.js';
 import {
     attach,
     delay,
     dispatchEvent,
-} from '../utils';
+} from '../utils.js';
 
 function genComponentConf() {
     let template = `

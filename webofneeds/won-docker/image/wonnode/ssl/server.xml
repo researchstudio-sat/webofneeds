@@ -87,6 +87,24 @@
                clientAuth="false" sslProtocol="TLS" />
     -->
 	<Connector
+    compression="on"
+    compressableMimeType="
+           text/html,
+           text/xml,
+           text/plain,
+           text/css,
+           text/javascript,
+           application/javascript,
+           application/x-font-ttf,
+           image/svg+xml,
+           text/turtle,
+           application/rdf+xml,
+           application/x-turtle,
+           text/rdf+n3,
+           application/json,
+           application/trig,
+           application/ld+json,
+           application/n-quads"
     clientAuth="wanted" port="8443" minSpareThreads="5" maxSpareThreads="75"
     enableLookups="true" disableUploadTimeout="true"
     acceptCount="100" maxThreads="200"

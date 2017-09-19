@@ -61,3 +61,15 @@ Go to `webofneeds/webofneeds/won-owner-webapp/src/main/webapp` and run `node_mod
 
 A **major build speedup** can be achieved by running the maven install task with the `copy-*-dependencies` options enabled and then copying the war files from the most generic `target`-folder to `$TOMCAT/shared/lib` and afterwards always using the `skip-dependencies` option for maven install.
 -->
+
+### Enabling GZip-compression
+
+If you want to enable gzip-compression on you local tomcat (e.g. because you're tweaking with page-load optimisations), you can enable gzip-compression by adding the following to your tomcat's `server.xml`:
+
+
+```xml
+<Connector
+    compression="on"
+    compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/x-font-ttf"
+   .../>
+```

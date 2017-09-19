@@ -4,7 +4,7 @@
 
 import {
    getIn,
-} from './utils';
+} from './utils.js';
 
 
 // ------- INIT  --------------------

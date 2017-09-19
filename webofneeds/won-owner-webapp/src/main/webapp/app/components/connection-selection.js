@@ -8,19 +8,19 @@ import {
     getIn,
     attach,
     decodeUriComponentProperly,
-} from '../utils';
+} from '../utils.js';
 import {
     labels,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     selectOpenPostUri,
-} from '../selectors';
+} from '../selectors.js';
 
-import connectionSelectionItemModule from './connection-selection-item';
+import connectionSelectionItemModule from './connection-selection-item.js';
 
 
 const serviceDependencies = ['$ngRedux', '$scope'];

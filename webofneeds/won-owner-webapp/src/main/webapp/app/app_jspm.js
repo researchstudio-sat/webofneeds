@@ -22,36 +22,36 @@ import {
     hyphen2Camel,
     firstToLowerCase,
     delay,
-} from './utils';
+} from './utils.js';
 
 //---------- Config -----------
-import { configRouting, runAccessControl } from './configRouting';
-import configRedux from './configRedux';
+import { configRouting, runAccessControl } from './configRouting.js';
+import configRedux from './configRedux.js';
 
 //--------- Actions -----------
-import { actionCreators }  from './actions/actions';
+import { actionCreators }  from './actions/actions.js';
 
 //-------- Components ---------
-import topnav from './components/topnav';
-import createNeedComponent from './components/create-need/create-need';
-import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
-import overviewSentRequestsComponent from './components/overview-sent-requests/overview-sent-requests';
-import postComponent from './components/post/post';
-import landingPageComponent from './components/landingpage/landingpage';
-import overviewPostsComponent from './components/overview-posts/overview-posts';
-import feedComponent from './components/feed/feed';
-import overviewMatchesComponent from './components/overview-matches/overview-matches';
-import aboutComponent from './components/about/about';
-import signupComponent from './components/signup/signup';
+import topnav from './components/topnav.js';
+import createNeedComponent from './components/create-need/create-need.js';
+import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests.js';
+import overviewSentRequestsComponent from './components/overview-sent-requests/overview-sent-requests.js';
+import postComponent from './components/post/post.js';
+import landingPageComponent from './components/landingpage/landingpage.js';
+import overviewPostsComponent from './components/overview-posts/overview-posts.js';
+import feedComponent from './components/feed/feed.js';
+import overviewMatchesComponent from './components/overview-matches/overview-matches.js';
+import aboutComponent from './components/about/about.js';
+import signupComponent from './components/signup/signup.js';
 
 
 //settings
-import settingsTitleBarModule from './components/settings-title-bar';
-import avatarSettingsModule from './components/settings/avatar-settings';
-import generalSettingsModule from './components/settings/general-settings';
+import settingsTitleBarModule from './components/settings-title-bar.js';
+import avatarSettingsModule from './components/settings/avatar-settings.js';
+import generalSettingsModule from './components/settings/general-settings.js';
 
 //won import (used so you can access the debugmode variable without reloading the page)
-import won from './service/won';
+import won from './service/won.js';
 window.won = won;
 
 
@@ -59,7 +59,7 @@ window.won = won;
  * approach to asynchronity (Remove it or the thunk-based
  * solution afterwards)
  */
-import { runMessagingAgent } from './messaging-agent';
+import { runMessagingAgent } from './messaging-agent.js';
 
 let app = angular.module('won.owner', [
     /* to enable legacy $stateChange* events in ui-router (see

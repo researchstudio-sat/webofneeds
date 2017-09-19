@@ -6,26 +6,26 @@ import Immutable from 'immutable';
 
 import {
     buildCreateMessage,
-} from '../won-message-utils';
+} from '../won-message-utils.js';
 
 import {
     actionCreators,
     actionTypes,
-} from './actions';
+} from './actions.js';
 
 import {
    accountRegister,
-} from './account-actions';
+} from './account-actions.js';
 
 import {
     registerAccount,
     generatePrivateId,
     login,
-} from '../won-utils';
+} from '../won-utils.js';
 
 import {
     delay,
-} from '../utils';
+} from '../utils.js';
 
 export function needCreate(draft, nodeUri) {
     return (dispatch, getState) => {

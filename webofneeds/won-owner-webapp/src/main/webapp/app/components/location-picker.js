@@ -4,22 +4,22 @@
 
 import angular from 'angular';
 import Immutable from 'immutable'; // also exports itself as (window).L
-import L from '../leaflet-bundleable';
+import L from '../leaflet-bundleable.js';
 import {
     attach,
     searchNominatim,
     reverseSearchNominatim,
     nominatim2draftLocation,
 } from '../utils.js';
-import { actionCreators }  from '../actions/actions';
+import { actionCreators }  from '../actions/actions.js';
 import {
     doneTypingBufferNg,
     DomCache,
-} from '../cstm-ng-utils'
+} from '../cstm-ng-utils.js'
 
 import {
     initLeaflet,
-} from '../won-utils';
+} from '../won-utils.js';
 
 const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {

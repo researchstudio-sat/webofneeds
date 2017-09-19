@@ -4,17 +4,17 @@
 ;
 
 import angular from 'angular';
-import { attach } from '../utils';
+import { attach } from '../utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     selectAllOwnNeeds,
     selectAllConnections,
     selectAllMessages,
-} from '../selectors';
-import won from '../won-es6';
+} from '../selectors.js';
+import won from '../won-es6.js';
 
 
 const serviceDependencies = ['$ngRedux', '$scope'];

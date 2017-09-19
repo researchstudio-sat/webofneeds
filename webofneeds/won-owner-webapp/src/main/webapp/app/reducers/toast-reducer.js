@@ -1,12 +1,12 @@
-import { actionTypes } from '../actions/actions';
+import { actionTypes } from '../actions/actions.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
-import won from '../won-es6';
+import won from '../won-es6.js';
 import {
     getIn,
     generateIdString,
-} from '../utils';
-import config from '../config';
+} from '../utils.js';
+import config from '../config.js';
 
 const initialState = Immutable.fromJS({
 });

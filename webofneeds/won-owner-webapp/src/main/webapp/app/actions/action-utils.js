@@ -2,9 +2,9 @@
  * Created by ksinger on 26.11.2015.
  */
 
-import { reduceAndMapTreeKeys, flattenTree, tree2constants } from '../utils';
+import { reduceAndMapTreeKeys, flattenTree, tree2constants } from '../utils.js';
 
-import won from '../won-es6';
+import won from '../won-es6.js';
 
 export function hierarchy2Creators(actionHierarchy) {
     const actionTypes = tree2constants(actionHierarchy);

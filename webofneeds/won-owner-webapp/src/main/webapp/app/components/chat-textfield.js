@@ -4,18 +4,19 @@
 
 ;
 
-// import Medium from '../mediumjs-es6';
+// import Medium from '../mediumjs-es6.js';
 import angular from 'angular';
 import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
+import Medium from 'medium.js';
 import {
     dispatchEvent,
     attach,
     delay,
     is,
-} from '../utils';
-import { actionCreators }  from '../actions/actions';
+} from '../utils.js';
+import { actionCreators }  from '../actions/actions.js';
 
 function genComponentConf() {
     let template = `

@@ -3,21 +3,21 @@
 import angular from 'angular';
 import {
     labels,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import {
     attach,
 } from '../utils.js'
 import {
     connect2Redux,
-} from '../won-utils';
-import { actionCreators }  from '../actions/actions';
+} from '../won-utils.js';
+import { actionCreators }  from '../actions/actions.js';
 import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
-} from '../selectors';
+} from '../selectors.js';
 
-import postContentModule from './post-content';
-import postHeaderModule from './post-header';
+import postContentModule from './post-content.js';
+import postHeaderModule from './post-header.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

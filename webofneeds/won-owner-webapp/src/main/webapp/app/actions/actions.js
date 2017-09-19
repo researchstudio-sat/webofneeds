@@ -35,7 +35,7 @@
  * in the reducers.
  */
 
-import  won from '../won-es6';
+import  won from '../won-es6.js';
 import Immutable from 'immutable';
 
 // <utils>
@@ -43,16 +43,16 @@ import Immutable from 'immutable';
 import {
     tree2constants,
     entries,
-} from '../utils';
-import { hierarchy2Creators } from './action-utils';
+} from '../utils.js';
+import { hierarchy2Creators } from './action-utils.js';
 import {
     buildCloseNeedMessage,
     buildOpenNeedMessage
-} from '../won-message-utils';
+} from '../won-message-utils.js';
 
 import {
     needCreate,
-} from './create-need-action';
+} from './create-need-action.js';
 
 import {
     stateBack,
@@ -61,7 +61,7 @@ import {
     stateGoDefault,
     stateGoKeepParams,
     stateGoResetParams,
-} from './cstm-router-actions';
+} from './cstm-router-actions.js';
 
 // </utils>
 
@@ -71,16 +71,16 @@ import {
     accountLogin,
     accountLogout,
     accountRegister,
-} from './account-actions';
+} from './account-actions.js';
 
-import * as cnct from './connections-actions';
-import * as messages from './messages-actions';
+import * as cnct from './connections-actions.js';
+import * as messages from './messages-actions.js';
 
 import {
     configInit,
     pageLoadAction
-} from './load-action';
-import { matchesLoad } from './matches-actions';
+} from './load-action.js';
+import { matchesLoad } from './matches-actions.js';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
 // </action-creators>

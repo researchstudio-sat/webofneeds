@@ -1,5 +1,6 @@
 @import 'button';
 @import 'collapsible';
+@import 'button';
 
 .slide-in {
   @extend .collapsible;
@@ -27,8 +28,7 @@
   & > .si__button {
     margin-left: 1.3rem;
     margin-right: 1rem;
-    // @extend .won-button--outline;
-    // margin-left: 0.5rem;
+    @include won-button--outlined(white);
   }
 
   > img {

@@ -1,18 +1,21 @@
 import angular from 'angular';
-import overviewTitleBarModule from '../overview-title-bar';
-import feedItemModule from '../feed-item'
-import { actionCreators }  from '../../actions/actions';
-import { attach } from '../../utils';
+import overviewTitleBarModule from '../overview-title-bar.js';
+import feedItemModule from '../feed-item.js'
+import { actionCreators }  from '../../actions/actions.js';
+import {
+    attach,
+    getIn,
+} from '../../utils.js';
 
 import {
     resetParams,
-} from '../../configRouting';
+} from '../../configRouting.js';
 
 import {
     selectAllOwnNeeds,
-} from '../../selectors';
+} from '../../selectors.js';
 
-import * as srefUtils from '../../sref-utils';
+import * as srefUtils from '../../sref-utils.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$state'/*'$routeParams' /*injections as strings here*/];
 class FeedController {
@@ -27,8 +30,20 @@ class FeedController {
         const selectFromState = (state) => {
             const ownActiveNeeds = selectAllOwnNeeds(state).filter(need => need.get("state") === won.WON.ActiveCompacted);
 
+            const initialLoadInProgress = !getIn(state, ['initialLoadFinished']);
+            const loginInProgress = !!getIn(state, ['loginInProcessFor']);
+            const ownNeedUris = ownActiveNeeds &&
+                ownActiveNeeds.map(
+                        need => need.get('uri')
+                ).toArray();
+            const hasOwnNeeds = ownNeedUris && ownNeedUris.length > 0;
+            const showSpinner = loginInProgress || initialLoadInProgress;
+
             return {
-                ownNeedUris: ownActiveNeeds && ownActiveNeeds.map(need => need.get('uri')).toArray(),
+                showSpinner,
+                showPlaceholder: !showSpinner && !hasOwnNeeds,
+                showFeed: hasOwnNeeds,
+                ownNeedUris,
             }
         };
         const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);

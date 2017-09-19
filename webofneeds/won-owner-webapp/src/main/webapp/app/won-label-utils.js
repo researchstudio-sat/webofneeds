@@ -1,6 +1,6 @@
 ;
-import won from './won-es6';
-import {deepFreeze} from './utils';
+import won from './won-es6.js';
+import {deepFreeze} from './utils.js';
 
 export const labels = deepFreeze({
     type: {

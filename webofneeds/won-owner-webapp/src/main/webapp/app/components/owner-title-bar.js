@@ -1,22 +1,22 @@
 ;
 
 import angular from 'angular';
-import squareImageModule from '../components/square-image';
+import squareImageModule from '../components/square-image.js';
 import {
     attach,
     decodeUriComponentProperly,
     getIn,
-} from '../utils';
+} from '../utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
-import won from '../won-es6';
-import { labels } from '../won-label-utils';
+} from '../won-utils.js';
+import won from '../won-es6.js';
+import { labels } from '../won-label-utils.js';
 import {
     selectOpenPostUri,
     selectAllMessagesByNeedUri,
-} from '../selectors';
-import { actionCreators }  from '../actions/actions';
+} from '../selectors.js';
+import { actionCreators }  from '../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

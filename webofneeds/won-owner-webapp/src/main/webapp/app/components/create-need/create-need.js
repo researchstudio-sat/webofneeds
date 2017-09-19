@@ -5,14 +5,14 @@
 
 import angular from 'angular'
 import 'ng-redux';
-import createPostModule from '../create-post';
+import createPostModule from '../create-post.js';
 
 import {
     attach,
     clone,
-} from '../../utils';
-import { actionCreators }  from '../../actions/actions';
-import won from '../../won-es6';
+} from '../../utils.js';
+import { actionCreators }  from '../../actions/actions.js';
+import won from '../../won-es6.js';
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];

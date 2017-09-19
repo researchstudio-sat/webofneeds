@@ -4,12 +4,12 @@
 
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
-import won from './won-es6';
+import won from './won-es6.js';
 import {
     decodeUriComponentProperly,
     is,
     getIn,
-} from './utils';
+} from './utils.js';
 
 export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');

@@ -5,8 +5,8 @@
 ;
 
 import angular from 'angular';
-import { dispatchEvent, attach } from '../utils';
-import enterModule from '../directives/enter';
+import { dispatchEvent, attach } from '../utils.js';
+import enterModule from '../directives/enter.js';
 
 function genComponentConf() {
     /*

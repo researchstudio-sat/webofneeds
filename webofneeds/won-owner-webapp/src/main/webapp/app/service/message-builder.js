@@ -4,7 +4,7 @@
 
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
-import won from './won';
+import won from './won.js';
 (function(){ // <message-builder-js> scope
 
     /**

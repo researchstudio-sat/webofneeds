@@ -1,13 +1,13 @@
 /**
  * Created by ksinger on 10.05.2016.
  */
-import { actionTypes } from '../actions/actions';
-import { repeatVar } from '../utils';
+import { actionTypes } from '../actions/actions.js';
+import { repeatVar } from '../utils.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
-import { combineReducersStable } from '../redux-utils';
-import { buildCreateMessage } from '../won-message-utils';
-import won from '../won-es6';
+import { combineReducersStable } from '../redux-utils.js';
+import { buildCreateMessage } from '../won-message-utils.js';
+import won from '../won-es6.js';
 
 const initialState = Immutable.fromJS({loggedIn: false});
 

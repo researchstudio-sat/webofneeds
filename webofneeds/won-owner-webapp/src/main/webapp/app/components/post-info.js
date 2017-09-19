@@ -6,21 +6,21 @@
 ;
 
 import angular from 'angular';
-import needMapModule from './need-map';
+import needMapModule from './need-map.js';
 
-import { attach, } from '../utils';
-import won from '../won-es6';
+import { attach, } from '../utils.js';
+import won from '../won-es6.js';
 import {
     relativeTime,
-} from '../won-label-utils';
+} from '../won-label-utils.js';
 import {
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 import {
     selectOpenPostUri,
     selectLastUpdateTime,
-} from '../selectors';
-import { actionCreators }  from '../actions/actions';
+} from '../selectors.js';
+import { actionCreators }  from '../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 function genComponentConf() {

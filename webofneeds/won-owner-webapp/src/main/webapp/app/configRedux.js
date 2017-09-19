@@ -2,10 +2,10 @@
  * Created by ksinger on 08.10.2015.
  */
 
-import reducer from './reducers/reducers';
+import reducer from './reducers/reducers.js';
 import thunk from 'redux-thunk';
 
-import { piwikMiddleware } from './piwik';
+import { piwikMiddleware } from './piwik.js';
 
 export default function configRedux($ngReduxProvider) {
     $ngReduxProvider.createStoreWith(reducer, [

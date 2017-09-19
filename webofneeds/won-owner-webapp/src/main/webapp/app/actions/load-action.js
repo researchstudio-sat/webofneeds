@@ -2,40 +2,40 @@
  * Created by ksinger on 18.02.2016.
  */
 
-import  won from '../won-es6';
+import  won from '../won-es6.js';
 import Immutable from 'immutable';
-import { actionTypes, actionCreators } from './actions';
-import { selectOpenPostUri } from '../selectors';
+import { actionTypes, actionCreators } from './actions.js';
+import { selectOpenPostUri } from '../selectors.js';
 
 import {
     accessControl,
     checkAccessToCurrentRoute,
-} from '../configRouting';
+} from '../configRouting.js';
 
 import {
     stateGoCurrent,
-} from './cstm-router-actions';
+} from './cstm-router-actions.js';
 
 import {
     checkLoginStatus,
     privateId2Credentials,
     login,
     logout,
-} from '../won-utils';
+} from '../won-utils.js';
 
-import config from '../config';
+import config from '../config.js';
 
 import {
     checkHttpStatus,
     getParameterByName,
-} from '../utils';
+} from '../utils.js';
 
 import {
     fetchOwnedData,
     fetchDataForNonOwnedNeedOnly,
     emptyDataset,
     wellFormedPayload,
-} from '../won-message-utils';
+} from '../won-message-utils.js';
 
 
 export const pageLoadAction = () => (dispatch, getState) => {
@@ -80,7 +80,12 @@ function loadingWhileSignedIn(dispatch, getState, username) {
 
 
     loginSuccess(username, true, dispatch, getState);
-    fetchOwnedData(username, dispatchInitialPageLoad(dispatch));
+    fetchOwnedData(username, dispatchInitialPageLoad(dispatch))
+    .then(() => dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: Immutable.fromJS({initialLoadFinished: true})
+        })
+    );
 }
 
 function loadingWithAnonymousAccount(dispatch, getState, privateId) {
@@ -99,7 +104,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
     ).then(allThatData => {
         return dispatch({
             type: actionTypes.initialPageLoad,
-            payload: allThatData
+            payload: allThatData.merge({initialLoadFinished: true})
         });
     }).catch(e => {
         console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
@@ -138,7 +143,7 @@ function loadingWhileSignedOut(dispatch, getState) {
     return dataPromise.then(publicData =>
         dispatch({
             type: actionTypes.initialPageLoad,
-            payload: publicData
+            payload: publicData.merge({initialLoadFinished: true})
         })
     ).then(() =>
         checkAccessToCurrentRoute(dispatch, getState)

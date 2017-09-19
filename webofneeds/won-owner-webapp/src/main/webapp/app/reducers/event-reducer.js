@@ -1,16 +1,16 @@
 /**
  * Created by syim on 11.12.2015.
  */
-import { actionTypes } from '../actions/actions';
+import { actionTypes } from '../actions/actions.js';
 import {
     repeatVar,
     getIn,
     contains,
-} from '../utils';
+} from '../utils.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
-import { combineReducersStable } from '../redux-utils';
-import won from '../won-es6';
+import { combineReducersStable } from '../redux-utils.js';
+import won from '../won-es6.js';
 
 const initialState = Immutable.fromJS({
     events: {},

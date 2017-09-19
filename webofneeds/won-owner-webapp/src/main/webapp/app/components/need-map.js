@@ -4,18 +4,18 @@
 import angular from 'angular';
 import inviewModule from 'angular-inview';
 
-import { attach } from '../utils';
-import won from '../won-es6';
-import { actionCreators }  from '../actions/actions';
-import L from '../leaflet-bundleable';
+import { attach } from '../utils.js';
+import won from '../won-es6.js';
+import { actionCreators }  from '../actions/actions.js';
+import L from '../leaflet-bundleable.js';
 import {
     initLeaflet,
     connect2Redux,
-} from '../won-utils';
+} from '../won-utils.js';
 
 import {
     DomCache,
-} from '../cstm-ng-utils';
+} from '../cstm-ng-utils.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 function genComponentConf() {
