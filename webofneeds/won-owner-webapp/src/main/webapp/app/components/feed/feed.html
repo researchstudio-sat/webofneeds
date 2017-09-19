@@ -3,9 +3,22 @@
     <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="feedcontent">
-    <div class="fc__inner" ng-class="{'empty' : self.ownNeedUris.length == 0}">
-        <div class="fc__empty" ng-if="self.ownNeedUris.length == 0">
+    
+    <div class="fc__loading" ng-show="self.showSpinner">
+        <img src="images/spinner/on_white.gif"
+             alt="Loading&hellip;"
+             class="hspinner"/>
+        <span class="fc__loading__text">Loading your posts&hellip;</span>
+    </div>
+
+    <div class="fc__inner"
+         ng-show="!self.showSpinner"
+         ng-class="{'empty' : self.ownNeedUris.length == 0}"
+    >
+        <div class="fc__empty" ng-if="self.showPlaceholder">
+        <!--<div class="fc__empty">-->
             <div class="fc__empty__description">
+
                 <img src="generated/icon-sprite.svg#ico-filter_list_grey"
                      class="fc__empty__description__icon">
                 <span class="fc__empty__description__text">
@@ -20,11 +33,11 @@
                 <span class="fc__empty__link__caption">Create a Need</span>
             </a>
         </div>
-        <h1 class="title" ng-if="self.ownNeedUris.length > 0">Recent activities</h1>
 
+        <h1 class="title" ng-if="self.showFeed">Recent activities</h1>
         <won-feed-item ng-repeat="uri in self.ownNeedUris"
                        need-uri="uri"
-                       ng-show="uri">
+                       ng-show="self.showFeed">
         </won-feed-item>
     </div>
 </main>

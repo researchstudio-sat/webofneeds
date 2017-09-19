@@ -49,6 +49,12 @@ const reducers = {
                 return getIn(action, ['payload', 'email']);
 
             case actionTypes.login:
+                if(getIn(action, ['payload', 'loginFinished'])) {
+                    return undefined;
+                } else {
+                    return loginInProcessFor;
+                }
+
             case actionTypes.loginFailed:
                 return undefined;
 
@@ -72,7 +78,10 @@ const reducers = {
 
 
     initialLoadFinished: (state = false, action = {}) =>
-        state || action.type === actionTypes.initialPageLoad,
+        state || (
+            action.type === actionTypes.initialPageLoad &&
+            getIn(action, ['payload', 'initialLoadFinished'])
+        ),
 
     loginVisible: (visible = false, action = {}) => {
         switch (action.type) {

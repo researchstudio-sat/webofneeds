@@ -144,25 +144,14 @@ export function accountLogin(credentials, options) {
                 return stateGoCurrent({privateId: credentials.privateId})(dispatch, getState);
             }
         })
-
         .then(() =>
             login(credentials)
         )
-        .then(response =>
-            options_.fetchData ? fetchOwnedData(email) : Immutable.Map() // only need to fetch data for non-new accounts
-        )
-        .then(allThatData =>
+        .then(() =>
             dispatch({
                 type: actionTypes.login,
-                payload: allThatData.merge({email: email, loggedIn: true})
+                payload: Immutable.fromJS({email: email, loggedIn: true})
             })
-        )
-        .then(() =>
-        /**
-         * TODO this action is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-            dispatch(actionCreators.reconnect())
         )
         .then(() => {
             if(!options_.doRedirects) {
@@ -173,6 +162,22 @@ export function accountLogin(credentials, options) {
                 return checkAccessToCurrentRoute(dispatch, getState);
             }
         })
+        .then(response =>
+            options_.fetchData ? fetchOwnedData(email) : Immutable.Map() // only need to fetch data for non-new accounts
+        )
+        .then(allThatData =>
+            dispatch({
+                type: actionTypes.login,
+                payload: allThatData.merge({email: email, loggedIn: true, loginFinished: true})
+            })
+        )
+        .then(() =>
+        /**
+         * TODO this action is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+            dispatch(actionCreators.reconnect())
+        )
         .catch(error => {
             console.error("accountLogin ErrorObject", error);
             return Promise.resolve()
