@@ -50,12 +50,12 @@ function genLoginConf() {
         </form>
         <div class="wl__register">
             No Account yet?
-            <a ui-sref="{{ self.absSRef('signup') }}">
+            <a href="{{ self.absHRef(self.$state, 'signup') }}">
                 Sign up
             </a>
         </div>`;
 
-    const serviceDependencies = ['$ngRedux', '$scope', '$element' /*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$element', '$state' /*'$routeParams' /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
