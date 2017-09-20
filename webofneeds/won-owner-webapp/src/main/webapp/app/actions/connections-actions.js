@@ -19,6 +19,7 @@ import {
     getIn,
     get,
     jsonld2simpleFormat,
+    cloneAsMutable,
 } from '../utils.js';
 
 import {
@@ -174,6 +175,7 @@ export function connectionsConnectAdHoc(theirNeedUri) {
 
 
         //TODO: CREATE COUNTERPART NEED
+        //TODO: connection-request text
         //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
         //TODO: SEND REQUEST FOR CREATED CONNECTION
     }
@@ -201,8 +203,6 @@ function adHocDraftTo(theirNeed) {
         descriptionPhrase = 'It\'s a response to: ';
     }
 
-    const location = get(theirNeed, 'location');
-    const plainLocation = location && location.toJS? location.toJS() : location; //i.e. not immutablejs
 
     return {
         title: 'Re: ' + get(theirNeed, 'title'),
@@ -211,8 +211,8 @@ function adHocDraftTo(theirNeed) {
         descriptionPhrase +
         '"' + get(theirNeed, 'description') +'"',
         type: reNeedType,
-        tags: get(theirNeed, 'tags'),
-        location: plainLocation,
+        tags: cloneAsMutable(get(theirNeed, 'tags')),
+        location: cloneAsMutable(get(theirNeed, 'location')),
     };
 
 }
