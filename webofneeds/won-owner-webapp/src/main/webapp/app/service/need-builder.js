@@ -143,7 +143,7 @@ import won from './won.js';
                         's:latitude': args.location.lng.toFixed(6),
                         's:longitude': args.location.lng.toFixed(6),
                     },
-                    's:name': args.address,
+                    's:name': args.location.name,
                     'won:hasBoundingBox':(!args.location.nwCorner || !args.location.seCorner ? undefined : {
                         'won:hasNorthWestCorner': {
                             '@id': '_:boundsNW',
