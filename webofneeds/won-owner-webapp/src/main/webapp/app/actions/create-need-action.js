@@ -14,7 +14,8 @@ import {
 } from './actions.js';
 
 import {
-   accountRegister,
+    accountRegister,
+    ensureLoggedIn,
 } from './account-actions.js';
 
 import {
@@ -30,34 +31,26 @@ import {
 
 export function needCreate(draft, nodeUri) {
     return (dispatch, getState) => {
-        const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
 
         const state = getState();
-        let email = getIn(state, ['user', 'email']);
-        let hasAccountPromise;
+
+        if(!nodeUri) {
+            nodeUri = getIn(state, ['config', 'defaultNodeUri']);
+        }
+
         const currentState = getIn(state, ['router', 'currentState', 'name']);
         const prevState = getIn(state, ['router', 'prevState', 'name']);
         const prevParams = getIn(state, ['router', 'prevParams']);
-
-        if(state.getIn(['user', 'loggedIn'])){
-            hasAccountPromise = Promise.resolve();
-        } else {
-            const privateId = generatePrivateId();
-            hasAccountPromise = accountRegister({privateId})(dispatch, getState)
-                    .then(() =>
-                        // wait for the server to process the login and the reconnect to
-                        // go through, before proceeding to need-creation.
-                        delay(500)
-                    )
-                    .catch(err => {
-                        console.error(`Creating temporary account (${privateId}) has failed due to `, err);
-                        dispatch(actionCreators.registerFailed({privateId}));
-                    });
-
-            delete prevParams.privateId; // should there be a previous privateId, we don't want to change back to that later
+        if(!state.getIn(['user', 'loggedIn'])){
+            /*
+             * `ensureLoggedIn` will generate a new privateId. should
+             * there be a previous privateId, we don't want to change
+             * back to that later.
+             */
+            delete prevParams.privateId;
         }
 
-        return hasAccountPromise
+        return ensureLoggedIn(dispatch, getState)
             .then(() => {
                 if (currentState === 'landingpage') {
                     return dispatch(actionCreators.router__stateGoAbs('feed'))
@@ -70,11 +63,13 @@ export function needCreate(draft, nodeUri) {
                     return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
                 }
             })
-            .then(() =>
-                dispatch({
+            .then(() => {
+                const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
+                return dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri}
                 })
-            );
+
+            });
     }
 }
