@@ -17,6 +17,7 @@ import {
     urisToLookupMap,
     msStringToDate,
     getIn,
+    get,
     jsonld2simpleFormat,
 } from '../utils.js';
 
@@ -156,14 +157,64 @@ export function connectionsConnect(connectionUri,message) {
     }
 }
 
-export function connectionsConnectAdHoc(needUri) {
+export function connectionsConnectAdHoc(theirNeedUri) {
     return (dispatch, getState) => {
         const state = getState();
+
+        const theirNeed = getIn(state, ['needs', theirNeedUri]);
+        const adHocDraft = adHocDraftTo(theirNeed);
+
+        dispatch(actionCreators.needs__create(adHocDraft))
+        .then(() => {
+            console.log('STARTED PUBLISHING AD HOC DRAFT');
+
+        });
+
+
+
 
         //TODO: CREATE COUNTERPART NEED
         //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
         //TODO: SEND REQUEST FOR CREATED CONNECTION
     }
+}
+
+function adHocDraftTo(theirNeed) {
+    let reNeedType, descriptionPhrase;
+    const theirNeedType = get(theirNeed, 'type');
+    if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
+        reNeedType = won.WON.BasicNeedTypeSupplyCompacted;
+        descriptionPhrase = 'I have something similar to: ';
+    } else if(theirNeedType === won.WON.BasicNeedTypeSupplyCompacted) {
+        reNeedType = won.WON.BasicNeedTypeDemandCompacted;
+        descriptionPhrase = 'I want something like: ';
+    } else if(theirNeedType === won.WON.BasicNeedTypeDotogetherCompacted) {
+        reNeedType = won.WON.BasicNeedTypeDotogetherCompacted;
+        descriptionPhrase = 'I\'d like to find people for something like the following: ';
+    } else {
+        console.error(
+            'The need responded to (' + theirNeedUri + ') doesn\'t ' +
+            'have a need type recognized by ad-hoc-connect method. Type: ',
+            theirNeedType
+        );
+        reNeedType = undefined;
+        descriptionPhrase = 'It\'s a response to: ';
+    }
+
+    const location = get(theirNeed, 'location');
+    const plainLocation = location && location.toJS? location.toJS() : location; //i.e. not immutablejs
+
+    return {
+        title: 'Re: ' + get(theirNeed, 'title'),
+        description:
+        'This is an automatically generated post. ' +
+        descriptionPhrase +
+        '"' + get(theirNeed, 'description') +'"',
+        type: reNeedType,
+        tags: get(theirNeed, 'tags'),
+        location: plainLocation,
+    };
+
 }
 
 export function connectionsClose(connectionUri) {
