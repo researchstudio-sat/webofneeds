@@ -265,6 +265,7 @@ function onMapClick(e, ctrl) {
         //use coords of original click though (to allow more detailed control)
         location.lat = e.latlng.lat;
         location.lon = e.latlng.lng;
+        location.lng = e.latlng.lng;
         ctrl.$scope.$apply(() => {
             ctrl.selectedLocation(location);
         })
