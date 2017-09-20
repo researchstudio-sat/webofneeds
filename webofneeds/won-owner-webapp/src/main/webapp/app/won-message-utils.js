@@ -252,11 +252,7 @@ export function buildCreateMessage(needData, wonNodeUri) {
         publishedContentUri: publishedContentUri, //mandatory
         tags: needData.tags,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-        location: getIn(needData, ['location', 'lng']),
-        //longitude: getIn(needData, ['location', 'lng']),
-        //latitude: getIn(needData, ['location', 'lat']),
-        //address: getIn(needData, ['location', 'name']),
-        //bounds: getIn(needData, ['location', 'bounds']),
+        location: getIn(needData, ['location']),
         whatsAround: needData.whatsAround,
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
