@@ -625,10 +625,25 @@ export function nominatim2draftLocation(searchResult) {
             lat: Number.parseFloat(b[1]),
             lng: Number.parseFloat(b[3]),
         },
-        bounds: [
-            [ Number.parseFloat(b[0]), Number.parseFloat(b[2]) ], //north-western point
-            [ Number.parseFloat(b[1]), Number.parseFloat(b[3]) ] //south-eastern point
-        ],
+        //bounds: [
+        //    [ Number.parseFloat(b[0]), Number.parseFloat(b[2]) ], //north-western point
+        //    [ Number.parseFloat(b[1]), Number.parseFloat(b[3]) ] //south-eastern point
+        //],
+    }
+}
+
+export function leafletBounds(location) {
+    if(location && location.nwCorner && location.seCorner) {
+        return [
+            [
+                location.nwCorner.lat,
+                location.nwCorner.lng,
+            ],
+            [
+                location.seCorner.lat,
+                location.seCorner.lng,
+            ]
+        ]
     }
 }
 
