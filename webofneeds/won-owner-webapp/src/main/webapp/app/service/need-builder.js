@@ -10,10 +10,10 @@ import won from './won.js';
 (function(){ // <need-builder-js> scope
 
     function hasModalities(args){
-        return hasPriceSpecification(args) || hasLocation(args) || hasTimeConstraint(args) || args.bounds;
+        return hasPriceSpecification(args) || hasLocation(args) || hasTimeConstraint(args);
     }
     function hasLocation(args) {
-        return !isNaN(args.longitude) && !isNaN(args.latitude) && args.address;
+        return !!args.location;
     }
     function hasPriceSpecification(args){
         return false; //TODO price-specification not fully implemented yet
@@ -140,22 +140,22 @@ import won from './won.js';
                     's:geo' : {
                         '@id': '_:location',
                         '@type': 's:GeoCoordinates',
-                        's:latitude': args.latitude.toFixed(6),
-                        's:longitude': args.longitude.toFixed(6),
+                        's:latitude': args.location.lng.toFixed(6),
+                        's:longitude': args.location.lng.toFixed(6),
                     },
                     's:name': args.address,
-                    'won:hasBoundingBox':(!args.bounds ? undefined : {
+                    'won:hasBoundingBox':(!args.location.nwCorner || !args.location.seCorner ? undefined : {
                         'won:hasNorthWestCorner': {
                             '@id': '_:boundsNW',
                             '@type': 's:GeoCoordinates',
-                            's:latitude': args.bounds[0][0].toFixed(6),
-                            's:longitude': args.bounds[0][1].toFixed(6),
+                            's:latitude': args.location.nwCorner.lat.toFixed(6),
+                            's:longitude': args.location.nwCorner.lng.toFixed(6),
                         },
                         'won:hasSouthEastCorner': {
                             '@id': '_:boundsSE',
                             '@type': 's:GeoCoordinates',
-                            's:latitude': args.bounds[1][0].toFixed(6),
-                            's:longitude': args.bounds[1][1].toFixed(6),
+                            's:latitude': args.location.seCorner.lat.toFixed(6),
+                            's:longitude': args.location.seCorner.lng.toFixed(6),
                         },
                     }),
                 }),
