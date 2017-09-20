@@ -167,7 +167,7 @@ export function connectionsConnectAdHoc(theirNeedUri) {
 
         dispatch(actionCreators.needs__create(adHocDraft))
         .then(() => {
-            console.log('STARTED PUBLISHING AD HOC DRAFT');
+            console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
 
         });
 
