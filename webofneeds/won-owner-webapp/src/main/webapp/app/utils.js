@@ -693,6 +693,20 @@ export function clone(obj) {
 }
 
 /**
+ * Returns a property of a given object, no matter whether
+ * it's a normal or an immutable-js object.
+ * @param obj
+ * @param property
+ */
+export function get(obj, property) {
+    if(obj.get) {
+        return obj.get(property);
+    } else {
+        return obj[property];
+    }
+}
+
+/**
  * Tries to look up a property-path on a nested object-structure.
  * Where `obj.x.y` would throw an exception if `x` wasn't defined
  * `get(obj, ['x','y'])` would return undefined.
