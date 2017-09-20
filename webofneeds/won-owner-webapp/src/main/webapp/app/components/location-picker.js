@@ -10,6 +10,7 @@ import {
     searchNominatim,
     reverseSearchNominatim,
     nominatim2draftLocation,
+    leafletBounds,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
@@ -128,7 +129,7 @@ function genComponentConf() {
             this.textfield().value = location.name; // use textfield to display result
 
             this.placeMarkers([location]);
-            this.map.fitBounds(location.bounds, { animate: true });
+            this.map.fitBounds(leafletBounds(location), { animate: true });
             this.markers[0].openPopup();
         }
         doneTyping() {
@@ -234,16 +235,24 @@ function jsonLd2draftLocation(location) {
         lon: Number.parseFloat(location.getIn(['s:geo', 's:longitude'])),
         lat: Number.parseFloat(location.getIn(['s:geo', 's:latitude'])),
         //importance: searchResult.importance,
-        bounds: [
-            [
-                Number.parseFloat(nw.get('s:latitude')),
-                Number.parseFloat(nw.get('s:longitude')),
-            ],
-            [
-                Number.parseFloat(se.get('s:latitude')),
-                Number.parseFloat(se.get('s:longitude')),
-            ]
-        ]
+        nwCorner: {
+            lat: Number.parseFloat(nw.get('s:latitude')),
+            lng: Number.parseFloat(nw.get('s:longitude')),
+        },
+        seCorner: {
+            lat: Number.parseFloat(se.get('s:latitude')),
+            lng: Number.parseFloat(se.get('s:longitude')),
+        },
+        //bounds: [
+        //    [
+        //        Number.parseFloat(nw.get('s:latitude')),
+        //        Number.parseFloat(nw.get('s:longitude')),
+        //    ],
+        //    [
+        //        Number.parseFloat(se.get('s:latitude')),
+        //        Number.parseFloat(se.get('s:longitude')),
+        //    ]
+        //]
     }
 }
 
