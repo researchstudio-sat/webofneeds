@@ -106,7 +106,7 @@ function genComponentConf() {
             }
 
             this.markers = locations.map(location =>
-                L.marker([location.lat, location.lon])
+                L.marker([location.lat, location.lng])
                 .bindPopup(location.name)
             );
 
@@ -141,12 +141,13 @@ function genComponentConf() {
             } else {
                 searchNominatim(text).then( searchResults => {
                     console.log('location search results: ', searchResults);
+                    const parsedResults = scrubSearchResults(searchResults, text);
                     this.$scope.$apply(() => {
-                        this.searchResults = scrubSearchResults(searchResults, text);
+                        this.searchResults = parsedResults;
                         //this.lastSearchedFor = { name: text };
                         this.lastSearchedFor = text;
                     });
-                    this.placeMarkers(searchResults);
+                    this.placeMarkers(Object.values(parsedResults));
                 });
             }
         }
@@ -157,14 +158,14 @@ function genComponentConf() {
 
                         console.log(currentLocation);
                         const lat = currentLocation.coords.latitude;
-                        const lon = currentLocation.coords.longitude;
+                        const lng = currentLocation.coords.longitude;
                         const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
                         // center map around current location
                         this.map.setZoom(zoom);
-                        this.map.panTo([lat, lon]);
+                        this.map.panTo([lat, lng]);
 
-                        reverseSearchNominatim(lat, lon, zoom)
+                        reverseSearchNominatim(lat, lng, zoom)
                             .then(searchResult => {
                                 const location = nominatim2draftLocation(searchResult);
                                 console.log('current location: ', location);
@@ -273,7 +274,6 @@ function onMapClick(e, ctrl) {
 
         //use coords of original click though (to allow more detailed control)
         location.lat = e.latlng.lat;
-        location.lon = e.latlng.lng;
         location.lng = e.latlng.lng;
         ctrl.$scope.$apply(() => {
             ctrl.selectedLocation(location);
