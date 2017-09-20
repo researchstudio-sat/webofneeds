@@ -163,7 +163,7 @@ export function connectionsConnectAdHoc(theirNeedUri) {
         const state = getState();
 
         const theirNeed = getIn(state, ['needs', theirNeedUri]);
-        const adHocDraft = adHocDraftTo(theirNeed);
+        const adHocDraft = generateResponseNeedTo(theirNeed);
 
         dispatch(actionCreators.needs__create(adHocDraft))
         .then(() => {
@@ -181,7 +181,7 @@ export function connectionsConnectAdHoc(theirNeedUri) {
     }
 }
 
-function adHocDraftTo(theirNeed) {
+function generateResponseNeedTo(theirNeed) {
     let reNeedType, descriptionPhrase;
     const theirNeedType = get(theirNeed, 'type');
     if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
