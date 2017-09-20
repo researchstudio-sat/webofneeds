@@ -41,7 +41,8 @@ export function needCreate(draft, nodeUri) {
         const currentState = getIn(state, ['router', 'currentState', 'name']);
         const prevState = getIn(state, ['router', 'prevState', 'name']);
         const prevParams = getIn(state, ['router', 'prevParams']);
-        if(!state.getIn(['user', 'loggedIn'])){
+
+        if(!state.getIn(['user', 'loggedIn']) && prevParams.privateId){
             /*
              * `ensureLoggedIn` will generate a new privateId. should
              * there be a previous privateId, we don't want to change
