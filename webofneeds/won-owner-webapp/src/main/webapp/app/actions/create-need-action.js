@@ -14,18 +14,10 @@ import {
 } from './actions.js';
 
 import {
-    accountRegister,
     ensureLoggedIn,
 } from './account-actions.js';
 
 import {
-    registerAccount,
-    generatePrivateId,
-    login,
-} from '../won-utils.js';
-
-import {
-    delay,
     getIn,
 } from '../utils.js';
 
