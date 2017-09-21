@@ -25,6 +25,7 @@ import {
 
 import {
     delay,
+    getIn,
 } from '../utils.js';
 
 export function needCreate(draft, nodeUri) {
@@ -32,8 +33,11 @@ export function needCreate(draft, nodeUri) {
         const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
 
         const state = getState();
-        let email = state.getIn(['user', 'email']);
+        let email = getIn(state, ['user', 'email']);
         let hasAccountPromise;
+        const currentState = getIn(state, ['router', 'currentState', 'name']);
+        const prevState = getIn(state, ['router', 'prevState', 'name']);
+        const prevParams = getIn(state, ['router', 'prevParams']);
 
         if(state.getIn(['user', 'loggedIn'])){
             hasAccountPromise = Promise.resolve();
@@ -46,20 +50,31 @@ export function needCreate(draft, nodeUri) {
                         delay(500)
                     )
                     .catch(err => {
-                        //TODO user-visible error message / error recovery mechanisms
                         console.error(`Creating temporary account (${privateId}) has failed due to `, err);
-                    })
+                        dispatch(actionCreators.registerFailed({privateId}));
+                    });
+
+            delete prevParams.privateId; // should there be a previous privateId, we don't want to change back to that later
         }
 
         return hasAccountPromise
             .then(() => {
+                if (currentState === 'landingpage') {
+                    return dispatch(actionCreators.router__stateGoAbs('feed'))
+                } else if (currentState === 'createNeed') {
+                    /*
+                     * go to view that was open before the create-view was opened, but
+                     * don't revert any new privateID or remove the create-gui from the
+                     * history stack.
+                     */
+                    return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
+                }
+            })
+            .then(() =>
                 dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri}
-                });
-            })
-            .then(() =>
-                dispatch(actionCreators.router__stateGoResetParams('feed'))
+                })
             );
     }
 }

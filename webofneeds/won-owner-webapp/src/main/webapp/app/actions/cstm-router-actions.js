@@ -33,7 +33,7 @@ export function stateBack() {
         if (hasPreviousState) {
             history.back();
         } else {
-            dispatch(actionCreators.router__stateGoResetParams('landingpage'));
+            dispatch(actionCreators.router__stateGoDefault());
         }
     }
 }
