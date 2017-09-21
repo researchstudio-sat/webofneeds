@@ -50,6 +50,8 @@ services:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt/
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html/
+    depends_on:
+      - gencert
 
   # portsgres need databases for wonnode
   postgres_node:
