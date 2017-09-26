@@ -137,12 +137,13 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
         if(matches(annotation, messageType, direction, facetType)){
           return pair.getKey().toString();
         }
-      } else {
-        Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(DefaultFacetMessageProcessor
-                                                                                          .class);
-        if(matches(annotation, messageType, direction, facetType)){
-          return pair.getKey().toString();
-        }
+      }
+      //either facetType is null or we did not find a FacetMessageProcessor for it
+      // try to find a DefaultFacetMessageProcessor to handle the message
+      Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(DefaultFacetMessageProcessor
+                                                                                        .class);
+      if(matches(annotation, messageType, direction, null)){
+        return pair.getKey().toString();
       }
     }
     throw new WonMessageProcessingException(String.format("unexpected combination of messageType %s, " +

@@ -35,4 +35,8 @@ public class WonCamelConstants {
 
   public static final String OWNER_APPLICATION_ID = "ownerApplicationId";
   public static final String OWNER_APPLICATIONS = "ownerApplications";
+
+  public static final String SUPPRESS_MESSAGE_TO_OWNER = "suppressMessageToOwner";
+  public static final String SUPPRESS_MESSAGE_REACTION = "suppressMessageReaction";
+
 }

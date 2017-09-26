@@ -32,10 +32,10 @@ public class BotOwnerCallback implements OwnerCallback
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-            logger.debug("onClose received for connection {} ",con);
+            logger.debug("onCloseFromOtherNeed received for connection {}, message {} ",con.getConnectionURI(), wonMessage.getMessageURI());
           getBotForNeedUri(con.getNeedURI()).onCloseFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onClose()",e);
+          logger.warn("error while handling onCloseFromOtherNeed()",e);
         }
       }
     }, new Date());
@@ -49,7 +49,7 @@ public class BotOwnerCallback implements OwnerCallback
         try {
           getBotForNeedUri(match.getFromNeed()).onHintFromMatcher(match, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onHint()",e);
+          logger.warn("error while handling onHintFromMatcher()",e);
         }
       }
     }, new Date());
@@ -60,10 +60,10 @@ public class BotOwnerCallback implements OwnerCallback
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-          logger.debug("onConnect called for connection {} ",con.getConnectionURI());
+          logger.debug("onConnectFromOtherNeed called for connection {}, message {}",con.getConnectionURI(), wonMessage.getMessageURI());
           getBotForNeedUri(con.getNeedURI()).onConnectFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onConnect()",e);
+          logger.warn("error while handling onConnectFromOtherNeed()",e);
         }
       }
     }, new Date());
@@ -76,7 +76,7 @@ public class BotOwnerCallback implements OwnerCallback
         try {
           getBotForNeedUri(con.getNeedURI()).onOpenFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onOpen()",e);
+          logger.warn("error while handling onOpenFromOtherNeed()",e);
         }
       }
     }, new Date());
@@ -87,10 +87,10 @@ public class BotOwnerCallback implements OwnerCallback
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-          logger.debug("onTextMessage for Connection {} ",con.getConnectionURI());
+          logger.debug("onMessageFromOtherNeed for Connection {}, message {}",con.getConnectionURI(), wonMessage.getMessageURI());
           getBotForNeedUri(con.getNeedURI()).onMessageFromOtherNeed(con, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onTextMessage()",e);
+          logger.warn("error while handling onMessageFromOtherNeed()",e);
         }
       }
     }, new Date());

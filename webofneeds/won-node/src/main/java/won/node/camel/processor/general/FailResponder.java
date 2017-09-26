@@ -69,10 +69,10 @@ public class FailResponder extends AbstractCamelProcessor
         errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
       }
 
-      logger.warn("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse",
+      logger.info("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse (more info on log level DEBUG)",
                    new Object[]{originalMessage.getMessageURI(), originalMessage.getMessageType(), errormessage});
       if (exception != null) {
-        logger.warn("stacktrace of caught exception:", exception);
+        logger.debug("stacktrace of caught exception:", exception);
       }
       logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
 
@@ -81,7 +81,7 @@ public class FailResponder extends AbstractCamelProcessor
         //do not throw failures back and forth. If the original message is already a failure message
         //that indicates a problem processing a failure message, log this and stop.
         logger.info("Encountered an error processing a FailureResponse for a FailureResponse. The FailureResponse is " +
-                      "logged at debug level. Its message URI is {}", originalMessage.getMessageURI(),exception);
+                      "logged at log level DEBUG. Its message URI is {}", originalMessage.getMessageURI(),exception);
 
         StringWriter sw = new StringWriter();
         RDFDataMgr.write(sw, originalMessage.getCompleteDataset(), Lang.TRIG);
@@ -107,8 +107,9 @@ public class FailResponder extends AbstractCamelProcessor
         sendSystemMessage(responseMessage);
       } else {
         logger.info(String.format("cannot route failure message for direction of original message, " +
-            "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",
-          originalMessage.getEnvelopeType()), exception);
+            "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged on log level DEBUG.",
+          originalMessage.getEnvelopeType()));
+        logger.debug("original cause", exception);
       }
     } catch (Throwable t){
       //something went wrong - we can't inform the sender of the message.

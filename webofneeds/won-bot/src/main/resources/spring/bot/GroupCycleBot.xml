@@ -14,25 +14,32 @@
   ~    limitations under the License.
   -->
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
-    <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
+    <import resource="classpath:/spring/component/needproducer/needproducer-mixed.xml"/>
 
-    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.GroupingBot">
+    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.GroupCycleBot">
+        <!-- optional property, by default one echo need per each need will be created -->
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="botContextWrapper" ref="botContextWrapper"/>
-        <property name="needProducer" ref="needProducerFromMails"/>
-        <property name="nodeURISource" ref="nodeUriSourceRandom"/>
+        <!--property name="needProducer" ref="needProducerFromMails" /-->
+        <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
+        <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <property name="wonMessageSender" ref="ownerProtocolNeedServiceClientJMSBased"/>
+        <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
+        <property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>
+        <property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>
+
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
-                <constructor-arg name="period" value="200"/>
+                <constructor-arg name="period" value="2000"/>
                 <constructor-arg name="timeUnit" value="MILLISECONDS"/>
-                <property name="initialDelay" value="1000"/> <!-- wait 1s at the beginning -->
+                <property name="initialDelay" value="2000"/> <!-- wait 10s at the beginning -->
                 <property name="fixedRate" value="false"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
@@ -40,6 +47,6 @@
 
     <bean id="botContextWrapper" class="won.bot.framework.bot.context.GroupBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
-        <constructor-arg name="botName" value="groupBot"/>
+        <constructor-arg name="botName" value="groupCircleBot"/>
     </bean>
 </beans>

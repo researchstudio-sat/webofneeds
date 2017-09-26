@@ -88,7 +88,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
   private void checkHasMyNode(final WonMessage message, URI ownNode) {
     if (!ownNode.equals(message.getSenderNodeURI())
       && !ownNode.equals(message.getReceiverNodeURI())) {
-      throw new UriNodePathException(message.getMessageURI());
+      throw new UriNodePathException("neither sender nor receiver is " + ownNode);
     }
   }
 
@@ -112,19 +112,19 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
       case FROM_EXTERNAL:
         // my node should be a receiver node
         if (!ownNode.equals(receiverNode)) {
-          throw new UriNodePathException(receiverNode);
+          throw new UriNodePathException(receiverNode + " is expected to be " + ownNode);
         }
         break;
       case FROM_OWNER:
         // my node should be a sender node
         if (!ownNode.equals(senderNode)) {
-          throw new UriNodePathException(senderNode);
+          throw new UriNodePathException(senderNode + " is expected to be " + ownNode);
         }
         break;
       case FROM_SYSTEM:
         // my node should be a sender node
         if (!ownNode.equals(senderNode)) {
-          throw new UriNodePathException(senderNode);
+          throw new UriNodePathException(senderNode + " is expected to be " + ownNode);
         }
         break;
     }
@@ -181,7 +181,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
   private void checkPrefix(URI uri, String expectedPrefix) {
     String prefix = getPrefix(uri);
     if (!prefix.equals(expectedPrefix)) {
-      throw new UriNodePathException(uri);
+      throw new UriNodePathException("URI '" + uri + "' does not start with the expected prefix '" + expectedPrefix + "'");
     }
     return;
   }

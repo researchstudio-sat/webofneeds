@@ -61,7 +61,7 @@ public class WonMessageProcessorCamelAdapter implements Processor {
             logger.debug("returning from adaptee {} with message {} (type: {}, direction: {}, recipient: {})",  new Object[]{adaptee, msg, ((WonMessage) msg).getMessageType(), ((WonMessage) msg).getEnvelopeType(), ((WonMessage) msg).getReceiverURI()});
         }
     } catch (Exception e) {
-      logger.info("re-trhowing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{})",  new Object[]{ e, adaptee, msg, ((WonMessage) msg).getMessageType(), ((WonMessage) msg).getEnvelopeType(), ((WonMessage) msg).getReceiverURI()});
+      logger.info("re-throwing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{})",  new Object[]{ e, adaptee, msg, ((WonMessage) msg).getMessageType(), ((WonMessage) msg).getEnvelopeType(), ((WonMessage) msg).getReceiverURI()});
       throw e;
     }
     //set the result of the call as the new message in the exchange's in

@@ -1,5 +1,8 @@
 package won.bot.framework.bot.context;
 
+import java.net.URI;
+import java.util.List;
+
 /**
  * Created by fsuda on 14.04.2017.
  */
@@ -22,5 +25,13 @@ public class GroupBotContextWrapper extends BotContextWrapper {
 
     public String getGroupMembersListName() {
         return groupMembersListName;
+    }
+
+    public List<URI> getGroupNeedUris(){
+        return getBotContext().getNamedNeedUriList(getGroupListName());
+    }
+
+    public List<URI> getGroupMemberNeedUris(){
+        return getBotContext().getNamedNeedUriList(getGroupMembersListName());
     }
 }

@@ -21,10 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.SigningStage;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
-import won.protocol.message.WonSignatureData;
+import won.protocol.message.*;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.DatasetHolder;
@@ -117,7 +114,8 @@ public class MessageReferencer {
 
             case SUCCESS_RESPONSE:
             case FAILURE_RESPONSE:
-                //we are replying to a message, so add that to the selected List
+                // the current message is a response message. We want to reference the message we are responding to.
+                // we find identify the message with the same parent as our current message and add it
                 URI isResponseToURI = WonMessageUtils.getLocalIsResponseToURI(message);
                 MessageEventPlaceholder messageEventPlaceholder = messageEventRepository.findOneByMessageURI(isResponseToURI);
                 String methodName = "selectLatestMessage::response";
@@ -188,7 +186,7 @@ public class MessageReferencer {
 
     private void deselectSelf(Set<MessageUriAndParentUri> selectedUris, WonMessage message) {
         //the message should not sign itself, just in case:
-        selectedUris.remove(message.getMessageURI());
+        selectedUris.removeIf(messageUriAndParentUri -> messageUriAndParentUri.getMessageURI().equals(message.getMessageURI()));
     }
 
     private WonMessage processSelected(List<MessageAndPlaceholder> selected, WonMessage message) {
@@ -283,6 +281,25 @@ public class MessageReferencer {
                     "messageURI=" + messageURI +
                     ", parentURI=" + parentURI +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof MessageUriAndParentUri)) return false;
+
+            MessageUriAndParentUri that = (MessageUriAndParentUri) o;
+
+            if (messageURI != null ? !messageURI.equals(that.messageURI) : that.messageURI != null) return false;
+            return parentURI != null ? parentURI.equals(that.parentURI) : that.parentURI == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = messageURI != null ? messageURI.hashCode() : 0;
+            result = 31 * result + (parentURI != null ? parentURI.hashCode() : 0);
+            return result;
         }
     }
 }

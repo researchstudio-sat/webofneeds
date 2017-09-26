@@ -23,74 +23,80 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 #{
   SELECT
 
-    ?numEvents
-    ?numRemoteEvents
-    ?numTypedEvents
-    ?numAddressedEvents
 
 
-    (if(?numEvents < 1 || ?numEvents > 2
-    || ?numTypedEvents != 1
-     # numAdressedEvents == 2 in case of a forwarded message. Allow it.
-    || ?numAddressedEvents < 1 || ?numAddressedEvents > 2
-    || ?numEvents != (1 + ?numRemoteEvents),
-    "FAIL", "OK") AS ?check)
+  ?numEvents
+      ?numRemoteEvents
+      ?numTypedEvents
+      ?numForwardedEvents
 
-  WHERE
-  {
 
-    { SELECT (count(DISTINCT ?event) as ?numEvents)
-      WHERE
-      {
-        GRAPH ?envelope
+      (if(?numEvents != ?numForwardedEvents + ?numRemoteEvents + 1
+      || ?numTypedEvents != ?numForwardedEvents + 1
+      || ?numEvents != (1 + ?numRemoteEvents + ?numForwardedEvents),
+      "FAIL", "OK") AS ?check)
+
+    WHERE
+    {
+
+      { SELECT (count(DISTINCT ?event) as ?numEvents)
+        WHERE
         {
-          ?envelope rdf:type msg:EnvelopeGraph .
-          ?envelope rdfg:subGraphOf ?event .
-        } .
+          GRAPH ?envelope
+          {
+            ?envelope rdf:type msg:EnvelopeGraph .
+            ?envelope rdfg:subGraphOf ?event .
+          } .
+        }
       }
-    }
 
-    { SELECT (count(DISTINCT ?event) as ?numTypedEvents)
-      WHERE
-      {
-        GRAPH ?envelope
+      { SELECT (count(DISTINCT ?event) as ?numTypedEvents)
+        WHERE
         {
-          ?envelope rdf:type msg:EnvelopeGraph .
-          ?event msg:hasMessageType ?type .
-        } .
+          GRAPH ?envelope
+          {
+            ?envelope rdf:type msg:EnvelopeGraph .
+            ?event msg:hasMessageType ?type .
+          } .
+        }
       }
-    }
 
-    { SELECT (count(DISTINCT ?event) as ?numAddressedEvents)
-      WHERE
-      {
-        GRAPH ?envelope
+      # number of remote events with addressing and type correctly related to another event
+      { SELECT (count(DISTINCT ?revent) as ?numRemoteEvents)
+        WHERE
         {
-          ?envelope rdf:type msg:EnvelopeGraph .
-          ?event msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode ?uri .
-        } .
+          GRAPH ?envelope
+          {
+            ?envelope rdf:type msg:EnvelopeGraph .
+            ?event msg:hasCorrespondingRemoteMessage ?revent .
+          } .
+          GRAPH ?renvelope
+          {
+            ?renvelope rdf:type msg:EnvelopeGraph .
+            ?revent msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode ?uri .
+            ?revent msg:hasMessageType ?type .
+            ?renvelope rdfg:subGraphOf ?revent .
+          } .
+        }
       }
-    }
 
-    # number of remote events with addressing and type correctly related to another event
-    { SELECT (count(DISTINCT ?revent) as ?numRemoteEvents)
-      WHERE
-      {
-        GRAPH ?envelope
+      # number of remote events with addressing and type correctly related to another event
+      { SELECT (count(DISTINCT ?revent) as ?numForwardedEvents)
+        WHERE
         {
-          ?envelope rdf:type msg:EnvelopeGraph .
-          ?event msg:hasCorrespondingRemoteMessage ?revent .
-        } .
-        GRAPH ?renvelope
-        {
-          ?renvelope rdf:type msg:EnvelopeGraph .
-          ?revent msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode ?uri .
-          ?revent msg:hasMessageType ?type .
-          ?renvelope rdfg:subGraphOf ?revent .
-        } .
+          GRAPH ?envelope
+          {
+            ?envelope rdf:type msg:EnvelopeGraph .
+            ?event msg:hasForwardedMessage ?revent .
+          } .
+          GRAPH ?renvelope
+          {
+            ?renvelope rdf:type msg:EnvelopeGraph .
+            ?renvelope rdfg:subGraphOf ?revent .
+          } .
+        }
       }
+
+
     }
-
-
-  }
 #}

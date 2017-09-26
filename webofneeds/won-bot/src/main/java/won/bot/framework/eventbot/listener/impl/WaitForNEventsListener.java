@@ -16,16 +16,19 @@
 
 package won.bot.framework.eventbot.listener.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.AbstractDoOnceAfterNEventsListener;
-import won.bot.framework.eventbot.EventListenerContext;
 
 /**
  * Listener that waits for N events, then publishes a FinishedEvent.
  */
 public class WaitForNEventsListener extends AbstractDoOnceAfterNEventsListener
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   public WaitForNEventsListener(final EventListenerContext context, final int targetCount)
   {
     super(context, targetCount);
@@ -55,7 +58,7 @@ public class WaitForNEventsListener extends AbstractDoOnceAfterNEventsListener
   @Override
   protected void doOnce(final Event event) throws Exception
   {
-    //do nothing. the super implementation will publish a FinishedEvent.
+    logger.debug("Finished waiting for {} events", getTargetCount());
   }
 
 }

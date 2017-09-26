@@ -33,4 +33,9 @@ public class DeactivateNeedCommandSuccessEvent extends BaseNeedSpecificEvent imp
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

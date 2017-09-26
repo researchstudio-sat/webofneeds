@@ -21,6 +21,8 @@ import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteClos
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
+import java.util.Optional;
+
 
 /**
  * Behaviour that responds to a CloseCommand by executing the ExecuteCommandAction
@@ -35,7 +37,7 @@ public class CloseBevahiour extends BotBehaviour {
     }
 
     @Override
-    protected void onActivate() {
+    protected void onActivate(Optional<Object> message) {
         this.subscribeWithAutoCleanup(CloseCommandEvent.class,
             new ActionOnEventListener(
                 context,

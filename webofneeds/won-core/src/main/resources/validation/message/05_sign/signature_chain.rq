@@ -42,7 +42,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(?g2) as ?parallelEnvSigChainSize)
+    { SELECT (count(distinct ?g2) as ?parallelEnvSigChainSize)
       WHERE
       {
         GRAPH ?envelope
@@ -55,7 +55,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(?g) as ?contentChainSize)
+    { SELECT (count(distinct ?g) as ?contentChainSize)
       WHERE
       {
         GRAPH ?envelope
@@ -65,7 +65,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       }
     }
 
-    { SELECT (count(?g) as ?parallelContentSigChainSize)
+    { SELECT (count(distinct ?g) as ?parallelContentSigChainSize)
       WHERE
       {
         GRAPH ?envelope

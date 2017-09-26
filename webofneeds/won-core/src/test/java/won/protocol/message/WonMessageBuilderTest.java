@@ -20,7 +20,6 @@ import com.google.common.collect.Iterators;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Assert;
@@ -114,36 +113,6 @@ public class WonMessageBuilderTest
   public void test_wrapped_message_contains_correct_number_of_envelope_graphs() {
     WonMessage msg2 = addContent(wrapMessage(createMessageWithContent().build())).build();
     Assert.assertEquals(2, msg2.getEnvelopeGraphs().size());
-  }
-
-
-
-
-
-
-  @Test
-  public void test_copy_yields_correct_number_of_content_graphs(){
-    WonMessage msg = copyEnvelopeAndContent(createMessageWithContent().build()).build();
-    Assert.assertEquals(2, Iterators.size(msg.getMessageContent().listNames()));
-  }
-
-  @Test
-  public void test_copy_replaces_messageURI(){
-    final WonMessage msg = copyEnvelopeAndContent(createMessageWithContent().build()).build();
-    Iterator<RDFNode> subjectIt = RdfUtils.visit(
-      msg.getMessageContent(), new RdfUtils.ModelVisitor<RDFNode>()
-      {
-        @Override
-        public RDFNode visit(final Model model) {
-          StmtIterator it = model.listStatements(model.getResource(msg.getMessageURI().toString()), RDF.type,
-            (RDFNode) null);
-          if (!it.hasNext()) return null;
-          return it.nextStatement().getSubject();
-        }
-      }
-    );
-    //this finds 3 triples: one in each of the two content graphs, 1 in the default graph.
-    Assert.assertEquals(3, Iterators.size(subjectIt));
   }
 
 
@@ -279,14 +248,6 @@ public class WonMessageBuilderTest
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
-  private WonMessageBuilder copyEnvelopeAndContent(WonMessage msg) {
-    return
-       WonMessageBuilder.copyEnvelopeFromWonMessage(msg)
-      .copyContentFromMessageReplacingMessageURI(msg)
-      .setReceiverURI(CONNECTION_URI_1)
-      .addContent(createDifferentContent(), null)
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
-  }
 
   private Model createContent(){
     Model Content = ModelFactory.createDefaultModel();

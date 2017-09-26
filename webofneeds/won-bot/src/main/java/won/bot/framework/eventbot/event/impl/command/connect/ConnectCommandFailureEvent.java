@@ -43,4 +43,9 @@ public class ConnectCommandFailureEvent extends AbstractMessageCommandResultEven
     public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
         super(originalCommandEvent, con, message);
     }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }

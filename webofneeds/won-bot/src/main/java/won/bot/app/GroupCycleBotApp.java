@@ -14,14 +14,24 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.eventbot.event.impl.command;
+package won.bot.app;
 
-import won.bot.framework.eventbot.event.impl.cmd.CommandEvent;
-import won.protocol.message.WonMessageType;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Interface for events that are intended to make the bot send a specific message.
+ * App for EchoBot
  */
-public interface MessageCommandEvent extends CommandEvent {
-    public WonMessageType getWonMessageType();
+public class GroupCycleBotApp
+{
+    public static void main(String[] args) throws Exception {
+        SpringApplication app = new SpringApplication(
+                new Object[]{"classpath:/spring/app/groupCycleBotApp.xml"}
+        );
+        app.setWebEnvironment(false);
+        ConfigurableApplicationContext applicationContext =  app.run(args);
+        //Thread.sleep(5*60*1000);
+        //app.exit(applicationContext);
+    }
+
 }

@@ -16,16 +16,12 @@
 
 package won.bot.framework.eventbot.event.impl.command;
 
-import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.cmd.CommandResultEvent;
 
 /**
  * Base interface for message command result events.
  */
-public interface MessageCommandResultEvent extends Event {
-    /**
-     * An optional message for diagnostic purposes.
-     * @return the message or null;
-     */
-    public String getMessage();
+public interface MessageCommandResultEvent extends CommandResultEvent<MessageCommandEvent> {
+
     public MessageCommandEvent getOriginalCommandEvent();
 }
