@@ -29,16 +29,16 @@ function genComponentConf() {
                 max-thumbnails="self.maxThumbnails"
                 items="self.images"
                 class="horizontal"
-                ng-show="!self.remoteNeed.get('location') && self.images.length > 0">
+                ng-show="(true || !self.remoteNeed.get('location')) && self.images.length > 0">
             </won-extended-gallery>
             <won-square-image 
                 title="self.remoteNeed.get('title')"
                 uri="self.remoteNeed.get('uri')"
-                ng-show="!self.remoteNeed.get('location') && self.images.length == 0">
+                ng-show="(true || !self.remoteNeed.get('location')) && self.images.length == 0">
             </won-square-image>
             <won-need-map
                 uri="self.remoteNeed.get('uri')"
-                ng-if="self.remoteNeed.get('location') && self.images.length == 0">
+                ng-if="false && self.remoteNeed.get('location') && self.images.length == 0">
             </won-need-map>
         </div>
 
