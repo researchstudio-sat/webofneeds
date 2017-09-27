@@ -159,35 +159,36 @@ export function connectionsConnect(connectionUri, textMessage) {
 }
 
 export function connectionsConnectAdHoc(theirNeedUri) {
-    return async (dispatch, getState) => {
-        const state = getState();
-
-        const theirNeed = getIn(state, ['needs', theirNeedUri]);
-        const adHocDraft = generateResponseNeedTo(theirNeed);
-        const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-
-        await ensureLoggedIn(dispatch, getState);
-
-        const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-        dispatch({
-            type: actionTypes.needs.create, // TODO custom action
-            payload: {eventUri, message, needUri}
-        });
-
-        const cnctMsg = buildAdHocConnectMessage(needUri)
-
-        console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
-
-
-
-
-
-        //TODO: CREATE COUNTERPART NEED
-        //TODO: connection-request text
-        //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
-        //TODO: SEND REQUEST FOR CREATED CONNECTION
-    }
+    return (dispatch, getState) => connectAdHoc(theirNeedUri, dispatch, getState) // moved to separate function to make transpilation work properly
 }
+async function connectAdHoc(theirNeedUri, dispatch, getState) {
+    const state = getState();
+
+    const theirNeed = getIn(state, ['needs', theirNeedUri]);
+    const adHocDraft = generateResponseNeedTo(theirNeed);
+    const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
+
+    await ensureLoggedIn(dispatch, getState);
+
+    const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+    dispatch({
+        type: actionTypes.needs.create, // TODO custom action
+        payload: {eventUri, message, needUri}
+    });
+
+    console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
+
+    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri);
+
+    //dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
+
+    console.log('STARTED CONNECTING AD: ', cnctMsg);
+    //TODO: CREATE COUNTERPART NEED
+    //TODO: connection-request text
+    //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
+    //TODO: SEND REQUEST FOR CREATED CONNECTION
+}
+
 
 function generateResponseNeedTo(theirNeed) {
     let reNeedType, descriptionPhrase;
