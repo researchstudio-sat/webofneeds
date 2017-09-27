@@ -193,13 +193,13 @@ function generateResponseNeedTo(theirNeed) {
     let reNeedType, descriptionPhrase;
     const theirNeedType = get(theirNeed, 'type');
     if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
-        reNeedType = won.WON.BasicNeedTypeSupplyCompacted;
+        reNeedType = won.WON.BasicNeedTypeSupply;
         descriptionPhrase = 'I have something similar to: ';
-    } else if(theirNeedType === won.WON.BasicNeedTypeSupplyCompacted) {
+    } else if(theirNeedType === won.WON.BasicNeedTypeSupply) {
         reNeedType = won.WON.BasicNeedTypeDemandCompacted;
         descriptionPhrase = 'I want something like: ';
     } else if(theirNeedType === won.WON.BasicNeedTypeDotogetherCompacted) {
-        reNeedType = won.WON.BasicNeedTypeDotogetherCompacted;
+        reNeedType = won.WON.BasicNeedTypeDotogether;
         descriptionPhrase = 'I\'d like to find people for something like the following: ';
     } else {
         console.error(
