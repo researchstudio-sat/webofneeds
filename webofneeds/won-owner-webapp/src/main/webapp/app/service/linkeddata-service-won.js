@@ -928,34 +928,34 @@ import won from './won.js';
                 }                
                 optional {
                     <${needUri}> won:seeks ?won_seeks.
-                    optional {
-                        ?won_seeks ?s1 ?s2.
-                        optional {
-                            ?s2 ?s3 ?s4.
-                            optional {
-                               ?s4 ?s5 ?s6.
-                               optional {
-                                  ?s6 ?s7 ?s8.
-                                }
-                            }
-                        }
-                    }
+                }
+                optional {
+                    ?won_seeks ?s1 ?s2.
+                } 
+                optional {
+                    ?s2 ?s3 ?s4.
+                }
+                optional {
+                    ?s4 ?s5 ?s6.
+                }
+                optional {
+                    ?s6 ?s7 ?s8.
                 }
                 
                 optional {
                     <${needUri}> won:is ?won_is.
-                    optional {
-                        ?won_is ?i1 ?i2.
-                        optional {
-                            ?i2 ?i3 ?i4.
-                            optional {
-                               ?i4 ?i5 ?i6.
-                               optional {
-                                  ?i6 ?i7 ?i8.
-                                }
-                            }
-                        }
-                    }
+                }
+                optional {
+                    ?won_is ?i1 ?i2.
+                }
+                optional {
+                    ?i2 ?i3 ?i4.
+                }
+                optional {
+                   ?i4 ?i5 ?i6.
+                }
+                optional {
+                   ?i6 ?i7 ?i8.
                 }
             }
             `
