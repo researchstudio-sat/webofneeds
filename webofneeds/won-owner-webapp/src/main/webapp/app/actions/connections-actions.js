@@ -42,6 +42,7 @@ import {
     buildChatMessage,
     buildRateMessage,
     buildConnectMessage,
+    buildAdHocConnectMessage,
     getEventsFromMessage,
 } from '../won-message-utils.js';
 
@@ -158,26 +159,25 @@ export function connectionsConnect(connectionUri, textMessage) {
 }
 
 export function connectionsConnectAdHoc(theirNeedUri) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
 
         const theirNeed = getIn(state, ['needs', theirNeedUri]);
         const adHocDraft = generateResponseNeedTo(theirNeed);
         const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
 
-        ensureLoggedIn(dispatch, getState)
-        .then(() => {
-            const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-            return dispatch({
-                type: actionTypes.needs.create, // TODO custom action
-                payload: {eventUri, message, needUri}
-            })
+        await ensureLoggedIn(dispatch, getState);
 
-        })
-        .then(() => {
-            console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
-
+        const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+        dispatch({
+            type: actionTypes.needs.create, // TODO custom action
+            payload: {eventUri, message, needUri}
         });
+
+        const cnctMsg = buildAdHocConnectMessage(needUri)
+
+        console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
+
 
 
 
