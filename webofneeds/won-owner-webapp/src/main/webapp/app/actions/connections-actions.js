@@ -128,15 +128,15 @@ export function connectionsConnect(connectionUri, textMessage) {
     return async (dispatch, getState) => {
         const state = getState();
         const eventData = selectAllByConnectionUri(state, connectionUri).toJS(); // TODO avoid toJS; UPDATE TO NEW STRUCTURE
-        const action = await buildConnectMessage(eventData.connection.uri, textMessage);
+        const cnctMsg = await buildConnectMessage(eventData.connection.uri, textMessage);
 
-        dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
         const framed = await jsonld.promises.frame(
-            action.message,
+            cnctMsg.message,
             {
-                '@id': action.eventUri,
-                '@context': action.message['@context']
+                '@id': cnctMsg.eventUri,
+                '@context': cnctMsg.message['@context']
             }
         )
 
@@ -151,7 +151,7 @@ export function connectionsConnect(connectionUri, textMessage) {
             payload: {
                 connectionUri,
                 textMessage,
-                eventUri: action.eventUri,
+                eventUri: cnctMsg.eventUri,
                 optimisticEvent: event,
             }
         });
