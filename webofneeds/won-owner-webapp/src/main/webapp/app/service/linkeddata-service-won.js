@@ -1250,49 +1250,31 @@ import won from './won.js';
      * @param connectionUri
      * @returns a promise to the data
      */
-    won.getEnvelopeDataforConnection = function(connectionUri){
+    won.getEnvelopeDataforConnection = async function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getEnvelopeDataforConnection: connectionUri must not be null"};
         }
-        return won.getNeedUriOfConnection(connectionUri)
-            .then(function(needUri) {
-                return won.getWonNodeUriOfNeed(needUri)
-                    .then(function (wonNodeUri) {
-                        return won.getRemoteneedUriOfConnection(connectionUri)
-                            .then(function(remoteneedUri){
-                                return won.getWonNodeUriOfNeed(remoteneedUri)
-                                    .then(remoteWonNodeUri => {
-                                        //if the local connection was created through a hint message (most likely)
-                                        //the remote connection is not known or doesn't exist yet. Hence, the next call
-                                        //may or may not succeed.
-                                        return won.getRemoteConnectionUriOfConnection(connectionUri)
-                                            .then(remoteConnectionUri => {
-                                                let ret = {};
-                                                ret[won.WONMSG.hasSender] = connectionUri;
-                                                ret[won.WONMSG.hasSenderNeed] = needUri;
-                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                if (remoteConnectionUri != null) {
-                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
-                                                }
-                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
-                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
-                                                return ret;
-                                            })
-                                            .catch(reason => {
-                                                //no connection found
-                                                let ret = {};
-                                                ret[won.WONMSG.hasSender] = connectionUri;
-                                                ret[won.WONMSG.hasSenderNeed] = needUri;
-                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
-                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
-                                                return ret;
-                                            });
-                                    });
-                            });
-                    });
-            });
-    }
+
+        const ownNeedUri = await won.getNeedUriOfConnection(connectionUri);
+        const ownNodeUri = await won.getWonNodeUriOfNeed(ownNeedUri);
+        const theirNeedUri = await won.getRemoteneedUriOfConnection(connectionUri);
+        const theirNodeUri = await won.getWonNodeUriOfNeed(theirNeedUri);
+
+        const ret = {
+            [won.WONMSG.hasSender]: connectionUri,
+            [won.WONMSG.hasSenderNeed]: ownNeedUri,
+            [won.WONMSG.hasSenderNode]: ownNodeUri,
+            [won.WONMSG.hasReceiverNeed]: theirNeedUri,
+            [won.WONMSG.hasReceiverNode]: theirNodeUri,
+        };
+        try {
+            const theirCnctUri = await won.getRemoteConnectionUriOfConnection(connectionUri);
+            if (theirCnctUri != null) {
+                ret[won.WONMSG.hasReceiver] = theirCnctUri;
+            }
+        } catch(err){}
+        return ret;
+    };
 
     /**
      * @param needUri
