@@ -61,6 +61,7 @@ export default function(state = initialState, action = {}) {
         case actionTypes.needs.close:
             return changeNeedState(state, action.payload.ownNeedUri, won.WON.InactiveCompacted);
 
+        case actionTypes.needs.create:
         case actionTypes.needs.createSuccessful:
             return addNeed(state, action.payload.need, true);
 
@@ -477,7 +478,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
         parsedNeed.location = location;
     }else{
-        console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm.toJS());
+        console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm && jsonldNeedImm.toJS());
         return undefined;
     }
 
