@@ -1244,6 +1244,31 @@ import won from './won.js';
                 return ret;
             });
     }
+
+
+    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri) {
+        if (!ownNeedUri){
+            throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
+        }
+        if (!theirNeedUri){
+            throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
+        }
+        //const ownNodeUri = await won.getWonNodeUriOfNeed(ownNeedUri);
+        //const theirNodeUri = await won.getWonNodeUriOfNeed(theirNeedUri);
+        const [ownNodeUri, theirNodeUri] = await [
+            won.getWonNodeUriOfNeed(ownNeedUri),
+            won.getWonNodeUriOfNeed(theirNeedUri),
+        ];
+        return {
+            [won.WONMSG.hasSenderNeed]: ownNeedUri,
+            [won.WONMSG.hasSenderNode]: ownNodeUri,
+            [won.WONMSG.hasReceiverNeed]: theirNeedUri,
+            [won.WONMSG.hasReceiverNode]: theirNodeUri,
+        };
+
+    }
+
+
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
      * to send a message via the specified connectionUri (that is interpreted as a local connection.
