@@ -124,41 +124,36 @@ export function connectionsOpen(connectionUri, message) {
 
 
 export function connectionsConnect(connectionUri, textMessage) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
         const eventData = selectAllByConnectionUri(state, connectionUri).toJS(); // TODO avoid toJS; UPDATE TO NEW STRUCTURE
-        const messageDataP = won
-            .getConnectionWithEventUris(eventData.connection.uri)
-            .then(connection=> {
-                return buildConnectMessage(connection.uri, textMessage)
-            });
-        messageDataP.then((action)=> {
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        const action = await buildConnectMessage(eventData.connection.uri, textMessage);
 
-            jsonld.promises.frame(
-                action.message,
-                {
-                    '@id': action.eventUri,
-                    '@context': action.message['@context']
-                }
-            ).then(framed => {
-                let event = getIn(framed, ['@graph', 0]);
-                if(event) {
-                    event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
-                    event = jsonld2simpleFormat(event);
-                }
+        dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
 
-                dispatch({
-                    type: actionTypes.connections.connect,
-                    payload: {
-                        connectionUri,
-                        textMessage,
-                        eventUri: action.eventUri,
-                        optimisticEvent: event,
-                    }
-                });
-            });
-        })
+        const framed = await jsonld.promises.frame(
+            action.message,
+            {
+                '@id': action.eventUri,
+                '@context': action.message['@context']
+            }
+        )
+
+        let event = getIn(framed, ['@graph', 0]);
+        if(event) {
+            event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
+            event = jsonld2simpleFormat(event);
+        }
+
+        dispatch({
+            type: actionTypes.connections.connect,
+            payload: {
+                connectionUri,
+                textMessage,
+                eventUri: action.eventUri,
+                optimisticEvent: event,
+            }
+        });
     }
 }
 
