@@ -352,7 +352,7 @@ import won from './won.js';
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri, reason){
         //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
-        console.error("Couldn't resolve " + uri + ". reason: ", reason);
+        console.error("Couldn't resolve " + uri + ". reason: ", JSON.stringify(reason));
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
