@@ -129,9 +129,9 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
 
 
 
-export function buildConnectMessage(msgToConnectFor, textMessage){
+export function buildConnectMessage(connectionUri, textMessage){
     return new Promise((resolve, reject) => {
-        var buildMessage = function(envelopeData, eventToConnectFor) {
+        var buildMessage = function(envelopeData) {
             //TODO: use event URI pattern specified by WoN node
             var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
             var message = new won.MessageBuilder(won.WONMSG.connectMessage)
@@ -148,11 +148,11 @@ export function buildConnectMessage(msgToConnectFor, textMessage){
         }
 
         //fetch all data needed
-        won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
+        won.getEnvelopeDataforConnection(connectionUri)
             .then(function(envelopeData){
-                resolve(buildMessage(envelopeData, msgToConnectFor.event));
+                resolve(buildMessage(envelopeData));
             },
-            won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
+            won.reportError("cannot open connection " + connectionUri)
         );
     })
 

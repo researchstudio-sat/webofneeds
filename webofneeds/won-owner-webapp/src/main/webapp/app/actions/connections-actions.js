@@ -27,11 +27,16 @@ import {
 } from '../configRouting.js';
 
 import {
+    ensureLoggedIn,
+} from './account-actions';
+
+import {
     actionTypes,
     actionCreators,
 } from './actions.js';
 
 import {
+    buildCreateMessage,
     buildOpenMessage,
     buildCloseMessage,
     buildChatMessage,
@@ -118,15 +123,14 @@ export function connectionsOpen(connectionUri, message) {
 }
 
 
-export function connectionsConnect(connectionUri,message) {
+export function connectionsConnect(connectionUri, textMessage) {
     return (dispatch, getState) => {
         const state = getState();
         const eventData = selectAllByConnectionUri(state, connectionUri).toJS(); // TODO avoid toJS; UPDATE TO NEW STRUCTURE
         const messageDataP = won
             .getConnectionWithEventUris(eventData.connection.uri)
             .then(connection=> {
-                let msgToOpenFor = {event: eventData, connection: connection};
-                return buildConnectMessage(msgToOpenFor, message)
+                return buildConnectMessage(connection.uri, textMessage)
             });
         messageDataP.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
@@ -148,7 +152,7 @@ export function connectionsConnect(connectionUri,message) {
                     type: actionTypes.connections.connect,
                     payload: {
                         connectionUri,
-                        message,
+                        textMessage,
                         eventUri: action.eventUri,
                         optimisticEvent: event,
                     }
@@ -164,8 +168,17 @@ export function connectionsConnectAdHoc(theirNeedUri) {
 
         const theirNeed = getIn(state, ['needs', theirNeedUri]);
         const adHocDraft = generateResponseNeedTo(theirNeed);
+        const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
 
-        dispatch(actionCreators.needs__create(adHocDraft))
+        ensureLoggedIn(dispatch, getState)
+        .then(() => {
+            const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+            return dispatch({
+                type: actionTypes.needs.create, // TODO custom action
+                payload: {eventUri, message, needUri}
+            })
+
+        })
         .then(() => {
             console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
 
