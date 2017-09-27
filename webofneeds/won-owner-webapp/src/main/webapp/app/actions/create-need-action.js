@@ -53,7 +53,11 @@ export function needCreate(draft, nodeUri) {
                      * don't revert any new privateID or remove the create-gui from the
                      * history stack.
                      */
-                    return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
+                    if(prevState)  {
+                        return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
+                    } else {
+                        return dispatch(actionCreators.router__stateGoDefault())
+                    }
                 }
             })
             .then(() => {
