@@ -959,64 +959,6 @@ import won from './won.js';
                 }
             }
             `
-            /*
-        let query = `
-            prefix won: <http://purl.org/webofneeds/model#>
-            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            prefix dct: <http://purl.org/dc/terms/>
-            prefix dc:    <http://purl.org/dc/elements/1.1/> 
-            construct {
-                <${needUri}> dct:created ?dct_created;
-                        won:isInState ?won_isInState;
-                        won:hasFlag ?won_hasFlag;
-                        won:hasConnections ?won_hasConnections;
-                        won:hasEventContainer ?won_hasEventContainer;
-                        won:is ?won_is;
-						won:seeks ?won_seeks.
-                         
-
-                ?won_hasConnections ?c1 ?c2.
-            
-                ?won_hasEventContainer ?ec1 ?ec2.
-                
-                ?won_seeks 
-                    dc:title ?s_dc_title;
-                    dc:description ?s_dc_description.
-                
-                ?won_is
-                    dc:title ?i_dc_title;
-                    dc:description ?i_dc_description.
-                
-            } where {
-                <${needUri}> dct:created ?dct_created;
-                    won:isInState ?won_isInState;
-                    won:hasFlag ?won_hasFlag;
-                    won:hasConnections ?won_hasConnections;
-                    won:hasEventContainer ?won_hasEventContainer.
-                
-                optional {
-                    ?won_hasConnections ?c1 ?c2.
-                }
-                
-                optional {
-                    ?won_hasEventContainer ?ec1 ?ec2.
-                }
-                
-                optional {
-                    <${needUri}> won:seeks ?won_seeks.
-                    ?won_seeks 
-                        dc:title ?s_dc_title;
-                        dc:description ?s_dc_description.
-                }
-                
-                optional {
-                    <${needUri}> won:is ?won_is.
-                    ?won_is
-                        dc:title ?i_dc_title;
-                        dc:description ?i_dc_description.
-                }
-            }
-            `*/
         const needJsonLdP = new Promise((resolve, reject) =>
             store.execute(query, (success, resultGraph) => {
                 if(!success) {
