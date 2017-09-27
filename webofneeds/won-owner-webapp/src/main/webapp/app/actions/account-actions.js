@@ -73,26 +73,23 @@ import {
  * Makes sure user is either logged in
  * or creates a private-ID account as fallback.
  */
-export function ensureLoggedIn(dispatch, getState) {
+export async function ensureLoggedIn(dispatch, getState) {
     const state = getState();
-    let hasAccountPromise;
     if(state.getIn(['user', 'loggedIn'])){
-        hasAccountPromise = Promise.resolve();
-    } else {
-        const privateId = generatePrivateId();
-        hasAccountPromise = accountRegister({privateId})(dispatch, getState)
-            .then(() =>
-                // wait for the server to process the login and the reconnect to
-                // go through, before proceeding to need-creation.
-                delay(500)
-            )
-            .catch(err => {
-                console.error(`Creating temporary account (${privateId}) has failed due to `, err);
-                dispatch(actionCreators.registerFailed({privateId}));
-            });
-
+        return;
     }
-    return hasAccountPromise;
+
+    const privateId = generatePrivateId();
+    try {
+        await accountRegister({privateId})(dispatch, getState)
+    } catch(err) {
+        console.error(`Creating temporary account (${privateId}) has failed due to `, err);
+        dispatch(actionCreators.registerFailed({privateId}));
+    }
+
+    // wait for the server to process the login and the reconnect to
+    // go through, before proceeding to need-creation.
+    await delay(500);
 }
 
 let _loginInProcessFor;
