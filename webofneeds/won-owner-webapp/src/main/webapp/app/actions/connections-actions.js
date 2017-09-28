@@ -158,10 +158,10 @@ export function connectionsConnect(connectionUri, textMessage) {
     }
 }
 
-export function connectionsConnectAdHoc(theirNeedUri) {
-    return (dispatch, getState) => connectAdHoc(theirNeedUri, dispatch, getState) // moved to separate function to make transpilation work properly
+export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
+    return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
 }
-async function connectAdHoc(theirNeedUri, dispatch, getState) {
+async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const state = getState();
 
     const theirNeed = getIn(state, ['needs', theirNeedUri]);
@@ -178,7 +178,7 @@ async function connectAdHoc(theirNeedUri, dispatch, getState) {
 
     console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
 
-    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri);
+    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, textMessage);
 
     //dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
