@@ -178,7 +178,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
 
     dispatch({
-        type: actionTypes.connections.connect,
+        type: actionTypes.connections.connectAdHoc,
         payload: {
             //connectionUri,
             textMessage,
