@@ -885,78 +885,69 @@ import won from './won.js';
         // this query returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
 
         let query = `
-         prefix won: <http://purl.org/webofneeds/model#>
+            prefix won: <http://purl.org/webofneeds/model#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             prefix dct: <http://purl.org/dc/terms/>
             construct {
-                <${needUri}> dct:created ?dct_created;
-                        won:isInState ?won_isInState;
-                        won:hasFlag ?won_hasFlag;
-                        won:hasConnections ?won_hasConnections;
-                        won:hasEventContainer ?won_hasEventContainer;
-                        won:is ?won_is;
-						won:seeks ?won_seeks.
-                         
+                <${needUri}> ?b ?c.
+                ?c ?d ?e.
+                ?e ?f ?g.
+                ?g ?h ?i.
+                ?i ?j ?k.
+                ?k ?l ?m.
 
-                ?won_hasConnections ?c1 ?c2.
-            
-                ?won_hasEventContainer ?ec1 ?ec2.
-                
-                ?won_seeks ?s1 ?s2.
-                ?s2 ?s3 ?s4.
-                ?s4 ?s5 ?s6.
-                ?s6 ?s7 ?s8.
-                
-                ?won_is ?i1 ?i2.
-                ?i2 ?i3 ?i4.
-                ?i4 ?i5 ?i6.
-                ?i6 ?i7 ?i8.
-                
             } where {
-                <${needUri}> dct:created ?dct_created;
-                    won:isInState ?won_isInState;
-                    won:hasConnections ?won_hasConnections;
-                    won:hasEventContainer ?won_hasEventContainer.
-                optional {
-                    <${needUri}> won:hasFlag ?won_hasFlag.
-                }                
-                optional {
-                    ?won_hasConnections ?c1 ?c2.
-                }                
-                optional {
-                    ?won_hasEventContainer ?ec1 ?ec2.
-                }                
-                optional {
-                    <${needUri}> won:seeks ?won_seeks.
+                {
+                    <${needUri}> dct:created ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                     <${needUri}> won:isInState ?c.
+                     <${needUri}> ?b ?c.
+                } UNION {
+                     <${needUri}> won:hasFlag ?c.
+                     <${needUri}> ?b ?c.
                 }
-                optional {
-                    ?won_seeks ?s1 ?s2.
-                } 
-                optional {
-                    ?s2 ?s3 ?s4.
+
+                UNION
+                {
+                    <${needUri}> won:hasConnections ?c.
+                    <${needUri}> ?b ?c.
+                    optional {?c ?d ?e.}
                 }
-                optional {
-                    ?s4 ?s5 ?s6.
+
+                UNION
+                {
+                    <${needUri}> won:hasEventContainer ?c.
+                    <${needUri}> ?b ?c.
+                    optional {?c ?d ?e.}
                 }
-                optional {
-                    ?s6 ?s7 ?s8.
-                }
-                
-                optional {
-                    <${needUri}> won:is ?won_is.
-                }
-                optional {
-                    ?won_is ?i1 ?i2.
-                }
-                optional {
-                    ?i2 ?i3 ?i4.
-                }
-                optional {
-                   ?i4 ?i5 ?i6.
-                }
-                optional {
-                   ?i6 ?i7 ?i8.
-                }
+
+                UNION {
+                  {  
+                    <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {?c ?d ?e.
+                  ?e ?f ?g.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {<${needUri}> ?b ?c.
+                  ?c ?d ?e.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {<${needUri}> ?b ?c.}}
+                }  
+
+               
             }
             `
         const needJsonLdP = new Promise((resolve, reject) =>
