@@ -189,7 +189,7 @@ function genComponentConf() {
                                     let whatsAround = {
                                         title: "What's Around?",
                                         type: "http://purl.org/webofneeds/model#DoTogether",
-                                        description: "Automatically created Need to see what's happening in your Area",
+                                        description: "Automatically created post to see what's happening in your area",
                                         tags: undefined,
                                         location: location,
                                         thumbnail: undefined,
