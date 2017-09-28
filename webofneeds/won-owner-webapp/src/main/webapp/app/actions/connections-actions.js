@@ -20,6 +20,7 @@ import {
     get,
     jsonld2simpleFormat,
     cloneAsMutable,
+    delay,
 } from '../utils.js';
 
 import {
@@ -132,19 +133,7 @@ export function connectionsConnect(connectionUri, textMessage) {
 
         dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
-        const framed = await jsonld.promises.frame(
-            cnctMsg.message,
-            {
-                '@id': cnctMsg.eventUri,
-                '@context': cnctMsg.message['@context']
-            }
-        )
-
-        let event = getIn(framed, ['@graph', 0]);
-        if(event) {
-            event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
-            event = jsonld2simpleFormat(event);
-        }
+        const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
 
         dispatch({
             type: actionTypes.connections.connect,
@@ -157,6 +146,7 @@ export function connectionsConnect(connectionUri, textMessage) {
         });
     }
 }
+
 
 export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
     return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
@@ -178,15 +168,53 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
 
     console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
 
+    //TODO wait for success-response instead
+    await delay(1000); // to give the server enough time to handle need creation.
+
+    // TODO handle failure to post need (the needUri won't be valid)
+
     const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, textMessage);
 
-    //dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
+    const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
 
-    console.log('STARTED CONNECTING AD: ', cnctMsg);
+    dispatch({
+        type: actionTypes.connections.connect,
+        payload: {
+            //connectionUri,
+            textMessage,
+            eventUri: cnctMsg.eventUri,
+            optimisticEvent: event,
+        }
+    });
+
+    dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
+
+    await won.invalidateCacheForNewConnection(undefined /* we don't have a cnct uri yet */, needUri); // mark connections dirty
+
+    console.log('STARTED AD-HOC CONNECTING: ', cnctMsg);
     //TODO: CREATE COUNTERPART NEED
     //TODO: connection-request text
     //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
     //TODO: SEND REQUEST FOR CREATED CONNECTION
+}
+
+async function messageGraphToEvent(eventUri, messageGraph) {
+
+    const framed = await jsonld.promises.frame(
+        messageGraph,
+        {
+            '@id': eventUri,
+            '@context': messageGraph['@context']
+        }
+    )
+
+    let event = getIn(framed, ['@graph', 0]);
+    if(event) {
+        event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
+        event = jsonld2simpleFormat(event);
+    }
+
+    return event;
 }
 
 

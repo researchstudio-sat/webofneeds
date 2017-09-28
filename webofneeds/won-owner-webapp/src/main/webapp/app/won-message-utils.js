@@ -137,8 +137,10 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @returns {{eventUri, message}|*}
  */
 export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMessage) {
-    const envelopeData = await won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri);
-    return buildConnectMessageForEnvelopeData(envelopeData, textMessage);
+    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri)
+    .then(envelopeData =>
+        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
+    );
 }
 
 /**
@@ -148,8 +150,10 @@ export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMes
  * @returns {{eventUri, message}|*}
  */
 export async function buildConnectMessage(connectionUri, textMessage){
-    const envelopeData = await won.getEnvelopeDataforConnection(connectionUri);
-    return buildConnectMessageForEnvelopeData(envelopeData, textMessage);
+    return won.getEnvelopeDataforConnection(connectionUri)
+    .then(envelopeData =>
+        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
+    );
 }
 
 function buildConnectMessageForEnvelopeData(envelopeData, textMessage) {

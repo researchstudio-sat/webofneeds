@@ -1253,18 +1253,18 @@ import won from './won.js';
         if (!theirNeedUri){
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
-        //const ownNodeUri = await won.getWonNodeUriOfNeed(ownNeedUri);
-        //const theirNodeUri = await won.getWonNodeUriOfNeed(theirNeedUri);
-        const [ownNodeUri, theirNodeUri] = await [
+        return Promise.all([
             won.getWonNodeUriOfNeed(ownNeedUri),
             won.getWonNodeUriOfNeed(theirNeedUri),
-        ];
-        return {
-            [won.WONMSG.hasSenderNeed]: ownNeedUri,
-            [won.WONMSG.hasSenderNode]: ownNodeUri,
-            [won.WONMSG.hasReceiverNeed]: theirNeedUri,
-            [won.WONMSG.hasReceiverNode]: theirNodeUri,
-        };
+        ])
+        .then(([ownNodeUri, theirNodeUri]) =>
+            ({
+                [won.WONMSG.hasSenderNeed]: ownNeedUri,
+                [won.WONMSG.hasSenderNode]: ownNodeUri,
+                [won.WONMSG.hasReceiverNeed]: theirNeedUri,
+                [won.WONMSG.hasReceiverNode]: theirNodeUri,
+            })
+        );
 
     }
 
