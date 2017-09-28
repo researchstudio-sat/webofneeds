@@ -92,13 +92,12 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
                 const location = post && post.get('location');
-                const showRequestButton = post && !post.get('ownNeed') && !post.get('isWhatsAround');
 
                 return {
                     post,
                     location: location,
                     address: location && location.get('address'),
-                    showRequestButton: true,
+                    showRequestButton: post && !post.get('ownNeed') && !post.get('isWhatsAround'),
                     friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
                         post.get('creationDate')
