@@ -1,4 +1,5 @@
-FROM openjdk:8
+# fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
+FROM openjdk:8u121-jdk
 
 # install certbot
 ADD ./jessie-backports.list /etc/apt/sources.list.d/jessie-backports.list
