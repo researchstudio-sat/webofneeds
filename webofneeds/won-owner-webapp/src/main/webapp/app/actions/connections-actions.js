@@ -48,18 +48,19 @@ import {
 } from '../won-message-utils.js';
 
 export function connectionsChatMessage(chatMessage, connectionUri) {
-   return dispatch => {
+   return (dispatch, getState) => {
        console.log('connectionsChatMessage: ', chatMessage, connectionUri);
 
        buildChatMessage(chatMessage, connectionUri)
        .then(msgData => {
 
+           const ownNeedUris = getState().get('needs').filter( n => n.get('ownNeed')).keySeq().toArray();
            /*
             * not sure how elegant it is to build the ld and then parse
             * it again. It uses existing utilities at least, reducing
             * redundant program logic. ^^
              */
-           const optimisticEventPromise = getEventsFromMessage(msgData.message)
+           const optimisticEventPromise = getEventsFromMessage(msgData.message, ownNeedUris)
                .then(optimisticEvent => optimisticEvent['msg:FromOwner']);
 
            return Promise.all([
@@ -94,7 +95,8 @@ export function connectionsOpen(connectionUri, message) {
     return (dispatch, getState) => {
         buildOpenMessage(connectionUri, message)
         .then(msgData => {
-            const optimisticEventPromise = getEventsFromMessage(msgData.message)
+            const ownNeedUris = getState().get('needs').filter( n => n.get('ownNeed')).keySeq().toArray();
+            const optimisticEventPromise = getEventsFromMessage(msgData.message, ownNeedUris)
                 .then(optimisticEvent => optimisticEvent['msg:FromOwner']);
             return Promise.all([
                 Promise.resolve(msgData),
@@ -332,7 +334,7 @@ export function showLatestMessages(connectionUri, numberOfEvents){
         //TODO the delay solution is super-hacky (idle-waiting)
         // -----> if(!self.connection__showLatestEvent) delay(100).then(loadStuff); // we tried to call this before the action-creators where attached.
 
-        console.log('connections-actions.js: testing for selective loading. ', connectionUri, connection);
+        //console.log('connections-actions.js: testing for selective loading. ', connectionUri, connection);
         //TODO determine first if component is actually visible (angular calls the constructor long before that)
 
         dispatch({

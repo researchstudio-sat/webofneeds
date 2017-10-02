@@ -296,7 +296,7 @@ export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
 
-export function getEventsFromMessage(msgJson) {
+export function getEventsFromMessage(msgJson, ownNeedUris) {
     const eventData = {};
     //call handler if there is one - it may modify the event object
     //frame the incoming jsonld to get the data that interest us
@@ -316,20 +316,66 @@ export function getEventsFromMessage(msgJson) {
         .then(framedMessages => {
             let acc = {};
             framedMessages.forEach((msg, i) => {
-                //filter out failed framing attempts
-                if( msg['@graph'].length > 0) {
+                if (msg['@graph'].length === 0) {
+                    // if framing fails, the length of the graphs array is 0. only accept if it is longer
+                    return;
+                } else if (acceptedSources[i] === 'msg:FromExternal') {
+                    // a FromExternal message must have a ReceiverNeed that we own, otherwise we made a mistake in framing it
+                    let receiverNeed = getIn(msg, ["@graph", 0, "msg:hasCorrespondingRemoteMessage", "msg:hasReceiverNeed", "@id"]);
+                    // we found a receiver need. seems to be a connection message from external
+                    if (receiverNeed) {
+                        if (ownNeedUris.includes(receiverNeed)) {
+                            //ok, the receiverNeed is one of ours
+                            acc[acceptedSources[i]] = msg;
+                            return;
+                        } else {
+                            //not our need - omit that result
+                            return;
+                        }
+                    } else {
+                        //now we could be handling a HintMessage - such a message does not have a corresponding
+                        //remote message. check that case
+                        if (getIn(msg, ["@graph", 0, "msg:hasMessageType", "@id"]) === won.WONMSG.hintMessageCompacted) {
+                            receiverNeed = getIn(msg, ["@graph", 0, "msg:hasReceiverNeed", "@id"]);
+                            if (receiverNeed) {
+                                if (ownNeedUris.includes(receiverNeed)) {
+                                    //ok, the receiverNeed is one of ours
+                                    acc[acceptedSources[i]] = msg;
+                                    return;
+                                } else {
+                                    //not our need - omit that result
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                } else if (acceptedSources[i] === 'msg:FromOwner') {
+                    // a FromOwner message must have a SenderNeed that we own, otherwise we made a mistake in framing it
+                    let senderNeed = getIn(msg, ["@graph", 0, "msg:hasSenderNeed", "@id"]);
+                    if (senderNeed) {
+                        if (ownNeedUris.includes(senderNeed)) {
+                            //ok, the senderNeed is one of ours
+                            acc[acceptedSources[i]] = msg;
+                            return;
+                        } else {
+                            //not our need - omit that result
+                            return;
+                        }
+                    }
+
+                } else if (acceptedSources[i] === 'msg:FromSystem'){
+                    // any other case: we accept the framing result as correct
                     acc[acceptedSources[i]] = msg;
+                    return;
                 }
             });
             return acc;
         })
         .then(msgFramings => {
             /* check framing results for failures */
-            if(Object.keys(msgFramings).length < 1) {
+            if(Object.keys(msgFramings).length != 1) {
                 /* Not a valid type */
-                const e = new Error('Tried to jsond-ld-frame the message ', msgJson,
-                    ' but it\'s type was neither of the following, accepted types: ',
-                    acceptedSources );
+                const e = new Error('Tried to jsond-ld-frame the message  but found ' + Object.keys(msgFramings).length + ' ways to frame it (expected: 1)');
                 e.msgJson = msgJson;
                 e.acceptedSources = acceptedSources;
                 e.framedMessages = msgFramings;

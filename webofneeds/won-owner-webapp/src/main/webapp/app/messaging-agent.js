@@ -233,7 +233,8 @@ export function runMessagingAgent(redux) {
         const data = JSON.parse(receivedMsg.data);
 
         console.log('onMessage: ', data);
-        getEventsFromMessage(data).then(events => {
+        const ownNeedUris = redux.getState().get('needs').filter( n => n.get('ownNeed')).keySeq().toArray();
+        getEventsFromMessage(data, ownNeedUris).then(events => {
             console.log('onMessage - events: ', events);
 
             var messageProcessed = false;
@@ -319,7 +320,7 @@ export function runMessagingAgent(redux) {
                         if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
                             const [eventUri, msg] = firstEntry;
                             ws.send(JSON.stringify(msg));
-                            console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
+                            //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
 
                             // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
                             redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
