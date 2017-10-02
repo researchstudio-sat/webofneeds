@@ -384,12 +384,18 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
             const fromCorrespondingMessage = jsonldMessageImm.get("hasCorrespondingRemoteMessage");
 
             if(fromCorrespondingMessage){
-                //if message comes within the events of showLatestMessages/showMoreMessages action
-                parsedMessage.belongsToUri = fromCorrespondingMessage.get("hasReceiver");
+                // if message comes within the events of showLatestMessages/showMoreMessages action
+                // in case of a connect message, the receiver (=connection URI)
+                // is not in the message sent by the remote need (because there is no connection yet)
+                // here, we try to fall back to the message copy received by our need if we fail to find a receiver
+                let receiver = fromCorrespondingMessage.get("hasReceiver");
+                if (!receiver) {
+                    receiver = jsonldMessageImm.get("hasReceiver");
+                }
+                parsedMessage.belongsToUri = receiver; 
                 parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
                 parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
                 parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
-
                 if(fromCorrespondingMessage.get("hasMessageType") === won.WONMSG.connectMessage){
                     parsedMessage.data.connectMessage = true;
                 }
