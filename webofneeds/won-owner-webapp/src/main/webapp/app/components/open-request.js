@@ -67,7 +67,7 @@ function genComponentConf() {
 
                 const ownNeed = selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-                const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage") && !msg.get("outgoingMessage")).first();
+                const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage")).first();
 
                 return {
                     connectionUri,
