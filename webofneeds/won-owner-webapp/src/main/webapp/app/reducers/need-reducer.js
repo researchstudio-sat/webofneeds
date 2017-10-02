@@ -102,7 +102,7 @@ export default function(state = initialState, action = {}) {
             return changeConnectionState(state, action.payload.connectionUri, won.WON.Closed);
 
         case actionTypes.messages.openMessageReceived:
-            return addConnectionFull(state, action.payload.connection, true);
+            return addConnectionFull(state, action.payload.connection);
 
         case actionTypes.connections.connectAdHoc:
             var optimisticEvent = getIn(action, ['payload', 'optimisticEvent']);
@@ -160,7 +160,7 @@ export default function(state = initialState, action = {}) {
 
                 return state
                     .deleteIn([needUri, 'connections', tmpConnectionUri])
-                    .setIn([needUri, 'connections', connectionUri], properConnection);
+                    .mergeDeepIn([needUri, 'connections', connectionUri], properConnection);
             } else {
                 // connection has been stored as match first
                 return changeConnectionState(state, connectionUri, won.WON.RequestSent);
@@ -248,7 +248,11 @@ function storeConnectionsData(state, connectionsToStore, newConnections) {
  * @return {*}
  */
 function addConnectionFull(state, connection, newConnection) {
+
     console.log("Adding Full Connection");
+    if(newConnection === undefined) {
+      newConnection = !!getNeedForConnectionUri(state, connection.uri); // do we already have a connection like that?
+    }
     let parsedConnection = parseConnection(connection, newConnection);
 
     if(parsedConnection){
@@ -258,9 +262,8 @@ function addConnectionFull(state, connection, newConnection) {
         let connections = state.getIn([needUri, 'connections']);
 
         if(connections){
-            connections = connections.set(parsedConnection.getIn(["data", "uri"]), parsedConnection.get("data"));
-
-            return state.setIn([needUri, "connections"], connections);
+            const connectionUri = parsedConnection.getIn(["data", "uri"]);
+            return state.mergeDeepIn([needUri, "connections", connectionUri], parsedConnection.get("data"));
         }else{
             console.error("Couldnt add valid connection - missing need data in state", needUri, "parsedConnection: ", parsedConnection.toJS());
         }
