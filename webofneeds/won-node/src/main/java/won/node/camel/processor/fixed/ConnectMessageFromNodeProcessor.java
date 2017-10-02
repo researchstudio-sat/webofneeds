@@ -35,7 +35,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
     URI wonNodeUriFromWonMessage = wonMessage.getReceiverNodeURI();
     URI remoteNeedUri = wonMessage.getSenderNeedURI();
     URI remoteConnectionUri = wonMessage.getSenderURI();
-    URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage);
+    URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
     URI connectionURI = wonMessage.getReceiverURI(); //if the uri is known already, we can load the connection!
 
     if (remoteConnectionUri == null) throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.getURI().toString()));

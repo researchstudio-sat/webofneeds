@@ -43,4 +43,9 @@ public class CloseCommandFailureEvent extends AbstractMessageCommandResultEvent 
     public CloseCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
         super(originalCommandEvent, con, message);
     }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }

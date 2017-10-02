@@ -61,8 +61,8 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
     ConnectionState originalState = con.getState();
       //TODO: we could introduce SYSTEM_CLOSE here
     con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
-    //if the connection was in suggested state, don't send a close message to the remote need
-    if (originalState != ConnectionState.SUGGESTED && con.getRemoteConnectionURI() != null) {
+    //if we know the remote connection, send a close message to the remote connection
+    if (con.getRemoteConnectionURI() != null) {
       URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getRemoteConnectionURI());
       URI remoteMessageUri = wonNodeInformationService.generateEventURI(remoteNodeURI);
 

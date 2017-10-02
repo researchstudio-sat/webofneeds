@@ -109,6 +109,8 @@ services:
     volumes:
       - $base_folder/nginx-int.conf:/etc/nginx/nginx.conf
       - $base_folder/won-server-certs2:/etc/nginx/won-server-certs/
+    depends_on:
+      - gencert2
 
   # portsgres need databases for owner and wonnode 2
   postgres2:

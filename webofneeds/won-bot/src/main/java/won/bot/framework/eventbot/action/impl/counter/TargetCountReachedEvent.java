@@ -23,13 +23,17 @@ import won.bot.framework.eventbot.event.BaseEvent;
  */
 public class TargetCountReachedEvent extends BaseEvent
 {
-  private Counter counter;
+  private TargetCounterDecorator counter;
 
-  public TargetCountReachedEvent(final Counter counter) {
+  public TargetCountReachedEvent(final TargetCounterDecorator counter) {
     this.counter = counter;
   }
 
   public Counter getCounter() {
     return counter;
+  }
+
+  public int getCount(){
+      return this.getCounter().getCount();
   }
 }

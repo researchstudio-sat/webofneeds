@@ -52,6 +52,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crawls the complete connection data and checks if it is valid.
@@ -75,7 +76,7 @@ public class ValidateConnectionDataBehaviour extends BotBehaviour {
     }
 
     @Override
-    protected void onActivate() {
+    protected void onActivate(Optional<Object> message) {
         logger.debug("activating validation for connection {}", command.getConnectionURI());
         logger.debug("will deactivate autmatically after " + abortTimeout );
         context.getTaskScheduler().schedule(

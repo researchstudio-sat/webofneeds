@@ -2,17 +2,26 @@ package won.bot.framework.eventbot.behaviour;
 
 import won.bot.framework.eventbot.event.BaseEvent;
 
+import java.util.Optional;
+
 /**
  * Created by fsuda on 12.05.2017.
  */
 public class BotBehaviourEvent extends BaseEvent {
     private BotBehaviour behaviour;
+    private Optional<Object> message;
 
-    public BotBehaviourEvent(BotBehaviour behaviour) {
+    public BotBehaviourEvent(BotBehaviour behaviour){
+        this(behaviour, Optional.empty());
+    }
+    public BotBehaviourEvent(BotBehaviour behaviour, Optional<Object> message) {
         this.behaviour = behaviour;
+        this.message = message;
     }
 
     public BotBehaviour getBehaviour() {
         return behaviour;
     }
+
+    public Optional<Object> getMessage(){ return message;};
 }

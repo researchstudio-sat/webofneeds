@@ -26,6 +26,7 @@ public interface CommandResultEvent<C extends CommandEvent> extends Event {
      * An optional message for diagnostic purposes.
      * @return the message or null;
      */
-    public String getMessage();
+    String getMessage();
     C getOriginalCommandEvent();
+    boolean isSuccess();
 }

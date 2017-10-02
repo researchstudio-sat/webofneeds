@@ -45,7 +45,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a  ui-sref="{{ self.resetParamsSRef(self.loggedIn ? 'feed' : 'landingpage') }}"
+                    <a href="{{ self.resetParamsHRef(self.$state, self.loggedIn ? 'feed' : 'landingpage') }}"
                         class="topnav__button">
                             <img src="generated/icon-sprite.svg#WON_ico_header"
                                 class="topnav__button__icon">
@@ -55,7 +55,7 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center">
-                    <a ui-sref="{{ self.resetParamsSRef('createNeed') }}"
+                    <a href="{{ self.resetParamsHRef(self.$state, 'createNeed') }}"
                        class="topnav__button"
                        ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
                         <img src="generated/icon-sprite.svg#ico36_plus"
@@ -133,7 +133,7 @@ function genTopnavConf() {
         </div>
     `;
 
-    const serviceDependencies = ['$ngRedux', '$scope', '$sanitize', /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$sanitize', '$state', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){

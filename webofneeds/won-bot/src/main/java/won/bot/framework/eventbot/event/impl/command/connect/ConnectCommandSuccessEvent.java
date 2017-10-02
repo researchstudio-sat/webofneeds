@@ -43,4 +43,9 @@ public class ConnectCommandSuccessEvent extends AbstractMessageCommandResultEven
     public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
         super(originalCommandEvent, con, message);
     }
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

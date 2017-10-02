@@ -1,6 +1,6 @@
 package won.bot.framework.eventbot.behaviour;
 
-import won.bot.framework.eventbot.event.BaseEvent;
+import java.util.Optional;
 
 /**
  * Created by fsuda on 12.05.2017.
@@ -8,5 +8,9 @@ import won.bot.framework.eventbot.event.BaseEvent;
 public class BotBehaviourActivatedEvent extends BotBehaviourEvent {
     public BotBehaviourActivatedEvent(BotBehaviour behaviour) {
         super(behaviour);
+    }
+
+    public BotBehaviourActivatedEvent(BotBehaviour behaviour, Optional<Object> message) {
+        super(behaviour, message);
     }
 }

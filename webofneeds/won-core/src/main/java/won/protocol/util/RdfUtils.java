@@ -961,6 +961,25 @@ public class RdfUtils
   }
 
   /**
+   * Finds the first resource which is a specified property of a specified resource.
+   *
+   *
+   * @param dataset <code>Dataset</code> to look into
+   * @param resourceURI
+   * @param p
+   * @return <code>URI</code> of the resource
+   */
+  public static RDFNode findFirstPropertyFromResource(Dataset dataset, final URI resourceURI, final Property p) {
+    return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<RDFNode>()
+    {
+      @Override
+      public RDFNode visit(final Model model) {
+        return findFirstPropertyFromResource(model, resourceURI, p);
+      }
+    });
+  }
+
+  /**
    * Finds resource which is a specified property of a specified resource.
    * If multiple (non equal) resources are found an exception is thrown.
    *
@@ -980,6 +999,17 @@ public class RdfUtils
     }, true);
   }
 
+
+  public static RDFNode findFirstPropertyFromResource(Dataset dataset, final Resource resource, final Property p) {
+    return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<RDFNode>()
+    {
+      @Override
+      public RDFNode visit(final Model model) {
+        return findFirstPropertyFromResource(model, resource, p);
+      }
+    });
+  }
+
   public static RDFNode findOnePropertyFromResource(Dataset dataset, final Resource resource, final Property p) {
     return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>()
     {
@@ -988,6 +1018,25 @@ public class RdfUtils
         return findOnePropertyFromResource(model, resource, p);
       }
     }, true);
+  }
+
+
+  /**
+   * Finds the first resource which is a specified property of a specified resource.
+   *
+   *
+   * @param model <code>Model</code> to look into
+   * @param resourceURI
+   * @param property
+   * @return <code>URI</code> of the resource
+   */
+  public static RDFNode findFirstPropertyFromResource(Model model, URI resourceURI, Property property) {
+    Resource resource = null;
+    if (resourceURI != null) {
+      resource = model.getResource(resourceURI.toString());
+    }
+
+    return findFirstPropertyFromResource(model, resource, property);
   }
 
   /**
@@ -1007,6 +1056,12 @@ public class RdfUtils
     }
 
     return findOnePropertyFromResource(model, resource, property);
+  }
+
+  public static RDFNode findFirstPropertyFromResource(final Model model, final Resource resource, final Property property) {
+    NodeIterator iterator = model.listObjectsOfProperty(resource, property);
+    if (iterator.hasNext()) return iterator.next();
+    return null;
   }
 
   public static RDFNode findOnePropertyFromResource(final Model model, final Resource resource, final Property property) {

@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
+import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
 
 /**
@@ -278,31 +280,102 @@ public class WonRdfUtils
       return null;
     }
 
-    /**
-     * Returns the first won:hasTextMessage object, or null if none is found.
-     * @param wonMessage
-     * @return
-     */
-    public static String getTextMessage(final WonMessage wonMessage){
-      return RdfUtils.findFirst(wonMessage.getCompleteDataset(), new RdfUtils.ModelVisitor<String>() {
-        @Override
-        public String visit(Model model) {
-          Statement stmt = model.getProperty(model.getResource(wonMessage.getMessageURI().toString()), WON.HAS_TEXT_MESSAGE);
-          if (stmt != null) {
-            return stmt.getObject().asLiteral().getLexicalForm();
-          }
-          URI remoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
-          if (remoteMessageURI != null){
-            stmt = model.getProperty(model.getResource(remoteMessageURI.toString()), WON.HAS_TEXT_MESSAGE);
-            if (stmt != null) {
-              return stmt.getObject().asLiteral().getLexicalForm();
-            }
+
+      /**
+       * Returns the first won:hasTextMessage object, or null if none is found.
+       * tries the message, its corresponding remote message, and any forwarded message,
+       * if any of those are contained in the dataset
+       *
+       * @param wonMessage
+       * @return
+       */
+      public static String getTextMessage(final WonMessage wonMessage) {
+          URI messageURI = wonMessage.getMessageURI();
+
+          //find the text message in the message, the remote message, or any forwarded message
+          String queryString =
+                  "prefix msg: <http://purl.org/webofneeds/message#>\n" +
+                          "prefix won: <http://purl.org/webofneeds/model#>\n" +
+                          "\n" +
+                          "SELECT distinct ?txt WHERE {\n" +
+                          "  {\n" +
+                          "    graph ?gA { ?msg won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gB { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n" +
+                          "    graph ?gA { ?msg2 won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gC { ?msg msg:hasForwardedMessage ?msg2 }\n" +
+                          "    graph ?gB { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gA { ?msg3 won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gD { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n" +
+                          "    graph ?gC { ?msg2 msg:hasForwardedMessage ?msg3 }\n" +
+                          "    graph ?gB { ?msg3 msg:hasCorrespondingRemoteMessage ?msg4 }\n" +
+                          "    graph ?gA { ?msg4 won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gE { ?msg msg:hasForwardedMessage ?msg2 }\n" +
+                          "    graph ?gD { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gC { ?msg3 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gB { ?msg4 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
+                          "    graph ?gA { ?msg5 won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gF { ?msg msg:hasCorrespondingRemoteMessage ?msg2 }\n" +
+                          "    graph ?gE { ?msg2 msg:hasForwardedMessage ?msg3 }\n" +
+                          "    graph ?gD { ?msg3 msg:hasCorrespondingRemoteMessage ?msg4 }\n" +
+                          "    graph ?gC { ?msg4 msg:hasForwardedMessage ?msg5 }\n" +
+                          "    graph ?gB { ?msg5 msg:hasCorrespondingRemoteMessage ?msg6 }\n" +
+                          "    graph ?gA { ?msg6 won:hasTextMessage ?txt }\n" +
+                          "  } union {\n" +
+                          "    graph ?gG { ?msg msg:hasForwardedMessage ?msg2 }\n" +
+                          "    graph ?gF { ?msg2 msg:hasCorrespondingRemoteMessage ?msg3 }\n" +
+                          "    graph ?gE { ?msg3 msg:hasForwardedMessage ?msg4 }\n" +
+                          "    graph ?gD { ?msg4 msg:hasCorrespondingRemoteMessage ?msg5 }\n" +
+                          "    graph ?gC { ?msg5 msg:hasForwardedMessage ?msg6 }\n" +
+                          "    graph ?gB { ?msg6 msg:hasCorrespondingRemoteMessage ?msg7 }\n" +
+                          "    graph ?gA { ?msg7 won:hasTextMessage ?txt }\n" +
+                          "  }\n" +
+                          "\n" +
+                          "}";
+          Query query = QueryFactory.create(queryString);
+
+          QuerySolutionMap initialBinding = new QuerySolutionMap();
+          Model tmpModel = ModelFactory.createDefaultModel();
+          initialBinding.add("msg", tmpModel.getResource(messageURI.toString()));
+          try (QueryExecution qexec = QueryExecutionFactory
+                  .create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String textMessage = rdfNodeToString(qs.get("txt"));
+                  if (rs.hasNext()) {
+                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
+                      throw new IllegalArgumentException("wonMessage has more than one text messages");
+                  }
+                  return textMessage;
+              }
           }
           return null;
-        }
-      });
+      }
+
+      private static String rdfNodeToString(RDFNode node) {
+          if (node.isLiteral()) {
+              return node.asLiteral().getString();
+          } else if (node.isResource()) {
+              return node.asResource().getURI();
+          }
+          return null;
+      }
+
+    private static RDFNode getTextMessageForResource(Dataset dataset, URI uri){
+      if (uri == null) return  null;
+      return RdfUtils.findFirstPropertyFromResource(dataset, uri, WON.HAS_TEXT_MESSAGE);
     }
 
+    private static RDFNode getTextMessageForResource(Dataset dataset, Resource resource){
+      if (resource == null) return null;
+      return RdfUtils.findFirstPropertyFromResource(dataset, resource, WON.HAS_TEXT_MESSAGE);
+    }
     /**
      * Converts the specified hint message into a Match object.
      * @param wonMessage
@@ -317,12 +390,12 @@ public class WonRdfUtils
 
       Dataset messageContent = wonMessage.getMessageContent();
 
-      RDFNode score = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+      RDFNode score = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
         WON.HAS_MATCH_SCORE);
       if (!score.isLiteral()) return null;
       match.setScore(score.asLiteral().getDouble());
 
-      RDFNode counterpart = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+      RDFNode counterpart = findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
                                                                  WON.HAS_MATCH_COUNTERPART);
       if (!counterpart.isResource()) return null;
       match.setToNeed(URI.create(counterpart.asResource().getURI()));
@@ -343,7 +416,12 @@ public class WonRdfUtils
   public static class FacetUtils {
 
 
-
+    /**
+     * Returns the facet in a connect message. Attempts to get it from the specified message itself.
+     * If no such facet is found there, the remoteFacet of the correspondingRemoteMessage is used.
+     * @param message
+     * @return
+       */
     public static URI getFacet(WonMessage message){
       URI uri = getObjectOfMessageProperty(message, WON.HAS_FACET);
       if (uri == null) {
@@ -352,6 +430,12 @@ public class WonRdfUtils
       return uri;
     }
 
+    /**
+     * Returns the remoteFacet in a connect message. Attempts to get it from the specified message itself.
+     * If no such facet is found there, the facet of the correspondingRemoteMessage is used.
+     * @param message
+     * @return
+     */
     public static URI getRemoteFacet(WonMessage message) {
       URI uri = getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
       if (uri == null) {
@@ -479,22 +563,22 @@ public class WonRdfUtils
      * @return <code>URI</code> of the need
      */
     public static URI getLocalNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.BELONGS_TO_NEED).asResource().getURI());
     }
 
     public static URI getRemoteNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_NEED).asResource().getURI());
     }
 
     public static URI getWonNodeURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_WON_NODE).asResource().getURI());
     }
 
     public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
   }
@@ -566,7 +650,7 @@ public class WonRdfUtils
       }
 
     public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
+      return URI.create(findOnePropertyFromResource(
         dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
     }
   }

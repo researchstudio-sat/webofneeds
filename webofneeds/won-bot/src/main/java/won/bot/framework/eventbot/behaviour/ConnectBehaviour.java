@@ -21,6 +21,8 @@ import won.bot.framework.eventbot.action.impl.wonmessage.execCommand.ExecuteConn
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 
+import java.util.Optional;
+
 
 /**
  * Behaviour that responds to a ConnectCommand by executing the ExecuteCommandAction
@@ -35,7 +37,7 @@ public class ConnectBehaviour extends BotBehaviour {
     }
 
     @Override
-    protected void onActivate() {
+    protected void onActivate(Optional<Object> message) {
         this.subscribeWithAutoCleanup(ConnectCommandEvent.class,
             new ActionOnEventListener(
                 context,

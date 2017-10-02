@@ -22,10 +22,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BotBehaviour {
@@ -79,17 +76,23 @@ public abstract class BotBehaviour {
     }
 
     /**
-     * Activates the behaviour by registering listeners. If the onActivate method of the subclass throws an Exception,
-     * the deactivate method is called.
+     * Activates the behaviour without passing a message object.
      */
-    public final synchronized void activate() {
-        coordinationBehaviours.stream().forEach(b -> b.activate());
+    public final void activate(){
+        activate(Optional.empty());
+    }
+    /**
+     * Activates the behaviour by registering listeners. If the onActivate method of the subclass throws an Exception,
+     * the deactivate method is called. The specified optional message is passed to subclasses.
+     */
+    public final synchronized void activate(Optional<Object> message) {
+        coordinationBehaviours.stream().forEach(b -> b.activate(message));
         if (active.get()) {
             cleanup();
         }
         ;
         try {
-            onActivate();
+            onActivate(message);
             active.set(true);
             context.getEventBus().publish(new BotBehaviourActivatedEvent(this));
         } catch (Exception e) {
@@ -102,13 +105,19 @@ public abstract class BotBehaviour {
     }
 
     /**
-     * Deactivates the behaviour. Automatically unsubscribes every EventListener Instance that has been created.
-     * No traces of it must be left in the Event Bus after this method has finished.
+     * Deactivates the behaviour without passing a message.
      */
-    public final synchronized void deactivate() {
+    public final void deactivate(){
+        deactivate(Optional.empty());
+    }
+    /**
+     * Deactivates the behaviour. Automatically unsubscribes every EventListener Instance that has been created.
+     * No traces of it must be left in the Event Bus after this method has finished. The specified optional message is passed to subclasses.
+     */
+    public final synchronized void deactivate(Optional<Object> message) {
         try {
             cleanup();
-            context.getEventBus().publish(new BotBehaviourDeactivatedEvent(this));
+            context.getEventBus().publish(new BotBehaviourDeactivatedEvent(this, message));
         } catch (Exception e) {
             logger.warn("could not deactivate {}, caught Exception", name, e);
         }
@@ -146,7 +155,7 @@ public abstract class BotBehaviour {
      * Activates the behaviour by registering listeners, if you addListeners with the subscribeWithAutoCleanup method, you
      * do not have to clean them within the onCleanup method.
      */
-    protected abstract void onActivate();
+    protected abstract void onActivate(Optional<Object> message);
 
     public String getName() {
         return name;

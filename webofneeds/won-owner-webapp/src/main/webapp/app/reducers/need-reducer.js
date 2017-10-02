@@ -185,6 +185,21 @@ export default function(state = initialState, action = {}) {
             console.log("sendChatMessage: ", action.payload.optimisticEvent);
             return addMessage(state, action.payload.optimisticEvent, true, true);
 
+        // update timestamp on success response
+        case actionTypes.messages.connect.successOwn:
+        case actionTypes.messages.open.successOwn:
+        case actionTypes.messages.chatMessage.successOwn:
+            var msgFromOwner = getIn(action, ['payload','events', 'msg:FromSystem'] );
+            var eventUri = getIn(msgFromOwner,['isResponseTo']);
+            var needUri = getIn(msgFromOwner, ['hasReceiverNeed']);
+            var connectionUri = getIn(msgFromOwner, ['hasReceiver']);
+            // we want to use the response date to update the original message date
+            // in order to use server timestamps everywhere
+            var responseDateOnServer = msStringToDate(getIn(msgFromOwner, ['hasReceivedTimestamp']));
+            return state
+                .setIn([needUri, 'connections', connectionUri, 'messages', eventUri, 'date'], responseDateOnServer);
+
+
         case actionTypes.connections.showLatestMessages:
         case actionTypes.connections.showMoreMessages:
             var loadedEvents = action.payload.get('events');
@@ -427,12 +442,18 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
             const fromCorrespondingMessage = jsonldMessageImm.get("hasCorrespondingRemoteMessage");
 
             if(fromCorrespondingMessage){
-                //if message comes within the events of showLatestMessages/showMoreMessages action
-                parsedMessage.belongsToUri = jsonldMessageImm.get("hasReceiver");
+                // if message comes within the events of showLatestMessages/showMoreMessages action
+                // in case of a connect message, the receiver (=connection URI)
+                // is not in the message sent by the remote need (because there is no connection yet)
+                // here, we try to fall back to the message copy received by our need if we fail to find a receiver
+                let receiver = fromCorrespondingMessage.get("hasReceiver");
+                if (!receiver) {
+                    receiver = jsonldMessageImm.get("hasReceiver");
+                }
+                parsedMessage.belongsToUri = receiver; 
                 parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
                 parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
                 parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
-
                 if(fromCorrespondingMessage.get("hasMessageType") === won.WONMSG.connectMessage){
                     parsedMessage.data.connectMessage = true;
                 }

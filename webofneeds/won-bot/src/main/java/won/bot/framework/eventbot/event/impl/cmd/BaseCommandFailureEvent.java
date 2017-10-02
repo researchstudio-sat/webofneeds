@@ -43,4 +43,9 @@ public abstract class BaseCommandFailureEvent<C extends CommandEvent> implements
     public C getOriginalCommandEvent() {
         return originalCommandEvent;
     }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }

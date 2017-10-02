@@ -52,6 +52,8 @@ public class WonMessageBuilder
   //some message exist twice: once on the receiver's won node and once on the sender's.
   //this property allows to link to the corresponding remote message
   private URI correspondingRemoteMessageURI;
+  //messages can be forwarded. if they are, they are added to the message and referenced:
+  private URI forwardedMessageURI;
 
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
@@ -187,6 +189,12 @@ public class WonMessageBuilder
       messageEventResource.addProperty(
               WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
               envelopeGraph.createResource(correspondingRemoteMessageURI.toString()));
+    }
+
+    if (forwardedMessageURI != null) {
+      messageEventResource.addProperty(
+              WONMSG.HAS_FORWARDED_MESSAGE,
+              envelopeGraph.createResource(forwardedMessageURI.toString()));
     }
 
     if (sentTimestamp != null) {
@@ -602,25 +610,6 @@ public class WonMessageBuilder
      return setPropertiesForPassingMessageToRemoteNodeAndCopyLocalMessage(ownerOrSystemMsg, newMessageUri);
   }
 
-  @Deprecated
-  /**
-   * The message to remote node will contain envelope with properties extracted from corresponding
-   * local message, as well as copy of the local message content with replaced uris (remote message uris).
-   * The method should no longer be used since introducing signatures, which led to preserving
-   * exact copy of local envelopes and local contents in remote message (no uris are replaced)
-   *
-   */
-  private static WonMessageBuilder setPropertiesForPassingMessageToRemoteNodeAndCopyLocalMessageReplacingUris(final
-                                                                                                           WonMessage
-                                                                                                      ownerOrSystemMsg,
-                                                                       URI newMessageUri){
-    return new WonMessageBuilder(newMessageUri)
-      .setSentTimestamp(new Date().getTime())
-      .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
-      .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
-      .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
-  }
 
   /**
    * Adds the complete message content to the message that will be built,
@@ -806,6 +795,11 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setForwardedMessageURI(URI forwardedMessageURI) {
+    this.forwardedMessageURI = forwardedMessageURI;
+    return this;
+  }
+
   public WonMessageBuilder setSentTimestamp(final long sentTimestamp) {
     this.sentTimestamp = sentTimestamp;
     return this;
@@ -870,63 +864,6 @@ public class WonMessageBuilder
     return builder;
   }
 
-  /**
-   * Copies all content graphs from the specified message, replacing all occurrences
-   * of the specified message's URI with the messageURI of this builder.
-   * @param wonMessage
-   * @return
-   */
-  public WonMessageBuilder copyContentFromMessageReplacingMessageURI(final WonMessage wonMessage) {
-    return copyContentFromMessage(wonMessage, true);
-  }
-
-  /**
-   * Copies all content graphs from the specified message to this builder.
-   *
-   * @param wonMessage
-   * @return
-   */
-  public WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage) {
-    return copyContentFromMessage(wonMessage, false);
-  }
-
-
-  /**
-   * Copies all content graphs from the specified message to this builder.
-   *
-   * If replaceMessageUri is true, replaces all occurrences
-   * of the specified message's URI with the messageURI of this builder.
-   *
-   * @param wonMessage
-   * @return
-   */
-  public WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage, boolean replaceMessageUri) {
-    Dataset messageContent = wonMessage.getMessageContent();
-    for (Iterator<String> nameIt = messageContent.listNames(); nameIt.hasNext(); ){
-      String modelUri = nameIt.next();
-      Model model = messageContent.getNamedModel(modelUri);
-      String otherMessageUri = wonMessage.getMessageURI().toString();
-      if (replaceMessageUri) {
-        //replace the messageURI of the specified message with that of this builder, just in case
-        //there are triples in the model referring to it
-        model = RdfUtils.replaceResource(model.getResource(otherMessageUri),
-          model.getResource(this.messageURI.toString()));
-      }
-      //change the model name: replace the message uri of the specified message with our uri
-      //we have to do that in any case as the content graph's URI must be one within the
-      //'URI space' of the message
-      String newModelUri = this.messageURI.toString()+"/copied";
-
-      addContent(model,null);
-    }
-    return this;
-  }
-
-
-
-
-
-
 
 
   public static WonMessage forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(final URI newMessageUri, final WonMessage wonMessage,
@@ -935,7 +872,10 @@ public class WonMessageBuilder
     WonMessageBuilder builder = new WonMessageBuilder(newMessageUri)
       .setWonMessageType(wonMessage.getMessageType())
       .forward(wonMessage)
-      .copyContentFromMessageReplacingMessageURI(wonMessage)
+      .setForwardedMessageURI(wonMessage.getMessageURI())
+      .setSenderNeedURI(needURI)
+      .setSenderURI(connectionURI)
+      .setSenderNodeURI(wonNodeUri)
       .setSentTimestamp(System.currentTimeMillis())
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
@@ -943,7 +883,7 @@ public class WonMessageBuilder
       .setIsRemoteResponseToMessageURI(wonMessage.getIsRemoteResponseToMessageURI())
       .setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI())
       .setIsResponseToMessageType(wonMessage.getIsResponseToMessageType())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
 
     return builder.build();
   }

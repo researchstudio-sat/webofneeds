@@ -30,7 +30,7 @@ public class ActionOnEventListener extends BaseEventListener
 {
   private EventBotAction task;
   private int timesRun = 0;
-  private int timesToRun = 0;
+  private int timesToRun = -1;
   private Object monitor = new Object();
 
   public ActionOnEventListener(final EventListenerContext context, final EventBotAction task) {

@@ -234,4 +234,55 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     Date findMaxActivityDateOfParentAtTime(@Param("parent") URI parentURI, @Param("messageType") WonMessageType
             messageType, @Param("referenceDate") Date referenceDate);
 
+    /**
+     * For a specified message (msg in the query), return true iff
+     * there is an earlier message with the same recipient and the same innermost message uri
+     * that is not the corresponding remote message of the specified one
+     * 
+     * @param messageUri
+     * @return
+     */
+    @Query("select case when (count(otherMsg) > 0) then true else false end " +
+            "from MessageEventPlaceholder msg, MessageEventPlaceholder otherMsg join Connection otherCon " +
+            "on (otherMsg.parentURI = otherCon.connectionURI) " +
+            "where " +
+            "msg.messageURI = :messageUri and " +
+            "otherMsg.messageURI <> msg.messageURI and " +
+            "otherCon.needURI = msg.receiverNeedURI and " +
+            "otherMsg.receiverNeedURI = msg.receiverNeedURI and " +
+            "otherMsg.innermostMessageURI = msg.innermostMessageURI and " +
+            "( " +
+            // either the other message is earlier - then we lose
+            "    msg.creationDate > otherMsg.creationDate " +
+            "    or (" +
+            // if both messages happen at the same instant, we need a tie-breaker: db id
+            "        msg.creationDate = otherMsg.creationDate and " +
+            "        msg.id > otherMsg.id "+
+            "    )" +
+            ")"
+    )
+    public boolean existEarlierMessageWithSameInnermostMessageURIAndReceiverNeedURI(
+            @Param("messageUri") URI messageUri);
+
+    /**
+     * When we want to forward a message to recipient r, we first check if we have
+     * received a message with the same innermost message from r. If that's the
+     * case, we don't forward it to r. Here is the check for that
+     *
+     * @param messageUri
+     * @return
+     */
+    @Query("select case when (count(otherMsg) > 0) then true else false end " +
+            "from MessageEventPlaceholder msg, MessageEventPlaceholder otherMsg join Connection otherCon " +
+            "on (otherMsg.parentURI = otherCon.connectionURI) " +
+            "where " +
+            "msg.messageURI = :messageUri and " +
+            "otherMsg.senderNeedURI = :senderNeedUri and " +
+            "otherMsg.messageURI <> msg.messageURI and " +
+            "otherCon.needURI = msg.receiverNeedURI and " +
+            "otherMsg.receiverNeedURI = msg.receiverNeedURI and " +
+            "otherMsg.innermostMessageURI = msg.innermostMessageURI"
+    )
+    public boolean isReceivedSameInnermostMessageFromSender(
+            @Param("messageUri") URI messageUri, @Param("senderNeedUri") URI senderNeedURI);
 }

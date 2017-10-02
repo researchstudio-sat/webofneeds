@@ -59,4 +59,8 @@ public class CreateNeedCommandFailureEvent extends BaseNeedSpecificEvent impleme
         return message;
     }
 
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }
