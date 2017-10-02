@@ -5,7 +5,10 @@ import { actionTypes } from '../actions/actions.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import won from '../won-es6.js';
-import { msStringToDate } from '../utils.js';
+import {
+    msStringToDate,
+    getIn
+} from '../utils.js';
 
 const initialState = Immutable.fromJS({
 });
@@ -129,6 +132,21 @@ export default function(state = initialState, action = {}) {
              }*/
             console.log("sendChatMessage: ", action.payload.optimisticEvent);
             return addMessage(state, action.payload.optimisticEvent, true, true);
+
+        // update timestamp on success response
+        case actionTypes.messages.connect.successOwn:
+        case actionTypes.messages.open.successOwn:
+        case actionTypes.messages.chatMessage.successOwn:
+            var msgFromOwner = getIn(action, ['payload','events', 'msg:FromSystem'] );
+            var eventUri = getIn(msgFromOwner,['isResponseTo']);
+            var needUri = getIn(msgFromOwner, ['hasReceiverNeed']);
+            var connectionUri = getIn(msgFromOwner, ['hasReceiver']);
+            // we want to use the response date to update the original message date
+            // in order to use server timestamps everywhere
+            var responseDateOnServer = msStringToDate(getIn(msgFromOwner, ['hasReceivedTimestamp']));
+            return state
+                .setIn([needUri, 'connections', connectionUri, 'messages', eventUri, 'date'], responseDateOnServer);
+
 
         case actionTypes.connections.showLatestMessages:
         case actionTypes.connections.showMoreMessages:
@@ -367,7 +385,7 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
 
             if(fromCorrespondingMessage){
                 //if message comes within the events of showLatestMessages/showMoreMessages action
-                parsedMessage.belongsToUri = jsonldMessageImm.get("hasReceiver");
+                parsedMessage.belongsToUri = fromCorrespondingMessage.get("hasReceiver");
                 parsedMessage.data.uri = fromCorrespondingMessage.get("uri");
                 parsedMessage.data.text = fromCorrespondingMessage.get("hasTextMessage");
                 parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["hasReceivedTimestamp"]));
