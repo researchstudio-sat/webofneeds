@@ -232,7 +232,7 @@ function generateResponseNeedTo(theirNeed) {
         descriptionPhrase = 'I\'d like to find people for something like the following: ';
     } else {
         console.error(
-            'The need responded to (' + theirNeedUri + ') doesn\'t ' +
+            'The need responded to (' + get(theirNeed, 'uri') + ') doesn\'t ' +
             'have a need type recognized by ad-hoc-connect method. Type: ',
             theirNeedType
         );
