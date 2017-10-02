@@ -31,6 +31,7 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            const selectFromState = (state) => ({});
             connect2Redux(selectFromState, actionCreators, [], this);
         }
 
