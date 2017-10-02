@@ -408,6 +408,9 @@ function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
         parsedMessage.data.uri = jsonldMessageImm.get("uri");
         parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
         parsedMessage.data.date = msStringToDate(jsonldMessageImm.get("hasSentTimestamp"));
+        if(jsonldMessage.get('hasMessageType') === won.WONMSG.connectMessage){
+            parsedMessage.data.connectMessage = true;
+        }
     }else{
         const fromOwner = jsonldMessageImm.get("msg:FromOwner");
 
