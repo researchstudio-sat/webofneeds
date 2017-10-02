@@ -192,10 +192,8 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     await won.invalidateCacheForNewConnection(undefined /* we don't have a cnct uri yet */, needUri); // mark connections dirty
 
     console.log('STARTED AD-HOC CONNECTING: ', cnctMsg);
-    //TODO: CREATE COUNTERPART NEED
-    //TODO: connection-request text
-    //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
-    //TODO: SEND REQUEST FOR CREATED CONNECTION
+
+    dispatch(actionCreators.router__stateGoAbs('feed'));
 }
 
 async function messageGraphToEvent(eventUri, messageGraph) {
