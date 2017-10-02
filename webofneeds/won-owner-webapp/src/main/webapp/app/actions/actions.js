@@ -105,6 +105,7 @@ const actionHierarchy = {
         fetch: cnct.connectionsFetch,
         open: cnct.connectionsOpen,
         connect: cnct.connectionsConnect,
+        connectAdHoc: cnct.connectionsConnectAdHoc,
         close: cnct.connectionsClose,
         rate: cnct.connectionsRate,
         sendChatMessage: cnct.connectionsChatMessage,

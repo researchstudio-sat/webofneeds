@@ -352,7 +352,7 @@ import won from './won.js';
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri, reason){
         //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
-        console.error("Couldn't resolve " + uri + ". reason: ", reason);
+        console.error("Couldn't resolve " + uri + ". reason: ", JSON.stringify(reason));
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
@@ -1410,55 +1410,62 @@ import won from './won.js';
                 return ret;
             });
     }
+
+
+    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri) {
+        if (!ownNeedUri){
+            throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
+        }
+        if (!theirNeedUri){
+            throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
+        }
+        return Promise.all([
+            won.getWonNodeUriOfNeed(ownNeedUri),
+            won.getWonNodeUriOfNeed(theirNeedUri),
+        ])
+        .then(([ownNodeUri, theirNodeUri]) =>
+            ({
+                [won.WONMSG.hasSenderNeed]: ownNeedUri,
+                [won.WONMSG.hasSenderNode]: ownNodeUri,
+                [won.WONMSG.hasReceiverNeed]: theirNeedUri,
+                [won.WONMSG.hasReceiverNode]: theirNodeUri,
+            })
+        );
+
+    }
+
+
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
      * to send a message via the specified connectionUri (that is interpreted as a local connection.
      * @param connectionUri
      * @returns a promise to the data
      */
-    won.getEnvelopeDataforConnection = function(connectionUri){
+    won.getEnvelopeDataforConnection = async function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getEnvelopeDataforConnection: connectionUri must not be null"};
         }
-        return won.getNeedUriOfConnection(connectionUri)
-            .then(function(needUri) {
-                return won.getWonNodeUriOfNeed(needUri)
-                    .then(function (wonNodeUri) {
-                        return won.getRemoteneedUriOfConnection(connectionUri)
-                            .then(function(remoteneedUri){
-                                return won.getWonNodeUriOfNeed(remoteneedUri)
-                                    .then(remoteWonNodeUri => {
-                                        //if the local connection was created through a hint message (most likely)
-                                        //the remote connection is not known or doesn't exist yet. Hence, the next call
-                                        //may or may not succeed.
-                                        return won.getRemoteConnectionUriOfConnection(connectionUri)
-                                            .then(remoteConnectionUri => {
-                                                let ret = {};
-                                                ret[won.WONMSG.hasSender] = connectionUri;
-                                                ret[won.WONMSG.hasSenderNeed] = needUri;
-                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                if (remoteConnectionUri != null) {
-                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
-                                                }
-                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
-                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
-                                                return ret;
-                                            })
-                                            .catch(reason => {
-                                                //no connection found
-                                                let ret = {};
-                                                ret[won.WONMSG.hasSender] = connectionUri;
-                                                ret[won.WONMSG.hasSenderNeed] = needUri;
-                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
-                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
-                                                return ret;
-                                            });
-                                    });
-                            });
-                    });
-            });
-    }
+
+        const ownNeedUri = await won.getNeedUriOfConnection(connectionUri);
+        const ownNodeUri = await won.getWonNodeUriOfNeed(ownNeedUri);
+        const theirNeedUri = await won.getRemoteneedUriOfConnection(connectionUri);
+        const theirNodeUri = await won.getWonNodeUriOfNeed(theirNeedUri);
+
+        const ret = {
+            [won.WONMSG.hasSender]: connectionUri,
+            [won.WONMSG.hasSenderNeed]: ownNeedUri,
+            [won.WONMSG.hasSenderNode]: ownNodeUri,
+            [won.WONMSG.hasReceiverNeed]: theirNeedUri,
+            [won.WONMSG.hasReceiverNode]: theirNodeUri,
+        };
+        try {
+            const theirCnctUri = await won.getRemoteConnectionUriOfConnection(connectionUri);
+            if (theirCnctUri != null) {
+                ret[won.WONMSG.hasReceiver] = theirCnctUri;
+            }
+        } catch(err){}
+        return ret;
+    };
 
     /**
      * @param needUri

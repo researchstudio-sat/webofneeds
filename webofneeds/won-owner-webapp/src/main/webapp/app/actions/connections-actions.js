@@ -17,7 +17,10 @@ import {
     urisToLookupMap,
     msStringToDate,
     getIn,
+    get,
     jsonld2simpleFormat,
+    cloneAsMutable,
+    delay,
 } from '../utils.js';
 
 import {
@@ -25,16 +28,22 @@ import {
 } from '../configRouting.js';
 
 import {
+    ensureLoggedIn,
+} from './account-actions';
+
+import {
     actionTypes,
     actionCreators,
 } from './actions.js';
 
 import {
+    buildCreateMessage,
     buildOpenMessage,
     buildCloseMessage,
     buildChatMessage,
     buildRateMessage,
     buildConnectMessage,
+    buildAdHocConnectMessage,
     getEventsFromMessage,
 } from '../won-message-utils.js';
 
@@ -116,44 +125,133 @@ export function connectionsOpen(connectionUri, message) {
 }
 
 
-export function connectionsConnect(connectionUri,message) {
-    return (dispatch, getState) => {
+export function connectionsConnect(connectionUri, textMessage) {
+    return async (dispatch, getState) => {
         const state = getState();
         const eventData = selectAllByConnectionUri(state, connectionUri).toJS(); // TODO avoid toJS; UPDATE TO NEW STRUCTURE
-        const messageDataP = won
-            .getConnectionWithEventUris(eventData.connection.uri)
-            .then(connection=> {
-                let msgToOpenFor = {event: eventData, connection: connection};
-                return buildConnectMessage(msgToOpenFor, message)
-            });
-        messageDataP.then((action)=> {
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        const cnctMsg = await buildConnectMessage(eventData.connection.uri, textMessage);
 
-            jsonld.promises.frame(
-                action.message,
-                {
-                    '@id': action.eventUri,
-                    '@context': action.message['@context']
-                }
-            ).then(framed => {
-                let event = getIn(framed, ['@graph', 0]);
-                if(event) {
-                    event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
-                    event = jsonld2simpleFormat(event);
-                }
+        dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
-                dispatch({
-                    type: actionTypes.connections.connect,
-                    payload: {
-                        connectionUri,
-                        message,
-                        eventUri: action.eventUri,
-                        optimisticEvent: event,
-                    }
-                });
-            });
-        })
+        const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
+
+        dispatch({
+            type: actionTypes.connections.connect,
+            payload: {
+                connectionUri,
+                textMessage,
+                eventUri: cnctMsg.eventUri,
+                optimisticEvent: event,
+            }
+        });
     }
+}
+
+
+export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
+    return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
+}
+async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
+    const state = getState();
+
+    const theirNeed = getIn(state, ['needs', theirNeedUri]);
+    const adHocDraft = generateResponseNeedTo(theirNeed);
+    const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
+
+    await ensureLoggedIn(dispatch, getState);
+
+    const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+    dispatch({
+        type: actionTypes.needs.create, // TODO custom action
+        payload: {eventUri, message, needUri}
+    });
+
+    console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
+
+    //TODO wait for success-response instead
+    await delay(1000); // to give the server enough time to handle need creation.
+
+    // TODO handle failure to post need (the needUri won't be valid)
+
+    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, textMessage);
+
+    const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
+
+    dispatch({
+        type: actionTypes.connections.connectAdHoc,
+        payload: {
+            //connectionUri,
+            textMessage,
+            eventUri: cnctMsg.eventUri,
+            optimisticEvent: event,
+        }
+    });
+
+    dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
+
+    await won.invalidateCacheForNewConnection(undefined /* we don't have a cnct uri yet */, needUri); // mark connections dirty
+
+    console.log('STARTED AD-HOC CONNECTING: ', cnctMsg);
+    //TODO: CREATE COUNTERPART NEED
+    //TODO: connection-request text
+    //TODO: CREATE CONNECTION BETWEEN COUNTERPART NEED AND GIVEN NEED
+    //TODO: SEND REQUEST FOR CREATED CONNECTION
+}
+
+async function messageGraphToEvent(eventUri, messageGraph) {
+
+    const framed = await jsonld.promises.frame(
+        messageGraph,
+        {
+            '@id': eventUri,
+            '@context': messageGraph['@context']
+        }
+    )
+
+    let event = getIn(framed, ['@graph', 0]);
+    if(event) {
+        event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
+        event = jsonld2simpleFormat(event);
+    }
+
+    return event;
+}
+
+
+function generateResponseNeedTo(theirNeed) {
+    let reNeedType, descriptionPhrase;
+    const theirNeedType = get(theirNeed, 'type');
+    if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
+        reNeedType = won.WON.BasicNeedTypeSupply;
+        descriptionPhrase = 'I have something similar to: ';
+    } else if(theirNeedType === won.WON.BasicNeedTypeSupplyCompacted) {
+        reNeedType = won.WON.BasicNeedTypeDemand;
+        descriptionPhrase = 'I want something like: ';
+    } else if(theirNeedType === won.WON.BasicNeedTypeDotogetherCompacted) {
+        reNeedType = won.WON.BasicNeedTypeDotogether;
+        descriptionPhrase = 'I\'d like to find people for something like the following: ';
+    } else {
+        console.error(
+            'The need responded to (' + get(theirNeed, 'uri') + ') doesn\'t ' +
+            'have a need type recognized by ad-hoc-connect method. Type: ',
+            theirNeedType
+        );
+        reNeedType = undefined;
+        descriptionPhrase = 'It\'s a response to: ';
+    }
+
+
+    return {
+        title: 'Re: ' + get(theirNeed, 'title'),
+        description:
+        'This is an automatically generated post. ' +
+        descriptionPhrase +
+        '"' + get(theirNeed, 'description') +'"',
+        type: reNeedType,
+        tags: cloneAsMutable(get(theirNeed, 'tags')),
+        location: cloneAsMutable(get(theirNeed, 'location')),
+    };
+
 }
 
 export function connectionsClose(connectionUri) {

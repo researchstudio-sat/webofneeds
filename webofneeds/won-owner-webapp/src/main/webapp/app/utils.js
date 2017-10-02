@@ -716,6 +716,34 @@ export function clone(obj) {
 }
 
 /**
+ * Returns a mutable object (or undefined if undefined was passed)
+ * @param obj immutable or mutable object, or undefined
+ */
+export function cloneAsMutable(obj) {
+    if(!obj) {
+        return obj;
+    } else if(obj.toJS) {
+        return obj.toJS()
+    } else {
+        return clone(obj);
+    }
+}
+
+/**
+ * Returns a property of a given object, no matter whether
+ * it's a normal or an immutable-js object.
+ * @param obj
+ * @param property
+ */
+export function get(obj, property) {
+    if(obj.get) {
+        return obj.get(property);
+    } else {
+        return obj[property];
+    }
+}
+
+/**
  * Tries to look up a property-path on a nested object-structure.
  * Where `obj.x.y` would throw an exception if `x` wasn't defined
  * `get(obj, ['x','y'])` would return undefined.
