@@ -510,11 +510,11 @@
     won.reportError = function(message) {
         if (arguments.length == 1) {
             return function(reason) {
-                console.error(message, " reason: ", reason);
+                console.log(message, " reason: ", reason);
             }
         } else {
             return function (reason) {
-                console.error("Error! reason: ", reason);
+                console.log("Error! reason: ", reason);
             }
         }
     }

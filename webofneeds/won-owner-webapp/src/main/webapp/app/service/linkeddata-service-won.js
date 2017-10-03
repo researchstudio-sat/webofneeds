@@ -352,7 +352,7 @@ import won from './won.js';
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri, reason){
         //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
-        console.error("Couldn't resolve " + uri + ". reason: ", JSON.stringify(reason));
+        console.error("Couldn't resolve " + uri + ". reason: ", reason);
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
@@ -882,153 +882,103 @@ import won from './won.js';
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
+        // this query returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
 
-        let propertyTree = {
-            prefixes: {
-                "won" : "http://purl.org/webofneeds/model#",
-                "rdf" : "http://www.w3.org/2000/01/rdf-schema#",
-                "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-                "dct" : "http://purl.org/dc/terms/",
-                "dc"  : "http://purl.org/dc/elements/1.1/",
-                "s"   : "http://schema.org/>"
-            },
+        let query = `
+            prefix won: <http://purl.org/webofneeds/model#>
+            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            prefix dct: <http://purl.org/dc/terms/>
+            construct {
+                <${needUri}> ?b ?c.
+                ?c ?d ?e.
+                ?e ?f ?g.
+                ?g ?h ?i.
+                ?i ?j ?k.
+                ?k ?l ?m.
 
-            roots: [
-                {node: "won:isInState"},
-                {node: "won:hasFlag"},
-                {node: "dtc:created"},
+            } where {
                 {
-                    node: "won:hasEventContainer",
-                    children: [
-                        {node: "rdfs:member"}
-                    ]
-                },
-                {
-                    node: "won:hasConnections",
-                    children: [
-                        {node: "rdfs:member"}
-                    ]
-                },
-                {
-                    node: "won:seeks",
-                    children: [
-                        {node: "dc:title"},
-                        {node: "dc:description"},
-                        {node: "won:hasTag"},
-                        {
-                            node: "s:geo",
-                            children: [
-                                {node: "rdf:type"},
-                                {node: "s:latitude"},
-                                {node: "s:longitude"}
-                            ]
-                        },
-                        {
-                            node: "won:hasBoundingBox",
-                            children: [
-                                {
-                                    node: "won:hasNorthWestCorner",
-                                    children: [
-                                        {node: "rdf:type"},
-                                        {node: "s:latitude"},
-                                        {node: "s:longitude"}
-                                    ]
-                                },
-                                {
-                                    node: "won:hasNorthWestCorner",
-                                    children: [
-                                        {node: "rdf:type"},
-                                        {node: "s:latitude"},
-                                        {node: "s:longitude"}
-                                    ]
-                                }
-
-                            ]
-                        }
-                    ]
-                },
-                {
-                    node: "won:is",
-                    children: [
-                        {node: "dc:title"},
-                        {node: "dc:description"},
-                        {node: "won:hasTag"},
-                        {
-                            node: "s:geo",
-                            children: [
-                                {node: "rdf:type"},
-                                {node: "s:latitude"},
-                                {node: "s:longitude"}
-                            ]
-                        },
-                        {
-                            node: "won:hasBoundingBox",
-                            children: [
-                                {
-                                    node: "won:hasNorthWestCorner",
-                                    children: [
-                                        {node: "rdf:type"},
-                                        {node: "s:latitude"},
-                                        {node: "s:longitude"}
-                                    ]
-                                },
-                                {
-                                    node: "won:hasNorthWestCorner",
-                                    children: [
-                                        {node: "rdf:type"},
-                                        {node: "s:latitude"},
-                                        {node: "s:longitude"}
-                                    ]
-                                }
-
-                            ]
-                        }
-                    ]
+                    <${needUri}> dct:created ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                     <${needUri}> won:isInState ?c.
+                     <${needUri}> ?b ?c.
+                } UNION {
+                     <${needUri}> won:hasFlag ?c.
+                     <${needUri}> ?b ?c.
                 }
-            ]
-        };
-/*
-        for (let j = 0; j < 1; j++) {
-            let rep = 100
-            let start = performance.now();
-            //for (let i = 0; i < rep; i++) {
-                //store.execute(query, (success, resultGraph) => {
-               // });
-            //}
-            let time = performance.now() - start;
-            //console.log("executed query for " + needUri + " (run " + j + ") " + rep + " times in " + time + " millis (" + (time / rep ) + " millis per query)");
-            start = performance.now();
-            for (let i = 0; i < rep; i++) {
-                let result = loadStarshapedGraph(store, needUri, propertyTree);
-            }
-            time = performance.now() - start;
-            console.log("executed custom code for " + needUri + " (run " + j + ") " + rep + " times in " + time + " millis (" + (time / rep ) + " millis per query)");
-        }*/
-        const needJsonLdP = new Promise((resolve, reject) => {
 
-                const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
+                UNION
+                {
+                    <${needUri}> won:hasConnections ?c.
+                    <${needUri}> ?b ?c.
+                    optional {?c ?d ?e.}
+                }
+
+                UNION
+                {
+                    <${needUri}> won:hasEventContainer ?c.
+                    <${needUri}> ?b ?c.
+                    optional {?c ?d ?e.}
+                }
+
+                UNION {
+                  {  
+                    <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {?c ?d ?e.
+                  ?e ?f ?g.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {<${needUri}> ?b ?c.
+                  ?c ?d ?e.}}
+                } UNION {
+                  {<${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  {<${needUri}> ?b ?c.}}
+                }  
+
+               
+            }
+            `
+        const needJsonLdP = new Promise((resolve, reject) =>
+            store.execute(query, (success, resultGraph) => {
+                if(!success) {
+                    reject('Failed selecting the triples of the need with the uri: ' + needUri);
+                }
+
                 const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
                     /* frame */
                     "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
                     "@context": {
-                        "msg": "http://purl.org/webofneeds/message#",
-                        "woncrypt": "http://purl.org/webofneeds/woncrypt#",
-                        "xsd": "http://www.w3.org/2001/XMLSchema#",
-                        "cert": "http://www.w3.org/ns/auth/cert#",
-                        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-                        "sig": "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
-                        "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
-                        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                        "won": "http://purl.org/webofneeds/model#",
-                        "ldp": "http://www.w3.org/ns/ldp#",
-                        "sioc": "http://rdfs.org/sioc/ns#",
-                        "dc": "http://purl.org/dc/elements/1.1/",
+                        "msg" : "http://purl.org/webofneeds/message#",
+                        "woncrypt" : "http://purl.org/webofneeds/woncrypt#",
+                        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+                        "cert" : "http://www.w3.org/ns/auth/cert#",
+                        "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+                        "sig" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
+                        "geo" : "http://www.w3.org/2003/01/geo/wgs84_pos#",
+                        "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        "won" : "http://purl.org/webofneeds/model#",
+                        "ldp" : "http://www.w3.org/ns/ldp#",
+                        "sioc" : "http://rdfs.org/sioc/ns#",
+                        "dc" : "http://purl.org/dc/elements/1.1/",
                         "dct": "http://purl.org/dc/terms/",
-                        "s": "http://schema.org/",
+                        "s" : "http://schema.org/",
                     },
                 });
+
                 resolve(needJsonLdP);
-            }
+            })
         ).then(needJsonLd => {
             // usually the need-data will be in a single object in the '@graph' array.
             // We can flatten this and still have valid json-ld
@@ -1057,166 +1007,6 @@ import won from './won.js';
 
         return needJsonLdP;
     }
-
-    //taken from https://www.w3.org/TR/rdf-interfaces/#triple-filters
-    won.tripleFilters = {
-        s: function(s) { return function(t) { return t.subject.equals(s); }; },
-        p: function(p) { return function(t) { return t.predicate.equals(p); }; },
-        o: function(o) { return function(t) { return t.object.equals(o); }; },
-        sp: function(s,p) { return function(t) { return t.subject.equals(s) && t.predicate.equals(p); }; },
-        so: function(s,o) { return function(t) { return t.subject.equals(s) && t.object.equals(o); }; },
-        po: function(p,o) { return function(t) { return t.predicate.equals(p) && t.object.equals(o); }; },
-        spo: function(s,p,o) { return function(t) { return t.subject.equals(s) && t.predicate.equals(p) && t.object.equals(o); }; },
-        describes: function(v) { return function(t) { return t.subject.equals(v) || t.object.equals(v); }; },
-        type: function(o) {
-            var type = rdf.resolve("rdf:type");
-            return function(t) { return t.predicate.equals(type) && t.object.equals(o); };
-        }
-    };
-
-
-    // loads all triples starting from start uri, using each array in 'paths' like a
-    // property path, collecting all reachable triples
-    // returns a JS RDF Interfaces Graph object
-    function loadStarshapedGraph(store, startUri, tree) {
-        let prefixes = tree.prefixes;
-        if (prefixes != null) {
-            for (let key in prefixes) {
-                if (prefixes.hasOwnProperty(key) && (! store.rdf.prefixes.get(key)) ) {
-                    store.rdf.prefixes.set(key, prefixes[key]);
-                }
-            }
-        }
-        try {
-            let startNode = store.rdf.createNamedNode(startUri);
-            let tmpResult  = { res : null };
-            store.graph( (success, result) => tmpResult.res = result);
-            let graph = tmpResult.res;
-            let resultGraph = new store.rdf.api.Graph();
-            for (let i = 0; i < tree.roots.length; i++) {
-                let subResult = loadStarshapedGraph_internal(store, graph, startNode, tree.roots[i]);
-                resultGraph.addAll(subResult);
-            }
-            return resultGraph;
-        } catch (e){
-            console.error("error executing custom select function: " + e);
-        }
-    }
-
-    /**
-     * Returns an RDFJSInterface.Graph containing all triples reachable from the start node
-     * using the specified property tree.
-     */
-    function loadStarshapedGraph_internal(store, dataGraph, startNode, tree) {
-        let resultGraph = new store.rdf.api.Graph();
-        // convert node path into an array if it isn't one already
-        //   (this allows for specifying a property path instead of just one property  )
-        let path = Array.isArray(tree.node) ? tree.node : [ tree.node];
-
-        // call this function for all elements and collect the results
-        let pathResult = loadGraphForPath(store, dataGraph, startNode, path);
-        resultGraph.addAll(pathResult.graph);
-        // recurse
-        let subtreeStartNodes = pathResult.leafNodes;
-        if (tree.hasOwnProperty("children")) {
-            let children = tree.children;
-            for (let i = 0; i < children.length; i++) {
-                let child = children[i];
-                for (let j = 0; j < subtreeStartNodes.length; j++) {
-                    let subtreeStartNode = subtreeStartNodes[j];
-                    let subResult = loadStarshapedGraph_internal(store, dataGraph, subtreeStartNode, child);
-                    resultGraph.addAll(subResult);
-                }
-            }
-        }
-        return resultGraph;
-    }
-
-    /**
-     * Returns a structure {"graph": RDFJSInterface.Graph, "leafNodes": <Array of RDFJSInterface.Node>}.
-     * The graph contains all triples reachable from the start node given the property path.
-     * @param startNode
-     * @param path
-     */
-    function loadGraphForPath(store, dataGraph, startNode, path) {
-        if (path.length == 0) return null;
-        let localResultGraph = dataGraph.filter(won.tripleFilters.sp(startNode, store.rdf.createNamedNode(path[0])))
-        let localLeafNodes = getObjectsFromGraph(localResultGraph);
-        if (path.length == 1) {
-            // last path element - the leaf in the current branch.
-            // if we find a value for this property, the whole branch will retun a result
-            return {
-                graph : localResultGraph,
-                leafNodes : localLeafNodes
-            };
-        } else {
-            let resultGraph = new store.rdf.api.Graph();
-            let resultLeafNodes = [];
-            for (i = 0; i < localLeafNodes.length; i++) {
-                let newStartNode = localLeafNodes[i];
-                let newPath = path.splice(1, path.length - 1);
-                let subResult = loadGraphForPath(store, newStartNode, newPath);
-                resultGraph.addAll(subResult.graph);
-                resultLeafNodes.push(subResult.leafNodes);
-            }
-            return {graph : resultGraph, leafNodes: resultLeafNodes};
-        }
-    }
-
-    function getObjectsFromGraph(graph){
-        let objects = [];
-        graph.forEach(triple => { objects.push(triple.object)});
-        return objects;
-    }
-
-    //find the objects
-
-
-    //example: an array is a tree: the first element is the root, strings are leaves, nested arrays are nested subtrees
- /*
-    let example = [
-                        "won:seeks",
-                        [
-                            "dc:title",
-                            "dc:description",
-                            "won:hasTag",
-                            [
-                                "won:hasLocation",
-                                [
-                                        "s:name", "rdf:type", ["s:geo",
- ["rdf:type",
- "s:latitude",
- "s:longitude"],]
- ]
-
-
-    let example =
-        ["won:seeks",
-            "dc:title",
-            "dc:description",
-            "won:hasTag",
-                    ["s:geo",
-                        "rdf:type",
-                        "s:latitude",
-                        "s:longitude"],
-                    ["won:hasBoundingBox",
-                        ["won:hasNorthWestCorner",
-                            ["s:geo",
-                                "rdf:type",
-                                "s:latitude",
-                                "s:longitude"]
-                            ],
-                        ["won:hasSouthEastCorner",
-                            ["s:geo",
-                                "rdf:type",
-                                "s:latitude",
-                                "s:longitude"]
-                        ],
-                    ]
-                ]
-            ];
-*/
-
 
     function triples2framedJson(needUri, triples, frame) {
         const jsonldjsQuads = {
@@ -1410,62 +1200,55 @@ import won from './won.js';
                 return ret;
             });
     }
-
-
-    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri) {
-        if (!ownNeedUri){
-            throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
-        }
-        if (!theirNeedUri){
-            throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
-        }
-        return Promise.all([
-            won.getWonNodeUriOfNeed(ownNeedUri),
-            won.getWonNodeUriOfNeed(theirNeedUri),
-        ])
-        .then(([ownNodeUri, theirNodeUri]) =>
-            ({
-                [won.WONMSG.hasSenderNeed]: ownNeedUri,
-                [won.WONMSG.hasSenderNode]: ownNodeUri,
-                [won.WONMSG.hasReceiverNeed]: theirNeedUri,
-                [won.WONMSG.hasReceiverNode]: theirNodeUri,
-            })
-        );
-
-    }
-
-
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
      * to send a message via the specified connectionUri (that is interpreted as a local connection.
      * @param connectionUri
      * @returns a promise to the data
      */
-    won.getEnvelopeDataforConnection = async function(connectionUri){
+    won.getEnvelopeDataforConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getEnvelopeDataforConnection: connectionUri must not be null"};
         }
-
-        const ownNeedUri = await won.getNeedUriOfConnection(connectionUri);
-        const ownNodeUri = await won.getWonNodeUriOfNeed(ownNeedUri);
-        const theirNeedUri = await won.getRemoteneedUriOfConnection(connectionUri);
-        const theirNodeUri = await won.getWonNodeUriOfNeed(theirNeedUri);
-
-        const ret = {
-            [won.WONMSG.hasSender]: connectionUri,
-            [won.WONMSG.hasSenderNeed]: ownNeedUri,
-            [won.WONMSG.hasSenderNode]: ownNodeUri,
-            [won.WONMSG.hasReceiverNeed]: theirNeedUri,
-            [won.WONMSG.hasReceiverNode]: theirNodeUri,
-        };
-        try {
-            const theirCnctUri = await won.getRemoteConnectionUriOfConnection(connectionUri);
-            if (theirCnctUri != null) {
-                ret[won.WONMSG.hasReceiver] = theirCnctUri;
-            }
-        } catch(err){}
-        return ret;
-    };
+        return won.getNeedUriOfConnection(connectionUri)
+            .then(function(needUri) {
+                return won.getWonNodeUriOfNeed(needUri)
+                    .then(function (wonNodeUri) {
+                        return won.getRemoteneedUriOfConnection(connectionUri)
+                            .then(function(remoteneedUri){
+                                return won.getWonNodeUriOfNeed(remoteneedUri)
+                                    .then(remoteWonNodeUri => {
+                                        //if the local connection was created through a hint message (most likely)
+                                        //the remote connection is not known or doesn't exist yet. Hence, the next call
+                                        //may or may not succeed.
+                                        return won.getRemoteConnectionUriOfConnection(connectionUri)
+                                            .then(remoteConnectionUri => {
+                                                let ret = {};
+                                                ret[won.WONMSG.hasSender] = connectionUri;
+                                                ret[won.WONMSG.hasSenderNeed] = needUri;
+                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                                                if (remoteConnectionUri != null) {
+                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
+                                                }
+                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
+                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
+                                                return ret;
+                                            })
+                                            .catch(reason => {
+                                                //no connection found
+                                                let ret = {};
+                                                ret[won.WONMSG.hasSender] = connectionUri;
+                                                ret[won.WONMSG.hasSenderNeed] = needUri;
+                                                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                                                ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
+                                                ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
+                                                return ret;
+                                            });
+                                    });
+                            });
+                    });
+            });
+    }
 
     /**
      * @param needUri

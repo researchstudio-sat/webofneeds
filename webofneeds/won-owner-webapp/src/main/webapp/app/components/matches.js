@@ -149,8 +149,8 @@ class Controller {
                 //LAYOUT,
                 isWhatsAround: state.getIn(["needs", postUri, "isWhatsAround"]),
                 connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
-                matchesArray: matches && matches.toArray(),
-                hasMatches: matches && matches.size > 0,
+                matchesArray: matches.toArray(),
+                hasMatches: matches.size > 0,
                 debugmode: won.debugmode,
             };
         };
