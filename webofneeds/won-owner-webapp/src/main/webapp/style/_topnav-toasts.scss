@@ -1,7 +1,7 @@
 @import 'won-config';
 
-topnav {
-  &__toasts {
+won-topnav {
+  .topnav__toasts {
     position: absolute;
     z-index: 999;
     right: 0rem;

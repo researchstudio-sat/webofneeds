@@ -128,34 +128,49 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
 }
 
 
+/**
+ * Creates json-ld for a connect-message, where there's no connection yet (i.e. we
+ * only know which own we want to connect with which remote need)
+ * @param ownNeedUri
+ * @param theirNeedUri
+ * @param textMessage
+ * @returns {{eventUri, message}|*}
+ */
+export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMessage) {
+    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri)
+    .then(envelopeData =>
+        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
+    );
+}
 
-export function buildConnectMessage(msgToConnectFor, textMessage){
-    return new Promise((resolve, reject) => {
-        var buildMessage = function(envelopeData, eventToConnectFor) {
-            //TODO: use event URI pattern specified by WoN node
-            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
-            var message = new won.MessageBuilder(won.WONMSG.connectMessage)
-                .eventURI(eventUri)
-                .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
-                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
-                .hasTextMessage(textMessage)
-                .hasOwnerDirection()
-                .hasSentTimestamp(new Date().getTime().toString())
-                .build();
-            //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
-            return {eventUri:eventUri,message:message};
-        }
+/**
+ * Builds json-ld for a connect-message in reaction to a need.
+ * @param connectionUri
+ * @param textMessage
+ * @returns {{eventUri, message}|*}
+ */
+export async function buildConnectMessage(connectionUri, textMessage){
+    return won.getEnvelopeDataforConnection(connectionUri)
+    .then(envelopeData =>
+        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
+    );
+}
 
-        //fetch all data needed
-        won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
-            .then(function(envelopeData){
-                resolve(buildMessage(envelopeData, msgToConnectFor.event));
-            },
-            won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
-        );
-    })
+function buildConnectMessageForEnvelopeData(envelopeData, textMessage) {
+    //TODO: use event URI pattern specified by WoN node
+    var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+    var message = new won.MessageBuilder(won.WONMSG.connectMessage)
+        .eventURI(eventUri)
+        .forEnvelopeData(envelopeData)
+        .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+        .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+        .hasTextMessage(textMessage)
+        .hasOwnerDirection()
+        .hasSentTimestamp(new Date().getTime().toString())
+        .build();
 
+    //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
+    return {eventUri:eventUri,message:message};
 }
 
 export function buildChatMessage(chatMessage, connectionUri) {

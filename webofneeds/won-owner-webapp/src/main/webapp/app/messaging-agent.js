@@ -316,10 +316,12 @@ export function runMessagingAgent(redux) {
                 (newMsgBuffer, oldMsgBuffer) => {
                     if (newMsgBuffer) {
                         const firstEntry = newMsgBuffer.entries().next().value;
-                        if (firstEntry) { //undefined if queue is empty
+                        if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
                             const [eventUri, msg] = firstEntry;
                             ws.send(JSON.stringify(msg));
                             console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
+
+                            // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
                             redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
                         }
                     }

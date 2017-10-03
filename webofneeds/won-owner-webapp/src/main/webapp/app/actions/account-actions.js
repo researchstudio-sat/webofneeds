@@ -12,6 +12,7 @@ import {
     privateId2Credentials,
     logout,
     parseCredentials,
+    generatePrivateId,
 } from '../won-utils.js';
 import {
     stateGoCurrent,
@@ -25,6 +26,7 @@ import {
 import {
     checkHttpStatus,
     getIn,
+    delay,
 } from '../utils.js';
 
 /**
@@ -66,6 +68,29 @@ import {
 //        );
 //    }
 //}
+
+/**
+ * Makes sure user is either logged in
+ * or creates a private-ID account as fallback.
+ */
+export async function ensureLoggedIn(dispatch, getState) {
+    const state = getState();
+    if(state.getIn(['user', 'loggedIn'])){
+        return;
+    }
+
+    const privateId = generatePrivateId();
+    try {
+        await accountRegister({privateId})(dispatch, getState)
+    } catch(err) {
+        console.error(`Creating temporary account (${privateId}) has failed due to `, err);
+        dispatch(actionCreators.registerFailed({privateId}));
+    }
+
+    // wait for the server to process the login and the reconnect to
+    // go through, before proceeding to need-creation.
+    await delay(500);
+}
 
 let _loginInProcessFor;
 /**
