@@ -890,7 +890,7 @@ import won from './won.js';
                 "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
                 "dct" : "http://purl.org/dc/terms/",
                 "dc"  : "http://purl.org/dc/elements/1.1/",
-                "s"   : "http://schema.org/>"
+                "s"   : "http://schema.org/"
             },
 
             roots: [
@@ -916,18 +916,10 @@ import won from './won.js';
                         {node: "dc:description"},
                         {node: "won:hasTag"},
                         {
-                            node: "s:geo",
-                            children: [
-                                {node: "rdf:type"},
-                                {node: "s:latitude"},
-                                {node: "s:longitude"}
-                            ]
-                        },
-                        {
-                            node: "won:hasBoundingBox",
+                            node: "won:hasLocation",
                             children: [
                                 {
-                                    node: "won:hasNorthWestCorner",
+                                    node: "s:geo",
                                     children: [
                                         {node: "rdf:type"},
                                         {node: "s:latitude"},
@@ -935,14 +927,27 @@ import won from './won.js';
                                     ]
                                 },
                                 {
-                                    node: "won:hasNorthWestCorner",
+                                    node: "won:hasBoundingBox",
                                     children: [
-                                        {node: "rdf:type"},
-                                        {node: "s:latitude"},
-                                        {node: "s:longitude"}
+                                        {
+                                            node: "won:hasNorthWestCorner",
+                                            children: [
+                                                {node: "rdf:type"},
+                                                {node: "s:latitude"},
+                                                {node: "s:longitude"}
+                                            ]
+                                        },
+                                        {
+                                            node: "won:hasSouthEastCorner",
+                                            children: [
+                                                {node: "rdf:type"},
+                                                {node: "s:latitude"},
+                                                {node: "s:longitude"}
+                                            ]
+                                        }
+
                                     ]
                                 }
-
                             ]
                         }
                     ]
@@ -954,18 +959,12 @@ import won from './won.js';
                         {node: "dc:description"},
                         {node: "won:hasTag"},
                         {
-                            node: "s:geo",
+                            node: "won:hasLocation",
                             children: [
+                                {node: "s:name"},
                                 {node: "rdf:type"},
-                                {node: "s:latitude"},
-                                {node: "s:longitude"}
-                            ]
-                        },
-                        {
-                            node: "won:hasBoundingBox",
-                            children: [
                                 {
-                                    node: "won:hasNorthWestCorner",
+                                    node: "s:geo",
                                     children: [
                                         {node: "rdf:type"},
                                         {node: "s:latitude"},
@@ -973,14 +972,28 @@ import won from './won.js';
                                     ]
                                 },
                                 {
-                                    node: "won:hasNorthWestCorner",
+                                    node: "won:hasBoundingBox",
                                     children: [
                                         {node: "rdf:type"},
-                                        {node: "s:latitude"},
-                                        {node: "s:longitude"}
+                                        {
+                                            node: "won:hasNorthWestCorner",
+                                            children: [
+                                                {node: "rdf:type"},
+                                                {node: "s:latitude"},
+                                                {node: "s:longitude"}
+                                            ]
+                                        },
+                                        {
+                                            node: "won:hasSouthEastCorner",
+                                            children: [
+                                                {node: "rdf:type"},
+                                                {node: "s:latitude"},
+                                                {node: "s:longitude"}
+                                            ]
+                                        }
+
                                     ]
                                 }
-
                             ]
                         }
                     ]
@@ -1246,7 +1259,7 @@ import won from './won.js';
                 return jld.promises.frame(complexJsonLd_, frame);
             })
             .then(framed => {
-                console.log('framed: ', framed);
+                //console.log('framed: ', framed);
                 return framed;
             })
             .catch(err => {
