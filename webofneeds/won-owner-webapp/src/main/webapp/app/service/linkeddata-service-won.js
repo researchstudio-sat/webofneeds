@@ -980,6 +980,8 @@ import won from './won.js';
                         {
                             node: "won:hasLocation",
                             children: [
+                                {node: "s:name"},
+                                {node: "rdf:type"},
                                 {
                                     node: "s:geo",
                                     children: [
