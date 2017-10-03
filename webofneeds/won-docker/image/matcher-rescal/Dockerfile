@@ -2,7 +2,8 @@
 # directory have to be copied into this folder (done by maven build)
 
 # use java as a base image
-FROM openjdk:8
+# fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
+FROM openjdk:8u121-jdk
 
 # install python + required packages
 RUN apt-get update && apt-get install -y python-numpy python-scipy
