@@ -882,7 +882,7 @@ import won from './won.js';
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
-
+/*
         let query = `
             prefix won: <http://purl.org/webofneeds/model#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -943,7 +943,7 @@ import won from './won.js';
             }
             `
 
-
+*/
         let propertyTree = {
             prefixes: {
                 "won" : "http://purl.org/webofneeds/model#",
@@ -1063,7 +1063,8 @@ import won from './won.js';
             ]
         };
 
-        for (let j = 0; j < 1; j++) {
+
+        /*for (let j = 0; j < 1; j++) {
             let rep = 1
             let start = performance.now();
             for (let i = 0; i < rep; i++) {
@@ -1086,7 +1087,7 @@ import won from './won.js';
             timeStr = format.format(time);
             timePerNeedStr = format.format(time / rep);
             console.log("executed custom code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
-        }
+        }*/
         const needJsonLdP = new Promise((resolve, reject) => {
 
                 const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
