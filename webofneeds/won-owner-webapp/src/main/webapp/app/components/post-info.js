@@ -72,11 +72,6 @@ function genComponentConf() {
                 <p ng-show="self.debugmode">
                     <a class="debuglink" target="_blank" href="{{self.post.get('uri')}}">[DATA]</a>
                 </p>
-                <button class="won-button--filled red" 
-                        ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})"
-                        ng-show="self.showRequestButton">
-                        Request Contact
-                </button>
             </div>
         </div>
     `;
@@ -92,12 +87,10 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
                 const location = post && post.get('location');
-
                 return {
                     post,
                     location: location,
                     address: location && location.get('address'),
-                    showRequestButton: post && !post.get('ownNeed') && !post.get('isWhatsAround'),
                     friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
                         post.get('creationDate')

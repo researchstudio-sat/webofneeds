@@ -66,7 +66,6 @@ export default function(state = initialState, action = {}) {
         case actionTypes.connections.open:
         case actionTypes.connections.sendChatMessage:
         case actionTypes.connections.connect:
-        case actionTypes.connections.connectAdHoc:
             var eventUri = action.payload.eventUri;
             return storeOptimisticEvent(state, action.payload.optimisticEvent);
 

@@ -14,36 +14,50 @@ import {
 } from './actions.js';
 
 import {
-    ensureLoggedIn,
+   accountRegister,
 } from './account-actions.js';
 
 import {
+    registerAccount,
+    generatePrivateId,
+    login,
+} from '../won-utils.js';
+
+import {
+    delay,
     getIn,
 } from '../utils.js';
 
 export function needCreate(draft, nodeUri) {
     return (dispatch, getState) => {
+        const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
 
         const state = getState();
-
-        if(!nodeUri) {
-            nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-        }
-
+        let email = getIn(state, ['user', 'email']);
+        let hasAccountPromise;
         const currentState = getIn(state, ['router', 'currentState', 'name']);
         const prevState = getIn(state, ['router', 'prevState', 'name']);
         const prevParams = getIn(state, ['router', 'prevParams']);
 
-        if(!state.getIn(['user', 'loggedIn']) && prevParams.privateId){
-            /*
-             * `ensureLoggedIn` will generate a new privateId. should
-             * there be a previous privateId, we don't want to change
-             * back to that later.
-             */
-            delete prevParams.privateId;
+        if(state.getIn(['user', 'loggedIn'])){
+            hasAccountPromise = Promise.resolve();
+        } else {
+            const privateId = generatePrivateId();
+            hasAccountPromise = accountRegister({privateId})(dispatch, getState)
+                    .then(() =>
+                        // wait for the server to process the login and the reconnect to
+                        // go through, before proceeding to need-creation.
+                        delay(500)
+                    )
+                    .catch(err => {
+                        console.error(`Creating temporary account (${privateId}) has failed due to `, err);
+                        dispatch(actionCreators.registerFailed({privateId}));
+                    });
+
+            delete prevParams.privateId; // should there be a previous privateId, we don't want to change back to that later
         }
 
-        return ensureLoggedIn(dispatch, getState)
+        return hasAccountPromise
             .then(() => {
                 if (currentState === 'landingpage') {
                     return dispatch(actionCreators.router__stateGoAbs('feed'))
@@ -53,20 +67,14 @@ export function needCreate(draft, nodeUri) {
                      * don't revert any new privateID or remove the create-gui from the
                      * history stack.
                      */
-                    if(prevState)  {
-                        return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
-                    } else {
-                        return dispatch(actionCreators.router__stateGoDefault())
-                    }
+                    return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
                 }
             })
-            .then(() => {
-                const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-                return dispatch({
+            .then(() =>
+                dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri}
                 })
-
-            });
+            );
     }
 }
