@@ -140,7 +140,7 @@ import won from './won.js';
                     's:geo' : {
                         '@id': '_:location',
                         '@type': 's:GeoCoordinates',
-                        's:latitude': args.location.lng.toFixed(6),
+                        's:latitude': args.location.lat.toFixed(6),
                         's:longitude': args.location.lng.toFixed(6),
                     },
                     's:name': args.location.name,
