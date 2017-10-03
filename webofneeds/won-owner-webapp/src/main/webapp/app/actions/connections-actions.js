@@ -238,13 +238,15 @@ function generateResponseNeedTo(theirNeed) {
         descriptionPhrase = 'It\'s a response to: ';
     }
 
+    let theirDescription = get(theirNeed, 'description');
+    let theirTitle = get(theirNeed, 'title');
 
     return {
-        title: 'Re: ' + get(theirNeed, 'title'),
+        title: 'Re: ' + theirTitle,
         description:
         'This is an automatically generated post. ' +
         descriptionPhrase +
-        '"' + get(theirNeed, 'description') +'"',
+        '"' + (theirDescription? theirDescription : theirTitle) +'"',
         type: reNeedType,
         tags: cloneAsMutable(get(theirNeed, 'tags')),
         location: cloneAsMutable(get(theirNeed, 'location')),
