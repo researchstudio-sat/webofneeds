@@ -883,6 +883,67 @@ import won from './won.js';
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
 
+        let query = `
+            prefix won: <http://purl.org/webofneeds/model#>
+            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            prefix dct: <http://purl.org/dc/terms/>
+            construct {
+                <${needUri}> ?b ?c.
+                ?c ?d ?e.
+                ?e ?f ?g.
+                ?g ?h ?i.
+                ?i ?j ?k.
+                ?k ?l ?m.
+
+            } where {
+                {
+                    <${needUri}> dct:created ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                     <${needUri}> won:isInState ?c.
+                     <${needUri}> ?b ?c.
+                } UNION {
+                     <${needUri}> won:hasFlag ?c.
+                     <${needUri}> ?b ?c.
+                }
+
+                UNION
+                {
+                    <${needUri}> won:hasConnections ?c.
+                    <${needUri}> ?b ?c.
+                    optional {?c ?d ?e.}
+                }
+
+                UNION
+                {
+                    <${needUri}> won:hasEventContainer ?c.
+                    <${needUri}> ?b ?c.
+                    optional {?c ?d ?e.}
+                }
+
+                UNION {
+                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.
+                } UNION {
+                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                } UNION {
+                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                } UNION {
+                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
+                  ?c ?d ?e.
+                }  
+            }
+            `
+
+
         let propertyTree = {
             prefixes: {
                 "won" : "http://purl.org/webofneeds/model#",
@@ -896,6 +957,7 @@ import won from './won.js';
             roots: [
                 {node: "won:isInState"},
                 {node: "won:hasFlag"},
+                {node: "won:hasFacet"},
                 {node: "dtc:created"},
                 {
                     node: "won:hasEventContainer",
@@ -1000,23 +1062,31 @@ import won from './won.js';
                 }
             ]
         };
-/*
+
         for (let j = 0; j < 1; j++) {
-            let rep = 100
+            let rep = 1
             let start = performance.now();
-            //for (let i = 0; i < rep; i++) {
-                //store.execute(query, (success, resultGraph) => {
-               // });
-            //}
+            for (let i = 0; i < rep; i++) {
+                store.execute(query, (success, resultGraph) => {
+               });
+            }
             let time = performance.now() - start;
-            //console.log("executed query for " + needUri + " (run " + j + ") " + rep + " times in " + time + " millis (" + (time / rep ) + " millis per query)");
+            let format = new Intl.NumberFormat("en-US",{minimumFractionDigits:2, maximumFractionDigits:2, useGrouping:false})
+            let pad = '         ';
+            let needPad = '                                                                   ';
+
+            let timeStr = format.format(time);
+            let timePerNeedStr = format.format(time / rep);
+            console.log("executed sparql code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
             start = performance.now();
             for (let i = 0; i < rep; i++) {
                 let result = loadStarshapedGraph(store, needUri, propertyTree);
             }
             time = performance.now() - start;
-            console.log("executed custom code for " + needUri + " (run " + j + ") " + rep + " times in " + time + " millis (" + (time / rep ) + " millis per query)");
-        }*/
+            timeStr = format.format(time);
+            timePerNeedStr = format.format(time / rep);
+            console.log("executed custom code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
+        }
         const needJsonLdP = new Promise((resolve, reject) => {
 
                 const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
@@ -1104,10 +1174,10 @@ import won from './won.js';
             let startNode = store.rdf.createNamedNode(startUri);
             let tmpResult  = { res : null };
             store.graph( (success, result) => tmpResult.res = result);
-            let graph = tmpResult.res;
+            let dataGraph = dropUnnecessaryTriples(store, tmpResult.res, tree.roots);
             let resultGraph = new store.rdf.api.Graph();
             for (let i = 0; i < tree.roots.length; i++) {
-                let subResult = loadStarshapedGraph_internal(store, graph, startNode, tree.roots[i]);
+                let subResult = loadStarshapedGraph_internal(store, dataGraph, startNode, tree.roots[i]);
                 resultGraph.addAll(subResult);
             }
             return resultGraph;
@@ -1115,6 +1185,63 @@ import won from './won.js';
             console.error("error executing custom select function: " + e);
         }
     }
+
+    function dropUnnecessaryTriples(store, graph, roots){
+        "use strict";
+        let usedProperties = collectProperties(store, roots);
+        //let usedPropertiesString = usedProperties.reduce( (acc, val) => acc + val);
+        return graph.filter( triple => {
+            let pred = triple.predicate;
+            //return usedPropertiesString.indexOf(pred.nominalValue) > -1;
+            return usedProperties.includes(pred.nominalValue);
+        })
+    }
+
+    function collectProperties(store, node) {
+        let usedProperties = [];
+        if (Array.isArray(node)){
+            node.forEach(element => {
+                if (typeof element === "string") {
+                    //we are processing an array of properties
+                    let resolvedProperty = store.rdf.resolve(element);
+                    if (!usedProperties.includes(resolvedProperty)){
+                        usedProperties.push(resolvedProperty);
+                    }
+                } else {
+                    //we are processing an array of tree nodes
+                    let foundProperties = collectProperties(store, element);
+                    foundProperties.forEach(prop => {
+                        if (!usedProperties.includes(prop)) {
+                            usedProperties.push(prop);
+                        }
+                    })
+                }
+            });
+        } else if (node.hasOwnProperty("usedProperties")) {
+            return node.usedProperties;
+        } else {
+            //we cache the recursion result in the object nodes of the structure
+            //we assume an object with fields 'node' and 'children'
+            if (node.hasOwnProperty("children")){
+                let foundProperties = collectProperties(store, node.children);
+                foundProperties.forEach(prop => {
+                    if (!usedProperties.includes(prop)){
+                        usedProperties.push(prop);
+                    }
+                });
+            }
+            if (node.hasOwnProperty("node")){
+                let resolvedProperty = store.rdf.resolve(node.node);
+                if (!usedProperties.includes(resolvedProperty)){
+                    usedProperties.push(resolvedProperty);
+                }
+            }
+            node.usedProperties = usedProperties;
+        }
+        return usedProperties;
+    }
+
+
 
     /**
      * Returns an RDFJSInterface.Graph containing all triples reachable from the start node
@@ -1127,7 +1254,7 @@ import won from './won.js';
         let path = Array.isArray(tree.node) ? tree.node : [ tree.node];
 
         // call this function for all elements and collect the results
-        let pathResult = loadGraphForPath(store, dataGraph, startNode, path);
+        let pathResult = loadGraphForPath(store, dropUnnecessaryTriples(store, dataGraph, path), startNode, path);
         resultGraph.addAll(pathResult.graph);
         // recurse
         let subtreeStartNodes = pathResult.leafNodes;
@@ -1137,7 +1264,7 @@ import won from './won.js';
                 let child = children[i];
                 for (let j = 0; j < subtreeStartNodes.length; j++) {
                     let subtreeStartNode = subtreeStartNodes[j];
-                    let subResult = loadStarshapedGraph_internal(store, dataGraph, subtreeStartNode, child);
+                    let subResult = loadStarshapedGraph_internal(store, dropUnnecessaryTriples(store, dataGraph, child), subtreeStartNode, child);
                     resultGraph.addAll(subResult);
                 }
             }
