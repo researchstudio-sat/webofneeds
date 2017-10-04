@@ -54,6 +54,14 @@ export default function(allToasts = initialState, action = {}) {
                 return allToasts;
             }
 
+        case actionTypes.geoLocationDenied:
+            return pushNewToast(allToasts,
+                'Sorry, we were unable to create your "What\'s Around"-Post, ' +
+                'because you have denied us accesss to your current location',
+                won.WON.warnToast, {}
+            );
+
+
         case actionTypes.lostConnection:
             return pushNewToast(allToasts, "Lost connection - progress " +
                 "can't be saved any more. Make sure your " +
