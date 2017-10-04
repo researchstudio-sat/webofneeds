@@ -48,7 +48,7 @@ export default function(allToasts = initialState, action = {}) {
                       'removing it' +
                     '</a> to start fresh.',
                     won.WON.errorToast,
-                    {htmlEnabled: true}
+                    {unsafeHtmlEnabled: true}
                 )
             } else {
                 return allToasts;
@@ -64,7 +64,8 @@ export default function(allToasts = initialState, action = {}) {
                 '<a href="https://www.mozilla.org/en-US/firefox/geolocation/">Firefox</a>, ' +
                 '<a href="https://support.apple.com/en-us/HT204690">Safari</a> and ' +
                 '<a href="https://privacy.microsoft.com/en-us/windows-10-location-and-privacy">Internet Explorer Edge</a>.',
-                won.WON.warnToast, {}
+                won.WON.warnToast,
+                {unsafeHtmlEnabled: true}
             );
 
 
@@ -97,14 +98,14 @@ export default function(allToasts = initialState, action = {}) {
  * @param msg
  * @param type
  * @param options
- *   * htmlEnabled: set this to true only if it's really necessary and never
+ *   * unsafeHtmlEnabled: set this to true only if it's really necessary and never
  *   with non-static text (e.g. never use this with toasts that show need-contents
  *   as this would open the possibility for XSS-attacks)
  * @returns {*}
  */
 function pushNewToast(allToasts, msg, type, options) {
     const options_ = Object.assign({
-        htmlEnabled: false,
+        unsafeHtmlEnabled: false,
     }, options);
 
     let toastType = type;
@@ -117,7 +118,7 @@ function pushNewToast(allToasts, msg, type, options) {
         id: id,
         type: toastType,
         msg: msg,
-        htmlEnabled: options_.htmlEnabled,
+        unsafeHtmlEnabled: options_.unsafeHtmlEnabled,
     }));
 }
 
