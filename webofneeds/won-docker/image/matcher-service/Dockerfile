@@ -2,7 +2,8 @@
 # conf directory have to be copied into this folder (done by maven build)
 
 # use java as a base image
-FROM openjdk:8
+# fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
+FROM openjdk:8u121-jdk
 
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/src/matcher-service/conf
