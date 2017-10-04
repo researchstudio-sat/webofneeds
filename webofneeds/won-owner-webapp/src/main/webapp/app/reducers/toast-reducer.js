@@ -57,7 +57,13 @@ export default function(allToasts = initialState, action = {}) {
         case actionTypes.geoLocationDenied:
             return pushNewToast(allToasts,
                 'Sorry, we were unable to create your "What\'s Around"-Post, ' +
-                'because you have denied us accesss to your current location',
+                'because you have denied us accesss to your current location. ' +
+                'To enable it, reload the page and click on "allow access". If' +
+                'you\'ve disabled it permanently you can find instructions here for  ' +
+                '<a href="https://support.google.com/chrome/answer/142065">Chrome</a>, ' +
+                '<a href="https://www.mozilla.org/en-US/firefox/geolocation/">Firefox</a>, ' +
+                '<a href="https://support.apple.com/en-us/HT204690">Safari</a> and ' +
+                '<a href="https://privacy.microsoft.com/en-us/windows-10-location-and-privacy">Internet Explorer Edge</a>.',
                 won.WON.warnToast, {}
             );
 
