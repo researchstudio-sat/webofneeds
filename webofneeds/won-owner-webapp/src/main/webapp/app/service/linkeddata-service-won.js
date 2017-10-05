@@ -1562,7 +1562,7 @@ import won from './won.js';
                 ret[won.WONMSG.hasReceiver] = theirConnectionUri;
             }
         } catch(err){}
-        return ret;
+        return new Promise().resolve(ret);
     };
 
     /**
@@ -1578,7 +1578,6 @@ import won from './won.js';
             )
         );
 
-    won.getconnectionUrisOfNeed =
     /*
      * Loads all URIs of a need's connections.
      */
@@ -1650,68 +1649,6 @@ import won from './won.js';
             .then(connection => connection.hasEvents);
     };
 
-
-    won.getLastEventOfEachConnectionOfNeed = function(needUri, requesterWebId) {
-        //fetch all connection uris of the need
-        var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId);
-        return allConnectionsPromise.then(
-            function getLastEventForConnections(connectionsData){
-                return somePromises(
-                    //for each connection uri:
-                    connectionsData.map(
-                        function(conData){
-                            return won.executeCrawlableQuery(
-                                        won.queries["getLastEventUriOfConnection"],
-                                        conData.connection.value,
-                                        requesterWebId
-                                ).then(function(eventUriResult){
-                                            return Promise.all(
-                                                [won.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
-                                                 won.getNodeWithAttributes(conData.connection.value),
-                                                 won.getTheirNeed(conData.remoteNeed.value)
-                                                ]
-                                            )
-                                        }
-                                ).then(function (result) {
-                                            //make a nice structure for the data
-                                            return {
-                                                event: result[0],
-                                                connection: result[1],
-                                                remoteNeed: result[2]
-                                            }
-                                        });
-                        }
-                    )
-                )
-            });
-    };
-
-     won.getConnectionTextMessages = function(connectionUri, requesterWebId) {
-        var queryResultPromise = won.executeCrawlableQuery(won.queries["getConnectionTextMessages"], connectionUri, requesterWebId);
-        return queryResultPromise.then(
-                function processConnectionTextMessages(results){
-                        var textMessages = [];
-                        for (var key in results) {
-                            var textMessage = {};
-                            var eventUri = getSafeValue(results[key].eventUri);
-                            var timestamp = getSafeValue(results[key].receivedTimestamp);
-                            var text = getSafeValue(results[key].text);
-                            var senderNeed = getSafeValue(results[key].senderNeed);
-                            var ownNodeResponseType = getSafeValue(results[key].ownNodeResponseType);
-                            var remoteNodeResponseType = getSafeValue(results[key].remoteNodeResponseType);
-                            var sender = getSafeValue(results[key].sender);
-                            var isOwnMessage = sender == connectionUri;
-                            if (eventUri != null && timestamp != null && text != null) {
-                                textMessage.eventUri = eventUri;
-                                textMessage.timestamp = timestamp;
-                                textMessage.text = text;
-                                textMessage.senderNeed = senderNeed;
-                                textMessages.push(textMessage);
-                            }
-                        }
-                        return textMessages;
-                    });
-    };
 
     /**
      * @param connectionUri
@@ -1904,7 +1841,7 @@ import won from './won.js';
     //TODO refactor this method.
     won.getConnectionInStateForNeedWithRemoteNeed = function(needUri,connectionState) {
 
-        return won.getconnectionUrisOfNeed(needUri).then(connectionUris => {
+        return won.getConnectionUrisOfNeed(needUri).then(connectionUris => {
 
 
 
@@ -2059,54 +1996,6 @@ import won from './won.js';
      * @type {{connectionMessages: {query: string, propertyPaths: *[]}}}
      */
     won.queries = {
-        "getConnectionTextMessages" : {
-            propertyPaths : [
-                { prefixes :
-                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-                  propertyPath : "won:hasEventContainer"
-                },
-                { prefixes :
-                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-                    propertyPath : "won:hasEventContainer/rdfs:member"
-                }
-            ],
-        query:
-        //note: we have to take the max timestamp as there might be multiple timestamps added to the
-        //message dataset during processing
-            "prefix msg: <http://purl.org/webofneeds/message#> \n"+
-                "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                "select distinct ?eventUri ?receivedTimestamp ?text ?senderNeed ?sender ?ownNodeResponseType ?remoteNodeResponseType\n" +
-                " where { \n" +
-                "  <::baseUri::> a won:Connection; \n" +
-                "  won:hasEventContainer ?container.\n" +
-                " {\n" +
-                "  ?container rdfs:member ?eventUri.\n" +
-                "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp;\n" +
-                " } union {\n" +
-                "  ?container rdfs:member/msg:hasCorrespondingRemoteMessage ?eventUri.\n" +
-                "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp;\n" +
-                " }\n" +
-                "  ?eventUri msg:hasMessageType ?messageType;\n" +
-                "       won:hasTextMessage ?text;\n" +
-                "       msg:hasSenderNeed ?senderNeed;\n" +
-                "       msg:hasSender ?sender.\n" +
-                " optional { \n" +
-                "   ?ownNodeResponse msg:isResponseTo ?eventUri; \n" +
-                "                    msg:hasMessageType ?ownNodeResponseType. \n" +
-                " } \n" +
-                " optional { \n" +
-                "   ?remoteNodeResponse msg:isRemoteResponseTo ?eventUri; \n" +
-                "                    msg:hasMessageType ?remoteNodeResponseType. \n" +
-                " } \n" +
-                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)\n" +
-                "}\n" +
-                "order by desc(?receivedTimestamp)"
-        },
         /**
          * Despite the name, returns the connections fo the specified need themselves. TODO rename
          */
@@ -2140,46 +2029,5 @@ import won from './won.js';
                 "} \n"
 
         },
-
-
-        "getLastEventUriOfConnection" : {
-        propertyPaths : [
-            { prefixes :
-                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-                propertyPath : "won:hasEventContainer"
-            },
-            { prefixes :
-                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
-                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-                propertyPath : "won:hasEventContainer/rdfs:member"
-            }
-        ],
-        query:
-            "prefix msg: <http://purl.org/webofneeds/message#> \n" +
-            "prefix won: <http://purl.org/webofneeds/model#> \n" +
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-            "select ?eventUri  \n" +
-            "where { \n" +
-            " {\n" +
-            "  <::baseUri::> a won:Connection; \n" +
-            "  won:hasEventContainer ?container.\n" +
-            "  ?container rdfs:member ?eventUri.\n" +
-            "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp.\n" +
-            "  ?eventUri msg:hasMessageType ?messageType.\n" +
-            " } union {\n" +
-            "  <::baseUri::> a won:Connection; \n" +
-            "  won:hasEventContainer ?container.\n" +
-            "  ?container rdfs:member/msg:hasCorrespondingRemoteMessage ?eventUri.\n" +
-            "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp.\n" +
-            "  ?eventUri msg:hasMessageType ?messageType.\n" +
-            " }\n" +
-            " filter (?messageType != msg:SuccessResponse)\n" +
-            "}\n" +
-            "order by desc(?receivedTimestamp) limit 1 \n"
-
-            }
     }
 })();
