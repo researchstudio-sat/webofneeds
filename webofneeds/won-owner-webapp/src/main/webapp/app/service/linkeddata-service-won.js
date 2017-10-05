@@ -18,14 +18,11 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 import {
-    checkHttpStatus,
     entries,
     urisToLookupMap,
     is,
     clone,
     contains,
-    camel2Hyphen,
-    somePromises,
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
@@ -111,19 +108,6 @@ import won from './won.js';
 
 
     won.clearStore();
-
-
-    var createNameNodeInStore = function(uri){
-        return privateData.store.rdf.createNamedNode(privateData.store.rdf.resolve(uri));
-    };
-
-    var getSafeValue = function(dataItem) {
-        if (typeof dataItem === 'undefined') return null;
-        if (dataItem == null) return null;
-        if (typeof dataItem.value === 'undefined') return dataItem;
-        if (dataItem.value != null) return dataItem.value;
-        return null;
-    };
 
     /**
      * An emulation of a lock that can be acquired by any number of readers
@@ -294,36 +278,6 @@ import won from './won.js';
         return ret;
     };
 
-    /**
-     * Returns true iff the uri is loaded and marked as dirty.
-     * @param uri
-     * @returns {boolean}
-     */
-    var cacheItemIsDirty = function cacheItemIsDirty(uri){
-        return cacheItemIsInState(uri, CACHE_ITEM_STATE.DIRTY, "dirty");
-    };
-
-    /**
-     * Returns true iff the uri is loaded and marked ok.
-     * @param uri
-     * @returns {boolean}
-     */
-    var cacheItemIsOk = function cacheItemIsOk(uri){
-        return cacheItemIsInState(uri, CACHE_ITEM_STATE.OK, "loaded");
-    };
-
-    var cacheItemIsPartiallyFetched = function cacheItemIsOk(uri){
-        return cacheItemIsInState(uri, CACHE_ITEM_STATE.PARTIALLY_FETCHED, "partially loaded");
-    };
-
-    /**
-     * Returns true iff the uri is loaded and marked unresolvable.
-     * @param uri
-     * @returns {boolean}
-     */
-    var cacheItemIsUnresolvable = function cacheItemIsUnresolvable(uri){
-        return cacheItemIsInState(uri, CACHE_ITEM_STATE.UNRESOLVABLE, "unresolvable");
-    };
 
     var cacheItemMarkAccessed = function cacheItemMarkAccessed(uri){
         var entry = privateData.cacheStatus[uri];
@@ -1436,56 +1390,6 @@ import won from './won.js';
         return result;
     }
 
-
-
-    /**
-     *
-     * NOTE: this function assumes an acyclic graph!!
-     * @param rootUri
-     * @param triples
-     * @return {{}}
-     */
-    function triples2jsonNaive(rootUri, triples) {
-        const resultJson = {};
-        const rootTriples = triples.filter(t => t.subject.nominalValue === rootUri);
-        for(var t of rootTriples) {
-            const predicate = won.getLocalName(t.predicate.nominalValue);
-            switch(t.object.interfaceName) {
-                case "Literal":
-                    // This is the simple case. we can just add it to our result object
-                    var literal = t.object.nominalValue;
-                    resultJson[predicate] = literal;
-                    break;
-
-                case "NamedNode":
-                    var namedNodeUri = t.object.nominalValue;
-                    var isUsedAsSubject = (triples.filter(t_ => t_.subject.nominalValue === namedNodeUri).length > 0);
-                    if(isUsedAsSubject) {
-                        // treat like blank node
-                        resultJson[predicate] = triples2json(namedNodeUri, triples);
-                    } else {
-                        // treat like literal node
-                        resultJson[predicate] = namedNodeUri;
-                    }
-                    break;
-
-                case "BlankNode":
-                    var blankNodeUri = t.object.nominalValue;
-                    resultJson[predicate] = triples2json(blankNodeUri, triples);
-                    break;
-
-                default:
-                    throw new Exception("Encountered triple with object of unknown type: "
-                        + t.object.interfaceName + "\n" +
-                        t.subject.nominalValue + " " +
-                        t.predicate.nominalValue + " " +
-                        t.object.nominalValue + " "
-                    );
-            }
-        }
-
-        return resultJson;
-    }
 
     /**
      * Impure function, that all cases of `rdfs:member` have. This
