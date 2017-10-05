@@ -288,18 +288,18 @@ function addConnectionFull(state, connection, newConnection) {
     return state;
 }
 
-function addMessage(state, message, outgoingMessage, newMessage) {
-    let parsedMessage = parseMessage(message, outgoingMessage, newMessage);
+function addMessage(state, wonMessage, outgoingMessage, newMessage) {
+    let parsedMessage = parseMessage(wonMessage, outgoingMessage, newMessage);
 
     if(parsedMessage){
         const connectionUri = parsedMessage.get("belongsToUri");
         let needUri = null;
         if (outgoingMessage){
             //needUri is the message's hasSenderNeed
-            needUri = message.get('hasSenderNeed');
+            needUri = wonMessage.getSenderNeed();
         } else{
             //needUri is the remote message's hasReceiverNeed
-            needUri = message.getIn(['hasCorrespondingRemoteMessage', 'hasReceiverNeed']);
+            needUri = wonMessage.getReceiverNeed();
         }
         if(needUri){
             let messages = state.getIn([needUri, "connections", connectionUri, "messages"]);
