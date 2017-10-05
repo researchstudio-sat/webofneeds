@@ -98,7 +98,7 @@ import won from './won.js';
 
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
         privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
-    }
+    };
     /**
      * OK: fully fetched
      * DIRTY: has changed
@@ -115,7 +115,7 @@ import won from './won.js';
 
     var createNameNodeInStore = function(uri){
         return privateData.store.rdf.createNamedNode(privateData.store.rdf.resolve(uri));
-    }
+    };
 
     var getSafeValue = function(dataItem) {
         if (typeof dataItem === 'undefined') return null;
@@ -123,7 +123,7 @@ import won from './won.js';
         if (typeof dataItem.value === 'undefined') return dataItem;
         if (dataItem.value != null) return dataItem.value;
         return null;
-    }
+    };
 
     /**
      * An emulation of a lock that can be acquired by any number of readers
@@ -263,7 +263,7 @@ import won from './won.js';
             timestamp: new Date().getTime(),
             state: partial? CACHE_ITEM_STATE.PARTIALLY_FETCHED : CACHE_ITEM_STATE.OK
         };
-    }
+    };
 
     var cacheItemIsInState = function cacheItemIsInState(uri, state, nameOfState){
         var entry = privateData.cacheStatus[uri];
@@ -276,7 +276,7 @@ import won from './won.js';
         var retStr = (ret + "     ").substr(0,5);
         //console.log("linkeddata-service-won.js: cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
         return ret;
-    }
+    };
 
     var cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(uri){
         var entry = privateData.cacheStatus[uri];
@@ -292,7 +292,7 @@ import won from './won.js';
         var retStr = (ret + "     ").substr(0,5);
         //console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
         return ret;
-    }
+    };
 
     /**
      * Returns true iff the uri is loaded and marked as dirty.
@@ -301,7 +301,7 @@ import won from './won.js';
      */
     var cacheItemIsDirty = function cacheItemIsDirty(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.DIRTY, "dirty");
-    }
+    };
 
     /**
      * Returns true iff the uri is loaded and marked ok.
@@ -310,11 +310,11 @@ import won from './won.js';
      */
     var cacheItemIsOk = function cacheItemIsOk(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.OK, "loaded");
-    }
+    };
 
     var cacheItemIsPartiallyFetched = function cacheItemIsOk(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.PARTIALLY_FETCHED, "partially loaded");
-    }
+    };
 
     /**
      * Returns true iff the uri is loaded and marked unresolvable.
@@ -323,7 +323,7 @@ import won from './won.js';
      */
     var cacheItemIsUnresolvable = function cacheItemIsUnresolvable(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.UNRESOLVABLE, "unresolvable");
-    }
+    };
 
     var cacheItemMarkAccessed = function cacheItemMarkAccessed(uri){
         var entry = privateData.cacheStatus[uri];
@@ -338,7 +338,7 @@ import won from './won.js';
         }
         //console.log("linkeddata-service-won.js: mark accessed:   " + uri);
         privateData.cacheStatus[uri].timestamp = new Date().getTime();
-    }
+    };
 
     var cacheItemMarkDirty = function cacheItemMarkDirty(uri){
         var entry = privateData.cacheStatus[uri];
@@ -347,22 +347,22 @@ import won from './won.js';
         }
         //console.log("linkeddata-service-won.js: mark dirty:      " + uri);
         privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
-    }
+    };
 
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri, reason){
         //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
         console.error("Couldn't resolve " + uri + ". reason: ", JSON.stringify(reason));
-    }
+    };
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
         //console.log("linkeddata-service-won.js: mark fetching:   " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.FETCHING};
-    }
+    };
 
     var cacheItemRemove = function cacheItemRemove(uri){
         delete privateData.cacheStatus[uri];
-    }
+    };
 
 
     /**
@@ -377,7 +377,7 @@ import won from './won.js';
             }
         }
         return unreleasedLocks;
-    }
+    };
 
     /**
      * Invalidates the appropriate linked data cache items (i.e. the set of connections
@@ -402,7 +402,7 @@ import won from './won.js';
                 }
             }
         );
-    }
+    };
 
     /**
      * Invalidates the appropriate linked data cache items such that all information about a
@@ -424,14 +424,14 @@ import won from './won.js';
                     cacheItemMarkDirty(connection.hasEventContainer);
                 }
             });
-    }
+    };
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
             cacheItemMarkDirty(needUri+'/connections')
         }
         return Promise.resolve(true); //return a promise for chaining
-    }
+    };
 
     var getReadUpdateLockPerUri = function(uri){
         var lock = privateData.readUpdateLocksPerUri[uri];
@@ -440,7 +440,7 @@ import won from './won.js';
             privateData.readUpdateLocksPerUri[uri] = lock;
         }
         return lock;
-    }
+    };
 
     var getReadUpdateLocksPerUris = function(uris){
         var locks = [];
@@ -451,7 +451,7 @@ import won from './won.js';
             }
         );
         return locks;
-    }
+    };
 
     /**
      * Acquires all locks, returns an array of promises.
@@ -467,7 +467,7 @@ import won from './won.js';
             }
         );
         return acquiredLocks;
-    }
+    };
 
 
     /**
@@ -488,11 +488,11 @@ import won from './won.js';
             // property is really not there (and should not be), so in that case it's not an error...
             //console.log(rejectionMessage);
             // TODO: this q.reject seems to have no effect
-            q.reject(rejectionMessage)
+            q.reject(rejectionMessage);
             return true;
         }
         return false;
-    }
+    };
 
     function buildRejectionMessage (success, data, options) {
         let errorMessage = null;
@@ -554,7 +554,7 @@ import won from './won.js';
             resultObject.result = results;
         });
         return resultObject.result;
-    }
+    };
 
     /**
      * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
@@ -587,7 +587,7 @@ import won from './won.js';
             })
         });
         return resultObject.result;
-    }
+    };
 
     /**
      * Fetches the linked data for the specified URI and saves it in the local triple-store.
@@ -645,7 +645,7 @@ import won from './won.js';
                                         resourceUri,
                                         partialFetch && resourceUri === uri
                                     )
-                                })
+                                });
                                 return allLoadedResources;
                             }
                         )
@@ -827,7 +827,7 @@ import won from './won.js';
         )
         .catch(e =>
             Promise.reject(`failed to load ${uri} due to reason: "${e}"`)
-        )
+        );
 
         return datasetP;
     };
@@ -1283,7 +1283,7 @@ import won from './won.js';
      */
     function loadGraphForPath(store, dataGraph, startNode, path) {
         if (path.length == 0) return null;
-        let localResultGraph = dataGraph.filter(won.tripleFilters.sp(startNode, store.rdf.createNamedNode(path[0])))
+        let localResultGraph = dataGraph.filter(won.tripleFilters.sp(startNode, store.rdf.createNamedNode(path[0])));
         let localLeafNodes = getObjectsFromGraph(localResultGraph);
         if (path.length == 1) {
             // last path element - the leaf in the current branch.
@@ -1415,13 +1415,13 @@ import won from './won.js';
 
         switch(element.interfaceName) {
             case "Literal":
-                result.type = "literal"
+                result.type = "literal";
                 break;
             case "NamedNode":
-                result.type = "IRI"
+                result.type = "IRI";
                 break;
             case "BlankNode":
-                result.type = "blank node"
+                result.type = "blank node";
                 break;
             default:
                 throw new Exception("Encountered triple with object of unknown type: "
@@ -1499,7 +1499,7 @@ import won from './won.js';
         visited.add(needJsonLd);
 
         for( var k of Object.keys(needJsonLd)) {
-            if(k === "rdfs:member" && !is('Array', needJsonLd[k])) needJsonLd[k] = [needJsonLd[k]]
+            if(k === "rdfs:member" && !is('Array', needJsonLd[k])) needJsonLd[k] = [needJsonLd[k]];
             ensureRdfsMemberArrays(needJsonLd[k], visited)
         }
     }
@@ -1510,50 +1510,45 @@ import won from './won.js';
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
         }
         return won.getNode(needUri).then(need => need.hasWonNode);
-    }
+    };
 
     won.getNeedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getNeedUriOfConnection: connectionUri must not be null"};
         }
         return won.getNode(connectionUri).then(connection => connection.belongsToNeed);
-    }
+    };
 
     won.getRemoteConnectionUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getRemoteConnectionUriOfConnection: connectionUri must not be null"};
         }
         return won.getNode(connectionUri).then(connection => connection.hasRemoteConnection)
-    }
+    };
 
     won.getRemoteneedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getRemoteneedUriOfConnection: connectionUri must not be null"};
         }
         return won.getNode(connectionUri).then(connection => connection.hasRemoteNeed);
-    }
+    };
 
-    won.getEnvelopeDataForNeed=function(needUri){
+    won.getEnvelopeDataForNeed=function(needUri, nodeUri){
         if(typeof needUri === 'undefined'||needUri == null){
             throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
         }
-        return won.getWonNodeUriOfNeed(needUri)
-            .then(wonNodeUri => {
-                let ret = {};
-                ret[won.WONMSG.hasSenderNeed] = needUri;
-                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                ret[won.WONMSG.hasReceiverNeed] = needUri;
-                ret[won.WONMSG.hasReceiverNode] = wonNodeUri;
-                return ret;
-            }).catch(reason => {
-                //no connection found
-                let ret = {};
-                ret[won.WONMSG.hasSenderNeed] = needUri;
-                ret[won.WONMSG.hasReceiverNeed] = needUri;
-                return ret;
-            });
-    }
 
+        let ret = {};
+        ret[won.WONMSG.hasSenderNeed] = needUri;
+        ret[won.WONMSG.hasReceiverNeed] = needUri;
+
+        if(!(typeof nodeUri === 'undefined'||nodeUri == null)) {
+            ret[won.WONMSG.hasSenderNode] = nodeUri;
+            ret[won.WONMSG.hasReceiverNode] = nodeUri;
+        }
+
+        return new Promise.resolve(ret);
+    };
 
     won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri) {
         if (!ownNeedUri){
@@ -1575,7 +1570,7 @@ import won from './won.js';
             })
         );
 
-    }
+    };
 
 
     /**
@@ -1651,7 +1646,7 @@ import won from './won.js';
                         try {
                             var subject = needUri;
                             var predicate = won.WON.hasConnections;
-                            var result = {}
+                            var result = {};
                             privateData.store.node(needUri, function (success, graph) {
                                 var resultGraph = graph.match(subject, predicate, null);
                                 if (!rejectIfFailed(success, resultGraph, {allowMultiple:false, allowNone: false, message:"Failed to load connections uri of need " + needUri})){
@@ -1693,7 +1688,7 @@ import won from './won.js';
     won.getEventUrisOfConnection = function(connectionUri, fetchParams) {
         return won.getConnectionWithEventUris(connectionUri,  fetchParams)
             .then(connection => connection.hasEvents);
-    }
+    };
 
 
     won.getLastEventOfEachConnectionOfNeed = function(needUri, requesterWebId) {
@@ -1729,7 +1724,7 @@ import won from './won.js';
                     )
                 )
             });
-    }
+    };
 
      won.getConnectionTextMessages = function(connectionUri, requesterWebId) {
         var queryResultPromise = won.executeCrawlableQuery(won.queries["getConnectionTextMessages"], connectionUri, requesterWebId);
@@ -1756,7 +1751,7 @@ import won from './won.js';
                         }
                         return textMessages;
                     });
-    }
+    };
 
 
     /**
@@ -1792,7 +1787,7 @@ import won from './won.js';
                  */
                 connection.hasEvents = is('String', eventContainer.member) ?
                     [eventContainer.member] :
-                    eventContainer.member
+                    eventContainer.member;
                 return connection;
             })
     };
@@ -1910,7 +1905,7 @@ import won from './won.js';
             });
 
         return nodePromise;
-    }
+    };
 
     /**
      * Deletes all triples where the specified uri is the subect. May have side effects on concurrent
@@ -1978,7 +1973,7 @@ import won from './won.js';
                             "              won:belongsToNeed <" +needUri +"> ; \n" +
                             "              won:hasRemoteNeed ?remoteNeed; \n"+
                             "              won:hasConnectionState "+ connectionState +". \n"+
-                            "} \n"
+                            "} \n";
 
                         privateData.store.execute(query,[],[],function(success,results){
                             if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
@@ -2000,7 +1995,7 @@ import won from './won.js';
         })
 
 
-    }
+    };
 
     /**
      * Executes the specified crawlableQuery, returns a promise to its results, which may become available
@@ -2040,7 +2035,7 @@ import won from './won.js';
                     }
                 }
             )
-        }
+        };
 
         var resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(propertyPaths, baseUri, relevantResources){
             //console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
@@ -2074,7 +2069,7 @@ import won from './won.js';
                         );
                     }
                 });
-        }
+        };
 
         var resolveOrExecuteQuery = function resolveOrExecuteQuery(resolvedUris){
             if (won.isNull(recursionData.depth)){
@@ -2099,11 +2094,11 @@ import won from './won.js';
                             return resolveOrExecuteQuery(newlyResolvedUris);
                         });
             }
-        }
+        };
 
         return resolveOrExecuteQuery([baseUri]);
 
-    }
+    };
 
     /**
      * SPARQL queries and property paths for identifying the resources required for the query to work.

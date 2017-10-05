@@ -98,7 +98,7 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
         return {eventUri: eventUri, message: message};
     };
 
-    return won.getEnvelopeDataForNeed(needUri)
+    return won.getEnvelopeDataForNeed(needUri, wonNodeUri)
         .then(
             envelopeData => buildMessage(envelopeData),
             err => won.reportError("cannot close need "+ needUri)
@@ -119,7 +119,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
         return {eventUri: eventUri, message: message};
     };
 
-    return won.getEnvelopeDataForNeed(needUri)
+    return won.getEnvelopeDataForNeed(needUri, wonNodeUri)
         .then(
             envelopeData => buildMessage(envelopeData),
             err => won.reportError("cannot close need "+ needUri)
