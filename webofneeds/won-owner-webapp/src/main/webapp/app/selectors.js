@@ -11,7 +11,6 @@ import {
     getIn,
 } from './utils.js';
 
-export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => getIn(state, ['router', 'currentParams']);
 
@@ -31,6 +30,16 @@ export const selectAllTheirNeeds = state => selectAllNeeds(state).filter(need =>
 export function selectNeedByConnectionUri(state, connectionUri){
     let needs = selectAllOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
     return needs.filter(need => need.getIn(["connections", connectionUri])).first();
+}
+
+/**
+ * Get the connection for a given connectionUri
+ * @param state to retrieve data from
+ * @param connectionUri to find corresponding connection for
+ */
+export function selectConnection(state, connectionUri){
+    let need = selectNeedByConnectionUri(state, connectionUri);
+    return need.getIn(['connections', connectionUri]);
 }
 
 /**
@@ -70,34 +79,6 @@ export function selectAllMessagesByNeedUri(state, needUri) {
     }
 
     return messages;
-}
-
-export const selectRemoteEvents = createSelector(
-    selectEvents,
-    events => {
-        const remoteUrisAndEvents = events
-            .toList()
-            .map(e => {
-                let remote = e.get('hasCorrespondingRemoteMessage'); // select remote
-                if(is('String', remote)) remote = events.get(remote); // for those rare cases where remote is only a uri
-                if(!remote) return undefined;
-                remote = remote.set('correspondsToOwnMsg', e); //add back-reference to it
-                return remote && [remote.get('uri'), remote]
-            })
-            .filter(uriAndEvent => uriAndEvent); // filter out `undefined`s
-        return Immutable.Map(remoteUrisAndEvents)
-    }
-);
-
-export function selectAllByConnectionUri(state, connectionUri) {
-    const ownNeed = selectNeedByConnectionUri(state, connectionUri);
-    const connection = ownNeed && state.getIn(["needs", ownNeed.get("uri"), "connections", connectionUri]);
-    const remoteNeedUri = connection && connection.get("remoteNeedUri");
-    const remoteNeed = remoteNeedUri && state.getIn(["needs", remoteNeedUri]);
-
-    const events = state.getIn(["events", "events"]).filter(event => event.get("hasReveiver") === connectionUri || event.get("hasSender") === connectionUri); //TODO: MAKE THIS BETTER AND CHECK FOR CORRECTNESS
-
-    return Immutable.Map({connection, events, ownNeed, remoteNeed});
 }
 
 export const selectOpenConnectionUri = createSelector(

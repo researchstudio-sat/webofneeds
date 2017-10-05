@@ -60,30 +60,29 @@ export function buildRateMessage(msgToRateFor, rating){
     });
 }
 
-export function buildCloseMessage(msgToConnectFor){
-    return new Promise((resolve, reject) => {
-        var buildMessage = function (envelopeData, eventToConnectFor) {
-            //TODO: use event URI pattern specified by WoN node
-            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
-            var message = new won.MessageBuilder(won.WONMSG.closeMessage)
-                .eventURI(eventUri)
-                .forEnvelopeData(envelopeData)
-                .hasOwnerDirection()
-                .hasSentTimestamp(new Date().getTime().toString())
-                .build();
-            //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
-            return {eventUri: eventUri, message: message};
-        }
+export function buildCloseMessage(connectionUri){
+    var buildMessage = function (envelopeData) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.closeMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime().toString())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
+        return {eventUri: eventUri, message: message};
+    };
 
-        //fetch all data needed
-        won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
-            .then(function (envelopeData) {
-                resolve(buildMessage(envelopeData, msgToConnectFor.event));
-            },
-            won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
-        );
+    //fetch all data needed
+    return won.getEnvelopeDataforConnection(connectionUri)
+    .then( envelopeData =>
+        buildMessage(envelopeData)
+    )
+    .catch(err => {
+        won.reportError("cannot close connection " + connectionUri +": " + JSON.stringify(err))
+        throw err;
     });
-
 }
 export function buildCloseNeedMessage(needUri, wonNodeUri){
     const buildMessage = function(envelopeData) {
@@ -285,126 +284,9 @@ export function buildCreateMessage(needData, wonNodeUri) {
         needUri: publishedContentUri,
     };
 }
-export  function setCommStateFromResponseForLocalNeedMessage(event) {
-    if (isSuccessMessage(event)){
-        event.commState = won.COMMUNUCATION_STATE.ACCEPTED;
-    } else {
-        event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
-    }
-}
+
 export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
-}
-
-export function getEventsFromMessage(msgJson, ownNeedUris) {
-    const eventData = {};
-    //call handler if there is one - it may modify the event object
-    //frame the incoming jsonld to get the data that interest us
-
-    const acceptedSources = [ 'msg:FromOwner', 'msg:FromSystem', 'msg:FromExternal' ];
-
-    const framingAttempts = acceptedSources.map(source =>
-        jsonld.promises.frame(msgJson, {
-            '@context': {
-                'won': 'http://purl.org/webofneeds/model#',
-                'msg': 'http://purl.org/webofneeds/message#'
-            },
-            '@type': source
-        }));
-
-    const maybeFramedMsgs = Promise.all(framingAttempts)
-        .then(framedMessages => {
-            let acc = {};
-            framedMessages.forEach((msg, i) => {
-                if (msg['@graph'].length === 0) {
-                    // if framing fails, the length of the graphs array is 0. only accept if it is longer
-                    return;
-                } else if (acceptedSources[i] === 'msg:FromExternal') {
-                    // a FromExternal message must have a ReceiverNeed that we own, otherwise we made a mistake in framing it
-                    let receiverNeed = getIn(msg, ["@graph", 0, "msg:hasCorrespondingRemoteMessage", "msg:hasReceiverNeed", "@id"]);
-                    // we found a receiver need. seems to be a connection message from external
-                    if (receiverNeed) {
-                        if (ownNeedUris.includes(receiverNeed)) {
-                            //ok, the receiverNeed is one of ours
-                            acc[acceptedSources[i]] = msg;
-                            return;
-                        } else {
-                            //not our need - omit that result
-                            return;
-                        }
-                    } else {
-                        //now we could be handling a HintMessage - such a message does not have a corresponding
-                        //remote message. check that case
-                        if (getIn(msg, ["@graph", 0, "msg:hasMessageType", "@id"]) === won.WONMSG.hintMessageCompacted) {
-                            receiverNeed = getIn(msg, ["@graph", 0, "msg:hasReceiverNeed", "@id"]);
-                            if (receiverNeed) {
-                                if (ownNeedUris.includes(receiverNeed)) {
-                                    //ok, the receiverNeed is one of ours
-                                    acc[acceptedSources[i]] = msg;
-                                    return;
-                                } else {
-                                    //not our need - omit that result
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                } else if (acceptedSources[i] === 'msg:FromOwner') {
-                    // a FromOwner message must have a SenderNeed that we own, otherwise we made a mistake in framing it
-                    let senderNeed = getIn(msg, ["@graph", 0, "msg:hasSenderNeed", "@id"]);
-                    if (senderNeed) {
-                        if (ownNeedUris.includes(senderNeed)) {
-                            //ok, the senderNeed is one of ours
-                            acc[acceptedSources[i]] = msg;
-                            return;
-                        } else {
-                            //not our need - omit that result
-                            return;
-                        }
-                    }
-
-                } else if (acceptedSources[i] === 'msg:FromSystem'){
-                    // any other case: we accept the framing result as correct
-                    acc[acceptedSources[i]] = msg;
-                    return;
-                }
-            });
-            return acc;
-        })
-        .then(msgFramings => {
-            /* check framing results for failures */
-            if(Object.keys(msgFramings).length != 1) {
-                /* Not a valid type */
-                const e = new Error('Tried to jsond-ld-frame the message  but found ' + Object.keys(msgFramings).length + ' ways to frame it (expected: 1)');
-                e.msgJson = msgJson;
-                e.acceptedSources = acceptedSources;
-                e.framedMessages = msgFramings;
-                throw e;
-            }
-            else {
-                return msgFramings;
-            }
-        });
-
-    const simplifiedEvents = maybeFramedMsgs.then(framedMessages =>
-        mapJoin(framedMessages, framedMessage => {
-            const framedSimplifiedMessage = Object.assign(
-                { '@context': framedMessage['@context'] }, //keep context
-                framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
-            );
-            let eventData = {};
-            for (var key in framedSimplifiedMessage){
-                const propName = won.getLocalName(key);
-                if (propName != null && ! won.isJsonLdKeyword(propName)) {
-                    eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
-                }
-            }
-            eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
-            eventData.framedMessage = framedSimplifiedMessage;
-            return eventData;
-        })
-    );
-    return simplifiedEvents;
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
@@ -568,4 +450,3 @@ function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
     );
     return needP
 }
-

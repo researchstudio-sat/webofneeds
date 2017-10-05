@@ -1696,139 +1696,6 @@ import won from './won.js';
     }
 
 
-    /**
-     * @deprecated this function probably doesn't work anymore. rather use getEventsOfConnection
-     *
-     * @param connectionUri
-     * @param requesterWebId
-     * @returns {*}
-     */
-    won.getAllConnectioneventUris = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
-        }
-        //TODO ensure that the eventcontainer is loaded
-        return won.ensureLoaded(connectionUri, { requesterWebId }).then(
-            function(){
-               var lock = getReadUpdateLockPerUri(connectionUri);
-               return lock.acquireReadLock().then(
-                   function() {
-                       try {
-                           var eventUris = [];
-                           var query =
-                               "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                               "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                               "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                               "select ?eventUri where { " +
-                               "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                               won.WON.hasEventContainerCompacted + " ?container.\n" +
-                               "?container rdfs:member ?eventUri. \n" +
-                               "}";
-                           privateData.store.execute(query, [], [], function (success, results) {
-                               if (rejectIfFailed(success, results,{message : "Error loading all connection event URIs for connection " + connectionUri +".", allowNone : false, allowMultiple: true})){
-                                   return;
-                               }
-                               for (var key in results) {
-                                   var eventUri = getSafeValue(results[key].eventUri);
-                                   if (eventUri != null) {
-                                       eventUris.push(eventUri);
-                                   }
-                               }
-                           });
-                           return eventUris;
-                       } catch (e) {
-                           return q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
-                       } finally {
-                           //we don't need to release after a promise resolves because
-                           //this function isn't deferred.
-                           lock.releaseReadLock();
-                       }
-                   }
-               );
-            });
-    }
-
-    won.crawlConnectionData = function(connectionUri, requesterWebId){
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "crawlConnectionData: connectionUri must not be null"};
-        }
-        return won.ensureLoaded(connectionUri, { requesterWebId }).then(
-            function(){
-                return won.getAllConnectioneventUris(connectionUri, requesterWebId).then(
-                    function(uris){
-                        var eventPromises = [];
-                        for (let key in uris){
-                            eventPromises.push(won.ensureLoaded(uris[key]));
-                        }
-                        return Promise.all(eventPromises);
-                    }
-                );
-            }
-        );
-
-    }
-
-    won.getLastConnectioneventUri = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getLastConnectioneventUri: connectionUri must not be null"};
-        }
-        return won.crawlConnectionData(connectionUri, requesterWebId).then(
-            function() {
-                var lock = getReadUpdateLockPerUri(connectionUri);
-                return lock.acquireReadLock().then(
-                    function (success) {
-                        try {
-                            var resultObject = {};
-                            var query =
-                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                                "select ?eventUri where { " +
-                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                                won.WON.hasEventContainerCompacted + " ?container.\n" +
-                                "?container rdfs:member ?eventUri. \n" +
-                                " optional { " +
-                                "  ?eventUri msg:hasReceivedTimestamp ?timestamp; \n" +
-                                "            msg:hasMessageType ?messageType .\n" +
-                                //filter added so we don't show the success/failure events as last events
-                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
-                                " } \n" +
-                                " optional { " +
-                                "  ?eventUri msg:hasCorrespondingRemoteMessage ?remoteEventUri. \n" +
-                                "  ?remoteEventUri msg:hasReceivedTimestamp ?timestamp; \n" +
-                                "            msg:hasMessageType ?messageType .\n" +
-                                //filter added so we don't show the success/failure events as last events
-                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
-                                " } \n" +
-                                "} " +
-                                "order by desc(?timestamp) limit 1";
-                            privateData.store.execute(query, [], [], function (success, results) {
-                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: false, allowMultiple: false})) {
-                                    return;
-                                }
-                                for (var key in results) {
-                                    var eventUri = getSafeValue(results[key].eventUri);
-                                    if (eventUri != null) {
-                                        resultObject.eventUri = eventUri;
-                                        return;
-                                    }
-                                }
-                            });
-                            return resultObject.eventUri;
-                        } catch (e) {
-                            return q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
-                        } finally {
-                            //we don't need to release after a promise resolves because
-                            //this function isn't deferred.
-                            lock.releaseReadLock();
-                        }
-                    })
-            }
-        );
-
-    }
-
-
     won.getLastEventOfEachConnectionOfNeed = function(needUri, requesterWebId) {
         //fetch all connection uris of the need
         var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId);
@@ -1879,83 +1746,18 @@ import won from './won.js';
                             var remoteNodeResponseType = getSafeValue(results[key].remoteNodeResponseType);
                             var sender = getSafeValue(results[key].sender);
                             var isOwnMessage = sender == connectionUri;
-                            var commState = "pending";
-                            if (isOwnMessage){
-                                if (ownNodeResponseType == won.WONMSG.successResponse && remoteNodeResponseType == won.WONMSG.successResponse){
-                                    commState = "sent";
-                                } else if (ownNodeResponseType == won.WONMSG.failureResponse) {
-                                    commState = "failed"
-                                } else if (remoteNodeResponseType == won.WONMSG.failureResponse) {
-                                    commState = "failed"
-                                }
-                            } else {
-                                commState = "";
-                            }
                             if (eventUri != null && timestamp != null && text != null) {
                                 textMessage.eventUri = eventUri;
                                 textMessage.timestamp = timestamp;
                                 textMessage.text = text;
                                 textMessage.senderNeed = senderNeed;
-                                textMessage.communicationState = commState;
                                 textMessages.push(textMessage);
                             }
-
                         }
                         return textMessages;
                     });
     }
 
-    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp, requesterWebId) {
-        return won.crawlConnectionData(connectionUri, requesterWebId).then(
-            function queryLastEventBeforeTime() {
-                var lock = getReadUpdateLockPerUri(connectionUri);
-                return lock.acquireReadLock().then(
-                    function (success) {
-                        try {
-                            var lastEventTypeBeforeTime;
-                            var filterPart = "";
-                            if (typeof beforeTimestamp != 'undefined') {
-                                filterPart = " filter ( ?timestamp > " + timestamp + " ) \n";
-                            }
-                            var query =
-                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                                "select distinct ?msgType where { " +
-                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                                won.WON.hasEventContainerCompacted + " ?container.\n" +
-                                "?container rdfs:member ?eventUri. \n" +
-                                "?eventUri won:hasMessageType ?msgType. \n" +
-                                " optional { " +
-                                "  ?eventUri msg:hasReceivedTimestamp ?timestamp .\n" +
-                                " } \n" +
-                                filterPart + //" filter ( ?timestamp > " + timestamp + " ) \n" +
-                                "} order by desc(?timestamp) ";//limit " + limit;
-
-                            privateData.store.execute(query, [], [], function (success, results) {
-                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
-                                    return;
-                                }
-                                for (var key in results) {
-                                    var msgType = getSafeValue(results[key].msgType);
-                                    if (msgType != null) {
-                                        lastEventTypeBeforeTime = msgType;
-                                    }
-                                    break;
-                                }
-                            });
-                            return lastEventTypeBeforeTime;
-                        } catch (e) {
-                            return q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
-                        } finally {
-                            //we don't need to release after a promise resolves because
-                            //this function isn't deferred.
-                            lock.releaseReadLock();
-                        }
-                    })
-            }
-        );
-    }
 
     /**
      * Maps `getNodeWithAttributes` over the list of uris and
@@ -2000,7 +1802,7 @@ import won from './won.js';
             .then(event => {
                 // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
                 if(is('Array', event.hasReceivedTimestamp)) {
-                    const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(x) > new Date(y));
+                    const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(y) - new Date(x));
                     event.hasReceivedTimestamp = latestFirst[0];
                 }
 

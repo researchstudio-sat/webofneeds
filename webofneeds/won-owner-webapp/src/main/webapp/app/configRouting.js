@@ -132,7 +132,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
 }]
 
 function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
-    console.log('in postViewEnsureLoaded');
+    //console.log('in postViewEnsureLoaded');
     const postUri = decodeUriComponentProperly(encodedPostUri);
     const state = getState();
 

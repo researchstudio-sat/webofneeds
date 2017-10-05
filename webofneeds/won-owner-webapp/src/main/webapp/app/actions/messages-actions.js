@@ -5,7 +5,6 @@
 
 import  won from '../won-es6.js';
 import { actionTypes, actionCreators, getConnectionRelatedData } from './actions.js';
-import { setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils.js';
 
 import Immutable from 'immutable';
 
@@ -26,17 +25,17 @@ import {
 
 export function successfulCloseNeed(event) {
     return (dispatch, getState) => {
-        console.log("got response for DEACTIVATE: " + event.hasMessageType);
+        console.log("got response for DEACTIVATE: " + event.getMessageType());
         //TODO maybe refactor these response message handling
-        if (getState().getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-            console.log("messages waitingForAnswer", event);
+        if (getState().getIn(['messages', 'waitingForAnswer', event.getIsRemoteResponseTo()])) {
+            console.log("messages waitingForAnswer", event.getMessageUri());
             //dispatch(actionCreators.connections__denied(event));
         }
     }
 }
 export function failedCloseNeed(event) {
     return (dispatch, getState) => {
-        const needUri = event.hasReceiverNeed;
+        const needUri = event.getReceiverNeed();
         /*
         * TODO not sure if it's necessary to invalidate
         * the cache here as the previous action will just have
@@ -91,21 +90,21 @@ export function failedCloseNeed(event) {
 export function successfulCloseConnection(event) {
     return (dispatch, getState) => {
         const state = getState();
-        console.log("got response for CLOSE: " + event.hasMessageType);
+        console.log("got response for CLOSE: " + event.getMessageType());
         let eventUri = null;
         let receiverUri = null;
         let isRemoteResponse = false;
         //TODO maybe refactor these response message handling
-        if (state.getIn(['messages', 'waitingForAnswer', event.isResponseTo])) {
-            console.log("messages waitingForAnswer", event);
-            eventUri = event.isResponseTo;
+        if (state.getIn(['messages', 'waitingForAnswer', event.getIsResponseTo()])) {
+            console.log("messages waitingForAnswer", event.getMessageUri());
+            eventUri = event.getIsResponseTo();
             dispatch({
                 type: actionTypes.messages.close.success,
                 payload: event
             });
-        } else if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-            console.log("messages waitingForAnswer", event);
-            eventUri = event.isRemoteResponseTo;
+        } else if (state.getIn(['messages', 'waitingForAnswer', event.getIsRemoteResponseTo()])) {
+            console.log("messages waitingForAnswer", event.getMessageUri());
+            eventUri = event.getIsRemoteResponseTo();
             dispatch({
                 type: actionTypes.messages.close.success,
                 payload: event
@@ -121,21 +120,20 @@ export function successfulCloseConnection(event) {
 }
 
 //TODO move redirect elsewhere (e.g. to click-handler) then remove
-export function successfulOpen({ events }){
+export function successfulOpen(event){
     return (dispatch, getState) => {
         const state = getState();
-        const event = events['msg:FromSystem'];
         dispatch({
             type: actionTypes.messages.open.successOwn,
             payload: {
-                events,
+                event,
             }
         });
 
         dispatch(actionCreators.router__stateGoAbs("post", {
-            postUri: event.hasReceiverNeed,
+            postUri: event.getReceiverNeed(),
             connectionType: won.WON.Connected,
-            connectionUri: event.hasReceiver,
+            connectionUri: event.getReceiver(),
         }));
     }
 }
@@ -143,25 +141,20 @@ export function successfulOpen({ events }){
 export function successfulCreate(event) {
     return (dispatch) => {
         //const state = getState();
-        console.log("got response for CREATE: " + event.hasMessageType);
+        console.log("got response for CREATE: " + event.getMessageType());
         //TODO: if negative, use alternative need URI and send again
         //fetch need data and store in local RDF store
         //get URI of newly created need from message
 
         //load the data into the local rdf store and publish NeedCreatedEvent when done
-        var needURI = event.hasReceiverNeed;
+        var needURI = event.getReceiverNeed();
         won.ensureLoaded(needURI)
             .then(() => {
-                var eventData = won.clone(event);
-                eventData.eventType = won.EVENT.NEED_CREATED;
-                setCommStateFromResponseForLocalNeedMessage(eventData);
-                eventData.needURI = needURI;
                 won.getNeedWithConnectionUris(needURI).then((need) => {
                     console.log("Dispatching action " + won.EVENT.NEED_CREATED);
                     dispatch(actionCreators.needs__createSuccessful({
-                        publishEventUri: event.isResponseTo,
-                        needUri: event.hasSenderNeed,
-                        eventData: eventData,
+                        publishEventUri: event.getIsResponseTo(),
+                        needUri: event.getSenderNeed(),
                         need: need,
                     }));
                 });
@@ -169,14 +162,15 @@ export function successfulCreate(event) {
     }
 }
 
-export function openMessageReceived(events) {
+export function openMessageReceived(event) {
     return dispatch => {
         const eventOnRemote = events['msg:FromOwner']; // from the other person's owner application / node
         const eventOnOwn = events['msg:FromExternal']; // generated on our node
+        
         eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
-        won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver || eventOnRemote.hasReceiver)
+        won.invalidateCacheForNewMessage(event.getReceiver())
         .then(() =>
-                getConnectionData(eventOnRemote, eventOnOwn))
+                getConnectionData(event))
         .then(data => {
                 dispatch({
                     type: actionTypes.messages.openMessageReceived,
@@ -187,20 +181,20 @@ export function openMessageReceived(events) {
     }
 }
 
-export function connectMessageReceived(events) {
+export function connectMessageReceived(event) {
     return (dispatch, getState) => {
 
         // from the other person's owner application / node
-        const eventOnRemote = jsonld2simpleFormat(getIn(events, ['msg:FromOwner', 'framedMessage']));
+        const eventOnRemote = event.getFramedRemoteMessageResourceForState();
 
         // generated on our node
-        const eventOnOwn = jsonld2simpleFormat(getIn(events, ['msg:FromExternal', 'framedMessage']));
+        const eventOnOwn = event.getFramedMessageResourceForState();
 
-        eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
+        eventOnRemote.eventType = won.messageType2EventType[event.getMessageType()];
 
-        const ownConnectionUri = eventOnOwn.hasReceiver || eventOnRemote.hasReceiver;
-        const ownNeedUri = eventOnOwn.hasReceiverNeed || eventOnRemote.hasReceiverNeed;
-        const theirNeedUri = eventOnOwn.hasSenderNeed || eventOnRemote.hasSenderNeed;
+        const ownConnectionUri = event.getReceiver();
+        const ownNeedUri = event.getReceiverNeed();
+        const theirNeedUri = event.getSenderNeed();
 
         const state = getState();
         let connectionP;
@@ -251,18 +245,17 @@ export function connectMessageReceived(events) {
  * @param eventOnOwn
  * @return {*}
  */
-function getConnectionData(eventOnRemote, eventOnOwn) {
+function getConnectionData(event) {
     return won
-        .getConnectionWithOwnAndRemoteNeed(eventOnRemote.hasReceiverNeed, eventOnRemote.hasSenderNeed)
+        .getConnectionWithOwnAndRemoteNeed(event.getReceiver(),event.getSender())
         .then(connectionData =>
             getConnectionRelatedData(
-                eventOnRemote.hasReceiverNeed,
-                eventOnRemote.hasSenderNeed,
+                event.getReceiverNeed(),
+                event.getSenderNeed(),
                 connectionData.uri
             )
             .then(data => {
-
-                if(data.events.filter(e => e.uri === eventOnOwn.uri).length === 0) {
+                if(data.events.filter(e => e.uri === event.getMessageUri()).length === 0) {
                     //
                     /*
                      * if data.events doesn't contain the arguments-events,
@@ -270,12 +263,12 @@ function getConnectionData(eventOnRemote, eventOnOwn) {
                      * due to a race condition, i.e. if data hasn't been
                      * stored on the node when the query resolves.
                      */
-                    const eventOnOwn_ = clone(eventOnOwn);
-                    eventOnOwn_.hasCorrespondingRemoteMessage = clone(eventOnRemote);
+                    const eventOnOwn_ = clone(event.getFramedMessageResourceForState());
+                    eventOnOwn_.hasCorrespondingRemoteMessage = clone(event.getFramedRemoteMessageResourceForState());
                     data.events.push( eventOnOwn_ );
                 }
 
-                data.receivedEvent = eventOnOwn.uri;
+                data.receivedEvent = event.getMessageUri();
                 data.updatedConnection = connectionData.uri;
 
                 return data
@@ -286,21 +279,23 @@ function getConnectionData(eventOnRemote, eventOnOwn) {
 
 export function hintMessageReceived(event) {
     return dispatch=> {
-        event.eventType = won.messageType2EventType[event.hasMessageType];
-        won.invalidateCacheForNewConnection(event.hasReceiver, event.hasReceiverNeed)
+        
+        //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
+        won.invalidateCacheForNewConnection(event.getReceiver(), event.getReceiverNeed())
             .then(() => {
-                let needUri = event.hasReceiverNeed;
+                let needUri = event.getReceiverNeed();
                 let match = {}
-
-                event.matchScore = event.framedMessage[won.WON.hasMatchScoreCompacted];
-                event.matchCounterpartURI = won.getSafeJsonLdValue(event.framedMessage[won.WON.hasMatchCounterpart]);
+                //TODO: why do add the matchscore and counterpart when we don't use the event?
+                
+                event.matchScore = event.getMatchScore();
+                event.matchCounterpartURI = event.getMatchCounterpart();
 
                 console.log('going to crawl connection related data');//deletme
 
-                getConnectionRelatedData(needUri, event.hasMatchCounterpart, event.hasReceiver)
+                getConnectionRelatedData(needUri, event.getMatchCounterpart(), event.getReceiver())
                 .then(data => {
-                        data.receivedEvent = event.uri;
-                        data.updatedConnection = event.hasReceiver;
+                        data.receivedEvent = event.getMessageUri();
+                        data.updatedConnection = event.getReceiver();
                         dispatch({
                             type: actionTypes.messages.hintMessageReceived,
                             payload: data
