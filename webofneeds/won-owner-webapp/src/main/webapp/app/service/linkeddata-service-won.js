@@ -1558,8 +1558,11 @@ import won from './won.js';
                 // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
                 if(is('Array', event.hasReceivedTimestamp)) {
                     const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(y) - new Date(x));
-                    event.hasReceivedTimestamp = latestFirst[0];
+                    event.hasReceivedTimestamp = new Date(latestFirst[0]);
+                } else {
+                    event.hasReceivedTimestamp = new Date(event.hasReceivedTimestamp);
                 }
+
 
                 if(!event.hasCorrespondingRemoteMessage) {
                     return event;

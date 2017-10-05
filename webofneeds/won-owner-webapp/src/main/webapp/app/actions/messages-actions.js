@@ -164,10 +164,6 @@ export function successfulCreate(event) {
 
 export function openMessageReceived(event) {
     return dispatch => {
-        const eventOnRemote = events['msg:FromOwner']; // from the other person's owner application / node
-        const eventOnOwn = events['msg:FromExternal']; // generated on our node
-        
-        eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
         won.invalidateCacheForNewMessage(event.getReceiver())
         .then(() =>
                 getConnectionData(event))
@@ -183,14 +179,6 @@ export function openMessageReceived(event) {
 
 export function connectMessageReceived(event) {
     return (dispatch, getState) => {
-
-        // from the other person's owner application / node
-        const eventOnRemote = event.getFramedRemoteMessageResourceForState();
-
-        // generated on our node
-        const eventOnOwn = event.getFramedMessageResourceForState();
-
-        eventOnRemote.eventType = won.messageType2EventType[event.getMessageType()];
 
         const ownConnectionUri = event.getReceiver();
         const ownNeedUri = event.getReceiverNeed();
@@ -223,11 +211,8 @@ export function connectMessageReceived(event) {
                     ownNeedUri: ownNeedUri,
                     ownNeed: ownNeed,
                     remoteNeed: theirNeed,
-                    receivedEvent: eventOnOwn.uri, // the more relevant event. used for unread-counter.
-                    events: [
-                        eventOnOwn,
-                        eventOnRemote,
-                    ],
+                    receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
+                    message: event,
                 }
             });
         });

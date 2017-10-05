@@ -864,7 +864,7 @@ import jsonld from 'jsonld';
 
         frameInPromise: function () {
             if (this.framedMessage){
-                return new Promise().resolve(this.framedMessage);
+                return Promise.resolve(this.framedMessage);
             }
             const type = this.getMessageDirection();
             const that = this;
@@ -884,7 +884,7 @@ import jsonld from 'jsonld';
         getProperty: function (property) {
             let val = this.__getFramedMessage()["@graph"][0][property];
             if (val) {
-                return this.__singleValueOrArray(won.getSafeJsonLdValue(val));
+                return this.__singleValueOrArray(val);
             }
             return this.getPropertyFromRemoteMessage(property);
         },
@@ -914,7 +914,7 @@ import jsonld from 'jsonld';
                 }
                 return val.map(x => won.getSafeJsonLdValue(x));
             }
-            return val;
+            return won.getSafeJsonLdValue(val);
         },
 
         getMessageType: function () {
@@ -1136,6 +1136,29 @@ import jsonld from 'jsonld';
                     }
                 }
             });
+            //now we should have the envelope inclusion trees for all messages
+            //unreferencedEnvelopes now points to all roots.
+            //walk over the roots and connect them via remoteMessage connections
+            if (unreferencedEnvelopes.length > 1) {
+                unreferencedEnvelopes.forEach(node => {
+                    if (node.correspondingRemoteMessageUri) {
+                        let remoteMessages = unreferencedEnvelopes
+                            .filter(envelope => envelope.messageUri == node.correspondingRemoteMessageUri)
+                        if (remoteMessages.length == 1) {
+                            //we found a remote envelope. link to it from our node
+                            node.remoteEnvelope = remoteMessages[0];
+                            if (node.messageDirection === "http://purl.org/webofneeds/message#FromExternal") {
+                                //both messages can link to each other, but the FromExternal one
+                                //is the top level one. mark the other one as referenced
+                                unreferencedEnvelopes = unreferencedEnvelopes.filter(env => env != node.remoteEnvelope);
+                            }
+                        } else if (remoteMessages.length > 1) {
+                            this.parseErrors.push("more than one candidate for the outermost remoteMessage envelope found");
+                        }
+                    }
+                });
+            }
+
             if (innermostEnvelopes.length == 0){
                 this.parseErrors.push("no innermost envelope found");
             }
@@ -1175,10 +1198,11 @@ import jsonld from 'jsonld';
                 .filter(resource => resource["@id"] == graphUri)
                 .map(resource => resource["http://purl.org/webofneeds/message#containsEnvelope"])
                 .filter(x => x);
-            if (!Array.isArray(data)) {
-                data = [data];
+            if (data.length > 0){
+                return data[0].map(x => x["@id"]);
+            } else {
+                return []
             }
-            return data.map( x => x["@id"]);
         },
         __getContainedContentGraphUris: (graph, messageUri) => {
             let graphUri = graph["@id"];
@@ -1220,10 +1244,10 @@ import jsonld from 'jsonld';
             let data = graphData
                 .filter(
                     resource =>
-                    resource["http://purl.org/webofneeds/message#correspondingRemoteMessageUri"])
+                    resource["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"])
                 .map(resource => (
                 {   "messageUri": resource["@id"],
-                    "correspondingRemoteMessageUri": resource["http://purl.org/webofneeds/message#correspondingRemoteMessageUri"][0]['@id']
+                    "correspondingRemoteMessageUri": resource["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"][0]['@id']
                 }
                 ))
                 .filter(x => !!x); //if that property was not present, filter out undefineds

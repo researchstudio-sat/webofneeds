@@ -71,7 +71,7 @@ export function runMessagingAgent(redux) {
         },
         function (message) {
             if(message.isFromExternal() && message.isConnectionMessage()) {
-                redux.dispatch(actionCreators.messages__connectionMessageReceived({ message }));
+                redux.dispatch(actionCreators.messages__connectionMessageReceived(message));
                 return true;
             }
             return false;
@@ -96,15 +96,15 @@ export function runMessagingAgent(redux) {
                 if (message.isSuccessResponse()) {
                     if (message.isFromExternal()) {
                         // got the second success-response (from the remote-node) - 2nd ACK
-                        redux.dispatch(actionCreators.messages__connect__successRemote({message}));
+                        redux.dispatch(actionCreators.messages__connect__successRemote(message));
                         return true;
                     } else {
                         // got the first success-response (from our own node) - 1st ACK
-                        redux.dispatch(actionCreators.messages__connect__successOwn({message}));
+                        redux.dispatch(actionCreators.messages__connect__successOwn(message));
                         return true;
                     }
                 } else if (message.isFailureResponse()) {
-                    redux.dispatch(actionCreators.messages__connect__failure({message}));
+                    redux.dispatch(actionCreators.messages__connect__failure(message));
                     return true;
                 }
             }
@@ -115,15 +115,15 @@ export function runMessagingAgent(redux) {
                 if (message.isSuccessResponse()) {
                     if (message.isFromExternal()) {
                         // got the second success-response (from the remote-node) - 2nd ACK
-                        redux.dispatch(actionCreators.messages__chatMessage__successRemote({ message }));
+                        redux.dispatch(actionCreators.messages__chatMessage__successRemote(message));
                         return true;
                     } else {
                         // got the first success-response (from our own node) - 1st ACK
-                        redux.dispatch(actionCreators.messages__chatMessage__successOwn({ message }));
+                        redux.dispatch(actionCreators.messages__chatMessage__successOwn(message));
                         return true;
                     }
                 } else if (message.isFailureResponse()) {
-                    redux.dispatch(actionCreators.messages__chatMessage__failure({ message }));
+                    redux.dispatch(actionCreators.messages__chatMessage__failure(message));
                     return true;
                 }
             }
@@ -134,15 +134,15 @@ export function runMessagingAgent(redux) {
                 if (message.isSuccessResponse()) {
                     if (message.isFromExternal()) {
                         // got the second success-response (from the remote-node) - 2nd ACK
-                        redux.dispatch(actionCreators.messages__open__successRemote({ message }));
+                        redux.dispatch(actionCreators.messages__open__successRemote(message));
                         return true;
                     } else {
                         // got the first success-response (from our own node) - 1st ACK
-                        redux.dispatch(actionCreators.messages__open__successOwn({ message }));
+                        redux.dispatch(actionCreators.messages__open__successOwn(message));
                         return true;
                     }
                 } else if (message.isFailureResponse()) {
-                    redux.dispatch(actionCreators.messages__open__failure({ message }));
+                    redux.dispatch(actionCreators.messages__open__failure(message));
 
                     /*
                      * as the failure should hit right after the open went out
@@ -150,7 +150,7 @@ export function runMessagingAgent(redux) {
                      * case (see connection-actions.js) and go back if it fails.
                      */
                     redux.dispatch(actionCreators.router__stateGoAbs("post", {
-                        postUri: acceptEvent.hasSenderNeed,
+                        postUri: message.getSenderNeed(),
                         connectionType: won.WON.RequestReceived,
                         connectionUri: message.getSender(),
                     }));
@@ -160,7 +160,7 @@ export function runMessagingAgent(redux) {
             return false;
         },
         function (message) {
-            if (message.isResponseToCloseMessage) {
+            if (message.isResponseToCloseMessage()) {
                 if (message.isSuccessResponse()) {
                     //JUMP HERE AND ONLY HERE WHEN CLOSE MESSAGES COME IN!
                     redux.dispatch(actionCreators.messages__close__success(message));
@@ -171,7 +171,7 @@ export function runMessagingAgent(redux) {
             return false;
         },
         function (message) {
-            if (message.isResponseToDeactivateMessage) {
+            if (message.isResponseToDeactivateMessage()) {
                 if (message.isSuccessResponse()){
                     redux.dispatch(actionCreators.messages__closeNeed__success(message));
                 } else {

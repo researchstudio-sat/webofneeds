@@ -53,7 +53,7 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
 
        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-       const theirNeed = getState().getIn("needs", theirNeedUri);
+       const theirNeed = getState().getIn(["needs", theirNeedUri]);
        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
        buildChatMessage(chatMessage, connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
@@ -87,7 +87,7 @@ export function connectionsOpen(connectionUri, message) {
     return (dispatch, getState) => {
         const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
         const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn("needs", theirNeedUri);
+        const theirNeed = getState().getIn(["needs", theirNeedUri]);
         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
         buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, message)
@@ -122,7 +122,7 @@ export function connectionsConnect(connectionUri, textMessage) {
 
         const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
         const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn("needs", theirNeedUri);
+        const theirNeed = getState().getIn(["needs", theirNeedUri]);
         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
         const cnctMsg = await buildConnectMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
@@ -255,7 +255,7 @@ export function connectionsClose(connectionUri) {
 
         const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
         const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn("needs", theirNeedUri);
+        const theirNeed = getState().getIn(["needs", theirNeedUri]);
         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
         buildCloseMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
@@ -286,7 +286,7 @@ export function connectionsRate(connectionUri,rating) {
 
                 const ownNeed = state.get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
                 const theirNeedUri = state.getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-                const theirNeed = state.getIn("needs", theirNeedUri);
+                const theirNeed = state.getIn(["needs", theirNeedUri]);
                 const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
                 return buildRateMessage(msgToRateFor, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, rating);

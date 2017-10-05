@@ -77,7 +77,7 @@ export default function(allNeedsInState = initialState, action = {}) {
                 allNeedsInState);
 
         case actionTypes.messages.connectMessageReceived:
-            var {ownNeedUri, ownNeed, remoteNeed, updatedConnection, connection, events } = action.payload;
+            var {ownNeedUri, ownNeed, remoteNeed, updatedConnection, connection, message } = action.payload;
             var ownNeedFromState = allNeedsInState.get(ownNeedUri);
 
             var stateWithOwnNeed = ownNeedFromState ? allNeedsInState : addNeed(allNeedsInState, ownNeed, true);
@@ -85,13 +85,8 @@ export default function(allNeedsInState = initialState, action = {}) {
             var stateWithBothNeedsAndConnection = addConnectionFull(stateWithBothNeeds, connection, true);
 
             let stateWithEverything = stateWithBothNeedsAndConnection;
-            if(events){
-                events.map(function(event, key){
-                    const evnt = Immutable.fromJS(event);
-                    if(evnt.get("hasCorrespondingRemoteMessage")) {
-                        stateWithEverything = addMessage(stateWithEverything, event, false, true);
-                    }
-                });
+            if(message){
+                stateWithEverything = addMessage(stateWithEverything, message, false, true);
             }
 
             return stateWithEverything;
@@ -143,8 +138,8 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.messages.connect.successOwn:
             //TODO SRP; split in isSuccessOfAdHocConnect, addAddHoc(?) and changeConnectionState
-            var wonMessage = action.payload.message;
-            var connectionUri = message.getReceiver();
+            var wonMessage = action.payload;
+            var connectionUri = wonMessage.getReceiver();
             var needForTmpCnct = selectNeedByConnectionUri(allNeedsInState, connectionUri);
             var unsortedAdHocConnection = needForTmpCnct && needForTmpCnct.getIn(['connections', connectionUri]);
             if(unsortedAdHocConnection) {
@@ -167,13 +162,13 @@ export default function(allNeedsInState = initialState, action = {}) {
             }
 
         case actionTypes.messages.close.success:
-            return changeConnectionState(allNeedsInState,  action.payload.message.getReceiver(), won.WON.Closed);
+            return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
 
         //NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
             //ADD RECEIVED CHAT MESSAGES
             //payload; { events }
-            return addMessage(allNeedsInState, action.payload.message, false, true);
+            return addMessage(allNeedsInState, action.payload, false, true);
 
         case actionTypes.connections.sendChatMessage:
             //ADD SENT TEXT MESSAGE
@@ -189,13 +184,13 @@ export default function(allNeedsInState = initialState, action = {}) {
         case actionTypes.messages.connect.successOwn:
         case actionTypes.messages.open.successOwn:
         case actionTypes.messages.chatMessage.successOwn:
-            var msgFromOwner = getIn(action, ['payload','events', 'msg:FromSystem'] );
-            var eventUri = getIn(msgFromOwner,['isResponseTo']);
-            var needUri = getIn(msgFromOwner, ['hasReceiverNeed']);
-            var connectionUri = getIn(msgFromOwner, ['hasReceiver']);
+            var wonMessage = getIn(action, ['payload']);
+            var eventUri = wonMessage.getIsResponseTo();
+            var needUri = wonMessage.getReceiverNeed();
+            var connectionUri = wonMessage.getReceiver();
             // we want to use the response date to update the original message date
             // in order to use server timestamps everywhere
-            var responseDateOnServer = msStringToDate(getIn(msgFromOwner, ['hasReceivedTimestamp']));
+            var responseDateOnServer = wonMessage.getTimestamp();
             return allNeedsInState
                 .setIn([needUri, 'connections', connectionUri, 'messages', eventUri, 'date'], responseDateOnServer);
 
@@ -289,23 +284,27 @@ function addConnectionFull(state, connection, newConnection) {
 }
 
 function addMessage(state, wonMessage, outgoingMessage, newMessage) {
-    let parsedMessage = parseMessage(wonMessage, outgoingMessage, newMessage);
+    if (wonMessage.getTextMessage()) {
+        // we only want to add messages to the state that actually contain text content.
+        // (no empty connect messages, for example)
+        let parsedMessage = parseMessage(wonMessage, outgoingMessage, newMessage);
 
-    if(parsedMessage){
-        const connectionUri = parsedMessage.get("belongsToUri");
-        let needUri = null;
-        if (outgoingMessage){
-            //needUri is the message's hasSenderNeed
-            needUri = wonMessage.getSenderNeed();
-        } else{
-            //needUri is the remote message's hasReceiverNeed
-            needUri = wonMessage.getReceiverNeed();
-        }
-        if(needUri){
-            let messages = state.getIn([needUri, "connections", connectionUri, "messages"]);
-            messages = messages.set(parsedMessage.getIn(["data", "uri"]), parsedMessage.get("data"));
+        if (parsedMessage) {
+            const connectionUri = parsedMessage.get("belongsToUri");
+            let needUri = null;
+            if (outgoingMessage) {
+                //needUri is the message's hasSenderNeed
+                needUri = wonMessage.getSenderNeed();
+            } else {
+                //needUri is the remote message's hasReceiverNeed
+                needUri = wonMessage.getReceiverNeed();
+            }
+            if (needUri) {
+                let messages = state.getIn([needUri, "connections", connectionUri, "messages"]);
+                messages = messages.set(parsedMessage.getIn(["data", "uri"]), parsedMessage.get("data"));
 
-            return state.setIn([needUri, "connections", connectionUri, "messages"], messages);
+                return state.setIn([needUri, "connections", connectionUri, "messages"], messages);
+            }
         }
     }
     return state;
@@ -421,7 +420,7 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         data: {
             uri: wonMessage.getMessageUri(),
             text: wonMessage.getTextMessage(),
-            date: wonMessage.getTimestamp(),
+            date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: outgoingMessage,
             newMessage: !!newMessage,
             connectMessage: wonMessage.isConnectMessage(),
