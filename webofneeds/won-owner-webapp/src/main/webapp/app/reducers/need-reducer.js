@@ -371,6 +371,7 @@ function parseConnection(jsonldConnection, newConnection) {
             state: undefined,
             messages: Immutable.Map(),
             remoteNeedUri: undefined,
+            remoteConnectionUri: undefined,
             creationDate: undefined,
             newConnection: !!newConnection,
         }
@@ -378,12 +379,14 @@ function parseConnection(jsonldConnection, newConnection) {
 
     const belongsToUri = jsonldConnectionImm.get("belongsToNeed");
     const remoteNeedUri = jsonldConnectionImm.get("hasRemoteNeed");
+    const remoteConnectionUri = jsonldConnectionImm.get("hasRemoteConnection");
     const uri = jsonldConnectionImm.get("uri");
 
     if(!!uri && !!belongsToUri && !!remoteNeedUri){
         parsedConnection.belongsToUri = belongsToUri;
         parsedConnection.data.uri = uri;
         parsedConnection.data.remoteNeedUri = remoteNeedUri;
+        parsedConnection.data.remoteConnectionUri = remoteConnectionUri;
 
         const creationDate = jsonldConnectionImm.get("dct:created"); //THIS IS NOT IN THE DATA
         if(creationDate){

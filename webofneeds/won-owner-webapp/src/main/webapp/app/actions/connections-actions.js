@@ -51,7 +51,12 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
    return (dispatch, getState) => {
        console.log('connectionsChatMessage: ', chatMessage, connectionUri);
 
-       buildChatMessage(chatMessage, connectionUri)
+       const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+       const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+       const theirNeed = getState().getIn("needs", theirNeedUri);
+       const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+
+       buildChatMessage(chatMessage, connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
        .then(msgData =>
             Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
        .then(([optimisticEvent, jsonldMessage]) => {
@@ -81,7 +86,12 @@ export function connectionsFetch(data) {
 
 export function connectionsOpen(connectionUri, message) {
     return (dispatch, getState) => {
-        buildOpenMessage(connectionUri, message)
+        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+        const theirNeed = getState().getIn("needs", theirNeedUri);
+        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+
+        buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, message)
         .then(msgData =>
             Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
         .then(([optimisticEvent, jsonldMessage]) => {
@@ -110,7 +120,13 @@ export function connectionsOpen(connectionUri, message) {
 export function connectionsConnect(connectionUri, textMessage) {
     return async (dispatch, getState) => {
         const state = getState();
-        const cnctMsg = await buildConnectMessage(connectionUri, textMessage);
+
+        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+        const theirNeed = getState().getIn("needs", theirNeedUri);
+        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+
+        const cnctMsg = await buildConnectMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
 
         dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
@@ -154,7 +170,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
 
     // TODO handle failure to post need (the needUri won't be valid)
 
-    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, textMessage);
+    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
 
     const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
 
@@ -237,7 +253,13 @@ function generateResponseNeedTo(theirNeed) {
 
 export function connectionsClose(connectionUri) {
     return (dispatch, getState) => {
-        buildCloseMessage(connectionUri)
+
+        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+        const theirNeed = getState().getIn("needs", theirNeedUri);
+        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+
+        buildCloseMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
         .then(closeMessage => {
             dispatch(actionCreators.messages__send({
                 eventUri: closeMessage.eventUri,
@@ -262,7 +284,13 @@ export function connectionsRate(connectionUri,rating) {
         won.getConnectionWithEventUris(connectionUri)
             .then(connection=> {
                 let msgToRateFor = {connection: connection};
-                return buildRateMessage(msgToRateFor, rating)
+
+                const ownNeed = state.get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+                const theirNeedUri = state.getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+                const theirNeed = state.getIn("needs", theirNeedUri);
+                const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+
+                return buildRateMessage(msgToRateFor, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, rating);
             }).then(action =>
                 dispatch(
                     actionCreators.messages__send({

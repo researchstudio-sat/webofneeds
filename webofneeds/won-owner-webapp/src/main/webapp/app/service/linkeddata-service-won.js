@@ -1505,35 +1505,6 @@ import won from './won.js';
         }
     }
 
-
-    won.getWonNodeUriOfNeed = function(needUri){
-        if (typeof needUri === 'undefined' || needUri == null  ){
-            throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
-        }
-        return won.getNode(needUri).then(need => need.hasWonNode);
-    };
-
-    won.getNeedUriOfConnection = function(connectionUri){
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getNeedUriOfConnection: connectionUri must not be null"};
-        }
-        return won.getNode(connectionUri).then(connection => connection.belongsToNeed);
-    };
-
-    won.getRemoteConnectionUriOfConnection = function(connectionUri){
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getRemoteConnectionUriOfConnection: connectionUri must not be null"};
-        }
-        return won.getNode(connectionUri).then(connection => connection.hasRemoteConnection)
-    };
-
-    won.getRemoteneedUriOfConnection = function(connectionUri){
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getRemoteneedUriOfConnection: connectionUri must not be null"};
-        }
-        return won.getNode(connectionUri).then(connection => connection.hasRemoteNeed);
-    };
-
     won.getEnvelopeDataForNeed=function(needUri, nodeUri){
         if(typeof needUri === 'undefined'||needUri == null){
             throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
@@ -1551,26 +1522,20 @@ import won from './won.js';
         return new Promise.resolve(ret);
     };
 
-    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri) {
+    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
         if (!ownNeedUri){
             throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
         }
         if (!theirNeedUri){
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
-        return Promise.all([
-            won.getWonNodeUriOfNeed(ownNeedUri),
-            won.getWonNodeUriOfNeed(theirNeedUri),
-        ])
-        .then(([ownNodeUri, theirNodeUri]) =>
-            ({
-                [won.WONMSG.hasSenderNeed]: ownNeedUri,
-                [won.WONMSG.hasSenderNode]: ownNodeUri,
-                [won.WONMSG.hasReceiverNeed]: theirNeedUri,
-                [won.WONMSG.hasReceiverNode]: theirNodeUri,
-            })
-        );
 
+        return new Promise().resolve({
+            [won.WONMSG.hasSenderNeed]: ownNeedUri,
+            [won.WONMSG.hasSenderNode]: ownNodeUri,
+            [won.WONMSG.hasReceiverNeed]: theirNeedUri,
+            [won.WONMSG.hasReceiverNode]: theirNodeUri,
+        })
     };
 
 
@@ -1580,15 +1545,10 @@ import won from './won.js';
      * @param connectionUri
      * @returns a promise to the data
      */
-    won.getEnvelopeDataforConnection = async function(connectionUri){
+    won.getEnvelopeDataforConnection = async function(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getEnvelopeDataforConnection: connectionUri must not be null"};
         }
-
-        const ownNeedUri = await won.getNeedUriOfConnection(connectionUri);
-        const ownNodeUri = await won.getWonNodeUriOfNeed(ownNeedUri);
-        const theirNeedUri = await won.getRemoteneedUriOfConnection(connectionUri);
-        const theirNodeUri = await won.getWonNodeUriOfNeed(theirNeedUri);
 
         const ret = {
             [won.WONMSG.hasSender]: connectionUri,
@@ -1598,9 +1558,8 @@ import won from './won.js';
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
         };
         try {
-            const theirCnctUri = await won.getRemoteConnectionUriOfConnection(connectionUri);
-            if (theirCnctUri != null) {
-                ret[won.WONMSG.hasReceiver] = theirCnctUri;
+            if (theirConnectionUri != null) {
+                ret[won.WONMSG.hasReceiver] = theirConnectionUri;
             }
         } catch(err){}
         return ret;
@@ -1752,17 +1711,6 @@ import won from './won.js';
                         }
                         return textMessages;
                     });
-    };
-
-
-    /**
-     * Maps `getNodeWithAttributes` over the list of uris and
-     * collects the results.
-     * @param uris array of strings
-     * @param fetchParams See `ensureLoaded`.
-     */
-    won.getNodes = function(uris, fetchParams) {
-        return urisToLookupMap(uris, uri => won.getNode(uri, fetchParams));
     };
 
     /**

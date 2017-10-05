@@ -34,7 +34,7 @@ export function wellFormedPayload (payload) {
     return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
-export function buildRateMessage(msgToRateFor, rating){
+export function buildRateMessage(msgToRateFor, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, rating){
     return new Promise((resolve, reject) => {
         var buildMessage = function(envelopeData, eventToRateFor) {
             //TODO: use event URI pattern specified by WoN node
@@ -51,7 +51,7 @@ export function buildRateMessage(msgToRateFor, rating){
         };
 
         //fetch all data needed
-        won.getEnvelopeDataforConnection(msgToRateFor.connection.uri)
+        won.getEnvelopeDataforConnection(msgToRateFor.connection.uri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
             .then(function(envelopeData){
                 resolve(buildMessage(envelopeData, msgToRateFor.event));
             },
@@ -60,7 +60,7 @@ export function buildRateMessage(msgToRateFor, rating){
     });
 }
 
-export function buildCloseMessage(connectionUri){
+export function buildCloseMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri){
     var buildMessage = function (envelopeData) {
         //TODO: use event URI pattern specified by WoN node
         var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
@@ -75,7 +75,7 @@ export function buildCloseMessage(connectionUri){
     };
 
     //fetch all data needed
-    return won.getEnvelopeDataforConnection(connectionUri)
+    return won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
     .then( envelopeData =>
         buildMessage(envelopeData)
     )
@@ -135,8 +135,8 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMessage) {
-    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri)
+export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage) {
+    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri)
     .then(envelopeData =>
         buildConnectMessageForEnvelopeData(envelopeData, textMessage)
     );
@@ -148,8 +148,8 @@ export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMes
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export async function buildConnectMessage(connectionUri, textMessage){
-    return won.getEnvelopeDataforConnection(connectionUri)
+export async function buildConnectMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, textMessage){
+    return won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
     .then(envelopeData =>
         buildConnectMessageForEnvelopeData(envelopeData, textMessage)
     );
@@ -172,9 +172,9 @@ function buildConnectMessageForEnvelopeData(envelopeData, textMessage) {
     return {eventUri:eventUri,message:message};
 }
 
-export function buildChatMessage(chatMessage, connectionUri) {
+export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {
     const messageP =
-        won.getEnvelopeDataforConnection(connectionUri)
+        won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {
             const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
 
@@ -199,9 +199,9 @@ export function buildChatMessage(chatMessage, connectionUri) {
 
 }
 
-export function buildOpenMessage(connectionUri, chatMessage) {
+export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {
     const messageP = won
-        .getEnvelopeDataforConnection(connectionUri)
+        .getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {
 
             //TODO: use event URI pattern specified by WoN node
