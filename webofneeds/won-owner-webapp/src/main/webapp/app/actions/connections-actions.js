@@ -79,7 +79,6 @@ export function connectionsFetch(data) {
         allConnectionsPromise.then(function (connections) {
             console.log("fetching connections");
             dispatch(actionCreators.needs__connectionsReceived({needUri: data.needUri, connections: connections}));
-            dispatch(actionCreators.events__fetch({connectionUris: connections}))
         })
     }
 }
