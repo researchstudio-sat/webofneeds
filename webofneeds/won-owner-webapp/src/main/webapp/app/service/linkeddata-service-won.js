@@ -1393,7 +1393,7 @@ import won from './won.js';
             ret[won.WONMSG.hasReceiverNode] = nodeUri;
         }
 
-        return new Promise.resolve(ret);
+        return Promise.resolve(ret);
     };
 
     won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
