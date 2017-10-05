@@ -449,6 +449,7 @@ function parseNeed(jsonldNeed, ownNeed) {
 
     let parsedNeed = {
         uri: undefined,
+        nodeUri: undefined,
         title: undefined,
         description: undefined,
         type: undefined,
@@ -463,7 +464,7 @@ function parseNeed(jsonldNeed, ownNeed) {
 
     if(jsonldNeedImm){
         const uri = jsonldNeedImm.get("@id");
-
+        const nodeUri = undefined; //TODO: RETRIEVE FROM DATA
         const isPresent = !!jsonldNeedImm.getIn(["won:is", "dc:title"]);
         const seeksPresent = !!jsonldNeedImm.getIn(["won:seeks", "dc:title"]);
         const is = jsonldNeedImm.get("won:is");
@@ -528,6 +529,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         parsedNeed.isWhatsAround = !!isWhatsAround;
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
         parsedNeed.location = location;
+        parsedNeed.nodeUri = nodeUri;
     }else{
         console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm && jsonldNeedImm.toJS());
         return undefined;
