@@ -1434,7 +1434,7 @@ import won from './won.js';
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
 
-        return new Promise().resolve({
+        return Promise.resolve({
             [won.WONMSG.hasSenderNeed]: ownNeedUri,
             [won.WONMSG.hasSenderNode]: ownNodeUri,
             [won.WONMSG.hasReceiverNeed]: theirNeedUri,
@@ -1466,7 +1466,7 @@ import won from './won.js';
                 ret[won.WONMSG.hasReceiver] = theirConnectionUri;
             }
         } catch(err){}
-        return new Promise().resolve(ret);
+        return Promise.resolve(ret);
     };
 
     /**
