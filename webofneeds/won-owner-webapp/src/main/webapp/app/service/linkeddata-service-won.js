@@ -955,6 +955,7 @@ import won from './won.js';
             },
 
             roots: [
+                {node: "won:hasWonNode"},
                 {node: "won:isInState"},
                 {node: "won:hasFlag"},
                 {node: "won:hasFacet"},

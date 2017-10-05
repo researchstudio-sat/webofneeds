@@ -464,7 +464,7 @@ function parseNeed(jsonldNeed, ownNeed) {
 
     if(jsonldNeedImm){
         const uri = jsonldNeedImm.get("@id");
-        const nodeUri = undefined; //TODO: RETRIEVE FROM DATA
+        const nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
         const isPresent = !!jsonldNeedImm.getIn(["won:is", "dc:title"]);
         const seeksPresent = !!jsonldNeedImm.getIn(["won:seeks", "dc:title"]);
         const is = jsonldNeedImm.get("won:is");
