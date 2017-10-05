@@ -482,36 +482,6 @@ import won from './won.js';
 
     /**
      * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
-     * Returns true if the query has at least one solution.
-     * @param baseUri
-     * @param propertyPath
-     * @param optionalSparqlPrefixes
-     * @returns {*}
-     */
-    won.canResolvePropertyPathFromBaseUri = function canResolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
-        var query = "";
-        if (won.isNull(baseUri)){
-            throw new Error("cannot evaluate property path: baseUri is null");
-        }
-        if (won.isNull(propertyPath)){
-            throw new Error("cannot evaluate property path: propertyPath is null");
-        }
-        if (!won.isNull(optionalSparqlPrefixes)){
-            query = query + optionalSparqlPrefixes;
-        }
-        query = query +
-            "ASK where { \n" +
-            "<" + baseUri +"> " + propertyPath + " ?target. \n" +
-            "} ";
-        var resultObject = {};
-        privateData.store.execute(query, [], [], function (success, results) {
-            resultObject.result = results;
-        });
-        return resultObject.result;
-    };
-
-    /**
-     * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
      * Returns all solutions of the path.
      * @param baseUri
      * @param propertyPath
