@@ -1375,6 +1375,19 @@ import won from './won.js';
         return Promise.resolve(ret);
     };
 
+    /**
+     * @param needUri
+     * @return {*} the data of all connection-nodes referenced by that need
+     */
+    won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
+        won.getConnectionUrisOfNeed(needUri, requesterWebId)
+        .then(connectionUris =>
+            urisToLookupMap(
+                connectionUris,
+                uri => won.getConnectionWithEventUris(uri, { requesterWebId })
+            )
+        );
+
     /*
      * Loads all URIs of a need's connections.
      */
@@ -1619,6 +1632,19 @@ import won from './won.js';
             });
         });
     };
+
+    won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
+        return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
+            for(let connectionUri of Object.keys(connections)) {
+                if(connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
+                    return connections[connectionUri];
+                }
+            }
+            throw new Error("Couldn't find connection between own need <" +
+               ownNeedUri + "> and remote need <" + remoteNeedUri + ">.");
+        })
+    };
+    
 
     /**
      * Executes the specified crawlableQuery, returns a promise to its results, which may become available
