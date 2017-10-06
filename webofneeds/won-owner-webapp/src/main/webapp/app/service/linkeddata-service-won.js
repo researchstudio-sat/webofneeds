@@ -249,19 +249,6 @@ import won from './won.js';
         };
     };
 
-    var cacheItemIsInState = function cacheItemIsInState(uri, state, nameOfState){
-        var entry = privateData.cacheStatus[uri];
-        var ret = false;
-        if (typeof entry === 'undefined') {
-            ret = false
-        } else {
-            ret = entry.state === state;
-        }
-        var retStr = (ret + "     ").substr(0,5);
-        //console.log("linkeddata-service-won.js: cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
-        return ret;
-    };
-
     var cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(uri){
         var entry = privateData.cacheStatus[uri];
         var ret = false;
@@ -316,21 +303,6 @@ import won from './won.js';
 
     var cacheItemRemove = function cacheItemRemove(uri){
         delete privateData.cacheStatus[uri];
-    };
-
-
-    /**
-     * Method used for debugging pending locks.
-     */
-    won.getUnreleasedLocks = function(){
-        var unreleasedLocks = [];
-        for (let key in privateData.readUpdateLocksPerUri){
-            var lock = privateData.readUpdateLocksPerUri[key];
-            if (lock.isLocked()){
-                unreleasedLocks.push(lock);
-            }
-        }
-        return unreleasedLocks;
     };
 
     /**
@@ -555,9 +527,8 @@ import won from './won.js';
                         cacheItemInsertOrOverwrite(uri, partialFetch);
                         return uri;
                     } else {
-                        return selectLoadedResourcesFromDataset(
-                            dataset
-                        ).then(allLoadedResources => {
+                        return selectLoadedResourcesFromDataset(dataset)
+                            .then(allLoadedResources => {
                                 allLoadedResources.forEach(resourceUri => {
                                     /*
                                      * only mark root resource as partial.
@@ -578,21 +549,6 @@ import won from './won.js';
                 reason => cacheItemMarkUnresolvable(uri, reason)
             )
 
-    };
-
-    function fetchesPartialRessource(requestParams) {
-        if(!requestParams) {
-            return false;
-        } else if(requestParams.pagingSize) {
-            return true;
-        } else {
-            return !!(requestParams['p'] ||
-                requestParams['resumebefore'] ||
-                requestParams['resumeafter'] ||
-                requestParams['type'] ||
-                requestParams['state'] ||
-                requestParams['timeof']);
-        }
     };
 
     /**
@@ -1419,19 +1375,6 @@ import won from './won.js';
         return Promise.resolve(ret);
     };
 
-    /**
-     * @param needUri
-     * @return {*} the data of all connection-nodes referenced by that need
-     */
-    won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
-        won.getConnectionUrisOfNeed(needUri, requesterWebId)
-        .then(connectionUris =>
-            urisToLookupMap(
-                connectionUris,
-                uri => won.getConnectionWithEventUris(uri, { requesterWebId })
-            )
-        );
-
     /*
      * Loads all URIs of a need's connections.
      */
@@ -1675,18 +1618,6 @@ import won from './won.js';
                 }
             });
         });
-    };
-
-    won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
-        return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
-            for(let connectionUri of Object.keys(connections)) {
-                if(connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
-                    return connections[connectionUri];
-                }
-            }
-            throw new Error("Couldn't find connection between own need <" +
-               ownNeedUri + "> and remote need <" + remoteNeedUri + ">.");
-        })
     };
 
     /**

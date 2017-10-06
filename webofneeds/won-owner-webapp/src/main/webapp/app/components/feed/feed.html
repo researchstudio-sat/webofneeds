@@ -4,16 +4,6 @@
 </header>
 <main class="feedcontent">
     <div class="fc__inner" ng-class="{'empty' : self.ownNeedUris.length == 0}">
-
-
-        <div class="fc__loading" ng-show="self.showSpinner">
-            <img src="images/spinner/on_white.gif"
-                 alt="Loading&hellip;"
-                 class="hspinner"/>
-            <span class="fc__loading__text">Loading your posts&hellip;</span>
-        </div>
-
-
         <div class="fc__empty" ng-if="self.showPlaceholder">
             <div class="fc__empty__description">
 
@@ -39,6 +29,11 @@
                        ng-show="self.showFeed">
         </won-feed-item>
 
-
+        <div class="fc__loading" ng-show="self.showSpinner">
+            <img src="images/spinner/on_white.gif"
+                 alt="Loading&hellip;"
+                 class="hspinner"/>
+            <span class="fc__loading__text">Loading your posts&hellip;</span>
+        </div>
     </div>
 </main>
