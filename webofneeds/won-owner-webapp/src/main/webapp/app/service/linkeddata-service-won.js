@@ -1561,8 +1561,6 @@ import won from './won.js';
                 }
             });
 
-    won.getConnectionEvent =
-    won.getNodeWithAttributes =
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.

@@ -419,7 +419,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true}) //ensure loaded does net seem to be necessary as it is called within getNeedWithConnectionUris TODO: remove this
+    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true}) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
         .then(() =>
             won.getNeed(needUri)
         );
