@@ -190,9 +190,14 @@ export default function(allNeedsInState = initialState, action = {}) {
             var connectionUri = wonMessage.getReceiver();
             // we want to use the response date to update the original message date
             // in order to use server timestamps everywhere
-            var responseDateOnServer = wonMessage.getTimestamp();
-            return allNeedsInState
-                .setIn([needUri, 'connections', connectionUri, 'messages', eventUri, 'date'], responseDateOnServer);
+            var responseDateOnServer =  msStringToDate(wonMessage.getTimestamp());
+            //make sure we have an event with that uri:
+            var eventToUpdate = allNeedsInState.getIn([needUri, 'connections', connectionUri, 'messages', eventUri]);
+            if (eventToUpdate) {
+                allNeedsInState =  allNeedsInState.setIn([needUri, 'connections', connectionUri, 'messages', eventUri, 'date'], responseDateOnServer);
+            }
+            return allNeedsInState;
+
 
 
         case actionTypes.connections.showLatestMessages:
@@ -310,17 +315,11 @@ function addMessage(state, wonMessage, outgoingMessage, newMessage) {
     return state;
 }
 
-function addMessages(state, messages) {
-    if(messages && messages.size > 0){
-
-        messages.map(function(message, key){
-            const outgoingMessage = !!message.get("hasTextMessage");
-            const incomingMessage = !!message.getIn(["hasCorrespondingRemoteMessage", "hasTextMessage"]);
-
-            if(outgoingMessage || incomingMessage){
-                //ONLY HANDLE TEXTMESSAGES
-                state = addMessage(state, message, outgoingMessage, true);
-            }
+function addMessages(state, wonMessages) {
+    if(wonMessages && wonMessages.size > 0){
+        wonMessages.map(wonMessage => {
+            const outgoingMessage = wonMessage.isFromOwner();
+            state = addMessage(state, wonMessage, outgoingMessage, true);
         });
     }else{
         console.log("no messages to add");
