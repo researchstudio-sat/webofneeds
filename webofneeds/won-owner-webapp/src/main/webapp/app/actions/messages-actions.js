@@ -148,17 +148,15 @@ export function successfulCreate(event) {
 
         //load the data into the local rdf store and publish NeedCreatedEvent when done
         var needURI = event.getReceiverNeed();
-        won.ensureLoaded(needURI)
-            .then(() => {
-                won.getNeed(needURI)
-                .then((need) => {
-                    console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                    dispatch(actionCreators.needs__createSuccessful({
-                        publishEventUri: event.getIsResponseTo(),
-                        needUri: event.getSenderNeed(),
-                        need: need,
-                    }));
-                });
+
+        won.getNeed(needURI)
+            .then((need) => {
+                console.log("Dispatching action " + won.EVENT.NEED_CREATED);
+                dispatch(actionCreators.needs__createSuccessful({
+                    publishEventUri: event.getIsResponseTo(),
+                    needUri: event.getSenderNeed(),
+                    need: need,
+                }));
             });
     }
 }
