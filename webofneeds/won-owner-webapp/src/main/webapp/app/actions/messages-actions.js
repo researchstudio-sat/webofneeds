@@ -150,7 +150,8 @@ export function successfulCreate(event) {
         var needURI = event.getReceiverNeed();
         won.ensureLoaded(needURI)
             .then(() => {
-                won.getNeedWithConnectionUris(needURI).then((need) => {
+                won.getNeedWithConnectionUris(needURI) //need but no connection needed TODO: use won.getNeed
+                .then((need) => {
                     console.log("Dispatching action " + won.EVENT.NEED_CREATED);
                     dispatch(actionCreators.needs__createSuccessful({
                         publishEventUri: event.getIsResponseTo(),
@@ -200,7 +201,7 @@ export function connectMessageReceived(event) {
         Promise.all([
             connectionP,
             won.getTheirNeed(theirNeedUri),
-            won.getOwnNeed(ownNeedUri),
+            won.getOwnNeed(ownNeedUri), //uses ownNeed (but does not need connections uris to be loaded) in connectMessageReceived
         ])
         .then(([connection, theirNeed, ownNeed]) => {
             dispatch({

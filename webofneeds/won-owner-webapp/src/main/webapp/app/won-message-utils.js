@@ -290,7 +290,7 @@ export function isSuccessMessage(event) {
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
-    return won.getNeedWithConnectionUris(needUri)
+    return won.getNeedWithConnectionUris(needUri) //need but no connections needed TODO: use won.getNeed
     .then(need =>
             emptyDataset
                 .setIn(['theirNeeds', needUri], Immutable.fromJS(need))
@@ -419,9 +419,9 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true})
+    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true}) //ensure loaded does net seem to be necessary as it is called within getNeedWithConnectionUris TODO: remove this
         .then(() =>
-            won.getNeedWithConnectionUris(needUri)
+            won.getNeedWithConnectionUris(needUri) //need but no connections needed TODO: use won.getNeed
         );
     needP.then(need =>
         curriedDispatch(

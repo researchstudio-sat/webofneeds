@@ -782,7 +782,6 @@ import won from './won.js';
      * belonging to it.
      * @type {Function}
      */
-    won.getOwnNeed =
     won.getNeedWithConnectionUris = function(needUri) {
         return Promise.all([
             // make sure need and its connection-container are loaded
@@ -798,6 +797,7 @@ import won from './won.js';
      * with a request for the connection-container
      * to get the connection-uris. Thus it's faster.
      */
+    won.getOwnNeed =
     won.getTheirNeed =
     won.getNeed = function(needUri) {
         return won.ensureLoaded(needUri)
