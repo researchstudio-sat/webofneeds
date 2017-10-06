@@ -231,7 +231,7 @@ export function connectMessageReceived(event) {
  */
 function getConnectionData(event) {
     return won
-        .getConnectionWithOwnAndRemoteNeed(event.getReceiver(),event.getSender())
+        .getConnectionWithOwnAndRemoteNeed(event.getReceiverNeed(),event.getSenderNeed())
         .then(connectionData =>
             getConnectionRelatedData(
                 event.getReceiverNeed(),
