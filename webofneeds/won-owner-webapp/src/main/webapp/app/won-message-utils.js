@@ -442,7 +442,7 @@ function fetchConnectionAndDispatch(cnctUri, curriedDispatch = () => undefined) 
 }
 
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-    const needP = won.getTheirNeed(needUri);
+    const needP = won.getNeed(needUri);
     needP.then(need =>
         curriedDispatch(
             wellFormedPayload({theirNeeds: {[needUri]: need}})

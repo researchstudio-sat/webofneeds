@@ -272,7 +272,7 @@ export function startTicking() {
  * @return {*}
  */
 export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
-    const remoteNeed = won.getTheirNeed(remoteNeedUri);
+    const remoteNeed = won.getNeed(remoteNeedUri);
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnectionWithEventUris(connectionUri, { requesterWebId: needUri });
     const events = won.getEventsOfConnection(connectionUri, { requesterWebId: needUri })

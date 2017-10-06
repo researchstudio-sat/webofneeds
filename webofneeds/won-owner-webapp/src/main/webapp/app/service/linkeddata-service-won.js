@@ -779,8 +779,6 @@ import won from './won.js';
      * with a request for the connection-container
      * to get the connection-uris. Thus it's faster.
      */
-    won.getOwnNeed =
-    won.getTheirNeed =
     won.getNeed = function(needUri) {
         return won.ensureLoaded(needUri)
             .then(() => selectNeedData(needUri, privateData.store));

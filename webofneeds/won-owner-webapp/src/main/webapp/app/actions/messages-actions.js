@@ -200,8 +200,8 @@ export function connectMessageReceived(event) {
 
         Promise.all([
             connectionP,
-            won.getTheirNeed(theirNeedUri),
-            won.getOwnNeed(ownNeedUri), //uses ownNeed (but does not need connections uris to be loaded) in connectMessageReceived
+            won.getNeed(theirNeedUri),
+            won.getNeed(ownNeedUri), //uses ownNeed (but does not need connections uris to be loaded) in connectMessageReceived
         ])
         .then(([connection, theirNeed, ownNeed]) => {
             dispatch({
