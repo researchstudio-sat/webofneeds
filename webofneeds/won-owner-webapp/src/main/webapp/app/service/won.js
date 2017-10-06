@@ -809,6 +809,195 @@ import jsonld from 'jsonld';
             };
     }
 
+    /**
+     *  Work in progress: for generating any number/structure of domain objects
+     *  (need, connection container, connection ,event container, event (=wonMessage)
+     *  from json-ld
+     *
+     */
+
+    won.WonDomainObjects = function(){
+    }
+
+    won.WonDomainObjects.prototype = {
+        constructor: won.WonDomainObjects,
+        /**
+         * Returns the needURIs.
+         */
+        getNeedUris: function () {
+
+        },
+        /**
+         * Returns the connection URIs.
+         */
+        getConnectionUris: function () {
+
+
+        },
+        /**
+         * Returns the event URIs.
+         */
+        getEventUris: function () {
+
+        },
+        /**
+         * Returns the domain object with the specified URI.
+         * @param uri
+         */
+        getDomainObject: function (uri) {
+
+        }
+    }
+
+    won.DomainObjectFactory = function() {
+
+    }
+
+    won.DomainObjectFactory.prototype = {
+        constructor: won.DomainObjectFactory,
+        /**
+         * Generates domain objects with the specified JSON-LD content. Returns a WonDomainObjects
+         * instance containing all domain objects found in the JSON-LD content.
+         */
+        jsonLdToWonDomainObjects : function (jsonLdContent) {
+
+        }
+    }
+
+
+    //helper function for the WonMessage hack
+    let makeEnvelopeGraphForMessageResource = function(messageResource){
+        "use strict";
+        let envelopeGraphUri = messageResource.uri + "#data";
+        let messageRes = {
+            "@id": messageResource.uri,
+            "@type": messageResource.type,
+        };
+        let envelope = {
+            "@id" : envelopeGraphUri,
+            "@graph": [
+                messageRes,
+                {
+                    "@id" : envelopeGraphUri,
+                    "@type": "http://purl.org/webofneeds/message#EnvelopeGraph",
+                }
+            ]
+        }
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceivedTimestamp" , messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSentTimestamp", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasPreviousMessage" , messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "protocolVersion", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSenderNeed", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSender", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSenderNode", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceiverNeed", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceiver", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceiverNode", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasCorrespondingRemoteMessage", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasMessageType", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasRemoteFacet", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasFacet", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasFacet", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasFacet", messageResource);
+        return envelope;
+    }
+
+    //helper function for the WonMessage hack
+    let addPropertyIfPresent = function (toAddTo, prefix, propertyName, toAddFrom) {
+        let value = toAddFrom[propertyName];
+        if (value && typeof value == 'string'){
+            toAddTo[prefix + propertyName] = value;
+        }
+    }
+
+    /**
+     * This is a hack that allows us to wrap a WonMessage object around a message that
+     * is retrieved from the local rdf store. This will work for Chat messages
+     *
+     * @param message
+     * @constructor
+     */
+    won.WonMessageFromMessageLoadedFromStore = function (message) {
+        /*
+        {"hasReceiver":"https://192.168.124.49:8443/won/resource/connection/9o4gbwa8qdwui8ivcsnw",
+            "type":"http://purl.org/webofneeds/message#FromExternal",
+            "hasPreviousMessage":"https://192.168.124.49:8443/won/resource/event/akl1lfmhsbsk4qw0gicg",
+            "hasReceivedTimestamp":null,
+            "protocolVersion":"1.0",
+            "hasCorrespondingRemoteMessage":
+                {"protocolVersion":"1.0",
+                    "hasTextMessage":"hi auch!",
+                    "hasSentTimestamp":"1507216622288",
+                    "hasSenderNeed":"https://192.168.124.49:8443/won/resource/need/5213160017499701000",
+                    "hasMessageType":"http://purl.org/webofneeds/message#OpenMessage",
+                    "hasCorrespondingRemoteMessage":"https://192.168.124.49:8443/won/resource/event/3pjpnf41zpmauu8zktgy",
+                    "hasReceiverNode":"https://192.168.124.49:8443/won/resource",
+                    "uri":
+                    "https://192.168.124.49:8443/won/resource/event/934297292498864100",
+                        "hasSender":"https://192.168.124.49:8443/won/resource/connection/dmq6mmmswbem7ss06pmq",
+                    "hasSenderNode":"https://192.168.124.49:8443/won/resource",
+                    "hasPreviousMessage":"https://192.168.124.49:8443/won/resource/event/oxrkhlzvpfyp2p9s0ah7",
+                    "hasRemoteFacet":"http://purl.org/webofneeds/model#OwnerFacet",
+                    "type":"http://purl.org/webofneeds/message#FromOwner",
+                    "hasReceivedTimestamp":"1507216622360",
+                    "hasFacet":"http://purl.org/webofneeds/model#OwnerFacet",
+                    "hasContent":"https://192.168.124.49:8443/won/resource/event/934297292498864100#content",
+                    "hasReceiverNeed":"https://192.168.124.49:8443/won/resource/need/560176687122239500"},
+            "hasSentTimestamp":"1507216622405",
+            "uri":"https://192.168.124.49:8443/won/resource/event/3pjpnf41zpmauu8zktgy"}
+        */
+
+        let contentResource = message;
+        if (!message.hasTextMessage){
+            contentResource = message.hasCorrespondingRemoteMessage;
+            if (! contentResource || !contentResource.hasTextMessage) {
+                contentResource = undefined;
+            }
+        }
+
+        //if we have a text message, create a content graph
+        let contentGraph = undefined;
+        if (contentResource) {
+            contentGraph = {
+                "@id": contentResource.uri + "@content",
+                "@graph": [
+                    {
+                        "@id": contentResource.uri,
+                        "http://purl.org/webofneeds/model#hasTextMessage": contentResource.hasTextMessage,
+                    }
+                ]
+            }
+        }
+
+        //create the envelope(s)
+        let envelopeGraphs = [];
+        let envelopeGraph = makeEnvelopeGraphForMessageResource(message);
+        let remoteEnvelopeGraph = undefined;
+        envelopeGraphs.push(envelopeGraph);
+        if (message.hasCorrespondingRemoteMessage){
+            remoteEnvelopeGraph = makeEnvelopeGraphForMessageResource(message.hasCorrespondingRemoteMessage);
+            envelopeGraphs.push(remoteEnvelopeGraph);
+        }
+
+        //link the inner envelope to the content if we have content
+        if (contentGraph) {
+            let innerEnvelopeGraph = (contentResource == message) ? envelopeGraph : remoteEnvelopeGraph;
+            let res = innerEnvelopeGraph["@graph"].filter( x => x["@id"] == contentResource.uri)[0];
+            res["http://purl.org/webofneeds/message#hasContent"] = contentGraph["@id"];
+        }
+
+        //build the complete jsonld structure
+        let jsonld = {
+            "@graph": [
+                contentGraph,
+                envelopeGraphs
+            ]
+        };
+        return won.wonMessageFromJsonLd(jsonld);
+    }
+
+
+
     won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, collapsedIntoOneGraph){
         return jsonld.promises.expand(wonMessageAsJsonLD)
             .then(expandedJsonLd =>
