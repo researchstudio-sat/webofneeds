@@ -149,7 +149,7 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
          * the `initiaPageLoad` didn't load this need yet. Also
          * we can be sure it's not your need and load it as `theirNeed`.
          */
-        won.getNeedWithConnectionUris(postUri) //need but no connections needed TODO: use won.getNeed
+        won.getNeed(postUri)
             .then(need =>
                 dispatch({
                     type: actionTypes.router.accessedNonLoadedPost,

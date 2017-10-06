@@ -774,24 +774,6 @@ import won from './won.js';
         );
     };
 
-
-
-    /**
-     * Loads and returns a need and in a
-     * follow-up http-request the connection-uris
-     * belonging to it.
-     * @type {Function}
-     */
-    won.getNeedWithConnectionUris = function(needUri) {
-        return Promise.all([
-            // make sure need and its connection-container are loaded
-            won.ensureLoaded(needUri),
-            won.getConnectionUrisOfNeed(needUri),
-        ]).then(() =>
-            selectNeedData(needUri, privateData.store)
-        )
-    };
-
     /**
      * Loads the need-data without following up
      * with a request for the connection-container

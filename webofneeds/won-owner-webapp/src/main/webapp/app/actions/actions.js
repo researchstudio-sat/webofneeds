@@ -273,7 +273,7 @@ export function startTicking() {
  */
 export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
     const remoteNeed = won.getTheirNeed(remoteNeedUri);
-    const ownNeed = won.getNeedWithConnectionUris(needUri); //need but no connections needed TODO: use won.getNeed
+    const ownNeed = won.getNeed(needUri);
     const connection = won.getConnectionWithEventUris(connectionUri, { requesterWebId: needUri });
     const events = won.getEventsOfConnection(connectionUri, { requesterWebId: needUri })
         .then(eventsLookup => {
