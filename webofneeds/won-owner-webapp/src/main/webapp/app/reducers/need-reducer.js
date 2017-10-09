@@ -235,7 +235,7 @@ function addNeed(needs, jsonldNeed, ownNeed) {
             newState = setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
         }
     } else {
-        console.error('Tried to add invalid need-object: ', jsonldNeedImm);
+        console.error('Tried to add invalid need-object: ', jsonldNeedImm.toJS());
         newState = needs;
     }
 
