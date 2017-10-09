@@ -502,6 +502,12 @@ import won from './won.js';
 
         //console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
 
+        //we allow suppressing the fetch - this is used when the data to be accessed is
+        //known to be present in the local store
+        if (fetchParams.doNotFetch){
+            cacheItemInsertOrOverwrite(uri,false);
+            return Promise.resolve(uri);
+        }
         /*
          * we also allow unresolvable resources, so as to avoid re-fetching them.
          * we also allow resources that are currently being fetched.
@@ -514,6 +520,7 @@ import won from './won.js';
             cacheItemMarkAccessed(uri);
             return Promise.resolve(uri);
         }
+
 
         if(partialFetch) {
             console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
@@ -1173,53 +1180,6 @@ import won from './won.js';
         return objects;
     }
 
-    //find the objects
-
-
-    //example: an array is a tree: the first element is the root, strings are leaves, nested arrays are nested subtrees
- /*
-    let example = [
-                        "won:seeks",
-                        [
-                            "dc:title",
-                            "dc:description",
-                            "won:hasTag",
-                            [
-                                "won:hasLocation",
-                                [
-                                        "s:name", "rdf:type", ["s:geo",
- ["rdf:type",
- "s:latitude",
- "s:longitude"],]
- ]
-
-
-    let example =
-        ["won:seeks",
-            "dc:title",
-            "dc:description",
-            "won:hasTag",
-                    ["s:geo",
-                        "rdf:type",
-                        "s:latitude",
-                        "s:longitude"],
-                    ["won:hasBoundingBox",
-                        ["won:hasNorthWestCorner",
-                            ["s:geo",
-                                "rdf:type",
-                                "s:latitude",
-                                "s:longitude"]
-                            ],
-                        ["won:hasSouthEastCorner",
-                            ["s:geo",
-                                "rdf:type",
-                                "s:latitude",
-                                "s:longitude"]
-                        ],
-                    ]
-                ]
-            ];
-*/
 
 
     function triples2framedJson(needUri, triples, frame) {
@@ -1508,11 +1468,16 @@ import won from './won.js';
                     * vital information in the correspondingRemoteMessage. So
                     * we fetch it here.
                     */
+                    fetchParams.doNotFetch = true;
                     return won
                         .getNode(event.hasCorrespondingRemoteMessage, fetchParams)
                         .then(correspondingEvent => {
-                           event.hasCorrespondingRemoteMessage = correspondingEvent;
-                           return event;
+                            if (correspondingEvent.type) {
+                                //if we have at least a type attribute, we add the remote event to the
+                                //local event. if not, it is just an URI.
+                                event.hasCorrespondingRemoteMessage = correspondingEvent;
+                            }
+                            return event;
                         })
                 }
             });
