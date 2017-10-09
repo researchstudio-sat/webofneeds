@@ -15,6 +15,7 @@ export default function(userData = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.initialPageLoad:
         case actionTypes.login:
+            console.log('login called');
 
             //because we get payload as immutablejs-map sometimes but not always
             var immutablePayload = Immutable.fromJS(action.payload);
@@ -37,9 +38,11 @@ export default function(userData = initialState, action = {}) {
             return Immutable.fromJS({loginError: action.payload.loginError, loggedIn: false});
 
         case actionTypes.loginReset:
+            console.log('loginReset called');
             return Immutable.fromJS({loginError: undefined});
 
         case actionTypes.registerReset:
+            console.log('registerReset called');
             return Immutable.fromJS({registerError: undefined});
 
         case actionTypes.registerFailed:
