@@ -262,8 +262,13 @@ function getConnectionData(event) {
 }
 
 export function hintMessageReceived(event) {
-    return dispatch=> {
-        
+    return (dispatch, getState) => {
+
+        //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
+        if (!getState().getIn(['needs', event.getReceiverNeed()])) {
+            console.log("ignoring hint for a need that is not ours:", event.getReceiverNeed());
+        }
+
         //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
         won.invalidateCacheForNewConnection(event.getReceiver(), event.getReceiverNeed())
             .then(() => {
