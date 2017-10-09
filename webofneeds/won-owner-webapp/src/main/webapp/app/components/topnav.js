@@ -115,10 +115,10 @@ function genTopnavConf() {
                     ng-click="self.toasts__delete(toast)"
                     src="generated/icon-sprite.svg#ico27_close"/>
                 <div class="topnav__toasts__element__text">
-                    <p ng-show="!toast.get('htmlEnabled')">
+                    <p ng-show="!toast.get('unsafeHtmlEnabled')">
                         {{toast.get('msg')}}
                     </p>
-                    <p ng-show="toast.get('htmlEnabled')"
+                    <p ng-show="toast.get('unsafeHtmlEnabled')"
                         ng-bind-html="toast.get('msg')">
                     </p>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
