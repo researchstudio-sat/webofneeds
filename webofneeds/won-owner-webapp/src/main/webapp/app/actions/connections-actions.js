@@ -408,7 +408,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
         const needUri = selectOpenPostUri(state);
         const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]);
         // determine the oldest loaded event
-        const sortedOwnEvents = events.valueSeq().sort( (event1, event2) => event1.get('date') - event2.date.get('date'));
+        const sortedOwnEvents = events.valueSeq().sort( (event1, event2) => event1.get('date') - event2.get('date'));
         const oldestEvent = sortedOwnEvents.first();
         const eventHashValue = oldestEvent
                 .get('uri')
