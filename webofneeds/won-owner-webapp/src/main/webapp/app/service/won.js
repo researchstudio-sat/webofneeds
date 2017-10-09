@@ -883,30 +883,28 @@ import jsonld from 'jsonld';
                 }
             ]
         }
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceivedTimestamp" , messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSentTimestamp", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasPreviousMessage" , messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "protocolVersion", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSenderNeed", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSender", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasSenderNode", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceiverNeed", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceiver", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasReceiverNode", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasCorrespondingRemoteMessage", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasMessageType", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasRemoteFacet", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasFacet", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasFacet", messageResource);
-        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", "hasFacet", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", false, "hasReceivedTimestamp" , messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", false, "hasSentTimestamp", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true,  "hasPreviousMessage" , messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", false, "protocolVersion", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasSenderNeed", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasSender", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasSenderNode", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasReceiverNeed", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasReceiver", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasReceiverNode", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasCorrespondingRemoteMessage", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasMessageType", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasRemoteFacet", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasFacet", messageResource);
         return envelope;
     }
 
     //helper function for the WonMessage hack
-    let addPropertyIfPresent = function (toAddTo, prefix, propertyName, toAddFrom) {
+    let addPropertyIfPresent = function (toAddTo, prefix, isUri, propertyName, toAddFrom) {
         let value = toAddFrom[propertyName];
         if (value && typeof value == 'string'){
-            toAddTo[prefix + propertyName] = value;
+            toAddTo[prefix + propertyName] = isUri ? {"@id": value} : value;
         }
     }
 
@@ -974,7 +972,7 @@ import jsonld from 'jsonld';
         let envelopeGraph = makeEnvelopeGraphForMessageResource(message);
         let remoteEnvelopeGraph = undefined;
         envelopeGraphs.push(envelopeGraph);
-        if (message.hasCorrespondingRemoteMessage){
+        if (message.hasCorrespondingRemoteMessage && message.hasCorrespondingRemoteMessage.type){
             remoteEnvelopeGraph = makeEnvelopeGraphForMessageResource(message.hasCorrespondingRemoteMessage);
             envelopeGraphs.push(remoteEnvelopeGraph);
         }
@@ -987,12 +985,14 @@ import jsonld from 'jsonld';
         }
 
         //build the complete jsonld structure
-        let jsonld = {
-            "@graph": [
-                contentGraph,
-                envelopeGraphs
-            ]
-        };
+        let jsonld = {"@graph":[]};
+
+        if (contentGraph) {
+            jsonld["@graph"].push(contentGraph);
+        }
+        if (envelopeGraphs && envelopeGraphs.length > 0) {
+            envelopeGraphs.forEach( envelopeGraph => jsonld["@graph"].push(envelopeGraph));
+        }
         return won.wonMessageFromJsonLd(jsonld);
     }
 
