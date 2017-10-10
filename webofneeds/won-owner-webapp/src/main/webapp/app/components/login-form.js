@@ -94,6 +94,10 @@ function genLoginConf() {
             }
         }
 
+        /** TODO: remove/rework this method! see issues:
+         * https://github.com/researchstudio-sat/webofneeds/issues/1244
+         * https://github.com/researchstudio-sat/webofneeds/issues/1239
+         */
         /**
          * auto-fill hack. firefox doesn't fire an input event when auto-filling,
          * so we do this here manually to make sure the ng-model updates itself.
