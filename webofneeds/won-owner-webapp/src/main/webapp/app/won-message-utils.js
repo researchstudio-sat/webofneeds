@@ -34,7 +34,7 @@ export function wellFormedPayload (payload) {
     return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
-export function buildRateMessage(msgToRateFor, rating){
+export function buildRateMessage(msgToRateFor, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, rating){
     return new Promise((resolve, reject) => {
         var buildMessage = function(envelopeData, eventToRateFor) {
             //TODO: use event URI pattern specified by WoN node
@@ -51,7 +51,7 @@ export function buildRateMessage(msgToRateFor, rating){
         };
 
         //fetch all data needed
-        won.getEnvelopeDataforConnection(msgToRateFor.connection.uri)
+        won.getEnvelopeDataforConnection(msgToRateFor.connection.uri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
             .then(function(envelopeData){
                 resolve(buildMessage(envelopeData, msgToRateFor.event));
             },
@@ -60,30 +60,29 @@ export function buildRateMessage(msgToRateFor, rating){
     });
 }
 
-export function buildCloseMessage(msgToConnectFor){
-    return new Promise((resolve, reject) => {
-        var buildMessage = function (envelopeData, eventToConnectFor) {
-            //TODO: use event URI pattern specified by WoN node
-            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
-            var message = new won.MessageBuilder(won.WONMSG.closeMessage)
-                .eventURI(eventUri)
-                .forEnvelopeData(envelopeData)
-                .hasOwnerDirection()
-                .hasSentTimestamp(new Date().getTime().toString())
-                .build();
-            //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
-            return {eventUri: eventUri, message: message};
-        }
+export function buildCloseMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri){
+    var buildMessage = function (envelopeData) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.closeMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime().toString())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
+        return {eventUri: eventUri, message: message};
+    };
 
-        //fetch all data needed
-        won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
-            .then(function (envelopeData) {
-                resolve(buildMessage(envelopeData, msgToConnectFor.event));
-            },
-            won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
-        );
+    //fetch all data needed
+    return won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
+    .then( envelopeData =>
+        buildMessage(envelopeData)
+    )
+    .catch(err => {
+        won.reportError("cannot close connection " + connectionUri +": " + JSON.stringify(err))
+        throw err;
     });
-
 }
 export function buildCloseNeedMessage(needUri, wonNodeUri){
     const buildMessage = function(envelopeData) {
@@ -99,7 +98,7 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
         return {eventUri: eventUri, message: message};
     };
 
-    return won.getEnvelopeDataForNeed(needUri)
+    return won.getEnvelopeDataForNeed(needUri, wonNodeUri)
         .then(
             envelopeData => buildMessage(envelopeData),
             err => won.reportError("cannot close need "+ needUri)
@@ -120,7 +119,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
         return {eventUri: eventUri, message: message};
     };
 
-    return won.getEnvelopeDataForNeed(needUri)
+    return won.getEnvelopeDataForNeed(needUri, wonNodeUri)
         .then(
             envelopeData => buildMessage(envelopeData),
             err => won.reportError("cannot close need "+ needUri)
@@ -136,8 +135,8 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMessage) {
-    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri)
+export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage) {
+    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri)
     .then(envelopeData =>
         buildConnectMessageForEnvelopeData(envelopeData, textMessage)
     );
@@ -149,8 +148,8 @@ export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, textMes
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export async function buildConnectMessage(connectionUri, textMessage){
-    return won.getEnvelopeDataforConnection(connectionUri)
+export async function buildConnectMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, textMessage){
+    return won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
     .then(envelopeData =>
         buildConnectMessageForEnvelopeData(envelopeData, textMessage)
     );
@@ -173,9 +172,9 @@ function buildConnectMessageForEnvelopeData(envelopeData, textMessage) {
     return {eventUri:eventUri,message:message};
 }
 
-export function buildChatMessage(chatMessage, connectionUri) {
+export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {
     const messageP =
-        won.getEnvelopeDataforConnection(connectionUri)
+        won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {
             const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
 
@@ -200,9 +199,9 @@ export function buildChatMessage(chatMessage, connectionUri) {
 
 }
 
-export function buildOpenMessage(connectionUri, chatMessage) {
+export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {
     const messageP = won
-        .getEnvelopeDataforConnection(connectionUri)
+        .getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {
 
             //TODO: use event URI pattern specified by WoN node
@@ -285,84 +284,13 @@ export function buildCreateMessage(needData, wonNodeUri) {
         needUri: publishedContentUri,
     };
 }
-export  function setCommStateFromResponseForLocalNeedMessage(event) {
-    if (isSuccessMessage(event)){
-        event.commState = won.COMMUNUCATION_STATE.ACCEPTED;
-    } else {
-        event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
-    }
-}
+
 export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
 
-export function getEventsFromMessage(msgJson) {
-    const eventData = {};
-    //call handler if there is one - it may modify the event object
-    //frame the incoming jsonld to get the data that interest us
-
-    const acceptedSources = [ 'msg:FromOwner', 'msg:FromSystem', 'msg:FromExternal' ];
-
-    const framingAttempts = acceptedSources.map(source =>
-        jsonld.promises.frame(msgJson, {
-            '@context': {
-                'won': 'http://purl.org/webofneeds/model#',
-                'msg': 'http://purl.org/webofneeds/message#'
-            },
-            '@type': source
-        }));
-
-    const maybeFramedMsgs = Promise.all(framingAttempts)
-        .then(framedMessages => {
-            let acc = {};
-            framedMessages.forEach((msg, i) => {
-                //filter out failed framing attempts
-                if( msg['@graph'].length > 0) {
-                    acc[acceptedSources[i]] = msg;
-                }
-            });
-            return acc;
-        })
-        .then(msgFramings => {
-            /* check framing results for failures */
-            if(Object.keys(msgFramings).length < 1) {
-                /* Not a valid type */
-                const e = new Error('Tried to jsond-ld-frame the message ', msgJson,
-                    ' but it\'s type was neither of the following, accepted types: ',
-                    acceptedSources );
-                e.msgJson = msgJson;
-                e.acceptedSources = acceptedSources;
-                e.framedMessages = msgFramings;
-                throw e;
-            }
-            else {
-                return msgFramings;
-            }
-        });
-
-    const simplifiedEvents = maybeFramedMsgs.then(framedMessages =>
-        mapJoin(framedMessages, framedMessage => {
-            const framedSimplifiedMessage = Object.assign(
-                { '@context': framedMessage['@context'] }, //keep context
-                framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
-            );
-            let eventData = {};
-            for (var key in framedSimplifiedMessage){
-                const propName = won.getLocalName(key);
-                if (propName != null && ! won.isJsonLdKeyword(propName)) {
-                    eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
-                }
-            }
-            eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
-            eventData.framedMessage = framedSimplifiedMessage;
-            return eventData;
-        })
-    );
-    return simplifiedEvents;
-}
-
 export function fetchDataForNonOwnedNeedOnly(needUri) {
-    return won.getNeedWithConnectionUris(needUri)
+    return won.getNeed(needUri)
     .then(need =>
             emptyDataset
                 .setIn(['theirNeeds', needUri], Immutable.fromJS(need))
@@ -411,7 +339,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     // wait for the own needs to be dispatched then load connections
     const allConnectionsPromise = allOwnNeedsPromise.then(() =>
         Promise.all(ownNeedUris.map(uri =>
-            won.getconnectionUrisOfNeed(uri)
+            won.getConnectionUrisOfNeed(uri)
                 .then(connectionUris =>
                     urisToLookupMap(connectionUris, uri =>
                             fetchConnectionAndDispatch(uri, curriedDispatch)
@@ -491,9 +419,9 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true})
+    const needP =  won.ensureLoaded(needUri, {requesterWebId: needUri, deep: true}) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
         .then(() =>
-            won.getNeedWithConnectionUris(needUri)
+            won.getNeed(needUri)
         );
     needP.then(need =>
         curriedDispatch(
@@ -514,7 +442,7 @@ function fetchConnectionAndDispatch(cnctUri, curriedDispatch = () => undefined) 
 }
 
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-    const needP = won.getTheirNeed(needUri);
+    const needP = won.getNeed(needUri);
     needP.then(need =>
         curriedDispatch(
             wellFormedPayload({theirNeeds: {[needUri]: need}})
@@ -522,4 +450,3 @@ function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
     );
     return needP
 }
-

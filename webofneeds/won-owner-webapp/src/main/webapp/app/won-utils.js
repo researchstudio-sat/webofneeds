@@ -76,16 +76,6 @@ export function selectTimestamp(event, ownNeedUri) {
     return event.get('hasReceivedTimestamp') || event.get('hasSentTimestamp');
 };
 
-export function selectEventsOfConnection(state, connectionUri) {
-    const eventUris = state.getIn(['connections', connectionUri, 'hasEvents']);
-    const eventUrisAndEvents = eventUris &&
-        eventUris.map(eventUri => [
-            eventUri,
-            state.getIn(['events', 'events', eventUri])
-        ]);
-    return Immutable.Map(eventUrisAndEvents);
-}
-
 
 /**
  * Makes sure the select-statement is reevaluated, should

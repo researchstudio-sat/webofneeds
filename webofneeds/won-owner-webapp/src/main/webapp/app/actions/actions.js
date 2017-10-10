@@ -80,7 +80,6 @@ import {
     configInit,
     pageLoadAction
 } from './load-action.js';
-import { matchesLoad } from './matches-actions.js';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
 // </action-creators>
@@ -93,14 +92,6 @@ import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
     initialPageLoad: pageLoadAction,
-    events:{
-        addUnreadEventUri:INJ_DEFAULT,
-        read:INJ_DEFAULT
-    },
-    matches: {
-        load: matchesLoad,
-        add:INJ_DEFAULT,
-    },
     connections:{
         fetch: cnct.connectionsFetch,
         open: cnct.connectionsOpen,
@@ -281,8 +272,8 @@ export function startTicking() {
  * @return {*}
  */
 export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
-    const remoteNeed = won.getTheirNeed(remoteNeedUri);
-    const ownNeed = won.getNeedWithConnectionUris(needUri);
+    const remoteNeed = won.getNeed(remoteNeedUri);
+    const ownNeed = won.getNeed(needUri);
     const connection = won.getConnectionWithEventUris(connectionUri, { requesterWebId: needUri });
     const events = won.getEventsOfConnection(connectionUri, { requesterWebId: needUri })
         .then(eventsLookup => {

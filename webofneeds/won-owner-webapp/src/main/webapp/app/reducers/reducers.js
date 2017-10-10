@@ -8,7 +8,6 @@ import { combineReducersStable } from '../redux-utils.js';
 import { messagesReducer } from './message-reducers.js';
 import reduceReducers from 'reduce-reducers';
 import needReducer from './need-reducer.js';
-import eventReducer from './event-reducer.js';
 import userReducer from './user-reducer.js';
 import toastReducer from './toast-reducer.js';
 import {
@@ -24,6 +23,8 @@ const reducers = {
     router,
 
     /**
+     * Example for a simple reducer:
+     *
     simplereducer: (state = initialState, action) => {
         switch(action.type) {
             case actionTypes.moreWub:
@@ -34,7 +35,7 @@ const reducers = {
     },
     */
 
-    events: eventReducer,
+
     user: userReducer,
     needs: needReducer,
     messages: messagesReducer,

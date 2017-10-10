@@ -18,6 +18,8 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6"; /* required to force babel to transpile this so the minifier is happy */
+import {jsonld2simpleFormat} from '../utils.js'
+import jsonld from 'jsonld';
    var won = {};
 
     /**
@@ -277,12 +279,6 @@
     //TODO: this temp event, before we find out how to deal with session timeout
     won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED = "WebSocketClosedUnexpected";
 
-    won.COMMUNUCATION_STATE = {};
-    won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent"; //own node not reachable
-    won.COMMUNUCATION_STATE.NOT_TRANSMITTED = "NotTransmittedEvent";
-    won.COMMUNUCATION_STATE.PENDING = "Pending";
-    won.COMMUNUCATION_STATE.ACCEPTED = "Accepted";
-
     won.EVENT.APPSTATE_CURRENT_NEED_CHANGED = "AppState.CurrentNeedChangedEvent";
 
     //keys for things that can be shown in the GUI as 'unread'
@@ -474,8 +470,8 @@
     won.getSafeJsonLdValue = function(dataItem) {
         if (dataItem == null) return null;
         if (typeof dataItem === 'object') {
-            if (dataItem['@id'] != null) return dataItem['@id'];
-            if (dataItem['@type'] != null && dataItem['@value'] != null) return dataItem['@value'];
+            if (dataItem['@id']) return dataItem['@id'];
+            if (dataItem['@value']) return dataItem['@value'];
         } else {
             return dataItem;
         }
@@ -813,8 +809,628 @@
             };
     }
 
+    /**
+     *  Work in progress: for generating any number/structure of domain objects
+     *  (need, connection container, connection ,event container, event (=wonMessage)
+     *  from json-ld
+     *
+     */
+
+    won.WonDomainObjects = function(){
+    }
+
+    won.WonDomainObjects.prototype = {
+        constructor: won.WonDomainObjects,
+        /**
+         * Returns the needURIs.
+         */
+        getNeedUris: function () {
+
+        },
+        /**
+         * Returns the connection URIs.
+         */
+        getConnectionUris: function () {
+
+
+        },
+        /**
+         * Returns the event URIs.
+         */
+        getEventUris: function () {
+
+        },
+        /**
+         * Returns the domain object with the specified URI.
+         * @param uri
+         */
+        getDomainObject: function (uri) {
+
+        }
+    }
+
+    won.DomainObjectFactory = function() {
+
+    }
+
+    won.DomainObjectFactory.prototype = {
+        constructor: won.DomainObjectFactory,
+        /**
+         * Generates domain objects with the specified JSON-LD content. Returns a WonDomainObjects
+         * instance containing all domain objects found in the JSON-LD content.
+         */
+        jsonLdToWonDomainObjects : function (jsonLdContent) {
+
+        }
+    }
+
+
+    //helper function for the WonMessage hack
+    let makeEnvelopeGraphForMessageResource = function(messageResource){
+        "use strict";
+        let envelopeGraphUri = messageResource.uri + "#data";
+        let messageRes = {
+            "@id": messageResource.uri,
+            "@type": messageResource.type,
+        };
+        let envelope = {
+            "@id" : envelopeGraphUri,
+            "@graph": [
+                messageRes,
+                {
+                    "@id" : envelopeGraphUri,
+                    "@type": "http://purl.org/webofneeds/message#EnvelopeGraph",
+                }
+            ]
+        }
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", false, "hasReceivedTimestamp" , messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", false, "hasSentTimestamp", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true,  "hasPreviousMessage" , messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", false, "protocolVersion", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasSenderNeed", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasSender", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasSenderNode", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasReceiverNeed", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasReceiver", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasReceiverNode", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasCorrespondingRemoteMessage", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasMessageType", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasRemoteFacet", messageResource);
+        addPropertyIfPresent(messageRes, "http://purl.org/webofneeds/message#", true, "hasFacet", messageResource);
+        return envelope;
+    }
+
+    //helper function for the WonMessage hack
+    let addPropertyIfPresent = function (toAddTo, prefix, isUri, propertyName, toAddFrom) {
+        let value = toAddFrom[propertyName];
+        if (value && typeof value == 'string'){
+            toAddTo[prefix + propertyName] = isUri ? {"@id": value} : value;
+        }
+    }
 
     /**
+     * This is a hack that allows us to wrap a WonMessage object around a message that
+     * is retrieved from the local rdf store. This will work for Chat messages
+     *
+     * @param message
+     * @constructor
+     */
+    won.WonMessageFromMessageLoadedFromStore = function (message) {
+        //console.log("converting this result from store to WonMessage", message)
+
+        let contentResource = message;
+        if (!message.hasTextMessage){
+            contentResource = message.hasCorrespondingRemoteMessage;
+            if (! contentResource || !contentResource.hasTextMessage) {
+                contentResource = undefined;
+            }
+        }
+
+        //if we have a text message, create a content graph
+        let contentGraph = undefined;
+        if (contentResource) {
+            contentGraph = {
+                "@id": contentResource.uri + "@content",
+                "@graph": [
+                    {
+                        "@id": contentResource.uri,
+                        "http://purl.org/webofneeds/model#hasTextMessage": contentResource.hasTextMessage,
+                    }
+                ]
+            }
+        }
+
+        //create the envelope(s)
+        let envelopeGraphs = [];
+        let envelopeGraph = makeEnvelopeGraphForMessageResource(message);
+        let remoteEnvelopeGraph = undefined;
+        envelopeGraphs.push(envelopeGraph);
+        if (message.hasCorrespondingRemoteMessage && message.hasCorrespondingRemoteMessage.type){
+            // link our message to remote message
+            let res = envelopeGraph["@graph"].filter( x => x["@id"] == message.uri)[0];
+            res["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"] = {"@id": message.hasCorrespondingRemoteMessage.uri }
+            // create envelope for remote message
+            remoteEnvelopeGraph = makeEnvelopeGraphForMessageResource(message.hasCorrespondingRemoteMessage);
+            envelopeGraphs.push(remoteEnvelopeGraph);
+        }
+
+        //link the inner envelope to the content if we have content
+        if (contentGraph) {
+            let innerEnvelopeGraph = (contentResource == message) ? envelopeGraph : remoteEnvelopeGraph;
+            let res = innerEnvelopeGraph["@graph"].filter( x => x["@id"] == contentResource.uri)[0];
+            res["http://purl.org/webofneeds/message#hasContent"] = contentGraph["@id"];
+        }
+
+        //build the complete jsonld structure
+        let jsonld = {"@graph":[]};
+
+        if (contentGraph) {
+            jsonld["@graph"].push(contentGraph);
+        }
+        if (envelopeGraphs && envelopeGraphs.length > 0) {
+            envelopeGraphs.forEach( envelopeGraph => jsonld["@graph"].push(envelopeGraph));
+        }
+        return won.wonMessageFromJsonLd(jsonld);
+    }
+
+
+
+    won.wonMessageFromJsonLd = function(wonMessageAsJsonLD){
+        //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
+        return jsonld.promises.expand(wonMessageAsJsonLD)
+            .then(expandedJsonLd =>
+                new WonMessage(expandedJsonLd)
+            )
+            .then(wonMessage =>
+                wonMessage.frameInPromise()
+                    .then(framed => wonMessage)
+            );
+    }
+
+    /**
+     * Like the JSONLD-Helper, an object that wraps a won message and
+     * offers convenience functions on it.
+     * @param jsonLdContent
+     * @constructor
+     */
+    function WonMessage(jsonLdContent) {
+        if (!(this instanceof WonMessage)){
+            return new WonMessage(jsonLdContent);
+        }
+        this.rawMessage = jsonLdContent;
+        this.parseErrors = [];
+        this.__init();
+    }
+
+    WonMessage.prototype = {
+        constructor: WonMessage,
+
+        getMessageUri: function () {
+            return this.__getMessageUri(this.messageStructure);
+        },
+
+        __getMessageUri: function (messageStructure) {
+            if (messageStructure.messageUri) {
+                return messageStructure.messageUri;
+            }
+            if (messageStructure.containedEnvelopes){
+                let uris = messageStructure.containedEnvelopes.map( envelope => this.__getMessageUri(envelope));
+                if (uris.length > 1) {
+                    throw new Error("Found more than one contained envelope in message with message uris: " + uris);
+                }
+                if (uris.length == 0) {
+                    throw new Error("Did not find any contained envelopes in message");
+                }
+                return uris[0];
+            }
+        },
+
+        getMessageDirection: function () {
+            return this.__getMessageDirection(this.messageStructure);
+        },
+
+        frameInPromise: function () {
+            if (this.framedMessage){
+                return Promise.resolve(this.framedMessage);
+            }
+            const type = this.getMessageDirection();
+            const that = this;
+            return jsonld.promises.frame(this.rawMessage, {
+                '@type': type
+            }).then(result => {
+                that.framedMessage = result;
+                return result;
+            });
+        },
+
+        __getFramedMessage: function () {
+            return this.framedMessage;
+        },
+
+
+        getProperty: function (property) {
+            let val = this.__getFramedMessage()["@graph"][0][property];
+            if (val) {
+                return this.__singleValueOrArray(val);
+            }
+            return this.getPropertyFromRemoteMessage(property);
+        },
+
+        getPropertyFromLocalMessage: function (property) {
+            let val =this.__getFramedMessage()["@graph"][0][property];
+            if (val) {
+                return  this.__singleValueOrArray(val);
+            }
+        },
+        getPropertyFromRemoteMessage: function(property){
+            const remoteMessage = this.__getFramedMessage()["@graph"][0]["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"];
+            if (remoteMessage){
+                let val = remoteMessage[property];
+                if (val) {
+                    return  this.__singleValueOrArray(val);
+                }
+            }
+            return null;
+        },
+
+        __singleValueOrArray: function (val) {
+            if (!val) return null;
+            if (Array.isArray(val)){
+                if (val.length == 1){
+                    return won.getSafeJsonLdValue(val);
+                }
+                return val.map(x => won.getSafeJsonLdValue(x));
+            }
+            return won.getSafeJsonLdValue(val);
+        },
+
+        getMessageType: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasMessageType");
+        },
+        getReceivedTimestamp: function () {
+            return this.getPropertyFromLocalMessage("http://purl.org/webofneeds/message#hasReceivedTimestamp");
+        },
+        getSentTimestamp: function () {
+            return this.getPropertyFromLocalMessage("http://purl.org/webofneeds/message#hasSentTimestamp");
+        },
+        /**
+         * Returns the receivedTimestamp, which is the server timestamp. If that timestamp is not found in the message,
+         * returns the sentTimestamp as a fallback.
+         */
+        getTimestamp: function() {
+            const ts = this.getReceivedTimestamp();
+            if (ts) {
+                return ts;
+            }
+            return this.getSentTimestamp();
+        },
+        getTextMessage: function () {
+            return this.getProperty("http://purl.org/webofneeds/model#hasTextMessage");
+        },
+        getMatchScore: function () {
+            return this.getProperty("http://purl.org/webofneeds/model#hasMatchScore");
+        },
+        getMatchCounterpart: function () {
+            return this.getProperty("http://purl.org/webofneeds/model#hasMatchCounterpart");
+        },
+        
+        getIsResponseTo: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#isResponseTo")
+        },
+        getIsRemoteResponseTo: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#isRemoteResponseTo")
+        },
+        getIsResponseToMessageType: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#isResponseToMessageType")
+        },
+        
+        
+        getSenderNode: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasSenderNode");
+        },
+        getSenderNeed: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasSenderNeed");
+        },
+        getSender: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasSender");
+        },
+        getReceiverNode: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasReceiverNode");
+        },
+        getReceiverNeed: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasReceiverNeed");
+        },
+        getReceiver: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasReceiver");
+        },
+        
+        
+        isFromSystem: function () {
+            let direction = this.getMessageDirection();
+            return  direction === "http://purl.org/webofneeds/message#FromSystem" ;
+        },
+        isFromOwner: function () {
+            let direction = this.getMessageDirection();
+            return  direction === "http://purl.org/webofneeds/message#FromOwner" ;
+        },
+        isFromExternal: function () {
+            let direction = this.getMessageDirection();
+            return  direction === "http://purl.org/webofneeds/message#FromExternal" ;
+        },
+        
+        isHintMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#HintMessage";
+        },
+        isCreateMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#CreateMessage";
+        },
+        isConnectMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#ConnectMessage";
+        },
+        isOpenMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#OpenMessage";
+        },
+        isConnectionMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#ConnectionMessage";
+        },
+        isCloseMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#CloseMessage";
+        },
+        isHintFeedbackMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#HintFeedbackMessage";
+        },
+        isActivateMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#ActivateMessage";
+        },
+        isDeactivateMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#DeactivateMessage";
+        },
+        
+        isSuccessResponse: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#SuccessResponse";
+        },
+        isFailureResponse: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#FailureResponse";
+        },
+        
+        isResponseToHintMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#HintMessage";
+        },
+        isResponseToCreateMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#CreateMessage";
+        },
+        isResponseToConnectMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#ConnectMessage";
+        },
+        isResponseToOpenMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#OpenMessage";
+        },
+        isResponseToConnectionMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#ConnectionMessage";
+        },
+        isResponseToCloseMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#CloseMessage";
+        },
+        isResponseToHintFeedbackMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#HintFeedbackMessage";
+        },
+        isResponseToActivateMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#ActivateMessage";
+        },
+        isResponseToDeactivateMessage: function () {
+            return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#DeactivateMessage";
+        },
+
+        __getMessageDirection: function (messageStructure) {
+            if (messageStructure.messageDirection) {
+                return messageStructure.messageDirection;
+            }
+            if (messageStructure.containedEnvelopes){
+                let uris = messageStructure.containedEnvelopes.map( envelope => this.__getMessageDirection(envelope));
+                if (uris.length > 1) {
+                    throw new Error("Found more than one contained envelope in message with message uris: " + uris);
+                }
+                if (uris.length == 0) {
+                    throw new Error("Did not find any contained envelopes in message");
+                }
+                return uris[0];
+            }
+        },
+
+        __init: function () {
+            this.context = 
+            this.graphs = this.rawMessage;
+            if (!Array.isArray(this.graphs)){
+                this.parseErrors.push("@graph not found or not an array");
+            }
+            this.graphUris = this.graphs.map( g => g["@id"]);
+            if (!Array.isArray(this.graphUris)){
+                this.parseErrors.push("GraphUris not found or not an array");
+            }
+            const nodes = {};
+            let unreferencedEnvelopes = [];
+            const innermostEnvelopes = [];
+            const contentGraphs = [];
+            //first pass: create one node per envelope/content graph
+            this.graphs.forEach(graph => {
+                let graphUri = graph["@id"];
+                if (this.__isEnvelopeGraph(graph)){
+                    let node = {uri: graphUri};
+                    unreferencedEnvelopes.push(graphUri);
+                    let msgUriAndDirection = this.__getMessageUriAndDirection(graph);
+                    if (msgUriAndDirection) {
+                        // it's possible that we don't find a triple <messageUri> a <type>
+                        // in the envelope, and we can't add it to the node here.
+                        node.messageUri = msgUriAndDirection.messageUri;
+                        node.messageDirection = msgUriAndDirection.messageDirection;
+                    }
+                    let messageUriAndCorrespondingRemoteMessageUri = this.__getMessageUriAndCorrespondingRemoteMessageUri(graph);
+                    if (messageUriAndCorrespondingRemoteMessageUri){
+                        node.messageUri = messageUriAndCorrespondingRemoteMessageUri.messageUri;
+                        node.correspondingRemoteMessageUri = messageUriAndCorrespondingRemoteMessageUri.correspondingRemoteMessageUri;
+                    }
+                    nodes[graphUri] = node;
+
+                } else if (this.__isSignatureGraph(graph)){
+                    //do nothing - we don't want to handle signatures in the client for now
+                } else {
+                    //content graph
+                    nodes[graphUri] = ({uri: graphUri});
+                }
+            });
+            //second pass: connect the nodes so we get a tree
+            this.graphs.forEach( graph => {
+                let graphUri = graph["@id"];
+                let node = nodes[graphUri];
+                if (this.__isEnvelopeGraph(graph)){
+                    let containedEnvelopes = this.__getContainedEnvelopeUris(graph);
+                    if (containedEnvelopes.length > 0) {
+                        node.containsEnvelopes = containedEnvelopes.map(uri => nodes[uri]);
+                        //remember that these envelopes are now referenced
+                        unreferencedEnvelopes = unreferencedEnvelopes.filter( uri => ! containedEnvelopes.includes(uri));
+                    } else if (!node.correspondingRemoteMessageUri) {
+                        //remember that this envelope contains no envelopes (and points to no remote messages)
+                        innermostEnvelopes.push(graphUri)
+                    }
+                    if (node.messageUri) {
+                        //if we know the message uri, we can look for content in this envelope
+                        let containedContent = this.__getContainedContentGraphUris(graph, node.messageUri);
+                        if (containedContent.length > 0) {
+                            node.containedContent = containedContent.map(uri => nodes[uri]);
+                            //remember the content graphs
+                            containedContent.forEach(uri => contentGraphs.push(uri));
+                        }
+                    }
+                }
+            });
+            //now we should have the envelope inclusion trees for all messages
+            //unreferencedEnvelopes now points to all roots.
+            //walk over the roots and connect them via remoteMessage connections
+            if (unreferencedEnvelopes.length > 1) {
+                unreferencedEnvelopes.forEach(node => {
+                    if (node.correspondingRemoteMessageUri) {
+                        let remoteMessages = unreferencedEnvelopes
+                            .filter(envelope => envelope.messageUri == node.correspondingRemoteMessageUri)
+                        if (remoteMessages.length == 1) {
+                            //we found a remote envelope. link to it from our node
+                            node.remoteEnvelope = remoteMessages[0];
+                            if (node.messageDirection === "http://purl.org/webofneeds/message#FromExternal") {
+                                //both messages can link to each other, but the FromExternal one
+                                //is the top level one. mark the other one as referenced
+                                unreferencedEnvelopes = unreferencedEnvelopes.filter(env => env != node.remoteEnvelope);
+                            }
+                        } else if (remoteMessages.length > 1) {
+                            this.parseErrors.push("more than one candidate for the outermost remoteMessage envelope found");
+                        }
+                    }
+                });
+            }
+
+            if (innermostEnvelopes.length == 0){
+                this.parseErrors.push("no innermost envelope found");
+            }
+            if (innermostEnvelopes.length > 1){
+                this.parseErrors.push("more than one innermost envelope found");
+            }
+            if (unreferencedEnvelopes.length == 0){
+                this.parseErrors.push("no unreferenced (i.e. outermost) envelope found");
+            }
+            if (unreferencedEnvelopes.length > 1){
+                this.parseErrors.push("more than one unreferenced (i.e. outermost) envelope found");
+            }
+            this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
+
+        },
+
+        __isEnvelopeGraph: graph => {
+            let graphUri = graph["@id"];
+            let graphData = graph["@graph"];
+            return graphData.some(resource =>
+                resource["@id"] === graphUri
+                && resource["@type"].includes("http://purl.org/webofneeds/message#EnvelopeGraph")
+            );
+        },
+        __isSignatureGraph: graph => {
+            let graphUri = graph["@id"];
+            let graphData = graph["@graph"];
+            return graphData.some(resource =>
+                resource["@id"] === graphUri
+                && resource["@type"].includes("http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature")
+            );
+        },
+        __getContainedEnvelopeUris: graph => {
+            let graphUri = graph["@id"];
+            let graphData = graph["@graph"];
+            let data = graphData
+                .filter(resource => resource["@id"] == graphUri)
+                .map(resource => resource["http://purl.org/webofneeds/message#containsEnvelope"])
+                .filter(x => x);
+            if (data.length > 0){
+                return data[0].map(x => x["@id"]);
+            } else {
+                return []
+            }
+        },
+        __getContainedContentGraphUris: (graph, messageUri) => {
+            let graphUri = graph["@id"];
+            let graphData = graph["@graph"];
+            const contentUrisArray = graphData
+                .filter(resource => resource["@id"] == messageUri)
+                .map(resource => resource["http://purl.org/webofneeds/message#hasContent"])
+                .filter(x => x);
+            if (contentUrisArray.length > 0){
+                return contentUrisArray[0].map(x => x["@id"])
+            } else {
+                return [];
+            }
+        },
+        __getMessageUriAndDirection: graph => {
+            let graphData = graph["@graph"];
+            let data = graphData
+                .filter(
+                    resource =>
+                        resource["@type"].includes("http://purl.org/webofneeds/message#FromExternal")
+                        || resource["@type"].includes("http://purl.org/webofneeds/message#FromOwner")
+                        || resource["@type"].includes("http://purl.org/webofneeds/message#FromSystem"))
+                .map(resource => (
+                    {   "messageUri": resource["@id"],
+                        "messageDirection": resource["@type"][0] //@type is an array in expanded jsonld
+                    }
+                ))
+                .filter(x => !!x); //if that property was not present, filter out undefineds
+            if (Array.isArray(data)) {
+                if (data.length == 0){
+                    return null;
+                }
+                return data[0];
+            }
+            return data;
+        },
+        __getMessageUriAndCorrespondingRemoteMessageUri: graph => {
+            let graphData = graph["@graph"];
+            let data = graphData
+                .filter(
+                    resource =>
+                    resource["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"])
+                .map(resource => (
+                {   "messageUri": resource["@id"],
+                    "correspondingRemoteMessageUri": resource["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"][0]['@id']
+                }
+                ))
+                .filter(x => !!x); //if that property was not present, filter out undefineds
+            if (Array.isArray(data)) {
+                if (data.length == 0){
+                    return null;
+                }
+                return data[0];
+            }
+            return data;
+        },
+    }
+    
+    
+
+        /**
      * Builds a JSON-LD WoN Message or adds the relevant data to the specified
      * JSON-LD data structure.
      * @param messageType a fully qualified URI
