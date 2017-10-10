@@ -31,6 +31,7 @@ export default function(userData = initialState, action = {}) {
             }
 
         case actionTypes.logout:
+            console.log('logout called');
             return Immutable.fromJS({loggedIn: false});
 
         case actionTypes.loginFailed:
