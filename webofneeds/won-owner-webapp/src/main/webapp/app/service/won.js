@@ -916,34 +916,7 @@ import jsonld from 'jsonld';
      * @constructor
      */
     won.WonMessageFromMessageLoadedFromStore = function (message) {
-        /*
-        {"hasReceiver":"https://192.168.124.49:8443/won/resource/connection/9o4gbwa8qdwui8ivcsnw",
-            "type":"http://purl.org/webofneeds/message#FromExternal",
-            "hasPreviousMessage":"https://192.168.124.49:8443/won/resource/event/akl1lfmhsbsk4qw0gicg",
-            "hasReceivedTimestamp":null,
-            "protocolVersion":"1.0",
-            "hasCorrespondingRemoteMessage":
-                {"protocolVersion":"1.0",
-                    "hasTextMessage":"hi auch!",
-                    "hasSentTimestamp":"1507216622288",
-                    "hasSenderNeed":"https://192.168.124.49:8443/won/resource/need/5213160017499701000",
-                    "hasMessageType":"http://purl.org/webofneeds/message#OpenMessage",
-                    "hasCorrespondingRemoteMessage":"https://192.168.124.49:8443/won/resource/event/3pjpnf41zpmauu8zktgy",
-                    "hasReceiverNode":"https://192.168.124.49:8443/won/resource",
-                    "uri":
-                    "https://192.168.124.49:8443/won/resource/event/934297292498864100",
-                        "hasSender":"https://192.168.124.49:8443/won/resource/connection/dmq6mmmswbem7ss06pmq",
-                    "hasSenderNode":"https://192.168.124.49:8443/won/resource",
-                    "hasPreviousMessage":"https://192.168.124.49:8443/won/resource/event/oxrkhlzvpfyp2p9s0ah7",
-                    "hasRemoteFacet":"http://purl.org/webofneeds/model#OwnerFacet",
-                    "type":"http://purl.org/webofneeds/message#FromOwner",
-                    "hasReceivedTimestamp":"1507216622360",
-                    "hasFacet":"http://purl.org/webofneeds/model#OwnerFacet",
-                    "hasContent":"https://192.168.124.49:8443/won/resource/event/934297292498864100#content",
-                    "hasReceiverNeed":"https://192.168.124.49:8443/won/resource/need/560176687122239500"},
-            "hasSentTimestamp":"1507216622405",
-            "uri":"https://192.168.124.49:8443/won/resource/event/3pjpnf41zpmauu8zktgy"}
-        */
+        //console.log("converting this result from store to WonMessage", message)
 
         let contentResource = message;
         if (!message.hasTextMessage){
@@ -973,6 +946,10 @@ import jsonld from 'jsonld';
         let remoteEnvelopeGraph = undefined;
         envelopeGraphs.push(envelopeGraph);
         if (message.hasCorrespondingRemoteMessage && message.hasCorrespondingRemoteMessage.type){
+            // link our message to remote message
+            let res = envelopeGraph["@graph"].filter( x => x["@id"] == message.uri)[0];
+            res["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"] = {"@id": message.hasCorrespondingRemoteMessage.uri }
+            // create envelope for remote message
             remoteEnvelopeGraph = makeEnvelopeGraphForMessageResource(message.hasCorrespondingRemoteMessage);
             envelopeGraphs.push(remoteEnvelopeGraph);
         }
@@ -998,7 +975,8 @@ import jsonld from 'jsonld';
 
 
 
-    won.wonMessageFromJsonLd = function(wonMessageAsJsonLD, collapsedIntoOneGraph){
+    won.wonMessageFromJsonLd = function(wonMessageAsJsonLD){
+        //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
         return jsonld.promises.expand(wonMessageAsJsonLD)
             .then(expandedJsonLd =>
                 new WonMessage(expandedJsonLd)
@@ -1310,8 +1288,8 @@ import jsonld from 'jsonld';
                         node.containsEnvelopes = containedEnvelopes.map(uri => nodes[uri]);
                         //remember that these envelopes are now referenced
                         unreferencedEnvelopes = unreferencedEnvelopes.filter( uri => ! containedEnvelopes.includes(uri));
-                    } else {
-                        //remember that this envelope contains no envelopes
+                    } else if (!node.correspondingRemoteMessageUri) {
+                        //remember that this envelope contains no envelopes (and points to no remote messages)
                         innermostEnvelopes.push(graphUri)
                     }
                     if (node.messageUri) {
