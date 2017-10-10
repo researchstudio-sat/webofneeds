@@ -188,6 +188,7 @@ export function runMessagingAgent(redux) {
         console.log('onMessage (jsonld)    : ', data);
         won.wonMessageFromJsonLd(data).then(message => {
             console.log('onMessage (wonMessage): ', message);
+            won.addJsonLdData(message.getMessageUri(), data);
 
             var messageProcessed = false;
     
