@@ -30,7 +30,7 @@ won-create-post {
 
   hr {
     border: 0;
-    border-top: $thinBorderWidth solid $won-line-gray;
+    /*border-top: $thinBorderWidth solid $won-line-gray;*/
     width: 100%;
   }
 
@@ -92,6 +92,9 @@ won-create-post {
     &.location {
       background-image: url('icon-sprite.svg#ico36_area_circle_hi');
     }
+  }
+  .cp__location {
+    margin-bottom: 0.75rem;
   }
 
   .cp__tags {
