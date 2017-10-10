@@ -708,7 +708,7 @@ import won from './won.js';
                 }
             })
             .then(() =>
-                addJsonLdData(uri, dataset)
+                won.addJsonLdData(uri, dataset)
             )
             .then(() => dataset)
         )
@@ -722,7 +722,7 @@ import won from './won.js';
     /**
      * Adds the specified JSON-LD dataset to the store.
      */
-    function addJsonLdData (uri, data) {
+    won.addJsonLdData = function(uri, data) {
         return new Promise((resolve, reject) =>
             privateData.store.load("application/ld+json", data, function (success, results) {
                 if (success) {
@@ -1463,6 +1463,10 @@ import won from './won.js';
                 if(!event.hasCorrespondingRemoteMessage) {
                     return event;
                 } else {
+                    if (event.isRemoteResponseTo) {
+                        //we can't access the remote message of a remote response. just use the event
+                        return event;
+                    }
                     /*
                     * there's some messages (e.g. incoming connect) where there's
                     * vital information in the correspondingRemoteMessage. So
