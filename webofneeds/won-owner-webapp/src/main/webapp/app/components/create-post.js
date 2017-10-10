@@ -86,7 +86,7 @@ function genComponentConf() {
                 <won-location-picker on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
             </div>
 
-            <won-labelled-hr label="::'or'" ng-show="self.isValid()"></won-labelled-hr>
+            <!--won-labelled-hr label="::'or'" ng-show="self.isValid()"></won-labelled-hr-->
 
             <button type="submit" class="won-button--filled red"
                     ng-show="self.isValid()"
