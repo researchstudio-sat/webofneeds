@@ -26,7 +26,6 @@ const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
-        <span class="lp__verifiedLocation" ng-show="self.locationIsSaved()">[CHECK]</span>
         <ol>
             <li ng-show="
                 !self.locationIsSaved() && self.currentLocation &&
