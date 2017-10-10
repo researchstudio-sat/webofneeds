@@ -24,7 +24,7 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
-        <div ng-show="self.images" class="mfi__gallery">
+        <div ng-show="self.images" class="mfi__gallery clickable" ng-click="self.toggleFeedback()">
             <won-extended-gallery
                 max-thumbnails="self.maxThumbnails"
                 items="self.images"
@@ -57,7 +57,8 @@ function genComponentConf() {
         <div
             class="mfi__match clickable"
             ng-if="!self.feedbackVisible"
-            ng-click="self.showFeedback()">
+            ng-click="self.showFeedback()"
+            ng-mouseenter="self.showFeedback()">
                 <div class="mfi__match__description">
                     <div class="mfi__match__description__title">
                         {{ self.ownNeed.get('title') }}
@@ -74,7 +75,8 @@ function genComponentConf() {
         </div>
         <won-feedback-grid
             connection-uri="self.connectionUri"
-            ng-if="self.feedbackVisible"/>
+            ng-if="self.feedbackVisible"
+            ng-mouseleave="self.hideFeedback()"/>
     `;
 
     class Controller {
