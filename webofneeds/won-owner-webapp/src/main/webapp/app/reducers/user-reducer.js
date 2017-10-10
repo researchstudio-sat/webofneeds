@@ -39,7 +39,11 @@ export default function(userData = initialState, action = {}) {
 
         case actionTypes.loginReset:
             console.log('loginReset called');
-            return Immutable.fromJS({loginError: undefined});
+            if(!userData.get("loggedIn")){
+                return Immutable.fromJS({loginError: undefined});
+            } else {
+                return userData
+            }
 
         case actionTypes.registerReset:
             console.log('registerReset called');
