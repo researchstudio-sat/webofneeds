@@ -81,6 +81,20 @@ export function selectAllMessagesByNeedUri(state, needUri) {
     return messages;
 }
 
+export function selectAllMessagesByNeedUriAndConnected(state, needUri) {
+    const connections = state.getIn(["needs", needUri, "connections"]);
+    const connectionsWithoutClosed = connections && connections.filter(conn => conn.get("state") === won.WON.Connected);
+    let messages = Immutable.Map();
+
+    if(connectionsWithoutClosed){
+        connectionsWithoutClosed.map(function(conn){
+            messages = messages.merge(conn.get("messages"));
+        });
+    }
+
+    return messages;
+}
+
 export const selectOpenConnectionUri = createSelector(
     selectRouterParams,
     (routerParams) => {
