@@ -15,10 +15,6 @@ import {
     connect2Redux,
 } from '../won-utils.js'
 
-import {
-    relativeTime,
-} from '../won-label-utils.js'
-
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
@@ -45,11 +41,6 @@ function genComponentConf() {
           <span>Available until 5th May</span>
         </div>
         -->
-        <div class="pc__datetime" ng-show="self.relativeCreationDate">
-          <img class="pc__icon"
-            src="generated/icon-sprite.svg#ico16_indicator_time"/>
-          <span>Posted {{ self.relativeCreationDate }}</span>
-        </div>
         <div class="pc__text"
           ng-show="!!self.need.get('description')">
           <img
@@ -84,11 +75,8 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pc4dbg = this;
             const selectFromState = (state) => {
-                const lastUpdateTime = state.get('lastUpdateTime');
-                const need = state.getIn(['needs', this.needUri]);
                 return {
-                    need,
-                    relativeCreationDate: need && relativeTime(lastUpdateTime, need.get('creationDate')),
+                    need: state.getIn(['needs', this.needUri]),
                 }
             };
             /*
