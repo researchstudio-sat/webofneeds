@@ -42,7 +42,7 @@ System.config({
     "redux-thunk": "npm:redux-thunk@1.0.0",
     "redux-ui-router": "npm:redux-ui-router@0.7.2",
     "reselect": "npm:reselect@2.0.2",
-    "sockjs": "bower:sockjs@0.3.4",
+    "sockjs-client": "bower:sockjs-client@0.3.4",
     "undo.js": "npm:undo.js@0.2.0",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
