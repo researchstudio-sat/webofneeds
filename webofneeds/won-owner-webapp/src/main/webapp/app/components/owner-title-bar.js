@@ -14,7 +14,7 @@ import won from '../won-es6.js';
 import { labels } from '../won-label-utils.js';
 import {
     selectOpenPostUri,
-    selectAllMessagesByNeedUri,
+    selectAllMessagesByNeedUriAndConnected,
 } from '../selectors.js';
 import { actionCreators }  from '../actions/actions.js';
 
@@ -145,7 +145,7 @@ function genComponentConf() {
                 const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
                 const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);
                 const connected = connections && connections.filter(conn => conn.get("state") === won.WON.Connected);
-                const messages = selectAllMessagesByNeedUri(state, postUri);
+                const messages = selectAllMessagesByNeedUriAndConnected(state, postUri);
 
                 const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
                 const unreadSentRequestsCount = sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size;
