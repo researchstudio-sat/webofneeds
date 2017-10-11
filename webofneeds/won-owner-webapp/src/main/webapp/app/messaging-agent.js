@@ -32,7 +32,7 @@ import {
 
 import { actionTypes, actionCreators } from './actions/actions.js';
 //import './message-service.js'; //TODO still uses es5
-import SockJS from 'sockjs';
+import SockJS from 'sockjs-client';
 import * as messages from './actions/messages-actions.js';
 
 export function runMessagingAgent(redux) {

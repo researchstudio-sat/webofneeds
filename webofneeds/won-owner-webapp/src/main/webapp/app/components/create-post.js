@@ -208,19 +208,17 @@ function genComponentConf() {
                                     );
                                 });
                         },
-                        err => { //error handler
-                            if (err.code === 2) {
-                                console.log("create whats around not possible due to error");
-                                //TODO: SHOW TOAST FOR ERROR
-                                this.pendingPublishing = false;
-                            }
+                        error => { //error handler
+                            console.error("Could not retrieve geolocation due to error: ", error.code, "fullerror:", error);
+                            this.geoLocationDenied();
+                            this.pendingPublishing = false;
                         },
                         { //options
                             enableHighAccuracy: true,
                             timeout: 5000,
                             maximumAge: 0
                         }
-                    );
+                    )
                 }
             }
         }

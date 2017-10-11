@@ -16,6 +16,8 @@
 
 package won.node.camel.processor.general;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
@@ -33,6 +35,9 @@ import java.net.URI;
  * Acquires a pessimistic read lock on the message's parent.
  */
 public class LockMessageParentWonMessageProcessor implements WonMessageProcessor{
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     ConnectionRepository connectionRepository;
     @Autowired
@@ -44,7 +49,18 @@ public class LockMessageParentWonMessageProcessor implements WonMessageProcessor
             
     @Override
     public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-        lockParent(message);
+        try {
+            lockParent(message);
+        } catch (Exception e) {
+            URI messageUri;
+            try {
+                messageUri = message.getMessageURI();
+            } catch (Exception e1) {
+                logger.error("Error getting messageURI from WonMessage");
+                messageUri = null;
+            }
+            logger.error("Error locking parent of WonMessage with uri {}", messageUri);
+        }
         return message;
     }
 

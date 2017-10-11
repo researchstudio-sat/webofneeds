@@ -10,6 +10,7 @@
     "clean": "gulp clean"
   },
   "devDependencies": {
+    "bower": "1.8.2",
     "gulp": "3.9.0",
     "gulp-autoprefixer": "3.1.0",
     "gulp-jspm": "0.5.13",
@@ -44,7 +45,7 @@
       "redux-thunk": "npm:redux-thunk@1.0.0",
       "redux-ui-router": "npm:redux-ui-router@0.7.2",
       "reselect": "npm:reselect@2.0.2",
-      "sockjs": "bower:sockjs@0.3.4",
+      "sockjs-client": "bower:sockjs-client@0.3.4",
       "undo.js": "npm:undo.js@0.2.0"
     },
     "devDependencies": {

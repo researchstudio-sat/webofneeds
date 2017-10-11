@@ -43,7 +43,7 @@ function genComponentConf() {
         <input
           type="text"
           ng-model="self.message"
-          placeholder="Reply Message (optional)"/>
+          placeholder="Request Message (optional)"/>
         <div class="flexbuttons">
           <button
             class="won-button--filled black"

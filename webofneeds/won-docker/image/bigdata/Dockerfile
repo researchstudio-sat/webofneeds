@@ -2,7 +2,8 @@
 # The bigdata-bundled.jar file has to be copied manually to this folder
 
 # use java as a base image
-FROM openjdk:8
+# fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
+FROM openjdk:8u121-jdk
 
 # download the (manually downloaded) jar and the properties file
 ADD ./bigdata-bundled.jar /usr/src/bigdata/bigdata-bundled.jar

@@ -116,8 +116,15 @@ public class FailResponder extends AbstractCamelProcessor
       //now:
       // 1. log the error we had here
       // 2. log the original error, otherwise it is swallowed completely
-      URI originalMessageURI = originalMessage == null? null : originalMessage.getMessageURI();
-      if (exception != null){
+        logger.warn("Error in failure response handling!");
+        URI originalMessageURI = null;
+        try {
+            originalMessageURI = originalMessage == null ? null : originalMessage.getMessageURI();
+        } catch (Exception e) {
+            logger.error("Error getting message URI from WonMessage");
+        }
+
+      if (exception != null && exception.getClass() != null){
         logger.warn(String.format("Could not send FailureResponse for original Exception %s (message: %s) that occurred while processing message %s.", exception.getClass().getSimpleName(), exception.getMessage(), originalMessageURI), t);
         logger.warn("original error: ", exception);
       } else {

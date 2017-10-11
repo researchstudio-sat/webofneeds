@@ -192,7 +192,7 @@ const actionHierarchy = {
     loginReset: INJ_DEFAULT,
     registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,
-
+    geoLocationDenied: INJ_DEFAULT,
     lostConnection: INJ_DEFAULT,
     reconnect: INJ_DEFAULT,
     reconnectSuccess: INJ_DEFAULT,
