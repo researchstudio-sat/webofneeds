@@ -915,7 +915,7 @@ import jsonld from 'jsonld';
      * @param message
      * @constructor
      */
-    won.WonMessageFromMessageLoadedFromStore = function (message) {
+    won.WonMessageFromMessageLoadedFromStore = async function (message) {
         //console.log("converting this result from store to WonMessage", message)
 
         let contentResource = message;
@@ -975,7 +975,7 @@ import jsonld from 'jsonld';
 
 
 
-    won.wonMessageFromJsonLd = function(wonMessageAsJsonLD){
+    won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD){
         //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
         return jsonld.promises.expand(wonMessageAsJsonLD)
             .then(expandedJsonLd =>

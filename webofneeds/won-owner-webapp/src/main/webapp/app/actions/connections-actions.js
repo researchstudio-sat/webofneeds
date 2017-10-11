@@ -91,9 +91,10 @@ export function connectionsOpen(connectionUri, message) {
         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
         buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, message)
-        .then(msgData =>
-            Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
-        .then(([optimisticEvent, jsonldMessage]) => {
+        .then(async msgData => {
+            const jsonldMessage = msgData.message;
+            const optimisticEvent = await won.wonMessageFromJsonLd(msgData.message);
+            //const smarterMessage = await won.WonMessageFromMessageLoadedFromStore(optimisticEvent);
             // dispatch(actionCreators.messages__send(messageData));
             dispatch({
                 type: actionTypes.connections.open,
@@ -101,6 +102,7 @@ export function connectionsOpen(connectionUri, message) {
                     eventUri: optimisticEvent.getMessageUri(),
                     message: jsonldMessage,
                     optimisticEvent,
+                    //optimisticWonMessage: smarterMessage,
                 }
             });
 
@@ -130,6 +132,7 @@ export function connectionsConnect(connectionUri, textMessage) {
         dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
         const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
+        //const smarterMessage = await won.WonMessageFromMessageLoadedFromStore(event);
 
         dispatch({
             type: actionTypes.connections.connect,
@@ -138,6 +141,7 @@ export function connectionsConnect(connectionUri, textMessage) {
                 textMessage,
                 eventUri: cnctMsg.eventUri,
                 optimisticEvent: event,
+                //optimisticWonMessage: smarterMessage,
             }
         });
     }
