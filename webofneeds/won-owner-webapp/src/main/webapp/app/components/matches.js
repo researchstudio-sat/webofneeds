@@ -64,7 +64,7 @@ let template = `
                 </a>                
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
                    class="clickable">
-                    <img ng-src="{{self.layout === 'map' ? 'generated/icon-sprite.svg#ico36_area_circle_hi' : 'generated/icon-sprite.svg#ico36_area_circle'}}"
+                    <img ng-src="{{self.layout === 'map' ? 'generated/icon-sprite.svg#ico36_matches_map_hi' : 'generated/icon-sprite.svg#ico36_matches_map'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
             </div>
