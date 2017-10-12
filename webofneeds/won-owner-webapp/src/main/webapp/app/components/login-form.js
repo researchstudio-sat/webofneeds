@@ -83,7 +83,7 @@ function genLoginConf() {
         }
 
         formKeyUp(event) {
-            this.loginReset();
+            this.typedAtLoginCredentials();
             if(event.keyCode == 13) {
                 this.login({
                     email: this.email,
