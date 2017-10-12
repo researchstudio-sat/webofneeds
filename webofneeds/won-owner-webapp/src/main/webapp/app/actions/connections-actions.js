@@ -131,8 +131,7 @@ export function connectionsConnect(connectionUri, textMessage) {
 
         dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
 
-        const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
-        //const smarterMessage = await won.WonMessageFromMessageLoadedFromStore(event);
+        const optimisticEvent = await won.toWonMessage(cnctMsg.message);
 
         dispatch({
             type: actionTypes.connections.connect,
@@ -140,7 +139,7 @@ export function connectionsConnect(connectionUri, textMessage) {
                 connectionUri,
                 textMessage,
                 eventUri: cnctMsg.eventUri,
-                optimisticEvent: event,
+                optimisticEvent,
                 //optimisticWonMessage: smarterMessage,
             }
         });
