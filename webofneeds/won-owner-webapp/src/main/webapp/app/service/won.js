@@ -908,6 +908,25 @@ import jsonld from 'jsonld';
         }
     }
 
+
+    /**
+     * This function should take any of the different chat-message-structures flying around in this code-base
+     * and return a WonMessage object.
+     * @param message
+     * @returns {*|Promise.<WonMessage>}
+     */
+    won.toWonMessage = function(message) {
+        if(message.uri && message.type) {
+            return won.WonMessageFromMessageLoadedFromStore(message);
+        } else if (message['@graph']) {
+            return won.wonMessageFromJsonLd(message);
+        } else if (message instanceof WonMessage) {
+            return Promise.resolve(message);
+        } else {
+            throw new Exception('Couldn\'t convert the following to a WonMessage: ', message);
+        }
+    };
+
     /**
      * This is a hack that allows us to wrap a WonMessage object around a message that
      * is retrieved from the local rdf store. This will work for Chat messages
