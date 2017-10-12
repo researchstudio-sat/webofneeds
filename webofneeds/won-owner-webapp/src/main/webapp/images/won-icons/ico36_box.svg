@@ -5,75 +5,75 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="36"
-   height="36"
-   viewBox="0 0 35.999999 35.999999"
+   version="1.1"
    id="svg4362"
-   version="1.1">
+   viewBox="0 0 35.999999 35.999999"
+   height="36"
+   width="36">
   <defs
      id="defs4364">
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath708">
+       id="clipPath708"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z"
-         id="path710" />
+         id="path710"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath720">
+       id="clipPath720"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 944.383,652.172 c 0,-34.969 28.357,-63.328 63.335,-63.328 l 0,0 c 34.979,0 63.335,28.359 63.335,63.328 l 0,0 c 0,34.984 -28.356,63.343 -63.335,63.343 l 0,0 c -34.978,0 -63.335,-28.359 -63.335,-63.343"
-         id="path722" />
+         id="path722"
+         d="m 944.383,652.172 c 0,-34.969 28.357,-63.328 63.335,-63.328 l 0,0 c 34.979,0 63.335,28.359 63.335,63.328 l 0,0 c 0,34.984 -28.356,63.343 -63.335,63.343 l 0,0 c -34.978,0 -63.335,-28.359 -63.335,-63.343" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath732">
+       id="clipPath732"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z"
-         id="path734" />
+         id="path734"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath212">
+       id="clipPath212"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18"
-         id="path214" />
+         id="path214"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath708-2">
+       id="clipPath708-2"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z"
-         id="path710-7" />
+         id="path710-7"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath720-7">
+       id="clipPath720-7"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 944.383,652.172 c 0,-34.969 28.357,-63.328 63.335,-63.328 l 0,0 c 34.979,0 63.335,28.359 63.335,63.328 l 0,0 c 0,34.984 -28.356,63.343 -63.335,63.343 l 0,0 c -34.978,0 -63.335,-28.359 -63.335,-63.343"
-         id="path722-4" />
+         id="path722-4"
+         d="m 944.383,652.172 c 0,-34.969 28.357,-63.328 63.335,-63.328 l 0,0 c 34.979,0 63.335,28.359 63.335,63.328 l 0,0 c 0,34.984 -28.356,63.343 -63.335,63.343 l 0,0 c -34.978,0 -63.335,-28.359 -63.335,-63.343" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath732-4">
+       id="clipPath732-4"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z"
-         id="path734-6" />
+         id="path734-6"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath212-8">
+       id="clipPath212-8"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18"
-         id="path214-5" />
+         id="path214-5"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
     </clipPath>
     <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath212-8-8">
+       id="clipPath212-8-8"
+       clipPathUnits="userSpaceOnUse">
       <path
-         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18"
-         id="path214-5-1" />
+         id="path214-5-1"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
     </clipPath>
   </defs>
   <metadata
@@ -89,27 +89,27 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     transform="matrix(0.79872882,0,0,0.79872882,9.1016386,-58.894196)">
+     transform="matrix(0.79872882,0,0,0.79872882,9.1016386,-58.894196)"
+     id="layer1">
     <g
-       id="g4192"
-       transform="matrix(1.25,0,0,-1.25,-992.89903,865.93415)">
+       transform="matrix(1.25,0,0,-1.25,-992.89903,865.93415)"
+       id="g4192">
       <path
-         d="m 803.2031,597.7021 c 9.941,0 18,8.059 18,18 0,9.941 -8.059,18 -18,18 -9.941,0 -18,-8.059 -18,-18 0,-9.941 8.059,-18 18,-18"
+         id="path202"
          style="fill:#f04646;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path202" />
+         d="m 803.2031,597.7021 c 9.941,0 18,8.059 18,18 0,9.941 -8.059,18 -18,18 -9.941,0 -18,-8.059 -18,-18 0,-9.941 8.059,-18 18,-18" />
       <path
-         d="m 793.2032,619.7031 0,-11 9,-5 0,11 -9,5 z"
+         id="path582"
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path582" />
+         d="m 793.2032,619.7031 0,-11 9,-5 0,11 -9,5 z" />
       <path
-         d="m 812.2032,619.7031 0,-11 -9,-5 0,11 9,5 z"
+         id="path606"
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path606" />
+         d="m 812.2032,619.7031 0,-11 -9,-5 0,11 9,5 z" />
       <path
-         d="m 793.6914,620.5039 9.09,5.199 8.828,-5.295 -8.789,-5 -9.129,5.096 z"
+         id="path702"
          style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         id="path702" />
+         d="m 793.6914,620.5039 9.09,5.199 8.828,-5.295 -8.789,-5 -9.129,5.096 z" />
     </g>
   </g>
 </svg>
