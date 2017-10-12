@@ -35,7 +35,7 @@ export default function(userData = initialState, action = {}) {
 
         case actionTypes.typedAtLoginCredentials:
             if(!userData.get("loggedIn")){
-                return Immutable.fromJS({loginError: undefined});
+                return userData.set('loginError', undefined);
             } else {
                 return userData
             }
