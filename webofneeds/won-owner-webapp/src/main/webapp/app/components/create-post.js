@@ -4,6 +4,8 @@
 ;
 
 import angular from 'angular'
+import ngAnimate from 'angular-animate';
+
 import 'ng-redux';
 import createNeedTitleBarModule from './create-need-title-bar.js';
 import posttypeSelectModule from './posttype-select.js';
@@ -65,7 +67,7 @@ function genComponentConf() {
                     on-unselect="::self.unselectType()">
             </won-posttype-select>
 
-            <div class="cp__mandatory-rest" ng-show="self.draft.type">
+            <div class="cp__mandatory-rest" ng-if="self.draft.type">
                 <won-image-dropzone
                         on-image-picked="::self.pickImage(image)">
                 </won-image-dropzone>
@@ -73,23 +75,54 @@ function genComponentConf() {
                 <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
             </div>
 
-            <hr ng-show="self.draft.tags && self.draft.tags.length > 0"/>
-            <div class="cp__tags" ng-show="self.draft.tags && self.draft.tags.length > 0">
-                <div class="cp__header tags">Tags</div>
-                <span class="cp__tags__tag" ng-repeat="tag in self.draft.tags">{{tag}}</span>
+            <div class="cp__details" ng-repeat="detail in self.details track by $index" ng-if="self.isValid()">
+                <div class="cp__tags" ng-if="detail === 'tags'">
+                    <div class="cp__header tags" ng-click="self.removeDetail($index)">
+                        <span class="nonHover">Tags</span>
+                        <span class="hover">Remove Tags</span>
+                    </div>
+                    <div class="cp__taglist">
+                        <span class="cp__taglist__tag" ng-repeat="tag in self.draft.tags">{{tag}}</span>
+                    </div>
+                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text"/>
+                </div>
+                
+                <div class="cp__location" ng-if="detail === 'location'">
+                    <div class="cp__header location" ng-click="self.removeDetail($index)">
+                        <span class="nonHover">Location</span>
+                        <span class="hover">Remove Location</span>
+                    </div>
+                    <won-location-picker on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+                </div>
             </div>
 
-
-            <hr ng-show="self.isValid()"/>
-            <div class="cp__location" ng-show="self.isValid()">
-                <div class="cp__header location">Location</div>
-                <won-location-picker on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+            <div class="cp__addDetail" ng-if="self.isValid()">
+                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()">
+                    <span class="nonHover">Add more detail</span>
+                    <span class="hover">Close Add more detail</span>
+                </div>
+                <div class="cp__detail__items" ng-if="self.showDetail" >
+                    <div class="cp__detail__items__item location" 
+                        ng-click="!self.isDetailPresent('location') && self.addDetail('location')"
+                        ng-class="{'picked' : self.isDetailPresent('location')}">Address or Location</div>
+                    <div class="cp__detail__items__item tags"
+                        ng-click="!self.isDetailPresent('tags') && self.addDetail('tags')"
+                        ng-class="{'picked' : self.isDetailPresent('tags')}">Tags</div>
+                    <!-- <div class="cp__detail__items__item image" 
+                        ng-click="!self.isDetailPresent('image') && self.addDetail('image')"
+                        ng-class="{'picked' : self.isDetailPresent('image')}">Image or Media</div>
+                    <div class="cp__detail__items__item description" 
+                        ng-click="!self.isDetailPresent('description') && self.addDetail('description')"
+                        ng-class="{'picked' : self.isDetailPresent('description')}">Description</div>
+                    <div class="cp__detail__items__item timeframe" 
+                        ng-click="!self.isDetailPresent('timeframe') && self.addDetail('timeframe')"
+                        ng-class="{'picked' : self.isDetailPresent('timeframe')}">Deadline or Timeframe</div> -->
+                </div>
             </div>
+            <won-labelled-hr label="::'or'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
 
-            <!--won-labelled-hr label="::'or'" ng-show="self.isValid()"></won-labelled-hr-->
-
-            <button type="submit" class="won-button--filled red"
-                    ng-show="self.isValid()"
+            <button type="submit" class="won-button--filled red cp__publish"
+                    ng-if="self.isValid()"
                     ng-click="::self.publish()">
                 <span ng-show="!self.pendingPublishing">
                     Publish
@@ -99,19 +132,24 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
-    `
+    `;
 
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
             attach(this, serviceDependencies, arguments);
 
+            //TODO debug; deleteme
+            window.cnc = this;
+
             this.postTypeTexts = postTypeTexts;
             this.characterLimit = 140; //TODO move to conf
             this.draft = {title: "", type: undefined, description: "", tags: undefined, location: undefined, thumbnail: undefined};
             this.pendingPublishing = false;
-            //TODO debug; deleteme
-            window.cnc = this;
+
+            this.showDetail = false;
+            this.details = [];
+
 
             const selectFromState = (state) => {
                 return {
@@ -163,6 +201,28 @@ function genComponentConf() {
 
         pickImage(image) {
             this.draft.thumbnail = image;
+        }
+
+        toggleDetail(){
+            this.showDetail = !this.showDetail;
+        }
+
+        addDetail(detail) {
+            this.details.push(detail);
+        }
+
+        removeDetail(detailIndex) {
+            console.log("details before removal of idx: ", detailIndex, ":", this.details);
+            var tempDetails = [];
+            for(var i=0; i < this.details.length; i++){
+                if(i!=detailIndex) tempDetails.push(this.details[i]);
+            }
+            this.details = tempDetails;
+            console.log("details after removal of idx: ", detailIndex, ":", this.details);
+        }
+
+        isDetailPresent(detail) {
+            return this.details.indexOf(detail) > -1;
         }
 
         createWhatsAround(){
@@ -242,6 +302,7 @@ export default angular.module('won.owner.components.createPost', [
         imageDropzoneModule,
         needTextfieldModule,
         locationPickerModule,
+        ngAnimate,
     ])
     .directive('wonCreatePost', genComponentConf)
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
