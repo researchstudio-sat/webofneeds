@@ -74,16 +74,10 @@ function genLoginConf() {
             });
 
             connect2Redux(login, actionCreators, [], this);
-
-            this.autofillHack();
-
-            this.$scope.$watch(() => this.loginVisible, (newVis, oldVis) => {
-                this.autofillHack();
-            });
         }
 
         formKeyUp(event) {
-            this.loginReset();
+            this.typedAtLoginCredentials();
             if(event.keyCode == 13) {
                 this.login({
                     email: this.email,
@@ -92,35 +86,6 @@ function genLoginConf() {
                     redirectToFeed: true
                 });
             }
-        }
-
-        /** TODO: remove/rework this method! see issues:
-         * https://github.com/researchstudio-sat/webofneeds/issues/1244
-         * https://github.com/researchstudio-sat/webofneeds/issues/1239
-         */
-        /**
-         * auto-fill hack. firefox doesn't fire an input event when auto-filling,
-         * so we do this here manually to make sure the ng-model updates itself.
-         */
-        autofillHack() {
-            const triggerInputEvents = () =>
-                ['#loginEmail', '#loginPassword']
-                    .map(id => this.$element[0].querySelector(id)) // select #<id>
-                    .forEach(el => dispatchEvent(el, 'input' ));
-
-            delay(0).then(triggerInputEvents);
-
-            /*
-             * @2s delay: to catch cases where the login is opened before the
-             * page finishes loading (for FF+Keefox auto-fill triggers only then)
-             * There's no guarantee that 2s are enough tough. However, as not even
-             * the DOM has the correct information (e.g. via `.innerHTML`) there's
-             * no better way of dealing this except for continuous event spamming.
-             */
-            delay(500).then(triggerInputEvents);
-            delay(1000).then(triggerInputEvents);
-            delay(2000).then(triggerInputEvents);
-
         }
     }
     Controller.$inject = serviceDependencies;

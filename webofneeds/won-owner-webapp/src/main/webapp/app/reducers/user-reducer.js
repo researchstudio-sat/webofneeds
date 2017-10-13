@@ -15,8 +15,6 @@ export default function(userData = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.initialPageLoad:
         case actionTypes.login:
-            console.log('login called');
-
             //because we get payload as immutablejs-map sometimes but not always
             var immutablePayload = Immutable.fromJS(action.payload);
 
@@ -24,34 +22,28 @@ export default function(userData = initialState, action = {}) {
             var email = immutablePayload.get('email');
 
             if(loggedIn){
-                console.log('reducers.js: received successful-login action from app-server');
                 return Immutable.fromJS({loggedIn: true, email: email});
             } else {
                 return userData;
             }
 
         case actionTypes.logout:
-            console.log('logout called');
             return Immutable.fromJS({loggedIn: false});
 
         case actionTypes.loginFailed:
-            console.log('reducers.js: received UNsuccessful-login action from app-server');
             return Immutable.fromJS({loginError: action.payload.loginError, loggedIn: false});
 
-        case actionTypes.loginReset:
-            console.log('loginReset called');
+        case actionTypes.typedAtLoginCredentials:
             if(!userData.get("loggedIn")){
-                return Immutable.fromJS({loginError: undefined});
+                return userData.set('loginError', undefined);
             } else {
                 return userData
             }
 
         case actionTypes.registerReset:
-            console.log('registerReset called');
             return Immutable.fromJS({registerError: undefined});
 
         case actionTypes.registerFailed:
-            console.log('reducers.js: received UNsuccessful-login action from app-server');
             return Immutable.fromJS({registerError: action.payload.registerError});
 
         default:

@@ -189,7 +189,7 @@ const actionHierarchy = {
     logoutStarted: INJ_DEFAULT,
     logout: accountLogout,
     register: accountRegister,
-    loginReset: INJ_DEFAULT,
+    typedAtLoginCredentials: INJ_DEFAULT,
     registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,
     geoLocationDenied: INJ_DEFAULT,
