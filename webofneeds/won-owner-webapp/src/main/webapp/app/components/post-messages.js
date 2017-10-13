@@ -5,6 +5,9 @@ import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
 import {
+    relativeTime,
+} from '../won-label-utils.js'
+import {
     connect2Redux,
 } from '../won-utils.js';
 import {
@@ -67,7 +70,7 @@ function genComponentConf() {
                         <div
                             ng-hide="message.get('unconfirmed')"
                             class="pm__content__message__content__time">
-                                {{ message.get('date') }}
+                                {{ self.relativeTime(self.lastUpdateTime, message.get('date')) }}
                         </div>
                         <a
                           ng-show="self.debugmode && message.get('outgoingMessage')"
@@ -104,6 +107,7 @@ function genComponentConf() {
     class Controller {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
+            this.relativeTime = relativeTime;
             window.pm4dbg = this;
 
             const self = this;

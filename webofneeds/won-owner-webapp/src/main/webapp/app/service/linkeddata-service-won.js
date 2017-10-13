@@ -826,7 +826,7 @@ import won from './won.js';
                 {node: "won:isInState"},
                 {node: "won:hasFlag"},
                 {node: "won:hasFacet"},
-                {node: "dtc:created"},
+                {node: "dct:created"},
                 {
                     node: "won:hasEventContainer",
                     children: [
