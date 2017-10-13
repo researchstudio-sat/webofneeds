@@ -77,16 +77,17 @@ export default function(allNeedsInState = initialState, action = {}) {
                 allNeedsInState);
 
         case actionTypes.messages.connectMessageReceived:
-            var {ownNeedUri, ownNeed, remoteNeed, updatedConnection, connection, message } = action.payload;
-            var ownNeedFromState = allNeedsInState.get(ownNeedUri);
+            var ownNeedFromState = allNeedsInState.get(action.payload.ownNeedUri);
+            var remoteNeedFromState = allNeedsInState.get(action.payload.remoteNeed['@id']);
+            var remoteNeed = action.payload.remoteNeed;
 
             var stateWithOwnNeed = ownNeedFromState ? allNeedsInState : addNeed(allNeedsInState, ownNeed, true);
             var stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
-            var stateWithBothNeedsAndConnection = addConnectionFull(stateWithBothNeeds, connection, true);
+            var stateWithBothNeedsAndConnection = addConnectionFull(stateWithBothNeeds, action.payload.connection, true);
 
             let stateWithEverything = stateWithBothNeedsAndConnection;
-            if(message){
-                stateWithEverything = addMessage(stateWithEverything, message, false, true);
+            if(action.payload.message){
+                stateWithEverything = addMessage(stateWithEverything, action.payload.message, false, true);
             }
 
             return stateWithEverything;
@@ -98,7 +99,8 @@ export default function(allNeedsInState = initialState, action = {}) {
             return changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.Closed);
 
         case actionTypes.messages.openMessageReceived:
-            return addConnectionFull(allNeedsInState, action.payload.connection);
+            var withConnection = addConnectionFull(allNeedsInState, action.payload.connection);
+            return addMessage(withConnection, action.payload.message, false, true);
 
         case actionTypes.connections.connectAdHoc:
             var optimisticEvent = getIn(action, ['payload', 'optimisticEvent']);
@@ -128,10 +130,12 @@ export default function(allNeedsInState = initialState, action = {}) {
 
 
         case actionTypes.connections.connect: // user has sent a request
-            return changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.RequestSent);
+            var cnctStateUpdated = changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.RequestSent);
+            return addMessage(cnctStateUpdated, action.payload.optimisticEvent, true, false);
 
         case actionTypes.connections.open:
-            return changeConnectionState(allNeedsInState,  action.payload.optimisticEvent.getSender(), won.WON.Connected);
+            var cnctStateUpdated = changeConnectionState(allNeedsInState,  action.payload.optimisticEvent.getSender(), won.WON.Connected);
+            return addMessage(cnctStateUpdated, action.payload.optimisticEvent, true, false);
 
         case actionTypes.messages.open.failure:
             return changeConnectionState(allNeedsInState,  action.payload.events['msg:FromSystem'].hasReceiver, won.WON.RequestReceived);
@@ -266,7 +270,7 @@ function addConnectionFull(state, connection, newConnection) {
 
     //console.log("Adding Full Connection");
     if(newConnection === undefined) {
-      newConnection = !!selectNeedByConnectionUri(state, connection.uri); // do we already have a connection like that?
+      newConnection = !!selectNeedByConnectionUri(state, connection.uri || connection.get('uri')); // do we already have a connection like that?
     }
     let parsedConnection = parseConnection(connection, newConnection);
 

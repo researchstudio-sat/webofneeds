@@ -254,6 +254,7 @@ function getConnectionData(event) {
 
                 data.receivedEvent = event.getMessageUri();
                 data.updatedConnection = connectionData.uri;
+                data.message = event;
 
                 return data
 
