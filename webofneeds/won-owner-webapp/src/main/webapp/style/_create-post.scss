@@ -2,6 +2,7 @@
 @import 'text';
 @import 'needtextfield';
 @import 'locationpicker';
+@import 'animate';
 
 
 .create-post {
@@ -34,6 +35,11 @@ won-create-post {
     width: 100%;
   }
 
+  .cp__labelledhr,
+  .cp__publish {
+    @include appearAnimation(0.5s, linear);
+  }
+
   //$createPostMaxContentWidth: $maxContentWidth / 2;
   //@media (max-width: $responsivenessBreakPoint){
   //  @include max-content-width($createPostMaxContentWidth, 0, 'cp');
@@ -58,6 +64,8 @@ won-create-post {
     justify-content: space-between;
     flex-wrap: wrap;
 
+    @include appearAnimation(0.5s, linear);
+
     won-image-dropzone {
       display: none; //removed for the time being (as long as the picture upload/save is not implemented)
       margin-right: $minContentPadding;
@@ -74,6 +82,129 @@ won-create-post {
     }
   }
 
+  .cp__details {
+    @include slideWithOpacityAnimation(1.0s, linear, 60rem, 0.5rem, 0.75rem);
+
+    border-top: $thinBorderWidth solid $won-line-gray;
+    margin: 0.75rem 0;
+    padding: 0.5rem 0;
+
+    .cp__header:hover {
+      color: $won_red;
+      background-image: url('icon-sprite.svg#ico36_close_circle');
+    }
+
+    .cp__tags {
+      .cp__taglist{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+
+        .cp__taglist__tag {
+          border-radius: 0.5rem;
+          background: $won-dark-purple;
+          color: white;
+          margin: 0.25rem 0.25rem 0.25rem 0;
+          padding: 0.25rem 0.5rem;
+        }
+      }
+      .cp__tags__input {
+        border-width: $thinBorderWidth;
+        border-style: solid;
+        border-radius: 0.1rem;
+        background-color: white;
+
+
+        font-size: $normalFontSize;
+        min-height: $formInputHeight;
+
+        $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+        padding: $verticalPadding 0.438rem;
+
+        box-sizing: border-box;
+
+        min-width: 0; // so a size is specified and break-word works
+        word-wrap: break-word;
+
+        border-color: $won-line-gray;
+
+        width: 100%;
+      }
+    }
+  }
+
+  .cp__addDetail {
+    border-top: $thinBorderWidth solid $won-line-gray;
+    margin: .75rem 0;
+    padding: .5rem 0;
+    @include appearAnimation(0.5s, linear);
+
+    .cp__detail__items {
+      @include slideWithOpacityAnimation(1.0s, linear, 20rem);
+
+      .cp__detail__items__item {
+        font-size: $normalFontSize;
+        padding: .5rem .5rem .5rem 2.5rem;
+        background-position: 0 .15rem;
+        background-size: 2rem;
+        background-repeat: no-repeat;
+        cursor: pointer;
+
+        &:hover {
+          color: $won-red;
+          background-image: url('icon-sprite.svg#ico36_close_circle');
+        }
+
+        &.location {
+          background-image: url('icon-sprite.svg#ico36_location_circle_hi');
+
+          &:hover {
+            background-image: url('icon-sprite.svg#ico36_location_circle');
+          }
+        }
+        &.tags {
+          background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
+
+          &:hover {
+            background-image: url('icon-sprite.svg#ico36_tags_circle');
+          }
+        }
+        &.image {
+          background-image: url('icon-sprite.svg#ico36_media_circle_hi');
+
+          &:hover {
+            background-image: url('icon-sprite.svg#ico36_media_circle');
+          }
+        }
+        &.description {
+          background-image: url('icon-sprite.svg#ico36_description_circle_hi');
+
+          &:hover {
+            background-image: url('icon-sprite.svg#ico36_description_circle');
+          }
+        }
+        &.timeframe {
+          background-image: url('icon-sprite.svg#ico36_time_circle_hi');
+
+          &:hover {
+            background-image: url('icon-sprite.svg#ico36_time_circle');
+          }
+        }
+        &.picked {
+          background-image: url('icon-sprite.svg#ico36_added_circle_grey');
+          color: $won-line-gray;
+          cursor: default;
+
+          &:hover {
+            color: $won-line-gray;
+            cursor: default;
+          }
+        }
+      }
+    }
+  }
+
   .cp__header {
     width: 100%;
     box-sizing: border-box;
@@ -85,6 +216,26 @@ won-create-post {
     background-size: 2rem;
     background-repeat: no-repeat;
 
+    span.hover {
+      display: none;
+    }
+
+    span.nonHover {
+      display: inline;
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      span.hover {
+        display: inline;
+      }
+
+      span.nonHover {
+        display: none;
+      }
+    }
+
     &.tags {
       background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
     }
@@ -92,21 +243,15 @@ won-create-post {
     &.location {
       background-image: url('icon-sprite.svg#ico36_area_circle_hi');
     }
-  }
-  .cp__location {
-    margin-bottom: 0.75rem;
-  }
 
-  .cp__tags {
-    display: flex;
-    flex-wrap: wrap;
+    &.addDetail {
+      color: $won-red;
+      background-image: url('icon-sprite.svg#ico36_plus_circle');
 
-    .cp__tags__tag {
-      border-radius: 0.5rem;
-      background: $won-dark-purple;
-      color: white;
-      margin: 0.25rem 0.25rem 0.25rem 0;
-      padding: 0.25rem 0.5rem;
+      &:hover {
+        background-image: url('icon-sprite.svg#ico36_close_circle_hi');
+        color: black;
+      }
     }
   }
 }
