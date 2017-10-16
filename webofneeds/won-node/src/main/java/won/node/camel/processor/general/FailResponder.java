@@ -68,7 +68,12 @@ public class FailResponder extends AbstractCamelProcessor
       } else {
         errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
       }
-
+      if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE){
+          //we don't want to send a FailureResponse for a hint message as matchers
+          //are not fully compatible messaging agents (needs), so sending this message will fail.
+          logger.debug("suppressing failure response for HINT message", exception);
+          return;
+      }
       logger.info("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse (more info on log level DEBUG)",
                    new Object[]{originalMessage.getMessageURI(), originalMessage.getMessageType(), errormessage});
       if (exception != null) {
