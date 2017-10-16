@@ -11,15 +11,26 @@ var gulp_jspm = require('gulp-jspm');
 var sourcemaps = require('gulp-sourcemaps');
 
 
-
 gulp.task('default', ['build']);
-gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
-gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
+gulp.task('build', ['config', 'sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
+gulp.task('watch', ['config', 'sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
     gulp.watch('./*.js', ['bundlejs']);
     gulp.watch('./app/**/*.js', ['bundlejs']);
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
+});
+
+
+// config task loads the config file depending on the environment the build is meant for
+var settings = {
+    environment : process.env.WON_DEPLOY_NODE_ENV || 'default',
+};
+
+gulp.task('config', function(){
+    return gulp.src('./config/' + settings.environment + '.js')
+        .pipe(rename('config.js'))
+        .pipe(gulp.dest('./app/'));
 });
 
 gulp.task('bundlejs', function(){
