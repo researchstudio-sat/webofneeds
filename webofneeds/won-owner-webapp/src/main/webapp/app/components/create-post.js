@@ -20,6 +20,7 @@ import {
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import won from '../won-es6.js';
+import Immutable from 'immutable';
 import {
     connect2Redux,
 } from '../won-utils.js';
@@ -84,7 +85,7 @@ function genComponentConf() {
                     <div class="cp__taglist">
                         <span class="cp__taglist__tag" ng-repeat="tag in self.draft.tags">{{tag}}</span>
                     </div>
-                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text"/>
+                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString" ng-keyup="::self.addTags()"/>
                 </div>
                 
                 <div class="cp__location" ng-if="detail === 'location'">
@@ -99,7 +100,7 @@ function genComponentConf() {
             <div class="cp__addDetail" ng-if="self.isValid()">
                 <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()">
                     <span class="nonHover">Add more detail</span>
-                    <span class="hover">Close Add more detail</span>
+                    <span class="hover">Close more detail</span>
                 </div>
                 <div class="cp__detail__items" ng-if="self.showDetail" >
                     <div class="cp__detail__items__item location" 
@@ -149,7 +150,8 @@ function genComponentConf() {
 
             this.showDetail = false;
             this.details = [];
-
+            this.tagsString = "";
+            this.tempTags = [];
 
             const selectFromState = (state) => {
                 return {
@@ -184,6 +186,14 @@ function genComponentConf() {
         publish() {
             if (!this.pendingPublishing) {
                 this.pendingPublishing = true;
+
+                if(!this.isDetailPresent("tags")){
+                    this.draft.tags = undefined;
+                }
+                if(!this.isDetailPresent("location")){
+                    this.draft.location = undefined;
+                }
+
                 this.needs__create(
                     this.draft,
                     this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
@@ -192,11 +202,28 @@ function genComponentConf() {
         }
 
         setDraft(updatedDraft) {
+            if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags")){
+                this.addDetail("tags");
+            }
+            this.tempTags = updatedDraft.tags;
+            updatedDraft.tags = this.mergeTags();
             Object.assign(this.draft, updatedDraft);
         }
 
+        mergeTags() {
+            let detailTags = Immutable.Set(this.tagsString? this.tagsString.match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
+
+            let combinedTags = detailTags.concat(this.tempTags);
+            const immutableTagSet = Immutable.Set(combinedTags);
+            return immutableTagSet.toJS();
+        }
+
+        addTags() {
+            this.draft.tags = this.mergeTags();
+        }
+
         locationIsSaved() {
-            return this.draft.location && this.draft.location.name;
+            return this.isDetailPresent("location") && this.draft.location && this.draft.location.name;
         }
 
         pickImage(image) {

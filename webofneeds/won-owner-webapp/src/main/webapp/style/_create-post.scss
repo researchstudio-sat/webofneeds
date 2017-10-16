@@ -90,17 +90,8 @@ won-create-post {
     padding: 0.5rem 0;
 
     .cp__header:hover {
-      cursor: pointer;
       color: $won_red;
       background-image: url('icon-sprite.svg#ico36_close_circle');
-
-      span.hover {
-        display: inline;
-      }
-
-      span.nonHover {
-        display: none;
-      }
     }
 
     .cp__tags {
@@ -231,6 +222,18 @@ won-create-post {
 
     span.nonHover {
       display: inline;
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      span.hover {
+        display: inline;
+      }
+
+      span.nonHover {
+        display: none;
+      }
     }
 
     &.tags {
