@@ -249,6 +249,7 @@ function generateResponseNeedTo(theirNeed) {
         type: reNeedType,
         tags: cloneAsMutable(get(theirNeed, 'tags')),
         location: cloneAsMutable(get(theirNeed, 'location')),
+        noHints: true,
     };
 
 }
