@@ -100,7 +100,7 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         return response;
     })
     .then(response =>
-        fetchOwnedData(email)
+        fetchOwnedData(email, dispatchInitialPageLoad(dispatch))
     ).then(allThatData => {
         return dispatch({
             type: actionTypes.initialPageLoad,
