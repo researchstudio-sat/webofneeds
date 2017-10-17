@@ -140,6 +140,15 @@ export default function(allNeedsInState = initialState, action = {}) {
         case actionTypes.messages.open.failure:
             return changeConnectionState(allNeedsInState,  action.payload.events['msg:FromSystem'].hasReceiver, won.WON.RequestReceived);
 
+        case actionTypes.messages.open.successRemote:
+        case actionTypes.messages.connect.successRemote:
+            // use the remote success message to obtain the remote connection uri (which we may not have known)
+            var wonMessage = action.payload;
+            var connectionUri =  wonMessage.getReceiver();
+            var needUri =  wonMessage.getReceiverNeed();
+            var remoteConnectionUri = wonMessage.getSender();
+            return allNeedsInState.setIn([needUri, 'connections', connectionUri, 'remoteConnectionUri'], remoteConnectionUri);
+
         case actionTypes.messages.connect.successOwn:
             //TODO SRP; split in isSuccessOfAdHocConnect, addAddHoc(?) and changeConnectionState
             var wonMessage = action.payload;
@@ -167,6 +176,10 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.messages.close.success:
             return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
+
+        //case actionTypes.messages.close.failure:
+            //do the same like in success -> debugging -> need ConnectionUR
+            // return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
 
         //NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
@@ -201,7 +214,6 @@ export default function(allNeedsInState = initialState, action = {}) {
                 allNeedsInState =  allNeedsInState.setIn([needUri, 'connections', connectionUri, 'messages', eventUri, 'date'], responseDateOnServer);
             }
             return allNeedsInState;
-
 
 
         case actionTypes.connections.showLatestMessages:
@@ -595,5 +607,6 @@ function parseLocation(jsonldLocation) {
  * @param connectionUri to find corresponding need for
  */
 function selectNeedByConnectionUri(allNeedsInState, connectionUri){
-    return allNeedsInState.filter(need => need.getIn(["connections", connectionUri])).first();
+    return allNeedsInState.filter(need =>
+        need.getIn(["connections", connectionUri])).first();
 }
