@@ -1,0 +1,13 @@
+<div>
+    <p> Hi there,</p>
+    <p>Your posting <a href="$linkLocalNeed">$localNeedTitle</a> was deactivated by the WoN node that hosts it.
+        Here is the explanation it provided:
+    </p>
+    <p>
+        $textMsg
+    </p>
+    <br/>
+    <p> <span>Best Wishes,</span> <br/>
+        <span>Owner application team</span>
+    </p>
+</div>

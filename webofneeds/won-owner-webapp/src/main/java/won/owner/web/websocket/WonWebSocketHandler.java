@@ -26,7 +26,10 @@ import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
@@ -268,7 +271,6 @@ public class WonWebSocketHandler
               .getReceiverURI().toString());
           }
           return;
-
         case CLOSE:
           //a close message is only received for an established connection. If the user
           //wants to be notified of requests, they will get closes as well
@@ -276,6 +278,19 @@ public class WonWebSocketHandler
             emailSender.sendCloseNotificationHtmlMessage(
               user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
                 .getReceiverURI().toString(), textMsg);
+          }
+          return;
+        case DEACTIVATE:
+          // a deactivate message, coming from the WoN node. Always deliverd by email.
+          emailSender.sendSystemDeactivateNotificationHtmlMessage(
+                    user.getEmail(), needUri.toString(), textMsg);
+
+          return;
+        case NEED_MESSAGE:
+          // a need message, coming from the WoN node. Always deliverd by email.
+          if (userNeed.isRequests()) {
+            emailSender.sendSystemDeactivateNotificationHtmlMessage(
+                    user.getEmail(), needUri.toString(), textMsg);
           }
           return;
         default:

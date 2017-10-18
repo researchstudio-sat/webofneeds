@@ -1,0 +1,12 @@
+<div>
+    <p> Hi there,</p>
+    <p>The WoN node that host your posting <a href="$linkLocalNeed">$localNeedTitle</a> sends this message:
+    </p>
+    <p>
+        $textMsg
+    </p>
+    <br/>
+    <p> <span>Best Wishes,</span> <br/>
+        <span>Owner application team</span>
+    </p>
+</div>
