@@ -108,7 +108,7 @@ import won from './won.js';
             putIntoBoth ||
             args.type === won.WON.BasicNeedTypeDemandCompacted;
 
-        const hasFlag = [];
+        let hasFlag = [];
 
         if(!!won.debugmode) {
             hasFlag.push("won:UsedForTesting");
@@ -118,6 +118,20 @@ import won from './won.js';
             hasFlag.push("won:WhatsAround");
             hasFlag.push("won:NoHintForCounterpart");
         }
+
+        if(!!args.noHints){
+            hasFlag.push("won:NoHintForMe");
+            hasFlag.push("won:NoHintForCounterpart");
+        }
+
+        //remove possible duplicates in hasFlag
+        const result = [];
+        hasFlag.forEach(function(item) {
+            if(result.indexOf(item) < 0) {
+                result.push(item);
+            }
+        });
+        hasFlag = result;
 
         var graph = [
             {
