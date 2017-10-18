@@ -67,7 +67,7 @@ public class WonOwnerMailSender {
     systemCloseNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/systemclose-notification-html.vm");
     hintNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/hint-notification-html.vm");
     needMessageNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/needmessage-notification-html.vm");
-    systemDeactivateNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/systemdeactivate-notification-html.vm");
+    systemDeactivateNotificationHtmlTemplate = velocityEngine.getTemplate("mail-templates/system-deactivate-notification-html.vm");
   }
 
   public void setWonMailSender(WonMailSender wonMailSender) {
