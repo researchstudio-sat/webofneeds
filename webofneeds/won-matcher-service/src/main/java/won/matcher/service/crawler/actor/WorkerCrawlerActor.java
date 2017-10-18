@@ -22,9 +22,10 @@ import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.NeedState;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -47,7 +48,7 @@ public class WorkerCrawlerActor extends UntypedActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
     @Autowired
-    private LinkedDataSource linkedDataSource;
+    private LinkedDataSourceBase linkedDataSource;
 
     @Autowired
     private CrawlSparqlService sparqlService;
@@ -106,9 +107,26 @@ public class WorkerCrawlerActor extends UntypedActor {
         // download resource if not already downloaded
         if (ds == null) {
             try {
-                ds = linkedDataSource.getDataForResource(URI.create(uriMsg.getUri()));
-            } catch (RestClientException e) {
-                throw new CrawlWrapperException(e, uriMsg);
+                DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders =
+                        linkedDataSource.getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()));
+                ds = datasetWithHeaders.getDataset();
+
+                // if there is paging activated and the won node tells us that there is more data (previous link)
+                // to be downloaded, then we add this link to the crawling process too
+                String prevLink = linkedDataSource.getPreviousLinkFromDatasetWithHeaders(datasetWithHeaders);
+                if (prevLink != null) {
+                    CrawlUriMessage newUriMsg = new CrawlUriMessage(uriMsg.getBaseUri(), prevLink,
+                            uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
+                    getSender().tell(newUriMsg, getSelf());
+                }
+
+            } catch (RestClientException e1) {
+                // happens if the fetch fails
+                throw new CrawlWrapperException(e1, uriMsg);
+            } catch (Exception e2) {
+                // for every other exception we also throw a CrawlWrapperException
+                // => Supervisor in MasterCrawlerActor will handle it
+                throw new CrawlWrapperException(e2, uriMsg);
             }
         }
         Lock lock = ds == null ? null : ds.getLock();

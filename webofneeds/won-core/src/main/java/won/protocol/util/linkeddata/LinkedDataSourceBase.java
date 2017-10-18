@@ -29,6 +29,7 @@ import org.apache.jena.tdb.TDB;
 import org.apache.jena.tdb.TDBFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
 
@@ -37,6 +38,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * LinkedDataSource implementation that delegates fetching linked data resources to the
@@ -47,6 +50,42 @@ public class LinkedDataSourceBase implements LinkedDataSource
   private final Logger logger = LoggerFactory.getLogger(getClass());
   protected LinkedDataRestClient linkedDataRestClient;
 
+    /**
+     * extract the previous link (in case won node had more data than could be sent or was requested) from http response headers
+     * @param datasetWithHeaders
+     * @return the previous link to more data on the node or null if the link header does not exist
+     */
+  public String getPreviousLinkFromDatasetWithHeaders(DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders) {
+
+      String prevLink = null;
+      List<String> links = datasetWithHeaders.getResponseHeaders().get("Link");
+      if (links != null) {
+          for (String link : links) {
+              Pattern pattern = Pattern.compile("<(.+)>; rel=\"?prev\"?");
+              Matcher matcher = pattern.matcher(link);
+              if (matcher.find()) {
+                  prevLink = matcher.group(1);
+                  return prevLink;
+              }
+          }
+      }
+
+     return prevLink;
+  }
+
+    /**
+     * get a dataset with headers. this methods can be used in combination with getPreviousLinkFromDatasetWithHeaders
+     * in case links to previous pages of data from the won node should be checked too
+     *
+     * @param resource uri of the resource to request
+     * @return dataset including http response headers
+     */
+  public DatasetResponseWithStatusCodeAndHeaders getDatasetWithHeadersForResource(URI resource) {
+
+      assert resource != null : "resource must not be null";
+      logger.debug("fetching linked data for URI {}", resource);
+      return linkedDataRestClient.readResourceDataWithHeaders(resource);
+  }
 
   @Override
   public Dataset getDataForResource(URI resource){
