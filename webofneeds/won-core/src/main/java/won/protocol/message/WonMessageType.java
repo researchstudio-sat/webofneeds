@@ -19,6 +19,7 @@ public enum WonMessageType
   CLOSE(WONMSG.TYPE_CLOSE),
   OPEN(WONMSG.TYPE_OPEN),
   CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE),
+  NEED_MESSAGE(WONMSG.TYPE_NEED_MESSAGE),
   HINT_MESSAGE(WONMSG.TYPE_HINT),
   HINT_FEEDBACK_MESSAGE(WONMSG.TYPE_HINT_FEEDBACK),
 
@@ -73,6 +74,8 @@ public enum WonMessageType
       return CLOSE;
     if (WONMSG.TYPE_CONNECTION_MESSAGE.equals(resource))
       return CONNECTION_MESSAGE;
+    if (WONMSG.TYPE_NEED_MESSAGE.equals(resource))
+      return NEED_MESSAGE;
     if (WONMSG.TYPE_HINT.equals(resource))
       return HINT_MESSAGE;
     if (WONMSG.TYPE_HINT_FEEDBACK.equals(resource))

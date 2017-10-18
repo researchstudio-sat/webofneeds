@@ -88,7 +88,7 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
     return WonMessageBuilder
-      .setMessagePropertiesForDeactivate(
+      .setMessagePropertiesForDeactivateFromOwner(
         wonNodeInformationService.generateEventURI(
           localWonNode),
         needURI,

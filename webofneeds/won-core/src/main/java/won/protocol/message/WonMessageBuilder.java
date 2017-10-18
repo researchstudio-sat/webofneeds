@@ -410,7 +410,7 @@ public class WonMessageBuilder
       .setSentTimestampToNow();
   }
 
-  public static WonMessageBuilder setMessagePropertiesForDeactivate(
+  public static WonMessageBuilder setMessagePropertiesForDeactivateFromOwner(
     URI messageURI,
     URI localNeed,
     URI localWonNode) {
@@ -422,6 +422,45 @@ public class WonMessageBuilder
       .setReceiverNeedURI(localNeed)
       .setReceiverNodeURI(localWonNode)
       .setSentTimestampToNow();
+  }
+
+  public static WonMessageBuilder setMessagePropertiesForDeactivateFromSystem(
+          URI messageURI,
+          URI localNeed,
+          URI localWonNode) {
+    return new WonMessageBuilder(messageURI)
+            .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
+            .setWonMessageType(WonMessageType.DEACTIVATE)
+            .setSenderNeedURI(localNeed)
+            .setSenderNodeURI(localWonNode)
+            .setReceiverNeedURI(localNeed)
+            .setReceiverNodeURI(localWonNode)
+            .setSentTimestampToNow();
+  }
+
+  /**
+   * Sets message properties for sending a 'need message' from System to Owner,
+   * i.e. a notification from the node to the owner. This message will have no
+   * effect on need or connection states and it is expected that a payload (e.g.
+   * via setTextMessage()) is added to the message builder prior to calling
+   * the build() method.
+   * @param messageURI
+   * @param localNeed
+   * @param localWonNode
+     * @return
+     */
+  public static WonMessageBuilder setMessagePropertiesForNeedMessageFromSystem(
+          URI messageURI,
+          URI localNeed,
+          URI localWonNode) {
+    return new WonMessageBuilder(messageURI)
+            .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
+            .setWonMessageType(WonMessageType.NEED_MESSAGE)
+            .setSenderNeedURI(localNeed)
+            .setSenderNodeURI(localWonNode)
+            .setReceiverNeedURI(localNeed)
+            .setReceiverNodeURI(localWonNode)
+            .setSentTimestampToNow();
   }
 
   public static WonMessageBuilder setMessagePropertiesForConnect(
