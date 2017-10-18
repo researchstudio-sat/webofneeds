@@ -17,8 +17,7 @@
 package won.protocol.rest;
 
 import org.apache.jena.query.Dataset;
-
-import java.util.Map;
+import org.springframework.http.HttpHeaders;
 
 /**
  * Simple structure to hold a dataset and the response headers that were sent along with the dataset.
@@ -27,9 +26,9 @@ public class DatasetResponseWithStatusCodeAndHeaders
 {
   private Dataset dataset;
   private int statusCode;
-  private Map<String, String> responseHeaders;
+  private HttpHeaders responseHeaders;
 
-  public DatasetResponseWithStatusCodeAndHeaders(final Dataset dataset, final int statusCode, final Map<String, String> responseHeaders) {
+  public DatasetResponseWithStatusCodeAndHeaders(final Dataset dataset, final int statusCode, final HttpHeaders responseHeaders) {
     this.dataset = dataset;
     this.statusCode = statusCode;
     this.responseHeaders = responseHeaders;
@@ -43,7 +42,7 @@ public class DatasetResponseWithStatusCodeAndHeaders
     return statusCode;
   }
 
-  public Map<String, String> getResponseHeaders() {
+  public HttpHeaders getResponseHeaders() {
     return responseHeaders;
   }
 }

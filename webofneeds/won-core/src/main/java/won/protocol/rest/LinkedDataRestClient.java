@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class LinkedDataRestClient {
@@ -97,7 +96,7 @@ public abstract class LinkedDataRestClient {
         //it was probably the wrong resourceURI
         Dataset result;
         int statusCode = -1;
-        Map<String, String> responseHeaderMap = null;
+        HttpHeaders responseHeaders = null;
         try {
             HttpHeaders headers = new HttpHeaders();
             for (String key : requestHeaders.keySet()) {
@@ -108,12 +107,7 @@ public abstract class LinkedDataRestClient {
             ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity, Dataset.class);
             //RestTemplate will automatically follow redirects on HttpGet calls
             statusCode = response.getStatusCode().value();
-            HttpHeaders responseHeaders = response.getHeaders();
-            if (responseHeaders == null) {
-                responseHeaderMap = new HashMap<>();
-            } else {
-                responseHeaderMap = responseHeaders.toSingleValueMap();
-            }
+            responseHeaders = response.getHeaders();
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new HttpClientErrorException(response.getStatusCode());
             }
@@ -139,7 +133,7 @@ public abstract class LinkedDataRestClient {
             logger.debug("fetched model with {} statements in default model for resource {}", result.getDefaultModel().size(),
                     resourceURI);
         }
-        return new DatasetResponseWithStatusCodeAndHeaders(result, statusCode, responseHeaderMap);
+        return new DatasetResponseWithStatusCodeAndHeaders(result, statusCode, responseHeaders);
     }
 
 

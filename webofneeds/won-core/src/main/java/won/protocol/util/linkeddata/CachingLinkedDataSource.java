@@ -267,7 +267,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     //if we don't get a new etag, see if we have a 304 code - then we can use th old etag
-    String etag = responseData.getResponseHeaders().get(HttpHeaders.ETAG);
+    String etag = responseData.getResponseHeaders().getFirst(HttpHeaders.ETAG);
     if (etag == null && responseData.getStatusCode() == HttpStatus.NOT_MODIFIED.value()
       && linkedDataCacheEntry != null){
       etag = linkedDataCacheEntry.getEtag();
@@ -365,7 +365,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
   }
 
   private Date parseExpiresHeader(final URI resource, final DatasetResponseWithStatusCodeAndHeaders responseData) {
-    String expiresHeader = responseData.getResponseHeaders().get(HttpHeaders.EXPIRES);
+    String expiresHeader = responseData.getResponseHeaders().getFirst(HttpHeaders.EXPIRES);
     if (expiresHeader == null) {
         return null;
     }
@@ -396,7 +396,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 
   private Date parseDateHeader(final URI resource, final DatasetResponseWithStatusCodeAndHeaders
     responseData) {
-    String dateHeader = responseData.getResponseHeaders().get(HttpHeaders.DATE);
+    String dateHeader = responseData.getResponseHeaders().getFirst(HttpHeaders.DATE);
     if (dateHeader == null){
       return null;
     }
@@ -414,7 +414,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
   }
 
   private EnumSet<CacheControlFlag> parseCacheControlHeaderFlags(final URI resource, final DatasetResponseWithStatusCodeAndHeaders responseData) {
-    String cacheControlHeaderValue = responseData.getResponseHeaders().get(HttpHeaders.CACHE_CONTROL);
+    String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
     EnumSet<CacheControlFlag> cacheControlFlags = EnumSet.noneOf(CacheControlFlag.class);
     if (cacheControlHeaderValue == null) return cacheControlFlags;
     String[] values = cacheControlHeaderValue.split(",");
@@ -428,7 +428,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
   }
 
   private Date parseCacheControlMaxAgeValue(final URI resource, final DatasetResponseWithStatusCodeAndHeaders responseData) {
-    String cacheControlHeaderValue = responseData.getResponseHeaders().get(HttpHeaders.CACHE_CONTROL);
+    String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
     if (cacheControlHeaderValue == null) return null;
     Pattern maxagePattern = Pattern.compile("[^\\s,]*max-age\\s*=\\s*(\\d+)[$\\s,]");
     Matcher m = maxagePattern.matcher(cacheControlHeaderValue);
@@ -520,11 +520,11 @@ public static class LinkedDataCacheEntry
     private Date expires = null;
     private byte[] dataset = null;
     private EnumSet<CacheControlFlag> cacheControlFlags = noneOf(CacheControlFlag.class);
-    private Map<String, String> headers;
+    private HttpHeaders headers;
     private int statusCode;
 
 
-    public LinkedDataCacheEntry(final String etag, final Date expires, final byte[] dataset, final EnumSet<CacheControlFlag> cacheControlFlags, final Map<String, String> headers, final int statusCode) {
+    public LinkedDataCacheEntry(final String etag, final Date expires, final byte[] dataset, final EnumSet<CacheControlFlag> cacheControlFlags, final HttpHeaders headers, final int statusCode) {
       this.etag = etag;
       this.expires = expires;
       this.dataset = dataset;
