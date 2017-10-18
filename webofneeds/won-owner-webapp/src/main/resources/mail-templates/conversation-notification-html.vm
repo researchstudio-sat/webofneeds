@@ -1,6 +1,6 @@
 <div>
     <p> Hi there,</p>
-    <p>The owner of '<a href="$linkRemoteNeed">$remoteNeedTitle</a>'   sent you a message via your posting
+    <p>The owner of '<a href="$linkRemoteNeed">$remoteNeedTitle</a>' sent you a message via your posting
         <a href="$linkLocalNeed">$localNeedTitle</a>.
     </p>
     #if ($textMsg)

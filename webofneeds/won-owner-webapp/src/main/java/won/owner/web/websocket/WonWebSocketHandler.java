@@ -37,10 +37,7 @@ import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageType;
+import won.protocol.message.*;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.util.WonRdfUtils;
 
@@ -275,9 +272,15 @@ public class WonWebSocketHandler
           //a close message is only received for an established connection. If the user
           //wants to be notified of requests, they will get closes as well
           if (userNeed.isRequests()) {
-            emailSender.sendCloseNotificationHtmlMessage(
-              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
-                .getReceiverURI().toString(), textMsg);
+            if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM){
+              emailSender.sendSystemCloseNotificationHtmlMessage(
+                      user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
+                              .getReceiverURI().toString(), textMsg);
+            } else {
+              emailSender.sendCloseNotificationHtmlMessage(
+                      user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
+                              .getReceiverURI().toString(), textMsg);
+            }
           }
           return;
         case DEACTIVATE:
@@ -288,10 +291,8 @@ public class WonWebSocketHandler
           return;
         case NEED_MESSAGE:
           // a need message, coming from the WoN node. Always deliverd by email.
-          if (userNeed.isRequests()) {
             emailSender.sendSystemDeactivateNotificationHtmlMessage(
                     user.getEmail(), needUri.toString(), textMsg);
-          }
           return;
         default:
           return;
