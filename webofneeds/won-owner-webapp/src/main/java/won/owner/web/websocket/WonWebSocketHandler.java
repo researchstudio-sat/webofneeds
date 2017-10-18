@@ -269,19 +269,7 @@ public class WonWebSocketHandler
           }
           return;
         case CLOSE:
-          //a close message is only received for an established connection. If the user
-          //wants to be notified of requests, they will get closes as well
-          if (userNeed.isRequests()) {
-            if (wonMessage.getEnvelopeType() == WonMessageDirection.FROM_SYSTEM){
-              emailSender.sendSystemCloseNotificationHtmlMessage(
-                      user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
-                              .getReceiverURI().toString(), textMsg);
-            } else {
-              emailSender.sendCloseNotificationHtmlMessage(
-                      user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
-                              .getReceiverURI().toString(), textMsg);
-            }
-          }
+          // do not send emails for a close
           return;
         case DEACTIVATE:
           // a deactivate message, coming from the WoN node. Always deliverd by email.
