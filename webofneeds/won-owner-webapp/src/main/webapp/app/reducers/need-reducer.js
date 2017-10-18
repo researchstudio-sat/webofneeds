@@ -147,7 +147,13 @@ export default function(allNeedsInState = initialState, action = {}) {
             var connectionUri =  wonMessage.getReceiver();
             var needUri =  wonMessage.getReceiverNeed();
             var remoteConnectionUri = wonMessage.getSender();
-            return allNeedsInState.setIn([needUri, 'connections', connectionUri, 'remoteConnectionUri'], remoteConnectionUri);
+
+            if(allNeedsInState.getIn([needUri, 'connections', connectionUri])){
+                return allNeedsInState.setIn([needUri, 'connections', connectionUri, 'remoteConnectionUri'], remoteConnectionUri);
+            }else{
+                console.warn("Open/Connect success for a connection that is not stored in the state yet, connUri: ",connectionUri);
+                return allNeedsInState;
+            }
 
         case actionTypes.messages.connect.successOwn:
             //TODO SRP; split in isSuccessOfAdHocConnect, addAddHoc(?) and changeConnectionState
