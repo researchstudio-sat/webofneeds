@@ -31,7 +31,7 @@
         <div class="title clickable"
              ng-click="self.closedPostsOpen = !self.closedPostsOpen"
              ng-class="{'open' : self.closedPostsOpen}"
-             ng-show="self.activePostsCount != 0 || self.activePostsCount != 0">
+             ng-show="self.inactivePostsCount != 0 || self.inactivePostsCount != 0">
             Closed
             <span class="title__counter">{{self.inactivePostsCount}}</span>
         </div>

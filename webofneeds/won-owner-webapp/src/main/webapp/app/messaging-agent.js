@@ -179,6 +179,28 @@ export function runMessagingAgent(redux) {
                 }
             }
             return false;
+        },
+        function (message) {
+            if(message.isFromSystem() && message.isCloseMessage()) {
+                redux.dispatch({
+                    type: actionTypes.messages.close.success,
+                    payload: message
+                });
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if (message.isFromSystem() && message.isDeactivateMessage()) {
+                redux.dispatch({
+                    type: actionTypes.needs.close,
+                    payload:{
+                        ownNeedUri: message.getReceiverNeed()
+                    },
+                });
+                return true;
+            }
+            return false;
         }
     ];
 
