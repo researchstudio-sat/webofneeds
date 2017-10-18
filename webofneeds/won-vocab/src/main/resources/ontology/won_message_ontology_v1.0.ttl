@@ -215,6 +215,16 @@
                    
                    rdfs:isDefinedBy <http://purl.org/webofneeds/message> .
 
+###  http://purl.org/webofneeds/message#NeedMessage
+
+:NeedMessage rdf:type owl:Class ;
+
+                   rdfs:subClassOf :MessageType ;
+
+                   rdfs:comment "Message sent between a need's owner and the WoN node hosting the need. The message is informative only
+                   and has no side effect The message is not routed to any other participant."@en ;
+
+                   rdfs:isDefinedBy <http://purl.org/webofneeds/message> .
 
 
 ###  http://purl.org/webofneeds/message#CreateMessage
