@@ -174,9 +174,18 @@ export function runMessagingAgent(redux) {
             if (message.isResponseToDeactivateMessage()) {
                 if (message.isSuccessResponse()){
                     redux.dispatch(actionCreators.messages__closeNeed__success(message));
+                    return true;                    
                 } else {
                     redux.dispatch(actionCreators.messages__closeNeed__failure(message));
+                    return true;                    
                 }
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromSystem() && message.isNeedMessage()) {
+                redux.dispatch(actionCreators.messages__needMessageReceived(message));
+                return true;
             }
             return false;
         },
@@ -192,6 +201,9 @@ export function runMessagingAgent(redux) {
         },
         function (message) {
             if (message.isFromSystem() && message.isDeactivateMessage()) {
+                //dispatch an action that is suitable for displaying a toast
+                redux.dispatch(actionCreators.needs__closedBySystem(message));
+                //adapt the state and GUI
                 redux.dispatch({
                     type: actionTypes.needs.close,
                     payload:{

@@ -262,6 +262,27 @@ function getConnectionData(event) {
         )
 }
 
+
+export function needMessageReceived(event) {
+    return (dispatch, getState) => {
+        //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
+        const need = getState().getIn(['needs', event.getReceiverNeed()]);
+        if (!need) {
+            console.log("ignoring needMessage for a need that is not ours:", event.getReceiverNeed());
+        }
+        dispatch({
+            type: actionTypes.messages.needMessageReceived,
+            payload: {
+                needUri: event.getReceiverNeed(),
+                needTitle: need.get("title"),
+                message: event.getTextMessage(),
+            }
+        });
+    }
+
+}
+
+
 export function hintMessageReceived(event) {
     return (dispatch, getState) => {
 
