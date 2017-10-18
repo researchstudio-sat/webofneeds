@@ -313,7 +313,6 @@ export function needsOpen(needUri) {
                     type: actionTypes.needs.reopen,
                     payload: {
                         ownNeedUri: needUri,
-                        affectedConnections: getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri")),
                     }
                 })
         )
@@ -339,7 +338,6 @@ export function needsClose(needUri) {
                 type: actionTypes.needs.close,
                 payload: {
                     ownNeedUri: needUri,
-                    affectedConnections: getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri")),
                 }
             })
         )
