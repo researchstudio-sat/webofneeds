@@ -78,24 +78,34 @@ public class WonOwnerMailSender {
                                         String localConnection, String textMsg) {
 
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
-    Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
-    DefaultNeedModelWrapper remoteNeedWrapper = new DefaultNeedModelWrapper(needDataset);
-    String remoteNeedTitle = remoteNeedWrapper.getSomeTitleFromIsOrAll("en","de");
-
-    Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
-    DefaultNeedModelWrapper localNeedWrapper = new DefaultNeedModelWrapper(localNeedDataset);
-    String localNeedTitle = localNeedWrapper.getSomeTitleFromIsOrAll("en","de");
-    String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
-    String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
-    String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,localNeed, localConnection, ConnectionState.CONNECTED.getURI().toString());
-
     VelocityContext velocityContext = new VelocityContext();
-    velocityContext.put("linkRemoteNeed", linkRemoteNeed);
-    velocityContext.put("linkLocalNeed", linkLocalNeed);
-    velocityContext.put("localNeedTitle", localNeedTitle);
-    velocityContext.put("remoteNeedTitle", remoteNeedTitle);
-    velocityContext.put("linkConnection", linkConnection);
-    velocityContext.put("textMsg", textMsg);
+
+    if (remoteNeed!= null) {
+      Dataset needDataset = linkedDataSource.getDataForResource(URI.create(remoteNeed));
+      DefaultNeedModelWrapper remoteNeedWrapper = new DefaultNeedModelWrapper(needDataset);
+      String remoteNeedTitle = remoteNeedWrapper.getSomeTitleFromIsOrAll("en", "de");
+      velocityContext.put("remoteNeedTitle", remoteNeedTitle);
+      String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
+      velocityContext.put("linkRemoteNeed", linkRemoteNeed);
+    }
+
+    if (localNeed != null) {
+      Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
+      DefaultNeedModelWrapper localNeedWrapper = new DefaultNeedModelWrapper(localNeedDataset);
+      String localNeedTitle = localNeedWrapper.getSomeTitleFromIsOrAll("en","de");
+      String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
+      velocityContext.put("linkLocalNeed", linkLocalNeed);
+      velocityContext.put("localNeedTitle", localNeedTitle);
+    }
+
+    if (localConnection != null){
+      String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,localNeed, localConnection, ConnectionState.CONNECTED.getURI().toString());
+      velocityContext.put("linkConnection", linkConnection);
+    }
+
+    if (textMsg != null) {
+      velocityContext.put("textMsg", textMsg);
+    }
 
     return velocityContext;
   }

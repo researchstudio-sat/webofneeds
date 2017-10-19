@@ -279,7 +279,7 @@ public class WonWebSocketHandler
           return;
         case NEED_MESSAGE:
           // a need message, coming from the WoN node. Always deliverd by email.
-            emailSender.sendSystemDeactivateNotificationHtmlMessage(
+            emailSender.sendNeedMessageNotificationHtmlMessage(
                     user.getEmail(), needUri.toString(), textMsg);
           return;
         default:
