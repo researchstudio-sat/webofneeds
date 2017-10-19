@@ -25,9 +25,9 @@ public class WonOwnerMailSender {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private static final String OWNER_REMOTE_NEED_LINK = "/#post/?postUri=";
-  private static final String OWNER_CONNECTION_LINK = "/#post/?postUri=%s&connectionUri=%s&connectionType=%s";
-  private static final String OWNER_LOCAL_NEED_LINK = "/#/post/?postUri=";
+  private static final String OWNER_REMOTE_NEED_LINK = "/#!post/?postUri=";
+  private static final String OWNER_CONNECTION_LINK =  "/#!post/?postUri=%s&connectionUri=%s&connectionType=%s";
+  private static final String OWNER_LOCAL_NEED_LINK =  "/#!post/?postUri=";
 
   private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
   private static final String SUBJECT_CONNECT = "New conversation request";
