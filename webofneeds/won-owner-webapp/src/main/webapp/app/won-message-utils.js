@@ -268,6 +268,7 @@ export function buildCreateMessage(needData, wonNodeUri) {
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
         location: getIn(needData, ['location']),
         whatsAround: needData.whatsAround,
+        noHints: needData.noHints,
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {

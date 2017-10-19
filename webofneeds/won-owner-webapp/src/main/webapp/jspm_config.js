@@ -20,6 +20,7 @@ System.config({
 
   map: {
     "angular": "npm:angular@1.6.6",
+    "angular-animate": "npm:angular-animate@1.6.6",
     "angular-inview": "npm:angular-inview@2.1.0",
     "angular-route": "npm:angular-route@1.6.6",
     "angular-sanitize": "npm:angular-sanitize@1.6.6",

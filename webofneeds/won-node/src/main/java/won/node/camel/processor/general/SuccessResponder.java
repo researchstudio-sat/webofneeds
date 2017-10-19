@@ -21,6 +21,7 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
@@ -40,6 +41,12 @@ public class SuccessResponder extends AbstractCamelProcessor
     //only send success message if the original message was sent on behalf of a need (otherwise we have to find out
     // with other means which ownerapplications to send the response to.
     if (originalMessage.getSenderNeedURI() == null) return;
+      if (originalMessage.getMessageType() == WonMessageType.HINT_MESSAGE){
+          //we don't want to send a SuccessResponse for a hint message as matchers
+          //are not fully compatible messaging agents (needs), so sending this message will fail.
+          logger.debug("suppressing success response for HINT message");
+          return;
+      }
     URI newMessageURI = this.wonNodeInformationService.generateEventURI();
     WonMessage responseMessage = WonMessageBuilder.setPropertiesForNodeResponse(originalMessage, true,
       newMessageURI).build();

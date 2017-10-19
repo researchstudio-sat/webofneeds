@@ -1,0 +1,40 @@
+@mixin slideWithOpacityAnimation($duration: 1.0s, $type: linear, $maxHeight: 9999rem, $padding: 0, $margin: 0) {
+  &.ng-enter,
+  &.ng-leave {
+    transition: all $type $duration;
+  }
+
+  &.ng-enter,
+  &.ng-leave.ng-leave-active {
+    opacity: 0;
+    max-height: 0;
+    overflow-y: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  &.ng-leave,
+  &.ng-enter.ng-enter-active {
+    opacity: 1;
+    max-height: $maxHeight;
+    margin: $margin 0;
+    padding: $padding 0;
+  }
+}
+
+@mixin appearAnimation($duration: 1.0s, $type: linear) {
+  &.ng-enter,
+  &.ng-leave {
+    transition: all $type $duration;
+  }
+
+  &.ng-enter,
+  &.ng-leave.ng-leave-active {
+    opacity: 0;
+  }
+
+  &.ng-leave,
+  &.ng-enter.ng-enter-active {
+    opacity: 1;
+  }
+}

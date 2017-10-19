@@ -1,8 +1,7 @@
 {
   "name": "won-owner-webapp",
   "version": "0.2.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "scripts": {
     "postinstall": "npm rebuild node-sass && jspm registry create bower jspm-bower-endpoint -y && jspm install",
     "build": "gulp build",
@@ -28,6 +27,7 @@
     "configFile": "jspm_config.js",
     "dependencies": {
       "angular": "npm:angular@1.6.6",
+      "angular-animate": "npm:angular-animate@1.6.6",
       "angular-inview": "npm:angular-inview@2.1.0",
       "angular-route": "npm:angular-route@1.6.6",
       "angular-sanitize": "npm:angular-sanitize@1.6.6",

@@ -6,6 +6,8 @@ import {
    getIn,
 } from './utils.js';
 
+import config from './config.js';
+
 
 // ------- INIT  --------------------
 
@@ -13,8 +15,7 @@ import {
 let _paq = _paq || [];
 window._paq = _paq; // export required for interaction with piwik
 
-const baseUrl = "//matchat.org/piwik/";
-const trackerUrl = baseUrl + 'piwik.php'
+const trackerUrl = config.piwik.baseUrl + 'piwik.php'
 
 /**
  * Use this function to call the piwik API.
@@ -30,17 +31,19 @@ const trackerUrl = baseUrl + 'piwik.php'
  */
 function piwikCall(args) {
     const tracker = window.Piwik && window.Piwik.getAsyncTracker(trackerUrl);
-    if(tracker) {
-        // piwik has loaded, we can properly call functions
-        tracker[args[0]].call(tracker, ...args.slice(1))
-        //console.log('piwik.js -- about to call ', args[0], ' with args: ', ...args.slice(1));
-    } else {
-        // push calls to _paq array, that piwik tracker will execute automatically
-        // once it loads.
-        _paq.push(args);
+    if (typeof config.piwik.baseUrl !== 'undefined' && config.piwik.baseUrl !== '' && config.piwik.baseUrl !== null) {
+        if (tracker) {
+            // piwik has loaded, we can properly call functions
+            tracker[args[0]].call(tracker,...args.slice(1)
+        )
+            //console.log('piwik.js -- about to call ', args[0], ' with args: ', ...args.slice(1));
+        } else {
+            // push calls to _paq array, that piwik tracker will execute automatically
+            // once it loads.
+            _paq.push(args);
+        }
     }
 }
-
 
 piwikCall(['setTrackerUrl', trackerUrl]);
 piwikCall(['setSiteId', '1']);
@@ -58,8 +61,11 @@ const firstScriptEl = document.getElementsByTagName('script')[0];
 el.type = 'text/javascript';
 el.async = true;
 el.defer = true;
-el.src = baseUrl + 'piwik.js';
-firstScriptEl.parentNode.insertBefore(el, firstScriptEl);
+el.src = config.piwik.baseUrl + 'piwik.js';
+
+if (typeof config.piwik.baseUrl !== 'undefined' && config.piwik.baseUrl !== '' && config.piwik.baseUrl !== null) {
+    firstScriptEl.parentNode.insertBefore(el, firstScriptEl);
+}
 
 
 export const piwikQueue = _paq;
