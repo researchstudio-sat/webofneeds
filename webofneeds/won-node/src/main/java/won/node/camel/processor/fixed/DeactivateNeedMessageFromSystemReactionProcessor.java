@@ -40,8 +40,8 @@ import java.util.Collection;
  *
  */
 @Component
-@FixedMessageReactionProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_DEACTIVATE_STRING)
-public class DeactivateNeedMessageReactionProcessor extends AbstractCamelProcessor
+@FixedMessageReactionProcessor(direction= WONMSG.TYPE_FROM_SYSTEM_STRING,messageType = WONMSG.TYPE_DEACTIVATE_STRING)
+public class DeactivateNeedMessageFromSystemReactionProcessor extends AbstractCamelProcessor
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 

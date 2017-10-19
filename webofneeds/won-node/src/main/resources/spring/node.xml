@@ -19,6 +19,7 @@
     <import
             resource="classpath:/spring/component/matcherProtocolMatcherServiceClient/matcherProtocolMatcherServiceClient-jms.xml"/>
     <import resource="classpath:/spring/component/scheduling/node-scheduling.xml" />
+    <import resource="classpath:/spring/component/maintenance/node-maintenance.xml" />
     <!-- monitoring -->
 
     <!--<import resource="classpath:/spring/component/monitoring/node-monitoring-jmx.xml" />-->

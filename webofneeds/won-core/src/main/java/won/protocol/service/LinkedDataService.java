@@ -244,7 +244,8 @@ public interface LinkedDataService
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException;
 
   /**
-   * Returns a dataset describing the need with the specified URI.
+   * Returns a dataset describing the need with the specified URI. If the need is in state ACTIVE,
+   * 'deep' data is added if requested.
    * @param needUri
    * @param deep - include need's connections datasets and each connection's events' datasets
    * @param deepLayerSize - number of connections and events to include in the deep need dataset

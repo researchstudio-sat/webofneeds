@@ -1,6 +1,6 @@
 <div>
     <p> Hi there,</p>
-    <p>The posting '<a href="$linkRemoteNeed">$remoteNeedTitle</a>'   might be interesting for your posting
+    <p>The posting '<a href="$linkRemoteNeed">$remoteNeedTitle</a>' might be interesting for your posting
         <a href="$linkLocalNeed">$localNeedTitle</a>.
     </p>
     <p><a href="$linkConnection">[Click here to request a conversation]</a></p>

@@ -1,18 +1,10 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.command.create.CreateNeedCommandEvent;
-import won.bot.framework.eventbot.event.impl.command.create.CreateNeedCommandFailureEvent;
-import won.bot.framework.eventbot.event.impl.command.create.CreateNeedCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.command.create.NeedCreationAbortedEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandSuccessEvent;
@@ -22,11 +14,9 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * Created by fsuda on 17.05.2017.
@@ -76,7 +66,7 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
 
     private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI) throws WonMessageBuilderException {
         return WonMessageBuilder
-                .setMessagePropertiesForDeactivate(
+                .setMessagePropertiesForDeactivateFromOwner(
                         wonNodeInformationService.generateEventURI(wonNodeURI),
                         needURI,
                         wonNodeURI)

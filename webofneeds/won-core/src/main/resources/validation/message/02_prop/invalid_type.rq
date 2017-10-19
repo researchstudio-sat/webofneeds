@@ -24,7 +24,8 @@ ASK
             && ?type != msg:CloseMessage && ?type != msg:ConnectionMessage && ?type != msg:HintMessage
             && ?type != msg:FailureResponse && ?type != msg:SuccessResponse
             && ?type != msg:ActivateMessage && ?type != msg:DeactivateMessage
-            && ?type != msg:OpenMessage && ?type != msg:HintFeedbackMessage)
+            && ?type != msg:OpenMessage && ?type != msg:HintFeedbackMessage
+            && ?type != msg:NeedMessage)
     } .
   }
   HAVING (?num > 0)

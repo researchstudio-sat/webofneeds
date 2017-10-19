@@ -1204,6 +1204,9 @@ import jsonld from 'jsonld';
         isDeactivateMessage: function () {
             return this.getMessageType() === "http://purl.org/webofneeds/message#DeactivateMessage";
         },
+        isNeedMessage: function () {
+            return this.getMessageType() === "http://purl.org/webofneeds/message#NeedMessage";
+        },
         
         isSuccessResponse: function () {
             return this.getMessageType() === "http://purl.org/webofneeds/message#SuccessResponse";

@@ -59,7 +59,7 @@ public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
         URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
 
-        return WonMessageBuilder.setMessagePropertiesForDeactivate(
+        return WonMessageBuilder.setMessagePropertiesForDeactivateFromOwner(
                   wonNodeInformationService.generateEventURI(localWonNode),
                   needURI,
                   localWonNode)
