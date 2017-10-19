@@ -290,6 +290,8 @@ public class MasterCrawlerActor extends UntypedActor
   private void startCrawling(WonNodeInfo wonNodeInfo) {
 
       // get the last needUri we crawled from the rdf store and continue crawling from that point
+      // this may not be optimal since last crawled need doesn't mean need with newest creation date at some point of time
+      // on the won node, but it is considered a good enough approach for now
       String lastNeedUri = sparqlService.retrieveLastCrawledNeedUri(wonNodeInfo.getWonNodeURI());
       String lastNeedId = getNeedOrConnectionIdFromUri(lastNeedUri);
       if (lastNeedId != null) {
@@ -313,6 +315,8 @@ public class MasterCrawlerActor extends UntypedActor
       }
 
       // get the last connectionUri we crawled from the rdf store and continue crawling from that point
+      // this may not be optimal since last crawled connection doesn't mean newest connection at some point of time
+      // on the won node, but it is considered a good enough approach for now
       String lastConnectionUri = sparqlService.retrieveLastCrawledConnectionUri(wonNodeInfo.getWonNodeURI());
       String lastConnectionId = getNeedOrConnectionIdFromUri(lastConnectionUri);
       if (lastConnectionId != null) {

@@ -162,7 +162,7 @@ public class CrawlSparqlService extends SparqlService {
                     "SELECT ?obj WHERE {\n" +
                     " <" + baseUri + "> " + prop + " ?obj.\n" +
                     " OPTIONAL {?obj won:crawlDate ?crawlDate. }\n" +
-                    " FILTER ((?crawlDate < \" + crawlDateThreshold + \" ) || !BOUND(?crawlDate)) }\n";
+                    " FILTER ((?crawlDate < " + crawlDateThreshold + " ) || !BOUND(?crawlDate)) }\n";
 
             log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
             log.debug("Execute query: {}", queryString);
