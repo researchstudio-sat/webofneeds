@@ -83,7 +83,7 @@ function genLoginConf() {
                     email: this.email,
                     password: this.password
                 }, {
-                    redirectToFeed: true
+                    redirectToFeed: false
                 });
             }
         }
