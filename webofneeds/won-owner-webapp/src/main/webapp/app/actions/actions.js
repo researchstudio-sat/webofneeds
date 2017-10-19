@@ -111,6 +111,7 @@ const actionHierarchy = {
         createSuccessful: INJ_DEFAULT,
         reopen: needsOpen,
         close: needsClose,
+        closedBySystem:needsClosedBySystem,
         failed: INJ_DEFAULT
     },
     router: {
@@ -174,6 +175,7 @@ const actionHierarchy = {
             failure: messages.failedCloseNeed
         },
         connectionMessageReceived: INJ_DEFAULT,
+        needMessageReceived: messages.needMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,
         openMessageReceived: messages.openMessageReceived,
@@ -313,11 +315,30 @@ export function needsOpen(needUri) {
                     type: actionTypes.needs.reopen,
                     payload: {
                         ownNeedUri: needUri,
-                        affectedConnections: getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri")),
                     }
                 })
         )
     }
+}
+
+export function needsClosedBySystem(event) {
+    return (dispatch, getState) => {
+        //first check if we really have the 'own' need in the state - otherwise we'll ignore the message
+        const need = getState().getIn(['needs', event.getReceiverNeed()]);
+        if (!need) {
+            console.log("ignoring deactivateMessage for a need that is not ours:", event.getReceiverNeed());
+        }
+        dispatch({
+            type: actionTypes.needs.closedBySystem,
+            payload: {
+                needUri: event.getReceiverNeed(),
+                needTitle: need.get("title"),
+                message: event.getTextMessage(),
+            }
+        });    
+        
+    }
+    
 }
 
 export function needsClose(needUri) {
@@ -339,7 +360,6 @@ export function needsClose(needUri) {
                 type: actionTypes.needs.close,
                 payload: {
                     ownNeedUri: needUri,
-                    affectedConnections: getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri")),
                 }
             })
         )

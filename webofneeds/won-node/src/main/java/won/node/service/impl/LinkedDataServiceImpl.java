@@ -214,15 +214,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                 ) throws NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException {
     Dataset dataset = getNeedDataset(needUri);
     if (deep) {
-      Slice<URI> slice = needInformationService.listConnectionURIs(needUri, 1, deepLayerSize, null, null);
-      NeedInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
-        this.uriService.createConnectionsURIForNeed(needUri).toString(), slice);
-      addDeepConnectionData(connectionsResource.getContent(), slice.getContent());
-      RdfUtils.addDatasetToDataset(dataset, connectionsResource.getContent());
-      for (URI connectionUri : slice.getContent()) {
-        NeedInformationService.PagedResource<Dataset,URI> eventsResource = listConnectionEventURIs(
-          connectionUri, 1, deepLayerSize, null, true);
-        RdfUtils.addDatasetToDataset(dataset, eventsResource.getContent());
+      Need need = needInformationService.readNeed(needUri);
+      if (need.getState() == NeedState.ACTIVE) {
+        //only add deep data if need is active
+        Slice<URI> slice = needInformationService.listConnectionURIs(needUri, 1, deepLayerSize, null, null);
+        NeedInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
+                this.uriService.createConnectionsURIForNeed(needUri).toString(), slice);
+        addDeepConnectionData(connectionsResource.getContent(), slice.getContent());
+        RdfUtils.addDatasetToDataset(dataset, connectionsResource.getContent());
+        for (URI connectionUri : slice.getContent()) {
+          NeedInformationService.PagedResource<Dataset, URI> eventsResource = listConnectionEventURIs(
+                  connectionUri, 1, deepLayerSize, null, true);
+          RdfUtils.addDatasetToDataset(dataset, eventsResource.getContent());
+        }
       }
     }
     return dataset;

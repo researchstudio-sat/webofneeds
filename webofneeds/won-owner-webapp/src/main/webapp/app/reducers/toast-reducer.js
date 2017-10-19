@@ -83,6 +83,16 @@ export default function(allToasts = initialState, action = {}) {
         case actionTypes.messages.chatMessage.failure:
             return pushNewToast(allToasts, "Sending Chat Message failed", won.WON.errorToast);
 
+        case actionTypes.messages.needMessageReceived:
+            var title = action.payload.needTitle;
+            var message = action.payload.message;
+            return pushNewToast(allToasts, "Notification for need '" + title + "': "+ message, won.WON.infoToast);
+
+        case actionTypes.needs.closedBySystem:
+            title = action.payload.needTitle;
+            message = action.payload.message;
+            return pushNewToast(allToasts, "Need '" + title + "' was closed with this explanation: "+ message, won.WON.infoToast);
+
         //SPECIFIC TOAST ACTIONS
         case actionTypes.toasts.delete:
             return allToasts.deleteIn([action.payload.get("id")]);

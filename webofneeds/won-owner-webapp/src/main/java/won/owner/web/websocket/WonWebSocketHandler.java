@@ -26,7 +26,10 @@ import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
@@ -34,10 +37,7 @@ import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageType;
+import won.protocol.message.*;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.util.WonRdfUtils;
 
@@ -268,15 +268,19 @@ public class WonWebSocketHandler
               .getReceiverURI().toString());
           }
           return;
-
         case CLOSE:
-          //a close message is only received for an established connection. If the user
-          //wants to be notified of requests, they will get closes as well
-          if (userNeed.isRequests()) {
-            emailSender.sendCloseNotificationHtmlMessage(
-              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
-                .getReceiverURI().toString(), textMsg);
-          }
+          // do not send emails for a close
+          return;
+        case DEACTIVATE:
+          // a deactivate message, coming from the WoN node. Always deliverd by email.
+          emailSender.sendSystemDeactivateNotificationHtmlMessage(
+                    user.getEmail(), needUri.toString(), textMsg);
+
+          return;
+        case NEED_MESSAGE:
+          // a need message, coming from the WoN node. Always deliverd by email.
+            emailSender.sendNeedMessageNotificationHtmlMessage(
+                    user.getEmail(), needUri.toString(), textMsg);
           return;
         default:
           return;
