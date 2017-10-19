@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.NullRememberMeServices;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
@@ -75,6 +77,9 @@ public class RestUserController
 
   @Autowired
   ServletContext context;
+
+  @Autowired
+  RememberMeServices rememberMeServices = new NullRememberMeServices();
 
   @Autowired
   public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
@@ -264,20 +269,26 @@ public class RestUserController
    */
   @RequestMapping(
     value = "/signin",
-    method = RequestMethod.POST
+    method = RequestMethod.GET
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
-  public ResponseEntity logIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity logIn(
+          @RequestParam("username") String username,
+          @RequestParam("password") String password,
+          HttpServletRequest request,
+          HttpServletResponse response) {
     SecurityContext context = SecurityContextHolder.getContext();
-    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(),
-                                                                                        user.getPassword());
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,
+                                                                                        password);
     try {
       Authentication auth = authenticationManager.authenticate(token);
       SecurityContextHolder.getContext().setAuthentication(auth);
       securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+      rememberMeServices.loginSuccess(request, response, auth);
       return new ResponseEntity("\"Signed in.\"", HttpStatus.OK);
     } catch (BadCredentialsException ex) {
+      rememberMeServices.loginFail(request, response);
       return new ResponseEntity("\"No such username/password combination registered.\"", HttpStatus.FORBIDDEN);
     }
   }
@@ -298,18 +309,23 @@ public class RestUserController
   )
   //TODO: move transactionality annotation into the service layer
   //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-  public ResponseEntity isSignedIn() {
+  public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
     // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
     // code by itself if the session isn't valid any more
     SecurityContext context = SecurityContextHolder.getContext();
-    //if(context.getAuthentication() )
-    if (context == null || context.getAuthentication() == null) {
+    Authentication authentication = null;
+    if (context != null) {
+      authentication = context.getAuthentication();
+    }
+    if (authentication == null) {
+      authentication = rememberMeServices.autoLogin(request, response);
+    }
+    if (authentication == null) {
       return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
-    } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
+    } else if ("anonymousUser".equals(authentication.getPrincipal())) {
       return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else {
-
-      User user = (User) context.getAuthentication().getPrincipal();
+      User user = (User) authentication.getPrincipal();
       Map values = new HashMap<String, String>();
       values.put("username", user.getUsername());
       values.put("authorities", user.getAuthorities());
@@ -382,5 +398,9 @@ public class RestUserController
     SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
     cookieClearingLogoutHandler.logout(request, response, null);
     securityContextLogoutHandler.logout(request, response, null);
+  }
+
+  public void setRememberMeServices(RememberMeServices rememberMeServices) {
+    this.rememberMeServices = rememberMeServices;
   }
 }

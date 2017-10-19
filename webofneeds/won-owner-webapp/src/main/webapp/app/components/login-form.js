@@ -17,7 +17,7 @@ import * as srefUtils from '../sref-utils.js';
 
 function genLoginConf() {
     let template = `
-        <form ng-submit="::self.login({email: self.email, password: self.password}, {redirectToFeed: false})"
+        <form ng-submit="::self.login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
             id="loginForm"
             class="loginForm"
         >
@@ -47,6 +47,10 @@ function genLoginConf() {
                 <!--ng-click="::self.login(self.email, self.password)">-->
                     Sign in
             </button>
+            <input
+                id="remember-me"
+                ng-model="self.rememberMe"
+                type="checkbox"/> remember me
         </form>
         <div class="wl__register">
             No Account yet?
@@ -66,6 +70,7 @@ function genLoginConf() {
 
             this.email = "";
             this.password = "";
+            this.rememberMe = false;
 
             const login = (state) => ({
                 loginVisible: state.get('loginVisible'),
@@ -81,7 +86,8 @@ function genLoginConf() {
             if(event.keyCode == 13) {
                 this.login({
                     email: this.email,
-                    password: this.password
+                    password: this.password,
+                    rememberMe: this.rememberMe,
                 }, {
                     redirectToFeed: false
                 });
