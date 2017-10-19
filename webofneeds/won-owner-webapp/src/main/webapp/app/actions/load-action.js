@@ -100,11 +100,11 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         return response;
     })
     .then(response =>
-        fetchOwnedData(email)
+        fetchOwnedData(email, dispatchInitialPageLoad(dispatch))
     ).then(allThatData => {
         return dispatch({
             type: actionTypes.initialPageLoad,
-            payload: allThatData.merge({initialLoadFinished: true})
+            payload: Immutable.fromJS({initialLoadFinished: true})
         });
     }).catch(e => {
         console.error('failed to sign-in with privateId ', privateId, ' because of: ', e);
