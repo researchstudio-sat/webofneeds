@@ -176,7 +176,7 @@ export function registerAccount(credentials) {
  */
 export function login(credentials) {
     const {email, password, rememberMe} = parseCredentials(credentials);
-    const loginUrl = '/owner/rest/users/signin?username=' + email + '&password=' + password + (rememberMe ? '&remember-me=true':'');
+    const loginUrl = '/owner/rest/users/signin?username=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password) + (rememberMe ? '&remember-me=true':'');
 
     return fetch(loginUrl, {
         method: 'get',
