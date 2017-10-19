@@ -57,8 +57,10 @@ public class WonMessageRoutes extends RouteBuilder
     @Override
     public void configure() throws Exception {
         onException(CannotAcquireLockException.class, JpaSystemException.class)  //due to our transaction isolation, we may have to retry
-            .maximumRedeliveries(10)
-            .redeliveryDelay(100)
+            .log(LoggingLevel.INFO, "re-delivering the current message because of an exception, wonMessage header: ${header." + WonCamelConstants.MESSAGE_HEADER +"}")
+            .maximumRedeliveries(2)
+            .redeliveryDelay(1000)
+            .handled(true)
             .routeId("retryAfterConcurrentUpdate")
             ;
 
