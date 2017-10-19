@@ -36,6 +36,11 @@
                            ng-model="self.passwordAgain" required type="password" compare-to="self.password"
                            ng-keyup="self.formKeyup($event)"/>
 
+                    <input
+                            id="remember-me"
+                            ng-model="self.rememberMe"
+                            type="checkbox"/> remember me
+
                     <span class="tg__errormsg"
                           ng-show="registerForm.password_repeat.$error.compareTo">
                         Password is not equal
@@ -43,7 +48,7 @@
                 </div>
                 <button id="signup" class="won-button--filled red"
                         ng-disabled="registerForm.$invalid"
-                        ng-click="::self.register({email: self.email, password: self.password})">
+                        ng-click="::self.register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
                     That’s all we need. Let’s go!
                 </button>
             </div>
