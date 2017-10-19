@@ -314,7 +314,7 @@ export function accountRegister(credentials) {
         .then(response =>
             accountLogin(credentials, {
                 fetchData: false,
-                redirectToFeed: false,
+                redirectToFeed: true,
             })(dispatch, getState)
         )
         .catch(

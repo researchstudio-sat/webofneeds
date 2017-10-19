@@ -17,7 +17,7 @@ import * as srefUtils from '../sref-utils.js';
 
 function genLoginConf() {
     let template = `
-        <form ng-submit="::self.login({email: self.email, password: self.password}, {redirectToFeed: true})"
+        <form ng-submit="::self.login({email: self.email, password: self.password}, {redirectToFeed: false})"
             id="loginForm"
             class="loginForm"
         >
