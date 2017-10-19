@@ -44,7 +44,7 @@ public class Need implements VersionedEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date lastUpdate = new Date();
+    private Date lastUpdate;
 
     /* The URI of the need */
     @Column(name = "needURI", unique = true)
@@ -134,6 +134,7 @@ public class Need implements VersionedEntity {
     @PrePersist
     protected void onCreate() {
         creationDate = new Date();
+        lastUpdate = creationDate;
         incrementVersion();
     }
 
@@ -143,6 +144,7 @@ public class Need implements VersionedEntity {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+        lastUpdate = creationDate;
     }
 
     @XmlTransient

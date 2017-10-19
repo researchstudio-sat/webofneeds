@@ -73,10 +73,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
     }
     Slice<URI> slice = null;
     if (needState == null) {
-      slice = needRepository.getAllNeedURIs(new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+      slice = needRepository.getAllNeedURIs(new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "lastUpdate"));
     } else {
       slice = needRepository.getAllNeedURIs(needState, new PageRequest(pageNum, pageSize, Sort.Direction.DESC,
-                                                                       "creationDate"));
+                                                                       "lastUpdate"));
     }
     return slice;
   }
@@ -93,10 +93,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Slice<URI> slice = null;
     if (needState == null) {
       slice = needRepository.getNeedURIsBefore(referenceDate, new PageRequest(0, pageSize, Sort
-        .Direction.DESC, "creationDate"));
+        .Direction.DESC, "lastUpdate"));
     } else {
       slice = needRepository.getNeedURIsBefore(referenceDate, needState, new PageRequest(0, pageSize, Sort
-        .Direction.DESC, "creationDate"));
+        .Direction.DESC, "lastUpdate"));
     }
     return slice;
   }
@@ -113,10 +113,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Slice<URI> slice = null;
     if (needState == null) {
       slice = needRepository.getNeedURIsAfter(referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC,
-                                                                             "creationDate"));
+                                                                             "lastUpdate"));
     } else {
       slice = needRepository.getNeedURIsAfter(referenceDate, needState, new PageRequest(0, pageSize, Sort.Direction.ASC,
-                                                                                        "creationDate"));
+                                                                                        "lastUpdate"));
     }
     return slice;
   }
