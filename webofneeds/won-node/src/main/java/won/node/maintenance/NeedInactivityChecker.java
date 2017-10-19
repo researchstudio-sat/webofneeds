@@ -135,11 +135,11 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
                                 simpleDateFormat.format(stopWarningThreshold),
                                 simpleDateFormat.format(deactivateThreshold)});
 
-                String warningMessage = "Note: this posting does not have active connections, nor has it seen any activity " +
+                String warningMessage = "This posting does not have active connections, nor has it seen any activity " +
                         "from your side in the last " + getTimeString(warnTimeout) + ". It will be deactivated if there continues " +
                         "to be no activity for more than " + getTimeString(deactivateTimeout - warnTimeout) + ". Automatic deactivation is " +
                         "done to clean up abandoned postings. You can reactivate your posting at any time.";
-                String deactivateMessage = "Note: this posting is deactivated because it has no active connections, nor has " +
+                String deactivateMessage = "This posting is deactivated because it has no active connections, nor has " +
                         "there been any activity from your side in the last "
                         + getTimeString(deactivateTimeout) + ". Automatic deactivation is done to " +
                         "clean up abandoned postings. You can reactivate your posting at any time.";
