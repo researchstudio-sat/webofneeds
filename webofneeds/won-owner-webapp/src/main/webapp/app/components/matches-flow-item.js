@@ -56,7 +56,7 @@ function genComponentConf() {
 
         <div
             class="mfi__match clickable"
-            ng-if="!self.feedbackVisible"
+            ng-show="!self.feedbackVisible"
             ng-click="self.showFeedback()"
             ng-mouseenter="self.showFeedback()">
                 <div class="mfi__match__description">
@@ -75,7 +75,7 @@ function genComponentConf() {
         </div>
         <won-feedback-grid
             connection-uri="self.connectionUri"
-            ng-if="self.feedbackVisible"
+            ng-show="self.feedbackVisible"
             ng-mouseleave="self.hideFeedback()"/>
     `;
 
