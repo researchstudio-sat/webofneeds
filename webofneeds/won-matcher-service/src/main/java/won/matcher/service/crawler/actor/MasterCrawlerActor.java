@@ -289,16 +289,60 @@ public class MasterCrawlerActor extends UntypedActor
    */
   private void startCrawling(WonNodeInfo wonNodeInfo) {
 
-    // try crawling with and without ending "/" in need list uri
-    String needListUri = wonNodeInfo.getNeedListURI();
-    if (needListUri.endsWith("/")) {
-      needListUri = needListUri.substring(0, needListUri.length() - 1);
-    }
+      // get the last needUri we crawled from the rdf store and continue crawling from that point
+      String lastNeedUri = sparqlService.retrieveLastCrawledNeedUri(wonNodeInfo.getWonNodeURI());
+      String lastNeedId = getNeedOrConnectionIdFromUri(lastNeedUri);
+      if (lastNeedId != null) {
+          String uri = wonNodeInfo.getNeedListURI() + "?resumeafter=" + lastNeedId;
+          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getNeedListURI(), wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
 
-    self().tell(new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
-                                    CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
-    self().tell(new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
-                                    CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+          // change the base uri here to end with a slash cause we don't know how the uri is saved
+          // also have to change the first uri parameter since messages with the same uri parameter get filtered out
+          uri = wonNodeInfo.getNeedListURI() + "/?resumeafter=" + lastNeedId;
+          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getNeedListURI() + "/", wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+      } else {
+
+          // or else if we didn't crawl needs yet start crawling the whole won node
+          String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
+          self().tell(new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+          self().tell(new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+      }
+
+      // get the last connectionUri we crawled from the rdf store and continue crawling from that point
+      String lastConnectionUri = sparqlService.retrieveLastCrawledConnectionUri(wonNodeInfo.getWonNodeURI());
+      String lastConnectionId = getNeedOrConnectionIdFromUri(lastConnectionUri);
+      if (lastConnectionId != null) {
+          String uri = wonNodeInfo.getConnectionURIPrefix() + "?resumeafter=" + lastConnectionId;
+          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getConnectionURIPrefix(), wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+
+          // change the base uri here to end with a slash cause we don't know how the uri is saved
+          // also have to change the first uri parameter since messages with the same uri parameter get filtered out
+          uri = wonNodeInfo.getConnectionURIPrefix() + "/?resumeafter=" + lastConnectionId;
+          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getConnectionURIPrefix() + "/", wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+      }
+  }
+
+  private String removeEndingSlash(String uri) {
+      if (uri != null && uri.endsWith("/")) {
+          return uri.substring(0, uri.length() - 1);
+      }
+      return uri;
+  }
+
+  private String getNeedOrConnectionIdFromUri(String uri) {
+
+      uri = removeEndingSlash(uri);
+      if (uri != null) {
+          String[] parts = uri.split("/");
+          return parts[parts.length - 1];
+      }
+      return null;
   }
 
 
