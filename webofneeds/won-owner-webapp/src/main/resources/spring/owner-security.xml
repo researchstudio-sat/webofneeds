@@ -9,7 +9,7 @@
 
 	<!-- special config for linked data brige: we want no caching headers added  -->
 	<http use-expressions="true" pattern="/rest/linked-data/**"
-		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
+		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository" >
 		<headers defaults-disabled="true">
 			<content-type-options />
 			<hsts />
@@ -63,6 +63,23 @@
             see: http://spring.io/blog/2014/09/16/preview-spring-security-websocket-support-sessions
         -->
         <custom-filter ref="sessionRepositoryFilter" before="FIRST" />
+
+		<!--
+			this config resets all remember-me cookies on startup because the
+			'key' property is by default set to a newly generated SecureRandom value.
+			Alternatively, we can inject a value through external configuration.
+			A suitable name for that property would be ${owner.webapp.rememberme.key}.
+		-->
+
+		<remember-me
+				user-service-ref="wonUserDetailService"
+				use-secure-cookie="true"
+				services-alias="rememberMeServices"
+				remember-me-parameter="remember-me"
+				remember-me-cookie="remember-me"
+				token-validity-seconds="5184000"
+				data-source-ref="dataSource"
+				/>
 
 		<!-- use spring security's default http headers -->
 		<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for

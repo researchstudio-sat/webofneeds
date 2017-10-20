@@ -23,6 +23,7 @@ class SignupController {
 
     constructor(/* arguments <- serviceDependencies */) {
         attach(this, serviceDependencies, arguments);
+        this.rememberMe=false;
         Object.assign(this, srefUtils); // bind srefUtils to scope
         const self = this;
 
@@ -40,7 +41,7 @@ class SignupController {
             event.keyCode == 13 &&
             this.passwordAgain === this.password
         ) {
-            this.register({email: this.email, password: this.password})
+            this.register({email: this.email, password: this.password, rememberMe:this.rememberMe})
         }
     }
 }
