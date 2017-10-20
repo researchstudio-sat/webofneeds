@@ -559,6 +559,12 @@
                 <version>1.7</version>
             </dependency>
             <dependency>
+                <!-- used by velocity html escaping -->
+                <groupId>oro</groupId>
+                <artifactId>oro</artifactId>
+                <version>2.0.8</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>${commons-collections.version}</version>
