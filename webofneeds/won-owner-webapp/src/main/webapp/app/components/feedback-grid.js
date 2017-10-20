@@ -14,7 +14,7 @@ function genComponentConf() {
             <a class="feedback clickable" ng-click="self.rateMatch(0); self.router__stateGoCurrent({connectionUri : self.connectionUri})">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_good"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_good_white"/>
-                <span class="feedback__text">Good - request conversation</span>
+                <span class="feedback__text">Good match - connect!</span>
             </a>
             <!--div class="feedback" ng-click="self.rateMatch(1)">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_ok"/>
@@ -24,7 +24,7 @@ function genComponentConf() {
             <div class="feedback clickable" ng-click="self.rateMatch(2)">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_notatall_hi"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_notatall_white"/>
-                <span class="feedback__text">Not at all - remove!</span>
+                <span class="feedback__text">Bad match - remove!</span>
             </div>
         `;
 
