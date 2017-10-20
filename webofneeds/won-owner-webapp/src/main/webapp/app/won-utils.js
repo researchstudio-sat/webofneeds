@@ -176,14 +176,16 @@ export function registerAccount(credentials) {
  */
 export function login(credentials) {
     const {email, password, rememberMe} = parseCredentials(credentials);
-    const loginUrl = '/owner/rest/users/signin?username=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password) + (rememberMe ? '&remember-me=true':'');
+    const loginUrl = '/owner/rest/users/signin'
+    const params = 'username=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password) + (rememberMe ? '&remember-me=true':'');
 
     return fetch(loginUrl, {
-        method: 'get',
+        method: 'post',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            "Content-Type": "application/x-www-form-urlencoded",
         },
+        body: params,
         credentials: 'include',
     })
     .then(

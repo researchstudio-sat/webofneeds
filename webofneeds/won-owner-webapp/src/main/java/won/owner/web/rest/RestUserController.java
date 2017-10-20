@@ -269,7 +269,7 @@ public class RestUserController
    */
   @RequestMapping(
     value = "/signin",
-    method = RequestMethod.GET
+    method = RequestMethod.POST
   )
   //TODO: move transactionality annotation into the service layer
   @Transactional(propagation = Propagation.SUPPORTS)
