@@ -77,7 +77,9 @@
 				services-alias="rememberMeServices"
 				remember-me-parameter="remember-me"
 				remember-me-cookie="remember-me"
-				token-validity-seconds="5184000"/>
+				token-validity-seconds="5184000"
+				data-source-ref="dataSource"
+				/>
 
 		<!-- use spring security's default http headers -->
 		<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
