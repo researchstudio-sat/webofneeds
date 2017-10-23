@@ -290,9 +290,10 @@ export function hintMessageReceived(event) {
         if (!getState().getIn(['needs', event.getReceiverNeed()])) {
             console.log("ignoring hint for a need that is not ours:", event.getReceiverNeed());
         } else {
-            //check the state of the need and ignore hint if it is inactive
-            const needState = getState().getIn(['needs', event.getReceiverNeed(), 'state']);
-            if (needState == won.WON.ActiveCompacted) {
+            if(getState().getIn(['needs', event.getMatchCounterpart(), 'state']) != won.WON.ActiveCompacted) {
+                console.log("ignoring hint for an inactive  need:", event.getMatchCounterpart());
+            } else {
+
                 //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
                 won.invalidateCacheForNewConnection(event.getReceiver(), event.getReceiverNeed())
                     .then(() => {
@@ -302,8 +303,6 @@ export function hintMessageReceived(event) {
 
                         event.matchScore = event.getMatchScore();
                         event.matchCounterpartURI = event.getMatchCounterpart();
-
-                        console.log('going to crawl connection related data');//deletme
 
                         getConnectionRelatedData(needUri, event.getMatchCounterpart(), event.getReceiver())
                             .then(data => {
@@ -325,13 +324,9 @@ export function hintMessageReceived(event) {
                         //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
                         //}
 
-                        console.log("handling hint message")
+                        console.log("handling hint message");
                     });
-            } else {
-                console.log("ignoring hint for a  closed need:", event.getReceiverNeed());
             }
         }
     }
 }
-
-
