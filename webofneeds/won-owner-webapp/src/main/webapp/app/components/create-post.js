@@ -98,9 +98,10 @@ function genComponentConf() {
             </div>
 
             <div class="cp__addDetail" ng-if="self.isValid()">
-                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()">
+                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()" ng-class="{'closedDetail': !self.showDetail}">
                     <span class="nonHover">Add more detail</span>
-                    <span class="hover">Close more detail</span>
+                    <span class="hover" ng-if="!self.showDetail">Open more detail</span>
+                    <span class="hover" ng-if="self.showDetail">Close more detail</span>
                 </div>
                 <div class="cp__detail__items" ng-if="self.showDetail" >
                     <div class="cp__detail__items__item location" 
@@ -213,7 +214,8 @@ function genComponentConf() {
         mergeTags() {
             let detailTags = Immutable.Set(this.tagsString? this.tagsString.match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
 
-            let combinedTags = detailTags.concat(this.tempTags);
+            let combinedTags = this.tempTags? detailTags.concat(this.tempTags) : detailTags;
+
             const immutableTagSet = Immutable.Set(combinedTags);
             return immutableTagSet.toJS();
         }

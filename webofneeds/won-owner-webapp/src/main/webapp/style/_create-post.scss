@@ -252,6 +252,10 @@ won-create-post {
         background-image: url('icon-sprite.svg#ico36_close_circle_hi');
         color: black;
       }
+
+      &.closedDetail:hover {
+        background-image: url('icon-sprite.svg#ico36_plus_circle_hi');
+      }
     }
   }
 }
