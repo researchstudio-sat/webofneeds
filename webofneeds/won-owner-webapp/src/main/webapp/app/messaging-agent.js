@@ -164,17 +164,14 @@ export function runMessagingAgent(redux) {
                 if (message.isSuccessResponse()) {
                     //JUMP HERE AND ONLY HERE WHEN CLOSE MESSAGES COME IN!
                     redux.dispatch(actionCreators.messages__close__success(message));
-                    //  redux.dispatch(actionCreators.messages__close__failure(event));
                     return true;
                 } else if (message.isFailureResponse()) {
-                    console.warn("The CLOSE MESSAGE ENDED UP IN AN FAILURERESPONSE");
-
-                    redux.dispatch({
-                        type: actionTypes.connections.close,
-                        payload: {
-                            connectionUri: message.getSender()
-                        },
-                    });
+                    //Resend the failed close message
+                    var connectionUri = message.getSender();
+                    if(connectionUri) { 
+                        console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
+                        redux.dispatch(actionCreators.connections__closeRemote(message));
+                    }
                     return true;
                 }
             }
