@@ -736,7 +736,9 @@ export function cloneAsMutable(obj) {
  * @param property
  */
 export function get(obj, property) {
-    if(obj.get) {
+    if(!obj) {
+        return undefined;
+    } else if(obj.get) {
         return obj.get(property);
     } else {
         return obj[property];
