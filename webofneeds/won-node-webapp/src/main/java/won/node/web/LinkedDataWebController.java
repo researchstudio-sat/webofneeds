@@ -1477,16 +1477,18 @@ LinkedDataWebController {
     private class DateParameter {
         private String timestamp;
         private Date date;
-        private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
         /**
-         * Creates date parameter from String timestamp, assumes timestamp format is "yyyy-MM-dd'T'HH:mm:ss.SSS".
+         * Creates date parameter from String timestamp, assumes timestamp format is ISO 8601.
          * If timestamp is null, the parameter is assigned current time value.
          *
          * @param timestamp
          */
         public DateParameter(final String timestamp) throws ParseException {
-            DateFormat format = new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ENGLISH);
+
+            // timestamp string is expected in ISO 8601 format (UTC)
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
             if (timestamp == null) {
                 this.date = new Date();
                 this.timestamp = format.format(date);
@@ -1494,17 +1496,6 @@ LinkedDataWebController {
                 this.date = format.parse(timestamp);
                 this.timestamp = timestamp;
             }
-        }
-
-        /**
-         * Creates date parameter from Date.
-         *
-         * @param date
-         */
-        public DateParameter(final Date date) {
-            DateFormat format = new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ENGLISH);
-            this.timestamp = format.format(date);
-            this.date = date;
         }
 
         /**
