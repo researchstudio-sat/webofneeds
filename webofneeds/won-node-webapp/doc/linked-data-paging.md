@@ -193,4 +193,6 @@ be very confusing. Instead, the user could see from some notifications that ther
 choose to reload the connections view. In the latter case we end up at case (1) and the process can repeat with 
 different max-member-count values.
 
+**NOTE**: The query parameter "modifiedafter" makes the requests return modified needs or connections. However for now it doesnt support paging!
+
 
