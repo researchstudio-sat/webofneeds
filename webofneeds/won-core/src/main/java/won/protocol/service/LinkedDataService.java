@@ -114,6 +114,15 @@ public interface LinkedDataService
    */
   public Dataset listConnectionURIs(final boolean deep) throws NoSuchConnectionException;
 
+    /**
+     * Returns container dataset containing all connection URIs that where modified (by adding events) after a certain date.
+     * @param modifiedAfter modification date
+     * @param deep If deep is true, the resource data of those connection uris is also part of the returned resource.
+     * @return
+     * @throws NoSuchConnectionException
+     */
+  public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException;
+
   /**
    * Returns a resource containing connection uris at given page.
    * If deep is true, the resource data of those connection uris is also part of the returned resource.

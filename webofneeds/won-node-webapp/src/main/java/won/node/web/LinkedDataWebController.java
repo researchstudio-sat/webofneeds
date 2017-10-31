@@ -693,6 +693,7 @@ LinkedDataWebController {
             @RequestParam(value = "resumebefore", required = false) String beforeId,
             @RequestParam(value = "resumeafter", required = false) String afterId,
             @RequestParam(value = "timeof", required = false) String timestamp,
+            @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
             @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
 
         logger.debug("listConnectionURIs() called");
@@ -706,10 +707,12 @@ LinkedDataWebController {
             DateParameter dateParam = new DateParameter(timestamp);
             String passableMap = getPassableQueryMap("timeof", dateParam.getTimestamp(), "deep", Boolean.toString(deep));
             //if no preferred size provided by the client => the client does not support paging, return everything:
-            if (preferedSize == null) {
+            if (preferedSize == null && modifiedAfter == null) {
                 // all connections; does not support date filtering for clients that do not support paging
                 rdfDataset = linkedDataService.listConnectionURIs(deep);
-
+            } else if (modifiedAfter != null) {
+                // paging is not implemented for modified connections for now!
+                rdfDataset = linkedDataService.listModifiedConnectionURIsAfter(new DateParameter(modifiedAfter).getDate(), deep);
             } else if (page != null) {
                 // return latest by the given timestamp
                 NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIs(

@@ -393,6 +393,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   @Override
   @Transactional
+  public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException {
+      List<URI> uris = new ArrayList<URI>(needInformationService.listModifiedConnectionURIsAfter(modifiedAfter));
+      NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
+              this.connectionResourceURIPrefix + "/", new SliceImpl<URI>(uris));
+      if (deep) {
+          addDeepConnectionData(containerPage.getContent(), uris);
+      }
+
+      return containerPage.getContent();
+  }
+
+  @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(final int page, final Integer
     preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIs(page, preferredSize, timeSpot);

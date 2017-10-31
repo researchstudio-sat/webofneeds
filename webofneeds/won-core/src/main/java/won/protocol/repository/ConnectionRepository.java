@@ -82,7 +82,9 @@ public interface ConnectionRepository extends WonRepository<Connection>
   @Query("select c from Connection c where c.needURI = ?1 and c.state != ?2")
   List<Connection> getConnectionsByNeedURIAndNotInStateForUpdate(URI needURI, ConnectionState connectionState);
 
-
+  @Query("select distinct msg.parentURI from MessageEventPlaceholder msg " +
+          "where ((msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) and (msg.creationDate > :modifiedAfter))")
+  List<URI> findModifiedConnectionURIsAfter(@Param("modifiedAfter") Date modifiedAfter);
 
   /**
    * Obtains connectionURIs grouped by the connectionURI itself and with message properties attached. The paging
