@@ -593,7 +593,8 @@ LinkedDataWebController {
                                                 @RequestParam(value = "p", required = false) Integer page,
                                                 @RequestParam(value = "resumebefore", required = false) String beforeId,
                                                 @RequestParam(value = "resumeafter", required = false) String afterId,
-                                                @RequestParam(value = "state", required = false) String state) throws IOException {
+                                                @RequestParam(value = "modifiedafter", required = false) String modifiedAfter,
+                                                @RequestParam(value = "state", required = false) String state) throws IOException, ParseException {
         logger.debug("listNeedURIs() for page " + page + " called");
 
         Dataset rdfDataset = null;
@@ -603,12 +604,12 @@ LinkedDataWebController {
         NeedState needState = getNeedState(state);
 
 
-        if (preferedSize == null) {
+        if (preferedSize == null && modifiedAfter == null) {
             // client doesn not support paging - return all needs; does not support need state filtering for clients that do
             // not support paging
             rdfDataset = linkedDataService.listNeedURIs();
 
-        } else if (page == null && beforeId == null && afterId == null) {
+        } else if (page == null && beforeId == null && afterId == null && modifiedAfter == null) {
             // return latest needs
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIs(
                     1, preferedSize, needState);
@@ -630,13 +631,18 @@ LinkedDataWebController {
                     referenceNeed, preferedSize, needState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
-        } else { // afterId != null
+        } else if (afterId != null) {
 
             URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
             NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listNeedURIsAfter(
                     referenceNeed, preferedSize, needState);
             rdfDataset = resource.getContent();
             addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
+        } else { // modifiedafter != null
+
+            // do not support paging for modified needs for now
+            DateParameter modifiedDate = new DateParameter(modifiedAfter);
+            rdfDataset = linkedDataService.listModifiedNeedURIsAfter(modifiedDate.getDate());
         }
 
         addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), URI.create(this
@@ -645,7 +651,6 @@ LinkedDataWebController {
         addCORSHeader(headers);
 
         return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
-
     }
 
     private NeedState getNeedState(final String state) {

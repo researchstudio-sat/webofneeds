@@ -4,12 +4,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.query.Param;
-import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 
 import javax.persistence.LockModeType;
+import javax.persistence.TemporalType;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,11 @@ public interface NeedRepository extends WonRepository<Need> {
     Slice<URI> getNeedURIsAfter(@Param("referenceDate") Date referenceDate,
                                 @Param("needState") NeedState needState,
                                 Pageable pageable);
+
+
+    @Query("select needURI from Need need where need.lastUpdate > :modifiedDate")
+    List<URI> findModifiedNeedURIsAfter(@Param("modifiedDate") Date modifiedDate);
+
 
     @Query("select state, count(*) from Connection where needURI = :need group by state")
     List<Object[]> getCountsPerConnectionState(@Param("need") URI needURI);

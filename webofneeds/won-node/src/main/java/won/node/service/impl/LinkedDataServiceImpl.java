@@ -174,6 +174,24 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Transactional
+  public Dataset listModifiedNeedURIsAfter(Date modifiedDate) {
+
+      Model model = ModelFactory.createDefaultModel();
+      setNsPrefixes(model);
+      Resource needListPageResource = null;
+      Collection<URI> uris = null;
+      uris = needInformationService.listModifiedNeedURIsAfter(modifiedDate);
+      needListPageResource = model.createResource(this.needResourceURIPrefix+"/");
+
+      for (URI needURI : uris) {
+          model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
+      }
+      Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+      addBaseUriAndDefaultPrefixes(ret);
+      return ret;
+  }
+
+  @Transactional
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
   Need need = needInformationService.readNeed(needUri);
 
@@ -594,7 +612,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return containerPage;
   }
 
-  @Transactional
   private Dataset setDefaults(Dataset dataset) {
     if (dataset == null) return null;
     DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());

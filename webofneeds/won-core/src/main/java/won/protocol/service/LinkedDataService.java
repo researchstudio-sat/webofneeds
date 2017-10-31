@@ -97,7 +97,12 @@ public interface LinkedDataService
     final URI need, final Integer preferedSize, NeedState needState);
 
 
-
+    /**
+     * Returns container dataset containing all needs that have been modified after a certain date
+     * @param modifiedDate modification date of needs
+     * @return
+     */
+  public Dataset listModifiedNeedURIsAfter(Date modifiedDate);
 
   /**
    * Returns container dataset containing all connection URIs.

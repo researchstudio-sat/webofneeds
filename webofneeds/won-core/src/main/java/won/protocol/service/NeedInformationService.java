@@ -76,6 +76,14 @@ public interface NeedInformationService {
 
 
     /**
+     * retrieves needs that have been modified after a certain date
+     * @param modifiedAfter modification date of the needs to retrieve
+     * @return collection of modified needs
+     */
+    public Collection<URI> listModifiedNeedURIsAfter(Date modifiedAfter);
+
+
+    /**
      * Retrieves all connection URIs (regardless of state).
      *
      * @return a collection of connection URIs.
