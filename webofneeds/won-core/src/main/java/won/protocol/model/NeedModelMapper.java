@@ -1,15 +1,16 @@
-package won.protocol.util;
+package won.protocol.model;
 
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.util.DateTimeUtils;
+import won.protocol.util.ModelMapper;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.Date;
 
 /**
  * User: gabriel
@@ -73,6 +74,9 @@ public class NeedModelMapper implements ModelMapper<Need> {
             logger.debug("no isInState property found for need resource {}", needRes.getURI());
         }
         need.setWonNodeURI(URI.create(needRes.getPropertyResourceValue(WON.HAS_WON_NODE).toString()));
+
+        Date lastUpdate = DateTimeUtils.parse(needRes.getProperty(DCTerms.modified).getString(), model);
+        need.setLastUpdate(lastUpdate);
 
         return need;
     }
