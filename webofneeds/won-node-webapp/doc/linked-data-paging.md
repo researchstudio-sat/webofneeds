@@ -68,7 +68,7 @@ This parameter is supported only for connections container.
 
 **modification date parameter** specifies resources in relation to a certain modification date:
   
-    modifiedafter: returns needs or connections that have been modified after a specified date using ISO 8601 format (UTC). For connections the modification date is calculated by the creation date of their last event.
+    modifiedafter: returns needs or connections that have been modified after a specified date using ISO 8601 format (UTC).
     
 This parameter currently does **NOT** support paging and cannot be used with the other paging parameters together (except with "deep"). 
 
