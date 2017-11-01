@@ -91,7 +91,7 @@ public interface NeedInformationService {
     public Collection<URI> listConnectionURIs();
 
     /**
-     * Retrieves all connection URIs that were modified (by adding events) after a certain date
+     * Retrieves all connection URIs that were modified after a certain date
      *
      * @param modifiedAfter modification date
      * @return
