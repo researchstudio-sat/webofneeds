@@ -22,7 +22,7 @@ function genLogoutConf() {
 
 
                 <span class="topnav__button__caption hide-in-responsive">
-                    {{self.loggedIn? self.email : "Sign In"}}
+                    {{self.loggedIn? self.getEmail() : "Sign In"}}
                 </span>
                 <img
                     src="generated/icon-sprite.svg#ico16_arrow_down"
@@ -70,6 +70,15 @@ function genLogoutConf() {
             });
 
             connect2Redux(logout, actionCreators, [], this);
+        }
+
+        getEmail() {
+            if(this.email.length > 16) {
+                var mail = this.email;
+                return mail.substring (0, 8) + "..." + mail.substring(mail.length-5,mail.length);
+            } else {
+                return this.email;
+            }
         }
     }
     Controller.$inject = serviceDependencies;
