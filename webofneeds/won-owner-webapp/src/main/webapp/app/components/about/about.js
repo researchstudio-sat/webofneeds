@@ -12,6 +12,9 @@ import {
 } from '../../utils.js';
 import { actionCreators }  from '../../actions/actions.js';
 
+const behindScenes  = "here";
+const behindScenesLink = behindScenes.link("http://researchstudio-sat.github.io/webofneeds/");
+
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
 const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
@@ -89,7 +92,7 @@ const questions = [
     " assessing the security of our approach, or if you have feedback for us, please contact us."},
     {title: "Is there a plug-in for [shop, marketplace, social network, forum] software X?", detail: "No." +
     " If you have an idea for an integration, or if you would like to help with one, let us know."},
-    {title: "What is behind the scenes?", detail: "You may go here for an explanation"}
+    {title: "What is behind the scenes?", detail: "You may go "+behindScenesLink+" for an explanation"}
 ];
 
 class AboutController {
