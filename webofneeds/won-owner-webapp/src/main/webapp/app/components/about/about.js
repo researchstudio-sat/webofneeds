@@ -12,10 +12,16 @@ import {
 } from '../../utils.js';
 import { actionCreators }  from '../../actions/actions.js';
 
+const goodServicesOffer = "matchat.org";
+const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
+
+const howSecure1 = window.location.protocol+"//"+window.location.host+"/owner/";
+const howSecure1Link = howSecure1.link(window.location.protocol+"//"+window.location.host+"/owner/");
+const howSecure2 = window.location.protocol+"//"+window.location.host+"/won/";
+const howSecure2Link = howSecure2.link(window.location.protocol+"//"+window.location.host+"/won/");
+
 const behindScenes  = "here";
 const behindScenesLink = behindScenes.link("http://researchstudio-sat.github.io/webofneeds/");
-
-// add code here from topnav.js to show the behindScenesLink
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
@@ -51,11 +57,9 @@ const questions = [
     " that you are fully anonymous here. Even if you are behind a proxy or an anonymization network, there might be" +
     " ways to de-anonymize you based on the data you provide."},
     {title: "I am offering goods/services on the Internet already. Can people find them here?",
-        detail: "Yes! The idea is to have an open, decentralized infrastructure that makes it easy for anyone" +
+         detail: "Yes! The idea is to have an open, decentralized infrastructure that makes it easy for anyone" +
         " to post what they seek or what they offer, and to find people to interact with. " +
-        " You'll have to set up a WoN node or post your offerings to a service (like" +
-        " matchat.org) that handles everything for you. We can help you with that."
-    },
+        " You'll have to set up a WoN node or post your offerings to a service (like "+goodServicesOfferLink+") that handles everything for you. We can help you with that.", unsafeHtmlEnabled: true},
     {title: "Is this website production-ready?", detail :"No. Do not use it for anything important to you. It is a" +
     " demonstrator of a research project and running on modest hardware. We're working on it, though."},
     {title: "Is this website secure?", detail :"No. See below for more information."},
@@ -80,7 +84,7 @@ const questions = [
     " Here is how we" +
     " implemented it - in the bird's eye view: Your data is stored in clear text on our servers. The communication" +
     " between your browser and your counterpart's browser is relayed over at most four intermediate servers: your" +
-    " Owner Application (https://matchat.org/owner/), your WoN node (https://matchat.org/won/), your" +
+    " Owner Application ("+howSecure1Link+"), your WoN node ("+howSecure2Link+"), your" +
     " counterpart's WoN node and your counterpart's Owner Application. Each one of" +
     " these communication channels are secured with TLS, so the data is encrypted as it is transmitted. Once your" +
     " messages reach your Owner Application, they are signed using asymmetric cryptography so your counterpart can " +
@@ -91,10 +95,10 @@ const questions = [
     " The Owner Application creates a new key pair for every need you" +
     " create, so others should not be able to find out which needs are yours and which needs are from other" +
     " people. Note that this system has not had an independent security audit. If you are interested in" +
-    " assessing the security of our approach, or if you have feedback for us, please contact us."},
+    " assessing the security of our approach, or if you have feedback for us, please contact us.", unsafeHtmlEnabled: true},
     {title: "Is there a plug-in for [shop, marketplace, social network, forum] software X?", detail: "No." +
     " If you have an idea for an integration, or if you would like to help with one, let us know."},
-    {title: "What is behind the scenes?", detail: "You may go "+behindScenesLink+" for an explanation"}
+    {title: "What is behind the scenes?", detail: "You may go "+behindScenesLink+" for an explanation.", unsafeHtmlEnabled: true}
 ];
 
 class AboutController {
