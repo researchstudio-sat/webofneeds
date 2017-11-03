@@ -73,6 +73,22 @@ function genComponentConf() {
                                 {{ self.relativeTime(self.lastUpdateTime, message.get('date')) }}
                         </div>
                         <a
+                          ng-show="self.showRdfIcon && message.get('outgoingMessage')"
+                          class="debuglink"
+                          target="_blank"
+                          href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
+                            <img class="rdflink__small clickable"
+                                src="generated/icon-sprite.svg#rdf_logo_2">
+                        </a>
+                         <a
+                          ng-show="self.showRdfIcon && !message.get('outgoingMessage')"
+                          class="debuglink"
+                          target="_blank"
+                          href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
+                            <img class="rdflink__small clickable"
+                                src="generated/icon-sprite.svg#rdf_logo_2">
+                        </a>
+                        <a
                           ng-show="self.debugmode && message.get('outgoingMessage')"
                           class="debuglink"
                           target="_blank"
@@ -100,6 +116,18 @@ function genComponentConf() {
                 >
             </chat-textfield>
         </div>
+        <br/>
+        <div>
+            <a class="rdflink clickable"
+               ng-click="self.showRdf()">
+               <!--    <span class="rdflink__text">{{self.showhide}}</span> -->
+                   <img 
+                       class="rdflink__small"
+                       src="generated/icon-sprite.svg#rdf_logo_1">
+                  <span class="rdflink__text">[{{self.showhide}}]</span> 
+                
+            </a>
+        </div>
     `;
 
 
@@ -111,6 +139,12 @@ function genComponentConf() {
             window.pm4dbg = this;
 
             const self = this;
+            this.showhide = "SHOW";
+            this.showRdfIcon = won.showRdf;
+
+            if(won.showRdf){
+                this.showhide = "HIDE";
+            }
 
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
 
@@ -235,6 +269,23 @@ function genComponentConf() {
             const trimmedMsg = this.chatMessage.trim();
             if(trimmedMsg) {
                this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
+            }
+        }
+
+        showRdf() {
+            if(won.showRdf) {
+                won.showRdf = false;
+                this.showRdfIcon = false;
+                this.showhide = "SHOW";
+            } else {
+                won.showRdf = true;
+                this.showRdfIcon = true;
+                this.showhide = "HIDE";
+            }
+            try {
+                this.connections__showMoreMessages(this.connectionUri);
+            } catch(Exception) {
+                //this.connections__showMoreMessages();
             }
         }
     }

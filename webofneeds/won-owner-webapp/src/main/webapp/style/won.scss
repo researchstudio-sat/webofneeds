@@ -35,6 +35,21 @@ button, input, textarea {
   font-size: $smallFontSize;
 }
 
+.rdflink {
+
+  &__big{
+   @include fixed-square($bigiconSize);
+  }
+  &__small{
+    @include fixed-square($iconSize);
+  }
+  &__text{
+    font-size: .75rem;
+    color: grey;
+  }
+
+}
+
 body {
 
   //this font will be inherited down the cascade
