@@ -15,6 +15,8 @@ import { actionCreators }  from '../../actions/actions.js';
 const behindScenes  = "here";
 const behindScenesLink = behindScenes.link("http://researchstudio-sat.github.io/webofneeds/");
 
+// add code here from topnav.js to show the behindScenesLink
+
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
 const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
