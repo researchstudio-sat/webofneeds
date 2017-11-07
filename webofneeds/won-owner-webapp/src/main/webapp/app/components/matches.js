@@ -139,7 +139,6 @@ class Controller {
                 connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
                 matchesArray: matches && matches.toArray(),
                 hasMatches: matches && matches.size > 0,
-                debugmode: won.debugmode,
             };
         };
         connect2Redux(selectFromState, actionCreators, [], this);

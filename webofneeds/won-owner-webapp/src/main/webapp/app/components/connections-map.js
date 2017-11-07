@@ -95,7 +95,6 @@ function genComponentConf() {
                     postLocation: postLocation,
                     connections: connections,
                     address: postLocation && postLocation.get('address'),
-                    debugmode: won.debugmode
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

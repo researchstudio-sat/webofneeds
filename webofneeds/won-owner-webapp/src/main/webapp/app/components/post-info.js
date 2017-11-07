@@ -107,7 +107,6 @@ function genComponentConf() {
                         selectLastUpdateTime(state),
                         post.get('creationDate')
                     ),
-                    debugmode: won.debugmode
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);

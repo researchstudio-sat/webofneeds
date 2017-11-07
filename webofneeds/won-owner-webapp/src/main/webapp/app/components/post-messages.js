@@ -157,6 +157,7 @@ function genComponentConf() {
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     lastUpdateTime: state.get('lastUpdateTime'),
                     chatMessages: sortedMessages,
+                    debugmode: won.debugmode,
 
                     // if the connect-message is here, everything else should be as well
                     allLoaded,
