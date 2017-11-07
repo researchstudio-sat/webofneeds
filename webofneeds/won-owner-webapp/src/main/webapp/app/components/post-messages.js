@@ -88,20 +88,6 @@ function genComponentConf() {
                             <img class="rdflink__small clickable"
                                 src="generated/icon-sprite.svg#rdf_logo_2">
                         </a>
-                        <a
-                          ng-show="self.debugmode && message.get('outgoingMessage')"
-                          class="debuglink"
-                          target="_blank"
-                          href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
-                            [MSGDATA]
-                        </a>
-                        <a
-                          ng-show="self.debugmode && !message.get('outgoingMessage')"
-                          class="debuglink"
-                          target="_blank"
-                          href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
-                            [MSGDATA]
-                        </a>
                     </div>
             </div>
         </div>
@@ -171,7 +157,6 @@ function genComponentConf() {
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     lastUpdateTime: state.get('lastUpdateTime'),
                     chatMessages: sortedMessages,
-                    debugmode: won.debugmode,
 
                     // if the connect-message is here, everything else should be as well
                     allLoaded,
