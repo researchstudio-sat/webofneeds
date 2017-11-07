@@ -52,7 +52,7 @@ function genComponentConf() {
             ng-click="self.closeRequest()">Decline</button>
           <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
         </div>
-        <a class="debuglink" target="_blank" href="{{self.connectionUri}}">
+        <a target="_blank" href="{{self.connectionUri}}">
             <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">
         </a>
     </div>

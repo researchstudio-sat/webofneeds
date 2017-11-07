@@ -74,7 +74,6 @@ function genComponentConf() {
                         </div>
                         <a
                           ng-show="self.showRdfIcon && message.get('outgoingMessage')"
-                          class="debuglink"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
                             <img class="rdflink__small clickable"
@@ -82,7 +81,6 @@ function genComponentConf() {
                         </a>
                          <a
                           ng-show="self.showRdfIcon && !message.get('outgoingMessage')"
-                          class="debuglink"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
                             <img class="rdflink__small clickable"

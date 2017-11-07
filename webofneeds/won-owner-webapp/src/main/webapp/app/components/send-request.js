@@ -56,8 +56,7 @@ function genComponentConf() {
               Request Contact
           </button>
         </div>
-        <a class="debuglink"
-          target="_blank"
+        <a target="_blank"
           href="{{self.sendAdHocRequest ? self.postUriToConnectTo : self.connectionUri}}">
             <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">
         </a>
