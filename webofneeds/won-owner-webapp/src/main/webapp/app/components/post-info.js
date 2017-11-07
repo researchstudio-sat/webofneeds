@@ -69,8 +69,13 @@ function genComponentConf() {
                     uri="self.post.get('uri')"
                     ng-show="self.location">
                 </won-need-map>
-                <p ng-show="self.debugmode">
-                    <a class="debuglink" target="_blank" href="{{self.post.get('uri')}}">[DATA]</a>
+                <br/>
+                <p class="post-info__details">
+                 <a href="{{self.post.get('uri')}}"
+                    target="_blank">
+                     <img class="rdflink__big clickable"
+                         src="generated/icon-sprite.svg#rdf_logo_1">
+                  </a>
                 </p>
                 <button class="won-button--filled red" 
                         ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})"
@@ -102,7 +107,6 @@ function genComponentConf() {
                         selectLastUpdateTime(state),
                         post.get('creationDate')
                     ),
-                    debugmode: won.debugmode
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);

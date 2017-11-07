@@ -52,7 +52,9 @@ function genComponentConf() {
             ng-click="self.closeRequest()">Decline</button>
           <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
         </div>
-        <a ng-show="self.debugmode" class="debuglink" target="_blank" href="{{self.connectionUri}}">[CNCT_DATA]</a>
+        <a class="debuglink" target="_blank" href="{{self.connectionUri}}">
+            <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">
+        </a>
     </div>
     `;
 
@@ -76,7 +78,6 @@ function genComponentConf() {
                     isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
                     lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
                     textMsg: connectMsg && connectMsg.get("text"),
-                    debugmode: won.debugmode,
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
