@@ -71,7 +71,8 @@ function genComponentConf() {
                 </won-need-map>
                 <br/>
                 <p class="post-info__details">
-                 <a href="{{self.post.get('uri')}}">
+                 <a href="{{self.post.get('uri')}}"
+                    target="_blank">
                      <img class="rdflink__big clickable"
                          src="generated/icon-sprite.svg#rdf_logo_1">
                   </a>
