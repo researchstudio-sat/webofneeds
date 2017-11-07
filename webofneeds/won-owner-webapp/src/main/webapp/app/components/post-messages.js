@@ -116,16 +116,13 @@ function genComponentConf() {
                 >
             </chat-textfield>
         </div>
-        <br/>
         <div>
-            <a class="rdflink clickable"
+            <a class="rdflink withlabel clickable"
                ng-click="self.showRdf()">
-               <!--    <span class="rdflink__text">{{self.showhide}}</span> -->
                    <img 
                        class="rdflink__small"
                        src="generated/icon-sprite.svg#rdf_logo_1">
                   <span class="rdflink__text">[{{self.showhide}}]</span> 
-                
             </a>
         </div>
     `;

@@ -36,6 +36,14 @@ button, input, textarea {
 }
 
 .rdflink {
+  &.withlabel {
+    display: table;
+
+    .rdflink__text {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  }
 
   &__big{
    @include fixed-square($bigiconSize);
