@@ -1,4 +1,5 @@
 System.config({
+  defaultJSExtensions: true,
   transpiler: "babel",
   babelOptions: {
     "optional": [
@@ -114,8 +115,7 @@ System.config({
     },
     "npm:buffer@5.0.7": {
       "base64-js": "npm:base64-js@1.2.1",
-      "ieee754": "npm:ieee754@1.1.8",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
+      "ieee754": "npm:ieee754@1.1.8"
     },
     "npm:core-js@1.2.6": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -188,7 +188,6 @@ System.config({
       "js-tokens": "npm:js-tokens@3.0.2",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "stream": "github:jspm/nodelibs-stream@0.1.0",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2",
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:medium.js@1.0.1": {
@@ -256,8 +255,7 @@ System.config({
     },
     "npm:util@0.10.3": {
       "inherits": "npm:inherits@2.0.1",
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:vm-browserify@0.0.4": {
       "indexof": "npm:indexof@0.0.1"
