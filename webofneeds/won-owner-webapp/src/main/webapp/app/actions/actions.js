@@ -353,6 +353,14 @@ export function needsClose(needUri) {
                 eventUri: data.eventUri,
                 message: data.message
             }));
+
+            const affectedConnections = getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri"));
+
+            for (con in affectedConnections.toJS()) {
+                console.log("Connection: " + con);
+                dispatch(actionCreators.connections__close(con),
+                )
+            }
         })
         .then(() =>
             // assume close went through successfully, update GUI
