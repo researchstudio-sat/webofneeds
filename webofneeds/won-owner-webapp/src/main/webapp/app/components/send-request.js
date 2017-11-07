@@ -56,17 +56,10 @@ function genComponentConf() {
               Request Contact
           </button>
         </div>
-        <a ng-show="self.debugmode && !self.sendAdHocRequest"
-          class="debuglink"
+        <a class="debuglink"
           target="_blank"
-          href="{{self.connectionUri}}">
-            [CONNDATA]
-        </a>
-        <a ng-show="self.debugmode && self.sendAdHocRequest"
-          class="debuglink"
-          target="_blank"
-          href="{{self.postUriToConnectTo}}">
-            [NEEDDATA]
+          href="{{self.sendAdHocRequest ? self.postUriToConnectTo : self.connectionUri}}">
+            <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">
         </a>
       </div>
     `;
@@ -92,7 +85,6 @@ function genComponentConf() {
                     sendAdHocRequest,
                     connectionUri,
                     postUriToConnectTo,
-                    debugmode: won.debugmode,
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
