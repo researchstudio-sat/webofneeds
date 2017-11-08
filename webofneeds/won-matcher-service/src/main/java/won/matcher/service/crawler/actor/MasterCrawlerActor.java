@@ -289,46 +289,43 @@ public class MasterCrawlerActor extends UntypedActor
    */
   private void startCrawling(WonNodeInfo wonNodeInfo) {
 
-      // get the last needUri we crawled from the rdf store and continue crawling from that point
-      // this may not be optimal since last crawled need doesn't mean need with newest creation date at some point of time
-      // on the won node, but it is considered a good enough approach for now
-      String lastNeedUri = sparqlService.retrieveLastCrawledNeedUri(wonNodeInfo.getWonNodeURI());
-      String lastNeedId = getNeedOrConnectionIdFromUri(lastNeedUri);
-      if (lastNeedId != null) {
-          String uri = wonNodeInfo.getNeedListURI() + "?resumeafter=" + lastNeedId;
-          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getNeedListURI(), wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+      // get the last known need modification date and start crawling from this point again
+      String lastNeedModificationDate = sparqlService.retrieveLastNeedModificationDate(wonNodeInfo.getWonNodeURI());
+      if (lastNeedModificationDate != null) {
+
+          String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
+          String modifiedUri = needListUri + "?modifiedafter=" + lastNeedModificationDate;
+          self().tell(new CrawlUriMessage(modifiedUri, needListUri, wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
 
           // change the base uri here to end with a slash cause we don't know how the uri is saved
           // also have to change the first uri parameter since messages with the same uri parameter get filtered out
-          uri = wonNodeInfo.getNeedListURI() + "/?resumeafter=" + lastNeedId;
-          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getNeedListURI() + "/", wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+          modifiedUri = removeEndingSlash(wonNodeInfo.getNeedListURI()) + "/?modifiedafter=" + lastNeedModificationDate;
+          self().tell(new CrawlUriMessage(modifiedUri, needListUri + "/", wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
       } else {
 
           // or else if we didn't crawl needs yet start crawling the whole won node
           String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
           self().tell(new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
           self().tell(new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
       }
 
-      // get the last connectionUri we crawled from the rdf store and continue crawling from that point
-      // this may not be optimal since last crawled connection doesn't mean newest connection at some point of time
-      // on the won node, but it is considered a good enough approach for now
-      String lastConnectionUri = sparqlService.retrieveLastCrawledConnectionUri(wonNodeInfo.getWonNodeURI());
-      String lastConnectionId = getNeedOrConnectionIdFromUri(lastConnectionUri);
-      if (lastConnectionId != null) {
-          String uri = wonNodeInfo.getConnectionURIPrefix() + "?resumeafter=" + lastConnectionId;
-          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getConnectionURIPrefix(), wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+      // get the last known connection modification date and start crawling from this point again
+      String lastConnectionModificationDate = sparqlService.retrieveLastConnectionModificationDate(wonNodeInfo.getWonNodeURI());
+      if (lastConnectionModificationDate != null) {
+          String connectionPrefixUri = removeEndingSlash(wonNodeInfo.getConnectionURIPrefix());
+          String modifiedUri = connectionPrefixUri + "?modifiedafter=" + lastConnectionModificationDate;
+          self().tell(new CrawlUriMessage(modifiedUri, connectionPrefixUri, wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
 
           // change the base uri here to end with a slash cause we don't know how the uri is saved
           // also have to change the first uri parameter since messages with the same uri parameter get filtered out
-          uri = wonNodeInfo.getConnectionURIPrefix() + "/?resumeafter=" + lastConnectionId;
-          self().tell(new CrawlUriMessage(uri, wonNodeInfo.getConnectionURIPrefix() + "/", wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+          modifiedUri = wonNodeInfo.getConnectionURIPrefix() + "/?modifiedafter=" + lastConnectionModificationDate;
+          self().tell(new CrawlUriMessage(modifiedUri, connectionPrefixUri + "/", wonNodeInfo.getWonNodeURI(),
+                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
       }
   }
 

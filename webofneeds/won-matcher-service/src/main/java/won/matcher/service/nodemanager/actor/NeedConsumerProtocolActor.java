@@ -96,7 +96,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
 
           // let the crawler save the data of this event too
           ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(
-            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate);
+            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate, null);
           resMsg.setSerializedResource(camelMsg.body().toString());
           resMsg.setSerializationFormat(Lang.TRIG);
           pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());

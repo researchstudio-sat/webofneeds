@@ -6,17 +6,15 @@ import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
+import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
-import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Sparql service extended with methods for crawling
@@ -26,78 +24,99 @@ import java.util.Set;
  */
 @Component
 public class CrawlSparqlService extends SparqlService {
-    public static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
-    public static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
-    public static final String CRAWL_STATUS_PREDICATE = WON.BASE_URI + "crawlStatus";
-    public static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
-    public static final String CRAWL_WON_NODE_URI_PREDICATE = WON.BASE_URI + "wonNodeUri";
+
+    private static final String HTTP_HEADER_SEPARATOR = ", ";
 
     @Autowired
     public CrawlSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
         super(sparqlEndpoint);
     }
 
+    @Autowired
+    private CrawlConfig config;
+
+
     /**
      * Update the message meta data about the crawling process using a separate graph.
-     * For each crawled URI save the date, the current status and the baseUri.
-     * This enables to construct the message again (e.g. for executing (unfinished)
-     * crawling again later)
-     *
      * @param msg message that describe crawling meta data to update
      */
     public void updateCrawlingMetadata(CrawlUriMessage msg) {
-
-        // delete the old entry
-        String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "DELETE WHERE { GRAPH won:crawlMetadata { <" + msg.getUri() + "> ?y ?z}}\n;";
-
-        // insert new entry
-        queryString += "\nINSERT DATA { GRAPH won:crawlMetadata {\n" +
-                "<" + msg.getUri() + "> won:crawlDate " + msg.getCrawlDate() + ".\n" +
-                "<" + msg.getUri() + "> won:crawlStatus '" + msg.getStatus() + "'.\n" +
-                "<" + msg.getUri() + "> won:crawlBaseUri <" + msg.getBaseUri() + ">.\n";
-        if (msg.getWonNodeUri() != null) {
-            queryString += "<" + msg.getUri() + "> won:wonNodeUri <" + msg.getWonNodeUri() + ">.\n";
-        }
-        queryString += "}}\n";
-
-        // execute query
-        executeUpdateQuery(queryString);
+        executeUpdateQuery(createUpdateCrawlingMetadataQuery(msg));
     }
 
     /**
      * Bulk update of several meta data messages about the crawling process using a separate graph.
-     * For each crawled URI save the date, the current status and the baseUri using only a
-     * single Sparql update query.
-     * This enables to construct the message again (e.g. for executing (unfinished)
-     * crawling again later).
-     *
      * @param msgs multiple messages that describe crawling meta data to update
      */
     public void bulkUpdateCrawlingMetadata(Collection<CrawlUriMessage> msgs) {
 
-        // delete the old entries
         StringBuilder builder = new StringBuilder();
-        builder.append("prefix won: <http://purl.org/webofneeds/model#>\n");
         for (CrawlUriMessage msg : msgs) {
-            builder.append("\nDELETE WHERE { GRAPH won:crawlMetadata { <");
-            builder.append(msg.getUri()).append("> ?p ?o }};");
+            builder.append(createUpdateCrawlingMetadataQuery(msg));
         }
-
-        // insert the new entries
-        builder.append("\n\nINSERT DATA { GRAPH won:crawlMetadata {\n");
-        for (CrawlUriMessage msg : msgs) {
-            builder.append("<").append(msg.getUri()).append("> won:crawlDate ").append(msg.getCrawlDate()).append(".\n");
-            builder.append("<").append(msg.getUri()).append("> won:crawlStatus '").append(msg.getStatus()).append("'.\n");
-            builder.append("<").append(msg.getUri()).append("> won:crawlBaseUri <").append(msg.getBaseUri()).append(">.\n");
-            if (msg.getWonNodeUri() != null) {
-                builder.append("<").append(msg.getUri()).append("> won:wonNodeUri <").append(msg.getWonNodeUri()).append(">.\n");
-            }
-        }
-        builder.append("}};\n");
 
         // execute the bulk query
         executeUpdateQuery(builder.toString());
+    }
+
+    private String createUpdateCrawlingMetadataQuery(CrawlUriMessage msg) {
+
+        // delete the old entry
+        StringBuilder builder = new StringBuilder();
+        builder.append("DELETE WHERE { GRAPH won:crawlMetadata { ?msgUri ?y ?z}};\n");
+
+        // insert new entry
+        builder.append("\nINSERT DATA { GRAPH won:crawlMetadata {\n");
+        builder.append("?msgUri won:crawlDate ?crawlDate.\n");
+        builder.append("?msgUri won:crawlStatus ?crawlStatus.\n");
+        builder.append("?msgUri won:crawlBaseUri ?crawlBaseUri.\n");
+
+        if (msg.getWonNodeUri() != null) {
+            builder.append("?msgUri won:wonNodeUri ?wonNodeUri.\n");
+        }
+
+        if (msg.getResourceETagHeaderValues() != null && !msg.getResourceETagHeaderValues().isEmpty()) {
+            for (int i = 0; i < msg.getResourceETagHeaderValues().size(); i++) {
+                builder.append("?msgUri won:resourceETagValue ? .\n");
+            }
+        }
+
+        builder.append("}};\n");
+
+        ParameterizedSparqlString pss = new ParameterizedSparqlString();
+        pss.setCommandText(builder.toString());
+        pss.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pss.setIri("msgUri", msg.getUri());
+        pss.setLiteral("crawlDate", msg.getCrawlDate());
+        pss.setLiteral("crawlStatus", msg.getStatus().toString());
+        pss.setIri("crawlBaseUri", msg.getBaseUri());
+        if (msg.getWonNodeUri() != null) {
+            pss.setIri("wonNodeUri", msg.getWonNodeUri());
+        }
+
+        if (msg.getResourceETagHeaderValues() != null && !msg.getResourceETagHeaderValues().isEmpty()) {
+            int i = 0;
+            for (String etagValue : msg.getResourceETagHeaderValues()) {
+                pss.setLiteral(i, etagValue);
+                i++;
+            }
+        }
+
+        return pss.toString();
+    }
+
+    private Set<String> commaConcatenatedStringToSet(String contatenatedString) {
+
+        if (contatenatedString == null || contatenatedString.isEmpty()) {
+            return null;
+        }
+
+        String[] splitValues = StringUtils.split(contatenatedString, HTTP_HEADER_SEPARATOR);
+        if (splitValues == null) {
+            return new HashSet<>(Arrays.asList(contatenatedString));
+        }
+
+        return new HashSet(Arrays.asList(splitValues));
     }
 
     /**
@@ -111,10 +130,12 @@ public class CrawlSparqlService extends SparqlService {
 
         Set<CrawlUriMessage> msgs = new LinkedHashSet<>();
         String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "SELECT ?uri ?base ?wonNode WHERE { GRAPH won:crawlMetadata {\n" +
+                "SELECT ?uri ?base ?wonNode (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE { GRAPH won:crawlMetadata {\n" +
                 " ?uri ?p '" + status + "'.\n" +
                 " ?uri won:crawlBaseUri ?base.\n" +
-                " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n}}\n";
+                " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n" +
+                " OPTIONAL { ?uri won:resourceETagValue ?etag }}}\n" +
+                " GROUP BY ?uri ?base ?wonNode\n";
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
         log.debug("Execute query: {}", queryString);
         Query query = QueryFactory.create(queryString);
@@ -127,13 +148,19 @@ public class CrawlSparqlService extends SparqlService {
             String uri = qs.get("uri").asResource().getURI();
             String baseUri = qs.get("base").asResource().getURI();
             CrawlUriMessage msg = null;
+            String wonNode = null;
+            Set<String> etags = null;
+
             if (qs.get("wonNode") != null) {
-                String wonNode = qs.get("wonNode").asResource().getURI();
-                msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
-            } else {
-                msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
+                wonNode = qs.get("wonNode").asResource().getURI();
             }
 
+            if (qs.get("etags") != null) {
+                String etagsString = qs.get("etags").asLiteral().getString();
+                etags = commaConcatenatedStringToSet(etagsString);
+            }
+
+            msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), etags);
             log.debug("Created message: {}", msg);
             msgs.add(msg);
         }
@@ -142,94 +169,144 @@ public class CrawlSparqlService extends SparqlService {
     }
 
     /**
-     * Extract linked URIs of resource URI that have not been crawled since a certain date (crawlDateThreshold). Use
-     * specified property paths to construct the query.
+     * Extract linked URIs of resource URI and create new CrawlUriMessages out of it for crawling.
+     * Uses base and non-base property paths for the extraction of uris and creation of new crawling messages.
      *
-     * @param uri                current processed resource URI
-     * @param properties         property paths used to query the sparql endpoint
-     * @param crawlDateThreshold extract only uris that have a crawlDate < crawlDateThreshold
-     * @return set of extracted URIs from the resource URI
+     * @param baseUri base uri of the current processed resource uri message
+     * @param wonNodeUri won node rui of the current processed resource uri message
+     * @return set of extracted CrawlUriMessages
      */
-    public Set<String> extractURIs(String uri, String baseUri, Iterable<String> properties, long crawlDateThreshold) {
-        Set<String> extractedURIs = new HashSet<String>();
-        for (String prop : properties) {
-            if (prop.trim().length() == 0) {
-                continue;
-                //ignore empty strings
-            }
-            // select URIs specified by property paths that have not already been crawled
-            String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                    "SELECT ?obj WHERE {\n" +
-                    " <" + baseUri + "> " + prop + " ?obj.\n" +
-                    " OPTIONAL {?obj won:crawlDate ?crawlDate. }\n" +
-                    " FILTER ((?crawlDate < " + crawlDateThreshold + " ) || !BOUND(?crawlDate)) }\n";
+    public Set<CrawlUriMessage> extractCrawlUriMessages(String baseUri, String wonNodeUri) {
 
-            log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-            log.debug("Execute query: {}", queryString);
-            Query query = QueryFactory.create(queryString);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-            ResultSet results = qexec.execSelect();
+        Set<CrawlUriMessage> newCrawlMessages = new HashSet<CrawlUriMessage>();
 
-            while (results.hasNext()) {
-                QuerySolution qs = results.nextSolution();
-                String extractedUri = qs.get("obj").asResource().getURI();
-                log.debug("Extracted URI: {}", extractedUri);
-                extractedURIs.add(extractedUri);
+        // extract uris from non-base property path
+        for (String prop : config.getCrawlNonBasePropertyPaths()) {
+            Set<CrawlUriMessage> msgs = extractCrawlUriMessagesForPropertyPath(baseUri, wonNodeUri, prop, false);
+            if (msgs != null) {
+                newCrawlMessages.addAll(msgs);
             }
-            qexec.close();
         }
 
-        return extractedURIs;
+        // extract uris from base property paths
+        for (String prop : config.getCrawlBasePropertyPaths()) {
+            Set<CrawlUriMessage> msgs = extractCrawlUriMessagesForPropertyPath(baseUri, wonNodeUri, prop, true);
+            if (msgs != null) {
+                newCrawlMessages.addAll(msgs);
+            }
+        }
+
+        return newCrawlMessages;
     }
 
     /**
-     * retrieve the last crawled needUri from a certain won node
-     * @param wonNodeUri won node to retrieve the last crawled uri for
-     * @return returns the last crawled needUri or null if none exists
+     * Extract linked URIs of resource URI and create new CrawlUriMessages for a certain property path and a base Uri.
+     * Also extract ETag values if they are available for certain uri resources so that they can be used
+     * to make crawling more efficient. Use specified property paths to construct the query.
+     *
+     * @param baseUri  base uri of the current processed resource uri message
+     * @param wonNodeUri won node rui of the current processed resource uri message
+     * @param propertyPath property path used to extract new uris in conjunction with base uri
+     * @param baseProperty base uri used to extract new uris in conjunction property path
+     * @return set of CrawlUriMessages extracted using a certain base uri and property path
      */
-    public String retrieveLastCrawledNeedUri(String wonNodeUri) {
+    private Set<CrawlUriMessage> extractCrawlUriMessagesForPropertyPath(
+            String baseUri, String wonNodeUri, String propertyPath, boolean baseProperty) {
+
+        if (propertyPath.trim().length() == 0) {
+            return null;
+        }
+
+        // select URIs specified by property paths that have not already been crawled
+        Set<CrawlUriMessage> newCrawlMessages = new HashSet<CrawlUriMessage>();
+        long crawlDate = System.currentTimeMillis();
+        String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
+                "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE {\n" +
+                " <" + baseUri + "> " + propertyPath + " ?uri.\n" +
+                " OPTIONAL {?uri won:resourceETagValue ?etag. }}\n" +
+                " GROUP BY ?uri\n";
+
+        log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+        log.debug("Execute query: {}", queryString);
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+        ResultSet results = qexec.execSelect();
+
+        while (results.hasNext()) {
+            QuerySolution qs = results.nextSolution();
+            String extractedUri = qs.get("uri").asResource().getURI();
+
+            Set<String> etags = null;
+            if (qs.get("etags") != null) {
+                String etagsString = qs.get("etags").asLiteral().getString();
+                etags = commaConcatenatedStringToSet(etagsString);
+            }
+
+            CrawlUriMessage newUriMsg = null;
+            log.debug("Extracted URI: {}", extractedUri);
+            if (baseProperty) {
+                newUriMsg = new CrawlUriMessage(
+                        extractedUri, extractedUri, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
+            } else {
+                newUriMsg = new CrawlUriMessage(
+                        extractedUri, baseUri, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate, etags);
+            }
+            newCrawlMessages.add(newUriMsg);
+        }
+        qexec.close();
+        return newCrawlMessages;
+    }
+
+    /**
+     * retrieve the last known modification date of any need of a certain won node
+     * @param wonNodeUri won node uri for which the last need modification date should be retrieved
+     * @return last known need modification date for a specific won node or null if none exists
+     */
+    public String retrieveLastNeedModificationDate(String wonNodeUri) {
 
         String query = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "SELECT ?needUri WHERE {\n" +
+                "prefix dcterms: <http://purl.org/dc/terms/>\n" +
+                "SELECT ?modificationDate WHERE {\n" +
                 " ?needUri a won:Need.\n" +
                 " ?needUri won:hasWonNode <" + wonNodeUri + ">. \n" +
-                " ?needUri won:crawlDate ?date. \n" +
-                "} ORDER BY DESC(?date) LIMIT 1\n";
+                " ?needUri dcterms:modified ?modificationDate. \n" +
+                "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
         ResultSet results = qexec.execSelect();
-        String needUri = null;
+        String modificationDate = null;
         if (results.hasNext()) {
             QuerySolution qs = results.nextSolution();
-            needUri = qs.get("needUri").asResource().getURI();
+            modificationDate = qs.get("modificationDate").asLiteral().getString();
         }
         qexec.close();
-        return needUri;
+        return modificationDate;
     }
 
     /**
-     * retrieve the last crawled connectionUri from a certain won node
-     * @param wonNodeUri won node to retrieve the last crawled uri for
-     * @return returns the last crawled connectionUri or null if none exists
+     * retrieve the last known modification date of any connection of a certain won node
+     * @param wonNodeUri won node uri for which the last connection modification date should be retrieved
+     * @return last known connection modification date for a specific won node or null if none exists
      */
-    public String retrieveLastCrawledConnectionUri(String wonNodeUri) {
+    public String retrieveLastConnectionModificationDate(String wonNodeUri) {
 
         String query = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "SELECT ?connectionUri WHERE {\n" +
+                "prefix dcterms: <http://purl.org/dc/terms/>\n" +
+                "SELECT ?modificationDate WHERE {\n" +
                 " ?connectionUri a won:Connection.\n" +
                 " ?connectionUri won:hasWonNode <" + wonNodeUri + ">. \n" +
-                " ?connectionUri won:crawlDate ?date. \n" +
-                "} ORDER BY DESC(?date) LIMIT 1\n";
+                " ?connectionUri dcterms:modified ?modificationDate. \n" +
+                "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
         ResultSet results = qexec.execSelect();
-        String connectionUri = null;
+        String modificationDate = null;
         if (results.hasNext()) {
             QuerySolution qs = results.nextSolution();
-            connectionUri = qs.get("connectionUri").asResource().getURI();
+            modificationDate = qs.get("modificationDate").asLiteral().getString();
         }
         qexec.close();
-        return connectionUri;
+        return modificationDate;
     }
 
     public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit, boolean
