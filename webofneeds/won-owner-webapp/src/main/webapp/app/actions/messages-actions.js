@@ -290,7 +290,7 @@ export function hintMessageReceived(event) {
         if (!getState().getIn(['needs', event.getReceiverNeed()])) {
             console.log("ignoring hint for a need that is not ours:", event.getReceiverNeed());
         } else {
-            if(getState().getIn(['needs', event.getMatchCounterpart(), 'state']) != won.WON.ActiveCompacted) {
+            if(getState().getIn(['needs', event.getMatchCounterpart(), 'state']) === won.WON.InactiveCompacted) {
                 console.log("ignoring hint for an inactive  need:", event.getMatchCounterpart());
             } else {
 
