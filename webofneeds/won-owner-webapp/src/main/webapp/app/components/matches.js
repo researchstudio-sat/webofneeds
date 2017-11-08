@@ -5,7 +5,6 @@ import won from '../won-es6.js';
 import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar.js';
 import matchesFlowItemModule from './matches-flow-item.js';
-import matchesGridItemModule from './matches-grid-item.js';
 import connectionsMapModule from './connections-map.js';
 import sendRequestModule from './send-request.js';
 import connectionsOverviewModule from './connections-overview.js';
@@ -52,11 +51,6 @@ let template = `
                     <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                <a ng-if="false" ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.GRID})"
-                   class="clickable">
-                    <img ng-src="{{self.layout === 'grid' ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
-                     class="omc__header__viewtype__icon clickable"/>
-                </a>
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.LIST})"
                    class="clickable">
                     <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
@@ -74,12 +68,6 @@ let template = `
                     connection-uri="match.get('uri')"
                     ng-repeat="match in self.matchesArray">
             </won-matches-flow-item>
-        </div>
-        <div ng-if="false && self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
-            <won-matches-grid-item
-                    connection-uri="match.get('uri')"
-                    ng-repeat="match in self.matchesArray">
-            </won-matches-grid-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'list'" class="omc__content__list">
             <won-connections-overview
@@ -103,7 +91,7 @@ let template = `
     </div>
 `;
 
-const LAYOUT = Object.freeze({ TILES: 'tiles', GRID: 'grid', LIST: 'list', MAP: 'map'});
+const LAYOUT = Object.freeze({ TILES: 'tiles', LIST: 'list', MAP: 'map'});
 
 class Controller {
     constructor() {
@@ -120,7 +108,7 @@ class Controller {
             const connectionUri = decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const isWhatsAround= getIn(state, ["needs", postUri, "isWhatsAround"]);
 
-            // either of 'tiles', 'grid', 'list'
+            // either of 'tiles', 'list'
             let layout = getIn(state, ['router','currentParams','layout']);
             if(!layout) {
                 layout = isWhatsAround? 'map' : 'tiles';
@@ -151,7 +139,6 @@ class Controller {
                 connection: state.getIn(["needs", postUri, 'connections', connectionUri]),
                 matchesArray: matches && matches.toArray(),
                 hasMatches: matches && matches.size > 0,
-                debugmode: won.debugmode,
             };
         };
         connect2Redux(selectFromState, actionCreators, [], this);
@@ -177,7 +164,6 @@ function genComponentConf() {
 export default angular.module('won.owner.components.matches', [
         overviewTitleBarModule,
         matchesFlowItemModule,
-        matchesGridItemModule,
         sendRequestModule,
         connectionsOverviewModule,
         connectionSelectionModule,

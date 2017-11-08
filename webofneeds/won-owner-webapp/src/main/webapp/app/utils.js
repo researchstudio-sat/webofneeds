@@ -736,7 +736,9 @@ export function cloneAsMutable(obj) {
  * @param property
  */
 export function get(obj, property) {
-    if(obj.get) {
+    if(!obj) {
+        return undefined;
+    } else if(obj.get) {
         return obj.get(property);
     } else {
         return obj[property];
@@ -997,4 +999,20 @@ export function getParameters(url) {
     paramsKVArray.forEach(kv => params[kv[0]] = kv[1]);
 
     return params;
+}
+
+/**
+ * Ellipsize a too long String
+ * used in account-menu.js to ellipsize the email in the topnav
+ * @param string
+ * @param size
+ * @returns {*}
+ */
+export function ellipsizeString (string, size) {
+
+    if(string.length > size) {
+        return string.substring (0, 8) + "…" + string.substring(string.length-5,string.length);
+    } else {
+        return string;
+    }
 }

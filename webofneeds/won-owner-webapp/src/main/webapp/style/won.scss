@@ -31,8 +31,27 @@ button, input, textarea {
   font-weight: inherit;
 }
 
-.debuglink {
-  font-size: $smallFontSize;
+.rdflink {
+  &.withlabel {
+    display: table;
+
+    .rdflink__text {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  }
+
+  &__big{
+   @include fixed-square($bigiconSize);
+  }
+  &__small{
+    @include fixed-square($iconSize);
+  }
+  &__text{
+    font-size: .75rem;
+    color: grey;
+  }
+
 }
 
 body {

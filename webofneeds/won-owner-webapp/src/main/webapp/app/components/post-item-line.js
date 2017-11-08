@@ -103,7 +103,6 @@ function genComponentConf() {
                      <span class="pil__indicators__item__caption"></span>
                 </div>
             </div>
-            <a class="debuglink" ng-show="self.debugmode" target="_blank" href="{{self.needUri}}"> [DATA]</a>
     `;
 
     class Controller {
@@ -140,7 +139,6 @@ function genComponentConf() {
                     unreadRequestsCount: unreadRequestsCount > 0 ? unreadRequestsCount : undefined,
                     unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
                     WON: won.WON,
-                    debugmode: won.debugmode,
                 };
             };
 

@@ -183,10 +183,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         case actionTypes.messages.close.success:
             return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
 
-        //case actionTypes.messages.close.failure:
-            //do the same like in success -> debugging -> need ConnectionUR
-            // return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
-
         //NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
             //ADD RECEIVED CHAT MESSAGES

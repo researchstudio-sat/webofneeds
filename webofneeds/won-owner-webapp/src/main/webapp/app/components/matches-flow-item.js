@@ -8,7 +8,11 @@ import feedbackGridModule from './feedback-grid.js';
 import postHeaderModule from './post-header.js';
 import postContentModule from './post-content.js';
 
-import { attach } from '../utils.js';
+import {
+    attach,
+    get,
+    getIn,
+} from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
     labels,
@@ -48,9 +52,10 @@ function genComponentConf() {
               need-uri="self.remoteNeed.get('uri')"
               hide-image="true">
             </won-post-header>
-            <hr/>
+            <hr ng-show="self.hasOptionalFields"/>
             <won-post-content
-              need-uri="self.remoteNeed.get('uri')">
+              need-uri="self.remoteNeed.get('uri')"
+              ng-show="self.hasOptionalFields">
             </won-post-content>
         </div>
 
@@ -92,9 +97,12 @@ function genComponentConf() {
                 const connectionData = ownNeed && state.getIn(["needs", ownNeed.get("uri"), "connections", self.connectionUri]);
                 const remoteNeed = connectionData && state.getIn(["needs", connectionData.get("remoteNeedUri")]);
 
+                const hasOptionalFields = !!(get(remoteNeed, 'location') || get(remoteNeed, 'description'));
+
                 return {
                     ownNeed,
                     remoteNeed,
+                    hasOptionalFields,
                 };
             };
 

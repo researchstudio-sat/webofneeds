@@ -103,8 +103,7 @@ This parameter currently does **NOT** support paging and cannot be used with the
 If no page related query parameter is provided, but client signals that it supports paging (by using the above Prefer
 header in hist requests), the node returns the 1st page of the paged resource based on the sorting logic outlined below.
 Therefore, for needs container, the latest created needs are returned. For events container, the latest created 
-events are returned. For connections container, the connections with latest events activity are returned.
-
+events are returned. For connections container, the connections are ordered by their first occured event creation date (latest created connections first).
 
 
 ## Sorting of members for paging

@@ -4,6 +4,7 @@
 ;
 import angular from 'angular';
 import { attach } from '../utils.js';
+import { ellipsizeString } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
     connect2Redux,
@@ -22,7 +23,7 @@ function genLogoutConf() {
 
 
                 <span class="topnav__button__caption hide-in-responsive">
-                    {{self.loggedIn? self.email : "Sign In"}}
+                    {{self.loggedIn? self.getEmail() : "Sign In"}}
                 </span>
                 <img
                     src="generated/icon-sprite.svg#ico16_arrow_down"
@@ -63,6 +64,7 @@ function genLogoutConf() {
 
             this.email = "";
             this.password = "";
+            this.maxEmailLength = 16;
 
             const logout = (state) => ({
                 loggedIn: state.getIn(['user','loggedIn']),
@@ -70,6 +72,10 @@ function genLogoutConf() {
             });
 
             connect2Redux(logout, actionCreators, [], this);
+        }
+
+        getEmail() {
+            return ellipsizeString(this.email, this.maxEmailLength);
         }
     }
     Controller.$inject = serviceDependencies;
