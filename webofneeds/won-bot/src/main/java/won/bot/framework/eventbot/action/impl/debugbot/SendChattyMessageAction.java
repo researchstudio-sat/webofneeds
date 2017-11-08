@@ -24,7 +24,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Connection;
-import won.protocol.util.ConnectionModelMapper;
+import won.protocol.model.ConnectionModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 

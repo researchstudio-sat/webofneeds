@@ -97,7 +97,12 @@ public interface LinkedDataService
     final URI need, final Integer preferedSize, NeedState needState);
 
 
-
+    /**
+     * Returns container dataset containing all needs that have been modified after a certain date
+     * @param modifiedDate modification date of needs
+     * @return
+     */
+  public Dataset listModifiedNeedURIsAfter(Date modifiedDate);
 
   /**
    * Returns container dataset containing all connection URIs.
@@ -108,6 +113,15 @@ public interface LinkedDataService
    * uri cannot be retrieved.
    */
   public Dataset listConnectionURIs(final boolean deep) throws NoSuchConnectionException;
+
+    /**
+     * Returns container dataset containing all connection URIs that where modified after a certain date.
+     * @param modifiedAfter modification date
+     * @param deep If deep is true, the resource data of those connection uris is also part of the returned resource.
+     * @return
+     * @throws NoSuchConnectionException
+     */
+  public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException;
 
   /**
    * Returns a resource containing connection uris at given page.

@@ -37,8 +37,8 @@
     </bean>
 
     <!-- Model Mapper for RDF -->
-    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"></bean>
-    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"></bean>
+    <bean id="needModelMapper" class="won.protocol.model.NeedModelMapper"></bean>
+    <bean id="connectionModelMapper" class="won.protocol.model.ConnectionModelMapper"></bean>
 
     <bean id="workqueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg value="30" type="int" index="0"/>
