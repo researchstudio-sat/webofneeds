@@ -111,6 +111,8 @@ public class Need implements VersionedEntity {
         return lastUpdate;
     }
 
+    protected void setLastUpdate(Date lastUpdate) { this.lastUpdate = lastUpdate; }
+
     protected void setVersion(final int version) {
         this.version = version;
     }

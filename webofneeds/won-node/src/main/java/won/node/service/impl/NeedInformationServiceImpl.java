@@ -109,6 +109,12 @@ public class NeedInformationServiceImpl implements NeedInformationService
     return slice;
   }
 
+    @Override
+    public Collection<URI> listModifiedNeedURIsAfter(Date modifiedAfter)
+    {
+        return needRepository.findModifiedNeedURIsAfter(modifiedAfter);
+    }
+
   @Override
   public Slice<URI> listNeedURIsAfter(URI needURI, Integer preferedPageSize, NeedState needState)
   {
@@ -138,6 +144,11 @@ public class NeedInformationServiceImpl implements NeedInformationService
   public Collection<URI> listConnectionURIs()
   {
     return connectionRepository.getAllConnectionURIs();
+  }
+
+  @Override
+  public Collection<URI> listModifiedConnectionURIsAfter(Date modifiedAfter) {
+      return connectionRepository.findModifiedConnectionURIsAfter(modifiedAfter);
   }
 
   @Override

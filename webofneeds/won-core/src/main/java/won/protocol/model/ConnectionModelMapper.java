@@ -1,15 +1,15 @@
-package won.protocol.util;
+package won.protocol.model;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
+import won.protocol.util.DateTimeUtils;
+import won.protocol.util.ModelMapper;
+import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.Date;
 
 /**
  * User: gabriel
@@ -33,6 +33,12 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
             Resource remoteNeed = model.createResource(connection.getRemoteNeedURI().toString());
             connectionMember.addProperty(WON.HAS_REMOTE_NEED, remoteNeed);
         }
+
+        Literal lastUpdate = DateTimeUtils.toLiteral(connection.getLastUpdate(), model);
+        if (lastUpdate != null) {
+            connectionMember.addProperty(DCTerms.modified, lastUpdate);
+        }
+
         connectionMember.addProperty(WON.HAS_FACET, model.createResource(connection.getTypeURI().toString()));
         return model;
     }
@@ -56,6 +62,10 @@ public class ConnectionModelMapper implements ModelMapper<Connection> {
         connection.setNeedURI(URI.create(connectionRes.getProperty(WON.BELONGS_TO_NEED).getResource().getURI()));
         connection.setRemoteNeedURI(URI.create(connectionRes.getProperty(WON.HAS_REMOTE_NEED).getResource().getURI()));
         connection.setTypeURI(URI.create(connectionRes.getProperty(WON.HAS_FACET).getResource().getURI()));
+
+        Date lastUpdate = DateTimeUtils.parse(connectionRes.getProperty(DCTerms.modified).getString(), model);
+        connection.setLastUpdate(lastUpdate);
+
         return connection;
     }
 }

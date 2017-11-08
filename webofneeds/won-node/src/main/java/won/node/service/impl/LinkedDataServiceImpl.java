@@ -45,9 +45,9 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.util.ConnectionModelMapper;
+import won.protocol.model.ConnectionModelMapper;
 import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.util.NeedModelMapper;
+import won.protocol.model.NeedModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
@@ -171,6 +171,24 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Slice<URI> slice = needInformationService.listNeedURIsAfter(need, preferedSize, needState);
     return toContainerPage(this.needResourceURIPrefix + "/", slice);
 
+  }
+
+  @Transactional
+  public Dataset listModifiedNeedURIsAfter(Date modifiedDate) {
+
+      Model model = ModelFactory.createDefaultModel();
+      setNsPrefixes(model);
+      Resource needListPageResource = null;
+      Collection<URI> uris = null;
+      uris = needInformationService.listModifiedNeedURIsAfter(modifiedDate);
+      needListPageResource = model.createResource(this.needResourceURIPrefix+"/");
+
+      for (URI needURI : uris) {
+          model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
+      }
+      Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
+      addBaseUriAndDefaultPrefixes(ret);
+      return ret;
   }
 
   @Transactional
@@ -371,6 +389,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
 
     return containerPage.getContent();
+  }
+
+  @Override
+  @Transactional
+  public Dataset listModifiedConnectionURIsAfter(Date modifiedAfter, boolean deep) throws NoSuchConnectionException {
+      List<URI> uris = new ArrayList<URI>(needInformationService.listModifiedConnectionURIsAfter(modifiedAfter));
+      NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
+              this.connectionResourceURIPrefix + "/", new SliceImpl<URI>(uris));
+      if (deep) {
+          addDeepConnectionData(containerPage.getContent(), uris);
+      }
+
+      return containerPage.getContent();
   }
 
   @Override
@@ -594,7 +625,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return containerPage;
   }
 
-  @Transactional
   private Dataset setDefaults(Dataset dataset) {
     if (dataset == null) return null;
     DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());

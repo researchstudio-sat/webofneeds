@@ -58,14 +58,19 @@ Only one of the paging parameter can be used per request.
 They are specific for each container. For events and connections container, the type parameter can be 
 specified (supported types: HINT_MESSAGE, HINT_FEEDBACK_MESSAGE, CONNECT, OPEN, CONNECTION_MESSAGE, 
 CLOSE). For needs container, the need state can be specified (Active/Inactive). For need connections container, the 
-timeof parameter can be specified, i.e. the time before which we should consider events activity can be specified (in
- format _yyyy-MM-dd'T'HH:mm:ss.SSS_)
+timeof parameter can be specified, i.e. the time before which we should consider events activity can be specified in ISO 8601 format (UTC): yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
 
   **member content parameter** defines if the content of the container member resources has to be returned:
   
     deep: e.g., deep=true in addition to members list returns a resource description for each member
     
 This parameter is supported only for connections container.
+
+**modification date parameter** specifies resources in relation to a certain modification date:
+  
+    modifiedafter: returns needs or connections that have been modified after a specified date using ISO 8601 format (UTC).
+    
+This parameter currently does **NOT** support paging and cannot be used with the other paging parameters together (except with "deep"). 
 
 ## Some example request URIs
 
@@ -191,5 +196,7 @@ This is intended because the GUI doesn't want to change the order of connections
 be very confusing. Instead, the user could see from some notifications that there are updates and can explicitly 
 choose to reload the connections view. In the latter case we end up at case (1) and the process can repeat with 
 different max-member-count values.
+
+**NOTE**: The query parameter "modifiedafter" makes the requests return modified needs or connections. However for now it doesnt support paging!
 
 
