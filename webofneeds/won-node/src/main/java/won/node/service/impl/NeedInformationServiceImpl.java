@@ -73,10 +73,14 @@ public class NeedInformationServiceImpl implements NeedInformationService
     }
     Slice<URI> slice = null;
     if (needState == null) {
-      slice = needRepository.getAllNeedURIs(new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "lastUpdate"));
+
+        // use 'creationDate' to keep a constant need order over requests
+      slice = needRepository.getAllNeedURIs(new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
     } else {
+
+        // use 'creationDate' to keep a constant need order over requests
       slice = needRepository.getAllNeedURIs(needState, new PageRequest(pageNum, pageSize, Sort.Direction.DESC,
-                                                                       "lastUpdate"));
+                                                                       "creationDate"));
     }
     return slice;
   }
@@ -92,14 +96,24 @@ public class NeedInformationServiceImpl implements NeedInformationService
     }
     Slice<URI> slice = null;
     if (needState == null) {
+
+        // use 'creationDate' to keep a constant need order over requests
       slice = needRepository.getNeedURIsBefore(referenceDate, new PageRequest(0, pageSize, Sort
-        .Direction.DESC, "lastUpdate"));
+        .Direction.DESC, "creationDate"));
     } else {
+
+        // use 'creationDate' to keep a constant need order over requests
       slice = needRepository.getNeedURIsBefore(referenceDate, needState, new PageRequest(0, pageSize, Sort
-        .Direction.DESC, "lastUpdate"));
+        .Direction.DESC, "creationDate"));
     }
     return slice;
   }
+
+    @Override
+    public Collection<URI> listModifiedNeedURIsAfter(Date modifiedAfter)
+    {
+        return needRepository.findModifiedNeedURIsAfter(modifiedAfter);
+    }
 
   @Override
   public Slice<URI> listNeedURIsAfter(URI needURI, Integer preferedPageSize, NeedState needState)
@@ -112,11 +126,15 @@ public class NeedInformationServiceImpl implements NeedInformationService
     }
     Slice<URI> slice = null;
     if (needState == null) {
+
+        // use 'creationDate' to keep a constant need order over requests
       slice = needRepository.getNeedURIsAfter(referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC,
-                                                                             "lastUpdate"));
+                                                                             "creationDate"));
     } else {
+
+        // use 'creationDate' to keep a constant need order over requests
       slice = needRepository.getNeedURIsAfter(referenceDate, needState, new PageRequest(0, pageSize, Sort.Direction.ASC,
-                                                                                        "lastUpdate"));
+                                                                                        "creationDate"));
     }
     return slice;
   }
@@ -129,6 +147,11 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  public Collection<URI> listModifiedConnectionURIsAfter(Date modifiedAfter) {
+      return connectionRepository.findModifiedConnectionURIsAfter(modifiedAfter);
+  }
+
+  @Override
   @Deprecated
   public Slice<URI> listConnectionURIs(int page, Integer preferedPageSize, Date timeSpot)
   {
@@ -136,12 +159,16 @@ public class NeedInformationServiceImpl implements NeedInformationService
     int pageNum = page - 1;
     Slice<URI> slice;
     if (timeSpot == null) {
-      slice = connectionRepository.getConnectionURIByLatestActivity(
-        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+      slice = connectionRepository.getConnectionURIByActivityDate(
+        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
     } else {
-      slice = connectionRepository.getConnectionURIByLatestActivity(
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+      slice = connectionRepository.getConnectionURIByActivityDate(
         timeSpot,
-        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
     }
     return slice;
   }
@@ -154,8 +181,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
     int pageSize = getPageSize(preferredPageSize);
     Slice<URI> slice = null;
-    slice = connectionRepository.getConnectionURIsBeforeByLatestActivity(
-      resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+
+      // use 'min(msg.creationDate)' to keep a constant connection order over requests
+    slice = connectionRepository.getConnectionURIsBeforeByActivityDate(
+      resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
     return slice;
   }
 
@@ -167,8 +196,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
     int pageSize = getPageSize(preferredPageSize);
     Slice<URI> slice = null;
-    slice = connectionRepository.getConnectionURIsAfterByLatestActivity(
-      resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "max(msg.creationDate)"));
+
+      // use 'min(msg.creationDate)' to keep a constant connection order over requests
+    slice = connectionRepository.getConnectionURIsAfterByActivityDate(
+      resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
     return slice;
   }
 
@@ -186,18 +217,20 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Slice<URI> slice = null;
     int pageSize = getPageSize(preferedPageSize);
     int pageNum = page - 1;
-    PageRequest pageRequest = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)");
+
+      // use 'min(msg.creationDate)' to keep a constant connection order over requests
+    PageRequest pageRequest = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)");
     if (messageType == null) {
       if (timeSpot == null) {
-        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, pageRequest);
+        slice = connectionRepository.getConnectionURIByActivityDate(needURI, pageRequest);
       } else {
-        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, timeSpot, pageRequest);
+        slice = connectionRepository.getConnectionURIByActivityDate(needURI, timeSpot, pageRequest);
       }
     } else {
       if (timeSpot == null) {
-        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, messageType, pageRequest);
+        slice = connectionRepository.getConnectionURIByActivityDate(needURI, messageType, pageRequest);
       } else {
-        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, messageType, timeSpot, pageRequest);
+        slice = connectionRepository.getConnectionURIByActivityDate(needURI, messageType, timeSpot, pageRequest);
       }
     }
     return slice;
@@ -213,13 +246,17 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Slice<URI> slice = null;
     if (messageType == null) {
       resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
-      slice = connectionRepository.getConnectionURIsBeforeByLatestActivity(
-        needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+      slice = connectionRepository.getConnectionURIsBeforeByActivityDate(
+        needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
     } else {
       resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
-      slice = connectionRepository.getConnectionURIsBeforeByLatestActivity(
+      
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+      slice = connectionRepository.getConnectionURIsBeforeByActivityDate(
         needURI, resume, messageType, timeSpot, new PageRequest(
-          0, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+          0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
     }
     return slice;
   }
@@ -234,13 +271,17 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Slice<URI> slice = null;
     if (messageType == null) {
       resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
-      slice = connectionRepository.getConnectionURIsAfterByLatestActivity(
-        needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "max(msg.creationDate)"));
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+      slice = connectionRepository.getConnectionURIsAfterByActivityDate(
+        needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
     } else {
       resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
-      slice = connectionRepository.getConnectionURIsAfterByLatestActivity(
+
+        // use 'min(msg.creationDate)' to keep a constant connection order over requests
+      slice = connectionRepository.getConnectionURIsAfterByActivityDate(
         needURI, resume, messageType, timeSpot, new PageRequest(
-          0, pageSize, Sort.Direction.ASC, "max(msg.creationDate)"));
+          0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
     }
     return slice;
   }

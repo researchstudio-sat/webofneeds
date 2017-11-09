@@ -98,6 +98,7 @@ const actionHierarchy = {
         connect: cnct.connectionsConnect,
         connectAdHoc: cnct.connectionsConnectAdHoc,
         close: cnct.connectionsClose,
+        closeRemote: cnct.connectionsCloseRemote,
         rate: cnct.connectionsRate,
         sendChatMessage: cnct.connectionsChatMessage,
         showLatestMessages: cnct.showLatestMessages,

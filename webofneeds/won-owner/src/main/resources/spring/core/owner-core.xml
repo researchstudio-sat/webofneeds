@@ -23,8 +23,8 @@
     </bean>
 
     <!-- Model Mapper for RDF -->
-    <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"/>
-    <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"/>
+    <bean id="needModelMapper" class="won.protocol.model.NeedModelMapper"/>
+    <bean id="connectionModelMapper" class="won.protocol.model.ConnectionModelMapper"/>
 
     <bean id="executor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
 

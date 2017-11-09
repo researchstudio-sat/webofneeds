@@ -276,6 +276,25 @@ export function connectionsClose(connectionUri) {
     }
 }
 
+export function connectionsCloseRemote(message){
+    //Closes the 'remoteConnection' again, if closeConnections(...) only closes the 'own' connection
+    return (dispatch, getState) => {
+        const connectionUri = message.getSender();
+        const remoteNeedUri = message.getSenderNeed();
+        const remoteNode = message.getSenderNode();
+        const ownNeedUri = message.getReceiverNeed();
+        const ownNode = message.getReceiverNode();
+
+        buildCloseMessage(connectionUri, remoteNeedUri, ownNeedUri, ownNode, remoteNode, null)
+            .then(closeMessage => {
+                dispatch(actionCreators.messages__send({
+                    eventUri: closeMessage.eventUri,
+                    message: closeMessage.message
+                }));
+            });
+    }
+}
+
 export function connectionsRate(connectionUri,rating) {
     return (dispatch, getState) => {
         console.log(connectionUri);
