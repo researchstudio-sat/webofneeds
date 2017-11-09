@@ -1,4 +1,4 @@
-# Knowing when to execute an operation
+# Invocation
 
 This document describes how a bot (or user) executes an operation it offers (for example, invoking a Web Service)
  
