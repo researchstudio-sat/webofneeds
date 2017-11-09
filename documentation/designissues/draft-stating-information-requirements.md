@@ -46,9 +46,13 @@ This way, both sides can evaluate each other's information requirements and gene
     1. Such messages would have to contain triples in their content graphs that our shapes are expecting.
         1. simplest solution is to add an imput field for raw RDF data in the owner app.
     1. Alternatively, the counterpart could send messages that tell us to ignore certain graphs that have been sent earlier, because they contained wrong data, or data that is no longer true (such as the current location). The semantics would be 'Graph XY (the one to ignore) is false'.
-        1. In order to do this, the owner app would have to allow creating such messages somehow, e.g. by displaying an 'ignore/don't ignore' toggle button next to each message.
+        1. We have defined how messages can later be retracted in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf) - we just need to implement that and give it a good GUI
     1. How could the bot could encourage such messages?
-        1. Variant A: Question - Suggestion - Question loop
+        1. Variant A: Keep it simple - show results - wait for triples
+            1. validate the current data with the shapes
+            1. send the validation result to the counterpart
+            1. wait for triples that improve the result or messages that invalidate certain graphs (and thereby improve the result).
+        1. Variant B: Question - Suggestion - Question loop (technically more complicated)
             1. validate the current data with the shapes
             1. create plaintext questions based on the validation result
             1. ask the counterpart those questions
@@ -57,7 +61,4 @@ This way, both sides can evaluate each other's information requirements and gene
             1. The bot sends a message to the counterpart that contains the new triples in its content graph. The semantics of the message is a 'suggestion': The bot asks the counterpart to accept these triples as true. The triples are displayed to the counterpart user and she can accept/deny the triples (as a toggle button next to the displayed triples)
             1. In cases of missing triples where default values are present in the SHACL, the bot can suggest the triples using the default values, without even asking a question.
             1. If the user accepts the triples as correct, the counterpart sends a message with the semantics 'Graph XY (the one the bot sent) is true'
-        1. Variant B: Keep it simple - show results - wait for triples
-            1. validate the current data with the shapes
-            1. send the validation result to the counterpart
-            1. wait for triples that improve the result or messages that invalidate certain graphs (and thereby improve the result).
+        
