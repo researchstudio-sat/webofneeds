@@ -129,17 +129,23 @@ public class CrawlSparqlService extends SparqlService {
     public Set<CrawlUriMessage> retrieveMessagesForCrawling(CrawlUriMessage.STATUS status) {
 
         Set<CrawlUriMessage> msgs = new LinkedHashSet<>();
-        String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "SELECT ?uri ?base ?wonNode (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE { GRAPH won:crawlMetadata {\n" +
-                " ?uri ?p '" + status + "'.\n" +
+
+        String queryString = "SELECT ?uri ?base ?wonNode (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags)" +
+                " WHERE { GRAPH won:crawlMetadata {\n" +
+                " ?uri ?p ?status.\n" +
                 " ?uri won:crawlBaseUri ?base.\n" +
                 " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n" +
                 " OPTIONAL { ?uri won:resourceETagValue ?etag }}}\n" +
                 " GROUP BY ?uri ?base ?wonNode\n";
+
+        ParameterizedSparqlString pps = new ParameterizedSparqlString();
+        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setCommandText(queryString);
+        pps.setLiteral("status", status.toString());
+
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", queryString);
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+        log.debug("Execute query: {}", pps.toString());
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
         ResultSet results = qexec.execSelect();
 
         while (results.hasNext()) {
@@ -220,16 +226,20 @@ public class CrawlSparqlService extends SparqlService {
         // select URIs specified by property paths that have not already been crawled
         Set<CrawlUriMessage> newCrawlMessages = new HashSet<CrawlUriMessage>();
         long crawlDate = System.currentTimeMillis();
-        String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE {\n" +
-                " <" + baseUri + "> " + propertyPath + " ?uri.\n" +
+
+        String queryString = "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE {\n" +
+                " ?baseUri " + propertyPath + " ?uri.\n" +  // propertyPath has to be appended manually because it contains ">" character and ParameterizedSparqlString cause of injection risk
                 " OPTIONAL {?uri won:resourceETagValue ?etag. }}\n" +
                 " GROUP BY ?uri\n";
 
+        ParameterizedSparqlString pps = new ParameterizedSparqlString();
+        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setCommandText(queryString);
+        pps.setIri("baseUri", baseUri);
+
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", queryString);
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+        log.debug("Execute query: {}", pps.toString());
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
         ResultSet results = qexec.execSelect();
 
         while (results.hasNext()) {
@@ -264,15 +274,19 @@ public class CrawlSparqlService extends SparqlService {
      */
     public String retrieveLastNeedModificationDate(String wonNodeUri) {
 
-        String query = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "prefix dcterms: <http://purl.org/dc/terms/>\n" +
-                "SELECT ?modificationDate WHERE {\n" +
+        String queryString = "SELECT ?modificationDate WHERE {\n" +
                 " ?needUri a won:Need.\n" +
-                " ?needUri won:hasWonNode <" + wonNodeUri + ">. \n" +
+                " ?needUri won:hasWonNode ?wonNodeUri. \n" +
                 " ?needUri dcterms:modified ?modificationDate. \n" +
                 "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+        ParameterizedSparqlString pps = new ParameterizedSparqlString();
+        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
+        pps.setCommandText(queryString);
+        pps.setIri("wonNodeUri", wonNodeUri);
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
         ResultSet results = qexec.execSelect();
         String modificationDate = null;
         if (results.hasNext()) {
@@ -290,15 +304,19 @@ public class CrawlSparqlService extends SparqlService {
      */
     public String retrieveLastConnectionModificationDate(String wonNodeUri) {
 
-        String query = "prefix won: <http://purl.org/webofneeds/model#>\n" +
-                "prefix dcterms: <http://purl.org/dc/terms/>\n" +
-                "SELECT ?modificationDate WHERE {\n" +
+        String queryString = "SELECT ?modificationDate WHERE {\n" +
                 " ?connectionUri a won:Connection.\n" +
-                " ?connectionUri won:hasWonNode <" + wonNodeUri + ">. \n" +
+                " ?connectionUri won:hasWonNode ?wonNodeUri. \n" +
                 " ?connectionUri dcterms:modified ?modificationDate. \n" +
                 "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+        ParameterizedSparqlString pps = new ParameterizedSparqlString();
+        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
+        pps.setCommandText(queryString);
+        pps.setIri("wonNodeUri", wonNodeUri);
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
         ResultSet results = qexec.execSelect();
         String modificationDate = null;
         if (results.hasNext()) {
@@ -315,24 +333,30 @@ public class CrawlSparqlService extends SparqlService {
         // query template to retrieve all alctive cralwed/saved needs in a certain date range
         String orderClause = sortAscending ? "ORDER BY ?date\n" : "ORDER BY DESC(?date)\n";
         log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
-        String queryTemplate = "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" +
+
+
+        String queryTemplate = "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" +
                 "  ?needUri a won:Need. \n" +
                 "  ?needUri won:crawlDate ?date.  \n" +
                 "  ?needUri won:isInState won:Active. \n" +
                 "  ?needUri won:hasWonNode ?wonNodeUri. \n" +
                 "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n" +
-                "  FILTER (?date >= %d && ?date < %d ) \n" +
+                "  FILTER (?date >= ?fromDate && ?date < ?toDate ) \n" +
                 "} " + orderClause +
-                " OFFSET %d\n" +
-                " LIMIT %d";
+                " OFFSET ?offset\n" +
+                " LIMIT ?limit";
 
-        String queryString = String.format(queryTemplate, fromDate, toDate, offset, limit);
+        ParameterizedSparqlString pps = new ParameterizedSparqlString();
+        pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        pps.setCommandText(queryTemplate);
+        pps.setLiteral("fromDate", fromDate);
+        pps.setLiteral("toDate", toDate);
+        pps.setLiteral("offset", offset);
+        pps.setLiteral("limit", limit);
 
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-        log.debug("Execute query: {}", queryString);
-        Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+        log.debug("Execute query: {}", pps.toString());
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
         ResultSet results = qexec.execSelect();
 
         // load all the needs into one bulk need event
