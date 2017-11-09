@@ -30,7 +30,6 @@ In this case, the shape is embedded in the content of a message.
 1. To specify information required from the counterpart so as to be able to perform an action. This could also be called service specification. This is the case if
     1. The shape is attached to a `[needuri]/won:performs` node that describes an operation the need is able to provide
     1. In this case, the shape's `sh:Severity` is used to convey mandatory (`sh:Violation`) or optional (`sh:Warning`) parameters
-    1. The shape is attached to a `[needuri]/won:performs` node that describes an operation the need is able to provide
 1. To specify properties of interest after matching. This is the case if  
     1. The shape is embedded in the content of a message via ´[needuri]/won:seeks´ 
     1. The `sh:severity` is to be interpreted as an indication of urgency/importance or precedence if multiple shapes are present
