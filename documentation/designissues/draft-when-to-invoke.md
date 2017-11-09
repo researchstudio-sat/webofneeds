@@ -1,18 +1,24 @@
-# Knowing when to invoke a Web Service
+# Knowing when to execute an operation
 
-This document describes a possible approach used by a bridging bot to determine when to invoke a Web Service.
+This document describes how a bot (or user) executes an operation it offers (for example, invoking a Web Service)
  
 ## Assumptions
-1. The bot can how to connect to a suitable counterpart need.
+1. The bot knows how to connect to a suitable counterpart need.
+1. The bot's need specifies an operation, connected to the need via `[need]/won:performs`.
 1. The bot has stated [Information Requirements](draft-stating-information-requirements.md) and obtained the required information.
 1. The bot has [populated the parameters](draft-parameters-for-Web-Services.md) for invoking the Web Service method
  
-## Getting the counterpart to trigger the invocation
- 
-### In-band communication
-The simple solution for triggering the invocation (essentially, performing a 'commit' on a transaction between the two needs) is using special messages. The bot can announce 'ready to commit', the counterpart sends a 'commit', and if the latter does not happen, the bot sends an 'abort' after some timeout.
+## Invocation, part 1: Proposal
+In that state, the bot creates a *proposal* (see our [DeSemWeb2017 paper](http://ceur-ws.org/Vol-1934/contribution-07.pdf)), covering
+* The messages containing the parameters
+* A message describing the operation
+    * stating the operation ([need] `won:executes` [operation])
+    * attaching parameters to the operation using property paths (one for each parameter)
+* A message referencing all messages containing relevant data (parameters and execution) using `agr:proposes`
 
-### Out-of-band communication
-Another option is to create a second connection between the two needs (the bot's and the counterpart's), that has a different 'Facet' - e.g, the BAPCParticipant/BAPCCoordinator facets. Thus, the transaction can be part of a bigger, distributed transaction between more parties, and the coordinator's WoN node can coordinate the distributed transaction (or rather, the business activity).
-In that case, during the setup of the business activity, the last message exchanged in the other connection should be referenced such that it is clear for both sides which state of the conversation the participants are trying to agree to.
- 
+## Invocation, part 2: Accepting
+When receiving a proposal the counterpart can send a message referencing the proposing message using `agr:accepts`.
+
+## Return value
+Some operations may produce a return value, but most will at least require some sort of confirmation that the operation was at least attempted.
+In order to represent such a confirmation, the callee can send messages indicating status (for longer operations, status updates may be helpful, in others, only one message indicates the operation was executed or attempted (in the case of no return value).
