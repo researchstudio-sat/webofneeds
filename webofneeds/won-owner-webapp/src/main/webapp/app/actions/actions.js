@@ -355,12 +355,15 @@ export function needsClose(needUri) {
                 message: data.message
             }));
 
+            //Close all the open connections of the need
             const affectedConnections = getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri"));
-
             for (con in affectedConnections.toJS()) {
                 console.log("Connection: " + con);
-                dispatch(actionCreators.connections__close(con),
-                )
+                var conState = getState().getIn(['needs', needUri, 'connections', con, 'state'])
+                if(conState == won.WON.Active) {
+                    dispatch(actionCreators.connections__close(con),
+                    )
+                }
             }
         })
         .then(() =>
