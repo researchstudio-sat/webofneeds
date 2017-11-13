@@ -80,6 +80,9 @@ export default function(allToasts = initialState, action = {}) {
         case actionTypes.messages.closeNeed.failed:
             return pushNewToast(allToasts, "Failed to close posting", won.WON.errorToast);
 
+        case actionTypes.messages.reopenNeed.failed:
+            return pushNewToast(allToasts, "Failed to reopen posting", won.WON.errorToast);
+
         case actionTypes.messages.chatMessage.failure:
             return pushNewToast(allToasts, "Failed to send chat message", won.WON.errorToast);
 
