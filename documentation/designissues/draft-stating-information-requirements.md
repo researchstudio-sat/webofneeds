@@ -60,9 +60,9 @@ This way, both sides can evaluate each other's information requirements and gene
 Needs can declare actions that they can execute and also define call for action to execute an action that counterpart needs declare. 
 
 
-### Action Declaration
+### Declare Actions
 
-To declare an action a need uses the `won:action` property appended to the `won:is` branch. Each action has a `rdf:type` property with object `won:actionDeclaration` as well as a property `won:actionInputShapesGraph` which references a SHACL graph that defines the input to this action. 
+To declare an action a need uses the `won:hasActionDeclaration` property appended to the `won:is` branch. Each action declaration has a property `won:hasActionInputShapesGraph` which references a SHACL graph that defines the input to this action. 
 
 The following example defines a need that offers "Taxi in Vienna" with an action declaration:
 
@@ -82,14 +82,13 @@ The following example defines a need that offers "Taxi in Vienna" with an action
       s:name        "Vienna, Austria"
     ]
         
-    won:action [
-      rdf:type won:actionDeclaration
-      won:actionInputShapesGraph :pickup-shapes-graph 
+    won:hasActionDeclaration [
+      won:hasActionInputShapesGraph :pickup-shapes-graph 
     ]
   ];
 ````
 
-The action declaration refers to an `won:actionInputShapesGraph` to define the input parameters needed to call a taxi. The input shapes graph `:pickup-shapes-graph` could look like the following and defines that there has to be exactly one `won:hasLocation` property present is the `won:is` branch of the need which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
+The input shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiActionRequest` that has  exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
 
 ````
 :pickup-shapes-graph {
@@ -97,10 +96,10 @@ The action declaration refers to an `won:actionInputShapesGraph` to define the i
     a sh:NodeShape ;
     sh:label "Required pickup information" ;
     sh:message "The required pickup information could not be found" ;
-    sh:targetClass won:Need ; 
+    sh:targetClass txi:callTaxiActionRequest ; 
     sh:severity sh:Violation ;
     sh:property [
-      sh:path ( won:is won:hasLocation ) ;
+      sh:path ( txi:hasPickUpLocation ) ;
       sh:maxCount 1 ;
       sh:minCount 1 ;
       sh:or (
@@ -112,14 +111,36 @@ The action declaration refers to an `won:actionInputShapesGraph` to define the i
 ````
 
     
-### Call for Action
-Needs can also look out for action declarations of other needs that they can execute for them. We refer to this as call for action. It is defined by appending a `won:action` property to a `won:seeks` branch. The action has also a `rdf:type` property but with a concrete action class (e.g. `txi:callTaxiAction`). The input data for the target action is specified by the property `won:actionInputDataGraph` and is used to validate the corresponding `won:actionInputShapesGraph` of an action declaration of another need. 
+### Request Actions
 
+Needs can also request actions of other needs to perform. An action request is defined by appending a `won:hasActionRequest` property to a `won:seeks` branch. The action request has also a `rdf:type` property but with a concrete action request class (e.g. `txi:callTaxiActionRequest`). 
+
+The input data for the target action is specified by the property `won:actionInputDataGraph` 
+
+and is used to validate the corresponding `won:actionInputShapesGraph` (by providing `txi:hasPickUpLocation` with an address that should be a valid `:addressShape`) of an action declaration of the taxi offer need from above:
 ````
-<call for action example>
+{
+<taxiDemandUri>
+  a won:Need;
+  won:seeks [
+    dc:title "Looking for a taxi in Vienna" ;
+    won:hasLocation [
+      a  s:Place ;
+      s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+    ]
+    
+    won:hasActionRequest [
+      rdf:type txi:callTaxiAction ;
+      txi:hasPickUpLocation [
+        a  s:Place ;
+        s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+      ]
+    ]
+  ] ; 
+}
 ````    
     
-### Execution
+### Execute Actions
 
 Actions can be executed when two needs have established a connection. Either of the two needs can propose to execute an action (either its own or one at the counterpart) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). An execution of an action is proposed by sending a graph to the conversation that has the following structure:
     
@@ -130,7 +151,7 @@ Actions can be executed when two needs have established a connection. Either of 
 }
 ````
     
-The `won:actionInputDataGraph` is meant to satisfy the SHACL constraints defined by `won:actionInputShapesGraph`. The input data graph can either be created newly for the action execution (e.g. by showing the user a form to enter some values) or reference a graph that is already available in the (non-executing) need as defined by call for action. 
+The `won:actionInputDataGraph` is meant to satisfy the SHACL constraints defined by `won:actionInputShapesGraph`. The input data graph can either be created newly for the action execution (e.g. by showing the user a form to enter some values) or reference a graph that is already available in the (non-executing) need as defined by "Request Actions". 
 
 If the executing need proposes an action it has to make sure that the SHACL constraints defined by `won:actionInputShapesGraph` are satisfied by the referenced graph of `won:actionInputDataGraph`. In other words the executing need should not propose something for execution that fail validation of the constraints. The other, non-executing, need can also propose the execution of an action (of the counterpart) and should also only propose `won:actionInputDataGraph` graphs which are well-formed regarding the SHACL constraints defined in `won:actionInputShapesGraph`. However, since the non-executing need is not responsible for the execution, the need which declares the action has to check the SHACL constraints before it accepts the proposal.
 
