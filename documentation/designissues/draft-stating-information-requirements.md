@@ -55,6 +55,45 @@ For validating the counterpart's information requirements:
 
 This way, both sides can evaluate each other's information requirements and generate a GUI (e.g. a form, a map, or a calendar) for the user to enter the data.
 
+## Actions
+
+Needs can declare actions that they can execute and also define call for action to execute an action that counterpart needs declare. 
+
+
+### Action Declaration
+
+To declare an action a need uses the `won:action` property appended to the `won:is` branch. Each action has a `rdf:type` property with object `won:actionDeclaration` as well as a property `won:actionInputShapesGraph` which references a SHACL graph that defines the input to this action. 
+
+````
+<declare action example>
+````
+    
+### Call for Action
+Needs can also look out for action declarations of other needs that they can execute for them. We refer to this as call for action. It is defined by appending a `won:action` property to a `won:seeks` branch. The action has also a `rdf:type` property but with a concrete action class (e.g. `txi:callTaxiAction`). The input data for the target action is specified by the property `won:actionInputDataGraph` and is used to validate the corresponding `won:actionInputShapesGraph` of an action declaration of another need. 
+
+````
+<call for action example>
+````    
+    
+### Execution
+
+Actions can be executed when two needs have established a connection. Either of the two needs can propose to execute an action (either its own or one at the counterpart) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). An execution of an action is proposed by sending a graph to the conversation that has the following structure:
+    
+````
+<msgURI> agr:propose {
+<NeedURI> won:execute <actionURI> 
+<actionUrRI> won:actionInputDataGraph [graph which statisfies the corresponding SHACL constraint]
+}
+````
+    
+The `won:actionInputDataGraph` is meant to satisfy the SHACL constraints defined by `won:actionInputShapesGraph`. The input data graph can either be created newly for the action execution (e.g. by showing the user a form to enter some values) or reference a graph that is already available in the (non-executing) need as defined by call for action. 
+
+If the executing need proposes an action it has to make sure that the SHACL constraints defined by `won:actionInputShapesGraph` are satisfied by the referenced graph of `won:actionInputDataGraph`. In other words the executing need should not propose something for execution that fail validation of the constraints. The other, non-executing, need can also propose the execution of an action (of the counterpart) and should also only propose `won:actionInputDataGraph` graphs which are well-formed regarding the SHACL constraints defined in `won:actionInputShapesGraph`. However, since the non-executing need is not responsible for the execution, the need which declares the action has to check the SHACL constraints before it accepts the proposal.
+
+After an action has been proposed and the SHACL validation is satisfied, it can be accepted (using `agr:accepts` property of the agreement protocol) by the other side to execute it. Now the execution starts (e.g. calling a backend API to call a taxi). Each side can use `agr:proposeToCancel` to try to cancel the action. However this does only cancel the action if the other side accepts this cancel request (e.g. if the taxi backend call hasn’t been made yet or can be rolled back).
+    
+    
+
 ## Changes required in current system; design issues
 
 1. Importing needs must be changed to allow for importing datasets (otherwise, we are not able to specify shapes graphs). This would also be required to specify multiple datasets with different access control settings, so this change might be useful for the future.
