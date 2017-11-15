@@ -64,9 +64,53 @@ Needs can declare actions that they can execute and also define call for action 
 
 To declare an action a need uses the `won:action` property appended to the `won:is` branch. Each action has a `rdf:type` property with object `won:actionDeclaration` as well as a property `won:actionInputShapesGraph` which references a SHACL graph that defines the input to this action. 
 
+The following example defines a need that offers "Taxi in Vienna" with an action declaration:
+
 ````
-<declare action example>
+<taxiOfferUri>
+  a won:Need;
+  won:is [
+    dc:title "Taxi in Vienna";
+    dc:description "Offering taxi services in Vienna and around";
+    won:hasLocation  [
+      a  s:Place ;
+      s:geo [
+        a s:GeoCoordinates ;
+        s:latitude   "48.209269" ;
+        s:longitude  "16.370831"
+      ] ;
+      s:name        "Vienna, Austria"
+    ]
+        
+    won:action [
+      rdf:type won:actionDeclaration
+      won:actionInputShapesGraph :pickup-shapes-graph 
+    ]
+  ];
 ````
+
+The action declaration refers to an `won:actionInputShapesGraph` to define the input parameters needed to call a taxi. The input shapes graph `:pickup-shapes-graph` could look like the following and defines that there has to be exactly one `won:hasLocation` property present is the `won:is` branch of the need which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
+
+````
+:pickup-shapes-graph {
+  :pickup-shape
+    a sh:NodeShape ;
+    sh:label "Required pickup information" ;
+    sh:message "The required pickup information could not be found" ;
+    sh:targetClass won:Need ; 
+    sh:severity sh:Violation ;
+    sh:property [
+      sh:path ( won:is won:hasLocation ) ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:or (
+        [ sh:node :locationShape ] # details of :locationShape not shown here
+        [ sh:node :addressShape ]  # details of :addressShape not shown here
+      )
+    ] .
+  }
+````
+
     
 ### Call for Action
 Needs can also look out for action declarations of other needs that they can execute for them. We refer to this as call for action. It is defined by appending a `won:action` property to a `won:seeks` branch. The action has also a `rdf:type` property but with a concrete action class (e.g. `txi:callTaxiAction`). The input data for the target action is specified by the property `won:actionInputDataGraph` and is used to validate the corresponding `won:actionInputShapesGraph` of an action declaration of another need. 
