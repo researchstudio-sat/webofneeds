@@ -30,6 +30,7 @@ HTTP GET method is supported for all WoN data via the following resources:
     Example: https://localhost:8443/won/resource/event/hbaz7dxrlq2lmol2yzlt
     
   **event container of a need** holds all events that pertain to a need (and not one of its connections) - these events are CREATE, ACTIVATE, DEACTIVATE, and their respective responses from the node.
+  
     Example: https://localhost:8443/won/page/need/8929366644928455000#events 
     
   **event container of a connection** represents all communication events that are part of a particular connection
