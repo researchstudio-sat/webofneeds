@@ -55,7 +55,9 @@ For validating the counterpart's information requirements:
 
 This way, both sides can evaluate each other's information requirements and generate a GUI (e.g. a form, a map, or a calendar) for the user to enter the data.
 
-## Actions
+## Actions 
+
+*NOTE:* this section is going to be re-worked, we are probably not going to use actions as described here.
 
 Needs can declare actions that they can execute and also define call for action to execute an action that counterpart needs declare. 
 
