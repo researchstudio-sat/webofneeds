@@ -5,6 +5,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
@@ -13,6 +14,7 @@ import won.cryptography.utils.TestingKeys;
  * User: ypanchenko
  * Date: 14.07.2014
  */
+@Ignore
 public class WonVerifierTest
 {
 

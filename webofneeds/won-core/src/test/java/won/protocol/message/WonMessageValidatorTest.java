@@ -10,6 +10,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -104,6 +105,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testValidCreateMessage() throws IOException {
     WonMessageValidator validator = new WonMessageValidator();
     StringBuilder message = new StringBuilder();
@@ -112,6 +114,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testValidResponseLocalMessage() throws IOException {
     WonMessageValidator validator = new WonMessageValidator();
     StringBuilder message = new StringBuilder();
@@ -120,6 +123,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testValidTextRemoteMessage() throws IOException {
     WonMessageValidator validator = new WonMessageValidator();
     StringBuilder message = new StringBuilder();
@@ -148,6 +152,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testMissingAndInvalidMessageDirection() throws IOException {
 
     // create invalid dataset by removing a triple with message direction
@@ -181,6 +186,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testMissingAndInvalidMessageType() throws IOException {
 
     // create invalid dataset by removing a triple with message type
@@ -212,6 +218,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testMissingTimestamp() throws IOException {
 
     // create invalid dataset by removing a triple with received timestamp
@@ -239,6 +246,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testInvalidEnvelopeChain() throws IOException {
 
     // test 1
@@ -296,6 +304,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testInvalidContentChain() throws IOException {
 
     Dataset invalidDataset = WonRdfUtils.MessageUtils.copyByDatasetSerialization(new WonMessage(createMessageDataset)
@@ -374,6 +383,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testMetaAndSignerConsistencyFromOwner() throws IOException {
 
 
@@ -436,6 +446,7 @@ public class WonMessageValidatorTest
 
 
   @Test
+  @Ignore
   public void testMetaAndSignerConsistencyFromExternal() throws IOException {
 
 
@@ -497,6 +508,7 @@ public class WonMessageValidatorTest
 
 
   @Test
+  @Ignore
   public void testSignatureRequiredProperties() throws IOException {
 
 
@@ -547,6 +559,7 @@ public class WonMessageValidatorTest
 
 
   @Test
+  @Ignore
   public void testSignatureReferenceValues() throws IOException {
 
 
@@ -614,6 +627,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testSignatureChainParallelToEnvelopeChain() throws IOException {
 
 
@@ -741,6 +755,7 @@ public class WonMessageValidatorTest
   }
 
   @Test
+  @Ignore
   public void testEventConsistency() throws IOException {
 
 

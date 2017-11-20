@@ -3,6 +3,7 @@ package won.cryptography.rdfsign;
 import org.apache.jena.query.Dataset;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
@@ -15,6 +16,7 @@ import java.util.List;
  * User: ypanchenko
  * Date: 14.07.2014
  */
+@Ignore
 public class WonSignerTest
 {
 
