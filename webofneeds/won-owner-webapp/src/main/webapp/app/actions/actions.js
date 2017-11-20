@@ -356,13 +356,11 @@ export function needsClose(needUri) {
             }));
 
             //Close all the open connections of the need
-            const affectedConnections = getState().getIn(['needs', needUri, 'connections']).map(conn => conn && conn.get("uri"));
-            for (con in affectedConnections.toJSON()) {
-                if( getState().getIn(['needs', needUri, 'connections', con, 'state']) === won.WON.Connected) {
-                    dispatch(actionCreators.connections__close(con),
-                    )
+            getState().getIn(['needs', needUri, 'connections']).map(function(con) {
+                if( getState().getIn(['needs', needUri, 'connections', con.get("uri"), 'state']) === won.WON.Connected) {
+                    dispatch(actionCreators.connections__close(con.get("uri")))
                 }
-            }
+            });
         })
         .then(() =>
             // assume close went through successfully, update GUI
