@@ -4,6 +4,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.message.Utils;
 import won.protocol.model.NeedContentPropertyType;
@@ -22,6 +23,7 @@ public class NeedModelWarpperTest {
     private final String NEED_URI = "https://node.matchat.org/won/resource/need/3030440624813201400";
 
     @Test
+    @Ignore
     public void loadModels() throws IOException {
 
         // load dataset and if the need and sysinfo models are there

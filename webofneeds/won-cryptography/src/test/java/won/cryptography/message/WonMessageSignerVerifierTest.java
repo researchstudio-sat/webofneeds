@@ -5,6 +5,7 @@ import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.service.KeyStoreService;
@@ -25,6 +26,7 @@ import java.util.Map;
  * User: ypanchenko
  * Date: 09.04.2015
  */
+@Ignore
 public class WonMessageSignerVerifierTest
 {
 
@@ -91,6 +93,7 @@ public class WonMessageSignerVerifierTest
   }
 
   @Test
+  @Ignore
   public void signAndVerifyUnsignedMessage() throws Exception {
 
     // create signed dataset
