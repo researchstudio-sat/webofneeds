@@ -358,6 +358,13 @@ export function needsClose(needUri) {
                 eventUri: data.eventUri,
                 message: data.message
             }));
+
+            //Close all the open connections of the need
+            getState().getIn(['needs', needUri, 'connections']).map(function(con) {
+                if( getState().getIn(['needs', needUri, 'connections', con.get("uri"), 'state']) === won.WON.Connected) {
+                    dispatch(actionCreators.connections__close(con.get("uri")))
+                }
+            });
         })
         .then(() =>
             // assume close went through successfully, update GUI
