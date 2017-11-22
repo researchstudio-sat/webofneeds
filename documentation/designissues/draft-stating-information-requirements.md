@@ -100,7 +100,7 @@ GRAPH :sysinfo {
 GRAPH :service-pickup-data-graph {
   <rideUri> 
   a txi:callTaxiAction ;
-  txi:hasPickupTime "2017-11-22T09:30:10Z"^^xsd:dateTime    # now + 10 min 
+  txi:hasPickupTime "2017-11-22T09:30:00Z"^^xsd:dateTime    # now + 10 min 
 }
 
 GRAPH :service-pickup-shapes-graph {
@@ -129,8 +129,11 @@ GRAPH :service-pickup-shapes-graph {
 }
 ````
 
+If this taxi service need is matched with a potential customer need with compatible goals they could start a collaboration.
 The taxi service cannot fulfill its goal just for itself by proposing its `:service-pickup-data-graph` to a customer since its shape graph `:service-pickup-shapes-graph` requires a pick up location property of type `txi:hasPickUpLocation`. This location has to be provided by a customer to satisfy the taxi services shapes graphs. 
-If this taxi service need is matched with a potential customer need with compatible goals they could start a collaboration. A customer need could look like the following:
+
+A customer need that could have been matched to the above service could look like the following. The need is again described in a `:sysinfo` graph but with a `won:seeks` top level branch to match the service need. 
+
 
 ````
 GRAPH :sysinfo {
@@ -153,7 +156,7 @@ GRAPH :sysinfo {
 GRAPH :customer-pickup-data-graph {
   <rideUri> 
   a txi:callTaxiAction ;
-  txi:hasPickupTime "2017-11-23T09:30:10Z"^^xsd:dateTime ;    # same time next day
+  txi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime ;    # same time next day
   txi:hasPickUpLocation [
     a  s:Place ;
     s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
@@ -161,8 +164,41 @@ GRAPH :customer-pickup-data-graph {
 }
 
 GRAPH :customer-pickup-shapes-graph {
-
+  :pickup-shape
+  a sh:NodeShape ;
+  sh:label "Required pickup information" ;
+  sh:message "The required pickup information could not be found" ;
+  sh:targetClass txi:callTaxiAction ; 
+  sh:severity sh:Violation ;
+  sh:closed true ;
+  sh:property [
+    sh:path ( txi:hasPickUpLocation ) ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:node :addressShape
+  ] ;
+  sh:property [
+    sh:path ( txi:hasPickUpDateTime ) ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:minInclusive "2017-11-23T09:25:00Z"^^xsd:dateTime ;   
+    sh:maxInclusive "2017-11-23T09:35:00Z"^^xsd:dateTime ;   
+  ] .
+  
+  :addressShape
+  a sh:NodeShape ;
+  sh:targetClass s:Place ; 
+  sh:closed true ;
+  sh:property [
+    sh:path ( s:name ) ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:hasValue "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+  ] .
 }
+
+
 ````    
     
 ### Execute Actions
