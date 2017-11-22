@@ -59,7 +59,7 @@ This way, both sides can evaluate each other's information requirements and gene
 
 Needs can declare goals that they want to achieve in collaboration with a counterpart need. For example, one need offers a taxi ride and the other needs is looking for a ride. This situation may be described as two complementary goals by the two needs which can result in a collaboration to fulfill actually a common goal of both - perform the ride togehter as driver and client. 
 
-As described before needs are matched based on the data in their `won:is` and `won:seeks` branches. A third type of top level branch therefore is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Needs try to fulfill their goals in a conversation with a counterpart need after the matching happened and a connection is opened. Needs would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL graph of its own goal(s) and where they can fulfill the SHACL graph on the counterpart with their own data graph in reverse. To fullfill two goals on both both sides one need would propose a data graph that satisfies both SHACL constraints. This data graph would usually be a combination of data graphs of goals of both sides.  
+As described before needs are matched based on the data in their `won:is` and `won:seeks` branches. A third type of top level branch therefore is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Needs try to fulfill their goals in a conversation with a counterpart need after the matching happened and a connection is opened. Needs would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL graph of its own goal(s) and where they can fulfill the SHACL graph on the counterpart with their own data graph in reverse. To fullfill two goals on both both sides one need would propose a data graph that satisfies both SHACL constraints. This data graph would usually be a combination of data graphs of goals of both sides. The other side could then accept the proposed data graph if it satisfies one of its goals and thereby form an agreement with its counterpart need.  
 
 This structure of goals can be used to describe service/API calls executed by bots that mange needs. For instance, a bot could create a need that describes the input data for a certain API call (e.g. call taxi) in its goals SHACL graph (e.g. specifying that there must be at least be a pickup location and optionally a time provided). It may for example use its own data graph in the goal to specify that the default time for pickup is in 10 minutes from now. 
 
@@ -86,17 +86,18 @@ The following example defines a need that offers "Taxi in Vienna" with a goal de
     ]
         
     won:goal [
-      won:ShapesGraph :pickup-shapes-graph 
+      won:ShapesGraph :pickup-shapes-graph      # defined below
       won:DataGraph [
-        <ride> txi:hasPickupTime <now + 10 min>
+        <rideUri> txi:hasPickupTime "2017-11-22T09:30:10Z"^^xsd:dateTime    # now + 10 min 
       ]
     ]
   ];
 ````
 
-The data graph sets a default pickup time to 10 minutes from now. This data can be overwritten by the customer, if requested, but it describes the default case where a customer usually orders a taxi and wants it immediately. 
+The data graph sets a default pickup time to 10 minutes from now. This data can be overwritten by the customer, if requested, but it describes the default case where a customer usually orders a taxi and wants it immediately if no time is specified explicitly. 
 
-The shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiAction` that has  exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
+The shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiAction` that has exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street). Also there must be exactly one property `txi:hasPickUpDateTime` attached to the `txi:callTaxiAction` that describes the pickup date and time. A taxi bot could use the default time specified in its own data graph (now + 10 min which has to be updated regularly) or the time from the customer need data graph if provided instead. 
+Furthermore the shapes graph defines that the `txi:callTaxiAction` must be `sh:closed true`. That means the shapes graph will only validate successfully if the proposed data graph has excatly the from described above with no additional properties. This way the taxi service bot can make sure that the agreement doesn't contain unkown triples before accepting it and that the call to the taxi service API can be made with all necessary parameters. 
 
 ````
 :pickup-shapes-graph {
@@ -104,8 +105,9 @@ The shapes graph `:pickup-shapes-graph` in the following defines that there must
     a sh:NodeShape ;
     sh:label "Required pickup information" ;
     sh:message "The required pickup information could not be found" ;
-    sh:targetClass txi:callTaxiActionRequest ; 
+    sh:targetClass txi:callTaxiAction ; 
     sh:severity sh:Violation ;
+    sh:closed true ;
     sh:property [
       sh:path ( txi:hasPickUpLocation ) ;
       sh:maxCount 1 ;
@@ -114,10 +116,15 @@ The shapes graph `:pickup-shapes-graph` in the following defines that there must
         [ sh:node :locationShape ] # details of :locationShape not shown here
         [ sh:node :addressShape ]  # details of :addressShape not shown here
       )
+    ] ;
+    sh:property [
+      sh:path ( txi:hasPickUpDateTime ) ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:datatype xsd:dateTime ;
     ] .
   }
 ````
-
     
 ### Request Actions
 
