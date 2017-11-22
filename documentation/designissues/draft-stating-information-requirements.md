@@ -67,10 +67,16 @@ This structure of goals can be used to describe service/API calls executed by bo
 
 Needs can declare zero or more goals in top level branches using the property `won:goal`. Each goal has one property `won:ShapesGraph` attached to it that defines the expected outcome data of the goal. Optionally each goal has another property `won:DataGraph` attached to it that defines the input data to support the satisfaction of the goal. 
 
-The following example defines a need that offers "Taxi in Vienna" with a goal declaration to find out the pickup location of potential customers: 
+The following example defines a need that offers "Taxi in Vienna" with a goal declaration to find out the pickup location of potential customers. In the `:sysinfo` graph the need is defined having a `won:is` top level branch that describes it for the matching. Also the need defines one goal using another top level branch element `won:goal`. 
+
+The data graph `:service-pickup-data-graph` describes a node that should be of type `txi:callTaxiAction` and sets a default pickup time to 10 minutes from now. If requested the pickup time data can be overwritten by the customer, but it describes the default case where a customer usually orders a taxi and wants it immediately if no time is specified explicitly. 
+
+The shapes graph `:service-pickup-shapes-graph` defines that there must be exactly one node of class `txi:callTaxiAction` that has exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street). Also there must be exactly one property `txi:hasPickUpDateTime` attached to the `txi:callTaxiAction` that describes the pickup date and time. A taxi bot could use the default time specified in its own data graph (now + 10 min which has to be updated regularly) or the time from the customer need data graph if provided instead. 
+Furthermore the shapes graph defines that the `txi:callTaxiAction` must be `sh:closed true`. That means the shapes graph will only validate successfully if the proposed data graph has excatly the from described above with no additional properties. This way the taxi service bot can make sure that the agreement doesn't contain unkown triples before accepting it and that the call to the taxi service API can be made with all necessary parameters. 
 
 ````
-<taxiOfferUri>
+GRAPH :sysinfo {
+  <taxiOfferUri>
   a won:Need;
   won:is [
     dc:title "Taxi in Vienna";
@@ -83,75 +89,79 @@ The following example defines a need that offers "Taxi in Vienna" with a goal de
         s:longitude  "16.370831"
       ] ;
       s:name        "Vienna, Austria"
-    ]
-        
-    won:goal [
-      won:ShapesGraph :pickup-shapes-graph      # defined below
-      won:DataGraph [
-        <rideUri> txi:hasPickupTime "2017-11-22T09:30:10Z"^^xsd:dateTime    # now + 10 min 
-      ]
-    ]
-  ];
-````
-
-The data graph sets a default pickup time to 10 minutes from now. This data can be overwritten by the customer, if requested, but it describes the default case where a customer usually orders a taxi and wants it immediately if no time is specified explicitly. 
-
-The shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiAction` that has exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street). Also there must be exactly one property `txi:hasPickUpDateTime` attached to the `txi:callTaxiAction` that describes the pickup date and time. A taxi bot could use the default time specified in its own data graph (now + 10 min which has to be updated regularly) or the time from the customer need data graph if provided instead. 
-Furthermore the shapes graph defines that the `txi:callTaxiAction` must be `sh:closed true`. That means the shapes graph will only validate successfully if the proposed data graph has excatly the from described above with no additional properties. This way the taxi service bot can make sure that the agreement doesn't contain unkown triples before accepting it and that the call to the taxi service API can be made with all necessary parameters. 
-
-````
-:pickup-shapes-graph {
-  :pickup-shape
-    a sh:NodeShape ;
-    sh:label "Required pickup information" ;
-    sh:message "The required pickup information could not be found" ;
-    sh:targetClass txi:callTaxiAction ; 
-    sh:severity sh:Violation ;
-    sh:closed true ;
-    sh:property [
-      sh:path ( txi:hasPickUpLocation ) ;
-      sh:maxCount 1 ;
-      sh:minCount 1 ;
-      sh:or (
-        [ sh:node :locationShape ] # details of :locationShape not shown here
-        [ sh:node :addressShape ]  # details of :addressShape not shown here
-      )
     ] ;
-    sh:property [
-      sh:path ( txi:hasPickUpDateTime ) ;
-      sh:maxCount 1 ;
-      sh:minCount 1 ;
-      sh:datatype xsd:dateTime ;
-    ] .
-  }
+        
+  won:goal [
+    won:DataGraph :service-pickup-data-graph ;
+    won:ShapesGraph :service-pickup-shapes-graph  
+  ] .
+}
+  
+GRAPH :service-pickup-data-graph {
+  <rideUri> 
+  a txi:callTaxiAction ;
+  txi:hasPickupTime "2017-11-22T09:30:10Z"^^xsd:dateTime    # now + 10 min 
+}
+
+GRAPH :service-pickup-shapes-graph {
+  :pickup-shape
+  a sh:NodeShape ;
+  sh:label "Required pickup information" ;
+  sh:message "The required pickup information could not be found" ;
+  sh:targetClass txi:callTaxiAction ; 
+  sh:severity sh:Violation ;
+  sh:closed true ;
+  sh:property [
+    sh:path ( txi:hasPickUpLocation ) ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:or (
+      [ sh:node :locationShape ] # details of :locationShape not shown here
+      [ sh:node :addressShape ]  # details of :addressShape not shown here
+    )
+  ] ;
+  sh:property [
+    sh:path ( txi:hasPickUpDateTime ) ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:datatype xsd:dateTime ;
+  ] .
+}
 ````
-    
-### Request Actions
 
-Needs can also request actions of other needs to perform. An action request is defined by appending a `won:hasActionRequest` property to a `won:seeks` branch. The action request has also a `rdf:type` property but with a concrete action request class (e.g. `txi:callTaxiActionRequest`). 
+The taxi service cannot fulfill its goal just for itself by proposing its `:service-pickup-data-graph` to a customer since its shape graph `:service-pickup-shapes-graph` requires a pick up location property of type `txi:hasPickUpLocation`. This location has to be provided by a customer to satisfy the taxi services shapes graphs. 
+If this taxi service need is matched with a potential customer need with compatible goals they could start a collaboration. A customer need could look like the following:
 
-The input data for the target action is specified by the property `won:actionInputDataGraph` 
-
-and is used to validate the corresponding `won:actionInputShapesGraph` (by providing `txi:hasPickUpLocation` with an address that should be a valid `:addressShape`) of an action declaration of the taxi offer need from above:
 ````
-{
-<taxiDemandUri>
+GRAPH :sysinfo {
+  <taxiDemandUri>
   a won:Need;
   won:seeks [
     dc:title "Looking for a taxi in Vienna" ;
     won:hasLocation [
       a  s:Place ;
       s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
-    ]
+    ] 
+  ] ;
     
-    won:hasActionRequest [
-      rdf:type txi:callTaxiAction ;
-      txi:hasPickUpLocation [
-        a  s:Place ;
-        s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
-      ]
-    ]
-  ] ; 
+  won:goal [
+    won:DataGraph :customer-pickup-data-graph ;
+    won:ShapesGraph :customer-pickup-shapes-graph 
+  ]
+}
+  
+GRAPH :customer-pickup-data-graph {
+  <rideUri> 
+  a txi:callTaxiAction ;
+  txi:hasPickupTime "2017-11-23T09:30:10Z"^^xsd:dateTime ;    # same time next day
+  txi:hasPickUpLocation [
+    a  s:Place ;
+    s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+  ]
+}
+
+GRAPH :customer-pickup-shapes-graph {
+
 }
 ````    
     
