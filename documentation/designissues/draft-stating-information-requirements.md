@@ -76,7 +76,7 @@ Furthermore the shapes graph defines that the `txi:callTaxiAction` must be `sh:c
 
 ````
 GRAPH :needGraph {
-  need:needUri1
+  need:taxiOfferNeed
   a won:Need;
   won:is [
     dc:title "Taxi in Vienna";
@@ -141,7 +141,7 @@ The shape graph specifies the conditions for the customer to accept an agreement
 
 ````
 GRAPH :needGraph {
-  need:needUri2
+  need:taxiDemandNeed
   a won:Need;
   won:seeks [
     dc:title "Looking for a taxi in Vienna" ;
@@ -203,14 +203,21 @@ GRAPH :customer-pickup-shapes-graph {
 }
 ````    
     
-### Execute Actions
+### Achieving Goals
 
-Actions can be executed when two needs have established a connection. Either of the two needs can propose to execute an action (either its own or one at the counterpart) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). An execution of an action is proposed by sending a graph to the conversation that has the following structure:
+Goals can be achieved in collaboration when two needs have established a connection and having a conversation. Either of the two needs can propose a solution for a goal of its counterpart (thereby usually fulfilling a common goal in case a complementary goal exists on its own side that is also fulfilled by the solution) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). A solution for a goal is proposed by sending a message with a proposed data graph to the conversation. The following example would be a solution for both goals of the two needs (`taxiOfferNeed` and `taxiDemandNeed`) defined above. 
     
 ````
-<msgURI> agr:propose {
-<NeedURI> won:execute <actionURI> 
-<actionUrRI> won:actionInputDataGraph [graph which statisfies the corresponding SHACL constraint]
+event:event1 agr:propose :pickup-solution .
+
+GRAPH :pickup-solution {
+  txi:ride3
+  a txi:callTaxiAction ;
+  txi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime
+  txi:hasPickUpLocation [
+    a  s:Place ;
+    s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+  ]
 }
 ````
     
