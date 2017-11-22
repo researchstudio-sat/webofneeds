@@ -205,7 +205,7 @@ GRAPH :customer-pickup-shapes-graph {
     
 ### Achieving Goals
 
-Goals can be achieved in collaboration when two needs have established a connection and having a conversation. Either of the two needs can propose a solution for a goal of its counterpart (thereby usually fulfilling a common goal in case a complementary goal exists on its own side that is also fulfilled by the solution) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). A solution for a goal is proposed by sending a message with a proposed data graph to the conversation. The following example would be a solution for both goals of the two needs (`taxiOfferNeed` and `taxiDemandNeed`) defined above. 
+Goals can be achieved in collaboration when two needs have established a connection and having a conversation. Either of the two needs can propose a solution for a goal of its counterpart (thereby usually fulfilling a common goal in case a complementary goal exists on its own side that is also fulfilled by the solution) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). A solution for a goal is proposed by sending a message with a proposed data graph to the conversation. The following example would be a solution for both goals of the two needs (`taxiOfferNeed` and `taxiDemandNeed`) defined above and could have been sent by the taxi service bot to a customer to agree on the specific conditions of the ride. 
     
 ````
 event:event1 agr:propose :pickup-solution .
@@ -221,7 +221,7 @@ GRAPH :pickup-solution {
 }
 ````
     
-The `won:actionInputDataGraph` is meant to satisfy the SHACL constraints defined by `won:actionInputShapesGraph`. The input data graph can either be created newly for the action execution (e.g. by showing the user a form to enter some values) or reference a graph that is already available in the (non-executing) need as defined by "Request Actions". 
+The `:pickup-solution` is meant to satisfy the shape graph of the customer need goal as well as its own goals shape graph. The proposed data graph is usually created by combining the data graphs of the goals of two needs. It can however also be created on-the-fly without any data present in the needs. For example by showing the user a form to enter some values and then creating a data graph to propose to the user.
 
 If the executing need proposes an action it has to make sure that the SHACL constraints defined by `won:actionInputShapesGraph` are satisfied by the referenced graph of `won:actionInputDataGraph`. In other words the executing need should not propose something for execution that fail validation of the constraints. The other, non-executing, need can also propose the execution of an action (of the counterpart) and should also only propose `won:actionInputDataGraph` graphs which are well-formed regarding the SHACL constraints defined in `won:actionInputShapesGraph`. However, since the non-executing need is not responsible for the execution, the need which declares the action has to check the SHACL constraints before it accepts the proposal.
 
