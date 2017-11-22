@@ -55,12 +55,13 @@ For validating the counterpart's information requirements:
 
 This way, both sides can evaluate each other's information requirements and generate a GUI (e.g. a form, a map, or a calendar) for the user to enter the data.
 
-## Actions 
+## Goals
 
-*NOTE:* this section is going to be re-worked, we are probably not going to use actions as described here.
+Needs can declare goals that they want to achieve in collaboration with a counterpart need. For example, one need offers a taxi ride and the other needs is looking for a ride. This situation may be described as two complementary goals by the two needs which can result in a collaboration to fulfill actually a common goal of both - perform the ride togehter as driver and client. 
 
-Needs can declare actions that they can execute and also define call for action to execute an action that counterpart needs declare. 
+As described before needs are matched based on the data in their `won:is` and `won:seeks` branches. A third type of top level branch therefore is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Needs try to fulfill their goals in a conversation with a counterpart need after the matching happened and a connection is opened. Needs would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL graph of its own goal(s) and where they can fulfill the SHACL graph on the counterpart with their own data graph in reverse. 
 
+This structure of goals can be used to describe service/API calls executed by bots that mange needs. For instance, a bot could create a need that describes the input data for a certain API call (e.g. call taxi) in its goals SHACL graph (e.g. specifying that there must be at least be a pickup location and optionally a time provided). It may for example use its own data graph in the goal to specify that the default time for pickup is in 5 minutes from now. 
 
 ### Declare Actions
 
