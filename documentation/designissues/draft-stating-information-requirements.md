@@ -59,15 +59,15 @@ This way, both sides can evaluate each other's information requirements and gene
 
 Needs can declare goals that they want to achieve in collaboration with a counterpart need. For example, one need offers a taxi ride and the other needs is looking for a ride. This situation may be described as two complementary goals by the two needs which can result in a collaboration to fulfill actually a common goal of both - perform the ride togehter as driver and client. 
 
-As described before needs are matched based on the data in their `won:is` and `won:seeks` branches. A third type of top level branch therefore is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Needs try to fulfill their goals in a conversation with a counterpart need after the matching happened and a connection is opened. Needs would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL graph of its own goal(s) and where they can fulfill the SHACL graph on the counterpart with their own data graph in reverse. 
+As described before needs are matched based on the data in their `won:is` and `won:seeks` branches. A third type of top level branch therefore is `won:goal`. A goal consists of data graph as input suggestion for the goal and a SHACL graph that defines how the data should look like after the goal is reached. Needs try to fulfill their goals in a conversation with a counterpart need after the matching happened and a connection is opened. Needs would look on the counterpart for fitting complementary goals where the data graph would fulfill the SHACL graph of its own goal(s) and where they can fulfill the SHACL graph on the counterpart with their own data graph in reverse. To fullfill two goals on both both sides one need would propose a data graph that satisfies both SHACL constraints. This data graph would usually be a combination of data graphs of goals of both sides.  
 
-This structure of goals can be used to describe service/API calls executed by bots that mange needs. For instance, a bot could create a need that describes the input data for a certain API call (e.g. call taxi) in its goals SHACL graph (e.g. specifying that there must be at least be a pickup location and optionally a time provided). It may for example use its own data graph in the goal to specify that the default time for pickup is in 5 minutes from now. 
+This structure of goals can be used to describe service/API calls executed by bots that mange needs. For instance, a bot could create a need that describes the input data for a certain API call (e.g. call taxi) in its goals SHACL graph (e.g. specifying that there must be at least be a pickup location and optionally a time provided). It may for example use its own data graph in the goal to specify that the default time for pickup is in 10 minutes from now. 
 
-### Declare Actions
+### Declare Goals
 
-To declare an action a need uses the `won:hasActionDeclaration` property appended to the `won:is` branch. Each action declaration has a property `won:hasActionInputShapesGraph` which references a SHACL graph that defines the input to this action. 
+Needs can declare zero or more goals in top level branches using the property `won:goal`. Each goal has one property `won:ShapesGraph` attached to it that defines the expected outcome data of the goal. Optionally each goal has another property `won:DataGraph` attached to it that defines the input data to support the satisfaction of the goal. 
 
-The following example defines a need that offers "Taxi in Vienna" with an action declaration:
+The following example defines a need that offers "Taxi in Vienna" with a goal declaration to find out the pickup location of potential customers: 
 
 ````
 <taxiOfferUri>
@@ -85,13 +85,18 @@ The following example defines a need that offers "Taxi in Vienna" with an action
       s:name        "Vienna, Austria"
     ]
         
-    won:hasActionDeclaration [
-      won:hasActionInputShapesGraph :pickup-shapes-graph 
+    won:goal [
+      won:ShapesGraph :pickup-shapes-graph 
+      won:DataGraph [
+        <ride> txi:hasPickupTime <now + 10 min>
+      ]
     ]
   ];
 ````
 
-The input shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiActionRequest` that has  exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
+The data graph sets a default pickup time to 10 minutes from now. This data can be overwritten by the customer, if requested, but it describes the default case where a customer usually orders a taxi and wants it immediately. 
+
+The shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiAction` that has  exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
 
 ````
 :pickup-shapes-graph {
