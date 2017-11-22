@@ -63,7 +63,7 @@ As described before needs are matched based on the data in their `won:is` and `w
 
 This structure of goals can be used to describe service/API calls executed by bots that mange needs. For instance, a bot could create a need that describes the input data for a certain API call (e.g. call taxi) in its goals SHACL graph (e.g. specifying that there must be at least be a pickup location and optionally a time provided). It may for example use its own data graph in the goal to specify that the default time for pickup is in 10 minutes from now. 
 
-### Declare Goals
+### Declaring Goals
 
 Needs can declare zero or more goals in top level branches using the property `won:goal`. Each goal has one property `won:ShapesGraph` attached to it that defines the expected outcome data of the goal. Optionally each goal has another property `won:DataGraph` attached to it that defines the input data to support the satisfaction of the goal. 
 
@@ -132,7 +132,11 @@ GRAPH :service-pickup-shapes-graph {
 If this taxi service need is matched with a potential customer need with compatible goals they could start a collaboration.
 The taxi service cannot fulfill its goal just for itself by proposing its `:service-pickup-data-graph` to a customer since its shape graph `:service-pickup-shapes-graph` requires a pick up location property of type `txi:hasPickUpLocation`. This location has to be provided by a customer to satisfy the taxi services shapes graphs. 
 
-A customer need that could have been matched to the above service could look like the following. The need is again described in a `:sysinfo` graph but with a `won:seeks` top level branch to match the service need. 
+A customer need that could have been matched to the above service could look like the following. The need is again described in a `:sysinfo` graph but with a `won:seeks` top level branch to match the service need. The need has one goal with a data graph `:customer-pickup-data-graph` and a shape graph `customer-pickup-data-graph`. 
+
+The data graph specifies a node of type `txi:callTaxiAction` with pickup time and location properties. The pickup time is set to the next day and is meant to overwrite the default pickup time in the data graph of the taxi service. For the pickup location an address string is specified. 
+
+The shape graph specifies the conditions for the customer to accept an agreement with a taxi service provider. As above the `sh:closed` property is used to have control of the triples in the final agreement. The customer expects an `:addressShape` as pickup location with value "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich" which matches exactly the location already specified in its data graph. That means the taxi service should just use this address without modifying anything here. Also the customer specifies the constraints for the pickup time in its goals shape graph. The pickup time that the customer recommends in its goals data graph must not match exactly the one that the taxi service might propose. The customer grants a time window of 10 minutes by specifying `sh:minInclusive` and `sh:maxInclusive` constraints for the `txi:hasPickUpDateTime`. 
 
 
 ````
