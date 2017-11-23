@@ -65,14 +65,14 @@ This structure of goals can be used to describe service/API calls executed by bo
 
 ### Declaring Goals
 
-Needs can declare zero or more goals in top level branches using the property `won:goal`. Each goal has one property `won:ShapesGraph` attached to it that defines the expected outcome data of the goal. Optionally each goal has another property `won:DataGraph` attached to it that defines the input data to support the satisfaction of the goal. 
+Needs can declare zero or more goals in top level branches using the property `won:goal`. Each goal has one property `won:hasShapesGraph` attached to it that defines the expected outcome data of the goal. Optionally each goal has another property `won:hasDataGraph` attached to it that defines the input data to support the satisfaction of the goal. 
 
 The following example defines a need that offers "Taxi in Vienna" with a goal declaration to find out the pickup location of potential customers. In the `:needGraph` graph the need is defined having a `won:is` top level branch that describes it for the matching. Also the need defines one goal using another top level branch element `won:goal`. 
 
 The data graph `:service-pickup-data-graph` describes a node that should be of type `txi:callTaxiAction` and sets a default pickup time to 10 minutes from now. If requested the pickup time data can be overwritten by the customer, but it describes the default case where a customer usually orders a taxi and wants it immediately if no time is specified explicitly. 
 
 The shapes graph `:service-pickup-shapes-graph` defines that there must be exactly one node of class `txi:callTaxiAction` that has exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street). Also there must be exactly one property `txi:hasPickUpDateTime` attached to the `txi:callTaxiAction` that describes the pickup date and time. A taxi bot could use the default time specified in its own data graph (now + 10 min which has to be updated regularly) or the time from the customer need data graph if provided instead. 
-Furthermore the shapes graph defines that the `txi:callTaxiAction` must be `sh:closed true`. That means the shapes graph will only validate successfully if the proposed data graph has excatly the from described above with no additional properties. This way the taxi service bot can make sure that the agreement doesn't contain unkown triples before accepting it and that the call to the taxi service API can be made with all necessary parameters. 
+Furthermore the shapes graph defines that the `txi:callTaxiAction` is `sh:closed true`. That means the shapes graph will only validate successfully if the proposed data graph has excatly the from described above with no additional properties. This way the taxi service bot can make sure that the agreement doesn't contain unkown triples before accepting it and that the call to the taxi service API can be made with all necessary parameters. 
 
 ````
 GRAPH :needGraph {
@@ -92,15 +92,15 @@ GRAPH :needGraph {
     ] ;
         
   won:goal [
-    won:DataGraph :service-pickup-data-graph ;
-    won:ShapesGraph :service-pickup-shapes-graph  
+    won:hasDataGraph :service-pickup-data-graph ;
+    won:hasShapesGraph :service-pickup-shapes-graph  
   ] .
 }
   
 GRAPH :service-pickup-data-graph {
   txi:ride1
   a txi:callTaxiAction ;
-  txi:hasPickupTime "2017-11-22T09:30:00Z"^^xsd:dateTime    # now + 10 min 
+  txi:hasPickupDateTime "2017-11-22T09:30:00Z"^^xsd:dateTime    # now + 10 min 
 }
 
 GRAPH :service-pickup-shapes-graph {
@@ -152,15 +152,15 @@ GRAPH :needGraph {
   ] ;
     
   won:goal [
-    won:DataGraph :customer-pickup-data-graph ;
-    won:ShapesGraph :customer-pickup-shapes-graph 
+    won:hasDataGraph :customer-pickup-data-graph ;
+    won:hasShapesGraph :customer-pickup-shapes-graph 
   ]
 }
   
 GRAPH :customer-pickup-data-graph {
   txi:ride2
   a txi:callTaxiAction ;
-  txi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime ;    # same time next day
+  txi:hasPickupDateTime "2017-11-23T09:30:00Z"^^xsd:dateTime ;    # same time next day
   txi:hasPickUpLocation [
     a  s:Place ;
     s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
@@ -213,7 +213,7 @@ event:event1 agr:propose :pickup-solution .
 GRAPH :pickup-solution {
   txi:ride3
   a txi:callTaxiAction ;
-  txi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime
+  txi:hasPickupDateTime "2017-11-23T09:30:00Z"^^xsd:dateTime
   txi:hasPickUpLocation [
     a  s:Place ;
     s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
@@ -228,6 +228,7 @@ The proposing need has to make sure that its goals shape graph is satisfied by t
 In our example the taxi service bot would combine the data graphs of both needs goals (taxi service and customer), check if the shape graphs of both needs goals are satisfied and then propose the data to the customer need. The customer need would then check if the proposed data satisfies its own goals shape graph and then accept it. However the roles who is proposing and who is accepting could also be changed so that the customer proposes data and the taxi service would accept it. Anyway the taxi service bot is able to call a taxi API after the proposal is accepted since its goals shape graph is satisfied which specified the input data needed to make the API call. 
 
 Each side can use `agr:proposeToCancel` and try to cancel an agreement and thereby try to roll back actions that may be started after the agreement was formed. However as stated before the request has to be accepted by the counterpart if an agreement should be canceled. 
+
 
 ## Changes required in current system; design issues
 
