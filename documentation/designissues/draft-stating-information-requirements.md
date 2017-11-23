@@ -125,13 +125,13 @@ GRAPH :service-pickup-shapes-graph {
     sh:path ( taxi:hasDriver ) ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
-    sh:equals need:taxiOfferNeed ;
+    sh:hasValue need:taxiOfferNeed ;
   ] ;
   sh:property [
     sh:path ( taxi:hasClient ) ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
-    sh:equals need:taxiDemandNeed ;
+    sh:hasValue need:taxiDemandNeed ;
   ] ;
   sh:property [
     sh:path ( taxi:hasPickUpDateTime ) ;
@@ -198,13 +198,13 @@ GRAPH :client-pickup-shapes-graph {
     sh:path ( taxi:hasDriver ) ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
-    sh:equals need:taxiOfferNeed ;
+    sh:hasValue need:taxiOfferNeed ;
   ] ;
   sh:property [
     sh:path ( taxi:hasClient ) ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
-    sh:equals need:taxiDemandNeed ;
+    sh:hasValue need:taxiDemandNeed ;
   ] ;
   sh:property [
     sh:path ( taxi:hasPickUpDateTime ) ;
