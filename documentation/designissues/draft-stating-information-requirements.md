@@ -21,19 +21,12 @@ Shapes can be used in needs in the following ways:
     1. The shape is attached to a `won:seeks` node of the need
     1. The shape specifies the `sh:severity` `sh:Info` 
     1. such shapes should cause a boost for matched needs that specify the property
-1. To specify information required from the counterpart so as to be able to perform an action. This could also be called service specification. This is the case if
-    1. The shape is attached to a `won:performs` node that describes an operation the need is able to provide
-    1. In this case, the shape's `sh:Severity` is used to convey mandatory (`sh:Violation`) or optional (`sh:Warning`) parameters
     
 ### post-matching
 In this case, the shape is embedded in the content of a message.
-1. To specify information required from the counterpart so as to be able to perform an action. This could also be called service specification. This is the case if
-    1. The shape is attached to a `[needuri]/won:performs` node that describes an operation the need is able to provide
-    1. In this case, the shape's `sh:Severity` is used to convey mandatory (`sh:Violation`) or optional (`sh:Warning`) parameters
 1. To specify properties of interest after matching. This is the case if  
     1. The shape is embedded in the content of a message via ´[needuri]/won:seeks´ 
     1. The `sh:severity` is to be interpreted as an indication of urgency/importance or precedence if multiple shapes are present
-
 
 This document is based on the [SHACL Constraint Language (SHACL) W3C Candidate Recommendation](https://www.w3.org/TR/shacl/)
 
