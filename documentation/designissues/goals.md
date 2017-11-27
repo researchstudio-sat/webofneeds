@@ -196,7 +196,8 @@ Message that proposes previous message to other need:
 event:event2 agr:propose event:event1
 ````
     
-The `:pickup-solution` is meant to satisfy the shape graph of the client need goal as well as its own goals shape graph. The proposed data graph is usually created by combining the data graphs of the goals of two needs. It can however also be created on-the-fly without any data present in the needs. For example by showing the user a form to enter some values, sending these values over the conversation to the other need and then creating a data graph to propose to the user again. 
+The `:pickup-solution` is meant to satisfy the shape graph of the client need goal as well as its own goals shape graph. The proposed data graph is usually created by combining the data graphs of the goals of two needs. It can however also be created on-the-fly without any data present in the needs. For example by showing the user a form to enter some values, sending these values over the conversation to the other need and then creating a data graph to propose to the user again (for an example see [information requests](draft-stating-information-requirements.md
+)). 
 
 The proposing need has to make sure that its goals shape graph is satisfied by the proposed data graph. After a data graph has been proposed, it can be accepted (using `agr:accepts` property of the agreement protocol) by the other side. The accepting need also has to make sure that its goals shape graph is satisfied by the proposed data graph before accepting the proposal. Once a proposal is accepted it cannot be canceled without the approval of the counterpart anymore. 
 
