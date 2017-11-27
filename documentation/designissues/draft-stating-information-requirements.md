@@ -2,7 +2,7 @@
 
 This document describes a possible approach for how owners can request information from their counterparts.
 
-The basic idea is that an owner uses SHACL shapes to specify their information needs. The counterpart then adds data to their communication channel (the connection) or invalidates already added data until the valid data in the channel can be validated by the shape.  
+The basic idea is that an owner uses SHACL shapes to specify their information needs. The counterpart then adds data to their communication channel (the connection) or invalidates already added data until the valid data in the channel can be validated by the shape. Information requirements are thought to be used to collect information without neccessarily immediate action to follow. If information is required to execute an action afterwards these should be described with [goals](goals.md). 
 
 ## Variants
 Shapes can be used in needs in the following ways:
