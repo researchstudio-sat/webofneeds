@@ -48,6 +48,54 @@ For validating the counterpart's information requirements:
 
 This way, both sides can evaluate each other's information requirements and generate a GUI (e.g. a form, a map, or a calendar) for the user to enter the data.
 
+For example one need could specify that it searches for apartments for rent in Vienna. Aditionally to that it could express an information requirement that specifies the question if the apartment is first occupancy. The person would maybe in both cases rent the apartment but is willing to pay another price for a first occupancy apartment. The corresponding need could look like this:
+
+````
+GRAPH :needGraph {
+  need:apartmentForRentDemandNeed
+  a won:Need;
+  won:seeks [
+    dc:title "Looking for an apartment for rent in Vienna" ;
+    won:hasLocation [
+      a  s:Place ;
+      s:name  "Wien, Österreich"
+    ] ;
+    
+    won:hasShapesGraph :infoApartmentGrah ;
+  ] ;
+}
+
+GRAPH :infoApartmentGrah {
+  :apartment-shape
+  a sh:NodeShape ;
+  sh:label "Is the apartment first occupancy?" ;
+  sh:message "The first occupancy information could not be found!" ;
+  sh:targetClass rent:apartment ; 
+  sh:severity sh:Info ;
+  sh:property [
+    sh:path ( rent:isFirstOccupancy ) ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:datatype xsd:boolean 
+  ] ;
+}
+````
+
+After the need got matched with a counterpart need that could offer an apartment for rent it could open a connection to start a conversation. Depending on the features and ontology knowledge of the counterpart need there could be two situations. 
+
+First the counterpart (apartment offer need) evaluates the information requirement shape graph `:infoApartmentGrah` on its on data and realises that the first occupancy information is still missing and that the `need:apartmentForRentDemandNeed` would like to know about it. If the owner GUI of the apartment offer need has some flexible feature to show gui elements dynamically it could show a checkbox to the end user with the question from the shape graph label `"Is the apartment first occupancy?"` to ask for the information. The information could then be sent in a message of the conversation and would then satisfy the `:infoApartmentGrah`:
+
+````
+event:event1 won:hasContentGraph :apartment-solution .
+
+GRAPH :apartment-solution {
+    need:needApartmentOffer a rent:apartment ;
+    isFirstOccupancy false
+}
+````
+
+Second if the counterpart need doesn't evaluate the `:infoApartmentGrah` on its own the `need:apartmentForRentDemandNeed` could explicitely ask for the information about first occupancy automatically (e.g. using a bot) using text messages. For instance `:infoApartmentGrah` would first evaluate unsuccessfully with severity `sh:Info`. Then the result message `"Is the apartment first occupancy?"` could be used to sent to the counterpart need with waiting for an yes/no answer. However this second scenario is more unlikely than the first one since some natural language processing would be needed to interpret the possible answer(s) to the question asked.  
+
 ## Changes required in current system; design issues
 
 1. Importing needs must be changed to allow for importing datasets (otherwise, we are not able to specify shapes graphs). This would also be required to specify multiple datasets with different access control settings, so this change might be useful for the future.
