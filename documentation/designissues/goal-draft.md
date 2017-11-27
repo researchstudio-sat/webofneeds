@@ -35,9 +35,9 @@ GRAPH :needGraph {
       s:name        "Vienna, Austria"
     ] ;
         
-  won:goal [
-    won:hasDataGraph :service-pickup-data-graph ;
-    won:hasShapesGraph :service-pickup-shapes-graph  
+  won:goal :myGoal ;
+  :myGoal won:hasDataGraph :service-pickup-data-graph .
+  :myGoal won:hasShapesGraph :service-pickup-shapes-graph .
   ] .
 }
   
@@ -107,9 +107,9 @@ GRAPH :needGraph {
     ] 
   ] ;
     
-  won:goal [
-    won:hasDataGraph :client-pickup-data-graph ;
-    won:hasShapesGraph :client-pickup-shapes-graph 
+  won:goal :myGoal ;
+  :myGoal won:hasDataGraph :client-pickup-data-graph .
+  :myGoal won:hasShapesGraph :client-pickup-shapes-graph .
   ]
 }
   
