@@ -91,6 +91,7 @@ function genComponentConf() {
         </div>
         <div>
             <chat-textfield
+                id = "chatField1"
                 class="pm__footer"
                 placeholder="::'Your Message'"
                 on-input="::self.input(value)"
@@ -127,6 +128,7 @@ function genComponentConf() {
                 this.showhide = "HIDE";
             }
 
+            document.getElementById("chatField1").addEventListener('keydown', e => this.keyListener(e));
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
 
             //this.postmsg = this;
@@ -179,6 +181,23 @@ function genComponentConf() {
                 )
             )
 
+        }
+
+        keyListener(e) {
+            var key = e.keyCode
+            var ctrlDown = e.ctrlKey||e.metaKey;
+
+            if (ctrlDown && e.altKey){
+
+            } else if (ctrlDown) {  // v
+                if(key==86){
+                    var clipboardData = e.clipboardData || window.clipboardData;
+                    var pastedData = clipboardData.getData('Text');
+                    this.chatMessage = this.chatMessage + clipboardData;
+                }
+            } else {
+                this.chatMessage = this.chatMessage + e.key;
+            }
         }
 
         ensureMessagesAreLoaded() {
