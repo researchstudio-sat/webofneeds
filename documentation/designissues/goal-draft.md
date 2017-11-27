@@ -200,6 +200,11 @@ The `:pickup-solution` is meant to satisfy the shape graph of the client need go
 
 The proposing need has to make sure that its goals shape graph is satisfied by the proposed data graph. After a data graph has been proposed, it can be accepted (using `agr:accepts` property of the agreement protocol) by the other side. The accepting need also has to make sure that its goals shape graph is satisfied by the proposed data graph before accepting the proposal. Once a proposal is accepted it cannot be canceled without the approval of the counterpart anymore. 
 
+Message that accepts the proposal message:
+````
+event:event3 agr:accept event:event2
+````
+
 In our example the taxi service bot would combine the data graphs of both needs goals (taxi service and client), check if the shape graphs of both needs goals are satisfied and then propose the data to the client need. The client need would then check if the proposed data satisfies its own goals shape graph and then accept it. However the roles who is proposing and who is accepting could also be changed so that the client proposes data and the taxi service would accept it. Anyway the taxi service bot is able to call a taxi API and order a taxi after the proposal is accepted since its goals shape graph is satisfied which specified the input data needed to make the API call. 
 
 Each side can use `agr:proposeToCancel` and try to cancel an agreement and thereby try to roll back actions that may be started after the agreement was formed (e.g. canceling the taxi order by calling the driver). However as stated before the request has to be accepted by the counterpart if an agreement should be canceled. 
