@@ -173,10 +173,11 @@ GRAPH :client-pickup-shapes-graph {
     
 ### Achieving Goals
 
-Goals can be achieved in collaboration when two needs have established a connection and having a conversation. Either of the two needs can propose a solution for a goal of its counterpart (thereby usually fulfilling a common goal in case a complementary goal exists on its own side that is also fulfilled by the solution) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). A solution for a goal is proposed by sending a message with a proposed data graph to the conversation. The following example would be a solution for both goals of the two needs (`taxiOfferNeed` and `taxiDemandNeed`) defined above and could have been sent by the taxi service bot to a client to agree on the specific conditions of the ride. 
+Goals can be achieved in collaboration when two needs have established a connection and having a conversation. Either of the two needs can propose a solution for a goal of its counterpart (thereby usually fulfilling a common goal in case a complementary goal exists on its own side that is also fulfilled by the solution) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). A solution for a goal is proposed by sending a message with a data graph to the conversation and afterwards another message that proposes the content of the referenced content message to the other need. The following example of 2 messages `event:event1` and `event:event2` would be a solution for both goals of the two needs (`taxiOfferNeed` and `taxiDemandNeed`) defined above and could have been sent by the taxi service bot to a client to agree on the specific conditions of the ride. 
     
+Message with data graph:
 ````
-event:event1 agr:propose :pickup-solution .
+event:event1 won:hasContentGraph :pickup-solution .
 
 GRAPH :pickup-solution {
   :myRide3 a taxi:Ride .
@@ -189,8 +190,13 @@ GRAPH :pickup-solution {
   ]
 }
 ````
+
+Message that proposes previous message to other need:
+````
+event:event2 agr:propose event:event1
+````
     
-The `:pickup-solution` is meant to satisfy the shape graph of the client need goal as well as its own goals shape graph. The proposed data graph is usually created by combining the data graphs of the goals of two needs. It can however also be created on-the-fly without any data present in the needs. For example by showing the user a form to enter some values and then creating a data graph to propose to the user.
+The `:pickup-solution` is meant to satisfy the shape graph of the client need goal as well as its own goals shape graph. The proposed data graph is usually created by combining the data graphs of the goals of two needs. It can however also be created on-the-fly without any data present in the needs. For example by showing the user a form to enter some values, sending these values over the conversation to the other need and then creating a data graph to propose to the user again. 
 
 The proposing need has to make sure that its goals shape graph is satisfied by the proposed data graph. After a data graph has been proposed, it can be accepted (using `agr:accepts` property of the agreement protocol) by the other side. The accepting need also has to make sure that its goals shape graph is satisfied by the proposed data graph before accepting the proposal. Once a proposal is accepted it cannot be canceled without the approval of the counterpart anymore. 
 
