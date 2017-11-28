@@ -79,6 +79,10 @@ won-create-post {
         font-weight: 700;
         padding-bottom: 1rem;
       }
+
+      p:last-of-type { //this is so that the padding is not present if there is only a single paragraph namely the .medium_title
+        padding-bottom: 0;
+      }
     }
   }
 
