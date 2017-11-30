@@ -7,7 +7,7 @@ import won.protocol.model.Connection;
  * Created by fsuda on 27.11.2017.
  */
 public class GoalSatisfiedEvent extends GoalEvent{
-    public GoalSatisfiedEvent(Connection con) {
-        super(con);
+    public GoalSatisfiedEvent(Connection con, Object payload) {
+        super(con, payload);
     }
 }

@@ -55,17 +55,17 @@ public class AnalyzeAction extends BaseEventBotAction {
             Connection con = messageFromOtherNeedEvent.getCon();
 
             if("GoalSatisfiedEvent".equals(textMessage)){
-                bus.publish(new GoalSatisfiedEvent(con));
+                bus.publish(new GoalSatisfiedEvent(con, new Object()));
             }else if("GoalShapeMissingEvent".equals(textMessage)){
-                bus.publish(new GoalShapeMissingEvent(con));
+                bus.publish(new GoalShapeMissingEvent(con, new Object()));
             } else if("GoalShapeAmbivalentEvent".equals(textMessage)){
-                bus.publish(new GoalShapeAmbivalentEvent(con));
+                bus.publish(new GoalShapeAmbivalentEvent(con, new Object()));
             } else if("ProposalCanceledEvent".equals(textMessage)){
-                bus.publish(new ProposalCanceledEvent(con));
+                bus.publish(new ProposalCanceledEvent(con, new Object()));
             }else if("ProposalAcceptedEvent".equals(textMessage)){
-                bus.publish(new ProposalAcceptedEvent(con));
+                bus.publish(new ProposalAcceptedEvent(con, new Object()));
             }else if("ProposalErrorEvent".equals(textMessage)){
-                bus.publish(new ProposalErrorEvent(con));
+                bus.publish(new ProposalErrorEvent(con, new Object()));
             }
         } else {
             logger.error("AnalyzeAction can only handle MessageFromOtherNeedEvent and OpenFromOtherNeedEvent");
