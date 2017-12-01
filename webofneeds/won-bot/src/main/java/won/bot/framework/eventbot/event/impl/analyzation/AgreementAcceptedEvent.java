@@ -5,8 +5,8 @@ import won.protocol.model.Connection;
 /**
  * Created by fsuda on 27.11.2017.
  */
-public class ProposalErrorEvent extends ProposalEvent{
-    public ProposalErrorEvent(Connection con, Object payload) {
+public class AgreementAcceptedEvent extends AgreementEvent {
+    public AgreementAcceptedEvent(Connection con, Object payload) {
         super(con, payload);
     }
 }

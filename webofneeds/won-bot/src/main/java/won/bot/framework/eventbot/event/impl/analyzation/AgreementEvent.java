@@ -6,10 +6,10 @@ import won.protocol.model.Connection;
 /**
  * Created by fsuda on 27.11.2017.
  */
-public abstract class ProposalEvent extends BaseNeedAndConnectionSpecificEvent {
+public abstract class AgreementEvent extends BaseNeedAndConnectionSpecificEvent {
     private final Object payload;
 
-    public ProposalEvent(Connection con, Object payload) {
+    public AgreementEvent(Connection con, Object payload) {
         super(con);
         this.payload = payload;
     }
