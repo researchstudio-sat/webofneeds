@@ -21,10 +21,11 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.analyzation.*;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCanceledEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementErrorEvent;
+import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
+import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -57,17 +58,15 @@ public class AnalyzeAction extends BaseEventBotAction {
             String textMessage = WonRdfUtils.MessageUtils.getTextMessage(messageFromOtherNeedEvent.getWonMessage());
             Connection con = messageFromOtherNeedEvent.getCon();
 
-            if("GoalSatisfiedEvent".equals(textMessage)){
-                bus.publish(new GoalSatisfiedEvent(con, new Object()));
-            }else if("GoalShapeMissingEvent".equals(textMessage)){
-                bus.publish(new GoalShapeMissingEvent(con, new Object()));
-            } else if("GoalShapeAmbivalentEvent".equals(textMessage)){
-                bus.publish(new GoalShapeAmbivalentEvent(con, new Object()));
-            } else if("ProposalCanceledEvent".equals(textMessage)){
+            if("PreconditionMetEvent".equals(textMessage)){
+                bus.publish(new PreconditionMetEvent(con, new Object()));
+            }else if("PrecondtionUnmetEvent".equals(textMessage)){
+                bus.publish(new PreconditionUnmetEvent(con, new Object()));
+            } else if("AgreementCanceledEvent".equals(textMessage)){
                 bus.publish(new AgreementCanceledEvent(con, new Object()));
-            }else if("ProposalAcceptedEvent".equals(textMessage)){
+            }else if("AgreementAcceptedEvent".equals(textMessage)){
                 bus.publish(new AgreementAcceptedEvent(con, new Object()));
-            }else if("ProposalErrorEvent".equals(textMessage)){
+            }else if("AgreementErrorEvent".equals(textMessage)){
                 bus.publish(new AgreementErrorEvent(con, new Object()));
             }
         } else {
