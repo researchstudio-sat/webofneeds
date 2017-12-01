@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.event.impl.analyzation;
+package won.bot.framework.eventbot.event.impl.analyzation.agreement;
 
 import won.protocol.model.Connection;
 
