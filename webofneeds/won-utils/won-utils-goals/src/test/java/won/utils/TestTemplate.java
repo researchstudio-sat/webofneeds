@@ -1,23 +1,18 @@
-package won.utils.goals;
+package won.utils;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
-import org.topbraid.shacl.util.ModelPrinter;
-import org.topbraid.shacl.validation.ValidationUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShaclTest {
+public abstract class TestTemplate {
 
     static Map<String, String> prefixes;
     static {
@@ -32,15 +27,15 @@ public class ShaclTest {
         prefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
     }
 
-    private Dataset p1Ds;
-    private Model p1NeedModel;
-    private Model p1DataModel;
-    private Model p1ShapeModel;
+    protected Dataset p1Ds;
+    protected Model p1NeedModel;
+    protected Model p1DataModel;
+    protected Model p1ShapeModel;
 
-    private Dataset p2Ds;
-    private Model p2NeedModel;
-    private Model p2DataModel;
-    private Model p2ShapeModel;
+    protected Dataset p2Ds;
+    protected Model p2NeedModel;
+    protected Model p2DataModel;
+    protected Model p2ShapeModel;
 
     @Before
     public void init() throws IOException {
@@ -60,16 +55,6 @@ public class ShaclTest {
         p2DataModel.setNsPrefixes(prefixes);
         p2ShapeModel = p2Ds.getNamedModel("http://example.org/2/p2g-shapes");
         p2ShapeModel.setNsPrefixes(prefixes);
-    }
-
-    @Test
-    public void validateP1DataWithP1Shape() throws IOException {
-
-        Resource report = ValidationUtil.validateModel(p1DataModel, p1ShapeModel, false);
-        ShaclReportWrapper reportWrapper = new ShaclReportWrapper(report);
-        Assert.assertFalse(reportWrapper.isConform());
-
-        System.out.println(ModelPrinter.get().print(report.getModel()));
     }
 
     private Dataset loadDataset(String path) throws IOException {
