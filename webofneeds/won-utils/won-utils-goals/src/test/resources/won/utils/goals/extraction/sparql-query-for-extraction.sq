@@ -29,7 +29,7 @@ construct {
             ?class a rdfs:class;
                    a sh:NodeShape.
             ?target a ?class .
-            bind (?shape as ?class) .
+            bind (?class as ?shape) .
         } union {
             ?shape sh:targetSubjectsOf ?property.
             ?target ?property ?any.
