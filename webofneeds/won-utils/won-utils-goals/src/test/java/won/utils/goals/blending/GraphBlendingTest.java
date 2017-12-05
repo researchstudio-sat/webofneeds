@@ -1,4 +1,4 @@
-package won.utils.goals;
+package won.utils.goals.blending;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -14,57 +14,59 @@ import java.io.InputStream;
 
 public class GraphBlendingTest {
 
+    private static final String baseFolder = "/won/utils/goals/blending/";
+
     @Test
     public void blendSameTriples() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/same.trig");
+        Dataset ds = loadDataset(baseFolder + "same.trig");
         test(ds);
     }
 
     @Test
     public void blendLiterals() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/literals.trig");
+        Dataset ds = loadDataset(baseFolder + "literals.trig");
         test(ds);
     }
 
     @Test
     public void blendURIs() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/uris.trig");
+        Dataset ds = loadDataset(baseFolder + "/uris.trig");
         test(ds);
     }
 
     @Test
     public void blendRecursive() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/recursive.trig");
+        Dataset ds = loadDataset(baseFolder + "recursive.trig");
         test(ds);
     }
 
     @Test
     public void blendDifferentLiterals() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/differentLiterals.trig");
+        Dataset ds = loadDataset(baseFolder + "differentLiterals.trig");
         test(ds);
     }
 
     @Test
     public void blendDifferentURIs() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/differentUris.trig");
+        Dataset ds = loadDataset(baseFolder +  "differentUris.trig");
         test(ds);
     }
 
     @Test
     public void blendDifferentProperties() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/differentProperties.trig");
+        Dataset ds = loadDataset(baseFolder + "differentProperties.trig");
         test(ds);
     }
 
     @Test
     public void blendEmpty() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/empty.trig");
+        Dataset ds = loadDataset(baseFolder + "empty.trig");
         test(ds);
     }
 
     @Test
     public void blendMultiple() throws IOException {
-        Dataset ds = loadDataset("/won/utils/goals/multiple.trig");
+        Dataset ds = loadDataset(baseFolder + "multiple.trig");
 
         Model m1 = ds.getNamedModel("http://example.org/test#data1");
         Model m2 = ds.getNamedModel("http://example.org/test#data2");
@@ -76,7 +78,7 @@ public class GraphBlendingTest {
     // Not supported by simple graph blending
 //    @Test
 //    public void blendPreserve() throws IOException {
-//        Dataset ds = loadDataset("/won/utils/goals/preserve.trig");
+//        Dataset ds = loadDataset(baseFolder + "preserve.trig");
 //        test(ds);
 //    }
 
