@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
-import won.utils.goals.GraphBlending;
+import won.utils.goals.blending.GraphBlending;
 
 import java.io.IOException;
 import java.io.InputStream;

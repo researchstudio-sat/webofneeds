@@ -1,4 +1,4 @@
-package won.utils.goals;
+package won.utils.goals.blending;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
