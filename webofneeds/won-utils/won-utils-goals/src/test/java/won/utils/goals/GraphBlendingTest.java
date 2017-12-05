@@ -56,6 +56,30 @@ public class GraphBlendingTest {
         test(ds);
     }
 
+    @Test
+    public void blendEmpty() throws IOException {
+        Dataset ds = loadDataset("/won/utils/goals/empty.trig");
+        test(ds);
+    }
+
+    @Test
+    public void blendMultiple() throws IOException {
+        Dataset ds = loadDataset("/won/utils/goals/multiple.trig");
+
+        Model m1 = ds.getNamedModel("http://example.org/test#data1");
+        Model m2 = ds.getNamedModel("http://example.org/test#data2");
+        Model actual = GraphBlending.blendSimple(m1, m2, "http://example.org/test#blended");
+        Assert.assertEquals(1, actual.listStatements().toList().size());
+    }
+
+
+    // Not supported by simple graph blending
+//    @Test
+//    public void blendPreserve() throws IOException {
+//        Dataset ds = loadDataset("/won/utils/goals/preserve.trig");
+//        test(ds);
+//    }
+
     public void test(Dataset ds) {
 
         Model m1 = ds.getNamedModel("http://example.org/test#data1");
@@ -64,6 +88,8 @@ public class GraphBlendingTest {
 
         // check that the actual blended graphs is the expected one
         Model actual = GraphBlending.blendSimple(m1, m2, "http://example.org/test#blended");
+        actual.write(System.out, "TRIG");
+
         Assert.assertFalse(containSameStatements(m1, m2));
         Assert.assertTrue(containSameStatements(expected, actual));
     }
