@@ -13,12 +13,18 @@ public class GraphBlending {
 
 
     /**
+     * Blends two model graphs into a new graph. For a description of blending check the design documents:
+     * https://github.com/researchstudio-sat/webofneeds/tree/goal-concept/documentation/
      *
-     * @param dataGraph1
-     * @param dataGraph2
-     * @param blendingUriPrefix must be a unique prefix
+     * This method implements a simple version of blending since it just recursively replaces all
+     * subject nodes by new uris if there are 2 sets of triples in the two graphs found that have the same
+     * predicate and object (but different subject).
+     *
+     * @param dataGraph1 model graph 1
+     * @param dataGraph2 model graph 2
+     * @param blendingUriPrefix must be a unique prefix since blended node URIs receive this prefix
      * @return
-     */
+    **/
     public static Model blendSimple(Model dataGraph1, Model dataGraph2, String blendingUriPrefix) {
 
         Map<String, String> prefixes = new HashMap<>();

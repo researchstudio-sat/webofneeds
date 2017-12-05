@@ -8,13 +8,13 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
 ex:data1 {
-    ex:test1 ex:testProperty ex:uri
+    ex:test1 ex:testProperty "test"
 }
 
 ex:data2 {
-    ex:test2 ex:testProperty ex:uri
+
 }
 
 ex:blended {
-    ex:blended0 ex:testProperty ex:uri
+    ex:test1 ex:testProperty "test"
 }
