@@ -1,4 +1,6 @@
-# This example is taken from http://shacl.org/playground and 
+
+
+# This example is taken from http://shacl.org/playground and
 # transformed to trig, putting shapes, data and validation results in separate graphs
 #
 # Test case: Property path instead of address shape. The address properties are not extracted.
@@ -40,7 +42,7 @@ schema:PersonShape
         sh:minInclusive 10000 ;
         sh:maxInclusive 99999 ;
     ] .
-	
+
 }
 
 
@@ -76,7 +78,7 @@ ex:Alice
 ex:AlicesAddress
     schema:streetAddress "Downing Street 10" ;
     schema:postalCode 230011 .
-	
+
 }
 
 
