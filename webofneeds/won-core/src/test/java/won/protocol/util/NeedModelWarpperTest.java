@@ -4,7 +4,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.message.Utils;
 import won.protocol.model.NeedContentPropertyType;
@@ -23,7 +22,6 @@ public class NeedModelWarpperTest {
     private final String NEED_URI = "https://node.matchat.org/won/resource/need/3030440624813201400";
 
     @Test
-    @Ignore
     public void loadModels() throws IOException {
 
         // load dataset and if the need and sysinfo models are there
@@ -73,7 +71,7 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG, null).size());
         Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, WON.HAS_TAG, null).size());
         Assert.assertEquals(5, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG, null).size());
-        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, "won:hasLocation/<s:geo>/<s:longitude>"));
+        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, "won:hasLocation/s:geo/s:longitude"));
     }
 
     @Test
