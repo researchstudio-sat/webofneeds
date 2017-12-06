@@ -18,7 +18,7 @@ construct {
 } where {
 	?node ?prop ?val .
     {
-      select distinct ?target ?shape
+      select distinct ?node ?shape
       where {
         {
             ?shape sh:targetNode ?target .
@@ -37,11 +37,9 @@ construct {
             ?shape sh:targetObjectsOf ?property.
             ?any ?property ?target.
         }
+        bind (?target as ?node)
       }
-   }
-  {
-    bind (?target as ?node)
-  } union {
+   } union {
     # handle sh:node references: the referenced node also
 	# becomes a target node
   	?target ?property ?node .
