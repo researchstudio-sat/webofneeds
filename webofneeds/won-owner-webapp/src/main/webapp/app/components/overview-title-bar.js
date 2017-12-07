@@ -43,7 +43,7 @@ function genComponentConf() {
                         class="clickable">
                         <a ng-click="self.router__stateGoResetParams('overviewIncomingRequests')"
                             ng-class="{'disabled' : !self.hasRequests}">
-                            Incoming Requests
+                            Requests
                             <span class="mtb__tabs__unread">{{ self.nrOfUnreadIncomingRequests }}</span>
                         </a>
                     </li>
