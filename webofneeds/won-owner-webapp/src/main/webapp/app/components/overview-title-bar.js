@@ -64,6 +64,7 @@ function genComponentConf() {
             </div>
         </nav>
     `;
+    
 
     class Controller {
         constructor() {
