@@ -57,6 +57,7 @@ public class DefaultPrefixUtils {
         prefixMapping.setNsPrefix("xsd", XSD.getURI());
         prefixMapping.setNsPrefix("dc", DC.getURI());
         prefixMapping.setNsPrefix("s", "http://schema.org/");
+        prefixMapping.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
     }
 
     public static PrefixMapping getDefaultPrefixes() {
