@@ -8,8 +8,9 @@ import org.topbraid.shacl.validation.ValidationUtil;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.utils.shacl.ShaclReportWrapper;
+import java.util.Collection;
+import java.util.LinkedList;
 
-import java.io.IOException;
 
 public class GoalProposal {
 
@@ -34,7 +35,7 @@ public class GoalProposal {
         combinedModel = RdfUtils.mergeAllDataToSingleModel(combinedDataset);
     }
 
-    public Model findValidProposalForGoals(String need1GoalUri, String need2GoalUri) throws IOException {
+    public Model findValidProposalForGoals(String need1GoalUri, String need2GoalUri) {
 
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
         NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
@@ -62,6 +63,24 @@ public class GoalProposal {
         }
 
         return null;
+    }
+
+    public Collection<Model> findAllPossibleProposals() {
+
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
+        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
+
+        Collection<Model> validProposals = new LinkedList<>();
+        for (Resource goal1 : needWrapper1.getGoals()) {
+            for (Resource goal2 : needWrapper2.getGoals()) {
+                Model proposal = findValidProposalForGoals(goal1.getURI(), goal2.getURI());
+                if (proposal != null) {
+                    validProposals.add(proposal);
+                }
+            }
+        }
+
+        return validProposals;
     }
 
 }

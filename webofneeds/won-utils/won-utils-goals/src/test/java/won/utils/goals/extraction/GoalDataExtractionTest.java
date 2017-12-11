@@ -14,7 +14,7 @@ import won.utils.goals.GoalUtils;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class DataExtractionTest {
+public class GoalDataExtractionTest {
 
     private static final String baseFolder = "/won/utils/goals/extraction/";
 
