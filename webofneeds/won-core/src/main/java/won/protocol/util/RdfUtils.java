@@ -1308,6 +1308,18 @@ public class RdfUtils
         addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
     }
 
+    public static Model mergeAllDataToSingleModel(final Dataset ds) {
+
+        // merge default graph and all named graph data into the default graph to be able to query all of it at once
+        Model mergedModel = ModelFactory.createDefaultModel();
+        Iterator<String> nameIter = ds.listNames();
+        mergedModel.add(ds.getDefaultModel());
+        while (nameIter.hasNext()) {
+            mergedModel.add(ds.getNamedModel(nameIter.next()));
+        }
+        return mergedModel;
+    }
+
   /**
    * Adds all triples of the dataset to the model.
    * @param dataset

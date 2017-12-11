@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
-import won.utils.goals.blending.GraphBlending;
+import won.utils.goals.GoalUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,7 +97,7 @@ public class ShaclTest {
     @Test
     public void validateBlendedDataWithShapes() {
 
-        Model blended = GraphBlending.blendSimple(p1DataModel, p2DataModel, "http://example.org/blended#");
+        Model blended = GoalUtils.blendGraphsSimple(p1DataModel, p2DataModel, "http://example.org/blended#");
         Resource report = ValidationUtil.validateModel(blended, p1ShapeModel, false);
         ShaclReportWrapper reportWrapper = new ShaclReportWrapper(report);
         Assert.assertTrue(reportWrapper.isConform());
