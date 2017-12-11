@@ -144,7 +144,10 @@ public class NeedModelWrapper {
         Iterator<String> modelNameIter = needDataset.listNames();
         while(modelNameIter.hasNext()) {
             String modelName = modelNameIter.next();
-            if (modelName.endsWith("#need")) {
+
+            // need content graphs usually end with "#need" the debug bot creates content graphs
+            // with the pattern "#content-". we must detect all possibilities here
+            if (modelName.endsWith("#need") || modelName.contains("#content-")) {
                 return needDataset.getNamedModel(modelName);
             }
         }
