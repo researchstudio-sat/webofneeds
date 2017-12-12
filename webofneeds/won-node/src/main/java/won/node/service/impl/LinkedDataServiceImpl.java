@@ -192,45 +192,63 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Transactional
-  public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
-  Need need = needInformationService.readNeed(needUri);
+  public DataWithEtag<Dataset> getNeedDataset(final URI needUri, String etag) {
 
-  // load the dataset from storage
-  Dataset dataset = need.getDatatsetHolder().getDataset();
-  Model metaModel = needModelMapper.toModel(need);
+      DataWithEtag<Need> data = null;
+      try {
+          data = needInformationService.readNeed(needUri, etag);
+      } catch (NoSuchNeedException e) {
+          return DataWithEtag.dataNotFound();
+      }
+      if (data.isNotFound()) {
+          return DataWithEtag.dataNotFound();
+      }
+      if (!data.isChanged()){
+          return DataWithEtag.dataNotChanged(data);
+      }
+      Need need = data.getData();
+      String newEtag = data.getEtag();
 
-  Resource needResource = metaModel.getResource(needUri.toString());
+    // load the dataset from storage
+    Dataset dataset = need.getDatatsetHolder().getDataset();
+    Model metaModel = needModelMapper.toModel(need);
 
-  // add connections
-  Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections");
-  metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+    Resource needResource = metaModel.getResource(needUri.toString());
 
-  // add need event container
-  Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"#events", WON.EVENT_CONTAINER);
-  metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
+    // add connections
+    Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections");
+    metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
-  // add need event URIs
-  Collection<MessageEventPlaceholder> messageEvents = need.getEventContainer().getEvents();
-  for (MessageEventPlaceholder messageEvent : messageEvents) {
+    // add need event container
+    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"#events", WON.EVENT_CONTAINER);
+    metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
+
+    // add need event URIs
+    Collection<MessageEventPlaceholder> messageEvents = need.getEventContainer().getEvents();
+    for (MessageEventPlaceholder messageEvent : messageEvents) {
     metaModel.add(metaModel.createStatement(needEventContainer,
                                             RDFS.member,
                                             metaModel.getResource(messageEvent.getMessageURI().toString())));
+    }
+
+    // add WON node link
+    needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
+
+    // add meta model to dataset
+    String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
+    dataset.addNamedModel(needMetaInformationURI, metaModel);
+    addBaseUriAndDefaultPrefixes(dataset);
+
+    return new DataWithEtag<>(dataset ,newEtag, etag);
   }
 
-  // add WON node link
-  needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
 
-  // add meta model to dataset
-  String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
-  dataset.addNamedModel(needMetaInformationURI, metaModel);
-  addBaseUriAndDefaultPrefixes(dataset);
-  return dataset;
-}
+
   @Override
   @Transactional
   public Dataset getNeedDataset(final URI needUri, boolean deep, Integer deepLayerSize
                                 ) throws NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException {
-    Dataset dataset = getNeedDataset(needUri);
+    Dataset dataset = getNeedDataset(needUri, null).getData();
     if (deep) {
       Need need = needInformationService.readNeed(needUri);
       if (need.getState() == NeedState.ACTIVE) {

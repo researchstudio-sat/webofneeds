@@ -248,14 +248,13 @@ public interface LinkedDataService
     boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException;
 
-
   /**
-   * Returns a dataset describing the need with the specified URI.
+   * Returns a dataset describing the need, if the etag indicates that it has changed.
    * @param needUri
-   * @return
-   * @throws NoSuchNeedException
+   * @param etag
+   * @return dataset with etag describing the need or null if not found
    */
-  public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException;
+  public DataWithEtag<Dataset> getNeedDataset(final URI needUri, String etag);
 
   /**
    * Returns a dataset describing the need with the specified URI. If the need is in state ACTIVE,
@@ -268,8 +267,6 @@ public interface LinkedDataService
    */
   public Dataset getNeedDataset(final URI needUri, final boolean deep, final Integer deepLayerSize)  throws
     NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException;
-
-
 
   /**
    * Returns a dataset describing the connection, if the etag indicates that it has changed.

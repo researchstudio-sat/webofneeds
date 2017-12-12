@@ -39,12 +39,14 @@ public class WonNodeSparqlService extends SparqlService
   public Set<WonNodeInfo> retrieveAllWonNodeInfo() {
 
     Set<WonNodeInfo> wonNodeInfos = new HashSet<>();
-    String queryString = "SELECT ?graphUri ?nodeUri WHERE { GRAPH ?graphUri {?nodeUri <%s> ?c} }";
-    queryString = String.format(queryString, WON.HAS_URI_PATTERN_SPECIFICATION.toString());
+    String queryString = "SELECT ?graphUri ?nodeUri WHERE { GRAPH ?graphUri {?nodeUri won:hasUriPrefixSpecification ?c} }";
+    ParameterizedSparqlString pps = new ParameterizedSparqlString();
+    pps.setCommandText(queryString);
+    pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-    log.debug("Execute query: {}", queryString);
-    Query query = QueryFactory.create(queryString);
-    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+    log.debug("Execute query: {}", pps.toString());
+    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, pps.asQuery());
     ResultSet results = qexec.execSelect();
 
     while (results.hasNext()) {

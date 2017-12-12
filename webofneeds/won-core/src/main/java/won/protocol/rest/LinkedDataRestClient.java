@@ -19,10 +19,7 @@ package won.protocol.rest;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
@@ -30,7 +27,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Map;
 
 public abstract class LinkedDataRestClient {
 
@@ -49,10 +45,7 @@ public abstract class LinkedDataRestClient {
         return readResourceDataWithHeaders(resourceURI).getDataset();
     }
 
-    public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI);
-
-    public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, Map<String, String>
-            requestHeaders);
+    public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, HttpHeaders httpHeaders);
 
     /**
      * Retrieves RDF for the specified resource URI for the entity with provided WebID.
@@ -67,28 +60,15 @@ public abstract class LinkedDataRestClient {
         return readResourceDataWithHeaders(resourceURI, requesterWebID).getDataset();
     }
 
+    public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI);
+
     public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, URI requesterWebID);
 
-
-    /**
-     * Retrieves RDF for the specified resource URI.
-     * Expects that the resource URI will lead to a 303 response, redirecting to the URI where RDF can be downloaded.
-     *
-     * @param resourceURI
-     * @return
-     */
-    public Dataset readResourceData(URI resourceURI, URI requesterWebID, Map<String, String>
-            requestHeaders) {
-        return readResourceDataWithHeaders(resourceURI, requesterWebID, requestHeaders).getDataset();
-    }
-
     public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, URI requesterWebID,
-                                                                                        Map<String,
-                                                                                                String>
-                                                                                                requestHeaders);
+                                                                                        HttpHeaders requestHeaders);
 
-    protected DatasetResponseWithStatusCodeAndHeaders readResourceData(URI resourceURI, RestTemplate restTemplate, Map<String,
-            String> requestHeaders) {
+
+    protected DatasetResponseWithStatusCodeAndHeaders readResourceData(URI resourceURI, RestTemplate restTemplate, HttpHeaders requestHeaders) {
         assert resourceURI != null : "resource URI must not be null";
         logger.debug("fetching linked data resource: {}", resourceURI);
 
@@ -98,11 +78,7 @@ public abstract class LinkedDataRestClient {
         int statusCode = -1;
         HttpHeaders responseHeaders = null;
         try {
-            HttpHeaders headers = new HttpHeaders();
-            for (String key : requestHeaders.keySet()) {
-                headers.add(key, requestHeaders.get(key));
-            }
-            HttpEntity entity = new HttpEntity(null, headers);
+            HttpEntity entity = new HttpEntity(null, requestHeaders);
 
             ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity, Dataset.class);
             //RestTemplate will automatically follow redirects on HttpGet calls

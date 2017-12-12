@@ -153,17 +153,19 @@ LinkedDataWebController {
     //webmvc controller method
     @RequestMapping("${uri.path.page.need}/{identifier}")
     public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
-        try {
-            URI needURI = uriService.createNeedURIForId(identifier);
-            Dataset rdfDataset = linkedDataService.getNeedDataset(needURI);
-            model.addAttribute("rdfDataset", rdfDataset);
-            model.addAttribute("resourceURI", needURI.toString());
-            model.addAttribute("dataURI", uriService.toDataURIIfPossible(needURI).toString());
-            return "rdfDatasetView";
-        } catch (NoSuchNeedException e) {
+
+        URI needURI = uriService.createNeedURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getNeedDataset(needURI, null).getData();
+
+        if (rdfDataset == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "notFoundView";
         }
+
+        model.addAttribute("rdfDataset", rdfDataset);
+        model.addAttribute("resourceURI", needURI.toString());
+        model.addAttribute("dataURI", uriService.toDataURIIfPossible(needURI).toString());
+        return "rdfDatasetView";
     }
 
     /**
@@ -773,23 +775,26 @@ LinkedDataWebController {
     public ResponseEntity<Dataset> readNeed(
             HttpServletRequest request,
             @PathVariable(value = "identifier") String identifier) {
+
         logger.debug("readNeed() called");
-        URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
-        try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            Dataset dataset = linkedDataService.getNeedDataset(needUri);
-            //TODO: need information does change over time. The immutable need information should never expire, the mutable should
-            HttpHeaders headers = new HttpHeaders();
-            addCORSHeader(headers);
-            stopWatch.stop();
-            logger.debug("readNeed took " + stopWatch.getLastTaskTimeMillis() + " millis");
+        return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
+            @Override
+            public URI createUriForIdentifier(final String identifier) {
+                return URI.create(needResourceURIPrefix + "/" + identifier);
+            }
 
-            return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
-        } catch (NoSuchNeedException e) {
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
-        }
+            @Override
+            public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
+                return linkedDataService.getNeedDataset(uri, etag);
+            }
 
+            @Override
+            public void addHeaders(final HttpHeaders headers) {
+                addCORSHeader(headers);
+                addPublicHeaders(headers);
+                addMutableResourceHeaders(headers);
+            }
+        });
     }
 
 

@@ -32,125 +32,124 @@ import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: ypanchenko
  * Date: 07.10.15
  */
-public class LinkedDataRestClientHttps extends LinkedDataRestClient
-{
+public class LinkedDataRestClientHttps extends LinkedDataRestClient {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private RestTemplate restTemplateWithDefaultWebId;
-  private HttpMessageConverter datasetConverter;
-  String acceptHeaderValue = null;
+    private RestTemplate restTemplateWithDefaultWebId;
+    private HttpMessageConverter datasetConverter;
+    String acceptHeaderValue = null;
 
-  private Integer readTimeout;
-  private Integer connectionTimeout;
+    private Integer readTimeout;
+    private Integer connectionTimeout;
 
-  private KeyStoreService keyStoreService;
-  private TrustStoreService trustStoreService;
-  private TrustStrategy trustStrategy;
-  private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new NeedUriAsAliasStrategy();
-
+    private KeyStoreService keyStoreService;
+    private TrustStoreService trustStoreService;
+    private TrustStrategy trustStrategy;
+    private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new NeedUriAsAliasStrategy();
 
 
-  public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
-    this.readTimeout = 20000;
-    this.connectionTimeout = 20000; //DEF. TIMEOUT IS 20 sec
-    this.keyStoreService = keyStoreService;
-    this.trustStoreService = trustStoreService;
-    this.trustStrategy = trustStrategy;
-    this.keyPairAliasDerivationStrategy = keyPairAliasDerivationStrategy;
-  }
-
-  @PostConstruct
-  public void initialize() {
-    datasetConverter = new RdfDatasetConverter();
-    HttpHeaders headers = new HttpHeaders();
-    this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
-    try {
-      restTemplateWithDefaultWebId = createRestTemplateForReadingLinkedData(this.keyStoreService
-        .getDefaultAlias());
-    } catch (Exception e) {
-      logger.error("Failed to create ssl tofu rest template", e);
-      throw new RuntimeException(e);
+    public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
+        this.readTimeout = 20000;
+        this.connectionTimeout = 20000; //DEF. TIMEOUT IS 20 sec
+        this.keyStoreService = keyStoreService;
+        this.trustStoreService = trustStoreService;
+        this.trustStrategy = trustStrategy;
+        this.keyPairAliasDerivationStrategy = keyPairAliasDerivationStrategy;
     }
-  }
 
-  private RestTemplate createRestTemplateForReadingLinkedData(String webID){
-    RestTemplate template = null;
-    try {
-      template = CryptographyUtils.createSslRestTemplate(
-        this.keyStoreService.getUnderlyingKeyStore(),
-        this.keyStoreService.getPassword(),
-        new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForNeedUri(webID)),
-        this.trustStoreService.getUnderlyingKeyStore(),
-        this.trustStrategy,
-        readTimeout, connectionTimeout, true);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to create rest template for webID '" + webID +"'", e);
+    @PostConstruct
+    public void initialize() {
+        datasetConverter = new RdfDatasetConverter();
+        HttpHeaders headers = new HttpHeaders();
+        this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
+        try {
+            restTemplateWithDefaultWebId = createRestTemplateForReadingLinkedData(this.keyStoreService
+                    .getDefaultAlias());
+        } catch (Exception e) {
+            logger.error("Failed to create ssl tofu rest template", e);
+            throw new RuntimeException(e);
+        }
     }
-    template.getMessageConverters().add(datasetConverter);
-    return template;
-  }
 
-  @Override
-  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, final URI requesterWebID) {
-
-    HttpMessageConverter datasetConverter = new RdfDatasetConverter();
-    RestTemplate restTemplate;
-    try {
-      restTemplate = getRestTemplateForReadingLinkedData(keyPairAliasDerivationStrategy.getAliasForNeedUri(requesterWebID.toString()));
-    } catch (Exception e) {
-      logger.error("Failed to create ssl tofu rest template", e);
-      throw new RuntimeException(e);
+    private RestTemplate createRestTemplateForReadingLinkedData(String webID) {
+        RestTemplate template = null;
+        try {
+            template = CryptographyUtils.createSslRestTemplate(
+                    this.keyStoreService.getUnderlyingKeyStore(),
+                    this.keyStoreService.getPassword(),
+                    new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForNeedUri(webID)),
+                    this.trustStoreService.getUnderlyingKeyStore(),
+                    this.trustStrategy,
+                    readTimeout, connectionTimeout, true);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create rest template for webID '" + webID + "'", e);
+        }
+        template.getMessageConverters().add(datasetConverter);
+        return template;
     }
-    restTemplate.getMessageConverters().add(datasetConverter);
-    Map<String, String> requestHeaders = new HashMap<String, String>();
-    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
-  }
 
-
-  private RestTemplate getRestTemplateForReadingLinkedData(String webID) {
-
-    if (webID.equals(keyStoreService.getDefaultAlias())) {
-      return restTemplateWithDefaultWebId;
+    @Override
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI) {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+        return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
     }
-    return createRestTemplateForReadingLinkedData(webID);
-  }
 
-  @Override
-  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI) {
-    Map<String, String> requestHeaders = new HashMap<String, String>();
-    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-    return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
-  }
+    @Override
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, final URI requesterWebID) {
 
-  @Override
-  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final
-                                                                Map<String, String> requestHeaders) {
-    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-    return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
-  }
+        HttpMessageConverter datasetConverter = new RdfDatasetConverter();
+        RestTemplate restTemplate;
+        try {
+            restTemplate = getRestTemplateForReadingLinkedData(keyPairAliasDerivationStrategy.getAliasForNeedUri(requesterWebID.toString()));
+        } catch (Exception e) {
+            logger.error("Failed to create ssl tofu rest template", e);
+            throw new RuntimeException(e);
+        }
+        restTemplate.getMessageConverters().add(datasetConverter);
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+        return super.readResourceData(resourceURI, restTemplate, requestHeaders);
+    }
 
-  @Override
-  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final URI requesterWebID, final
-  Map<String, String> requestHeaders) {
-    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-    return super.readResourceData(resourceURI, getRestTemplateForReadingLinkedData(requesterWebID.toString()),
-                                  requestHeaders);
-  }
+    @Override
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(
+            final URI resourceURI, final URI requesterWebID, final HttpHeaders requestHeaders) {
+        requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+        return super.readResourceData(resourceURI, getRestTemplateForReadingLinkedData(requesterWebID.toString()),
+                requestHeaders);
+    }
 
-  public void setReadTimeout(final Integer readTimeout) {
-    this.readTimeout = readTimeout;
-  }
 
-  public void setConnectionTimeout(final Integer connectionTimeout) {
-    this.connectionTimeout = connectionTimeout;
-  }
+    private RestTemplate getRestTemplateForReadingLinkedData(String webID) {
+
+        if (webID.equals(keyStoreService.getDefaultAlias())) {
+            return restTemplateWithDefaultWebId;
+        }
+        return createRestTemplateForReadingLinkedData(webID);
+    }
+
+    @Override
+    public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, HttpHeaders requestHeaders) {
+
+        if (requestHeaders == null) {
+            requestHeaders = new HttpHeaders();
+        }
+        requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+        return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
+    }
+
+    public void setReadTimeout(final Integer readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+    public void setConnectionTimeout(final Integer connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
 }

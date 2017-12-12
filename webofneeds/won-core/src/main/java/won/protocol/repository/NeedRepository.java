@@ -37,6 +37,8 @@ public interface NeedRepository extends WonRepository<Need> {
 
     Need findOneByNeedURI(URI needURI);
 
+    Need findOneByNeedURIAndVersionNot(URI needURI, int version);
+
     @Query("select needURI from Need need where need.creationDate < :referenceDate")
     Slice<URI> getNeedURIsBefore(@Param("referenceDate") Date referenceDate, Pageable pageable);
 
