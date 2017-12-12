@@ -5,6 +5,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
@@ -18,6 +19,7 @@ import java.util.Map;
  * User: ypanchenko
  * Date: 27.03.2015
  */
+@Ignore
 public class WonKeysReaderWriterTest
 {
 

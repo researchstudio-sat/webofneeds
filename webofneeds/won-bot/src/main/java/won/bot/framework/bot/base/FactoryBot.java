@@ -3,6 +3,7 @@ package won.bot.framework.bot.base;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.behaviour.ExecuteWonMessageCommandBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotHintBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotInitBehaviour;
 
@@ -25,6 +26,8 @@ public abstract class FactoryBot extends EventBot {
         BotBehaviour factoryBotInitBehaviour = new FactoryBotInitBehaviour(ctx);
 
         BotBehaviour factoryBotHintBehaviour = new FactoryBotHintBehaviour(ctx);
+        BotBehaviour messageCommandBehaviour = new ExecuteWonMessageCommandBehaviour(ctx);
+
         BotBehaviour runningBehaviour = new  BotBehaviour(ctx) {
             @Override
             protected void onActivate(Optional<Object> message) {
@@ -32,7 +35,7 @@ public abstract class FactoryBot extends EventBot {
             }
         };
 
-        factoryBotInitBehaviour.onDeactivateActivate(runningBehaviour,factoryBotHintBehaviour);
+        factoryBotInitBehaviour.onDeactivateActivate(runningBehaviour, factoryBotHintBehaviour, messageCommandBehaviour);
 
         factoryBotInitBehaviour.activate();
     }

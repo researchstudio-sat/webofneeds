@@ -46,22 +46,28 @@ bin/setenv.*
 /webofneeds/won-owner-webapp/src/main/webapp/node
 /webofneeds/won-owner-webapp/src/main/webapp/node_modules
 /webofneeds/won-owner-webapp/app/config.js
-/webofneeds/won-docker/bots/bots.jar
-/webofneeds/won-docker/bots/conf/
-/webofneeds/won-docker/matcher-service/conf/
-/webofneeds/won-docker/matcher-service/won-matcher-service.jar
-/webofneeds/won-docker/matcher-siren/conf/
-/webofneeds/won-docker/matcher-siren/won-matcher-siren.jar
-/webofneeds/won-docker/owner/conf/
-/webofneeds/won-docker/owner/owner.war
-/webofneeds/won-docker/owner/tomcat-libs/
-/webofneeds/won-docker/wonnode/conf/
-/webofneeds/won-docker/wonnode/tomcat-libs/
-/webofneeds/won-docker/wonnode/won.war
+webofneeds/won-docker/image/bots/bots.jar
+webofneeds/won-docker/image/bots/conf/
+webofneeds/won-docker/image/matcher-rescal/conf/
+webofneeds/won-docker/image/matcher-rescal/python/
+webofneeds/won-docker/image/matcher-rescal/won-matcher-rescal.jar
+webofneeds/won-docker/image/matcher-service/conf/
+webofneeds/won-docker/image/matcher-service/won-matcher-service.jar
+webofneeds/won-docker/image/matcher-solr/conf/
+webofneeds/won-docker/image/matcher-solr/won-matcher-solr.jar
+webofneeds/won-docker/image/owner/conf/
+webofneeds/won-docker/image/owner/owner.war
+webofneeds/won-docker/image/owner/tomcat-libs/
+webofneeds/won-docker/image/wonnode/conf/
+webofneeds/won-docker/image/wonnode/tomcat-libs/
+webofneeds/won-docker/image/wonnode/won.war
+
 
 #local config and data
 webofneeds/conf.*
 /webofneeds/data.local
+webofneeds/state.config.properties
+webofneeds/won.log
 
 #local package caches
 bower_components/

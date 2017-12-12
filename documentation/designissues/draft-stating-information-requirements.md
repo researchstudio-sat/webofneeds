@@ -4,12 +4,36 @@ This document describes a possible approach for how owners can request informati
 
 The basic idea is that an owner uses SHACL shapes to specify their information needs. The counterpart then adds data to their communication channel (the connection) or invalidates already added data until the valid data in the channel can be validated by the shape.  
 
-## Use cases
-Shapes can be used in needs for two reasons
-1. To specify matching Constraints
-2. To specify information required from the counterpart so as to be able to perform an action
+## Variants
+Shapes can be used in needs in the following ways:
+1. /pre-matching/ - as part of the need description
+1. /post-matching/, i.e. during a conversation 
+### pre-matching 
+1. To specify matching constraints.  This is the case if 
+    1. The shape is attached to a `won:seeks` node of the need
+    1. The shape specifies the `sh:severity` `sh:Violation` 
+    1. such shapes should cause non-matching needs to be filtered out while matching
+1. To specify preferences. This is the case if
+    1. The shape is attached to a `won:seeks` node of the need
+    1. The shape specifies the `sh:severity` `sh:Warning` 
+    1. such shapes should cause a penalty for matched needs that do not conform to the shape
+1. To specify properties of interest. This is the case if
+    1. The shape is attached to a `won:seeks` node of the need
+    1. The shape specifies the `sh:severity` `sh:Info` 
+    1. such shapes should cause a boost for matched needs that specify the property
+1. To specify information required from the counterpart so as to be able to perform an action. This could also be called service specification. This is the case if
+    1. The shape is attached to a `won:performs` node that describes an operation the need is able to provide
+    1. In this case, the shape's `sh:Severity` is used to convey mandatory (`sh:Violation`) or optional (`sh:Warning`) parameters
+    
+### post-matching
+In this case, the shape is embedded in the content of a message.
+1. To specify information required from the counterpart so as to be able to perform an action. This could also be called service specification. This is the case if
+    1. The shape is attached to a `[needuri]/won:performs` node that describes an operation the need is able to provide
+    1. In this case, the shape's `sh:Severity` is used to convey mandatory (`sh:Violation`) or optional (`sh:Warning`) parameters
+1. To specify properties of interest after matching. This is the case if  
+    1. The shape is embedded in the content of a message via ´[needuri]/won:seeks´ 
+    1. The `sh:severity` is to be interpreted as an indication of urgency/importance or precedence if multiple shapes are present
 
-For the time being, we only implement 2.
 
 This document is based on the [SHACL Constraint Language (SHACL) W3C Candidate Recommendation](https://www.w3.org/TR/shacl/)
 
@@ -31,6 +55,112 @@ For validating the counterpart's information requirements:
 
 This way, both sides can evaluate each other's information requirements and generate a GUI (e.g. a form, a map, or a calendar) for the user to enter the data.
 
+## Actions 
+
+*NOTE:* this section is going to be re-worked, we are probably not going to use actions as described here.
+
+Needs can declare actions that they can execute and also define call for action to execute an action that counterpart needs declare. 
+
+
+### Declare Actions
+
+To declare an action a need uses the `won:hasActionDeclaration` property appended to the `won:is` branch. Each action declaration has a property `won:hasActionInputShapesGraph` which references a SHACL graph that defines the input to this action. 
+
+The following example defines a need that offers "Taxi in Vienna" with an action declaration:
+
+````
+<taxiOfferUri>
+  a won:Need;
+  won:is [
+    dc:title "Taxi in Vienna";
+    dc:description "Offering taxi services in Vienna and around";
+    won:hasLocation  [
+      a  s:Place ;
+      s:geo [
+        a s:GeoCoordinates ;
+        s:latitude   "48.209269" ;
+        s:longitude  "16.370831"
+      ] ;
+      s:name        "Vienna, Austria"
+    ]
+        
+    won:hasActionDeclaration [
+      won:hasActionInputShapesGraph :pickup-shapes-graph 
+    ]
+  ];
+````
+
+The input shapes graph `:pickup-shapes-graph` in the following defines that there must be exactly one node of class `txi:callTaxiActionRequest` that has  exactly one `txi:hasPickUpLocation` property which describes the pickup either as location (e.g. geo coordinates) or address (e.g. name and number of street):
+
+````
+:pickup-shapes-graph {
+  :pickup-shape
+    a sh:NodeShape ;
+    sh:label "Required pickup information" ;
+    sh:message "The required pickup information could not be found" ;
+    sh:targetClass txi:callTaxiActionRequest ; 
+    sh:severity sh:Violation ;
+    sh:property [
+      sh:path ( txi:hasPickUpLocation ) ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:or (
+        [ sh:node :locationShape ] # details of :locationShape not shown here
+        [ sh:node :addressShape ]  # details of :addressShape not shown here
+      )
+    ] .
+  }
+````
+
+    
+### Request Actions
+
+Needs can also request actions of other needs to perform. An action request is defined by appending a `won:hasActionRequest` property to a `won:seeks` branch. The action request has also a `rdf:type` property but with a concrete action request class (e.g. `txi:callTaxiActionRequest`). 
+
+The input data for the target action is specified by the property `won:actionInputDataGraph` 
+
+and is used to validate the corresponding `won:actionInputShapesGraph` (by providing `txi:hasPickUpLocation` with an address that should be a valid `:addressShape`) of an action declaration of the taxi offer need from above:
+````
+{
+<taxiDemandUri>
+  a won:Need;
+  won:seeks [
+    dc:title "Looking for a taxi in Vienna" ;
+    won:hasLocation [
+      a  s:Place ;
+      s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+    ]
+    
+    won:hasActionRequest [
+      rdf:type txi:callTaxiAction ;
+      txi:hasPickUpLocation [
+        a  s:Place ;
+        s:name  "Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+      ]
+    ]
+  ] ; 
+}
+````    
+    
+### Execute Actions
+
+Actions can be executed when two needs have established a connection. Either of the two needs can propose to execute an action (either its own or one at the counterpart) by using the agreement protocol, described in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf). An execution of an action is proposed by sending a graph to the conversation that has the following structure:
+    
+````
+<msgURI> agr:propose {
+<NeedURI> won:execute <actionURI> 
+<actionUrRI> won:actionInputDataGraph [graph which statisfies the corresponding SHACL constraint]
+}
+````
+    
+The `won:actionInputDataGraph` is meant to satisfy the SHACL constraints defined by `won:actionInputShapesGraph`. The input data graph can either be created newly for the action execution (e.g. by showing the user a form to enter some values) or reference a graph that is already available in the (non-executing) need as defined by "Request Actions". 
+
+If the executing need proposes an action it has to make sure that the SHACL constraints defined by `won:actionInputShapesGraph` are satisfied by the referenced graph of `won:actionInputDataGraph`. In other words the executing need should not propose something for execution that fail validation of the constraints. The other, non-executing, need can also propose the execution of an action (of the counterpart) and should also only propose `won:actionInputDataGraph` graphs which are well-formed regarding the SHACL constraints defined in `won:actionInputShapesGraph`. However, since the non-executing need is not responsible for the execution, the need which declares the action has to check the SHACL constraints before it accepts the proposal.
+
+After an action has been proposed and the SHACL validation is satisfied, it can be accepted (using `agr:accepts` property of the agreement protocol) by the other side to execute it. Now the execution starts (e.g. calling a backend API to call a taxi). Each side can use `agr:proposeToCancel` to try to cancel the action. However this does only cancel the action if the other side accepts this cancel request (e.g. if the taxi backend call hasn’t been made yet or can be rolled back).
+    
+    
+
 ## Changes required in current system; design issues
 
 1. Importing needs must be changed to allow for importing datasets (otherwise, we are not able to specify shapes graphs). This would also be required to specify multiple datasets with different access control settings, so this change might be useful for the future.
@@ -46,9 +176,13 @@ This way, both sides can evaluate each other's information requirements and gene
     1. Such messages would have to contain triples in their content graphs that our shapes are expecting.
         1. simplest solution is to add an imput field for raw RDF data in the owner app.
     1. Alternatively, the counterpart could send messages that tell us to ignore certain graphs that have been sent earlier, because they contained wrong data, or data that is no longer true (such as the current location). The semantics would be 'Graph XY (the one to ignore) is false'.
-        1. In order to do this, the owner app would have to allow creating such messages somehow, e.g. by displaying an 'ignore/don't ignore' toggle button next to each message.
+        1. We have defined how messages can later be retracted in [our DeSemWeb2017 publication](http://ceur-ws.org/Vol-1934/contribution-07.pdf) - we just need to implement that and give it a good GUI
     1. How could the bot could encourage such messages?
-        1. Variant A: Question - Suggestion - Question loop
+        1. Variant A: Keep it simple - show results - wait for triples
+            1. validate the current data with the shapes
+            1. send the validation result to the counterpart
+            1. wait for triples that improve the result or messages that invalidate certain graphs (and thereby improve the result).
+        1. Variant B: Question - Suggestion - Question loop (technically more complicated)
             1. validate the current data with the shapes
             1. create plaintext questions based on the validation result
             1. ask the counterpart those questions
@@ -57,7 +191,4 @@ This way, both sides can evaluate each other's information requirements and gene
             1. The bot sends a message to the counterpart that contains the new triples in its content graph. The semantics of the message is a 'suggestion': The bot asks the counterpart to accept these triples as true. The triples are displayed to the counterpart user and she can accept/deny the triples (as a toggle button next to the displayed triples)
             1. In cases of missing triples where default values are present in the SHACL, the bot can suggest the triples using the default values, without even asking a question.
             1. If the user accepts the triples as correct, the counterpart sends a message with the semantics 'Graph XY (the one the bot sent) is true'
-        1. Variant B: Keep it simple - show results - wait for triples
-            1. validate the current data with the shapes
-            1. send the validation result to the counterpart
-            1. wait for triples that improve the result or messages that invalidate certain graphs (and thereby improve the result).
+        

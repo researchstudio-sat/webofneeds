@@ -14,6 +14,7 @@ function genComponentConf() {
 
         generateHexColor(title) {
             var hash = 0;
+
             if(this.uri){
                 for (var i = 0; i < this.uri.length; i++) {
                     hash = this.uri.charCodeAt(i) + ((hash << 5) - hash);
@@ -27,10 +28,17 @@ function genComponentConf() {
         }
 
         generateTitleCharacter() {
-            if(this.title)
-                return this.title.charAt(0).toUpperCase();
-            else
+            if(this.title) {
+                try {
+                    return this.title.charAt(0).toUpperCase();
+                } catch (err) {
+                    //for resilience purposes, since we can't be sure whether a need is a string or anything else
+                    console.warn("Title Character could not be retrieved from: ", this.title);
+                    return "?";
+                }
+            } else {
                 return "?";
+            }
         }
     }
 

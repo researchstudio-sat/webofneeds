@@ -289,43 +289,41 @@ export function hintMessageReceived(event) {
         //first check if we really have the 'own' need in the state - otherwise we'll ignore the hint
         if (!getState().getIn(['needs', event.getReceiverNeed()])) {
             console.log("ignoring hint for a need that is not ours:", event.getReceiverNeed());
+        } else if(getState().getIn(['needs', event.getMatchCounterpart(), 'state']) === won.WON.InactiveCompacted) {
+            console.log("ignoring hint for an inactive  need:", event.getMatchCounterpart());
+        } else {
+            //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
+            won.invalidateCacheForNewConnection(event.getReceiver(), event.getReceiverNeed())
+                .then(() => {
+                    let needUri = event.getReceiverNeed();
+                    let match = {}
+                    //TODO: why do add the matchscore and counterpart when we don't use the event?
+
+                    event.matchScore = event.getMatchScore();
+                    event.matchCounterpartURI = event.getMatchCounterpart();
+
+                    getConnectionRelatedData(needUri, event.getMatchCounterpart(), event.getReceiver())
+                        .then(data => {
+                                data.receivedEvent = event.getMessageUri();
+                                data.updatedConnection = event.getReceiver();
+                                dispatch({
+                                    type: actionTypes.messages.hintMessageReceived,
+                                    payload: data
+                                });
+                            }
+                        );
+
+                    // /add some properties to the eventData so as to make them easily accessible to consumers
+                    //of the hint event
+                    // below is commented as it seems to cause to hint event data loaded/displayed
+                    //if (eventData.matchCounterpartURI != null) {
+                    //    //load the data of the need the hint is about, if required
+                    //    //linkedDataService.ensureLoaded(eventData.uri);
+                    //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
+                    //}
+
+                    console.log("handling hint message");
+                });
         }
-
-        //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
-        won.invalidateCacheForNewConnection(event.getReceiver(), event.getReceiverNeed())
-            .then(() => {
-                let needUri = event.getReceiverNeed();
-                let match = {}
-                //TODO: why do add the matchscore and counterpart when we don't use the event?
-                
-                event.matchScore = event.getMatchScore();
-                event.matchCounterpartURI = event.getMatchCounterpart();
-
-                console.log('going to crawl connection related data');//deletme
-
-                getConnectionRelatedData(needUri, event.getMatchCounterpart(), event.getReceiver())
-                .then(data => {
-                        data.receivedEvent = event.getMessageUri();
-                        data.updatedConnection = event.getReceiver();
-                        dispatch({
-                            type: actionTypes.messages.hintMessageReceived,
-                            payload: data
-                        });
-                    }
-                );
-
-                // /add some properties to the eventData so as to make them easily accessible to consumers
-                //of the hint event
-                // below is commented as it seems to cause to hint event data loaded/displayed
-                //if (eventData.matchCounterpartURI != null) {
-                //    //load the data of the need the hint is about, if required
-                //    //linkedDataService.ensureLoaded(eventData.uri);
-                //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
-                //}
-
-                console.log("handling hint message")
-            });
     }
 }
-
-

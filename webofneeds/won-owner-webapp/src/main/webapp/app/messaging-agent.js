@@ -177,6 +177,18 @@ export function runMessagingAgent(redux) {
             }
             return false;
         },
+        function(message) {
+            if(message.isResponseToActivateMessage()){
+                if(message.isSuccessResponse()) {
+                    redux.dispatch(actionCreators.messages__reopenNeed__success(message));
+                    return true;
+                } else {
+                    redux.dispatch(actionCreators.messages__reopenNeed__failure(message));
+                    return true;
+                }
+            }
+            return false;
+        },
         function (message) {
             if (message.isResponseToDeactivateMessage()) {
                 if (message.isSuccessResponse()){

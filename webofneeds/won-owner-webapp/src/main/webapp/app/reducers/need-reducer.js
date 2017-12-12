@@ -59,6 +59,9 @@ export default function(allNeedsInState = initialState, action = {}) {
                 allNeedsInState
             );
 
+        case actionTypes.messages.reopenNeed.failed:
+            return storeConnectionsData(allNeedsInState, action.payload.get('connections'), false);
+
         case actionTypes.needs.reopen:
             return changeNeedState(allNeedsInState, action.payload.ownNeedUri, won.WON.ActiveCompacted);
 
