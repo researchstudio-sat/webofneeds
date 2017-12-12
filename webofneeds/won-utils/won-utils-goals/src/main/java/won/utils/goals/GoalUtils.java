@@ -23,12 +23,10 @@ import java.util.Map;
 
 public class GoalUtils {
 
-    private static final String goalExtractionQueryWithFilter;
-    private static final String goalExtractionQueryWithoutFilter;
+    private static final String goalExtractionQuery;
 
     static {
-        goalExtractionQueryWithFilter = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-with-validation-error-filter.sq");
-        goalExtractionQueryWithoutFilter = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-without-filter.sq");
+        goalExtractionQuery = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-only-referenced-properties.sq");
     }
 
     private static String loadSparqlQuery(String filePath) {
@@ -52,29 +50,25 @@ public class GoalUtils {
      * The method executes shacl validation using the shapes model on the data model. The goal data is extracted
      * from the resulting report as well as the shapes and data model. A specific sparql query loaded from resources
      * specifies which data will be extracted. The extracted data will contain all focus nodes that were actually
-     * referenced in the shapes model.
+     * referenced in the shapes model and only these properties that were referenced in the shapes model.
      * For details on the extraction refer to the sparql queries:
-     * /won/utils/goals/extraction/goal-extraction-with-validation-error-filter.sq
-     * /won/utils/goals/extraction/goal-extraction-without-filter.sq
+     * /won/utils/goals/extraction/goal-extraction-only-referenced-properties.sq
      *
      * @param dataModel The data model is expected to contain the rdf data which is usually the merged data of two
      *                  needs and their conversation from which the goal data is gonna be extracted.
      * @param shaclShapesModel the shapes model specifies shacl constraints for the data that should be extracted
      *                         from the data model
-     * @param withValidationErrorFilters if true extracts only those focus nodes which have no validation errors,
-     *                                   if false extracts all focus nodes
      *
      * @return
      */
-    public static Model extractGoalData(Model dataModel, Model shaclShapesModel, boolean withValidationErrorFilters) {
+    public static Model extractGoalData(Model dataModel, Model shaclShapesModel) {
 
         Resource report = ValidationUtil.validateModel(dataModel, shaclShapesModel, false);
         Model combinedModel = ModelFactory.createDefaultModel();
         combinedModel.add(dataModel);
         combinedModel.add(report.getModel());
         combinedModel.add(shaclShapesModel);
-        String sparqlQuery = (withValidationErrorFilters) ? goalExtractionQueryWithFilter : goalExtractionQueryWithoutFilter;
-        Query query = QueryFactory.create(sparqlQuery);
+        Query query = QueryFactory.create(goalExtractionQuery);
         QueryExecution qexec = QueryExecutionFactory.create(query ,combinedModel);
         Model result = qexec.execConstruct();
         return result;

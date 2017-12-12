@@ -7,10 +7,12 @@
 @prefix ex: <http://example.org/ns#> .
 
 ex:Bob
+    a schema:Person ;
     schema:givenName "Robert" ;
     schema:birthDate "1971-07-07"^^xsd:date ;
     schema:address ex:BobsAddress .
 
 ex:BobsAddress
+    a schema:Address ;
     schema:streetAddress "1600 Amphitheatre Pkway" ;
     schema:postalCode 19404 .

@@ -45,8 +45,8 @@ public class GoalInstantiation {
 
         // validate the two goal shapes against all data (from the two needs plus conversation)
         // and extract specific data for each goal using the shacl results
-        Model extractedModel1 = GoalUtils.extractGoalData(combinedModel, shapesModel1, false);
-        Model extractedModel2 = GoalUtils.extractGoalData(combinedModel, shapesModel2, false);
+        Model extractedModel1 = GoalUtils.extractGoalData(combinedModel, shapesModel1);
+        Model extractedModel2 = GoalUtils.extractGoalData(combinedModel, shapesModel2);
 
         // blend the two extracted graphs
         Model blendedModel = GoalUtils.blendGraphsSimple(extractedModel1, extractedModel2, blendingUriPrefix);

@@ -1,3 +1,10 @@
+# This example is taken from http://shacl.org/playground and 
+# transformed to trig, putting shapes, data and validation results in separate graphs
+#
+# Test case: there is an additional node in the data - ex:Paris - that is not covered by the shape.
+# There are two validation results. 
+# Expected result: nothing
+
 @prefix dash: <http://datashapes.org/dash#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -6,21 +13,14 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex: <http://example.org/ns#> .
 
-
 ex:Bob
     a schema:Person ;
     schema:givenName "Robert" ;
-    schema:familyName "Junior" ;
     schema:birthDate "1971-07-07"^^xsd:date ;
-    schema:deathDate "1998-09-10"^^xsd:date ;
-	schema:birthPlace ex:Paris ;
     schema:address ex:BobsAddress .
 
-ex:Alice
-    a schema:Person ;
-    schema:givenName "Alice" ;
-    schema:familyName "McAllister" ;
-    schema:birthDate "1951-01-02"^^xsd:date ;
-    schema:deathDate "1978-09-10"^^xsd:date ;
-	schema:birthPlace ex:London ;
-    schema:address ex:AlicesAddress .
+ex:BobsAddress
+    a schema:Address ;
+    schema:streetAddress "1600 Amphitheatre Pkway" ;
+    schema:postalCode 9404 .
+

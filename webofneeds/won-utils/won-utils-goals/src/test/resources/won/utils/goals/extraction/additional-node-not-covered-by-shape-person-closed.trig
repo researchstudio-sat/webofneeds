@@ -44,6 +44,7 @@ schema:PersonShape
 
 schema:AddressShape
     a sh:NodeShape ;
+    sh:targetClass schema:Address ;
     sh:closed true ;
     sh:property [
         sh:path schema:streetAddress ;
@@ -71,6 +72,7 @@ ex:Bob
     schema:address ex:BobsAddress .
 
 ex:BobsAddress
+    a schema:Address ;
     schema:streetAddress "1600 Amphitheatre Pkway" ;
     schema:postalCode 19404 .
 

@@ -67,7 +67,7 @@
             ] .
     
     _:b0    dc:description  "This is a need automatically created by the DebugBot." ;
-            dc:title        "Debugging with initial connect: tennis lessons" .
+            dc:title        "Debugging with initial connect: taxi in Vienna" .
 }
 
 ex1:p1g-data {
