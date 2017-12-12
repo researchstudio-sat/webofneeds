@@ -57,7 +57,7 @@ ex1:TaxiRideShape
 		sh:path taxi:hasDriver;
 		sh:minCount 1 ;
 		sh:maxCount 1 ;
-		sh:value ex1:p1 ;    # p1's shape ties her own identifier to the data
+		sh:hasValue ex1:p1 ;    # p1's shape ties her own identifier to the data
 	] ;
 	sh:ignoredProperties ( rdf:type ) ;
 	sh:closed true .

@@ -23,7 +23,7 @@ public class GoalDataExtractionTest {
         Dataset ds = loadDataset(baseFolder + "playground-example.trig");
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
-        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel, true);
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isEmpty());
     }
@@ -33,7 +33,7 @@ public class GoalDataExtractionTest {
         Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape.trig");
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
-        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel, true);
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isEmpty());
     }
@@ -43,7 +43,7 @@ public class GoalDataExtractionTest {
         Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape-noerrors.trig");
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
-        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel, true);
         Model expected =loadModel(baseFolder + "additional-node-not-covered-by-shape-noerrors-expected-result.trig");
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
@@ -54,7 +54,7 @@ public class GoalDataExtractionTest {
         Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape-person-closed.trig");
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
-        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel, true);
         Model expected =loadModel(baseFolder + "additional-node-not-covered-by-shape-person-closed-expected-result.trig");
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
@@ -65,7 +65,7 @@ public class GoalDataExtractionTest {
         Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape-property-path.trig");
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
-        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel, true);
         Model expected =loadModel(baseFolder + "additional-node-not-covered-by-shape-property-path-expected-result.trig");
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));
@@ -76,7 +76,7 @@ public class GoalDataExtractionTest {
         Dataset ds = loadDataset(baseFolder + "additional-node-not-covered-by-shape-property-path-with-error.trig");
         Model dataModel = ds.getNamedModel("http://example.org/ns#data");
         Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
-        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel, true);
         Model expected =loadModel(baseFolder + "additional-node-not-covered-by-shape-property-path-with-error-expected-result.trig");
         RDFDataMgr.write(System.out, actual, Lang.TRIG);
         Assert.assertTrue(actual.isIsomorphicWith(expected));

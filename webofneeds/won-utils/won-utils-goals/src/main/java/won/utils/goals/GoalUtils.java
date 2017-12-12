@@ -23,44 +23,58 @@ import java.util.Map;
 
 public class GoalUtils {
 
-    private static final String sparqlExtractionQuery;
+    private static final String goalExtractionQueryWithFilter;
+    private static final String goalExtractionQueryWithoutFilter;
 
     static {
-        String sparqlFile = "/won/utils/goals/extraction/sparql-query-for-extraction.sq";
-        InputStream is  = GoalUtils.class.getResourceAsStream(sparqlFile);
+        goalExtractionQueryWithFilter = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-with-validation-error-filter.sq");
+        goalExtractionQueryWithoutFilter = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-without-filter.sq");
+    }
+
+    private static String loadSparqlQuery(String filePath) {
+        InputStream is  = GoalUtils.class.getResourceAsStream(filePath);
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(is, writer, Charsets.UTF_8);
         } catch (IOException e) {
-            throw new NotFoundException("failed to load resource: " + sparqlFile);
+            throw new NotFoundException("failed to load resource: " + filePath);
+        } finally {
+            try {
+                is.close();
+            } catch (Exception e) {
+            }
         }
-        sparqlExtractionQuery = writer.toString();
+        return writer.toString();
     }
-
 
     /**
      * Extracts data from a data model while considering shacl shapes expressing constraints on that data model.
      * The method executes shacl validation using the shapes model on the data model. The goal data is extracted
      * from the resulting report as well as the shapes and data model. A specific sparql query loaded from resources
      * specifies which data will be extracted. The extracted data will contain all focus nodes that were actually
-     * referenced in the shapes model and that did not produce any validation errors during the shacl validation.
-     * For details on the extraction refer to the sparql query: /won/utils/goals/extraction/sparql-query-for-extraction.sq
+     * referenced in the shapes model.
+     * For details on the extraction refer to the sparql queries:
+     * /won/utils/goals/extraction/goal-extraction-with-validation-error-filter.sq
+     * /won/utils/goals/extraction/goal-extraction-without-filter.sq
      *
      * @param dataModel The data model is expected to contain the rdf data which is usually the merged data of two
      *                  needs and their conversation from which the goal data is gonna be extracted.
      * @param shaclShapesModel the shapes model specifies shacl constraints for the data that should be extracted
      *                         from the data model
+     * @param withValidationErrorFilters if true extracts only those focus nodes which have no validation errors,
+     *                                   if false extracts all focus nodes
      *
      * @return
      */
-    public static Model extractGoalData(Model dataModel, Model shaclShapesModel) {
+    public static Model extractGoalData(Model dataModel, Model shaclShapesModel, boolean withValidationErrorFilters) {
 
         Resource report = ValidationUtil.validateModel(dataModel, shaclShapesModel, false);
         Model combinedModel = ModelFactory.createDefaultModel();
         combinedModel.add(dataModel);
         combinedModel.add(report.getModel());
         combinedModel.add(shaclShapesModel);
-        Query query = QueryFactory.create(sparqlExtractionQuery);
+        String sparqlQuery = (withValidationErrorFilters) ? goalExtractionQueryWithFilter : goalExtractionQueryWithoutFilter;
+        Query query = QueryFactory.create(sparqlQuery);
         QueryExecution qexec = QueryExecutionFactory.create(query ,combinedModel);
         Model result = qexec.execConstruct();
         return result;

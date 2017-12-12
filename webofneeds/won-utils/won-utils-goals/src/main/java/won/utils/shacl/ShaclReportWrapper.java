@@ -19,6 +19,10 @@ public class ShaclReportWrapper {
         reportResource = RdfUtils.findOneSubjectResource(report.getModel(), RDF.type, SH.ValidationReport);
     }
 
+    public Resource getReport() {
+        return report;
+    }
+
     public boolean isConform() {
         RDFNode node = RdfUtils.findOnePropertyFromResource(report.getModel(), reportResource, SH.conforms);
         if (node != null && node.asLiteral() != null) {

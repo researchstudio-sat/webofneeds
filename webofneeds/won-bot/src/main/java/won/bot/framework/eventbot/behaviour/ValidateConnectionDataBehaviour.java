@@ -141,6 +141,7 @@ public class ValidateConnectionDataBehaviour extends BotBehaviour {
                         logger.debug("finished crawling need data for connection {}", command.getConnectionURI());
                         Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
                         RdfUtils.addDatasetToDataset(crawledData, dataset);
+
                         validateConnectionData(crawledData);
                         //deactivate();
                     }
