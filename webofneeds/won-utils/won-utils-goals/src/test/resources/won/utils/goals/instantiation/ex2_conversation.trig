@@ -1,3 +1,5 @@
+# example 2: all information necessary to make a valid goal instance (proposal) is available in the goals of the two needs and the conversation (=> taxi:hasPickupTime)
+
 @prefix msg:   <http://purl.org/webofneeds/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
@@ -16,6 +18,11 @@
 @prefix event: <https://localhost:8443/won/resource/event/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex1: <http://example.org/1/> .
+@prefix ex2: <http://example.org/2/> .
+@prefix taxi: <http://example.org/taxi/> .
 
 <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-xf2s> {
     <https://localhost:8443/won/resource/event/f0750556p5l2jyajdlzz#envelope-xf2s>
@@ -1371,8 +1378,9 @@
 }
 
 <https://localhost:8443/won/resource/event/7741472099153082000#content> {
-    event:7741472099153082000
-            won:hasTextMessage  "How much are the lessons?" .
+     event:7741472099153082000
+            won:hasTextMessage  "Here i send you the missing pickup time" .
+     ex2:myRide taxi:hasPickupTime "2017-11-23T09:30:00Z"^^xsd:dateTime .
 }
 
 <https://localhost:8443/won/resource/event/7741472099153082000#data> {

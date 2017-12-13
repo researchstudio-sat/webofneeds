@@ -2,6 +2,7 @@ package won.utils.goals.instantiation;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
@@ -18,11 +19,11 @@ public class GoalInstantiationTest {
     private static final String baseFolder = "/won/utils/goals/instantiation/";
 
     @Test
-    public void test() throws IOException {
+    public void example1_allInfoInTwoGoals() throws IOException {
 
-        Dataset need1 = loadDataset(baseFolder + "need_seeks_taxi.trig");
-        Dataset need2 = loadDataset(baseFolder + "need_debug_taxi.trig");
-        Dataset conversation = loadDataset(baseFolder + "conversation.trig");
+        Dataset need1 = loadDataset(baseFolder + "ex1_need.trig");
+        Dataset need2 = loadDataset(baseFolder + "ex1_need_debug.trig");
+        Dataset conversation = loadDataset(baseFolder + "ex1_conversation.trig");
 
         GoalInstantiation goalInstantiation = new GoalInstantiation(need1, need2, conversation, "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
@@ -30,6 +31,54 @@ public class GoalInstantiationTest {
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
         Assert.assertTrue(results.iterator().next().isConform());
+    }
+
+    @Test
+    public void example2_allInfoInTwoGoalsAndMessage() throws IOException {
+
+        Dataset need1 = loadDataset(baseFolder + "ex2_need.trig");
+        Dataset need2 = loadDataset(baseFolder + "ex2_need_debug.trig");
+        Dataset conversationWithoutPickupTime = loadDataset(baseFolder + "ex1_conversation.trig");
+        Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
+
+        // this conversation doas not contain the missing pickup time info so the goals cannot be fulfilled
+        GoalInstantiation goalInstantiation = new GoalInstantiation(need1, need2, conversationWithoutPickupTime, "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
+        Assert.assertEquals(1, results.size());
+        System.out.println(results.iterator().next().toString());
+        Assert.assertFalse(results.iterator().next().isConform());
+
+        // this conversation contains the missing pickup info so the goals can be fulfilled
+        goalInstantiation = new GoalInstantiation(need1, need2, conversationWithPickupTime, "http://example.org/blended/");
+        results = goalInstantiation.createAllGoalInstantiationResults();
+        Assert.assertEquals(1, results.size());
+        System.out.println(results.iterator().next().toString());
+        Assert.assertTrue(results.iterator().next().isConform());
+    }
+
+    @Test
+    public void example3_multipleGoalsFulfilled() throws IOException {
+
+        Dataset need1 = loadDataset(baseFolder + "ex3_need.trig");
+        Dataset need2 = loadDataset(baseFolder + "ex3_need_debug.trig");
+        Dataset conversation = loadDataset(baseFolder + "ex3_conversation.trig");
+
+        GoalInstantiation goalInstantiation = new GoalInstantiation(need1, need2, conversation, "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
+
+        for (GoalInstantiationResult r : results) {
+            System.out.println(r);
+        }
+
+        // We have 4 and 2 goals so we expected 8 results
+        Assert.assertEquals(8, results.size());
+
+        // We expected three valid results
+        Collection<Model> validResults = goalInstantiation.findAllValidGoalInstantiationModels();
+        Assert.assertEquals(3, validResults.size());
+        for (Model valid : validResults) {
+            valid.write(System.out, "TRIG");
+        }
     }
 
     private Dataset loadDataset(String path) throws IOException {

@@ -24,6 +24,10 @@ public class GoalInstantiationResult {
         return instanceModel;
     }
 
+    public ShaclReportWrapper getShaclReportWrapper() {
+        return shaclReport;
+    }
+
     public String toString() {
         StringWriter writer = new StringWriter();
         instanceModel.write(writer, "TRIG");

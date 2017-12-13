@@ -1,3 +1,5 @@
+# example 1: all information necessary to make a valid goal instance (proposal) is available in the goals of the two needs
+
 @prefix msg:   <http://purl.org/webofneeds/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix need:  <https://localhost:8443/won/resource/need/> .
