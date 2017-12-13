@@ -32,7 +32,7 @@ public class NeedEvent implements Serializable
 
   public static enum TYPE
   {
-    CREATED, ACTIVATED, DEACTIVATED
+      ACTIVE, INACTIVE
   }
 
   public NeedEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format) {

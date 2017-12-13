@@ -371,7 +371,7 @@ public class CrawlSparqlService extends SparqlService {
             Dataset ds = retrieveNeedDataset(needUri);
             StringWriter sw = new StringWriter();
             RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-            NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED,
+            NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE,
                     crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
             bulkNeedEvent.addNeedEvent(needEvent);
         }
