@@ -1,0 +1,22 @@
+PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+
+DELETE
+ {
+    GRAPH ?contentGraph { ?s ?p ?o }
+ }
+ WHERE
+ {
+    GRAPH ?retractingMessageContent {
+        ?msg mod:retracts ?otherMessage
+    }
+    GRAPH ?retractedMessageEnvelope {
+        ?otherMessage msg:hasContent ?contentGraph
+    }
+    GRAPH ?contentGraph {
+        ?s ?p ?o
+    }
+ }
+
