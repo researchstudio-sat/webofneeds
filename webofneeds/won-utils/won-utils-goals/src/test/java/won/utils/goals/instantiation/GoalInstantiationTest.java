@@ -7,7 +7,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
-import won.utils.goals.GoalInstantiation;
+import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex1_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex1_conversation.trig");
 
-        GoalInstantiation goalInstantiation = new GoalInstantiation(need1, need2, conversation, "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
 
         Assert.assertEquals(1, results.size());
@@ -42,14 +42,14 @@ public class GoalInstantiationTest {
         Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
 
         // this conversation doas not contain the missing pickup time info so the goals cannot be fulfilled
-        GoalInstantiation goalInstantiation = new GoalInstantiation(need1, need2, conversationWithoutPickupTime, "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithoutPickupTime, "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
         Assert.assertFalse(results.iterator().next().isConform());
 
         // this conversation contains the missing pickup info so the goals can be fulfilled
-        goalInstantiation = new GoalInstantiation(need1, need2, conversationWithPickupTime, "http://example.org/blended/");
+        goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime, "http://example.org/blended/");
         results = goalInstantiation.createAllGoalInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
@@ -63,7 +63,7 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex3_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex3_conversation.trig");
 
-        GoalInstantiation goalInstantiation = new GoalInstantiation(need1, need2, conversation, "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
 
         for (GoalInstantiationResult r : results) {
@@ -74,7 +74,7 @@ public class GoalInstantiationTest {
         Assert.assertEquals(8, results.size());
 
         // We expected three valid results
-        Collection<Model> validResults = goalInstantiation.findAllValidGoalInstantiationModels();
+        Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
         Assert.assertEquals(3, validResults.size());
         for (Model valid : validResults) {
             valid.write(System.out, "TRIG");

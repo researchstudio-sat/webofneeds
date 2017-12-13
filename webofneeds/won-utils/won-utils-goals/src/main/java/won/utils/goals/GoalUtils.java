@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Utils class for handling goals related actions like graph blending and data extraction of goals instantiation.
+ */
 public class GoalUtils {
 
     private static final String goalExtractionQuery;

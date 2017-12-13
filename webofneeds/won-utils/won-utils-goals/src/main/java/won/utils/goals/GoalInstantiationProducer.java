@@ -5,7 +5,6 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.topbraid.shacl.validation.ValidationUtil;
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -13,8 +12,12 @@ import won.protocol.util.RdfUtils;
 import java.util.Collection;
 import java.util.LinkedList;
 
-
-public class GoalInstantiation {
+/**
+ * Class supports in producing goal instantiations that can be used to create proposals for instance.
+ * Goal instantiations are data models that evaluate successfully against defined shacl shapes taken from
+ * two goals of two needs.
+ */
+public class GoalInstantiationProducer {
 
     private Dataset need1;
     private Dataset need2;
@@ -22,7 +25,7 @@ public class GoalInstantiation {
     private Model combinedModelWithoutGoals;
     private String blendingUriPrefix;
 
-    public GoalInstantiation(Dataset need1, Dataset need2, Dataset conversation, String blendingUriPrefix) {
+    public GoalInstantiationProducer(Dataset need1, Dataset need2, Dataset conversation, String blendingUriPrefix) {
 
         this.need1 = need1;
         this.need2 = need2;
@@ -51,6 +54,14 @@ public class GoalInstantiation {
         return need1Model;
     }
 
+    /**
+     * Create a goal instantiation result from the attempt to instantiate two goals of two needs using all
+     * the need data, the conversation data and the data and shapes of the two goals.
+     *
+     * @param goal1 resource referencing goal from need1
+     * @param goal2 resource referencing goal from need2
+     * @return
+     */
     private GoalInstantiationResult findInstantiationForGoals(Resource goal1, Resource goal2) {
 
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
@@ -82,11 +93,15 @@ public class GoalInstantiation {
         Model combinedShapesModel = ModelFactory.createDefaultModel();
         combinedShapesModel.add(shapesModel1);
         combinedShapesModel.add(shapesModel2);
-        Resource report = ValidationUtil.validateModel(blendedModel, combinedShapesModel, false);
-
-        return new GoalInstantiationResult(blendedModel, report);
+        return new GoalInstantiationResult(blendedModel, combinedShapesModel);
     }
 
+    /**
+     * create all possible goal instantiations between two needs.
+     * That means trying to combine each two goals of the two needs.
+     *
+     * @return
+     */
     public Collection<GoalInstantiationResult> createAllGoalInstantiationResults() {
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
         NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
@@ -102,7 +117,13 @@ public class GoalInstantiation {
         return results;
     }
 
-    public Collection<Model> findAllValidGoalInstantiationModels() {
+    /**
+     * create all possible goal instantiations between two needs and retrieve only those models
+     * that conform to the shape models of their goals.
+     *
+     * @return
+     */
+    public Collection<Model> createAllConformGoalInstantiationModels() {
 
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
         NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
