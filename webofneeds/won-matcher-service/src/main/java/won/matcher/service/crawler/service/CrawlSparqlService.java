@@ -278,6 +278,7 @@ public class CrawlSparqlService extends SparqlService {
                 " ?needUri a won:Need.\n" +
                 " ?needUri won:hasWonNode ?wonNodeUri. \n" +
                 " ?needUri dcterms:modified ?modificationDate. \n" +
+                " ?needUri dcterms:crawlStatus 'DONE'. \n" +
                 "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
