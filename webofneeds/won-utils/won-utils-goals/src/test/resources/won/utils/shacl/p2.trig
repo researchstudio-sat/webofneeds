@@ -55,7 +55,7 @@ ex2:p2g-shapes {
 		sh:path taxi:hasClient;
 		sh:minCount 1 ;
 		sh:maxCount 1 ;
-		sh:value ex2:p2 ;
+		sh:hasValue ex2:p2 ;
 	] ;
 	sh:property [
 		sh:path taxi:hasDriver;
@@ -65,5 +65,4 @@ ex2:p2g-shapes {
 	] ;
 	sh:ignoredProperties ( rdf:type ) ;
 	sh:closed true .
-
 }

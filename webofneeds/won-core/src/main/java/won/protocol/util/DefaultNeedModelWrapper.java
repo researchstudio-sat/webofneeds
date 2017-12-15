@@ -120,6 +120,7 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
 
     public Coordinate getLocationCoordinate(Resource contentNode) {
 
+        Model needModel = getNeedModel();
         Property geoProperty = needModel.createProperty("http://schema.org/", "geo");
         Property longitudeProperty = needModel.createProperty("http://schema.org/", "longitude");
         Property latitudeProperty = needModel.createProperty("http://schema.org/", "latitude");

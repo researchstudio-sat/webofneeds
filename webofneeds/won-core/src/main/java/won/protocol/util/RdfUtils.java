@@ -158,6 +158,12 @@ public class RdfUtils
       while(namesIt.hasNext()) {
         String name = namesIt.next();
         Model model = dataset.getNamedModel(name);
+        if (!otherDataset.containsNamedModel(name)){
+          //treat empty named graphs same as non-existent ones: check if the named graph in the otherDataset is empty
+          if (dataset.getNamedModel(name).isEmpty()){
+            return true;
+          }
+        }
         Model otherModel = otherDataset.getNamedModel(name);
         if (!areModelsIsomorphic(model, otherModel)){
           return false;
@@ -168,6 +174,10 @@ public class RdfUtils
       while(namesIt.hasNext()) {
         String name = namesIt.next();
         if (!dataset.containsNamedModel(name)){
+          //treat empty named graphs same as non-existent ones: check if the named graph in the otherDataset is empty
+          if (otherDataset.getNamedModel(name).isEmpty()){
+            return true;
+          }
           return false;
         }
       }
@@ -205,14 +215,48 @@ public class RdfUtils
       return new Pair<Model>(cloneFirst, cloneSecond);
     }
     //both models are non-null:
-    //remove all statements from clones that exist in the other one, too
+    //remove all statements from clones that exist in the other one, too (excluding blank nodes)
     StmtIterator it = firstModel.listStatements();
     while (it.hasNext()){
-      cloneSecond.remove(it.nextStatement());
+      Statement stmt = it.nextStatement();
+      if (stmt.getSubject().isAnon() ||
+            stmt.getObject().isAnon()) {
+        Resource s = stmt.getSubject();
+        Property p = stmt.getPredicate();
+        RDFNode o = stmt.getObject();
+        if(s.isAnon()) s = null;
+        if(o.isAnon()) o = null;
+        StmtIterator it2 = cloneSecond.listStatements(s, p, o);
+        while (it2.hasNext()) {
+          Statement toRemove = it2.nextStatement();
+          if (stmt.getSubject().isAnon() && ! toRemove.getSubject().isAnon()) continue;
+          if (stmt.getObject().isAnon() && ! toRemove.getObject().isAnon()) continue;
+          it2.remove();
+        }
+      } else {
+        cloneSecond.remove(stmt);
+      }
     }
     it = secondModel.listStatements();
     while (it.hasNext()){
-      cloneFirst.remove(it.nextStatement());
+      Statement stmt = it.nextStatement();
+      if (stmt.getSubject().isAnon() ||
+              stmt.getObject().isAnon()) {
+        Resource s = stmt.getSubject();
+        Property p = stmt.getPredicate();
+        RDFNode o = stmt.getObject();
+        if(s.isAnon()) s = null;
+        if(o.isAnon()) o = null;
+        StmtIterator it2 =cloneFirst.listStatements(s, p, o);
+        while (it2.hasNext()) {
+          Statement toRemove = it2.nextStatement();
+          if (stmt.getSubject().isAnon() && ! toRemove.getSubject().isAnon()) continue;
+          if (stmt.getObject().isAnon() && ! toRemove.getObject().isAnon()) continue;
+          it2.remove();
+        }
+      } else {
+        cloneFirst.remove(stmt);
+      }
     }
     return new Pair<Model>(cloneFirst, cloneSecond);
   }
@@ -330,6 +374,13 @@ public class RdfUtils
       modelForNewStatements.add(newStmt);
     }
     model.add(modelForNewStatements);
+  }
+
+  public static void removeResource(Model model, Resource resource) {
+      // remove statements where resource is subject
+      model.removeAll(resource, null, (RDFNode) null);
+      // remove statements where resource is object
+      model.removeAll(null, null, resource);
   }
 
   /**
@@ -1437,6 +1488,18 @@ public class RdfUtils
      */
     public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
         addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
+    }
+
+    public static Model mergeAllDataToSingleModel(final Dataset ds) {
+
+        // merge default graph and all named graph data into the default graph to be able to query all of it at once
+        Model mergedModel = ModelFactory.createDefaultModel();
+        Iterator<String> nameIter = ds.listNames();
+        mergedModel.add(ds.getDefaultModel());
+        while (nameIter.hasNext()) {
+            mergedModel.add(ds.getNamedModel(nameIter.next()));
+        }
+        return mergedModel;
     }
 
   /**

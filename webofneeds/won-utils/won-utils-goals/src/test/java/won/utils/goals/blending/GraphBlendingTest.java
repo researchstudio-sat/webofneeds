@@ -3,11 +3,11 @@ package won.utils.goals.blending;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+import won.utils.goals.GoalUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +70,7 @@ public class GraphBlendingTest {
 
         Model m1 = ds.getNamedModel("http://example.org/test#data1");
         Model m2 = ds.getNamedModel("http://example.org/test#data2");
-        Model actual = GraphBlending.blendSimple(m1, m2, "http://example.org/test#blended");
+        Model actual = GoalUtils.blendGraphsSimple(m1, m2, "http://example.org/test#blended");
         Assert.assertEquals(1, actual.listStatements().toList().size());
     }
 
@@ -89,22 +89,11 @@ public class GraphBlendingTest {
         Model expected = ds.getNamedModel("http://example.org/test#blended");
 
         // check that the actual blended graphs is the expected one
-        Model actual = GraphBlending.blendSimple(m1, m2, "http://example.org/test#blended");
+        Model actual = GoalUtils.blendGraphsSimple(m1, m2, "http://example.org/test#blended");
         actual.write(System.out, "TRIG");
 
-        Assert.assertFalse(containSameStatements(m1, m2));
-        Assert.assertTrue(containSameStatements(expected, actual));
-    }
-
-    private boolean containSameStatements(Model m1, Model m2) {
-
-        for (Statement stmt1 : m1.listStatements().toList()) {
-            if (!m2.contains(stmt1)) {
-                return false;
-            }
-        }
-
-        return (m1.listStatements().toList().size() == m2.listStatements().toList().size());
+        Assert.assertFalse(m1.isIsomorphicWith(m2));
+        Assert.assertTrue(expected.isIsomorphicWith(actual));
     }
 
     private Dataset loadDataset(String path) throws IOException {

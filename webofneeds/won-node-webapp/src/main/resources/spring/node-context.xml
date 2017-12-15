@@ -58,7 +58,7 @@
     verification step is not needed, and we can be more open about caching.
      -->
     <sec:http request-matcher="regex"
-              pattern="(/(resource|data|page)/event/.+|/(resource|data|page)/need/[a-zA-z0-9]+/deep.*|/(resource|data|page)/need/[a-zA-z0-9]+/events/.+|/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true)"
+              pattern="dontmatch(/(resource|data|page)/event/.+|/(resource|data|page)/need/[a-zA-z0-9]+/deep.*|/(resource|data|page)/need/[a-zA-z0-9]+/events/.+|/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true)"
               entry-point-ref="authorizationEntryPoint"
               authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
               use-expressions="true"
@@ -72,9 +72,9 @@
         <!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
         <sec:custom-filter ref="clientCertificateWebIdFilter" position="X509_FILTER" />
-        <sec:intercept-url pattern = "/(resource|data|page)/event/.+" access="hasRole('ROLE_WEBID')" />
-        <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" access="hasRole('ROLE_WEBID')" />
-        <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/events/.+"
+        <sec:intercept-url pattern = "dontmatch/(resource|data|page)/event/.+" access="hasRole('ROLE_WEBID')" />
+        <sec:intercept-url pattern = "dontmatch/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" access="hasRole('ROLE_WEBID')" />
+        <sec:intercept-url pattern = "dontmatch/(resource|data|page)/need/[a-zA-z0-9]+/events/.+"
                            access="hasRole('ROLE_WEBID')" />
         <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true"
                            access="hasRole('ROLE_WEBID')" />

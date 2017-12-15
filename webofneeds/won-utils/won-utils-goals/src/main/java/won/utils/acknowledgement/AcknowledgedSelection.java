@@ -1,9 +1,12 @@
-package won.utils.modification;
+package won.utils.acknowledgement;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.query.*;
-import org.apache.jena.update.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.update.UpdateRequest;
 import won.protocol.util.RdfUtils;
 import won.utils.goals.extraction.DataExtraction;
 
@@ -11,12 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-public class ConversationModification {
-
+public class AcknowledgedSelection {
     private String queryString;
-    private static String queryFile = "/modification/query.sq";
+    private static String queryFile = "/acknowledgement/query.sq";
 
-    public ConversationModification() {
+    public AcknowledgedSelection() {
         InputStream is  = DataExtraction.class.getResourceAsStream(queryFile);
         StringWriter writer = new StringWriter();
         try {
@@ -27,13 +29,11 @@ public class ConversationModification {
         this.queryString = writer.toString();
     }
 
-    public Dataset applyModificationSelection(Dataset conversationDataset){
-        //dummy impl for now
+    public Dataset applyAcknowledgedSelection(Dataset conversationDataset){
         UpdateRequest update = UpdateFactory.create(queryString);
         Dataset copy = RdfUtils.cloneDataset(conversationDataset);
         UpdateProcessor updateProcessor = UpdateExecutionFactory.create(update,copy);
         updateProcessor.execute();
-
         return copy;
     }
 }

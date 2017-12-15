@@ -15,6 +15,7 @@
 @prefix event: <https://node.matchat.org/won/resource/event/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
 
 <https://node.matchat.org/won/resource/event/6899375303355711000#need> {
     need:3030440624813201400
@@ -45,6 +46,7 @@
                             won:hasTag              "tennis" , "lesson" ;
                             dc:description  "people learning tennis"
                                                           ] ;
+
             won:hasFacet          won:OwnerFacet ;
             won:hasFlag           won:UsedForTesting ;
             won:hasFlag           won:NoHintForMe;
@@ -53,8 +55,42 @@
                                                       woncrypt:ecc_curveId    "secp384r1" ;
                                                       woncrypt:ecc_qx         "50e72f92e6652ceb8dd70b46f4ff0420df8cfaaa90cd4ad91b0409c3c81dd956835ddce1b3b971165850e4ff1cc71e70" ;
                                                       woncrypt:ecc_qy         "d94553e0fa643c0cd1eb9c72a75705527273ca94665ed54223ef57377aa549d7fb5658ed45bf953d6a83e182d6453ba8"
-                                                    ] ] .
+                                                    ] ] ;
+
+            won:goal [
+                won:hasShapesGraph won:shapesGraph1 ;
+                won:hasDataGraph won:dataGraph1 ;
+            ] ;
+
+            won:goal won:NamedGoal .
+            won:NamedGoal won:hasShapesGraph won:shapesGraph2 .
+            won:NamedGoal won:hasDataGraph won:dataGraph2 .
 }
+
+won:shapesGraph1 {
+
+    won:isTitleShape
+   	    a sh:NodeShape;
+        sh:targetClass won:Need ;
+        sh:property [
+            sh:path ( won:is dc:title );
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+}
+
+won:dataGraph1 {
+    need:3030440624813201400 won:test1 won:test2 .
+}
+
+# empty shapes graph, missing data graph
+won:shapesGraph1 {
+
+}
+
+# won:dataGraph1 {
+# }
+
 
 <https://node.matchat.org/won/resource/need/3030440624813201400#sysinfo> {
     <https://node.matchat.org/won/resource/need/3030440624813201400#events>
