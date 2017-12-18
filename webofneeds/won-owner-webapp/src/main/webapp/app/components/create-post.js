@@ -61,7 +61,7 @@ function genComponentConf() {
                     Retrieving What's Around&nbsp;&hellip;
                 </span>
             </button>
-            <won-labelled-hr label="::'or create your own'"></won-labelled-hr>
+            <won-labelled-hr label="::'... or be more specific:'"></won-labelled-hr>
             <won-posttype-select
                     options="::self.postTypeTexts"
                     on-select="::self.selectType(idx)"

@@ -113,7 +113,7 @@ function genComponentConf() {
                 element: this.mediumMount(),
 
                 modifier: 'auto',
-                placeholder: 'What',
+                placeholder: 'What? - title <br> Longer description #tag',
                 autoHR: false, //if true, inserts <hr> after two empty lines
                 mode: Medium.partialMode, // allows newlines, no styling
                 attributes: {
