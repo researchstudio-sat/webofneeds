@@ -1,7 +1,7 @@
 @import 'won-config';
 
-$verticalPadding: 0.2rem;
-$horizontalPadding: 0.5rem;
+$verticalPadding: 0.7rem;
+$horizontalPadding: 1rem;
 $minHeight: $iconSize + $verticalPadding * 2;
 
 %typeselect {
@@ -9,7 +9,6 @@ $minHeight: $iconSize + $verticalPadding * 2;
   list-style: none;
   border: $thinBorderWidth solid $won-line-gray;
   background-color: white;
-  padding: 0.5rem;
   min-height: $formInputHeight;
   box-sizing: border-box;
 
