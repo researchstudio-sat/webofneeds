@@ -12,7 +12,6 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.model.NeedState;
@@ -32,8 +31,9 @@ import java.util.stream.Collectors;
  * Created by hfriedrich on 16.03.2017.
  */
 public class NeedModelWrapper {
-    protected Model needModel;
-    protected Model sysInfoModel;
+
+    // holds all the need data with its different (default and named) models
+    protected Dataset needDataset;
 
     /**
      * Create a new need model (incluing sysinfo)
@@ -42,12 +42,15 @@ public class NeedModelWrapper {
      */
     public NeedModelWrapper(String needUri) {
 
-        needModel = ModelFactory.createDefaultModel();
+        needDataset = DatasetFactory.create();
+        Model needModel = ModelFactory.createDefaultModel();
         DefaultPrefixUtils.setDefaultPrefixes(needModel);
         needModel.createResource(needUri, WON.NEED);
-        sysInfoModel = ModelFactory.createDefaultModel();
+        Model sysInfoModel = ModelFactory.createDefaultModel();
         DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
         sysInfoModel.createResource(needUri, WON.NEED);
+        needDataset.addNamedModel("dummy#need", needModel);
+        needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
     }
 
     /**
@@ -57,28 +60,24 @@ public class NeedModelWrapper {
      */
     public NeedModelWrapper(Dataset ds) {
 
-        Iterator<String> iter = ds.listNames();
-        while (iter.hasNext()) {
-            String m = iter.next();
-            if (m.endsWith("#need") || m.contains(WonMessageBuilder.CONTENT_URI_SUFFIX)) {
-                needModel = ds.getNamedModel(m);
-                needModel.setNsPrefixes(ds.getDefaultModel().getNsPrefixMap());
-            } else if (m.endsWith("#sysinfo")) {
-                sysInfoModel = ds.getNamedModel(m);
-                sysInfoModel.setNsPrefixes(ds.getDefaultModel().getNsPrefixMap());
+        needDataset = ds;
+        String needUri = getNeedUri();
+
+        if (needUri != null) {
+            if (getNeedModel() == null) {
+                Model needModel = ModelFactory.createDefaultModel();
+                needModel.createResource(needUri, WON.NEED);
+                DefaultPrefixUtils.setDefaultPrefixes(needModel);
+                needDataset.addNamedModel("dummy#need", needModel);
+
             }
-        }
 
-        if ((sysInfoModel == null) && (needModel != null)) {
-            this.sysInfoModel = ModelFactory.createDefaultModel();
-            DefaultPrefixUtils.setDefaultPrefixes(this.sysInfoModel);
-            this.sysInfoModel.createResource(getNeedUri(), WON.NEED);
-        }
-
-        if ((needModel == null) && (sysInfoModel != null)) {
-            this.needModel = ModelFactory.createDefaultModel();
-            DefaultPrefixUtils.setDefaultPrefixes(this.needModel);
-            this.needModel.createResource(getNeedNode(NeedGraphType.SYSINFO).getURI(), WON.NEED);
+            if (getSysInfoModel() == null) {
+                Model sysInfoModel = ModelFactory.createDefaultModel();
+                sysInfoModel.createResource(needUri, WON.NEED);
+                DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
+                needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
+            }
         }
 
         checkModels();
@@ -92,19 +91,35 @@ public class NeedModelWrapper {
      */
     public NeedModelWrapper(Model needModel, Model sysInfoModel) {
 
-        this.needModel = needModel;
-        this.sysInfoModel = sysInfoModel;
+        needDataset = DatasetFactory.create();
+        String needUri = null;
 
-        if ((sysInfoModel == null) && (needModel != null)) {
-            this.sysInfoModel = ModelFactory.createDefaultModel();
-            DefaultPrefixUtils.setDefaultPrefixes(this.sysInfoModel);
-            this.sysInfoModel.createResource(getNeedUri(), WON.NEED);
+        if (sysInfoModel != null) {
+            needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
+            needUri = getNeedNode(NeedGraphType.SYSINFO).getURI();
         }
 
-        if ((needModel == null) && (sysInfoModel != null)) {
-            this.needModel = ModelFactory.createDefaultModel();
-            DefaultPrefixUtils.setDefaultPrefixes(this.needModel);
-            this.needModel.createResource(getNeedNode(NeedGraphType.SYSINFO).getURI(), WON.NEED);
+        if (needModel != null) {
+            needDataset.addNamedModel("dummy#need", needModel);
+            needUri = getNeedNode(NeedGraphType.NEED).getURI();
+        }
+
+        if (needUri != null) {
+            if (sysInfoModel == null) {
+
+                sysInfoModel = ModelFactory.createDefaultModel();
+                DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
+                sysInfoModel.createResource(needUri, WON.NEED);
+                needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
+            }
+
+            if (needModel == null) {
+
+                needModel = ModelFactory.createDefaultModel();
+                DefaultPrefixUtils.setDefaultPrefixes(needModel);
+                needModel.createResource(needUri, WON.NEED);
+                needDataset.addNamedModel("dummy#need", needModel);
+            }
         }
 
         checkModels();
@@ -120,14 +135,34 @@ public class NeedModelWrapper {
 
 
     private void checkModels() {
-        try {
-            getNeedNode(NeedGraphType.NEED);
-            getNeedNode(NeedGraphType.SYSINFO);
-        } catch (NullPointerException e1) {
-            throw new DataIntegrityException("at least one graph of need or sysinfo must exist in dataset", e1);
-        } catch (IncorrectPropertyCountException e2) {
-            throw new DataIntegrityException("need and sysinfo models must be a won:Need");
+        if (getNeedNode(NeedGraphType.SYSINFO) == null || getNeedNode(NeedGraphType.SYSINFO) == null) {
+            throw new DataIntegrityException("need and sysinfo models must contain a resource of type won:Need");
         }
+    }
+
+    protected Model getNeedModel() {
+        Iterator<String> modelNameIter = needDataset.listNames();
+        while(modelNameIter.hasNext()) {
+            String modelName = modelNameIter.next();
+
+            // need content graphs usually end with "#need" the debug bot creates content graphs
+            // with the pattern "#content-". we must detect all possibilities here
+            if (modelName.endsWith("#need") || modelName.contains("#content-")) {
+                return needDataset.getNamedModel(modelName);
+            }
+        }
+        return null;
+    }
+
+    protected Model getSysInfoModel() {
+        Iterator<String> modelNameIter = needDataset.listNames();
+        while(modelNameIter.hasNext()) {
+            String modelName = modelNameIter.next();
+            if (modelName.endsWith("#sysinfo")) {
+                return needDataset.getNamedModel(modelName);
+            }
+        }
+        return null;
     }
 
     /**
@@ -136,12 +171,11 @@ public class NeedModelWrapper {
      * @param graph type specifies the need or sysinfo model to return
      * @return need or sysinfo model
      */
-    public Model getNeedModel(NeedGraphType graph) {
-
+    public Model copyNeedModel(NeedGraphType graph) {
         if (graph.equals(NeedGraphType.NEED)) {
-            return needModel;
+            return RdfUtils.cloneModel(getNeedModel());
         } else {
-            return sysInfoModel;
+            return RdfUtils.cloneModel(getSysInfoModel());
         }
     }
 
@@ -153,15 +187,38 @@ public class NeedModelWrapper {
      */
     public Resource getNeedNode(NeedGraphType graph) {
 
-        if (graph.equals(NeedGraphType.NEED)) {
-            return RdfUtils.findOneSubjectResource(needModel, RDF.type, WON.NEED);
-        } else {
-            return RdfUtils.findOneSubjectResource(sysInfoModel, RDF.type, WON.NEED);
+
+        if (graph.equals(NeedGraphType.NEED) && getNeedModel() != null) {
+            ResIterator iter = getNeedModel().listSubjectsWithProperty(RDF.type, WON.NEED);
+            if (iter.hasNext()) {
+                return iter.next();
+            }
+        } else if (graph.equals(NeedGraphType.SYSINFO) && getSysInfoModel() != null) {
+            ResIterator iter = getSysInfoModel().listSubjectsWithProperty(RDF.type, WON.NEED);
+            if (iter.hasNext()) {
+                return iter.next();
+            }
         }
+
+        return null;
     }
 
     public String getNeedUri() {
-        return getNeedNode(NeedGraphType.NEED).getURI();
+
+        Resource needNode = null;
+        Resource sysInfoNode = null;
+        try {
+            needNode = getNeedNode(NeedGraphType.NEED);
+        } catch (Exception e) {
+            sysInfoNode = getNeedNode(NeedGraphType.SYSINFO);
+        }
+
+        if (needNode != null) {
+            return needNode.getURI();
+        } else if (sysInfoNode != null) {
+            return sysInfoNode.getURI();
+        }
+        return null;
     }
 
     public void addFlag(Resource flag) {
@@ -174,18 +231,57 @@ public class NeedModelWrapper {
 
     public void addFacetUri(String facetUri) {
 
-        Resource facet = needModel.createResource(facetUri);
+        Resource facet = getNeedModel().createResource(facetUri);
         getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_FACET, facet);
     }
 
     public Collection<String> getFacetUris() {
 
         Collection<String> facetUris = new LinkedList<>();
-        NodeIterator iter = needModel.listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_FACET);
+        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_FACET);
         while (iter.hasNext()) {
             facetUris.add(iter.next().asResource().getURI());
         }
         return facetUris;
+    }
+
+    public Collection<Resource> getGoals() {
+
+        Collection<Resource> goalUris = new LinkedList<>();
+        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.GOAL);
+        while (iter.hasNext()) {
+            goalUris.add(iter.next().asResource());
+        }
+        return goalUris;
+    }
+
+    public Resource getGoal(String uri) {
+        return getNeedModel().getResource(uri);
+    }
+
+    public Model getShapesGraph(Resource goalNode) {
+
+        if (goalNode != null) {
+            NodeIterator nodeIter = getNeedModel().listObjectsOfProperty(goalNode, WON.HAS_SHAPES_GRAPH);
+            if (nodeIter.hasNext()) {
+                String shapesGraphUri = nodeIter.next().asResource().getURI();
+                return needDataset.getNamedModel(shapesGraphUri);
+            }
+        }
+
+        return null;
+    }
+
+    public Model getDataGraph(Resource goalNode) {
+        if (goalNode != null) {
+            NodeIterator nodeIter = getNeedModel().listObjectsOfProperty(goalNode, WON.HAS_DATA_GRAPH);
+            if (nodeIter.hasNext()) {
+                String dataGraphUri = nodeIter.next().asResource().getURI();
+                return needDataset.getNamedModel(dataGraphUri);
+            }
+        }
+
+        return null;
     }
 
     public void setNeedState(NeedState state) {
@@ -197,6 +293,7 @@ public class NeedModelWrapper {
     }
 
     public NeedState getNeedState() {
+        Model sysInfoModel = getSysInfoModel();
         sysInfoModel.enterCriticalSection(true);
         RDFNode state = RdfUtils.findOnePropertyFromResource(sysInfoModel, getNeedNode(NeedGraphType.SYSINFO), WON.IS_IN_STATE);
         sysInfoModel.leaveCriticalSection();
@@ -210,12 +307,12 @@ public class NeedModelWrapper {
     public ZonedDateTime getCreationDate() {
 
         String dateString = RdfUtils.findOnePropertyFromResource(
-                sysInfoModel, getNeedNode(NeedGraphType.SYSINFO), DCTerms.created).asLiteral().getString();
+                getSysInfoModel(), getNeedNode(NeedGraphType.SYSINFO), DCTerms.created).asLiteral().getString();
         return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
     }
 
     public void setConnectionContainerUri(String containerUri) {
-        Resource container = sysInfoModel.createResource(containerUri);
+        Resource container = getSysInfoModel().createResource(containerUri);
         Resource need = getNeedNode(NeedGraphType.SYSINFO);
         need.removeAll(WON.HAS_CONNECTIONS);
         need.addProperty(WON.HAS_CONNECTIONS, container);
@@ -223,12 +320,12 @@ public class NeedModelWrapper {
 
     public String getConnectionContainerUri() {
         return RdfUtils.findOnePropertyFromResource(
-                sysInfoModel, getNeedNode(NeedGraphType.SYSINFO), WON.HAS_CONNECTIONS).asResource().getURI();
+                getSysInfoModel(), getNeedNode(NeedGraphType.SYSINFO), WON.HAS_CONNECTIONS).asResource().getURI();
     }
 
     public void setWonNodeUri(String nodeUri) {
 
-        Resource node = sysInfoModel.createResource(nodeUri);
+        Resource node = getSysInfoModel().createResource(nodeUri);
         Resource need = getNeedNode(NeedGraphType.SYSINFO);
         need.removeAll(WON.HAS_WON_NODE);
         need.addProperty(WON.HAS_WON_NODE, node);
@@ -236,7 +333,7 @@ public class NeedModelWrapper {
 
     public String getWonNodeUri() {
         return RdfUtils.findOnePropertyFromResource(
-                sysInfoModel, getNeedNode(NeedGraphType.SYSINFO), WON.HAS_WON_NODE).asResource().getURI();
+                getSysInfoModel(), getNeedNode(NeedGraphType.SYSINFO), WON.HAS_WON_NODE).asResource().getURI();
     }
 
     /**
@@ -252,7 +349,7 @@ public class NeedModelWrapper {
             throw new IllegalArgumentException("NeedContentPropertyType.ALL not defined for this method");
         }
 
-        Resource contentNode = (uri != null) ? needModel.createResource(uri) : needModel.createResource();
+        Resource contentNode = (uri != null) ? getNeedModel().createResource(uri) : getNeedModel().createResource();
         addContentPropertyToNeedNode(type, contentNode);
         return contentNode;
     }
@@ -265,7 +362,7 @@ public class NeedModelWrapper {
         } else if (NeedContentPropertyType.SEEKS.equals(type)) {
             needNode.addProperty(WON.SEEKS, contentNode);
         } else if (NeedContentPropertyType.SEEKS_SEEKS.equals(type)) {
-            Resource intermediate = needModel.createResource();
+            Resource intermediate = getNeedModel().createResource();
             needNode.addProperty(WON.SEEKS, intermediate);
             intermediate.addProperty(WON.SEEKS, contentNode);
         } else if (NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
@@ -331,7 +428,7 @@ public class NeedModelWrapper {
                 "SELECT DISTINCT ?contentNode WHERE { \n" + queryClause + "\n }";
 
         Query query = QueryFactory.create(queryString);
-        QueryExecution qexec = QueryExecutionFactory.create(query, needModel);
+        QueryExecution qexec = QueryExecutionFactory.create(query, getNeedModel());
         ResultSet rs = qexec.execSelect();
 
         while (rs.hasNext()) {
@@ -363,7 +460,7 @@ public class NeedModelWrapper {
 
     public String getContentPropertyStringValue(Resource contentNode, Property p) {
 
-        RDFNode node = RdfUtils.findOnePropertyFromResource(needModel, contentNode, p);
+        RDFNode node = RdfUtils.findOnePropertyFromResource(getNeedModel(), contentNode, p);
         if (node != null && node.isLiteral()) {
             return node.asLiteral().getString();
         }
@@ -383,7 +480,7 @@ public class NeedModelWrapper {
     public Collection<String> getContentPropertyStringValues(Resource contentNode, Property p, String language) {
 
         Collection<String> values = new LinkedList<>();
-        NodeIterator nodeIterator = needModel.listObjectsOfProperty(contentNode, p);
+        NodeIterator nodeIterator = getNeedModel().listObjectsOfProperty(contentNode, p);
         while (nodeIterator.hasNext()) {
             Literal literalValue = nodeIterator.next().asLiteral();
             if (language == null || language.equals(literalValue.getLanguage())) {
@@ -461,7 +558,7 @@ public class NeedModelWrapper {
         Collection<Resource> nodes = getContentNodes(type);
         RDFNode object = null;
         for (Resource node : nodes) {
-            NodeIterator nodeIterator = needModel.listObjectsOfProperty(node, p);
+            NodeIterator nodeIterator = getNeedModel().listObjectsOfProperty(node, p);
             if (nodeIterator.hasNext()) {
                 if (object != null) {
                     throw new IncorrectPropertyCountException("expected exactly one occurrence of property " + p.getURI(), 1, 2);
@@ -488,7 +585,7 @@ public class NeedModelWrapper {
         }
 
         Node node = nodes.iterator().next().asNode();
-        return RdfUtils.getNodeForPropertyPath(needModel, node, path);
+        return RdfUtils.getNodeForPropertyPath(getNeedModel(), node, path);
     }
 
     private boolean isSplittableNode(RDFNode node) {
@@ -526,7 +623,7 @@ public class NeedModelWrapper {
      * @return
      */
     public Model normalizeNeedModel() {
-        Model copy = RdfUtils.cloneModel(needModel);
+        Model copy = RdfUtils.cloneModel(getNeedModel());
         Set<RDFNode> blacklist = new HashSet<>();
         RDFNode needNode = copy.getResource(getNeedUri().toString());
         //System.out.println("model before modification:");

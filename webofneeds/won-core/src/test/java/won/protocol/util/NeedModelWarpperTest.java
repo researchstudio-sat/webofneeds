@@ -2,9 +2,9 @@ package won.protocol.util;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.message.Utils;
 import won.protocol.model.NeedContentPropertyType;
@@ -15,6 +15,7 @@ import won.protocol.vocabulary.WON;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 /**
  * Created by hfriedrich on 16.03.2017.
@@ -23,7 +24,6 @@ public class NeedModelWarpperTest {
     private final String NEED_URI = "https://node.matchat.org/won/resource/need/3030440624813201400";
 
     @Test
-    @Ignore
     public void loadModels() throws IOException {
 
         // load dataset and if the need and sysinfo models are there
@@ -33,11 +33,11 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(NEED_URI, needModelWrapper.getNeedNode(NeedGraphType.SYSINFO).getURI());
 
         // load the need and sysinfo models individually
-        Model needModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
-        Model sysInfoModel = needModelWrapper.getNeedModel(NeedGraphType.SYSINFO);
+        Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+        Model sysInfoModel = needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO);
         NeedModelWrapper needModelWrapperNew = new NeedModelWrapper(needModel, sysInfoModel);
-        Assert.assertEquals(needModelWrapperNew.getNeedModel(NeedGraphType.NEED), needModelWrapper.getNeedModel(NeedGraphType.NEED));
-        Assert.assertEquals(needModelWrapperNew.getNeedModel(NeedGraphType.SYSINFO), needModelWrapper.getNeedModel(NeedGraphType.SYSINFO));
+        Assert.assertTrue(needModelWrapperNew.copyNeedModel(NeedGraphType.NEED).isIsomorphicWith(needModelWrapper.copyNeedModel(NeedGraphType.NEED)));
+        Assert.assertTrue(needModelWrapperNew.copyNeedModel(NeedGraphType.SYSINFO).isIsomorphicWith(needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO)));
 
         // load only the need model, the other one is created
         needModelWrapperNew = new NeedModelWrapper(needModel, null);
@@ -73,7 +73,22 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG, null).size());
         Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, WON.HAS_TAG, null).size());
         Assert.assertEquals(5, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG, null).size());
-        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, "won:hasLocation/<s:geo>/<s:longitude>"));
+        Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, "won:hasLocation/s:geo/s:longitude"));
+
+        // query the goals
+        Assert.assertEquals(2, needModelWrapper.getGoals().size());
+        Assert.assertNotNull(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal"));
+        Assert.assertTrue(needModelWrapper.getShapesGraph(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal")).isEmpty());
+        Assert.assertTrue(needModelWrapper.getDataGraph(needModelWrapper.getGoal("http://purl.org/webofneeds/model#NamedGoal")).isEmpty());
+        Collection<Resource> goals = needModelWrapper.getGoals();
+        Resource blank = null;
+        for (Resource goal : goals) {
+            if (!goal.isURIResource()) {
+                blank = goal;
+            }
+        }
+        Assert.assertFalse(needModelWrapper.getShapesGraph(blank).isEmpty());
+        Assert.assertFalse(needModelWrapper.getDataGraph(blank).isEmpty());
     }
 
     @Test
@@ -96,7 +111,7 @@ public class NeedModelWarpperTest {
 
         // create a empty wrapper with a need uri, check that the need and sysinfo models are there
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(NEED_URI);
-        Assert.assertNotNull(needModelWrapper.getNeedModel(NeedGraphType.SYSINFO));
+        Assert.assertNotNull(needModelWrapper.copyNeedModel(NeedGraphType.SYSINFO));
         Assert.assertEquals(NEED_URI, needModelWrapper.getNeedUri());
 
         // check that wrapper is empty
@@ -129,7 +144,7 @@ public class NeedModelWarpperTest {
 
         // create a empty wrapper with a need uri, check that the need and sysinfo models are there
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(NEED_URI);
-        Assert.assertNotNull(needModelWrapper.getNeedModel(NeedGraphType.NEED));
+        Assert.assertNotNull(needModelWrapper.copyNeedModel(NeedGraphType.NEED));
         Assert.assertEquals(NEED_URI, needModelWrapper.getNeedUri());
 
         // adding content without creating content nodes doesnt work
@@ -175,7 +190,7 @@ public class NeedModelWarpperTest {
         // compare model that is not changed by normalization
         Dataset ds = Utils.createTestDataset("/needmodel/need1.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
-        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         Assert.assertTrue(originalModel.isIsomorphicWith(normalizedModel));
 
@@ -187,7 +202,7 @@ public class NeedModelWarpperTest {
         // check case where "is" and "seeks" point to the same blank node
         Dataset ds = Utils.createTestDataset("/needmodel/need2.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
-        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
         Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
@@ -204,7 +219,7 @@ public class NeedModelWarpperTest {
         // check case where "is" and "seeks" point to the same blank node
         Dataset ds = Utils.createTestDataset("/needmodel/need3.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
-        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
         Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
@@ -221,7 +236,7 @@ public class NeedModelWarpperTest {
         // check case where "is" and "seeks" point to the same blank node
         Dataset ds = Utils.createTestDataset("/needmodel/need4.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
-        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
         Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
@@ -238,7 +253,7 @@ public class NeedModelWarpperTest {
         // check case where "is" and "seeks" point to the same blank node
         Dataset ds = Utils.createTestDataset("/needmodel/need5.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
-        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
         Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
@@ -253,7 +268,7 @@ public class NeedModelWarpperTest {
         // check case where "is" and "seeks" point to the same blank node
         Dataset ds = Utils.createTestDataset("/needmodel/need6.trig");
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
-        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
     }

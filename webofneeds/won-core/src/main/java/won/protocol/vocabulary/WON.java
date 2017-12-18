@@ -115,6 +115,10 @@ public class WON {
     public static final Property IS = m.createProperty(BASE_URI, "is");
     public static final Property SEEKS = m.createProperty(BASE_URI, "seeks");
 
+    public static final Property GOAL = m.createProperty(BASE_URI, "goal");
+    public static final Property HAS_SHAPES_GRAPH = m.createProperty(BASE_URI, "hasShapesGraph");
+    public static final Property HAS_DATA_GRAPH = m.createProperty(BASE_URI, "hasDataGraph");
+
     public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
     public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
 

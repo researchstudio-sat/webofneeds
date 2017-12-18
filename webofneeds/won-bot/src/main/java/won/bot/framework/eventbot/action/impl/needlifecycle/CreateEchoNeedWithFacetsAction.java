@@ -80,7 +80,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
             needModelWrapper.addFacetUri(facetUri.toString());
         }
 
-        final Model needModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        final Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
 

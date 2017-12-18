@@ -97,7 +97,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                     wrapper.addFacetUri(facet.toString());
                 }
 
-                Model model = wrapper.getNeedModel(NeedGraphType.NEED);
+                Model model = wrapper.copyNeedModel(NeedGraphType.NEED);
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model, isUsedForTesting, isDoNotMatch);

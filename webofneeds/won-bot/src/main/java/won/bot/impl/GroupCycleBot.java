@@ -661,6 +661,6 @@ public class GroupCycleBot extends EventBot {
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needURI.toString());
         needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.title, title);
         needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.description, description);
-        return needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        return needModelWrapper.copyNeedModel(NeedGraphType.NEED);
     }
 }
