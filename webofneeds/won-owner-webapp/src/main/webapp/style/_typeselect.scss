@@ -15,9 +15,10 @@ $minHeight: $iconSize + $verticalPadding * 2;
   & .ts__option, & .ts__option--selected {
     padding: $verticalPadding $horizontalPadding;
     min-height: $minHeight;
-	margin: 0 0.5rem;
-	&:first { margin-top: 0.5rem; }
-	&:last { margin-bottom: 0.5rem; }
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+	&:first-of-type { margin-top: 0.5rem; }
+	&:last-of-type { margin-bottom: 0.5rem; }
     position: relative; // so the help-boxes can be placed absolutely
 
     @include flex-row-spaced;
