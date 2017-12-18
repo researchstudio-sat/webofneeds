@@ -156,7 +156,7 @@ function genComponentConf() {
 
             const selectFromState = (state) => {
                 return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround") && need.get("state") === won.WON.ActiveCompacted),
                 }
             };
 
