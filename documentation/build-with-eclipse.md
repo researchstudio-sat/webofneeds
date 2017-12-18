@@ -2,8 +2,9 @@
 
 ### Eclipse:
 
-1.	Download Eclipse Oxygen: Java EE
-2.	https://www.eclipse.org/downloads/download.php?file=/oomph/epp/oxygen/R/eclipse-inst-win64.exe
+1.	Download Eclipse Oxygen: Java EE:
+    * either get the portable version here: https://www.eclipse.org/downloads/eclipse-packages/ » Eclipse IDE for Java EE Developers » 64bit. 
+    * or use this direct link to the currently latest zip: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/1a/eclipse-jee-oxygen-1a-win32-x86_64.zip
 3.	Place the Eclipse main folder in “C:\DATA\DEV\repo”
 4.	Start Eclipse
 5.	Install Spring: Help -> Eclipse Marketplace –> Search and install “Spring Tool Suite”
