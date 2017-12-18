@@ -186,15 +186,12 @@ public class WorkerCrawlerActor extends UntypedActor {
             needModelWrapper = new NeedModelWrapper(ds);
             if (needModelWrapper.isANeed()) {
                 NeedState state = needModelWrapper.getNeedState();
-                if (state.equals(NeedState.ACTIVE)) {
 
-                    log.debug("Created need event for need uri {}", uriMsg.getUri());
-                    long crawlDate = System.currentTimeMillis();
-                    NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
-                    NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
-                    pubSubMediator
-                            .tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
-                }
+                NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
+                log.debug("Created need event for need uri {}", uriMsg.getUri());
+                long crawlDate = System.currentTimeMillis();
+                NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
             }
 
         } catch (DataIntegrityException e) {

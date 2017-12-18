@@ -147,7 +147,7 @@ public class MasterCrawlerActor extends UntypedActor
    * @param message
    */
   @Override
-  public void onReceive(final Object message) {
+  public void onReceive(final Object message) throws InterruptedException {
 
     if (message.equals(RECRAWL_TICK)) {
       askWonNodeInfoForCrawling();
@@ -239,7 +239,7 @@ public class MasterCrawlerActor extends UntypedActor
    *
    * @param event
    */
-  private void processWonNodeEvent(WonNodeEvent event) {
+  private void processWonNodeEvent(WonNodeEvent event) throws InterruptedException {
 
     if (event.getStatus().equals(WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE)) {
 
@@ -247,6 +247,9 @@ public class MasterCrawlerActor extends UntypedActor
       log.debug("added new won node to set of crawling won nodes: {}", event.getWonNodeUri());
       skipWonNodeUris.remove(event.getWonNodeUri());
       crawlWonNodeUris.add(event.getWonNodeUri());
+
+      // sleep 30 seconds before start crawling to give the matcher time to connect to each other
+      Thread.sleep(30000);
       startCrawling(event.getWonNodeInfo());
 
     } else if (event.getStatus().equals(WonNodeEvent.STATUS.SKIP_WON_NODE)) {

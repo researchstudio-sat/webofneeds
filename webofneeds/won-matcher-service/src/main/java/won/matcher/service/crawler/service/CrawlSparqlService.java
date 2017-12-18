@@ -278,6 +278,7 @@ public class CrawlSparqlService extends SparqlService {
                 " ?needUri a won:Need.\n" +
                 " ?needUri won:hasWonNode ?wonNodeUri. \n" +
                 " ?needUri dcterms:modified ?modificationDate. \n" +
+                " ?needUri dcterms:crawlStatus 'DONE'. \n" +
                 "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
@@ -371,7 +372,7 @@ public class CrawlSparqlService extends SparqlService {
             Dataset ds = retrieveNeedDataset(needUri);
             StringWriter sw = new StringWriter();
             RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-            NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED,
+            NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE,
                     crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
             bulkNeedEvent.addNeedEvent(needEvent);
         }
