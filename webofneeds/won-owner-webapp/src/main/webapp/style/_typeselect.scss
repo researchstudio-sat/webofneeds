@@ -1,7 +1,7 @@
 @import 'won-config';
 
-$verticalPadding: 0.7rem;
-$horizontalPadding: 1rem;
+$verticalPadding: .2rem;
+$horizontalPadding: .5rem;
 $minHeight: $iconSize + $verticalPadding * 2;
 
 %typeselect {
@@ -15,7 +15,9 @@ $minHeight: $iconSize + $verticalPadding * 2;
   & .ts__option, & .ts__option--selected {
     padding: $verticalPadding $horizontalPadding;
     min-height: $minHeight;
-
+	margin: 0 0.5rem;
+	&:first { margin-top: 0.5rem; }
+	&:last { margin-bottom: 0.5rem; }
     position: relative; // so the help-boxes can be placed absolutely
 
     @include flex-row-spaced;
