@@ -1,7 +1,7 @@
 @import 'won-config';
 
-$verticalPadding: 0.2rem;
-$horizontalPadding: 0.5rem;
+$verticalPadding: .2rem;
+$horizontalPadding: .5rem;
 $minHeight: $iconSize + $verticalPadding * 2;
 
 %typeselect {
@@ -9,14 +9,22 @@ $minHeight: $iconSize + $verticalPadding * 2;
   list-style: none;
   border: $thinBorderWidth solid $won-line-gray;
   background-color: white;
-  padding: 0.5rem;
   min-height: $formInputHeight;
   box-sizing: border-box;
 
+  & .ts__option{
+    &:first-of-type { margin-top: 0.5rem; }
+    &:last-of-type { margin-bottom: 0.5rem; }
+  }
+  & .ts__option--selected {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem; 
+  }
   & .ts__option, & .ts__option--selected {
     padding: $verticalPadding $horizontalPadding;
     min-height: $minHeight;
-
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
     position: relative; // so the help-boxes can be placed absolutely
 
     @include flex-row-spaced;

@@ -61,7 +61,7 @@ function genComponentConf() {
                     Retrieving What's Around&nbsp;&hellip;
                 </span>
             </button>
-            <won-labelled-hr label="::'or create your own'"></won-labelled-hr>
+            <won-labelled-hr label="::' or be more specific '"></won-labelled-hr>
             <won-posttype-select
                     options="::self.postTypeTexts"
                     on-select="::self.selectType(idx)"
@@ -74,7 +74,11 @@ function genComponentConf() {
                 </won-image-dropzone>
 
                 <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+
             </div>
+			<div class="cp__textfield_instruction" ng-if="self.isValid()">
+				<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+			</div>			
 
             <div class="cp__details" ng-repeat="detail in self.details track by $index" ng-if="self.isValid()">
                 <div class="cp__tags" ng-if="detail === 'tags'">
@@ -121,7 +125,7 @@ function genComponentConf() {
                         ng-class="{'picked' : self.isDetailPresent('timeframe')}">Deadline or Timeframe</div> -->
                 </div>
             </div>
-            <won-labelled-hr label="::'or'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+            <won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
 
             <button type="submit" class="won-button--filled red cp__publish"
                     ng-if="self.isValid()"

@@ -60,21 +60,32 @@ public class SolrMatcherActor extends UntypedActor {
 
         if (o instanceof NeedEvent) {
             NeedEvent needEvent = (NeedEvent) o;
-            processNeedEvent(needEvent);
+            if (needEvent.getEventType().equals(NeedEvent.TYPE.ACTIVE)) {
+                processActiveNeedEvent(needEvent);
+            } else if (needEvent.getEventType().equals(NeedEvent.TYPE.INACTIVE)) {
+                processInactiveNeedEvent(needEvent);
+            } else {
+                unhandled(o);
+            }
         } else if (o instanceof BulkNeedEvent) {
             log.info("received bulk need event, processing {} need events ...", ((BulkNeedEvent) o).getNeedEvents().size());
             for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
-                processNeedEvent(event);
+                processActiveNeedEvent(event);
             }
         } else {
             unhandled(o);
         }
     }
 
-    protected void processNeedEvent(NeedEvent needEvent)
+    protected void processInactiveNeedEvent(NeedEvent needEvent) throws IOException, JsonLdError {
+        log.info("Add inactive need event content {} to solr index", needEvent);
+        needIndexer.index(needEvent.deserializeNeedDataset());
+    }
+
+    protected void processActiveNeedEvent(NeedEvent needEvent)
             throws IOException, SolrServerException, JsonLdError {
 
-        log.info("Start processing need event {}", needEvent);
+        log.info("Start processing active need event {}", needEvent);
 
         // check if the need has doNotMatch flag, then do not use it for querying or indexing
         Dataset dataset = needEvent.deserializeNeedDataset();

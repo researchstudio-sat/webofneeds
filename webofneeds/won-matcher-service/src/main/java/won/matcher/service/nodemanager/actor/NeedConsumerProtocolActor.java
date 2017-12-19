@@ -79,15 +79,15 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
           long crawlDate = System.currentTimeMillis();
 
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, crawlDate,
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate,
                                   camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, crawlDate,
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVE, crawlDate,
                                   camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, crawlDate,
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.INACTIVE, crawlDate,
                                   camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
           } else {
@@ -96,7 +96,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
 
           // let the crawler save the data of this event too
           ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(
-            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate);
+            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate, null);
           resMsg.setSerializedResource(camelMsg.body().toString());
           resMsg.setSerializationFormat(Lang.TRIG);
           pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());

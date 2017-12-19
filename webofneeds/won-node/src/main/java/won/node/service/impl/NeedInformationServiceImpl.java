@@ -294,6 +294,20 @@ public class NeedInformationServiceImpl implements NeedInformationService
     return (DataAccessUtils.loadNeed(needRepository, needURI));
   }
 
+    @Override
+    public DataWithEtag<Need> readNeed(final URI needURI, String etag) throws NoSuchNeedException
+    {
+        if (needURI == null) throw new IllegalArgumentException("needURI is not set");
+        Need need = null;
+        if (etag == null) {
+            need = DataAccessUtils.loadNeed(needRepository, needURI);
+        } else {
+            Integer version = Integer.valueOf(etag);
+            need = needRepository.findOneByNeedURIAndVersionNot(needURI, version);
+        }
+        return new DataWithEtag<>(need, need == null ? etag : Integer.toString(need.getVersion()), etag);
+    }
+
   @Override
   public Model readNeedContent(final URI needURI) throws NoSuchNeedException
   {

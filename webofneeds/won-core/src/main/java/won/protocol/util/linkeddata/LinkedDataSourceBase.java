@@ -29,6 +29,7 @@ import org.apache.jena.tdb.TDB;
 import org.apache.jena.tdb.TDBFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.RdfUtils;
@@ -80,11 +81,11 @@ public class LinkedDataSourceBase implements LinkedDataSource
      * @param resource uri of the resource to request
      * @return dataset including http response headers
      */
-  public DatasetResponseWithStatusCodeAndHeaders getDatasetWithHeadersForResource(URI resource) {
+  public DatasetResponseWithStatusCodeAndHeaders getDatasetWithHeadersForResource(URI resource, HttpHeaders httpHeaders) {
 
       assert resource != null : "resource must not be null";
       logger.debug("fetching linked data for URI {}", resource);
-      return linkedDataRestClient.readResourceDataWithHeaders(resource);
+      return linkedDataRestClient.readResourceDataWithHeaders(resource, httpHeaders);
   }
 
   @Override

@@ -58,6 +58,6 @@ public class SolrTest {
         }
 
         String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
-        return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.CREATED, System.currentTimeMillis(), dataset);
+        return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.ACTIVE, System.currentTimeMillis(), dataset);
     }
 }

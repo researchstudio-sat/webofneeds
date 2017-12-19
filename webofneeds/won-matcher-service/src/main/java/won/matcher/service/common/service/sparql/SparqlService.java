@@ -67,8 +67,11 @@ public class SparqlService
 
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, model, Lang.NTRIPLES);
-    String query = "\nCLEAR GRAPH <" + graph + ">;\n" + "\nINSERT DATA { GRAPH <" + graph + "> { " + sw + "}};\n";
-    return query;
+    String query = "\nCLEAR GRAPH ?g;\n" + "\nINSERT DATA { GRAPH ?g { " + sw + "}};\n";
+    ParameterizedSparqlString pps = new ParameterizedSparqlString();
+    pps.setCommandText(query);
+    pps.setIri("g", graph);
+    return pps.toString();
   }
 
   /**
@@ -99,9 +102,11 @@ public class SparqlService
 
   public Model retrieveModel(String graphName) {
 
-    String queryTemplate = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <%s> { ?s ?p ?o } . }";
-    String queryString = String.format(queryTemplate, graphName);
-    Query query = QueryFactory.create(queryString);
+    String queryTemplate = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?g { ?s ?p ?o } . }";
+    ParameterizedSparqlString pps = new ParameterizedSparqlString();
+    pps.setCommandText(queryTemplate);
+    pps.setIri("g", graphName);
+    Query query = QueryFactory.create(pps.toString());
     QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
     Model model = qexec.execConstruct();
     return model;
@@ -120,9 +125,13 @@ public class SparqlService
   public Dataset retrieveNeedDataset(String uri) {
 
     String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { " +
-      "GRAPH ?g { <" + uri + "> a won:Need. ?a ?b ?c. } }";
+      "GRAPH ?g { ?uri a won:Need. ?a ?b ?c. } }";
 
-    Query query = QueryFactory.create(queryString);
+    ParameterizedSparqlString pps = new ParameterizedSparqlString();
+    pps.setCommandText(queryString);
+    pps.setIri("uri", uri);
+
+    Query query = QueryFactory.create(pps.toString());
     QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
     ResultSet results = qexec.execSelect();
 

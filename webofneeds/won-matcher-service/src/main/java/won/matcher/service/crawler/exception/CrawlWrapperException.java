@@ -16,7 +16,8 @@ public class CrawlWrapperException extends RuntimeException
   public CrawlWrapperException(Exception e, CrawlUriMessage msg) {
     super(e.getMessage());
     exception = e;
-    breakingMessage = new CrawlUriMessage(msg.getUri(), msg.getBaseUri(), CrawlUriMessage.STATUS.FAILED, msg.getCrawlDate());
+    breakingMessage = new CrawlUriMessage(msg.getUri(), msg.getBaseUri(), msg.getWonNodeUri(),
+            CrawlUriMessage.STATUS.FAILED, msg.getCrawlDate(), msg.getResourceETagHeaderValues());
   }
 
   public Exception getException() {
