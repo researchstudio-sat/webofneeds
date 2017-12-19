@@ -85,6 +85,12 @@ won-create-post {
       }
     }
   }
+  
+  .cp__textfield_instruction {
+    color: $won-line-gray;
+    padding: 0 1rem;
+	@include appearAnimation(0.5s, linear);
+  }
 
   .cp__details {
     @include slideWithOpacityAnimation(1.0s, linear, 60rem, 0.5rem, 0.75rem);
