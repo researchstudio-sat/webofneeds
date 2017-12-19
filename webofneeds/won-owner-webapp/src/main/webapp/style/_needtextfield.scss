@@ -44,18 +44,18 @@ need-textfield {
     & .Medium, & .Medium-placeholder {
       //$padding: 0.3rem;
       //padding: $padding;
-      font-size: $normalFontSize;
-      min-height: $formInputHeight;
 
+      font-size: $normalFontSize;
       $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
       $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
-      padding: $verticalPadding 0.438rem;
 
+      padding: $verticalPadding 1rem;
+	  min-height: $formInputHeight + $realFontHeight;
+	  
       box-sizing: border-box;
 
       min-width: 0; // so a size is specified and break-word works
       word-wrap: break-word;
-
 
       &.wdt__text--placeholder {
         color: $won-line-gray;
