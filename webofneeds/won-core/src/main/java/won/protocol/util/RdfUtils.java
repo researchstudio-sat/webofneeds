@@ -201,6 +201,13 @@ public class RdfUtils
     model.add(modelForNewStatements);
   }
 
+  public static void removeResource(Model model, Resource resource) {
+      // remove statements where resource is subject
+      model.removeAll(resource, null, (RDFNode) null);
+      // remove statements where resource is object
+      model.removeAll(null, null, resource);
+  }
+
   /**
    * Creates a new model that contains both specified models' content. The base resource is that of model1,
    * all triples in model2 that are attached to the its base resource are modified so as to be attached to the
@@ -1306,6 +1313,18 @@ public class RdfUtils
      */
     public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
         addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
+    }
+
+    public static Model mergeAllDataToSingleModel(final Dataset ds) {
+
+        // merge default graph and all named graph data into the default graph to be able to query all of it at once
+        Model mergedModel = ModelFactory.createDefaultModel();
+        Iterator<String> nameIter = ds.listNames();
+        mergedModel.add(ds.getDefaultModel());
+        while (nameIter.hasNext()) {
+            mergedModel.add(ds.getNamedModel(nameIter.next()));
+        }
+        return mergedModel;
     }
 
   /**

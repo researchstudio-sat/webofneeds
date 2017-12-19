@@ -3,7 +3,6 @@ package won.bot.framework.eventbot.action.impl.mail.receive;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.bot.context.MailBotContextWrapper;
-import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
@@ -80,7 +79,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     needModelWrapper.addFacetUri(facet.toString());
                 }
 
-                Model model = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+                Model model = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
 
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 

@@ -25,7 +25,6 @@ import won.bot.framework.eventbot.action.impl.counter.Counter;
 import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
-import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedCreationFailedEvent;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
@@ -123,7 +122,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         for (URI facet : facets) {
             needModelWrapper.addFacetUri(facet.toString());
         }
-        final Model needModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        final Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         final Event origEvent = event;
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
