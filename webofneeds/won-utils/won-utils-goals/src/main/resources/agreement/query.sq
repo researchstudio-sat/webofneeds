@@ -1,0 +1,19 @@
+PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+
+ SELECT ?acc ?s ?p ?o WHERE {
+      ?prop agr:proposes ?clause .
+      ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
+      ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+      ?acc agr:accepts ?prop .
+      ?clause msg:hasContent ?clauseContent .
+      GRAPH ?clauseContent {
+      	?s ?p ?o .
+      }
+
+
+}
+order by ?acc
