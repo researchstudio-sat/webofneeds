@@ -71,6 +71,8 @@
                 />
         ...
         </Service>
+    
+    **NOTE: replace with your own certificate path for server and client certificate locations if necessary**
         
 6.  Edit server configuration: DoubleClick the server in the "Server View" and select:
     *  "Open launch configuration" >> (x)= Arguments >> VM arguments >> add 
