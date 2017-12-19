@@ -74,6 +74,9 @@ function genComponentConf() {
                 </won-image-dropzone>
 
                 <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+				<div class="cp__textfield_instruction" ng-if="self.isValid()">
+							<span>Title (1st line) &#9166; Longer description. Supports #tags.</span>
+				</div>
             </div>
 
             <div class="cp__details" ng-repeat="detail in self.details track by $index" ng-if="self.isValid()">
