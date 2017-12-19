@@ -119,7 +119,7 @@ export const piwikMiddleware = store => next => action => {
             'messages.openMessageReceived',
             'connections.connect',
             'messages.connectMessageReceived',
-#            'messages.hintMessageReceived', 
+//            'messages.hintMessageReceived', 
             'connections.close',
         ],
         Needs: [
