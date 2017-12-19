@@ -7,25 +7,25 @@
     * or use this direct link to the currently latest zip: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/1a/eclipse-jee-oxygen-1a-win32-x86_64.zip
 2.  Place the Eclipse main folder in `C:\DATA\DEV\...` 
 3.  Start Eclipse
-4.  Install Spring: Help -> Eclipse Marketplace –> Search and install `Spring Tool Suite`
+4.  Install Spring: Help >> Eclipse Marketplace >> Search and install `Spring Tool Suite`
 5.  Restart Eclipse
 6.  Add `-clean -Xms512m -Xmx1024m` to the `.exe` shortcut
 7.  Clone project with git to `C:\DATA\DEV\workspace` (it’s easier not to do this in eclipse, but with the git bash or gui)
-8.  Import project in eclipse: File -> Import -> Existing Maven Project -> point to `pom.xml`
-9. Deactivate "autobuild": Window -> Preferences -> General -> Workspace -> uncheck "Build automatically"
+8.  Import project in eclipse: File >> Import >> Existing Maven Project >> point to `pom.xml`
+9. Deactivate "autobuild": Window >> Preferences >> General >> Workspace >> uncheck "Build automatically"
 10. Ideykeyscheme: https://code.google.com/archive/p/ideakeyscheme/
     *  Add jar file to `eclipse\plugins` folder. 
     *  Restart Eclipse. 
     *  Open Window → Preferences → General → Keys and select the scheme "Intellij Idea".
-11. Change "spaces for tabs" settings: Window -> Preferences -> General -> Editors -> Text Editors -> Check "Insert spaces for tabs"
+11. Change "spaces for tabs" settings: Window >> Preferences >> General >> Editors >> Text Editors >> Check "Insert spaces for tabs"
 
 ### Tomcat integration:
 
-1.  Create Server: File –> New -> Other -> Server
+1.  Create Server: File >> New >> Other >> Server
 2.  Choose Tomcat
 3.  Add node + owner
-4.  Add Server view: Window -> Show View –> Server
-5.  Change server.xml: In Project Explorer -> Server -> "Your Server" -> open `server.xml` and add
+4.  Add Server view: Window >> Show View >> Server
+5.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
 
         <Service name="Catalina">
         ...
@@ -73,7 +73,7 @@
         </Service>
         
 6.  Edit server configuration: DoubleClick the server in the "Server View" and select:
-    *  "Open launch configuration" -> (x)= Arguments -> VM arguments -> add 
+    *  "Open launch configuration" >> (x)= Arguments >> VM arguments >> add 
             `-XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR=C:\DATA\DEV\workspace\ecWebofneeds\webofneeds\conf.local -Dlogback.configurationFile=C:\DATA\DEV\workspace\ecWebofneeds\webofneeds\conf.local\logback_debug.xml`
     *  Server Locations: "Use Tomcat installation (takes control of tomcat installation)"
     *  Server Options: Publish module… + Modules auto reload…
@@ -81,6 +81,6 @@
     *  Timeouts: i.e. 180 + 30
     *  Ports: The ports should be shown for HTTP + SSL
 7.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure to copy the `tcnative-1.dll` into the Java jdk folder and the tomcat! Same with the `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar`
-    *  Also add them to "Open launch configuration" -> "Classpath" as "Add External JARs..."
+    *  Also add them to "Open launch configuration" >> "Classpath" as "Add External JARs..."
 8.  Start server
 9.  Run the gulpfile outside eclipse: `npm run build` in `wepapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
