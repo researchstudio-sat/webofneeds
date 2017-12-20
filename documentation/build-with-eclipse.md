@@ -26,7 +26,7 @@
 3.  Add node + owner
 4.  Add Server view: Window >> Show View >> Server
 5.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
-
+```xml
         <Service name="Catalina">
         ...
         <Connector 
@@ -58,7 +58,7 @@
                 compression="on" 
                 disableUploadTimeout="true" 
                 enableLookups="true" 
-                keystoreFile="C:\DATA\DEV\workspace\certs\client-certs\owner-keys.jks" 
+                keystoreFile="C:\DATA\DEV\<PATH TO CERTS>\client-certs\owner-keys.jks" 
                 keystorePass="temp" 
                 maxPostSize="5242880000" 
                 maxSpareThreads="75" 
@@ -71,7 +71,8 @@
                 />
         ...
         </Service>
-    
+  ```
+  
     **NOTE: replace with your own certificate path for server and client certificate locations if necessary**
         
 6.  Edit server configuration: DoubleClick the server in the "Server View" and select:
