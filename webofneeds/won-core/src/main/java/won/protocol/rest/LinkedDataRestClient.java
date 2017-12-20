@@ -84,9 +84,15 @@ public abstract class LinkedDataRestClient {
             //RestTemplate will automatically follow redirects on HttpGet calls
             statusCode = response.getStatusCode().value();
             responseHeaders = response.getHeaders();
+
             if (response.getStatusCode().is4xxClientError()) {
                 throw new HttpClientErrorException(response.getStatusCode());
             }
+
+            if (response.getStatusCode().is5xxServerError()) {
+                throw new HttpServerErrorException(response.getStatusCode());
+            }
+
             result = response.getBody();
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException) {
