@@ -10,7 +10,9 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.Lock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
@@ -29,6 +31,8 @@ import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -89,6 +93,7 @@ public class WorkerCrawlerActor extends UntypedActor {
         // URI message to process received
         // start the crawling request
         Dataset ds = null;
+        List<String> etags = null;
 
         // check if resource is already downloaded
         if (uriMsg instanceof ResourceCrawlUriMessage) {
@@ -107,16 +112,32 @@ public class WorkerCrawlerActor extends UntypedActor {
         // download resource if not already downloaded
         if (ds == null) {
             try {
+
+                // use ETag/If-None-Match Headers to make the process more efficient
+                HttpHeaders httpHeaders = new HttpHeaders();
+                if (uriMsg.getResourceETagHeaderValues() != null && !uriMsg.getResourceETagHeaderValues().isEmpty()) {
+                    String ifNoneMatchHeaderValue = StringUtils.collectionToDelimitedString(
+                            uriMsg.getResourceETagHeaderValues(), ", ");
+                    httpHeaders.add("If-None-Match", ifNoneMatchHeaderValue);
+                }
+
                 DatasetResponseWithStatusCodeAndHeaders datasetWithHeaders =
-                        linkedDataSource.getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()));
+                        linkedDataSource.getDatasetWithHeadersForResource(URI.create(uriMsg.getUri()), httpHeaders);
                 ds = datasetWithHeaders.getDataset();
+                etags = datasetWithHeaders.getResponseHeaders().get("ETag");
+
+                // if dataset was not modified (304) we can treat the current crawl uri as done
+                if (ds == null && datasetWithHeaders.getStatusCode() == 304) {
+                    sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
+                    return;
+                }
 
                 // if there is paging activated and the won node tells us that there is more data (previous link)
                 // to be downloaded, then we add this link to the crawling process too
                 String prevLink = linkedDataSource.getPreviousLinkFromDatasetWithHeaders(datasetWithHeaders);
                 if (prevLink != null) {
                     CrawlUriMessage newUriMsg = new CrawlUriMessage(uriMsg.getBaseUri(), prevLink,
-                            uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
+                            uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null);
                     getSender().tell(newUriMsg, getSelf());
                 }
 
@@ -145,47 +166,17 @@ public class WorkerCrawlerActor extends UntypedActor {
             return;
         }
 
-        // send extracted non-base URIs back to sender and save meta data about crawling the URI
-        // extract only uris which were crawled at least one recrawl interval ago
-        long crawlDate = System.currentTimeMillis();
-        log.debug("Extract non-base URIs from message {}", uriMsg);
-
-        // we set the date threshold parameter of extractUri() to 0 here.
-        // That means filtering out all URIs that have already been crawled at some point in time.
-        // Therefore we don't get updates of needs from crawling but it reduces crawling activity a lot
-        long threshold = 0;
-        Set<String> extractedURIs = sparqlService.extractURIs(
-                uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlNonBasePropertyPaths(), threshold);
-        for (String extractedURI : extractedURIs) {
-            CrawlUriMessage newUriMsg = new CrawlUriMessage(
-                    extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate);
-            getSender().tell(newUriMsg, getSelf());
-        }
-
-        // send extracted base URIs back to sender and save meta data about crawling the URI
-        // extract only uris which were crawled at least one recrawl interval ago
-        log.debug("Extract base URIs from message {}", uriMsg);
-
-        // we set the date threshold parameter of extractUri() to 0 here.
-        // That means filtering out all URIs that have already been crawled at some point in time.
-        // Therefore we don't get updates of needs from crawling but it reduces crawling activity a lot
-        threshold = 0;
-        extractedURIs = sparqlService.extractURIs(
-                uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlBasePropertyPaths(), threshold);
-        for (String extractedURI : extractedURIs) {
-            CrawlUriMessage newUriMsg = new CrawlUriMessage(
-                    extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate);
-            getSender().tell(newUriMsg, getSelf());
+        // extract URIs from current resource and send extracted URI messages back to sender
+        log.debug("Extract URIs from message {}", uriMsg);
+        Set<CrawlUriMessage> newCrawlMessages = sparqlService.extractCrawlUriMessages(uriMsg.getBaseUri(), wonNodeUri);
+        for (CrawlUriMessage newMsg : newCrawlMessages) {
+            getSender().tell(newMsg, getSelf());
         }
 
         // signal sender that this URI is processed and save meta data about crawling the URI.
         // This needs to be done after all extracted URI messages have been sent to guarantee consistency
         // in case of failure
-        crawlDate = System.currentTimeMillis();
-        CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
-                uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate);
-        log.info("Crawling done for URI {}", uriDoneMsg.getUri());
-        getSender().tell(uriDoneMsg, getSelf());
+        sendDoneUriMessage(uriMsg, wonNodeUri, etags);
 
         // if this URI/dataset was a need then send an event to the distributed event bus
         NeedModelWrapper needModelWrapper;
@@ -195,14 +186,12 @@ public class WorkerCrawlerActor extends UntypedActor {
             needModelWrapper = new NeedModelWrapper(ds);
             if (needModelWrapper.isANeed()) {
                 NeedState state = needModelWrapper.getNeedState();
-                if (state.equals(NeedState.ACTIVE)) {
 
-                    log.debug("Created need event for need uri {}", uriMsg.getUri());
-                    NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
-                    NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
-                    pubSubMediator
-                            .tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
-                }
+                NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
+                log.debug("Created need event for need uri {}", uriMsg.getUri());
+                long crawlDate = System.currentTimeMillis();
+                NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+                pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
             }
 
         } catch (DataIntegrityException e) {
@@ -229,6 +218,17 @@ public class WorkerCrawlerActor extends UntypedActor {
         } catch (IncorrectPropertyCountException e) {
             return null;
         }
+    }
+
+    private void sendDoneUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags) {
+
+        long crawlDate = System.currentTimeMillis();
+        CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
+                sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
+        String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues()) : "<None>";
+        String responseETags = etags != null ? String.join(", ", etags) : "<None>";
+        log.info("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})", uriDoneMsg.getUri(), responseETags, ifNoneMatch);
+        getSender().tell(uriDoneMsg, getSelf());
     }
 
     public void setSparqlService(final CrawlSparqlService sparqlService) {

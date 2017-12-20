@@ -9,7 +9,7 @@ function genComponentConf() {
                 <a class="cntb__inner__left clickable" ng-click="self.back()">
                     <img  src="generated/icon-sprite.svg#ico27_close" class="cntb__icon">
                 </a>
-                <h1 class="cntb__inner__center cntb__title">Hey, everyone!</div>
+                <h1 class="cntb__inner__center cntb__title">"Hello, everyone, …"</div>
             </div>
         </nav>
     `;

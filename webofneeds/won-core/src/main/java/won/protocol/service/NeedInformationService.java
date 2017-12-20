@@ -91,7 +91,7 @@ public interface NeedInformationService {
     public Collection<URI> listConnectionURIs();
 
     /**
-     * Retrieves all connection URIs that were modified after a certain date
+     * Retrieves all connection URIs that were modified (by adding events) after a certain date
      *
      * @param modifiedAfter modification date
      * @return
@@ -204,6 +204,17 @@ public interface NeedInformationService {
     public Need readNeed(URI needURI) throws NoSuchNeedException;
 
     /**
+     * read need data including if need version number is equal to etag
+     *
+     * @param needURI describes the need to lookup
+     * @param etag describes the version of the data to look up
+     * @return need data with corresponding etag version number
+     * or null if no need with the specified URI or the version number of the etag is found
+     * @throws NoSuchNeedException
+     */
+    public DataWithEtag<Need> readNeed(URI needURI, String etag) throws NoSuchNeedException;
+
+    /**
      * Retrieves the public description of the need as an RDF graph.
      *
      * @param needURI
@@ -220,6 +231,15 @@ public interface NeedInformationService {
      * @throws NoSuchNeedException
      */
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
+
+    /**
+     * read connection data including etag if connection version number is equal to etag
+     *
+     * @param connectionURI describes the connection to lookup
+     * @param Etag describes the version of the data to look up
+     * @return connection data with corresponding etag version number
+     * or null if no need with the specified URI or the version number of the etag is found
+     */
     public DataWithEtag<Connection> readConnection(URI connectionURI, String Etag);
 
     /**

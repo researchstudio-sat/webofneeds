@@ -139,7 +139,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     //  * if ETAG indicates not modified, return cached result but update caching info
     // * return result
     DatasetResponseWithStatusCodeAndHeaders responseData = null;
-    Map<String, String> headers = new HashMap<>();
+    HttpHeaders headers = new HttpHeaders();
 
     if (linkedDataCacheEntry != null) {
       Date now = new Date();
@@ -191,7 +191,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
    * @param headers
    * @return
    */
-  private DatasetResponseWithStatusCodeAndHeaders fetchOnlyOnce(final URI resource, final URI requesterWebID, final LinkedDataCacheEntry linkedDataCacheEntry, final Map<String, String> headers) {
+  private DatasetResponseWithStatusCodeAndHeaders fetchOnlyOnce(final URI resource, final URI requesterWebID, final LinkedDataCacheEntry linkedDataCacheEntry, final HttpHeaders headers) {
     String cacheKey = makeCacheKey(resource, requesterWebID);
     CountDownLatch latch = new CountDownLatch(1);
     CountDownLatch preExistingLatch = countDownLatchMap.putIfAbsent(cacheKey, latch);
@@ -236,7 +236,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
       final URI resource,
       final URI requesterWebID,
       final LinkedDataCacheEntry linkedDataCacheEntry,
-      final Map<String, String> headers) {
+      final HttpHeaders headers) {
     DatasetResponseWithStatusCodeAndHeaders responseData = fetchWithEtagValidation(resource,
                                                                                    requesterWebID, linkedDataCacheEntry, headers);
     Date expires = parseCacheControlMaxAgeValue(resource, responseData);
@@ -313,14 +313,14 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
       final URI resource,
       final URI requesterWebID,
       final LinkedDataCacheEntry linkedDataCacheEntry,
-      final Map<String, String> headers) {
+      final HttpHeaders headers) {
     if (linkedDataCacheEntry == null || linkedDataCacheEntry.getEtag() == null){
       logger.debug("fetching from server without ETAG validation: {} ", resource);
       return fetch(resource, requesterWebID, headers);
     }
     //we already have an etag - use it for validating
-      Map<String, String> myHeaders = headers != null ? headers : new HashMap<>();
-    myHeaders.put(HttpHeaders.IF_NONE_MATCH, linkedDataCacheEntry.getEtag());
+      HttpHeaders myHeaders = headers != null ? headers : new HttpHeaders();
+    myHeaders.add(HttpHeaders.IF_NONE_MATCH, linkedDataCacheEntry.getEtag());
     logger.debug("fetching from server with ETAG validation: {} ", resource);
     DatasetResponseWithStatusCodeAndHeaders datasetResponse = fetch(resource, requesterWebID,
                                                                     myHeaders);
@@ -352,7 +352,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
    * @return
    */
   private DatasetResponseWithStatusCodeAndHeaders fetch(final URI resource, final URI
-    requesterWebID, final Map<String, String> headers) {
+    requesterWebID, final HttpHeaders headers) {
     final DatasetResponseWithStatusCodeAndHeaders responseData;
     if (requesterWebID != null){
       logger.debug("fetching linked data for URI {} with WebID {}", resource, requesterWebID);
