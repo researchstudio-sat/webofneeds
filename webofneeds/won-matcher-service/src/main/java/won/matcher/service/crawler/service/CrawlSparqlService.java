@@ -268,17 +268,20 @@ public class CrawlSparqlService extends SparqlService {
     }
 
     /**
-     * retrieve the last known modification date of any need of a certain won node
-     * @param wonNodeUri won node uri for which the last need modification date should be retrieved
-     * @return last known need modification date for a specific won node or null if none exists
+     * To start crawling (http modification query) from a certain point in time, take last
+     * modification date from a need known in the database that is in status 'DONE' which means
+     * it has been crawled.
+     *
+     * @param wonNodeUri won node uri for which need modification dates should be retrieved
+     * @return modification date to start crawling from or null if none exists
      */
-    public String retrieveLastNeedModificationDate(String wonNodeUri) {
+    public String retrieveNeedModificationDateForCrawling(String wonNodeUri) {
 
         String queryString = "SELECT ?modificationDate WHERE {\n" +
                 " ?needUri a won:Need.\n" +
                 " ?needUri won:hasWonNode ?wonNodeUri. \n" +
                 " ?needUri dcterms:modified ?modificationDate. \n" +
-                " ?needUri dcterms:crawlStatus 'DONE'. \n" +
+                " ?needUri won:crawlStatus 'DONE'. \n" +
                 "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
@@ -299,16 +302,20 @@ public class CrawlSparqlService extends SparqlService {
     }
 
     /**
-     * retrieve the last known modification date of any connection of a certain won node
-     * @param wonNodeUri won node uri for which the last connection modification date should be retrieved
-     * @return last known connection modification date for a specific won node or null if none exists
+     * To start crawling (http modification query) from a certain point in time, take last
+     * modification date from a connection known in the database that is in status 'DONE' which means
+     * it has been crawled.
+     *
+     * @param wonNodeUri won node uri for which connection modification dates should be retrieved
+     * @return modification date to start crawling from or null if none exists
      */
-    public String retrieveLastConnectionModificationDate(String wonNodeUri) {
+    public String retrieveConnectionModificationDateForCrawling(String wonNodeUri) {
 
         String queryString = "SELECT ?modificationDate WHERE {\n" +
                 " ?connectionUri a won:Connection.\n" +
                 " ?connectionUri won:hasWonNode ?wonNodeUri. \n" +
                 " ?connectionUri dcterms:modified ?modificationDate. \n" +
+                " ?connectionUri won:crawlStatus 'DONE'. \n" +
                 "} ORDER BY DESC(?modificationDate) LIMIT 1\n";
 
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
