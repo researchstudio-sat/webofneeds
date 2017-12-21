@@ -1,12 +1,13 @@
 package won.bot.framework.eventbot.event.impl.analyzation.precondition;
 
 import won.protocol.model.Connection;
+import won.utils.goals.GoalInstantiationResult;
 
 /**
  * Created by fsuda on 27.11.2017.
  */
 public class PreconditionUnmetEvent extends PreconditionEvent {
-    public PreconditionUnmetEvent(Connection con, Object payload) {
+    public PreconditionUnmetEvent(Connection con, GoalInstantiationResult payload) {
         super(con, payload);
     }
 }
