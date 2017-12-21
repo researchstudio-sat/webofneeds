@@ -293,7 +293,8 @@ public class MasterCrawlerActor extends UntypedActor
   private void startCrawling(WonNodeInfo wonNodeInfo) {
 
       // get the last known need modification date and start crawling from this point again
-      String lastNeedModificationDate = sparqlService.retrieveLastNeedModificationDate(wonNodeInfo.getWonNodeURI());
+      log.info("start crawling won node: {}", wonNodeInfo.getWonNodeURI());
+      String lastNeedModificationDate = sparqlService.retrieveNeedModificationDateForCrawling(wonNodeInfo.getWonNodeURI());
       if (lastNeedModificationDate != null) {
 
           String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
@@ -317,7 +318,7 @@ public class MasterCrawlerActor extends UntypedActor
       }
 
       // get the last known connection modification date and start crawling from this point again
-      String lastConnectionModificationDate = sparqlService.retrieveLastConnectionModificationDate(wonNodeInfo.getWonNodeURI());
+      String lastConnectionModificationDate = sparqlService.retrieveConnectionModificationDateForCrawling(wonNodeInfo.getWonNodeURI());
       if (lastConnectionModificationDate != null) {
           String connectionPrefixUri = removeEndingSlash(wonNodeInfo.getConnectionURIPrefix());
           String modifiedUri = connectionPrefixUri + "?modifiedafter=" + lastConnectionModificationDate;
