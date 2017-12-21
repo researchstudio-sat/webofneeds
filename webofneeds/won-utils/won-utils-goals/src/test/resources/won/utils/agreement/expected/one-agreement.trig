@@ -19,5 +19,5 @@
 @prefix agr: <http://purl.org/webofneeds/agreement#> .
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#agreement> {
-    <https://localhost:8443/won/resource/event/5669098069340991000>	<http://purl.org/webofneeds/model#hasTextMessage>	"one" .
+    <https://localhost:8443/won/resource/event/5669098069340991000>	won:hasTextMessage	"one" .
 }

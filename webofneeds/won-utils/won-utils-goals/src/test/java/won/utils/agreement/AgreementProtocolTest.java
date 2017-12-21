@@ -24,6 +24,14 @@ public class AgreementProtocolTest {
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "no-agreements.trig");
         test(input,expectedOutput);
     }
+    
+    @Test
+    public void oneAgreementTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
+        test(input,expectedOutput);
+    }
+
 
     public void test(Dataset input, Dataset expectedOutput) {
 

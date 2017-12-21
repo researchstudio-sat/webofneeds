@@ -20,7 +20,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 public class AgreementFunction {
-    private String queryString;
+    private static final String AGREEMENT_SUFFIX = "#agreement";
+	private String queryString;
     private static String queryFile = "/agreement/query.sq";
 
     public AgreementFunction() {
@@ -65,7 +66,9 @@ public class AgreementFunction {
                 currentAgreementContent.add(new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o));
             }
             //add the last model
-            result.addNamedModel(currentAgreement.asResource().getURI(), currentAgreementContent);
+            if (currentAgreement != null) {
+            	result.addNamedModel(currentAgreement.asResource().getURI()+AGREEMENT_SUFFIX, currentAgreementContent);
+            }
             return result;
         }
     }
