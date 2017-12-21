@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.*;
 import org.apache.jena.update.*;
 import won.protocol.util.RdfUtils;
-import won.utils.goals.extraction.DataExtraction;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,7 @@ public class ModifiedSelection {
     private static String queryFile = "/modification/query.sq";
 
     public ModifiedSelection() {
-        InputStream is  = DataExtraction.class.getResourceAsStream(queryFile);
+        InputStream is  = ModifiedSelection.class.getResourceAsStream(queryFile);
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(is, writer, Charsets.UTF_8);

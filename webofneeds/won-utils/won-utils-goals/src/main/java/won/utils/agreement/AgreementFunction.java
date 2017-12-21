@@ -14,7 +14,6 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
 import won.protocol.util.RdfUtils;
-import won.utils.goals.extraction.DataExtraction;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +24,7 @@ public class AgreementFunction {
     private static String queryFile = "/agreement/query.sq";
 
     public AgreementFunction() {
-        InputStream is  = DataExtraction.class.getResourceAsStream(queryFile);
+        InputStream is  = AgreementFunction.class.getResourceAsStream(queryFile);
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(is, writer, Charsets.UTF_8);

@@ -8,7 +8,7 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import won.protocol.util.RdfUtils;
-import won.utils.goals.extraction.DataExtraction;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +19,7 @@ public class AcknowledgedSelection {
     private static String queryFile = "/acknowledgement/query.sq";
 
     public AcknowledgedSelection() {
-        InputStream is  = DataExtraction.class.getResourceAsStream(queryFile);
+        InputStream is  = AcknowledgedSelection.class.getResourceAsStream(queryFile);
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(is, writer, Charsets.UTF_8);
