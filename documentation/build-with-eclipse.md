@@ -77,7 +77,7 @@
         
 6.  Edit server configuration: DoubleClick the server in the "Server View" and select:
     *  "Open launch configuration" >> (x)= Arguments >> VM arguments >> add 
-            `-XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR=C:\DATA\DEV\workspace\ecWebofneeds\webofneeds\conf.local -Dlogback.configurationFile=C:\DATA\DEV\workspace\ecWebofneeds\webofneeds\conf.local\logback_debug.xml`
+            `-XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR=C:\DATA\DEV\workspace\ecWebofneeds\webofneeds\conf.local -Dlogback.configurationFile=C:\DATA\DEV\workspace\ecWebofneeds\webofneeds\conf.local\logback.xml`
     *  Server Locations: "Use Tomcat installation (takes control of tomcat installation)"
     *  Server Options: Publish module… + Modules auto reload…
     *  Publishing: Never publish automatically
