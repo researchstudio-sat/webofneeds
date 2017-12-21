@@ -24,7 +24,7 @@
 
 1.  Create Server: File >> New >> Other >> Server
 2.  Choose Tomcat and click *Next* 
-3.  Add node and owner and click finish
+3.  Add node and owner and click finish (if you don't have these options, you probably did not install eclipse for Java EE)
 4.  Add Server view: Window >> Show View >> Server
 5.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
 ```xml
