@@ -2,8 +2,8 @@
 
 ### Eclipse:
 
-1.  Download Eclipse Oxygen: Java EE:
-    * either get the portable version here: https://www.eclipse.org/downloads/eclipse-packages/ » Eclipse IDE for Java EE Developers » 64bit. 
+1.  Download **Eclipse Oxygen: Java EE**:
+    * either get the portable version here: https://www.eclipse.org/downloads/eclipse-packages/ » Eclipse IDE **for Java EE Developers** » 64bit. 
     * or use this direct link to the currently latest zip: https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/1a/eclipse-jee-oxygen-1a-win32-x86_64.zip
 2.  Install/unzip eclipse to a folder (e.g. `C:\DATA\DEV\...`)
 3.  Start Eclipse
@@ -18,12 +18,13 @@
     *  Restart Eclipse. 
     *  Open Window → Preferences → General → Keys and select the scheme "Intellij Idea".
 11. Change "spaces for tabs" settings: Window >> Preferences >> General >> Editors >> Text Editors >> Check "Insert spaces for tabs"
+12. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check 'skip-tests'
 
 ### Tomcat integration:
 
 1.  Create Server: File >> New >> Other >> Server
-2.  Choose Tomcat
-3.  Add node + owner
+2.  Choose Tomcat and click *Next* 
+3.  Add node and owner and click finish
 4.  Add Server view: Window >> Show View >> Server
 5.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
 ```xml
