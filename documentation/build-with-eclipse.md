@@ -83,7 +83,7 @@
     *  Publishing: Never publish automatically
     *  Timeouts: i.e. 180 + 30
     *  Ports: The ports should be shown for HTTP + SSL
-7.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure to copy the `tcnative-1.dll` **into the Java jdk folder and the tomcat!** (Otherwise you will get Invalid KeystoreFormat Exceptions at server startup and an info message which says "The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path") 
+7.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure to copy the `tcnative-1.dll` **into the Java jdk folder and the tomcat!** (Otherwise you will get Invalid KeystoreFormat Exceptions at server startup and an info message which says "The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path => following path where to put the .dll") 
 Same with the `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar`
     *  Also add the bouncy castle libraries to "Open launch configuration" >> "Classpath" as "Add External JARs..."
 8.  Start server
