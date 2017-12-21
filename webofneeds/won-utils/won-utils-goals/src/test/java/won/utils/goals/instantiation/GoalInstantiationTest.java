@@ -68,6 +68,33 @@ public class GoalInstantiationTest {
 
         for (GoalInstantiationResult r : results) {
             System.out.println(r);
+            Model m = r.getInstanceModel();
+        }
+
+        // We have 4 and 2 goals so we expected 8 results
+        Assert.assertEquals(8, results.size());
+
+        // We expected three valid results
+        Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
+        Assert.assertEquals(3, validResults.size());
+        for (Model valid : validResults) {
+            valid.write(System.out, "TRIG");
+        }
+    }
+
+    @Test
+    public void example4_geoCoordinatesFulfilled() throws IOException {
+
+        Dataset need1 = loadDataset(baseFolder + "ex4_need.trig");
+        Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
+        Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");
+
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
+
+        for (GoalInstantiationResult r : results) {
+            System.out.println(r);
+            Model m = r.getInstanceModel();
         }
 
         // We have 4 and 2 goals so we expected 8 results
