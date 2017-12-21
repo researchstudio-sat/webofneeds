@@ -30,8 +30,8 @@
         <Service name="Catalina">
         ...
         <Connector 
-                SSLCertificateFile="C:/DATA/DEV/workspace/certs/won-server-certs/t-cert.pem" 
-                SSLCertificateKeyFile="C:/DATA/DEV/workspace/certs/won-server-certs/t-key.pem" 
+                SSLCertificateFile="<PATH TO SERVER CERTS>/won-server-certs/t-cert.pem" 
+                SSLCertificateKeyFile="<PATH TO SERVER CERTS>/won-server-certs/t-key.pem" 
                 SSLEnabled="true" 
                 SSLPassword="changeit" 
                 SSLVerifyClient="optionalNoCA" 
@@ -58,7 +58,7 @@
                 compression="on" 
                 disableUploadTimeout="true" 
                 enableLookups="true" 
-                keystoreFile="C:\DATA\DEV\<PATH TO CERTS>\client-certs\owner-keys.jks" 
+                keystoreFile="<PATH TO CLIENT CERTS>\client-certs\owner-keys.jks" 
                 keystorePass="temp" 
                 maxPostSize="5242880000" 
                 maxSpareThreads="75" 
