@@ -1,6 +1,7 @@
 /**
  * Created by ksinger on 01.09.2015.
  */
+import GeoPoint from 'geopoint';
 
 export function hyphen2Camel(hyphened) {
     return hyphened
@@ -130,7 +131,7 @@ export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
  * @returns {*}
  */
 export function repeatVar(x, n) {
-   return Array.apply(null, Array(n)).map(() => x);
+    return Array.apply(null, Array(n)).map(() => x);
 }
 
 /**
@@ -433,7 +434,7 @@ export function* entries(obj) {
 export function mapObj(obj, f) {
     const accumulator = {};
     for(let [key, value] of entries(obj)) {
-       accumulator[key] = f(value, key);
+        accumulator[key] = f(value, key);
     }
     return accumulator;
 }
@@ -461,7 +462,7 @@ export function flattenObj(objOfObj) {
         flattened = Object.assign(flattened, innerObjects);
     }
     return flattened;
-    
+
 }
 
 /**
@@ -478,11 +479,11 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
     //make sure we have an array and not a single uri.
     const urisAsArray = is('Array', uris) ? uris : [uris];
     const asyncLookups = urisAsArray.map(uri =>
-        asyncLookupFunction(uri)
-        .catch(error => {
-            console.error({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
-            return undefined;
-        })
+            asyncLookupFunction(uri)
+                .catch(error => {
+                    console.error({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
+                    return undefined;
+                })
     );
     return Promise.all(asyncLookups).then( dataObjects => {
         const lookupMap = {};
@@ -511,10 +512,10 @@ export function urisToLookupMapStrict(uris, asyncLookupFunction) {
     //make sure we have an array and not a single uri.
     const urisAsArray = is('Array', uris) ? uris : [uris];
     const asyncLookups = urisAsArray.map(uri =>
-        asyncLookupFunction(uri)
-        .catch(error => {
-            throw({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
-        })
+            asyncLookupFunction(uri)
+                .catch(error => {
+                    throw({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
+                })
     );
     return Promise.all(asyncLookups).then( dataObjects => {
         const lookupMap = {};
@@ -600,11 +601,24 @@ export function reverseSearchNominatim(lat, lon, zoom) {
         "&format=json";
 
     if(!isNaN(zoom)) {
-       url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
+        url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
     }
     console.log("About to do reverse lookup on nominatim: " + url);
-    return fetchJSON(url);
+
+    let json = fetchJSON((url)).catch(function(e){
+        var distance = 0.2;
+        var gp = new GeoPoint(lat, lon);
+        var bBox = gp.boundingCoordinates(distance, true);
+        return {
+            display_name: "-",
+            lat: lat,
+            lon: lon,
+            boundingbox: [bBox[0]._degLat, bBox[1]._degLat, bBox[0]._degLon, bBox[1]._degLon],
+        }
+    });
+    return json;
 }
+
 
 /**
  * drop info not stored in rdf, thus info that we
@@ -922,30 +936,30 @@ export function somePromises(promises, errorHandler) {
         handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
 
     const resultPromise = new Promise((resolve, reject) =>
-        promises.forEach((promise, key) => {
-            promise.then(
-                value => {
-                    successes++;
-                    if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-                    results[key] = value;
-                    if (failures + successes >= numPromises) resolve(results);
-                },
-                reason => {
-                    failures ++;
-                    //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
-                    if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-                    results[key] = null;
-                    handler(key, reason);
-                    if (failures >= numPromises) {
-                        reject(results);
-                    } else if (failures + successes >= numPromises) {
-                        resolve(results);
+            promises.forEach((promise, key) => {
+                promise.then(
+                        value => {
+                        successes++;
+                        if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
+                        results[key] = value;
+                        if (failures + successes >= numPromises) resolve(results);
+                    },
+                        reason => {
+                        failures ++;
+                        //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
+                        if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
+                        results[key] = null;
+                        handler(key, reason);
+                        if (failures >= numPromises) {
+                            reject(results);
+                        } else if (failures + successes >= numPromises) {
+                            resolve(results);
+                        }
                     }
-                }
-            )
+                )
 
 
-        })
+            })
     )
 }
 
