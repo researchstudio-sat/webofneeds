@@ -6,8 +6,11 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -20,7 +23,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 public class AgreementFunction {
-    private static final String AGREEMENT_SUFFIX = "#agreement";
+    private static final String AGREEMENT_SUFFIX = "";
 	private String queryString;
     private static String queryFile = "/agreement/query.sq";
 
@@ -36,6 +39,7 @@ public class AgreementFunction {
     }
 
     public Dataset applyAgreementFunction(Dataset conversationDataset){
+    	conversationDataset.begin(ReadWrite.READ);
         Dataset result = DatasetFactory.createGeneral();
         Query query = QueryFactory.create(queryString);
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, conversationDataset)) {
@@ -63,13 +67,16 @@ public class AgreementFunction {
                 RDFNode s = solution.get("s");
                 RDFNode p = solution.get("p");
                 RDFNode o = solution.get("o");
-                currentAgreementContent.add(new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o));
+                Statement newStatement = new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o);
+                currentAgreementContent.add(newStatement);
             }
             //add the last model
             if (currentAgreement != null) {
             	result.addNamedModel(currentAgreement.asResource().getURI()+AGREEMENT_SUFFIX, currentAgreementContent);
             }
             return result;
+        } finally {
+        	conversationDataset.commit();
         }
     }
 }

@@ -32,7 +32,63 @@ public class AgreementProtocolTest {
         test(input,expectedOutput);
     }
 
+    @Test
+    public void oneAgreementOneCancellationTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-one-cancellation.trig");
+        test(input,expectedOutput);
+    }
 
+    @Test
+    public void oneAgreementOneCancellationTestProposalError () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation-proposal-error.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-one-cancellation-proposal-error.trig");
+        test(input,expectedOutput);
+    } 
+    
+    
+    @Test
+    public void oneAgreementTwoProposalClauses () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-two-proposal-clauses.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-two-proposal-clauses.trig");
+        test(input,expectedOutput);
+    } 
+    
+    @Test
+    public void oneAgreementMissingProposal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-missing-proposal.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-missing-proposal.trig");
+        test(input,expectedOutput);
+    }
+    
+    @Test
+    public void oneAgreementMissingClause () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-missing-clause.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-missing-clause.trig");
+        test(input,expectedOutput);
+    }
+    
+    @Test
+    public void noAgreementOneCancellationError () throws IOException {
+        Dataset input = loadDataset( inputFolder + "no-agreement-one-cancellation-error.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "no-agreement-one-cancellation-error.trig");
+        test(input,expectedOutput);
+    }
+    
+    @Test
+    public void twoProposalOneAgreementOneCancellation () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-one-agreement-one-cancellation.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-agreement-one-cancellation.trig");
+        test(input,expectedOutput);
+    }
+    
+    @Test
+    public void twoProposalOneAgreementOneCancellationError () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-one-agreement-errormsg-one-cancellation.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-agreement-errormsg-one-cancellation.trig");
+        test(input,expectedOutput);
+    }
+    
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
