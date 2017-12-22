@@ -23,10 +23,11 @@
 ### Tomcat integration:
 
 1.  Create Server: File >> New >> Other >> Server
-2.  Choose Tomcat and click *Next* 
-3.  Add node and owner and click finish (if you don't have these options, you probably did not install eclipse for Java EE)
-4.  Add Server view: Window >> Show View >> Server
-5.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
+2.  Choose Tomcat 
+3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
+4.  Add node and owner and click finish (if you don't have these options, you probably did not install eclipse for Java EE)
+5.  Add Server view: Window >> Show View >> Server
+6.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
 ```xml
         <Service name="Catalina">
         ...
@@ -76,7 +77,7 @@
   
 **NOTE: replace with your own certificate path for server and client certificate locations if necessary**
         
-6.  Edit server configuration: DoubleClick the server in the "Server View" and select:
+7.  Edit server configuration: DoubleClick the server in the "Server View" and select:
     *  "Open launch configuration" >> (x)= Arguments >> VM arguments >> add 
             `-XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR=<PATH TO PROJECT>/webofneeds/conf.local -Dlogback.configurationFile=<PATH TO PROJECT>/webofneeds/conf.local/logback.xml` (Note: Change the path to the webofneeds project according to your configuration)
     *  Server Locations: "Use Tomcat installation (takes control of tomcat installation)"
@@ -84,7 +85,7 @@
     *  Publishing: Never publish automatically
     *  Timeouts: i.e. 180 + 30
     *  Ports: The ports should be shown for HTTP + SSL
-7.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure to copy the `tcnative-1.dll` **into the Java jdk bin folder and the tomcat libs folder!** (Otherwise you will get Invalid KeystoreFormat Exceptions at server startup and an info message which says "The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path => following path where to put the .dll") 
-8. Add the bouncy castle libraries `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to "Open launch configuration" >> "Classpath" as "Add External JARs..." and to the tomcat lib folder
-9.  Start server
-10.  Run the gulpfile outside eclipse: `npm run build` in `wepapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
+8.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure to copy the `tcnative-1.dll` **into the Java jdk bin folder and the tomcat libs folder!** (Otherwise you will get Invalid KeystoreFormat Exceptions at server startup and an info message which says "The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path => following path where to put the .dll") 
+9. Add the bouncy castle libraries `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to "Open launch configuration" >> "Classpath" as "Add External JARs..." and to the tomcat lib folder
+10.  Start server
+11.  Run the gulpfile outside eclipse: `npm run build` in `wepapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"
