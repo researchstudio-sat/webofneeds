@@ -25,7 +25,10 @@
 1.  Create Server: File >> New >> Other >> Server
 2.  Choose Tomcat 
 3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
-4.  Add node and owner and click finish (if you don't have these options, you probably did not install eclipse for Java EE)
+4.  Add node and owner and click finish 
+      1. If you do not have the options to add the owner and node application to the tomcat (also accessible via Server >> [your tomcat server] >> Add and Remove), something went wrong.
+            1. Maybe you did not install eclipse for Java EE. Check Help >> About Eclipse. If it does not say 'Eclipse Java EE IDE for Web Developers.', the easiest is to download and install Eclipse for Java EE.
+            2. Maybe the import of the webofneeds maven project somehow did not work properly. Delete all imported projects (without deleting the sources), then import again (File >> Import... >> Maven >> Existing Maven Projects )
 5.  Add Server view: Window >> Show View >> Server
 6.  Change server.xml: In Project Explorer >> Server >> "Your Server" >> open `server.xml` and add
 ```xml
