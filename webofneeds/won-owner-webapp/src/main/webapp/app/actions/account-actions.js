@@ -89,7 +89,7 @@ export async function ensureLoggedIn(dispatch, getState) {
 
     // wait for the server to process the login and the reconnect to
     // go through, before proceeding to need-creation.
-    await delay(500);
+    await delay(3000);
 }
 
 let _loginInProcessFor;
