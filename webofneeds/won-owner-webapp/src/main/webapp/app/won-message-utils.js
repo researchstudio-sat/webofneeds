@@ -340,7 +340,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     // wait for the own needs to be dispatched then load connections
     const allConnectionsPromise = allOwnNeedsPromise.then(() =>
         Promise.all(ownNeedUris.map(uri =>
-            won.getConnectionUrisOfNeed(uri)
+            won.getConnectionUrisOfNeed(uri, false)
                 .then(connectionUris =>
                     urisToLookupMap(connectionUris, uri =>
                             fetchConnectionAndDispatch(uri, curriedDispatch)

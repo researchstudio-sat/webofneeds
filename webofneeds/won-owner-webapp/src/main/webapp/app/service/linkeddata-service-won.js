@@ -1340,7 +1340,7 @@ import won from './won.js';
      * @return {*} the data of all connection-nodes referenced by that need
      */
     won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
-        won.getConnectionUrisOfNeed(needUri, requesterWebId)
+        won.getConnectionUrisOfNeed(needUri, requesterWebId,true)
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
@@ -1351,11 +1351,18 @@ import won from './won.js';
     /*
      * Loads all URIs of a need's connections.
      */
-    won.getConnectionUrisOfNeed = (needUri, requesterWebId) =>
-        won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId)
-            .then(
-                (result) =>  result.map( x => x.connection.value));
-
+    won.getConnectionUrisOfNeed = (needUri, requesterWebId, includeClosed=false) =>
+    	{
+    		if (includeClosed) {
+    			return won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId)
+            		.then(
+            			(result) =>  result.map( x => x.connection.value));
+    		} else {
+    			return won.executeCrawlableQuery(won.queries["getUnclosedConnectionUrisOfActiveNeed"], needUri, requesterWebId)
+        		.then(
+        			(result) =>  result.map( x => x.connection.value));
+    		}
+    	}	
 
     /**
      *
@@ -1758,6 +1765,41 @@ import won from './won.js';
                 "  ?connection won:belongsToNeed ?need; \n" +
                 "              won:hasRemoteNeed ?remoteNeed; \n"+
             "                  won:hasConnectionState ?connectionState. \n"+
+                "} \n"
+
+        },
+        /**
+         * Despite the name, returns the connections fo the specified need themselves. TODO rename
+         */
+        "getUnclosedConnectionUrisOfActiveNeed" : {
+            propertyPaths : [
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections"
+                },
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections/rdfs:member"
+                }
+            ],
+        query:
+                "prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                "select ?connection ?need ?remoteNeed ?connectionState  \n" +
+                " where { \n" +
+                " <::baseUri::> a won:Need; \n" +
+                "           won:hasConnections ?connections; \n" +
+                "           won:isInState ?needState."
+                "  ?connections rdfs:member ?connection. \n" +
+                "  ?connection won:belongsToNeed ?need; \n" +
+                "              won:hasRemoteNeed ?remoteNeed; \n"+
+                "                  won:hasConnectionState ?connectionState. \n"+
+                "  filter ( ?connectionState != won:Closed && ?needState = won:Active) \n" +
                 "} \n"
 
         },
