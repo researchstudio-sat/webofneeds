@@ -460,7 +460,7 @@ import won from './won.js';
      * @param optionalSparqlPrefixes
      * @returns {*}
      */
-    won.resolvePropertyPathFromBaseUri = function resolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
+    won.resolvePropertyPathFromBaseUri = function resolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes, optionalSparqlFragment){
         var query = "";
         if (won.isNull(baseUri)){
             throw new Error("cannot evaluate property path: baseUri is null");
@@ -473,8 +473,12 @@ import won from './won.js';
         }
         query = query +
             "SELECT ?target where { \n" +
-            "<" + baseUri +"> " + propertyPath + " ?target. \n" +
-            "} ";
+            "<::baseUri::> " + propertyPath + " ?target. \n";
+        if (!won.isNull(optionalSparqlFragment)){
+        	query = query + optionalSparqlFragment;
+        }
+        query = query + "} ";
+        query = query.replace(/\:\:baseUri\:\:/g, baseUri);
         var resultObject = {};
         privateData.store.execute(query, [], [], function (success, results) {
             resultObject.result = [];
@@ -1340,7 +1344,7 @@ import won from './won.js';
      * @return {*} the data of all connection-nodes referenced by that need
      */
     won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
-        won.getConnectionUrisOfNeed(needUri, requesterWebId,true)
+        won.getConnectionUrisOfNeed(needUri, requesterWebId,false)
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
@@ -1676,7 +1680,8 @@ import won from './won.js';
                                 var foundUris = won.resolvePropertyPathFromBaseUri(
                                         baseUri,
                                         propertyPath.propertyPath,
-                                        propertyPath.prefixes);
+                                        propertyPath.prefixes,
+                                        propertyPath.fragment);
 
                                 //resolve all property paths, add to 'resolvedUris'
                                 Array.prototype.push.apply(resolvedUris, foundUris);
@@ -1777,13 +1782,16 @@ import won from './won.js';
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
                         "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
                         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-                    propertyPath : "won:hasConnections"
+                    propertyPath : "won:hasConnections",
+                    fragment: "filter (<::baseUri::> won:isInState won:Active)"
+                    
                 },
                 { prefixes :
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
                         "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
                         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-                    propertyPath : "won:hasConnections/rdfs:member"
+                    propertyPath : "won:hasConnections/rdfs:member",
+                    fragment: "filter (<::baseUri::> won:isInState won:Active)"
                 }
             ],
         query:
