@@ -68,6 +68,7 @@ webofneeds/conf.*
 /webofneeds/data.local
 webofneeds/state.config.properties
 webofneeds/won.log
+certs
 
 #local package caches
 bower_components/

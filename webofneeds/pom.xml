@@ -94,11 +94,6 @@
                 <artifactId>activemq-broker</artifactId>
                 <version>${activemq.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.qpid</groupId>
-                <artifactId>qpid-client</artifactId>
-                <version>${qpid.version}</version>
-            </dependency>
             <!-- xbean is required for ActiveMQ broker configuration in the spring xml file -->
             <dependency>
                 <groupId>org.apache.xbean</groupId>
@@ -118,6 +113,10 @@
                     <exclusion>
                         <groupId>org.bouncycastle</groupId>
                         <artifactId>bcpkix-jdk15on</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.qpid</groupId>
+                        <artifactId>proton-jms</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
