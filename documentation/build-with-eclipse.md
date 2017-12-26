@@ -81,13 +81,25 @@
 **NOTE: replace with your own certificate path for server and client certificate locations if necessary**
         
 7.  Edit server configuration: DoubleClick the server in the "Server View" and select:
-    *  "Open launch configuration" >> (x)= Arguments >> VM arguments >> add 
-            `-Djava.library.path="<TOMCAT_FOLDER>\bin" -XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR="<PROJECT_FOLDER>\webofneeds\conf.local" -Dlogback.configurationFile="<PROJECT_FOLDER>\webofneeds\conf.local\logback.xml"` (Note: Change `<PROJECT_FOLDER>` to the webofneeds project location and the `<TOMCAT_FOLDER>` to the installation directory of your tomcat.)
-    *  Server Locations: "Use Tomcat installation (takes control of tomcat installation)"
-    *  Server Options: Publish module… + Modules auto reload…
-    *  Publishing: Never publish automatically
-    *  Timeouts: i.e. 180 + 30
-    *  Ports: The ports should be shown for HTTP + SSL
+    * Open launch configuration >> (x)= Arguments >> VM arguments
+         * append the following, replacing the placeholders `<PROJECT_FOLDER>` to the webofneeds project location and the `<TOMCAT_FOLDER>` to the installation directory of your tomcat: `-Djava.library.path="<TOMCAT_FOLDER>\bin" -XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR="<PROJECT_FOLDER>\webofneeds\conf.local" -Dlogback.configurationFile="<PROJECT_FOLDER>\webofneeds\conf.local\logback.xml"` 
+   * Add the JSTL jar to your tomcat's classpath libs (or tomcat cannot be run in `Serve modules without publishing` mode, see `Server Options` below):
+      * Open Launch Configuration >> Classpath >> User Entries >> Add External JARs ... 
+	   * Navigate to your maven repository (default location: [user home]\.m2\repository; if it's not there, look into [user home]\.m2\settings.xml)
+	   * find javax\servlet\jstl\1.2\jstl-1.2.jar
+	   * if you don't find it
+		   * build the whole project with `mvn install`
+		   * try again      
+    * Server Locations: Use Workspace Metadata
+    * Server Options
+        * [x] Serve modules without publishing *(allows for instant effect of changes)*
+        * [x] Publish module contexts to separate XML files
+        * [x] Modules auto reload by default
+        * [ ] Enable security
+        * [ ] Enable tomcat logging
+    * Publishing: Never publish automatically
+    * Timeouts: i.e. 180 + 30
+    * Ports: The ports should be shown for HTTP + SSL
 8.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure that you have the `tcnative-1.dll` **in the tomcat bin folder!**, and that you correctly point to it with the `-Djava.library.path` varialbe (Step 7). Otherwise you will get Invalid KeystoreFormat Exceptions at server startup and an info message which says "The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path => following path where to put the .dll" 
 9. Add the bouncy castle libraries `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to "Open launch configuration" >> "Classpath" as "Add External JARs..." and to the tomcat lib folder
 10.  Start server
