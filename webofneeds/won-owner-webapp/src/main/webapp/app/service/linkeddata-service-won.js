@@ -1794,7 +1794,7 @@ import won from './won.js';
                 " where { \n" +
                 " <::baseUri::> a won:Need; \n" +
                 "           won:hasConnections ?connections; \n" +
-                "           won:isInState ?needState."
+                "           won:isInState ?needState.\n " +
                 "  ?connections rdfs:member ?connection. \n" +
                 "  ?connection won:belongsToNeed ?need; \n" +
                 "              won:hasRemoteNeed ?remoteNeed; \n"+
