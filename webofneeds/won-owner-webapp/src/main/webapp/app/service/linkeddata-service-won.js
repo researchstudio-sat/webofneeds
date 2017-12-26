@@ -1784,7 +1784,6 @@ import won from './won.js';
                         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
                     propertyPath : "won:hasConnections",
                     fragment: " filter exists {<::baseUri::> won:isInState won:Active} "
-                    
                 },
                 { prefixes :
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
