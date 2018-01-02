@@ -53,7 +53,7 @@ services:
     depends_on:
       - gencert
 
-  # portsgres need databases for wonnode
+  # postgres need databases for wonnode
   postgres_node:
     image: webofneeds/postgres:live
     build: ../../image/postgres
@@ -95,7 +95,7 @@ services:
       - postgres_node
       - nginx
 
-  # portsgres need databases for owner
+  # postgres need databases for owner
   postgres_owner:
     image: webofneeds/postgres:live
     build: ../../image/postgres

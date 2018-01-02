@@ -1,0 +1,176 @@
+version: '2'
+services:
+
+  # owner server self-signed certificate for communication with wonnode
+  gencert:
+    build: ../../image/gencert
+    environment:
+      - "CN=uki.matchat.org"
+      - "PASS=file:/usr/local/certs/out/won_certificate_passwd_file"
+      - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/certs/out/
+      - $base_folder/openssl.conf:/usr/local/openssl.conf
+
+  # postgres need databases for wonnode
+  postgres_node:
+    build: ../../image/postgres
+    environment:
+      - "POSTGRES_PASSWORD=$postgres_db_passwd"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    volumes:
+      - $base_folder/postgres_node/data/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+
+  # wonnode with nginx proxy => https://node.uki.matchat.org
+  wonnode:
+    build: ../../image/wonnode
+    environment:
+      - "uri.host=node.uki.matchat.org"
+      - "uri.prefix=https://node.uki.matchat.org/won"
+      - "http.port=8443"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5433/won_node"
+      - "db.ddl.strategy=validate"
+      - "db.sql.user=won"
+      - "db.sql.password=$postgres_db_passwd"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "activemq.broker.port=61617"
+      - "client.authentication.behind.proxy=true"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+      - "8443:8443"
+      - "61617:61617"
+    volumes:
+      - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
+      - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - postgres_node
+
+  # postgres need databases for owner
+  postgres_owner:
+    build: ../../image/postgres
+    environment:
+      - "POSTGRES_PASSWORD=$postgres_db_passwd"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    volumes:
+      - $base_folder/postgres_owner/data/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+
+  # owner with nginx proxy (https://uki.matchat.org)
+  owner:
+    build: ../../image/owner
+    environment:
+      - "node.default.host=node.uki.matchat.org"
+      - "uri.host=uki.matchat.org"
+      - "http.port=8082"
+      - "node.default.http.port=443"
+      - "uri.prefix=https://uki.matchat.org/uki"
+      - "uri.prefix.node.default=https://node.uki.matchat.org/won"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5432/won_owner"
+      - "db.ddl.strategy=validate"
+      - "db.sql.user=won"
+      - "db.sql.password=$postgres_db_passwd"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "email.from.won.user=$MAIL_USER"
+      - "email.from.won.password=$MAIL_PASS"
+      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+      - "8082:8443"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - postgres_owner
+      - gencert
+
+  # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
+  bigdata:
+    image: webofneeds/bigdata
+    volumes:
+      - $base_folder/bigdata/data/:/usr/src/bigdata/data
+    ports:
+      - "10000:9999"
+
+  # matcher service connect with wonnode on (proxied: node.uki.matchat.org)
+  matcher_service:
+    build: ../../image/matcher-service
+    environment:
+      - "node.host=satvm06.researchstudio.at"
+      - "matcher.uri=https://uki.matchat.org/matcher_service"
+      - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
+      - "uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+      - "wonNodeController.wonNode.crawl=https://node.uki.matchat.org/won/resource"
+      - "cluster.local.port=2561"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+      - "2561:2561"
+    volumes:
+      - $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/
+    depends_on:
+      - bigdata
+      - wonnode
+
+  # solr server as a need index
+  solr:
+    build: ../../image/solr
+    volumes:
+      - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+      - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
+    ports:
+      - "8984:8983"
+
+  # solr matcher and connect to matcher service
+  matcher_solr:
+    build: ../../image/matcher-solr
+    environment:
+      - "node.host=satvm06.researchstudio.at"
+      - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
+      - "cluster.local.port=2562"
+      - "matcher.solr.uri.solr.server=http://satvm06.researchstudio.at:8984/solr/"
+      - "matcher.solr.uri.solr.server.public=http://satvm06.researchstudio.at:8984/solr/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+      - "2562:2562"
+    depends_on:
+      - solr
+      - matcher_service
+
+  # mongodb for persistent debug bot
+  mongodb:
+    image: tutum/mongodb:3.2
+    environment:
+      - "MONGODB_USER=won"
+      - "MONGODB_DATABASE=uki_bot"
+      - "MONGODB_PASS=$mongo_db_passwd"
+    ports:
+      - "27017:27017"
+      - "28017:28017"
+    volumes:
+      - $base_folder/mongodb/data/db:/data/db
+
+  # debug bot used to test need communication, connect to wonnodes (proxied: node.uki.matchat.org)
+  debug_bot:
+    build: ../../image/bots
+    environment:
+      - "uri.prefix.owner=https://uki.matchat.org/debug_bot"  # set this for the trust store alias
+      - "node.default.host=node.uki.matchat.org"
+      - "node.default.http.port=443"
+      - "uri.prefix.node.default=https://node.uki.matchat.org/won"
+      - "won.node.uris=https://node.uki.matchat.org/won/resource"
+      - "botContext.impl=mongoBotContext"
+      - "botContext.mongodb.user=won"
+      - "botContext.mongodb.pass=$mongo_db_passwd"
+      - "botContext.mongodb.host=satvm06.researchstudio.at"
+      - "botContext.mongodb.port=27017"
+      - "botContext.mongodb.database=uki_bot"
+    depends_on:
+      - wonnode
+      - mongodb
