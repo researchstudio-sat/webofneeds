@@ -18,7 +18,7 @@ rm won_certificate_passwd_file
 scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-uki.conf won@satvm06:$base_folder/openssl.conf
 
 # copy the nginx.conf file to the proxy server
-scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-uki.conf won@satvm01:$live_base_folder/nginx-uki.conf
+scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-uki-http.conf won@satvm01:$live_base_folder/nginx-uki-http.conf
 
 # copy letsencrypt certificate files from satvm01 (live/matchat) to satvm06
 ssh won@satvm06 mkdir -p $base_folder/letsencrypt/certs/live/matchat.org

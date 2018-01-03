@@ -39,16 +39,18 @@ services:
       - $base_folder/won-server-certs:/usr/local/certs/out/
       - $base_folder/openssl.conf:/usr/local/openssl.conf
 
-  # nginx proxy server for wonnode
+  # nginx proxy server for domains: matchat.org, www.matchat.org, node.matchat.org, uki.matchat.org, node.uki.matchat.org
   nginx:
     image: nginx
     ports:
       - "80:80"
       - "443:443"
       - "61616:61616"
+      - "51616:51616"
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt/
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
+      - $base_folder/nginx-uki-http.conf:/etc/nginx/conf.d/nginx-uki-http.conf
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html/
     depends_on:
       - gencert
