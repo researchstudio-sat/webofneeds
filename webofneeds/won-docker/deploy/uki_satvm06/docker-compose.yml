@@ -99,7 +99,7 @@ services:
     ports:
       - "10000:9999"
 
-  # matcher service connect with wonnode on (proxied: node.uki.matchat.org)
+  # matcher service connect with wonnode on node.uki.matchat.org and node.matchat.org
   matcher_service:
     build: ../../image/matcher-service
     environment:
@@ -107,7 +107,7 @@ services:
       - "matcher.uri=https://uki.matchat.org/matcher_service"
       - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
       - "uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://node.uki.matchat.org/won/resource"
+      - "wonNodeController.wonNode.crawl=https://node.uki.matchat.org/won/resource,https://node.matchat.org/won/resource" # crawl uki won node and matchat won node
       - "cluster.local.port=2561"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
