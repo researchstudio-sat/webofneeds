@@ -17,6 +17,7 @@ nbproject
 .classpath
 .project
 .settings
+**/.springBeans
 
 # Buildtools
 build.properties
