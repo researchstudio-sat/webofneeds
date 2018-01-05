@@ -24,6 +24,7 @@ import {
     watchImmutableRdxState,
     checkHttpStatus,
     is,
+    getIn,
 } from './utils.js';
 
 import {
@@ -352,6 +353,20 @@ export function runMessagingAgent(redux) {
 
             unsubscribeWatches.push(unsubscribeMsgQWatch);
             unsubscribeWatches.push(unsubscribeReconnectWatch);
+        }
+        
+        //if there are enqueued messages, send the first one, (sending the rest should be triggered by the watch we just created)
+        const currentMsgBuffer = getIn(redux.getState(), ['messages','enqueued']);
+        if (currentMsgBuffer) {
+            const firstEntry = currentMsgBuffer.entries().next().value;
+            if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
+                const [eventUri, msg] = firstEntry;
+                ws.send(JSON.stringify(msg));
+                //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
+
+                // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
+                redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
+            }
         }
 
     };
