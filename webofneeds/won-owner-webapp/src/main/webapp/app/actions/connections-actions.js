@@ -167,9 +167,6 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
 
     console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
 
-    //TODO wait for success-response instead
-    await delay(1000); // to give the server enough time to handle need creation.
-
     // TODO handle failure to post need (the needUri won't be valid)
 
     const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);

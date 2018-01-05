@@ -86,10 +86,6 @@ export async function ensureLoggedIn(dispatch, getState) {
         console.error(`Creating temporary account (${privateId}) has failed due to `, err);
         dispatch(actionCreators.registerFailed({privateId}));
     }
-
-    // wait for the server to process the login and the reconnect to
-    // go through, before proceeding to need-creation.
-    await delay(3000);
 }
 
 let _loginInProcessFor;
