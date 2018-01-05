@@ -1,26 +1,26 @@
 package won.utils.agreement;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.query.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.vocabulary.RDF;
-import won.protocol.util.RdfUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 
 public class AgreementFunction {
     private static final String AGREEMENT_SUFFIX = "";
@@ -33,7 +33,7 @@ public class AgreementFunction {
         try {
             IOUtils.copy(is, writer, Charsets.UTF_8);
         } catch (IOException e) {
-            throw new IllegalStateException("Could not read queryString file", e);
+            throw new IllegalStateException("Could not read query file from classpath location " + queryFile, e);
         }
         this.queryString = writer.toString();
     }
@@ -41,6 +41,7 @@ public class AgreementFunction {
     public Dataset applyAgreementFunction(Dataset conversationDataset){
     	conversationDataset.begin(ReadWrite.READ);
         Dataset result = DatasetFactory.createGeneral();
+        result.begin(ReadWrite.WRITE);
         Query query = QueryFactory.create(queryString);
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, conversationDataset)) {
             ResultSet resultSet = queryExecution.execSelect();
@@ -77,6 +78,8 @@ public class AgreementFunction {
             return result;
         } finally {
         	conversationDataset.commit();
+        	result.commit();
         }
     }
+    
 }

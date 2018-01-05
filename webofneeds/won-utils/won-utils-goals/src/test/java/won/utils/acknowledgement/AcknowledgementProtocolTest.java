@@ -1,5 +1,7 @@
 package won.utils.acknowledgement;
 
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -8,10 +10,12 @@ import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
+import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 public class AcknowledgementProtocolTest {
 
@@ -70,6 +74,13 @@ public class AcknowledgementProtocolTest {
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-local-message-fails-remotely.trig");
         test(input,expectedOutput);
     }
+    
+    @Test
+    public void oneSelfAcceptedAgreementSameGraph () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-self-accepted-agreement-same-graph.trig ");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-self-accepted-agreement-same-graph.trig ");
+        test(input,expectedOutput);
+    }
 
     public void test(Dataset input, Dataset expectedOutput) {
 
@@ -105,4 +116,6 @@ public class AcknowledgementProtocolTest {
 
         return dataset;
     }
+    
+    
 }

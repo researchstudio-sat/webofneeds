@@ -8,6 +8,15 @@ PREFIX won: <http://purl.org/webofneeds/model#>
     GRAPH ?g1 {   
         ?prop agr:proposes ?clause .
     }
+
+    GRAPH ?clauseContent {
+      ?s ?p ?o .
+    }
+
+   GRAPH ?g3 {
+        ?clause msg:hasContent ?clauseContent .
+    }
+        
     # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
     # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
     # THIS QUERY WILL ONLY WORK WITH JENA
@@ -18,12 +27,53 @@ PREFIX won: <http://purl.org/webofneeds/model#>
     GRAPH ?g2 {
         ?acc agr:accepts ?prop .
     }
-    GRAPH ?g3 {
-        ?clause msg:hasContent ?clauseContent .
+    
+    # only report the first agreement if there are multiple accept messages:
+    # make sure there is no earlier accept message than acc, 
+    # and if there is an accept message that is at the same point in the conversation 
+    # only accept the main solution if acc is lexicographically smaller than the other one
+    filter not exists {
+        #find another accept message
+        GRAPH ?gf1 {
+            ?acc2 agr:accepts ?prop .
+            filter(?acc2 != ?acc) . #different from acc
+        }   
+        GRAPH <urn:x-arq:UnionGraph> {
+            # also after prop
+            ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+            # acc2 must not be before acc. If it is parallel, use lexicographically first uri
+            filter exists {
+                # if there is a path from acc to acc2, acc2 is earlier and we want the
+                # overall solution to be discarded.
+                ?acc msg:hasPreviousMessage+ ?acc2.
+            }
+         
+        }
     }
-    GRAPH ?clauseContent {
-      ?s ?p ?o .
+    
+    # only report the first agreement if there are multiple accept messages:
+    # make sure there is no earlier accept message than acc, 
+    # and if there is an accept message that is at the same point in the conversation 
+    # only accept the main solution if acc is lexicographically smaller than the other one
+    filter not exists {
+        #find another accept message
+        GRAPH ?gf1 {
+            ?acc2 agr:accepts ?prop .
+            filter(?acc2 != ?acc) . #different from acc
+        }   
+        GRAPH <urn:x-arq:UnionGraph> {
+            # also after prop
+            ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+            # acc2 must not be before acc. If it is parallel, use lexicographically first uri
+            filter not exists {
+                # if there is a path from acc to acc2, acc2 is earlier and we want the
+                # overall solution to be discarded.
+                ?acc msg:hasPreviousMessage+ ?acc2.
+            }
+            filter (STR(?acc2) < STR(?acc)) 
+        }
     }
+    
     filter not exists {
       
       GRAPH ?gc1 {   
@@ -48,7 +98,6 @@ PREFIX won: <http://purl.org/webofneeds/model#>
                   
     }
     
-
 
 }
 order by ?acc

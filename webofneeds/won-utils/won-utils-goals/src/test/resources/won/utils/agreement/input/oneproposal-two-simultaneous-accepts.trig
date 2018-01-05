@@ -706,8 +706,7 @@
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:hasTextMessage  "validate" ;
-            agr:proposesToCancel event:557600936467257340 .
+            won:hasTextMessage  "validate" .
 }
 
 <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#envelope-xm9b-sig> {
@@ -1330,7 +1329,8 @@
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
-            won:hasTextMessage  "Please go on." .
+            won:hasTextMessage  "Please go on." ;
+            agr:accepts event:557600936467257340 .
 }
 
 <https://localhost:8443/won/resource/event/fbsnd9ilwhqg8f4l2tjg#envelope-jfhm> {
@@ -1457,8 +1457,7 @@
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
             won:hasTextMessage  "two" ;
-            agr:accepts event:usi9yhill1lo2xi70sjx ;
-            agr:accepts event:00d5wzbbf8hzzt2eewcc  .
+            agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#envelope-ua55> {
@@ -2347,8 +2346,7 @@
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
-            agr:proposes event:6671551888677331000 .
+            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
 }
 
 <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-1xbk> {
@@ -2554,14 +2552,13 @@
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:hasTextMessage  "I'm not sure I understand you fully." ;
-            agr:proposes event:5669098069340991000 .
+            won:hasTextMessage  "I'm not sure I understand you fully." .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
             won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
-            agr:accepts event:1435888415723958200 .
+            agr:accepts event:557600936467257340 .
 }
 
 <https://localhost:8443/won/resource/event/3jaz102f0678yab8vwx2#envelope-7byg> {
@@ -2675,7 +2672,7 @@
 <https://localhost:8443/won/resource/event/bri4ydc53o2dkyskug32#envelope-egj9> {
     event:bri4ydc53o2dkyskug32
             a                         msg:FromExternal ;
-            msg:hasPreviousMessage    event:tggbraefz9y07d2npt2m , event:ow321nn1va6clfidc4s0 ;
+            msg:hasPreviousMessage    event:tggbraefz9y07d2npt2m ;
             msg:hasReceivedTimestamp  1513345785944 ;
             msg:protocolVersion       "1.0" .
     

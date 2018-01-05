@@ -706,8 +706,7 @@
 
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
-            won:hasTextMessage  "validate" ;
-            agr:proposesToCancel event:557600936467257340 .
+            won:hasTextMessage  "validate" .
 }
 
 <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#envelope-xm9b-sig> {
@@ -2560,8 +2559,7 @@
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
     event:mt1f8i41bogt7kc91fi6
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
-            agr:accepts event:1435888415723958200 .
+            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
 }
 
 <https://localhost:8443/won/resource/event/3jaz102f0678yab8vwx2#envelope-7byg> {

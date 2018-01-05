@@ -20,4 +20,5 @@
 
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0> {
     <https://localhost:8443/won/resource/event/5669098069340991000>	won:hasTextMessage	"one" .
+    <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc> won:hasTextMessage  "I'm not sure I understand you fully." .
 }

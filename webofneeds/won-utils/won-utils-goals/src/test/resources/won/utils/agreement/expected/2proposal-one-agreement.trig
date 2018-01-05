@@ -18,6 +18,7 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix agr: <http://purl.org/webofneeds/agreement#> .
 
-<https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0> {
-     event:5669098069340991000 won:hasTextMessage  "one" .    
+<https://localhost:8443/won/resource/event/557600936467257340> {
+    <https://localhost:8443/won/resource/event/6671551888677331000> won:hasTextMessage "hi" .
+    <https://localhost:8443/won/resource/event/5669098069340991000> won:hasTextMessage  "one" .
 }
