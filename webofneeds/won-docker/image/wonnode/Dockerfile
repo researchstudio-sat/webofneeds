@@ -18,19 +18,25 @@ ENV WON_CONFIG_DIR=/usr/local/tomcat/won/conf
 ENV LOGBACK_CONFIG=logback_info.xml
 ENV CERTIFICATE_PASSWORD=changeit
 
-# add the webofneeds files
-ADD ./tomcat-libs/* /usr/local/tomcat/lib/
-ADD ./won.war /usr/local/tomcat/webapps/
-ADD ./conf/node.properties /usr/local/tomcat/won/conf/node.properties
-ADD ./conf/logback* /usr/local/tomcat/won/conf/
-
 # configure tomcat
 ADD ./setenv.sh /usr/local/tomcat/bin/
+ADD ./ssl/server.xml /usr/local/tomcat/conf/
 # uncomment the following line to access tomcat manager with admin user
 #ADD ./tomcat-users.xml /usr/local/tomcat/conf/
 
-# configure tomcat for ssl - this server.xml contains connector with special configuration for ssl:
-ADD ./ssl/server.xml /usr/local/tomcat/conf/
+# remove the applications not needed => comment the next two lines for having access to the tomcat manager
+RUN rm -rf /usr/local/tomcat/webapps/*
+RUN rm -rf /usr/local/tomcat/work/Catalina/localhost/*
+
+# add and extract the application war files to the webapps folder
+ADD ./won.war /usr/local/tomcat/webapps/
+RUN unzip /usr/local/tomcat/webapps/won.war -d /usr/local/tomcat/webapps/won
+RUN rm /usr/local/tomcat/webapps/won.war
+
+# add the webofneeds files
+ADD ./tomcat-libs/* /usr/local/tomcat/lib/
+ADD ./conf/node.properties /usr/local/tomcat/won/conf/node.properties
+ADD ./conf/logback* /usr/local/tomcat/won/conf/
 
 # prepare folder for server certificates - this path should be the same as the folder containing
 # SSLCertificateFile/Key configured in server.xml:
