@@ -157,7 +157,7 @@ public class DebugBot extends EventBot {
         bus.subscribe(OpenFromOtherNeedEvent.class,
                 new ActionOnEventListener(ctx,
                         new MultipleActions(ctx,
-                                new RespondToMessageAction(ctx, "Hi there!"),
+                        		new OpenConnectionAction(ctx, welcomeMessage),
                                 new PublishSetChattinessEventAction(ctx, true))));
 
         //if the bot receives a text message - try to map the command of the text message to a DebugEvent
