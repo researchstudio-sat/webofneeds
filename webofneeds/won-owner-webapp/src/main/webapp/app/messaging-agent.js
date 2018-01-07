@@ -273,9 +273,7 @@ export function runMessagingAgent(redux) {
     function onMessage(receivedMsg) {
         const data = JSON.parse(receivedMsg.data);
 
-        console.log('onMessage (jsonld)    : ', data);
         won.wonMessageFromJsonLd(data).then(message => {
-            console.log('onMessage (wonMessage): ', message);
             won.addJsonLdData(message.getMessageUri(), data);
 
             var messageProcessed = false;
@@ -358,22 +356,32 @@ export function runMessagingAgent(redux) {
             redux.dispatch(actionCreators.reconnectSuccess());
         }
 
+        const sendFirstInBuffer = function(newMsgBuffer){
+        	if (newMsgBuffer && ! newMsgBuffer.isEmpty()) {
+            	try {
+                    const firstEntry = newMsgBuffer.entries().next().value;
+                    if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
+                    	if (firstEntry.length != 2){
+                    		console.error("Could not send message, did not find a uri/message pair in the message buffer. The first Entry in the buffer is:", firstEntry);
+                    		return;
+                    	}
+                        const [eventUri, msg] = firstEntry;
+                        ws.send(JSON.stringify(msg));
+                        //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
+
+                        // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
+                        redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
+                    }
+            	} catch (error){
+            		console.log("could not send message due to this error", error);
+            	}
+            }
+        };
+        
         if(unsubscribeWatches.length === 0) {
             const unsubscribeMsgQWatch = watchImmutableRdxState(
                 redux, ['messages', 'enqueued'],
-                (newMsgBuffer, oldMsgBuffer) => {
-                    if (newMsgBuffer) {
-                        const firstEntry = newMsgBuffer.entries().next().value;
-                        if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
-                            const [eventUri, msg] = firstEntry;
-                            ws.send(JSON.stringify(msg));
-                            //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
-
-                            // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
-                            redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
-                        }
-                    }
-                }
+                (newMsgBuffer, oldMsgBuffer) => sendFirstInBuffer(newMsgBuffer)
             );
             const unsubscribeReconnectWatch = watchImmutableRdxState(
                 redux, ['messages', 'reconnecting'],
@@ -397,17 +405,7 @@ export function runMessagingAgent(redux) {
         
         //if there are enqueued messages, send the first one, (sending the rest should be triggered by the watch we just created)
         const currentMsgBuffer = getIn(redux.getState(), ['messages','enqueued']);
-        if (currentMsgBuffer) {
-            const firstEntry = currentMsgBuffer.entries().next().value;
-            if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
-                const [eventUri, msg] = firstEntry;
-                ws.send(JSON.stringify(msg));
-                //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
-
-                // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
-                redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
-            }
-        }
+        sendFirstInBuffer(currentMsgBuffer);
 
     };
     function onError(e) {

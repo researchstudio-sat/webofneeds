@@ -77,14 +77,12 @@ export function messagesReducer(messages = initialState, action = {}) {
 
         case actionTypes.messages.dispatchActionOn.failureOwn:
         case actionTypes.messages.dispatchActionOn.successOwn:
-        	console.log("cleaning up after successOwn");
         	//all the dispatching was done by the action creator. remove the queued actions now:
             return messages.removeIn(['dispatchOnSuccessOwn', action.payload.eventUri])
             			   .removeIn(['dispatchOnFailureOwn', action.payload.eventUri]);	
 
         case actionTypes.messages.dispatchActionOn.failureRemote:
         case actionTypes.messages.dispatchActionOn.successRemote:
-        	console.log("cleaning up after successOwn");
         	//all the dispatching was done by the action creator. remove the queued actions now:
             return messages.removeIn(['dispatchOnSuccessRemote', action.payload.eventUri])
             			   .removeIn(['dispatchOnFailureRemote', action.payload.eventUri]);     

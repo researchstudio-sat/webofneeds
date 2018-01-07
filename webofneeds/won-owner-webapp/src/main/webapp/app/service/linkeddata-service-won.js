@@ -526,10 +526,6 @@ import won from './won.js';
         }
 
 
-        if(partialFetch) {
-            console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
-        }
-
         cacheItemMarkFetching(uri);
         return won.fetch(uri, fetchParams )
             .then(

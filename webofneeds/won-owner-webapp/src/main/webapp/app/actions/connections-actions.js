@@ -83,36 +83,35 @@ export function connectionsFetch(data) {
     }
 }
 
-export function connectionsOpen(connectionUri, message) {
-    return (dispatch, getState) => {
-        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn(["needs", theirNeedUri]);
-        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-        buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, message)
-        .then(async msgData => {
-            const jsonldMessage = msgData.message;
-            const optimisticEvent = await won.wonMessageFromJsonLd(msgData.message);
-            //const smarterMessage = await won.WonMessageFromMessageLoadedFromStore(optimisticEvent);
-            // dispatch(actionCreators.messages__send(messageData));
-            dispatch({
-                type: actionTypes.connections.open,
-                payload: {
-                    eventUri: optimisticEvent.getMessageUri(),
-                    message: jsonldMessage,
-                    optimisticEvent,
-                    //optimisticWonMessage: smarterMessage,
-                }
-            });
+export function connectionsOpen(connectionUri, textMessage) {	
+    return async (dispatch, getState) => {
+    	 const state = getState();
+         const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+         const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+         const theirNeed = getState().getIn(["needs", theirNeedUri]);
+         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-            dispatch(actionCreators.router__stateGoAbs("post", {
-                postUri: optimisticEvent.getSenderNeed(),
-                connectionType: won.WON.Connected,
-                connectionUri: optimisticEvent.getSender(),
-            }));
+         const openMsg = await buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
+         
+         const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
 
-        });
+         dispatch({
+             type: actionTypes.connections.open,
+             payload: {
+                 connectionUri,
+                 textMessage,
+                 eventUri: openMsg.eventUri,
+                 message: openMsg.message,
+                 optimisticEvent,
+             }
+         });
+         
+         dispatch(actionCreators.router__stateGoAbs("post", {
+             postUri: optimisticEvent.getSenderNeed(),
+             connectionType: won.WON.Connected,
+             connectionUri: optimisticEvent.getSender(),
+         }));
     }
 }
 
@@ -128,7 +127,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     await ensureLoggedIn(dispatch, getState);
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
     const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
-
+    
     // connect action to be dispatched when the 
     // ad hoc need has been created: 
     const connectAction = {
