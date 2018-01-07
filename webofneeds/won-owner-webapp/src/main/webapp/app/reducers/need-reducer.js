@@ -213,7 +213,6 @@ export default function(allNeedsInState = initialState, action = {}) {
 			 * payload: { eventUri: optimisticEvent.uri, message,
 			 * optimisticEvent, }
 			 */
-            console.log("sendChatMessage: ", action.payload.optimisticEvent);
             return addMessage(allNeedsInState, action.payload.optimisticEvent, true, true);
 
         // update timestamp on success response

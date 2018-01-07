@@ -67,7 +67,6 @@ export function messagesReducer(messages = initialState, action = {}) {
                 .set('reconnecting', false);
 
         case actionTypes.messages.dispatchActionOn.registerSuccessOwn: 
-        	console.log("registering for SuccessOwn");
         	const path = ['dispatchOnSuccessOwn', action.payload.eventUri];
         	const toDispatchList = messages.getIn(path);
         	if (!toDispatchList){

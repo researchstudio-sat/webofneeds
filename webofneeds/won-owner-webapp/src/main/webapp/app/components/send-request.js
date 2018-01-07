@@ -92,11 +92,8 @@ function genComponentConf() {
         sendRequest(message) {
             if(this.sendAdHocRequest || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
-                    console.log("sending request from whatsaround need, close original connection");
                     //Close the connection if there was a present connection for a whatsaround need
                     this.connections__close(this.connectionUri);
-                }else{
-                    console.log("sending adhoc request");
                 }
 
                 if(this.postUriToConnectTo){

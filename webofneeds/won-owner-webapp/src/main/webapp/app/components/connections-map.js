@@ -108,7 +108,6 @@ function genComponentConf() {
         }
 
         updateMap(postLocation, connections, needs) {
-            console.log("Call an update on the map for location: ", postLocation, "connections: ", connections, "needs: ", needs);
             this.markers.forEach(marker => this.map.removeLayer(marker)); //Remove all existing markers
             this.markers = []; //RESET MARKERS
 
@@ -117,16 +116,12 @@ function genComponentConf() {
             }
 
             if(connections && connections.size > 0){
-                console.log("Setting markers for connections");
                 connections.map(function(conn){
-                    console.log("Looking Up remoteNeed with Uri: ",conn.get("remoteNeedUri")," with data ", needs && needs.get(conn.get("remoteNeedUri")));
                     let need = needs && needs.get(conn.get("remoteNeedUri"));
                     let connLocation = needs && needs.getIn([conn.get("remoteNeedUri"), "location"]);
                     if(need && need.get("location")) {
-                        console.log("setting marker for connectionLocation: ",connLocation.toJS());
                         this.markers.push(this.createUniqueMarker(need, conn));
                     }else{
-                        console.log("no marker set because connection Need does not have a location");
                     }
                 }, this);
             }

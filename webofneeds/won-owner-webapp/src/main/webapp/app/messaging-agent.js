@@ -38,9 +38,6 @@ import * as messages from './actions/messages-actions.js';
 
 export function runMessagingAgent(redux) {
 
-    console.log('Starting messaging agent.');
-
-
     /**
      * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
      * events, to process another message you add another anonymous function that checks on the necessary message properties/values

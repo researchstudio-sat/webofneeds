@@ -89,7 +89,6 @@ import won from './won.js';
      */
     won.buildNeedRdf = function(args){
 
-        console.log('need-builder.js:buildNeedRdf:attachmentUris', args.attachmentUris);
 
         if(hasAttachmentUrls(args)) {
             var attachmentUrisTyped = args.attachmentUris.map(function (uri) {

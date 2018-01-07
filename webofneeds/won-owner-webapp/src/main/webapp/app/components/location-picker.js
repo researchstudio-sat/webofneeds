@@ -119,7 +119,6 @@ function genComponentConf() {
             this.placeMarkers([]);
         }
         selectedLocation(location) {
-            console.log("selectedLocation: ", location);
             this.resetSearchResults(); // picked one, can hide the rest if they were there
 
             let draft = {location};
@@ -133,13 +132,11 @@ function genComponentConf() {
         }
         doneTyping() {
             const text = this.textfield().value;
-            console.log('starting type-ahead search for: ' + text);
 
             if(!text) {
                 this.$scope.$apply(() => { this.resetSearchResults(); });
             } else {
                 searchNominatim(text).then( searchResults => {
-                    console.log('location search results: ', searchResults);
                     const parsedResults = scrubSearchResults(searchResults, text);
                     this.$scope.$apply(() => {
                         this.searchResults = parsedResults;
@@ -155,7 +152,6 @@ function genComponentConf() {
                 navigator.geolocation.getCurrentPosition(
                     currentLocation => {
 
-                        console.log(currentLocation);
                         const lat = currentLocation.coords.latitude;
                         const lng = currentLocation.coords.longitude;
                         const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
@@ -167,7 +163,6 @@ function genComponentConf() {
                         reverseSearchNominatim(lat, lng, zoom)
                             .then(searchResult => {
                                 const location = nominatim2draftLocation(searchResult);
-                                console.log('current location: ', location);
                                 this.$scope.$apply(() => { this.currentLocation = location });
                             });
                     },
@@ -262,13 +257,11 @@ function onMapClick(e, ctrl) {
     // This code was moved out of the controller
     // here to avoid confusion resulting from
     // this binding.
-    console.log('clicked map ', e);
     reverseSearchNominatim(
         e.latlng.lat,
         e.latlng.lng,
         ctrl.map.getZoom()// - 1
     ).then(searchResult => {
-        console.log('nearest address: ', searchResult);
         const location = nominatim2draftLocation(searchResult);
 
         //use coords of original click though (to allow more detailed control)

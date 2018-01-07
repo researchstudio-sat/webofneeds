@@ -1293,7 +1293,6 @@ import won from './won.js';
     };
 
     won.getEnvelopeDataforNewConnection = function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
-    	console.log("getEnvelopeDataforNewConnection");
         if (!ownNeedUri){
         	console.log("no own need uri");
             throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
@@ -1302,7 +1301,6 @@ import won from './won.js';
         	console.log("no remote need uri");
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
-        console.log("returning a normal envelope");
         return {
             [won.WONMSG.hasSenderNeed]: ownNeedUri,
             [won.WONMSG.hasSenderNode]: ownNodeUri,
@@ -1331,7 +1329,7 @@ import won from './won.js';
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
         };
         try {
-            if (theirConnectionUri != null) {
+            if (theirConnectionUri) {
                 ret[won.WONMSG.hasReceiver] = theirConnectionUri;
             }
         } catch(err){}

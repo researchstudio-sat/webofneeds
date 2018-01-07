@@ -49,7 +49,6 @@ import {
 
 export function connectionsChatMessage(chatMessage, connectionUri) {
    return (dispatch, getState) => {
-       console.log('connectionsChatMessage: ', chatMessage, connectionUri);
 
        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
@@ -77,7 +76,6 @@ export function connectionsFetch(data) {
     return dispatch=> {
         const allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
         allConnectionsPromise.then(function (connections) {
-            console.log("fetching connections");
             dispatch(actionCreators.needs__connectionsReceived({needUri: data.needUri, connections: connections}));
         })
     }
@@ -120,11 +118,11 @@ export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
     return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
 }
 async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
+    await ensureLoggedIn(dispatch, getState);
 	const state = getState();
     const theirNeed = getIn(state, ['needs', theirNeedUri]);
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-    await ensureLoggedIn(dispatch, getState);
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
     const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
     
@@ -151,7 +149,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     // create the new need
     dispatch({
         type: actionTypes.needs.create, // TODO custom action
-        payload: {eventUri, message, needUri, adHocDraft}
+        payload: {eventUri, message, needUri, need: adHocDraft}
     });
 
     dispatch(actionCreators.router__stateGoAbs('feed'));
@@ -252,8 +250,6 @@ export function connectionsCloseRemote(message){
 
 export function connectionsRate(connectionUri,rating) {
     return (dispatch, getState) => {
-        console.log(connectionUri);
-        console.log(rating);
 
         const state = getState();
         let messageData = null;
