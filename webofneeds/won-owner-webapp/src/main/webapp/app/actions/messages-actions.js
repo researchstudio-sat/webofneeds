@@ -25,10 +25,8 @@ import {
 
 export function successfulCloseNeed(event) {
     return (dispatch, getState) => {
-        console.log("got response for DEACTIVATE: " + event.getMessageType());
         //TODO maybe refactor these response message handling
         if (getState().getIn(['messages', 'waitingForAnswer', event.getIsRemoteResponseTo()])) {
-            console.log("messages waitingForAnswer", event.getMessageUri());
             //dispatch(actionCreators.connections__denied(event));
         }
     }
@@ -90,20 +88,17 @@ export function failedCloseNeed(event) {
 export function successfulCloseConnection(event) {
     return (dispatch, getState) => {
         const state = getState();
-        console.log("got response for CLOSE: " + event.getMessageType());
         let eventUri = null;
         let receiverUri = null;
         let isRemoteResponse = false;
         //TODO maybe refactor these response message handling
         if (state.getIn(['messages', 'waitingForAnswer', event.getIsResponseTo()])) {
-            console.log("messages waitingForAnswer", event.getMessageUri());
             eventUri = event.getIsResponseTo();
             dispatch({
                 type: actionTypes.messages.close.success,
                 payload: event
             });
         } else if (state.getIn(['messages', 'waitingForAnswer', event.getIsRemoteResponseTo()])) {
-            console.log("messages waitingForAnswer", event.getMessageUri());
             eventUri = event.getIsRemoteResponseTo();
             dispatch({
                 type: actionTypes.messages.close.success,
@@ -141,7 +136,6 @@ export function successfulOpen(event){
 export function successfulCreate(event) {
     return (dispatch) => {
         //const state = getState();
-        console.log("got response for CREATE: " + event.getMessageType());
         //TODO: if negative, use alternative need URI and send again
         //fetch need data and store in local RDF store
         //get URI of newly created need from message
@@ -151,7 +145,6 @@ export function successfulCreate(event) {
 
         won.getNeed(needURI)
             .then((need) => {
-                console.log("Dispatching action " + won.EVENT.NEED_CREATED);
                 dispatch(actionCreators.needs__createSuccessful({
                     publishEventUri: event.getIsResponseTo(),
                     needUri: event.getSenderNeed(),
@@ -322,7 +315,6 @@ export function hintMessageReceived(event) {
                     //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
                     //}
 
-                    console.log("handling hint message");
                 });
         }
     }

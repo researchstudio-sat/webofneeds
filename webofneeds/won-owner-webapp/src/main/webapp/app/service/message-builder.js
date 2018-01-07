@@ -81,8 +81,6 @@ import won from './won.js';
             }
         ];
 
-        console.log('message-builder.js:buildMessageRdf:attachmentBlankNodes: ', attachmentBlankNodes);
-        console.log('message-builder.js:buildMessageRdf:envelopeGraph: ', envelopeGraph.concat(attachmentBlankNodes));
 
         msgGraph.push({
             // msg envelope

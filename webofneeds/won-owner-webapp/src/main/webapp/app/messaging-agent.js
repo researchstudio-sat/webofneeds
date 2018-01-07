@@ -271,6 +271,10 @@ export function runMessagingAgent(redux) {
     ]
 
     function onMessage(receivedMsg) {
+    	//reset the heartbeat counter when we receive a message.
+    	missedHeartbeats = 0;
+    	 
+    	 
         const data = JSON.parse(receivedMsg.data);
 
         won.wonMessageFromJsonLd(data).then(message => {
@@ -333,7 +337,6 @@ export function runMessagingAgent(redux) {
     };
 
     function onHeartbeat(e) {
-        console.debug('messaging-agent.js: received heartbeat',e);
         missedHeartbeats = 0; // reset the deadman count
     }
 
