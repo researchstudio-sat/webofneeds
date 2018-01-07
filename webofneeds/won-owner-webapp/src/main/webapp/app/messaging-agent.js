@@ -236,6 +236,40 @@ export function runMessagingAgent(redux) {
         }
     ];
 
+    // processors that are used for reacting to certain messages after they 
+    // have been processed normally
+    const messagePostProcessingArray = [
+        function (message) {
+            if(message.isFromSystem() && message.isSuccessResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__successOwn(message));
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromSystem() && message.isFailureResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__failureOwn(message));
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromExternal() && message.isSuccessResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__successRemote(message));
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromExternal() && message.isFailureResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__failureRemote(message));
+                return true;
+            }
+            return false;
+        },
+
+    ]
+
     function onMessage(receivedMsg) {
         const data = JSON.parse(receivedMsg.data);
 
@@ -246,8 +280,14 @@ export function runMessagingAgent(redux) {
 
             var messageProcessed = false;
     
+            //process message
             for(var i = 0; i < messageProcessingArray.length; i++) {
                 messageProcessed = messageProcessed || messageProcessingArray[i](message);
+            }
+            
+            //post-process message
+            for(var i = 0; i < messagePostProcessingArray.length; i++) {
+                messagePostProcessingArray[i](message);
             }
     
             if(!messageProcessed){

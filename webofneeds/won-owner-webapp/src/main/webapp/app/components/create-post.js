@@ -289,9 +289,9 @@ function genComponentConf() {
                                         whatsAround: true
                                     };
 
-                                    this.existingWhatsAroundNeeds.map(
-                                        need => this.needs__close(need.get("uri"))
-                                    );
+                                    this.existingWhatsAroundNeeds
+                                    	.filter( need => need.get("state") == "won:Active" )
+                                    	.map(need => this.needs__close(need.get("uri")) );
 
                                     console.log("Creating Whats around with data: ", whatsAround);
 

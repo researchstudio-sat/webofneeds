@@ -117,77 +117,43 @@ export function connectionsOpen(connectionUri, message) {
 }
 
 
-
-export function connectionsConnect(connectionUri, textMessage) {
-    return async (dispatch, getState) => {
-        const state = getState();
-
-        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn(["needs", theirNeedUri]);
-        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
-
-        const cnctMsg = await buildConnectMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
-
-        dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
-
-        const optimisticEvent = await won.toWonMessage(cnctMsg.message);
-
-        dispatch({
-            type: actionTypes.connections.connect,
-            payload: {
-                connectionUri,
-                textMessage,
-                eventUri: cnctMsg.eventUri,
-                optimisticEvent,
-                //optimisticWonMessage: smarterMessage,
-            }
-        });
-    }
-}
-
-
 export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
     return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
 }
 async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
-    const state = getState();
-
+	const state = getState();
     const theirNeed = getIn(state, ['needs', theirNeedUri]);
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-
     await ensureLoggedIn(dispatch, getState);
-
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+    const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
+
+    // connect action to be dispatched when the 
+    // ad hoc need has been created: 
+    const connectAction = {
+		type: actionTypes.needs.connect, 
+		payload: {
+            eventUri: cnctMsg.eventUri,
+            message: cnctMsg.message,
+        }
+    }
+    
+    // register the connect action to be dispatched when 
+    // need creation is successful
+    dispatch({
+    	type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+    	payload: {
+    		eventUri: eventUri,
+    		actionToDispatch: connectAction,
+    	}
+    })
+    
+    // create the new need
     dispatch({
         type: actionTypes.needs.create, // TODO custom action
-        payload: {eventUri, message, needUri}
+        payload: {eventUri, message, needUri, adHocDraft}
     });
-
-    console.log('STARTED PUBLISHING AD HOC DRAFT: ', adHocDraft);
-
-    // TODO handle failure to post need (the needUri won't be valid)
-
-    const cnctMsg = await buildAdHocConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
-
-    const event = await messageGraphToEvent(cnctMsg.eventUri, cnctMsg.message);
-
-    dispatch({
-        type: actionTypes.connections.connectAdHoc,
-        payload: {
-            //connectionUri,
-            textMessage,
-            eventUri: cnctMsg.eventUri,
-            optimisticEvent: event,
-        }
-    });
-
-    dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
-
-    await won.invalidateCacheForNewConnection(undefined /* we don't have a cnct uri yet */, needUri); // mark connections dirty
-
-    console.log('STARTED AD-HOC CONNECTING: ', cnctMsg);
 
     dispatch(actionCreators.router__stateGoAbs('feed'));
 }
@@ -217,13 +183,10 @@ function generateResponseNeedTo(theirNeed) {
     const theirNeedType = get(theirNeed, 'type');
     if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
         reNeedType = won.WON.BasicNeedTypeSupply;
-        descriptionPhrase = 'I have something similar to: ';
     } else if(theirNeedType === won.WON.BasicNeedTypeSupplyCompacted) {
         reNeedType = won.WON.BasicNeedTypeDemand;
-        descriptionPhrase = 'I want something like: ';
     } else if(theirNeedType === won.WON.BasicNeedTypeDotogetherCompacted) {
         reNeedType = won.WON.BasicNeedTypeDotogether;
-        descriptionPhrase = 'I\'d like to find people for something like the following: ';
     } else {
         console.error(
             'The need responded to (' + get(theirNeed, 'uri') + ') doesn\'t ' +
@@ -231,18 +194,14 @@ function generateResponseNeedTo(theirNeed) {
             theirNeedType
         );
         reNeedType = undefined;
-        descriptionPhrase = 'It\'s a response to: ';
     }
+    descriptionPhrase = 'Direct response to : ';
 
-    let theirDescription = get(theirNeed, 'description');
     let theirTitle = get(theirNeed, 'title');
 
     return {
         title: 'Re: ' + theirTitle,
-        description:
-        'This is an automatically generated post. ' +
-        descriptionPhrase +
-        '"' + (theirDescription? theirDescription : theirTitle) +'"',
+        description: descriptionPhrase + theirTitle,
         type: reNeedType,
         tags: cloneAsMutable(get(theirNeed, 'tags')),
         location: cloneAsMutable(get(theirNeed, 'location')),

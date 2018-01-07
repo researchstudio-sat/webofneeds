@@ -1628,7 +1628,6 @@ import jsonld from 'jsonld';
             return this;
         },
         build: function () {
-            console.log("built this message:" + JSON.stringify(this.data));
             return this.data;
         }
     };

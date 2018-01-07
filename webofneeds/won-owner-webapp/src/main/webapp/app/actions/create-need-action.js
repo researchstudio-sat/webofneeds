@@ -64,7 +64,7 @@ export function needCreate(draft, nodeUri) {
                 const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
                 return dispatch({
                     type: actionTypes.needs.create,
-                    payload: {eventUri, message, needUri}
+                    payload: {eventUri, message, needUri, need: draft}
                 })
 
             });

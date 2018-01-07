@@ -1296,20 +1296,23 @@ import won from './won.js';
         return Promise.resolve(ret);
     };
 
-    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
+    won.getEnvelopeDataforNewConnection = function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
+    	console.log("getEnvelopeDataforNewConnection");
         if (!ownNeedUri){
+        	console.log("no own need uri");
             throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
         }
         if (!theirNeedUri){
+        	console.log("no remote need uri");
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
-
-        return Promise.resolve({
+        console.log("returning a normal envelope");
+        return {
             [won.WONMSG.hasSenderNeed]: ownNeedUri,
             [won.WONMSG.hasSenderNode]: ownNodeUri,
             [won.WONMSG.hasReceiverNeed]: theirNeedUri,
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
-        })
+        }
     };
 
 
