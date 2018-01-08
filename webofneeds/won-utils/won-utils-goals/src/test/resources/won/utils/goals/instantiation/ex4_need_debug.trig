@@ -103,13 +103,11 @@ ex1:p1g-shapes {
         sh:path s:latitude ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:datatype xsd:float ;
     ] ;
     sh:property [
         sh:path s:longitude ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:datatype xsd:float ;
     ] ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:closed true .

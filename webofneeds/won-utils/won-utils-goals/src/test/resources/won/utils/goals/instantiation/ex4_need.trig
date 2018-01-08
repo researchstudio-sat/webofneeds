@@ -115,24 +115,46 @@ ex2:p2g-shapes {
         sh:maxCount 1 ;
         sh:class s:GeoCoordinates
     ] ;
+    sh:property [
+        sh:path ( taxi:hasPickupLocation s:latitude ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue "48.213814" ;
+    ] ;
+    sh:property [
+        sh:path ( taxi:hasPickupLocation s:longitude ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue "16.340870" ;
+    ] ;
+    sh:property [
+        sh:path ( taxi:hasDropoffLocation s:latitude ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue "40.213814" ;
+    ] ;
+    sh:property [
+        sh:path ( taxi:hasDropoffLocation s:longitude ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue "12.340870" ;
+    ] ;
 	sh:ignoredProperties ( rdf:type ) ;
 	sh:closed true .
 
-  ex2:GeoCoordinateShape
-    a sh:NodeShape;
-    sh:targetClass s:GeoCoordinates ;
-    sh:property [
-        sh:path s:latitude ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:float ;
-    ] ;
-    sh:property [
-        sh:path s:longitude ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:float ;
-    ] ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:closed true .
+    ex2:GeoCoordinateShape
+        a sh:NodeShape;
+        sh:targetClass s:GeoCoordinates ;
+        sh:property [
+            sh:path s:latitude ;
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+        sh:property [
+            sh:path s:longitude ;
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+        sh:ignoredProperties ( rdf:type ) ;
+        sh:closed true .
 }
