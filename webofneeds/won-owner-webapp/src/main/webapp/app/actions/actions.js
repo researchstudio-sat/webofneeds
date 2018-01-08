@@ -396,9 +396,5 @@ export function needsClose(needUri) {
                 }
             })
         )
-        .then(() =>
-            // go back to overview
-            dispatch(actionCreators.router__stateGoResetParams('overviewPosts'))
-        )
     }
 }
