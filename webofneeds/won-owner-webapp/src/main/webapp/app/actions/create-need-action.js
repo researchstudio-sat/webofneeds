@@ -48,16 +48,7 @@ export function needCreate(draft, nodeUri) {
                 if (currentState === 'landingpage') {
                     return dispatch(actionCreators.router__stateGoAbs('feed'))
                 } else if (currentState === 'createNeed') {
-                    /*
-                     * go to view that was open before the create-view was opened, but
-                     * don't revert any new privateID or remove the create-gui from the
-                     * history stack.
-                     */
-                    if(prevState)  {
-                        return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
-                    } else {
-                        return dispatch(actionCreators.router__stateGoDefault())
-                    }
+                    return dispatch(actionCreators.router__stateGoDefault())
                 }
             })
             .then(() => {
