@@ -134,8 +134,11 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage){
+export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri){
     const envelopeData = won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri);
+    if (optionalOwnConnectionUri){
+       envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
+    }
     //TODO: use event URI pattern specified by WoN node
     var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
     var message = new won.MessageBuilder(won.WONMSG.connectMessage)

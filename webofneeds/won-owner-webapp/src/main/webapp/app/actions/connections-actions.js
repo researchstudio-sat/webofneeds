@@ -126,6 +126,8 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
     const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
     
+    const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
+    
     // connect action to be dispatched when the 
     // ad hoc need has been created: 
     const connectAction = {
@@ -133,6 +135,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
 		payload: {
             eventUri: cnctMsg.eventUri,
             message: cnctMsg.message,
+            optimisticEvent: optimisticEvent,
         }
     }
     

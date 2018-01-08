@@ -80,26 +80,37 @@ export default function(allNeedsInState = initialState, action = {}) {
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData, false),
                 allNeedsInState);
 
+        case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.connectMessageReceived:
             var ownNeedFromState = allNeedsInState.get(action.payload.ownNeedUri);
             var remoteNeedFromState = allNeedsInState.get(action.payload.remoteNeed['@id']);
             var remoteNeed = action.payload.remoteNeed;
 
-            var stateWithOwnNeed = ownNeedFromState ? allNeedsInState : addNeed(allNeedsInState, ownNeed, true);
-            var stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee
+            let changedState = ownNeedFromState ? allNeedsInState : addNeed(allNeedsInState, ownNeed, true);
+            changedState = addNeed(changedState, remoteNeed, false); // guarantee
 																					// that
 																					// remoteNeed
 																					// is
 																					// in
 																					// state
-            var stateWithBothNeedsAndConnection = addConnectionFull(stateWithBothNeeds, action.payload.connection, true);
-
-            let stateWithEverything = stateWithBothNeedsAndConnection;
-            if(action.payload.message){
-                stateWithEverything = addMessage(stateWithEverything, action.payload.message, false, true);
+            if (action.type == actionTypes.messages.connectMessageReceived){
+            	changedState = addConnectionFull(changedState, action.payload.connection, true);	
             }
 
-            return stateWithEverything;
+            if(action.payload.message){
+            	changedState  = addMessage(changedState , action.payload.message, false, true);
+            }
+            changedState  = changeConnectionStateByFun(
+            		changedState  , 
+	            			action.payload.updatedConnection, 
+	            			state => {
+		            			if (!state) return won.WON.RequestReceived; //fallback if no state present
+		            			if (state == won.WON.RequestSent) return won.WON.Connected;
+		            			if (state == won.WON.Suggested) return won.WON.RequestReceived;
+		            			if (state == won.WON.Closed) return won.WON.RequestReceived;
+		            			return won.WON.RequestReceived;
+		            		});
+            return changedState ;
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(allNeedsInState, action.payload, true);
 
@@ -107,48 +118,54 @@ export default function(allNeedsInState = initialState, action = {}) {
         case actionTypes.connections.close:
             return changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.Closed);
 
-        case actionTypes.messages.openMessageReceived:
-            var withConnection = addConnectionFull(allNeedsInState, action.payload.connection);
-            return addMessage(withConnection, action.payload.message, false, true);
-
-        case actionTypes.connections.connectAdHoc:
-            var optimisticEvent = getIn(action, ['payload', 'optimisticEvent']);
-            var ownNeedUri = optimisticEvent.hasSenderNeed;
-            var theirNeedUri = optimisticEvent.hasReceiverNeed;
-            var eventUri = optimisticEvent.uri;
-            var tmpConnectionUri = 'connectionFrom:' + eventUri; // need to
-																	// wait for
-																	// success-response
-																	// to set
-																	// that
-            var optimisticConnection = Immutable.fromJS({
-                uri: tmpConnectionUri,
-                usingTemporaryUri: true,
-                state: won.WON.RequestSent,
-                remoteNeedUri: theirNeedUri,
-                newConnection: true,
-                messages: {
-                    [eventUri]: {
-                        uri: eventUri,
-                        text: optimisticEvent.hasTextMessage,
-                        date: msStringToDate(optimisticEvent.hasSentTimestamp),
-                        outgoingMessage: true,
-                        newMessage: true,
-                        connectMessage: true,
-                    }
-                }
-            });
-            // as eventUris shouldn't clash with connectionUris, we can store it
-			// like this and already display it
-            return allNeedsInState.setIn([ownNeedUri, 'connections', tmpConnectionUri], optimisticConnection);
-
-
-        case actionTypes.connections.connect: // user has sent a request
-            var cnctStateUpdated = changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.RequestSent);
-            return addMessage(cnctStateUpdated, action.payload.optimisticEvent, true, false);
-
-        case actionTypes.connections.open:
-            var cnctStateUpdated = changeConnectionState(allNeedsInState,  action.payload.optimisticEvent.getSender(), won.WON.Connected);
+     
+        case actionTypes.needs.connect: // user has sent a connect request
+        	
+        	const optimisticEvent = action.payload.optimisticEvent;
+            const ownNeedUri = optimisticEvent.getSenderNeed();
+            const theirNeedUri = optimisticEvent.getReceiverNeed();
+            const eventUri = optimisticEvent.getMessageUri();
+            let stateUpdated;
+            
+            if (action.payload.ownConnectionUri) {
+            	stateUpdated = changeConnectionState(allNeedsInState, action.payload.ownConnectionUri, won.WON.RequestSent);
+            	//because we have a connection uri, we can add the message
+            	return addMessage(stateUpdated, action.payload.optimisticEvent, true, false);
+            } else {
+	            var tmpConnectionUri = 'connectionFrom:' + eventUri; // need to
+																		// wait for
+																		// success-response
+																		// to set
+																		// that
+	            var optimisticConnection = Immutable.fromJS({
+	                uri: tmpConnectionUri,
+	                usingTemporaryUri: true,
+	                state: won.WON.RequestSent,
+	                remoteNeedUri: theirNeedUri,
+	                newConnection: true,
+	                messages: {
+	                    [eventUri]: {
+	                        uri: eventUri,
+	                        text: optimisticEvent.getTextMessage(),
+	                        date: msStringToDate(optimisticEvent.getSentTimestamp()),
+	                        outgoingMessage: true,
+	                        newMessage: true,
+	                        connectMessage: true,
+	                    }
+	                }
+	            });
+	            return allNeedsInState.setIn([ownNeedUri, 'connections', tmpConnectionUri], optimisticConnection)
+            }
+            
+            
+        case actionTypes.connections.open: // user has sent an open request        	
+            var cnctStateUpdated = changeConnectionStateByFun(allNeedsInState, action.payload.connectionUri, 
+            		state => {
+            			if (!state) return won.WON.RequestSent; //fallback if no state present
+            			if (state == won.WON.RequestReceived) return won.WON.Connected;
+            			if (state == won.WON.Suggested) return won.WON.RequestSent;
+            			if (state == won.WON.Closed) return won.WON.RequestSent;
+            		});
             return addMessage(cnctStateUpdated, action.payload.optimisticEvent, true, false);
 
         case actionTypes.messages.open.failure:
@@ -173,10 +190,11 @@ export default function(allNeedsInState = initialState, action = {}) {
         case actionTypes.messages.connect.successOwn:
             // TODO SRP; split in isSuccessOfAdHocConnect, addAddHoc(?) and
 			// changeConnectionState
-            var wonMessage = action.payload;
-            var connectionUri = wonMessage.getReceiver();
-            var needForTmpCnct = selectNeedByConnectionUri(allNeedsInState, connectionUri);
-            var unsortedAdHocConnection = needForTmpCnct && needForTmpCnct.getIn(['connections', connectionUri]);
+            const wonMessage = action.payload;
+            const tmpConnectionUri = "connectionFrom:" + wonMessage.getIsResponseTo();
+            const connectionUri = wonMessage.getReceiver();
+            const needForTmpCnct = selectNeedByConnectionUri(allNeedsInState, tmpConnectionUri);
+            var unsortedAdHocConnection = needForTmpCnct && needForTmpCnct.getIn(['connections', tmpConnectionUri]);
             if(unsortedAdHocConnection) {
                 // connection was established from scratch without having a
 				// connection uri. now that we have the uri, we can store it
@@ -431,6 +449,22 @@ function changeConnectionState(state, connectionUri, newState) {
             .setIn([needUri, "connections", connectionUri, "newConnection"], true);
 }
 
+function changeConnectionStateByFun(state, connectionUri, fun) {
+    const need = selectNeedByConnectionUri(state, connectionUri);
+
+    if(!need) {
+        console.error("no need found for connectionUri", connectionUri);
+        return state;
+    }
+
+    const needUri = need.get("uri");
+    const connectionState = state.getIn([needUri, "connections", connectionUri, "state"]);
+    return state
+            .setIn([needUri, "connections", connectionUri, "state"], fun(connectionState))
+            .setIn([needUri, "connections", connectionUri, "newConnection"], true);
+}
+
+
 function changeNeedState(state, needUri, newState) {
     return state
         .setIn([needUri, "state"], newState);
@@ -523,7 +557,7 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         !parsedMessage.data.text ||
         !parsedMessage.data.date
     ) {
-        console.error('Cant parse chat-message, data is an invalid message-object: ', jsonldMessageImm.toJS());
+        console.error('Cant parse chat-message, data is an invalid message-object: ', wonMessage);
         return undefined;
     } else {
         return Immutable.fromJS(parsedMessage);

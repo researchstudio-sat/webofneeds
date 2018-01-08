@@ -155,18 +155,46 @@ export function successfulCreate(event) {
 }
 
 export function openMessageReceived(event) {
-    return dispatch => {
-        won.invalidateCacheForNewMessage(event.getReceiver())
-        .then(() =>
-                getConnectionData(event))
-        .then(data => {
-                dispatch({
-                    type: actionTypes.messages.openMessageReceived,
-                    payload: data
-                })
-            }
-        )
-    }
+	 return (dispatch, getState) => {
+
+	        const ownConnectionUri = event.getReceiver();
+	        const ownNeedUri = event.getReceiverNeed();
+	        const theirNeedUri = event.getSenderNeed();
+
+	        const state = getState();
+	        let connectionP;
+	        if(state.getIn(['connections', ownConnectionUri])) {
+	            // already in state. invalidate the version in the rdf-store.
+	            connectionP = Promise.resolve(state.getIn(['connections', ownConnectionUri]))
+	            won.invalidateCacheForNewConnection(ownConnectionUri, ownNeedUri);
+	        } else {
+	            // need to fetch
+	            connectionP = won
+	                .getConnectionWithEventUris(ownConnectionUri, { requesterWebId: ownNeedUri })
+	                .then(cnct => Immutable.fromJS(cnct));
+	        }
+
+	        Promise.all([
+	            connectionP,
+	            won.getNeed(theirNeedUri),
+	            won.getNeed(ownNeedUri), //uses ownNeed (but does not need connections uris to be loaded) in connectMessageReceived
+	        ])
+	        .then(([connection, theirNeed, ownNeed]) => {
+	            dispatch({
+	                type: actionTypes.messages.openMessageReceived,
+	                payload: {
+	                    updatedConnection: ownConnectionUri,
+	                    connection:  connection,
+	                    ownNeedUri: ownNeedUri,
+	                    ownNeed: ownNeed,
+	                    remoteNeed: theirNeed,
+	                    receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
+	                    message: event,
+	                }
+	            });
+	        });
+
+	    }
 }
 
 export function connectMessageReceived(event) {

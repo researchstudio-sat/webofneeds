@@ -32,7 +32,7 @@ export function needCreate(draft, nodeUri) {
 
         const currentState = getIn(state, ['router', 'currentState', 'name']);
         const prevState = getIn(state, ['router', 'prevState', 'name']);
-        const prevParams = getIn(state, ['router', 'prevParams']);
+        let prevParams = getIn(state, ['router', 'prevParams']);
 
         if(!state.getIn(['user', 'loggedIn']) && prevParams.privateId){
             /*
@@ -40,7 +40,7 @@ export function needCreate(draft, nodeUri) {
              * there be a previous privateId, we don't want to change
              * back to that later.
              */
-            delete prevParams.privateId;
+        	 prevParams = prevParams.remove("privateId")
         }
 
         return ensureLoggedIn(dispatch, getState)

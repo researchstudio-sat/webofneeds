@@ -26,35 +26,28 @@ import {
     buildConnectMessage,
 } from '../won-message-utils.js';
 
-
-export function needsConnect(event) {
+//ownConnectionUri is optional - set if known
+export function needsConnect(ownNeedUri, ownConnectionUri, theirNeedUri, textMessage) {
     return async (dispatch, getState) => {
-    	const ownNeedUri = event.needUri;
-    	const theirNeedUri = event.remoteNeedUri;
-    	const textMessage = event.textMessage;
-    	
     	
         const state = getState();
-        console.log("executing CONNECT NEEDS action");
-        const ownNeed = getState().getIn(["needs", ownNeedUri]);
-        const theirNeed = getState().getIn(["needs", theirNeedUri]);
+        const ownNeed = state.getIn(["needs", ownNeedUri]);
+        const theirNeed = state.getIn(["needs", theirNeedUri]);
         let theirNodeUri = null;
         if (theirNeed){
         	theirNodeUri = theirNeed.get("nodeUri");
         } else {
         	theirNodeUri = await won.getNode(theirNeedUri).hasWonNode;
         } 
-        const cnctMsg = await buildConnectMessage(ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), textMessage);
-
-        dispatch(actionCreators.messages__send({eventUri: cnctMsg.eventUri, message: cnctMsg.message}));
-
-        const optimisticEvent = await won.toWonMessage(cnctMsg.message);
-
+        const cnctMsg = await buildConnectMessage(ownNeedUri, theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), textMessage, ownConnectionUri);
+        const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
         dispatch({
             type: actionTypes.needs.connect,
             payload: {
                 eventUri: cnctMsg.eventUri,
-                optimisticEvent,
+                message: cnctMsg.message,
+                ownConnectionUri: ownConnectionUri,
+                optimisticEvent: optimisticEvent,
             }
         });
     }

@@ -102,7 +102,11 @@ function genComponentConf() {
 
                 this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
             }else{
-                this.connections__open(this.connectionUri, message);
+                this.needs__connect(
+                		this.ownNeed.get("uri"), 
+                		this.connectionUri,
+                		this.ownNeed.getIn(['connections',this.connectionUri]).get("remoteNeedUri"), 
+                		message);
                 this.router__stateGoCurrent({connectionUri: null})
             }
         }
