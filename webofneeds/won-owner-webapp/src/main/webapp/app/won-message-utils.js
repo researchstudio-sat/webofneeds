@@ -127,20 +127,6 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
 }
 
 
-/**
- * Creates json-ld for a connect-message, where there's no connection yet (i.e. we
- * only know which own we want to connect with which remote need)
- * @param ownNeedUri
- * @param theirNeedUri
- * @param textMessage
- * @returns {{eventUri, message}|*}
- */
-export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage) {
-    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri)
-    .then(envelopeData =>
-        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
-    );
-}
 
 /**
  * Builds json-ld for a connect-message in reaction to a need.
@@ -148,28 +134,24 @@ export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, ownNode
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export async function buildConnectMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, textMessage){
-    return won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
-    .then(envelopeData =>
-        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
-    );
-}
-
-function buildConnectMessageForEnvelopeData(envelopeData, textMessage) {
+export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri){
+    const envelopeData = won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri);
+    if (optionalOwnConnectionUri){
+       envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
+    }
     //TODO: use event URI pattern specified by WoN node
     var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
     var message = new won.MessageBuilder(won.WONMSG.connectMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
-        .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
-        .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+        .hasFacet(won.WON.OwnerFacet) 
+        .hasRemoteFacet(won.WON.OwnerFacet)
         .hasTextMessage(textMessage)
         .hasOwnerDirection()
         .hasSentTimestamp(new Date().getTime().toString())
         .build();
 
-    //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
-    return {eventUri:eventUri,message:message};
+    return {eventUri:eventUri,message:message};  
 }
 
 export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {

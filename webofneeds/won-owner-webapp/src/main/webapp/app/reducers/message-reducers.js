@@ -22,6 +22,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         case actionTypes.logout:
             return initialState;
 
+        case actionTypes.needs.connect:            
         case actionTypes.needs.create:
             return messages.setIn(
                 ['enqueued', action.payload.eventUri],
@@ -65,6 +66,28 @@ export function messagesReducer(messages = initialState, action = {}) {
                 .set('lostConnection', false)
                 .set('reconnecting', false);
 
+        case actionTypes.messages.dispatchActionOn.registerSuccessOwn: 
+        	const path = ['dispatchOnSuccessOwn', action.payload.eventUri];
+        	const toDispatchList = messages.getIn(path);
+        	if (!toDispatchList){
+        		return messages.setIn(path, [action.payload.actionToDispatch]);
+        	} 
+        	return messages.updateIn(path, list => list.push(action.payload.actionToDispatch));
+
+        case actionTypes.messages.dispatchActionOn.failureOwn:
+        case actionTypes.messages.dispatchActionOn.successOwn:
+        	//all the dispatching was done by the action creator. remove the queued actions now:
+            return messages.removeIn(['dispatchOnSuccessOwn', action.payload.eventUri])
+            			   .removeIn(['dispatchOnFailureOwn', action.payload.eventUri]);	
+
+        case actionTypes.messages.dispatchActionOn.failureRemote:
+        case actionTypes.messages.dispatchActionOn.successRemote:
+        	//all the dispatching was done by the action creator. remove the queued actions now:
+            return messages.removeIn(['dispatchOnSuccessRemote', action.payload.eventUri])
+            			   .removeIn(['dispatchOnFailureRemote', action.payload.eventUri]);     
+            
+            
+            
         default:
             return messages;
     }

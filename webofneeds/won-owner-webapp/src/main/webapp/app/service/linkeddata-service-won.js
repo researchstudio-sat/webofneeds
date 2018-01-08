@@ -526,10 +526,6 @@ import won from './won.js';
         }
 
 
-        if(partialFetch) {
-            console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
-        }
-
         cacheItemMarkFetching(uri);
         return won.fetch(uri, fetchParams )
             .then(
@@ -1296,20 +1292,21 @@ import won from './won.js';
         return Promise.resolve(ret);
     };
 
-    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
+    won.getEnvelopeDataforNewConnection = function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
         if (!ownNeedUri){
+        	console.log("no own need uri");
             throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
         }
         if (!theirNeedUri){
+        	console.log("no remote need uri");
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
-
-        return Promise.resolve({
+        return {
             [won.WONMSG.hasSenderNeed]: ownNeedUri,
             [won.WONMSG.hasSenderNode]: ownNodeUri,
             [won.WONMSG.hasReceiverNeed]: theirNeedUri,
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
-        })
+        }
     };
 
 
@@ -1332,7 +1329,7 @@ import won from './won.js';
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
         };
         try {
-            if (theirConnectionUri != null) {
+            if (theirConnectionUri) {
                 ret[won.WONMSG.hasReceiver] = theirConnectionUri;
             }
         } catch(err){}

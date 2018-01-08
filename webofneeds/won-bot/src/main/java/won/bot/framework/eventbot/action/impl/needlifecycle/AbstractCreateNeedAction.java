@@ -28,6 +28,7 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
+import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -108,7 +109,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
         return WonMessageBuilder.setMessagePropertiesForCreate(
             wonNodeInformationService.generateEventURI(wonNodeURI),
             needURI,
-            wonNodeURI).addContent(needModel, null).build();
+            wonNodeURI).addContent(needModelWrapper.copyNeedModel(NeedGraphType.NEED), null).build();
     }
 
     public void setUsedForTesting(final boolean usedForTesting) {

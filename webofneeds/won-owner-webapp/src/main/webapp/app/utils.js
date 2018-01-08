@@ -44,7 +44,6 @@ export function dispatchEvent(elem, eventName, eventData) {
         event = new Event(eventName);
     }
     elem.dispatchEvent(event);
-    //console.log('dispatching');
 }
 
 /*
@@ -318,7 +317,6 @@ export function concatTags(tags) {
 // This scrolling function
 // is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
 export function scrollTo(eID) {
-    console.log("SCROLL TO METHOD");
     var startY = currentYPosition();
     var stopY = elmYPosition(eID);
     var distance = stopY > startY ? stopY - startY : startY - stopY;
@@ -589,7 +587,6 @@ export function searchNominatim(searchStr) {
     var url = "https://nominatim.openstreetmap.org/search" +
         "?q=" + encodeURIComponent(searchStr) +
         "&format=json";
-    console.log("About to query nominatim: " + url);
     return fetchJSON(url);
 }
 
@@ -603,7 +600,6 @@ export function reverseSearchNominatim(lat, lon, zoom) {
     if(!isNaN(zoom)) {
         url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
     }
-    console.log("About to do reverse lookup on nominatim: " + url);
 
     let json = fetchJSON((url)).catch(function(e){
         var distance = 0.2;

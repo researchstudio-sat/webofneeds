@@ -55,6 +55,11 @@ import {
 } from './create-need-action.js';
 
 import {
+    needsConnect,
+} from './needs-actions.js';
+
+
+import {
     stateBack,
     stateGoAbs,
     stateGoCurrent,
@@ -95,7 +100,6 @@ const actionHierarchy = {
     connections:{
         fetch: cnct.connectionsFetch,
         open: cnct.connectionsOpen,
-        connect: cnct.connectionsConnect,
         connectAdHoc: cnct.connectionsConnectAdHoc,
         close: cnct.connectionsClose,
         closeRemote: cnct.connectionsCloseRemote,
@@ -113,7 +117,8 @@ const actionHierarchy = {
         reopen: needsOpen,
         close: needsClose,
         closedBySystem:needsClosedBySystem,
-        failed: INJ_DEFAULT
+        failed: INJ_DEFAULT,
+        connect: needsConnect,
     },
     router: {
         stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
@@ -185,6 +190,24 @@ const actionHierarchy = {
         hintMessageReceived: messages.hintMessageReceived,
         openMessageReceived: messages.openMessageReceived,
 
+        // register a fully prepared action object to be dispatched
+        // after a specific message (identified by URI)  has been processed
+        // (when the respective success message is processed)
+        dispatchActionOn: {
+        	// registers the action (in action.actionToDispatch)
+        	registerSuccessOwn: INJ_DEFAULT,
+        	registerFailureOwn: INJ_DEFAULT,
+        	registerSuccessRemote: INJ_DEFAULT,
+        	registerFailureRemote: INJ_DEFAULT,
+        	// the action creator dispatches the registered actions
+        	successOwn: messages.dispatchActionOnSuccessOwn,
+        	successRemote: messages.dispatchActionOnSuccessRemote,
+        	// failure actions clear the list of registered success actions
+        	// and vice versa
+        	failureOwn: messages.dispatchActionOnSuccessOwn,
+        	failureRemote: messages.dispatchActionOnSuccessOwn,
+        },
+        
         waitingForAnswer: INJ_DEFAULT,
     },
     hideLogin: INJ_DEFAULT,
@@ -308,7 +331,6 @@ export function needsOpen(needUri) {
             getState().getIn(['config', 'defaultNodeUri'])
         )
             .then((data)=> {
-                console.log(data);
                 dispatch(actionCreators.messages__send({
                     eventUri: data.eventUri,
                     message: data.message
@@ -353,7 +375,6 @@ export function needsClose(needUri) {
             getState().getIn(['config', 'defaultNodeUri'])
         )
         .then((data)=> {
-            console.log(data);
             dispatch(actionCreators.messages__send({
                 eventUri: data.eventUri,
                 message: data.message
