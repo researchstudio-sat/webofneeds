@@ -112,6 +112,7 @@
             <sec:frame-options />
             <sec:xss-protection />
         </sec:headers>
+        <sec:intercept-url pattern="/(resource|data|page)(/need(/?))?" access="permitAll"/>
         <sec:intercept-url pattern="/(resource|data|page)/((need/[a-zA-Z0-9]+)|(connection/a-zA-Z0-9]+(/events)?))" access="permitAll"/>
         <sec:intercept-url pattern=".*" access="denyAll"/>
         <!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
