@@ -23,13 +23,24 @@ public class GoalInstantiationProducer {
     private Dataset need2;
     private Dataset conversation;
     private Model combinedModelWithoutGoals;
+    private String variableUriPrefix;
     private String blendingUriPrefix;
 
-    public GoalInstantiationProducer(Dataset need1, Dataset need2, Dataset conversation, String blendingUriPrefix) {
+    /**
+     * Initialize the GoalInstantiationProducer
+     *
+     * @param need1 Dataset of need 1
+     * @param need2 Dataset of need 2
+     * @param conversation Dataset of the conversation between two needs
+     * @param variableUriPrefix uri prefix defines which resource URIs are considered for blending
+     * @param blendingUriPrefix uri prefix that is used to generate the result URIs of blended resources
+     */
+    public GoalInstantiationProducer(Dataset need1, Dataset need2, Dataset conversation, String variableUriPrefix, String blendingUriPrefix) {
 
         this.need1 = need1;
         this.need2 = need2;
         this.conversation = conversation;
+        this.variableUriPrefix = variableUriPrefix;
         this.blendingUriPrefix = blendingUriPrefix;
 
         // first remove all goals data and shapes graphs from needs
@@ -62,7 +73,7 @@ public class GoalInstantiationProducer {
      * @param goal2 resource referencing goal from need2
      * @return
      */
-    private GoalInstantiationResult findInstantiationForGoals(Resource goal1, Resource goal2) {
+    private GoalInstantiationResult findConformInstantiationForGoals(Resource goal1, Resource goal2) {
 
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
         Model shapesModel1 = needWrapper1.getShapesGraph(goal1);
@@ -86,35 +97,21 @@ public class GoalInstantiationProducer {
         Model extractedModel1 = GoalUtils.extractGoalData(combinedModelWithGoalData, shapesModel1);
         Model extractedModel2 = GoalUtils.extractGoalData(combinedModelWithGoalData, shapesModel2);
 
-        // blend the two extracted graphs
-        Model blendedModel = GoalUtils.blendGraphsSimple(extractedModel1, extractedModel2, blendingUriPrefix);
-
-        // check the blended graph against the shacl shape graphs of both goals
         Model combinedShapesModel = ModelFactory.createDefaultModel();
         combinedShapesModel.add(shapesModel1);
         combinedShapesModel.add(shapesModel2);
-        return new GoalInstantiationResult(blendedModel, combinedShapesModel);
-    }
 
-    /**
-     * create all possible goal instantiations between two needs.
-     * That means trying to combine each two goals of the two needs.
-     *
-     * @return
-     */
-    public Collection<GoalInstantiationResult> createAllGoalInstantiationResults() {
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
-        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
-
-        Collection<GoalInstantiationResult> results = new LinkedList<>();
-        for (Resource goal1 : needWrapper1.getGoals()) {
-            for (Resource goal2 : needWrapper2.getGoals()) {
-                GoalInstantiationResult instantiationResult = findInstantiationForGoals(goal1, goal2);
-                results.add(instantiationResult);
+        // blend the two extracted graphs
+        GraphBlendingIterator blendingIterator = new GraphBlendingIterator(extractedModel1, extractedModel2, variableUriPrefix, blendingUriPrefix);
+        while (blendingIterator.hasNext()) {
+            Model blendedModel = blendingIterator.next();
+            GoalInstantiationResult instantiationResult = new GoalInstantiationResult(blendedModel, combinedShapesModel);
+            if (instantiationResult.isConform()) {
+                return instantiationResult;
             }
         }
 
-        return results;
+        return null;
     }
 
     /**
@@ -131,8 +128,8 @@ public class GoalInstantiationProducer {
         Collection<Model> validInstantiationModels = new LinkedList<>();
         for (Resource goal1 : needWrapper1.getGoals()) {
             for (Resource goal2 : needWrapper2.getGoals()) {
-                GoalInstantiationResult instantiationResult = findInstantiationForGoals(goal1, goal2);
-                if (instantiationResult.isConform()) {
+                GoalInstantiationResult instantiationResult = findConformInstantiationForGoals(goal1, goal2);
+                if (instantiationResult != null) {
                     validInstantiationModels.add(instantiationResult.getInstanceModel());
                 }
             }

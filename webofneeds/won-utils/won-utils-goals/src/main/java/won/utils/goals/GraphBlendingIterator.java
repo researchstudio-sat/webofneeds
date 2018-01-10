@@ -66,7 +66,7 @@ public class GraphBlendingIterator implements Iterator<Model> {
     }
 
     private boolean isVariableResource(String uri) {
-        return uri.startsWith(variableUriPrefix);
+        return (uri != null && uri.startsWith(variableUriPrefix));
     }
 
     private boolean isValidBlending(Statement stmt1, Statement stmt2) {
