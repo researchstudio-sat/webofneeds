@@ -26,7 +26,6 @@ public class GraphBlendingIterator implements Iterator<Model> {
     private String blendingUriPrefix;
     private ArrayList<Pair<String, String>> blendingResourceUriPairs;
     private int powerSetIndex = 0;
-    private int blendingIndex = 0;
 
     /**
      * Initialize the blending iterator
@@ -88,7 +87,7 @@ public class GraphBlendingIterator implements Iterator<Model> {
 
         // check if the combination of pairs is allowed
         int validPowerSetIndex = powerSetIndex - 1;
-        boolean isValidPowerSet = true;
+        boolean isValidPowerSet;
         do {
             validPowerSetIndex++;
 
@@ -97,6 +96,7 @@ public class GraphBlendingIterator implements Iterator<Model> {
             // if the same resource URI occurs in both graphs it should also only occur once in a valid set, either
             // as left or right side of a pair. Therefore we can test for valid combinations using a set or list structure
             // by inserting both left and right side pair entries and check for duplicate keys
+            isValidPowerSet = true;
             Set<String> resourceSet = new HashSet<>();
             for (int i = 0; i < blendingResourceUriPairs.size(); i++) {
                 // check which bits are set in the current setIndex
@@ -142,6 +142,7 @@ public class GraphBlendingIterator implements Iterator<Model> {
         blendedModel.add(dataGraph1.listStatements());
         blendedModel.add(dataGraph2.listStatements());
 
+        int blendingIndex = 0;
         for (int i = 0; i < blendingResourceUriPairs.size(); i++) {
 
             // check which bits are set in the current powerSetIndex and blend the corresponding Resource pairs
