@@ -4,11 +4,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.util.ResourceUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Iterator class that iterates over all possible models that could be a valid result from blending two input models.
@@ -19,7 +18,7 @@ import java.util.NoSuchElementException;
  */
 public class GraphBlendingIterator implements Iterator<Model> {
 
-    private static int MAX_RESOURCE_PAIR_SIZE = 16;
+    private static int MAX_RESOURCE_PAIR_SIZE = 10;
 
     private Model dataGraph1;
     private Model dataGraph2;
@@ -79,6 +78,51 @@ public class GraphBlendingIterator implements Iterator<Model> {
         return (1 << blendingResourceUriPairs.size());
     }
 
+    /**
+     * Return the next valid power set index of a set of resource URI pairs.
+     * Not all power set indices are valid since resource URIs may only occur at most once in pair sets.
+     *
+     * @return next valid power set index or an index >= power set size if no next valid index exists anymore
+     */
+    private int getNextValidPowerSetIndex() {
+
+        // check if the combination of pairs is allowed
+        int validPowerSetIndex = powerSetIndex - 1;
+        boolean isValidPowerSet = true;
+        do {
+            validPowerSetIndex++;
+
+            // resource URI may only occur at most once in pair sets
+            // e.g. {(A,X),(B,X)} is not allowed since X occurs twice, so a lot of combinations are filtered out here
+            // if the same resource URI occurs in both graphs it should also only occur once in a valid set, either
+            // as left or right side of a pair. Therefore we can test for valid combinations using a set or list structure
+            // by inserting both left and right side pair entries and check for duplicate keys
+            Set<String> resourceSet = new HashSet<>();
+            for (int i = 0; i < blendingResourceUriPairs.size(); i++) {
+                // check which bits are set in the current setIndex
+                if ((validPowerSetIndex & (1 << i)) > 0) {
+                    Pair<String, String> currentPair = blendingResourceUriPairs.get(i);
+                    if (resourceSet.contains(currentPair.getLeft()) || resourceSet.contains(currentPair.getRight()) ||
+                            currentPair.getLeft().equals(currentPair.getRight())) {
+                        isValidPowerSet = false;
+                        break;
+                    } else {
+                        resourceSet.add(currentPair.getLeft());
+                        resourceSet.add(currentPair.getRight());
+                    }
+                }
+            }
+        } while (validPowerSetIndex < getPowerSetSize() && !isValidPowerSet);
+
+        // if we found the next valid power set index return it
+        if (isValidPowerSet) {
+           return validPowerSetIndex;
+        }
+
+        // this shows that no next valid power set index exists anymore
+        return getPowerSetSize();
+    }
+
     @Override
     public boolean hasNext() {
         return (powerSetIndex < getPowerSetSize());
@@ -93,6 +137,8 @@ public class GraphBlendingIterator implements Iterator<Model> {
 
         // add all triples together in one graph
         Model blendedModel = ModelFactory.createDefaultModel();
+        blendedModel.setNsPrefixes(dataGraph1.getNsPrefixMap());
+        blendedModel.setNsPrefixes(dataGraph2.getNsPrefixMap());
         blendedModel.add(dataGraph1.listStatements());
         blendedModel.add(dataGraph2.listStatements());
 
@@ -106,7 +152,7 @@ public class GraphBlendingIterator implements Iterator<Model> {
                 do {
                     blendingIndex++;
                     blendedResourceUri = blendingUriPrefix + blendingIndex;
-                } while (blendedModel.getResource(blendedResourceUri) != null);
+                } while (blendedModel.containsResource(new ResourceImpl(blendedResourceUri)));
 
                 // blend the resources by renaming them
                 Pair<String, String> blendingPair = blendingResourceUriPairs.get(i);
@@ -115,6 +161,9 @@ public class GraphBlendingIterator implements Iterator<Model> {
             }
         }
 
+        // increase the power set index to the next valid index and return the blended model
+        powerSetIndex++;
+        powerSetIndex = getNextValidPowerSetIndex();
         return blendedModel;
     }
 
