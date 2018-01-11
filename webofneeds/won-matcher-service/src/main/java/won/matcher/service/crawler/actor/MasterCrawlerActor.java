@@ -301,19 +301,11 @@ public class MasterCrawlerActor extends UntypedActor
           String modifiedUri = needListUri + "?modifiedafter=" + lastNeedModificationDate;
           self().tell(new CrawlUriMessage(modifiedUri, needListUri, wonNodeInfo.getWonNodeURI(),
                   CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
-
-          // change the base uri here to end with a slash cause we don't know how the uri is saved
-          // also have to change the first uri parameter since messages with the same uri parameter get filtered out
-          modifiedUri = removeEndingSlash(wonNodeInfo.getNeedListURI()) + "/?modifiedafter=" + lastNeedModificationDate;
-          self().tell(new CrawlUriMessage(modifiedUri, needListUri + "/", wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
       } else {
 
           // or else if we didn't crawl needs yet start crawling the whole won node
           String needListUri = removeEndingSlash(wonNodeInfo.getNeedListURI());
           self().tell(new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
-          self().tell(new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
                   CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
       }
 
@@ -323,12 +315,6 @@ public class MasterCrawlerActor extends UntypedActor
           String connectionPrefixUri = removeEndingSlash(wonNodeInfo.getConnectionURIPrefix());
           String modifiedUri = connectionPrefixUri + "?modifiedafter=" + lastConnectionModificationDate;
           self().tell(new CrawlUriMessage(modifiedUri, connectionPrefixUri, wonNodeInfo.getWonNodeURI(),
-                  CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
-
-          // change the base uri here to end with a slash cause we don't know how the uri is saved
-          // also have to change the first uri parameter since messages with the same uri parameter get filtered out
-          modifiedUri = wonNodeInfo.getConnectionURIPrefix() + "/?modifiedafter=" + lastConnectionModificationDate;
-          self().tell(new CrawlUriMessage(modifiedUri, connectionPrefixUri + "/", wonNodeInfo.getWonNodeURI(),
                   CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null), getSelf());
       }
   }
@@ -340,15 +326,6 @@ public class MasterCrawlerActor extends UntypedActor
       return uri;
   }
 
-  private String getNeedOrConnectionIdFromUri(String uri) {
-
-      uri = removeEndingSlash(uri);
-      if (uri != null) {
-          String[] parts = uri.split("/");
-          return parts[parts.length - 1];
-      }
-      return null;
-  }
 
 
 }
