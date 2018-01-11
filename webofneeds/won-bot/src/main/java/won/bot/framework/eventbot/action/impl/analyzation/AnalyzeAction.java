@@ -28,7 +28,6 @@ import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementErro
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Connection;
@@ -61,7 +60,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             Dataset remoteNeedDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getRemoteNeedURI());
             Dataset connectionDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getConnectionURI());
 
-            GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, connectionDataset, "http://example.org/blended/");
+            GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, connectionDataset, "http://example.org/","http://example.org/blended/");
             Collection<GoalInstantiationResult> results = goalInstantiationProducer.createAllGoalInstantiationResults();
             Connection con = ((WonMessageReceivedOnConnectionEvent) event).getCon();
 
@@ -80,9 +79,9 @@ public class AnalyzeAction extends BaseEventBotAction {
                 String textMessage = WonRdfUtils.MessageUtils.getTextMessage(messageFromOtherNeedEvent.getWonMessage());
 
                 if("PreconditionMetEvent".equals(textMessage)){
-                    bus.publish(new PreconditionMetEvent(con, new GoalInstantiationResult()));
+                    bus.publish(new PreconditionMetEvent(con, null));
                 }else if("PrecondtionUnmetEvent".equals(textMessage)){
-                    bus.publish(new PreconditionUnmetEvent(con, new GoalInstantiationResult()));
+                    bus.publish(new PreconditionUnmetEvent(con, null));
                 } else if("AgreementCanceledEvent".equals(textMessage)){
                     bus.publish(new AgreementCanceledEvent(con, new Object()));
                 }else if("AgreementAcceptedEvent".equals(textMessage)){

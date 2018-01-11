@@ -8,6 +8,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
 import won.utils.goals.GoalInstantiationProducer;
+import won.utils.goals.GoalInstantiationResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,10 +26,11 @@ public class GoalInstantiationTest {
         Dataset conversation = loadDataset(baseFolder + "ex1_conversation.trig");
 
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
-        Collection<Model> results = goalInstantiation.createAllConformGoalInstantiationModels();
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
 
         Assert.assertEquals(1, results.size());
-        results.iterator().next().write(System.out, "TTL");
+        System.out.println(results.iterator().next().toString());
+        Assert.assertTrue(results.iterator().next().isConform());
     }
 
     @Test
@@ -39,15 +41,19 @@ public class GoalInstantiationTest {
         Dataset conversationWithoutPickupTime = loadDataset(baseFolder + "ex1_conversation.trig");
         Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
 
-        // this conversation does not contain the missing pickup time info so the goals cannot be fulfilled
+        // this conversation doas not contain the missing pickup time info so the goals cannot be fulfilled
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
-        Collection<Model> results = goalInstantiation.createAllConformGoalInstantiationModels();
-        Assert.assertEquals(0, results.size());
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
+        Assert.assertEquals(1, results.size());
+        System.out.println(results.iterator().next().toString());
+        Assert.assertFalse(results.iterator().next().isConform());
 
         // this conversation contains the missing pickup info so the goals can be fulfilled
         goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime, "http://example.org/", "http://example.org/blended/");
-        results = goalInstantiation.createAllConformGoalInstantiationModels();
+        results = goalInstantiation.createAllGoalInstantiationResults();
         Assert.assertEquals(1, results.size());
+        System.out.println(results.iterator().next().toString());
+        Assert.assertTrue(results.iterator().next().isConform());
     }
 
     @Test
@@ -58,7 +64,10 @@ public class GoalInstantiationTest {
         Dataset conversation = loadDataset(baseFolder + "ex3_conversation.trig");
 
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
-        Collection<Model> results = goalInstantiation.createAllConformGoalInstantiationModels();
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
+
+        // We have 4 and 2 goals so we expected 8 results
+        Assert.assertEquals(8, results.size());
 
         // We expected three valid results
         Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
@@ -76,9 +85,12 @@ public class GoalInstantiationTest {
         Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");
 
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
-        Collection<Model> results = goalInstantiation.createAllConformGoalInstantiationModels();
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
 
-        // We expected one valid result
+        // We have only one goal on each side so we expect only one result
+        Assert.assertEquals(1, results.size());
+
+        // We expect also one valid result
         Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
         Assert.assertEquals(1, validResults.size());
         for (Model valid : validResults) {

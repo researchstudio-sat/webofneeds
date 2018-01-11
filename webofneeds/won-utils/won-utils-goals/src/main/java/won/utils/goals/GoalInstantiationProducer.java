@@ -5,9 +5,11 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.validation.ValidationUtil;
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
+import won.utils.shacl.ShaclReportWrapper;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -69,12 +71,15 @@ public class GoalInstantiationProducer {
     /**
      * Create a goal instantiation result from the attempt to instantiate two goals of two needs using all
      * the need data, the conversation data and the data and shapes of the two goals.
+     * If a model can be found that conforms to the shacl shapes of both needs this model is chosen to be returned
+     * in the GoalInstantiationResult. If no conforming model can be found, the model with the least
+     * shacl validation results (validation errors) is used.
      *
      * @param goal1 resource referencing goal from need1
      * @param goal2 resource referencing goal from need2
-     * @return
+     * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
      */
-    private GoalInstantiationResult findConformInstantiationForGoals(Resource goal1, Resource goal2) {
+    private GoalInstantiationResult findInstantiationForGoals(Resource goal1, Resource goal2) {
 
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
         Model shapesModel1 = needWrapper1.getShapesGraph(goal1);
@@ -102,23 +107,56 @@ public class GoalInstantiationProducer {
         combinedShapesModel.add(shapesModel1);
         combinedShapesModel.add(shapesModel2);
 
+        int minValidationResults = Integer.MAX_VALUE;
+        GoalInstantiationResult bestGoalInstantiationResult = null;
+
         // blend the two extracted graphs
         GraphBlendingIterator blendingIterator = new GraphBlendingIterator(extractedModel1, extractedModel2, variableUriPrefix, blendingUriPrefix);
         while (blendingIterator.hasNext()) {
             Model blendedModel = blendingIterator.next();
 
             // check if the blended model conforms to the combined shacl shapes of both needs
-            if (GoalUtils.validateModelShaclConformity(blendedModel, combinedShapesModel)) {
+            Resource report = ValidationUtil.validateModel(blendedModel, combinedShapesModel, false);
+            ShaclReportWrapper shaclReportWrapper = new ShaclReportWrapper(report);
+            if (shaclReportWrapper.isConform()) {
 
                 // if we found a blended model that is conform to the shacl shapes lets try to condense it
                 // as far as possible to get the minimum model that is still conform to the shapes
                 Function<Model, Boolean> modelTestingFunction = param -> GoalUtils.validateModelShaclConformity(param, combinedShapesModel);
                 Model condensedModel = RdfUtils.condenseModelByIterativeTesting(blendedModel, modelTestingFunction);
-                return new GoalInstantiationResult(condensedModel, combinedShapesModel);
+                bestGoalInstantiationResult = new GoalInstantiationResult(condensedModel, combinedShapesModel);
+            } else {
+
+                // if the model is not conform save it if it has the least validation results found so far
+                if (shaclReportWrapper.getValidationResults().size() < minValidationResults) {
+                    minValidationResults = shaclReportWrapper.getValidationResults().size();
+                    bestGoalInstantiationResult = new GoalInstantiationResult(blendedModel, combinedShapesModel);
+                }
             }
         }
 
-        return null;
+        return bestGoalInstantiationResult;
+    }
+
+    /**
+     * create all possible goal instantiations between two needs.
+     * That means trying to combine each two goals of the two needs.
+     *
+     * @return
+     */
+    public Collection<GoalInstantiationResult> createAllGoalInstantiationResults() {
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
+        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
+
+        Collection<GoalInstantiationResult> results = new LinkedList<>();
+        for (Resource goal1 : needWrapper1.getGoals()) {
+            for (Resource goal2 : needWrapper2.getGoals()) {
+                GoalInstantiationResult instantiationResult = findInstantiationForGoals(goal1, goal2);
+                results.add(instantiationResult);
+            }
+        }
+
+        return results;
     }
 
     /**
@@ -135,8 +173,8 @@ public class GoalInstantiationProducer {
         Collection<Model> validInstantiationModels = new LinkedList<>();
         for (Resource goal1 : needWrapper1.getGoals()) {
             for (Resource goal2 : needWrapper2.getGoals()) {
-                GoalInstantiationResult instantiationResult = findConformInstantiationForGoals(goal1, goal2);
-                if (instantiationResult != null) {
+                GoalInstantiationResult instantiationResult = findInstantiationForGoals(goal1, goal2);
+                if (instantiationResult.isConform()) {
                     validInstantiationModels.add(instantiationResult.getInstanceModel());
                 }
             }
