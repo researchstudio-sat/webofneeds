@@ -23,7 +23,7 @@
 ### Tomcat integration:
 
 1.  Create Server: File >> New >> Other >> Server
-2.  Choose Tomcat 
+2.  Choose Tomcat, then press "next" (not "finish")
 3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
 4.  Add node and owner and click finish 
       1. If you do not have the options to add the owner and node application to the tomcat (also accessible via Server >> [your tomcat server] >> Add and Remove), something went wrong.
