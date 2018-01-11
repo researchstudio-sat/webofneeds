@@ -88,7 +88,7 @@
 		* Navigate to your maven repository (default location: [user home]\.m2\repository; if it's not there, look into [user home]\.m2\settings.xml)
 		* find javax\servlet\jstl\1.2\jstl-1.2.jar
 		* if you don't find it
-			* build the whole project with `mvn install`
+			* build the whole project with `mvn install -Dmaven.test.skip=true`
 			* try again      
 	*  Server Locations: Use Workspace Metadata
 	*  Server Options
