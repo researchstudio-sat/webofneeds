@@ -227,15 +227,27 @@ public class CrawlSparqlService extends SparqlService {
         Set<CrawlUriMessage> newCrawlMessages = new HashSet<CrawlUriMessage>();
         long crawlDate = System.currentTimeMillis();
 
+        // we have to query the baseUri with and without trailing slahes cause we don't know how the RDF data
+        // is described in detail. Usually the "need" prefix ends with a trailing "slash" but we don't assume
+        // here that is always the case, so we query both variants: with and without trailing slashes.
+        // Check the need list with its need: rdfs:member entries for example
         String queryString = "SELECT ?uri (group_concat(distinct ?etag;separator=\"" + HTTP_HEADER_SEPARATOR + "\") as ?etags) WHERE {\n" +
-                " ?baseUri " + propertyPath + " ?uri.\n" +  // propertyPath has to be appended manually because it contains ">" character and ParameterizedSparqlString cause of injection risk
+                "{ ?baseUriWithTrailingSlash " + propertyPath + " ?uri. } \n" +  // propertyPath has to be appended manually because it contains ">" character and ParameterizedSparqlString cause of injection risk
+                "UNION { ?baseUriWithoutTrailingSlash " + propertyPath + " ?uri. } \n" + // propertyPath has to be appended manually because it contains ">" character and ParameterizedSparqlString cause of injection risk
                 " OPTIONAL {?uri won:resourceETagValue ?etag. }}\n" +
                 " GROUP BY ?uri\n";
 
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
         pps.setNsPrefix("won", "http://purl.org/webofneeds/model#");
         pps.setCommandText(queryString);
-        pps.setIri("baseUri", baseUri);
+
+        baseUri = baseUri.trim();
+        if (baseUri.endsWith("/")) {
+            baseUri = baseUri.substring(0, baseUri.length() - 1);
+        }
+
+        pps.setIri("baseUriWithoutTrailingSlash", baseUri);
+        pps.setIri("baseUriWithTrailingSlash", baseUri + "/");
 
         log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
         log.debug("Execute query: {}", pps.toString());
