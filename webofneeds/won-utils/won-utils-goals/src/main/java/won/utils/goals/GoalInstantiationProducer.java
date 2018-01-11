@@ -11,6 +11,7 @@ import won.protocol.util.RdfUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.function.Function;
 
 /**
  * Class supports in producing goal instantiations that can be used to create proposals for instance.
@@ -105,9 +106,15 @@ public class GoalInstantiationProducer {
         GraphBlendingIterator blendingIterator = new GraphBlendingIterator(extractedModel1, extractedModel2, variableUriPrefix, blendingUriPrefix);
         while (blendingIterator.hasNext()) {
             Model blendedModel = blendingIterator.next();
-            GoalInstantiationResult instantiationResult = new GoalInstantiationResult(blendedModel, combinedShapesModel);
-            if (instantiationResult.isConform()) {
-                return instantiationResult;
+
+            // check if the blended model conforms to the combined shacl shapes of both needs
+            if (GoalUtils.validateModelShaclConformity(blendedModel, combinedShapesModel)) {
+
+                // if we found a blended model that is conform to the shacl shapes lets try to condense it
+                // as far as possible to get the minimum model that is still conform to the shapes
+                Function<Model, Boolean> modelTestingFunction = param -> GoalUtils.validateModelShaclConformity(param, combinedShapesModel);
+                Model condensedModel = RdfUtils.condenseModelByIterativeTesting(blendedModel, modelTestingFunction);
+                return new GoalInstantiationResult(condensedModel, combinedShapesModel);
             }
         }
 

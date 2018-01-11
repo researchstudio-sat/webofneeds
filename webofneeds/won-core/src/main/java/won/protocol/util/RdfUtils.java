@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -1343,6 +1344,36 @@ public class RdfUtils
         return null;
       }
     });
+  }
+
+    /**
+     * Condense a model to a minimum of statements by iteratively removing single statements and testing if the
+     * condensed model is still valid. A test function is used that can be passed to test for the validity of the
+     * model in every step.
+     *
+     * @param model input model to be condensed
+     * @param isModelValidTest test function should return true if the model is valid (previous condensation step was ok)
+     *                         and false otherwise
+     * @return the condensed model
+     */
+  public static Model condenseModelByIterativeTesting(Model model, Function<Model, Boolean> isModelValidTest) {
+
+      Model condensedModel = RdfUtils.cloneModel(model);
+      boolean done = false;
+      while (!done) {
+          done = true;
+          for (Statement stmt : condensedModel.listStatements().toList()) {
+              Model backupModel = RdfUtils.cloneModel(condensedModel);
+              condensedModel.remove(stmt);
+              if (isModelValidTest.apply(condensedModel)) {
+                  done = false;
+              } else {
+                  condensedModel = backupModel;
+              }
+          }
+      }
+
+      return condensedModel;
   }
 
   public static interface GraphNameCheck

@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.NotFoundException;
 import org.topbraid.shacl.validation.ValidationUtil;
+import won.utils.shacl.ShaclReportWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +71,13 @@ public class GoalUtils {
         QueryExecution qexec = QueryExecutionFactory.create(query ,combinedModel);
         Model result = qexec.execConstruct();
         return result;
+    }
+
+    public static Boolean validateModelShaclConformity(Model dataModel, Model shaclShapesModel) {
+
+        Resource report = ValidationUtil.validateModel(dataModel, shaclShapesModel, false);
+        ShaclReportWrapper shaclReportWrapper = new ShaclReportWrapper(report);
+        return shaclReportWrapper.isConform();
     }
 
 }
