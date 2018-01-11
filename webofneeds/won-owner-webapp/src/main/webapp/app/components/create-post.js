@@ -62,34 +62,55 @@ function genComponentConf() {
                 </span>
             </button>
             <won-labelled-hr label="::' or be more specific '"></won-labelled-hr>
-            <won-posttype-select
-                    options="::self.postTypeTexts"
-                    on-select="::self.selectType(idx)"
-                    on-unselect="::self.unselectType()">
-            </won-posttype-select>
+            
+            
+            <!--
+					Changes Here
+			-->
+			
+			<!-- Tab links -->
+			<div class="tab">
+			  <button id="searchButton" class="tablinks active" ng-click="[self.selectType('is'), self.openTab(event, 'Search', 'searchButton')]">Search</button>
+			  <button id="postButton" class="tablinks" ng-click="[self.selectType('seeks'), self.openTab(event, 'Post', 'postButton')]">Post</button>
+			</div>
 
-            <div class="cp__mandatory-rest" ng-if="self.draft.type">
-                <won-image-dropzone
-                        on-image-picked="::self.pickImage(image)">
-                </won-image-dropzone>
+			<!-- Tab content -->
+			<div id="Search" class="tabcontent" style="display: block;">
+			 	<div class="cp__mandatory-rest ng-if="self.draft.type"">
+			        <won-image-dropzone on-image-picked="::self.pickImage(image)">
+			        </won-image-dropzone>
+					<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+				</div>
+				<div class="cp__textfield_instruction" ng-if="self.isValid()">
+					<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+				</div>
+			</div>
+			
+			<div id="Post" class="tabcontent">
+    			<div class="cp__mandatory-rest ng-if="self.draft.type"">
+			        <won-image-dropzone on-image-picked="::self.pickImage(image)">
+			        </won-image-dropzone>
+					<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+				</div>
+				<div class="cp__textfield_instruction" ng-if="self.isValid()">
+					<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+				</div>
+    		</div>
 
-                <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+    		
+    		<!--
+			-->
 
-            </div>
-			<div class="cp__textfield_instruction" ng-if="self.isValid()">
-				<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-			</div>			
-
-            <div class="cp__details" ng-repeat="detail in self.details track by $index" ng-if="self.isValid()">
+            <div class="cp__details" ng-repeat="detail in self.details[self.isSeeks] track by $index" ng-if="self.isValid()">
                 <div class="cp__tags" ng-if="detail === 'tags'">
                     <div class="cp__header tags" ng-click="self.removeDetail($index)">
                         <span class="nonHover">Tags</span>
                         <span class="hover">Remove Tags</span>
                     </div>
                     <div class="cp__taglist">
-                        <span class="cp__taglist__tag" ng-repeat="tag in self.draft.tags">{{tag}}</span>
+                        <span class="cp__taglist__tag" ng-repeat="tag in self.draftObject[self.isSeeks].tags">{{tag}}</span>
                     </div>
-                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString" ng-keyup="::self.addTags()"/>
+                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.isSeeks]" ng-keyup="::self.addTags()"/>
                 </div>
                 
                 <div class="cp__location" ng-if="detail === 'location'">
@@ -102,18 +123,20 @@ function genComponentConf() {
             </div>
 
             <div class="cp__addDetail" ng-if="self.isValid()">
-                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()" ng-class="{'closedDetail': !self.showDetail}">
+                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()" ng-class="{'closedDetail': !self.showDetail[self.isSeeks]}">
                     <span class="nonHover">Add more detail</span>
-                    <span class="hover" ng-if="!self.showDetail">Open more detail</span>
-                    <span class="hover" ng-if="self.showDetail">Close more detail</span>
+                    <span class="hover" ng-if="!self.showDetail[self.isSeeks]">Open more detail</span>
+                    <span class="hover" ng-if="self.showDetail[self.isSeeks]">Close more detail</span>
                 </div>
-                <div class="cp__detail__items" ng-if="self.showDetail" >
+                <div class="cp__detail__items" ng-if="self.showDetail[self.isSeeks]" >
                     <div class="cp__detail__items__item location" 
                         ng-click="!self.isDetailPresent('location') && self.addDetail('location')"
                         ng-class="{'picked' : self.isDetailPresent('location')}">Address or Location</div>
+                        
                     <div class="cp__detail__items__item tags"
                         ng-click="!self.isDetailPresent('tags') && self.addDetail('tags')"
                         ng-class="{'picked' : self.isDetailPresent('tags')}">Tags</div>
+                        
                     <!-- <div class="cp__detail__items__item image" 
                         ng-click="!self.isDetailPresent('image') && self.addDetail('image')"
                         ng-class="{'picked' : self.isDetailPresent('image')}">Image or Media</div>
@@ -150,14 +173,20 @@ function genComponentConf() {
 
             this.postTypeTexts = postTypeTexts;
             this.characterLimit = 140; //TODO move to conf
-            this.draft = {title: "", type: undefined, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+            this.draftSeeks = {title: "", type: postTypeTexts[0].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+            this.draftIs = {title: "", type: postTypeTexts[1].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+            this.draftObject = {seeks: this.draftSeeks, is: this.draftIs};
+            this.isSeeks = 'is';
+            
             this.pendingPublishing = false;
 
-            this.showDetail = false;
-            this.details = [];
-            this.tagsString = "";
-            this.tempTags = [];
-
+            this.showDetail = {seeks: false, is: false};
+            this.details = {seeks: [], is: []};
+            this.tagsString = {seeks: "", is: ""};
+            this.tempTags = {seeks: [], is: []};
+            
+            //this.selectType(0);
+            //this.selectedTab = 'Search';          
             const selectFromState = (state) => {
                 return {
                     existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
@@ -168,14 +197,38 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, [], this);
         }
         isValid(){
-            return this.draft && this.draft.type && this.draft.title && this.draft.title.length < this.characterLimit;
+            return this.draftObject[this.isSeeks] && this.draftObject[this.isSeeks].title && this.draftObject[this.isSeeks].title.length < this.characterLimit;
         }
 
-        selectType(typeIdx) {
-            this.draft.type = postTypeTexts[typeIdx].type;
+        
+       openTab(evt, tabName, button) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(button).className += " active";
+        }
+        
+        
+    
+        selectType(type) {
+        	this.isSeeks = type;
         }
         unselectType() {
-            this.draft.type = undefined;
+            this.draftObject[this.isSeeks].type = undefined;
         }
         titlePicZoneNg() {
             return angular.element(this.titlePicZone())
@@ -187,19 +240,30 @@ function genComponentConf() {
             return this._titlePicZone;
         }
         publish() {
+        	// Post both needs
             if (!this.pendingPublishing) {
                 this.pendingPublishing = true;
 
+                //TODO: Check for both and make tags + location independent
+                /*
                 if(!this.isDetailPresent("tags")){
-                    this.draft.tags = undefined;
+                    this.draftObject.is.tags = undefined;
                 }
                 if(!this.isDetailPresent("location")){
-                    this.draft.location = undefined;
+                    this.draftObject.is.location = undefined;
                 }
+                
+                if(!this.isDetailPresent("tags")){
+                    this.draftObject[this.isSeeks].tags = undefined;
+                }
+                if(!this.isDetailPresent("location")){
+                    this.draftObject[this.isSeeks].location = undefined;
+                }*/
 
                 this.needs__create(
-                    this.draft,
-                    this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
+                    //this.draft,
+                    this.draftObject,
+                		this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
                 );
             }
         }
@@ -208,50 +272,50 @@ function genComponentConf() {
             if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags")){
                 this.addDetail("tags");
             }
-            this.tempTags = updatedDraft.tags;
+            this.tempTags[this.isSeeks] = updatedDraft.tags;
             updatedDraft.tags = this.mergeTags();
-            Object.assign(this.draft, updatedDraft);
+            Object.assign(this.draftObject[this.isSeeks], updatedDraft);
         }
 
         mergeTags() {
-            let detailTags = Immutable.Set(this.tagsString? this.tagsString.match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
+            let detailTags = Immutable.Set(this.tagsString[this.isSeeks]? this.tagsString[this.isSeeks].match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
 
-            let combinedTags = this.tempTags? detailTags.concat(this.tempTags) : detailTags;
+            let combinedTags = this.tempTags[this.isSeeks]? detailTags.concat(this.tempTags[this.isSeeks]) : detailTags;
 
             const immutableTagSet = Immutable.Set(combinedTags);
             return immutableTagSet.toJS();
         }
 
         addTags() {
-            this.draft.tags = this.mergeTags();
+            this.draftObject[this.isSeeks].tags = this.mergeTags();
         }
 
         locationIsSaved() {
-            return this.isDetailPresent("location") && this.draft.location && this.draft.location.name;
+            return this.isDetailPresent("location") && this.draftObject[this.isSeek].location && this.draftObject[this.isSeeks].location.name;
         }
 
         pickImage(image) {
-            this.draft.thumbnail = image;
+            this.draftObject[this.isSeeks].thumbnail = image;
         }
 
         toggleDetail(){
-            this.showDetail = !this.showDetail;
+            this.showDetail[this.isSeeks] = !this.showDetail[this.isSeeks];
         }
 
         addDetail(detail) {
-            this.details.push(detail);
+            this.details[this.isSeeks].push(detail);
         }
 
         removeDetail(detailIndex) {
             var tempDetails = [];
-            for(var i=0; i < this.details.length; i++){
-                if(i!=detailIndex) tempDetails.push(this.details[i]);
+            for(var i=0; i < this.details[this.isSeeks].length; i++){
+                if(i!=detailIndex) tempDetails.push(this.details[this.isSeeks][i]);
             }
-            this.details = tempDetails;
+            this.details[this.isSeeks] = tempDetails;
         }
 
         isDetailPresent(detail) {
-            return this.details.indexOf(detail) > -1;
+            return this.details[this.isSeeks].indexOf(detail) > -1;
         }
 
         createWhatsAround(){
@@ -287,9 +351,11 @@ function genComponentConf() {
                                     	.filter( need => need.get("state") == "won:Active" )
                                     	.map(need => this.needs__close(need.get("uri")) );
 
-
+                                    //TODO: Point to same DataSet instead of double it
+                                    this.draftObject.is = whatsAround;
+                                    this.draftObject.seeks = whatsAround;
                                     this.needs__create(
-                                        whatsAround,
+                                        this.draftObject,
                                         this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
                                     );
                                 });
@@ -312,7 +378,7 @@ function genComponentConf() {
     Controller.$inject = serviceDependencies;
 
     return {
-        restrict: 'E',
+    	restrict: 'E',
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl

@@ -70,6 +70,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.needs.create: // optimistic need adding
         	return addNeedInCreation(allNeedsInState, action.payload.need, action.payload.needUri)
+        	//return addNeedInCreation(allNeedsInState, action.payload.needList, action.payload.needUri);
         case actionTypes.needs.createSuccessful:
             return addNeed(allNeedsInState, action.payload.need, true);
 

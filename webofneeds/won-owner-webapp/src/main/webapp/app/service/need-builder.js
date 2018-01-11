@@ -96,6 +96,7 @@ import won from './won.js';
             });
         }
 
+        /*
         const putIntoBoth =
             args.type === won.WON.BasicNeedTypeDotogetherCompacted;
 
@@ -106,7 +107,7 @@ import won from './won.js';
         const putIntoSeeks =
             putIntoBoth ||
             args.type === won.WON.BasicNeedTypeDemandCompacted;
-
+        
         let hasFlag = [];
 
         if(!!won.debugmode) {
@@ -122,6 +123,7 @@ import won from './won.js';
             hasFlag.push("won:NoHintForMe");
             hasFlag.push("won:NoHintForCounterpart");
         }
+        *
 
         //remove possible duplicates in hasFlag
         const result = [];
@@ -131,66 +133,78 @@ import won from './won.js';
             }
         });
         hasFlag = result;
+        */
+        
+        const buildContentNode = (id, isOrSeeksData) => ({
+
+            '@id': id,
+            'dc:title': isOrSeeksData.title,
+            'dc:description': isOrSeeksData.description,
+            'won:hasTag': isOrSeeksData.tags,
+            'won:hasAttachment': (hasAttachmentUrls(isOrSeeksData) ? attachmentUrisTyped : undefined),
+            'won:hasLocation': (!hasLocation(isOrSeeksData)? undefined : {
+                '@type': 's:Place',
+                's:geo' : {
+                    '@id': '_:location',
+                    '@type': 's:GeoCoordinates',
+                    's:latitude': isOrSeeksData.location.lat.toFixed(6),
+                    's:longitude': isOrSeeksData.location.lng.toFixed(6),
+                },
+                's:name': isOrSeeksData.location.name,
+                'won:hasBoundingBox':(!isOrSeeksData.location.nwCorner || !isOrSeeksData.location.seCorner ? undefined : {
+                    'won:hasNorthWestCorner': {
+                        '@id': '_:boundsNW',
+                        '@type': 's:GeoCoordinates',
+                        's:latitude': isOrSeeksData.location.nwCorner.lat.toFixed(6),
+                        's:longitude': isOrSeeksData.location.nwCorner.lng.toFixed(6),
+                    },
+                    'won:hasSouthEastCorner': {
+                        '@id': '_:boundsSE',
+                        '@type': 's:GeoCoordinates',
+                        's:latitude': isOrSeeksData.location.seCorner.lat.toFixed(6),
+                        's:longitude': isOrSeeksData.location.seCorner.lng.toFixed(6),
+                    },
+                }),
+            }),
+            'won:hasTimeSpecification': (!hasTimeConstraint(isOrSeeksData)? undefined : {
+                '@id': '_:timeSpecification',
+                '@type': 'won:TimeSpecification',
+                'won:hasRecurInfiniteTimes': isOrSeeksData.recurInfinite,
+                'won:hasRecursIn': isOrSeeksData.recursIn,
+                'won:hasStartTime': isOrSeeksData.startTime,
+                'won:hasEndTime': isOrSeeksData.endTime
+            }),
+
+            'won:hasPriceSpecificationhas': (!hasPriceSpecification(isOrSeeksData)? undefined : {
+                '@id': '_:priceSpecification',
+                '@type': 'won:PriceSpecification',
+                'won:hasCurrency': isOrSeeksData.currency,
+                'won:hasLowerPriceLimit': isOrSeeksData.lowerPriceLimit,
+                'won:hasUpperPriceLimit': isOrSeeksData.upperPriceLimit
+            })
+            //TODO images, time, currency(?)
+        })
 
         var graph = [
             {
-                '@id': args.publishedContentUri,
+                '@id': args.is.publishedContentUri?  args.is.publishedContentUri :  args.seeks.publishedContentUri,
                 '@type': 'won:Need',
-                'won:is': putIntoIs? { '@id': '_:needContent' } : undefined,
-                'won:seeks': putIntoSeeks? { '@id': '_:needContent' } : undefined,
+                'won:is': args.is? { '@id': '_:isNeedContent' } : undefined,
+                'won:seeks': args.seeks? { '@id': '_:seeksNeedContent' } : undefined,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'won:hasFlag': hasFlag,
+                'won:hasFlag': new Set([
+                    won.debugmode? "won:UsedForTesting" : undefined,
+                    		
+                    args.is.whatsAround? "won:WhatsAround" : undefined,
+                    args.is.whatsAround? "won:NoHintForCounterpart" : undefined,
+                    		
+                    args.is.noHints? "won:NoHintForMe" : undefined,
+                    args.is.noHints? "won:NoHintForCounterpart" : undefined,
+                ]),///.toArray().filter(f => f),
             },
-            {
-
-                '@id': '_:needContent',
-                'dc:title': args.title,
-                'dc:description': args.description,
-                'won:hasTag': args.tags,
-                'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined),
-                'won:hasLocation': (!hasLocation(args)? undefined : {
-                    '@type': 's:Place',
-                    's:geo' : {
-                        '@id': '_:location',
-                        '@type': 's:GeoCoordinates',
-                        's:latitude': args.location.lat.toFixed(6),
-                        's:longitude': args.location.lng.toFixed(6),
-                    },
-                    's:name': args.location.name,
-                    'won:hasBoundingBox':(!args.location.nwCorner || !args.location.seCorner ? undefined : {
-                        'won:hasNorthWestCorner': {
-                            '@id': '_:boundsNW',
-                            '@type': 's:GeoCoordinates',
-                            's:latitude': args.location.nwCorner.lat.toFixed(6),
-                            's:longitude': args.location.nwCorner.lng.toFixed(6),
-                        },
-                        'won:hasSouthEastCorner': {
-                            '@id': '_:boundsSE',
-                            '@type': 's:GeoCoordinates',
-                            's:latitude': args.location.seCorner.lat.toFixed(6),
-                            's:longitude': args.location.seCorner.lng.toFixed(6),
-                        },
-                    }),
-                }),
-                'won:hasTimeSpecification': (!hasTimeConstraint(args)? undefined : {
-                    '@id': '_:timeSpecification',
-                    '@type': 'won:TimeSpecification',
-                    'won:hasRecurInfiniteTimes': args.recurInfinite,
-                    'won:hasRecursIn': args.recursIn,
-                    'won:hasStartTime': args.startTime,
-                    'won:hasEndTime': args.endTime
-                }),
-
-                'won:hasPriceSpecificationhas': (!hasPriceSpecification(args)? undefined : {
-                    '@id': '_:priceSpecification',
-                    '@type': 'won:PriceSpecification',
-                    'won:hasCurrency': args.currency,
-                    'won:hasLowerPriceLimit': args.lowerPriceLimit,
-                    'won:hasUpperPriceLimit': args.upperPriceLimit
-                })
-                //TODO images, time, currency(?)
-            }
             //, <if _hasModalities> {... (see directly below) } </if>
+            args.is? buildContentNode('_:isNeedContent', args.is) : {},
+            args.seeks? buildContentNode('_:seeksNeedContent', args.seeks) : {},
         ];
         return {
             '@graph': graph,
