@@ -84,7 +84,7 @@
 	*  Open launch configuration >> (x)= Arguments >> VM arguments
 		* append the following, replacing the placeholders `<PROJECT_FOLDER>` to the webofneeds project location and the `<TOMCAT_FOLDER>` to the installation directory of your tomcat: `-Djava.library.path="<TOMCAT_FOLDER>\bin" -XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR="<PROJECT_FOLDER>\webofneeds\conf.local" -Dlogback.configurationFile="<PROJECT_FOLDER>\webofneeds\conf.local\logback.xml"` 
 	*  Add the JSTL jar to your tomcat's classpath libs (or tomcat cannot be run in `Serve modules without publishing` mode, see `Server Options` below):
-	        *  Open Launch Configuration >> Classpath >> User Entries >> Add External JARs ... 
+		*  Open Launch Configuration >> Classpath >> User Entries >> Add External JARs ... 
 		* Navigate to your maven repository (default location: [user home]\.m2\repository; if it's not there, look into [user home]\.m2\settings.xml)
 		* find javax\servlet\jstl\1.2\jstl-1.2.jar
 		* if you don't find it
