@@ -74,11 +74,20 @@
 
 ex1:p1g-data {
    ex1:ride1 a taxi:Ride .
-   ex1:ride1 taxi:hasDriver need:8uiuri25l2b84oywmgsy . # note: p1 links her own identifier to the structure
+   ex1:ride1 taxi:hasDriver need:8uiuri25l2b84oywmgsy .
 }
 
 ex1:p1g-shapes {
-  ex2:TaxiRideShape
+
+  ex1:selfShape
+      a sh:NodeShape ;
+      sh:targetNode need:8uiuri25l2b84oywmgsy ;
+      sh:property [
+          sh:path [ sh:inversePath taxi:hasDriver ];
+          sh:class taxi:Ride ;
+      ] .
+
+  ex1:TaxiRideShape
 	a sh:NodeShape;
     sh:targetClass taxi:Ride ;
 	sh:property [
@@ -93,23 +102,33 @@ ex1:p1g-shapes {
         sh:maxCount 1 ;
         sh:class s:GeoCoordinates
     ] ;
+    sh:property [
+        sh:path taxi:hasClient;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path taxi:hasDriver;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue need:8uiuri25l2b84oywmgsy ;
+    ] ;
 	sh:ignoredProperties ( rdf:type ) ;
 	sh:closed true .
 
-  ex2:GeoCoordinateShape
+  ex1:GeoCoordinateShape
     a sh:NodeShape;
     sh:targetClass s:GeoCoordinates ;
     sh:property [
         sh:path s:latitude ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:datatype xsd:float ;
     ] ;
     sh:property [
         sh:path s:longitude ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:datatype xsd:float ;
     ] ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:closed true .

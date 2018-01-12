@@ -19,10 +19,6 @@ public class GoalInstantiationResult {
     private ShaclReportWrapper shaclReportWrapper;
     private Model shaclShapesModel;
 
-    public GoalInstantiationResult(){
-        //TODO: REMOVE THIS IS ONLY HERE FOR DEBUG PURPOSES TO CREATE EMPTY GoalInstantiationResults
-    };
-
     public GoalInstantiationResult(Model instanceModel, Model shaclShapesModel) {
         this.instanceModel = instanceModel;
         this.shaclShapesModel = shaclShapesModel;
