@@ -8,7 +8,10 @@ import angular from 'angular';
 //import logoutComponent from './logout.js';
 import dropdownModule from './covering-dropdown.js';
 import accountMenuModule from './account-menu.js';
-import { attach } from '../utils.js';
+import { 
+    attach,
+    getIn,
+ } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import config from '../config.js';
 import {
@@ -47,10 +50,10 @@ function genTopnavConf() {
                 <div class="topnav__inner__left">
                     <a href="{{ self.resetParamsHRef(self.$state, self.loggedIn ? 'feed' : 'landingpage') }}"
                         class="topnav__button">
-                            <img src="generated/icon-sprite.svg#WON_ico_header"
+                            <img src="skin/{{self.themeName}}/images/logo.svg"
                                 class="topnav__button__icon">
                             <span class="topnav__page-title topnav__button__caption">
-                                Web of Needs &ndash; Beta
+                                {{ self.appTitle }}
                             </span>
                     </a>
                 </div>
@@ -144,6 +147,8 @@ function genTopnavConf() {
             window.tnc4dbg = this;
 
             const selectFromState = (state) => ({
+                themeName: getIn(state, ['config', 'theme', 'name']),
+                appTitle: getIn(state, ['config', 'theme', 'title']),
                 WON: won.WON,
                 loginVisible: state.get('loginVisible'),
                 open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")

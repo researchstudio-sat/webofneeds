@@ -112,7 +112,7 @@ class AboutController {
         this.config = config;
 
         const select = (state) => {
-            const theme = getIn(state, ['config','theme']);
+            const theme = getIn(state, ['config','theme', 'name']);
             return { 
                 theme,
                 peopleGrid: peopleGrid({theme}),
