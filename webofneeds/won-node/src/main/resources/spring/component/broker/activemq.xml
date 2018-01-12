@@ -183,27 +183,6 @@
                         </spring:bean>
                     </trustManagers>
 
-            <!--TODO problems with key loading and keystore format, and trusting own key -->
-                    <!-- Trust/Key managers should correspond to the security/tls config, TODO find a way to impose it, i.e. config should be an argument to the trust/key-manager -->
-                    <!--sslContext
-                            >
-
-                        <trustManagers>
-                            <spring:bean class="won.cryptography.service.WonConfigBasedTrustManagerWrapper">
-                                <spring:constructor-arg ref="wonSecurityConfig" />
-                                <spring:constructor-arg>
-                                    <spring:value type="won.cryptography.service.WonCommunicatingParty">MESSAGING_SERVER</spring:value>
-                                </spring:constructor-arg>
-                            </spring:bean>
-                        </trustManagers>
-                        <keyManagers>
-                            <spring:bean class="won.cryptography.service.WonConfigBasedKeyManagerWrapper">
-                                <spring:constructor-arg ref="wonSecurityConfig" />
-                                <spring:constructor-arg>
-                                    <spring:value type="won.cryptography.service.WonCommunicatingParty">MESSAGING_SERVER</spring:value>
-                                </spring:constructor-arg>
-                            </spring:bean>
-                        </keyManagers-->
                 </sslContext>
 
         </sslContext>

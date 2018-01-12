@@ -4,7 +4,8 @@ import org.apache.http.conn.ssl.PrivateKeyDetails;
 import org.apache.http.conn.ssl.PrivateKeyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.cryptography.service.KeyStoreService;
+
+import won.cryptography.service.keystore.KeyStoreService;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;

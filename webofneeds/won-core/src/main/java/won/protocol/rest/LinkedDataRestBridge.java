@@ -9,8 +9,9 @@ import org.springframework.web.client.RestTemplate;
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.keymanagement.NeedUriAsAliasStrategy;
 import won.cryptography.service.CryptographyUtils;
-import won.cryptography.service.KeyStoreService;
 import won.cryptography.service.TrustStoreService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
 import javax.annotation.PostConstruct;
@@ -24,7 +25,7 @@ public class LinkedDataRestBridge
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private RestTemplate restTemplateWithDefaultWebId;
+  private RestTemplate restTemplateWithoutWebId;
 
   private Integer readTimeout;
   private Integer connectionTimeout;
@@ -45,18 +46,12 @@ public class LinkedDataRestBridge
 
   @PostConstruct
   public void initialize() {
-    try {
-      restTemplateWithDefaultWebId = createRestTemplateForReadingLinkedData(this.keyStoreService
-                                                                              .getDefaultAlias());
-    } catch (Exception e) {
-      logger.error("Failed to create ssl tofu rest template", e);
-      throw new RuntimeException(e);
-    }
+      restTemplateWithoutWebId = new RestTemplate();
   }
 
 
   public RestTemplate getRestTemplate() {
-    return restTemplateWithDefaultWebId;
+    return restTemplateWithoutWebId;
   }
 
   public RestTemplate getRestTemplate(String requesterWebID) {
@@ -73,9 +68,8 @@ public class LinkedDataRestBridge
 
 
   private RestTemplate getRestTemplateForReadingLinkedData(String webID) throws Exception {
-
-    if (webID.equals(keyStoreService.getDefaultAlias())) {
-      return restTemplateWithDefaultWebId;
+    if (webID == null) {
+      return restTemplateWithoutWebId;
     }
     return createRestTemplateForReadingLinkedData(webID);
   }

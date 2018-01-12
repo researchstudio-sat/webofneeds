@@ -17,7 +17,8 @@
     </listener>
     <!--context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:/spring/owner-jmsonly.xml
+        <param-value>
+            classpath:/spring/owner-webapp-jmsonly.xml
 	        classpath:/spring/owner-security.xml
             classpath:/spring/owner-context.xml
             classpath:/spring/owner-mailer.xml

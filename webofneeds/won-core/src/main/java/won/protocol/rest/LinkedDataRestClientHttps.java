@@ -26,8 +26,9 @@ import org.springframework.web.client.RestTemplate;
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.keymanagement.NeedUriAsAliasStrategy;
 import won.cryptography.service.CryptographyUtils;
-import won.cryptography.service.KeyStoreService;
 import won.cryptography.service.TrustStoreService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
 import javax.annotation.PostConstruct;
@@ -41,7 +42,6 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private RestTemplate restTemplateWithDefaultWebId;
     private HttpMessageConverter datasetConverter;
     String acceptHeaderValue = null;
 
@@ -68,13 +68,6 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
         datasetConverter = new RdfDatasetConverter();
         HttpHeaders headers = new HttpHeaders();
         this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
-        try {
-            restTemplateWithDefaultWebId = createRestTemplateForReadingLinkedData(this.keyStoreService
-                    .getDefaultAlias());
-        } catch (Exception e) {
-            logger.error("Failed to create ssl tofu rest template", e);
-            throw new RuntimeException(e);
-        }
     }
 
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) {
@@ -96,9 +89,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
 
     @Override
     public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI) {
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-        return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
+        return readResourceDataWithHeaders(resourceURI, (URI) null);
     }
 
     @Override
@@ -107,7 +98,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
         HttpMessageConverter datasetConverter = new RdfDatasetConverter();
         RestTemplate restTemplate;
         try {
-            restTemplate = getRestTemplateForReadingLinkedData(keyPairAliasDerivationStrategy.getAliasForNeedUri(requesterWebID.toString()));
+            restTemplate = getRestTemplateForReadingLinkedData(requesterWebID == null ? null : requesterWebID.toString());
         } catch (Exception e) {
             logger.error("Failed to create ssl tofu rest template", e);
             throw new RuntimeException(e);
@@ -122,27 +113,18 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(
             final URI resourceURI, final URI requesterWebID, final HttpHeaders requestHeaders) {
         requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-        return super.readResourceData(resourceURI, getRestTemplateForReadingLinkedData(requesterWebID.toString()),
+        return super.readResourceData(resourceURI, getRestTemplateForReadingLinkedData(requesterWebID == null ? null : requesterWebID.toString()),
                 requestHeaders);
     }
 
 
     private RestTemplate getRestTemplateForReadingLinkedData(String webID) {
-
-        if (webID.equals(keyStoreService.getDefaultAlias())) {
-            return restTemplateWithDefaultWebId;
-        }
         return createRestTemplateForReadingLinkedData(webID);
     }
 
     @Override
     public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, HttpHeaders requestHeaders) {
-
-        if (requestHeaders == null) {
-            requestHeaders = new HttpHeaders();
-        }
-        requestHeaders.add(HttpHeaders.ACCEPT, this.acceptHeaderValue);
-        return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
+    	return readResourceDataWithHeaders(resourceURI, null, requestHeaders);
     }
 
     public void setReadTimeout(final Integer readTimeout) {

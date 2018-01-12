@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.path.Path;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -32,7 +32,7 @@ public class TestingDataSource implements LinkedDataSource
     //load public  keys:
     Security.addProvider(new BouncyCastleProvider());
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
+    FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
     storeService.init();
     pubKeysMap.put(TestSigningUtils.needCertUri, storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
     pubKeysMap.put(TestSigningUtils.ownerCertUri, storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());

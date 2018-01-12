@@ -50,6 +50,10 @@ public class User implements UserDetails{
 
   @Column(name = "email")
   private String email;
+  
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, 
+  fetch = FetchType.LAZY, optional = false)
+  private KeystoreHolder keystoreHolder;
 
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
@@ -137,7 +141,15 @@ public class User implements UserDetails{
   public void setPassword(final String password) {
     this.password = password;
   }
+  
+  public KeystoreHolder getKeystoreHolder() {
+	return keystoreHolder;
+  }
 
+  public void setKeystoreHolder(KeystoreHolder keystoreHolder) {
+	this.keystoreHolder = keystoreHolder;
+  }
+  
   /*
 	public List<Need> getNeeds() {
 		return needs;

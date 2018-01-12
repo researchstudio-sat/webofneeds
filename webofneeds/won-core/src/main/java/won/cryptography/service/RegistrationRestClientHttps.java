@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import won.cryptography.service.keystore.KeyStoreService;
+
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;

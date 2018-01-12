@@ -1,13 +1,18 @@
 package won.cryptography.message;
 
+import java.io.File;
+import java.net.URI;
+import java.security.Security;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.service.DefaultSecurityWonTransmissionService;
-import won.cryptography.service.KeyStoreService;
+
+import won.cryptography.service.CryptographyService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingDataSource;
 import won.protocol.message.WonMessage;
@@ -17,10 +22,6 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor;
 import won.protocol.util.RdfUtils;
-
-import java.io.File;
-import java.net.URI;
-import java.security.Security;
 
 /**
  * User: ypanchenko
@@ -60,22 +61,19 @@ public class VerifyAndSignExamples
 
     Security.addProvider(new BouncyCastleProvider());
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
-    storeService.setDefaultAlias(TestSigningUtils.ownerCertUri);
+    FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
     storeService.init();
-    DefaultSecurityWonTransmissionService config = new DefaultSecurityWonTransmissionService();
-    config.setClientKeyStoreService(storeService);
-    config.initialize();
 
     nodeAddingProcessor = new SignatureAddingWonMessageProcessor();
-    nodeAddingProcessor.setCryptographyService(config.getClientCryptographyService());
+    CryptographyService cryptographyService = new CryptographyService(storeService, TestSigningUtils.ownerCertUri);
+    
+    nodeAddingProcessor.setCryptographyService(cryptographyService);
 
     ownerAddingProcessor = new SignatureAddingWonMessageProcessor();
-    ownerAddingProcessor.setCryptographyService(config.getClientCryptographyService());
+    ownerAddingProcessor.setCryptographyService(cryptographyService);
 
     checkingProcessor = new SignatureCheckingWonMessageProcessor();
     checkingProcessor.setLinkedDataSource(new TestingDataSource());
-
 
   }
 
