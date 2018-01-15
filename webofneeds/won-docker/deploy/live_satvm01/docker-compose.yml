@@ -60,7 +60,7 @@ services:
       - "80:80"
       - "443:443"
       - "61616:61616"
-      - "51616:51616"
+      - "61626:61626"
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt/
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
