@@ -7,6 +7,8 @@ export const labels = deepFreeze({
         [won.WON.BasicNeedTypeDemandCompacted]: 'I want something',
         [won.WON.BasicNeedTypeSupplyCompacted]: 'I offer something',
         [won.WON.BasicNeedTypeDotogetherCompacted]: 'I want to do something together',
+        //TODO: Find right declaration
+        [won.WON.BasicNeedTypeCombinedCompacted]: 'I want to post and search',
         [won.WON.BasicNeedTypeCritiqueCompacted]: 'I want to change something',
         [won.WON.BasicNeedTypeWhatsAroundCompacted]: 'What\'s Around',
     },
