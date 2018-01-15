@@ -33,6 +33,10 @@ services:
     environment:
       - "key_store_password=$uki_certificate_passwd"
       - "domain_params=-d line.uki.or.at"
+      - "key_pem_file=/etc/letsencrypt/live/line.uki.or.at/privkey.pem"
+      - "cert_pem_file=/etc/letsencrypt/live/line.uki.or.at/fullchain.pem"
+      - "pfx_store_file=/etc/letsencrypt/live/line.uki.or.at/t-key-cert.pfx"
+      - "jks_store_file=/etc/letsencrypt/live/line.uki.or.at/t-keystore.jks"
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
