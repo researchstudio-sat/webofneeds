@@ -15,7 +15,7 @@ ENV webroot_dir="/usr/share/nginx/html"
 # mail address that gets informed when the certificate is about to run out
 ENV certificate_email=florian.kleedorfer@researchstudio.at
 
-ENV domain_params=-d matchat.org -d www.matchat.org -d node.matchat.org
+ENV domain_params="-d matchat.org -d www.matchat.org -d node.matchat.org"
 
 # java key store password
 ENV key_store_password=changeit
