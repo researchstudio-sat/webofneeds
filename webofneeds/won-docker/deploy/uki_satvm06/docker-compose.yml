@@ -36,12 +36,12 @@ services:
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$uki_certificate_passwd"
-      - "activemq.broker.port=51616"
+      - "activemq.broker.port=61626"
       - "client.authentication.behind.proxy=true"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "8443:8443"
-      - "51617:51616"
+      - "61627:61626"
     volumes:
       - $base_folder/letsencrypt/certs/live/line.uki.or.at/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
       - $base_folder/letsencrypt/certs/live/line.uki.or.at/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
