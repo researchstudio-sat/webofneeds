@@ -43,6 +43,12 @@ const postTypeTexts = [
         helpText: 'Select this if you are looking to find other people who share your interest. You will be matched' +
         ' with other people who chose this option as well.'
     },
+    {
+        type: won.WON.BasicNeedTypeCombined,
+        text: 'I\'m offering and looking for',
+        helpText: 'Select this if you are looking for things or services other people offer + Use this if you are offering an item or a service. You will find people who said' +
+        ' that they\'re looking for something.'
+    },
 ];
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
@@ -70,8 +76,8 @@ function genComponentConf() {
 			
 			<!-- Tab links -->
 			<div class="tab">
-			  <button id="searchButton" class="tablinks active" ng-click="[self.selectType('is'), self.openTab(event, 'Search', 'searchButton')]">Search</button>
-			  <button id="postButton" class="tablinks" ng-click="[self.selectType('seeks'), self.openTab(event, 'Post', 'postButton')]">Post</button>
+			  <button id="searchButton" class="tablinks active" ng-click="[self.selectType('seeks'), self.openTab(event, 'Search', 'searchButton')]">Search</button>
+			  <button id="postButton" class="tablinks" ng-click="[self.selectType('is'), self.openTab(event, 'Post', 'postButton')]">Post</button>
 			</div>
 
 			<!-- Tab content -->
@@ -173,17 +179,17 @@ function genComponentConf() {
 
             this.postTypeTexts = postTypeTexts;
             this.characterLimit = 140; //TODO move to conf
-            this.draftSeeks = {title: "", type: postTypeTexts[0].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
-            this.draftIs = {title: "", type: postTypeTexts[1].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
-            this.draftObject = {seeks: this.draftSeeks, is: this.draftIs};
-            this.isSeeks = 'is';
+            this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+            this.draftSeeks = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+            this.draftObject = {is: this.draftIs, seeks: this.draftSeeks};
+            this.isSeeks = 'seeks';
             
             this.pendingPublishing = false;
 
-            this.showDetail = {seeks: false, is: false};
-            this.details = {seeks: [], is: []};
-            this.tagsString = {seeks: "", is: ""};
-            this.tempTags = {seeks: [], is: []};
+            this.showDetail = {is: false, seeks: false};
+            this.details = {is: [], seeks: []};
+            this.tagsString = {is: "", seeks: ""};
+            this.tempTags = {is: [], seeks: []};
             
             //this.selectType(0);
             //this.selectedTab = 'Search';          
@@ -222,8 +228,6 @@ function genComponentConf() {
             document.getElementById(button).className += " active";
         }
         
-        
-    
         selectType(type) {
         	this.isSeeks = type;
         }
@@ -291,7 +295,7 @@ function genComponentConf() {
         }
 
         locationIsSaved() {
-            return this.isDetailPresent("location") && this.draftObject[this.isSeek].location && this.draftObject[this.isSeeks].location.name;
+            return this.isDetailPresent("location") && this.draftObject[this.isSeeks].location && this.draftObject[this.isSeeks].location.name;
         }
 
         pickImage(image) {
@@ -353,7 +357,7 @@ function genComponentConf() {
 
                                     //TODO: Point to same DataSet instead of double it
                                     this.draftObject.is = whatsAround;
-                                    this.draftObject.seeks = whatsAround;
+                                    this.draftObject.seeks = this.draftObject.is;
                                     this.needs__create(
                                         this.draftObject,
                                         this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])

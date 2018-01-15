@@ -135,7 +135,7 @@ import won from './won.js';
         hasFlag = result;
         */
         
-        const buildContentNode = (id, isOrSeeksData) => ({
+        const buildContentNode = (id, isOrSeeksData, isSeeks) => ({
 
             '@id': id,
             'dc:title': isOrSeeksData.title,
@@ -145,7 +145,7 @@ import won from './won.js';
             'won:hasLocation': (!hasLocation(isOrSeeksData)? undefined : {
                 '@type': 's:Place',
                 's:geo' : {
-                    '@id': '_:location',
+                    '@id': isSeeks? '_:isLocation' : '_:seeksLocation',
                     '@type': 's:GeoCoordinates',
                     's:latitude': isOrSeeksData.location.lat.toFixed(6),
                     's:longitude': isOrSeeksData.location.lng.toFixed(6),
@@ -153,19 +153,20 @@ import won from './won.js';
                 's:name': isOrSeeksData.location.name,
                 'won:hasBoundingBox':(!isOrSeeksData.location.nwCorner || !isOrSeeksData.location.seCorner ? undefined : {
                     'won:hasNorthWestCorner': {
-                        '@id': '_:boundsNW',
+                        '@id': isSeeks? '_:isBoundsNW' : '_:seeksBoundsNW',
                         '@type': 's:GeoCoordinates',
                         's:latitude': isOrSeeksData.location.nwCorner.lat.toFixed(6),
                         's:longitude': isOrSeeksData.location.nwCorner.lng.toFixed(6),
                     },
                     'won:hasSouthEastCorner': {
-                        '@id': '_:boundsSE',
+                        '@id':  isSeeks? '_:isBoundsSE' : '_:seeksBoundsSE',
                         '@type': 's:GeoCoordinates',
                         's:latitude': isOrSeeksData.location.seCorner.lat.toFixed(6),
                         's:longitude': isOrSeeksData.location.seCorner.lng.toFixed(6),
                     },
                 }),
             }),
+            //TODO: Different id for is and seeks
             'won:hasTimeSpecification': (!hasTimeConstraint(isOrSeeksData)? undefined : {
                 '@id': '_:timeSpecification',
                 '@type': 'won:TimeSpecification',
@@ -185,12 +186,13 @@ import won from './won.js';
             //TODO images, time, currency(?)
         })
 
+        var isWhatsAround = args.is.whatsAround;
         var graph = [
             {
                 '@id': args.is.publishedContentUri?  args.is.publishedContentUri :  args.seeks.publishedContentUri,
                 '@type': 'won:Need',
-                'won:is': args.is? { '@id': '_:isNeedContent' } : undefined,
-                'won:seeks': args.seeks? { '@id': '_:seeksNeedContent' } : undefined,
+                'won:is': isWhatsAround? { '@id': '_:needContent' } : (args.is? { '@id': '_:isNeedContent' } : undefined),
+                'won:seeks': isWhatsAround? { '@id': '_:needContent' } : (args.seeks? { '@id': '_:seeksNeedContent' } : undefined),
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
                 'won:hasFlag': new Set([
                     won.debugmode? "won:UsedForTesting" : undefined,
@@ -203,8 +205,8 @@ import won from './won.js';
                 ]),///.toArray().filter(f => f),
             },
             //, <if _hasModalities> {... (see directly below) } </if>
-            args.is? buildContentNode('_:isNeedContent', args.is) : {},
-            args.seeks? buildContentNode('_:seeksNeedContent', args.seeks) : {},
+            args.is? buildContentNode((isWhatsAround? '_:needContent' : '_:isNeedContent'), args.is, true) : {},
+            isWhatsAround? {} : (args.seeks? buildContentNode('_:seeksNeedContent', args.seeks, false) : {}),
         ];
         return {
             '@graph': graph,
