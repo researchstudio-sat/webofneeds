@@ -5,6 +5,10 @@ PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
  SELECT ?acc ?s ?p ?o WHERE {
+    
+    filter (?prop != ?clause) .
+    filter (?prop != ?acc) .
+    
     GRAPH ?g1 {   
         ?prop agr:proposes ?clause .
     }
@@ -76,6 +80,9 @@ PREFIX won: <http://purl.org/webofneeds/model#>
     
     filter not exists {
       
+      filter (?cancelProp != ?acc) .
+      filter (?cancelAcc != ?cancelProp) .
+      
       GRAPH ?gc1 {   
           ?cancelProp agr:proposesToCancel ?acc .
       }
@@ -97,6 +104,7 @@ PREFIX won: <http://purl.org/webofneeds/model#>
       }
                   
     }
+    
     
 
 }

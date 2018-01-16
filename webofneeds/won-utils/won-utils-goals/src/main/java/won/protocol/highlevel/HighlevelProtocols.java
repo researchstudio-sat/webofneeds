@@ -2,6 +2,8 @@ package won.protocol.highlevel;
 
 import org.apache.jena.query.Dataset;
 
+import won.utils.acknowledgement.AcknowledgedSelection;
+
 
 public class HighlevelProtocols {
 	/**
@@ -10,6 +12,9 @@ public class HighlevelProtocols {
 	public static Dataset getAgreements(Dataset conversationDataset) {
 		//TODO: use AcknowledgedSelection, ModifiedSelection, and AgreementFunction 
 		//to calculate agrements
+		AcknowledgedSelection acknowledgedSelection = new AcknowledgedSelection();
+		Dataset result = acknowledgedSelection.applyAcknowledgedSelection(conversationDataset);
+		
 		return null;
 	}
 	

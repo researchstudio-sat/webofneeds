@@ -231,6 +231,71 @@ public class AgreementProtocolTest {
         test(input,expectedOutput);
     }
     
+    // This tries to propose a HintFeedBackMessage
+    @Test
+    public void agreementProposesHintFeedback () throws IOException {
+        Dataset input = loadDataset( inputFolder + "agreement-proposes-in-hint-feedback-clause.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "agreement-proposes-in-hint-feedback-clause.trig");
+        test(input,expectedOutput);
+    }
+    
+    // This tries to propose a ConnectMessage
+    @Test
+    public void agreementProposesConnectMessage () throws IOException {
+        Dataset input = loadDataset( inputFolder + "agreement-proposes-connect-message.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "agreement-proposes-connect-message.trig");
+        test(input,expectedOutput);
+    }
+  
+    
+    // This tries to propose a ConnectMessage
+    @Test
+    public void agreementConnectMessageProposesHintFeedbackMessage () throws IOException {
+        Dataset input = loadDataset( inputFolder + "agreementConnectMessageProposesHintFeedbackMessage.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "agreementConnectMessageProposesHintFeedbackMessage.trig");
+        test(input,expectedOutput);
+    }
+
+    // This tries to propose two Agreements with three envelopes. One of the envelopes has an accept message of the 1st agreement
+    @Test
+    public void twoAgreementsSharingEnvelopeforAcceptsPurposes () throws IOException {
+        Dataset input = loadDataset( inputFolder + "two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        test(input,expectedOutput);
+    }
+    
+    // This tries to propose two Agreements with three envelopes. One of the envelopes has an accept message of the 1st agreement
+    @Test
+    public void cancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes () throws IOException {
+        Dataset input = loadDataset( inputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        test(input,expectedOutput);
+    }
+    
+    // This tries to propose a Proposal, with different agents making a proposal...
+    @Test
+    public void oneAgreementProposedProposaldAgent () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-proposed-proposal-dagent.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-proposed-proposal-dagent.trig");
+        test(input,expectedOutput);
+    }
+    
+    // This tries to propose a Proposal, with the same agent making a proposal...
+    @Test
+    public void oneAgreementProposedProposalsAgent () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-proposed-proposal-sagent.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-proposed-proposal-sagent.trig");
+        test(input,expectedOutput);
+    }
+    
+    // This includes a Proposal that Cancels itself...
+    @Test
+    public void selfCancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes () throws IOException {
+        Dataset input = loadDataset( inputFolder + "self-cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "self-cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+        test(input,expectedOutput);
+    }
+    
     private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	AgreementFunction agreementFunction = new AgreementFunction();
         Dataset actual = agreementFunction.applyAgreementFunction(input);
