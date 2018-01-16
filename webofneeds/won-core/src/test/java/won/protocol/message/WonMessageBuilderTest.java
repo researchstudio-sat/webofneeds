@@ -220,11 +220,11 @@ public class WonMessageBuilderTest
 
 
   private WonMessageBuilder addContent(WonMessageBuilder builder) {
-    return builder.addContent(createDifferentContent(), null);
+    return builder.addContent(createDifferentContent());
   }
 
   private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
-    return builder.addContent(createDifferentContent(), null);
+    return builder.addContent(createDifferentContent());
   }
 
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
@@ -235,15 +235,15 @@ public class WonMessageBuilderTest
 
   private WonMessageBuilder createMessageWithContent(){
       return new WonMessageBuilder(MSG_URI_1)
-        .addContent(createContent(), null)
+        .addContent(createContent())
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
   private WonMessageBuilder createMessageWithTwoContentGraphs(){
     return new WonMessageBuilder(MSG_URI_1)
-      .addContent(createContent(), null)
-      .addContent(createDifferentContent(), null)
+      .addContent(createContent())
+      .addContent(createDifferentContent())
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }

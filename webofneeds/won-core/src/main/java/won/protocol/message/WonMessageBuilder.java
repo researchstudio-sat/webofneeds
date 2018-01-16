@@ -486,7 +486,7 @@ public class WonMessageBuilder
       .setSenderNodeURI(localWonNode)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .addContent(facetModel, null)
+      .addContent(facetModel)
       .setSentTimestampToNow();
   }
 
@@ -528,7 +528,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
       .setSentTimestampToNow()
-      .addContent(contentModel, null);
+      .addContent(contentModel);
   }
 
   public static WonMessageBuilder setMessagePropertiesForHintFeedback(
@@ -552,7 +552,7 @@ public class WonMessageBuilder
       .setSenderNeedURI(needURI)
       .setSenderURI(connectionURI)
       .setSentTimestampToNow()
-      .addContent(contentModel, null);
+      .addContent(contentModel);
   }
 
   public static WonMessageBuilder setMessagePropertiesForHintNotification(
@@ -581,7 +581,7 @@ public class WonMessageBuilder
       .setReceiverURI(needConnectionURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
-      .addContent(contentModel, null)
+      .addContent(contentModel)
       .setSentTimestampToNow();
   }
 
@@ -604,7 +604,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnection)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .addContent(content, null)
+      .addContent(content)
       .setSentTimestampToNow();
   }
 
@@ -767,7 +767,7 @@ public class WonMessageBuilder
    * @param content
    * @return
    */
-  public WonMessageBuilder addContent(Model content, Model signature) {
+  public WonMessageBuilder addContent(Model content) {
     URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
       new RdfUtils.GraphNameCheck()
       {
@@ -778,8 +778,6 @@ public class WonMessageBuilder
         }
       });
     contentMap.put(contentGraphUri, content);
-    if (signature != null)
-      signatureMap.put(contentGraphUri, signature);
     return this;
   }
 
@@ -794,7 +792,7 @@ public class WonMessageBuilder
       //no content graphs yet. Make one and return it.
       Model contentGraph = ModelFactory.createDefaultModel();
       RdfUtils.replaceBaseURI(contentGraph, this.messageURI.toString());
-      addContent(contentGraph, null);
+      addContent(contentGraph);
       return contentGraph;
     }
     //content map is not empty. find one without a signature:
@@ -804,7 +802,7 @@ public class WonMessageBuilder
     //all content graphs are signed. add a new one.
     Model contentGraph = ModelFactory.createDefaultModel();
     RdfUtils.replaceBaseURI(contentGraph, this.messageURI.toString());
-    addContent(contentGraph, null);
+    addContent(contentGraph);
     return contentGraph;
   }
 

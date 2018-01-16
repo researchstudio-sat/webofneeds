@@ -17,13 +17,8 @@
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
 import org.apache.jena.rdf.model.Model;
-import won.bot.framework.bot.context.BotContextWrapper;
-import won.bot.framework.bot.context.CommentBotContextWrapper;
-import won.bot.framework.bot.context.GroupBotContextWrapper;
-import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -108,7 +103,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
         return WonMessageBuilder.setMessagePropertiesForCreate(
             wonNodeInformationService.generateEventURI(wonNodeURI),
             needURI,
-            wonNodeURI).addContent(needModel, null).build();
+            wonNodeURI).addContent(needModel).build();
     }
 
     public void setUsedForTesting(final boolean usedForTesting) {

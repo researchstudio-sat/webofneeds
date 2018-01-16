@@ -136,7 +136,7 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
                 wonNodeInformationService.generateEventURI(
                         wonNodeURI),
                 needURI,
-                wonNodeURI).addContent(needModel, null).build();
+                wonNodeURI).addContent(needModel).build();
     }
 
 
