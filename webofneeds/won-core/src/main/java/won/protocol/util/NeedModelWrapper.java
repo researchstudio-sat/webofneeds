@@ -135,7 +135,7 @@ public class NeedModelWrapper {
 
 
     private void checkModels() {
-        if (getNeedNode(NeedGraphType.SYSINFO) == null || getNeedNode(NeedGraphType.SYSINFO) == null) {
+        if (getNeedNode(NeedGraphType.SYSINFO) == null || getNeedNode(NeedGraphType.NEED) == null) {
             throw new DataIntegrityException("need and sysinfo models must contain a resource of type won:Need");
         }
     }
