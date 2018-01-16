@@ -69,47 +69,119 @@ function genComponentConf() {
             </button>
             <won-labelled-hr label="::' or be more specific '"></won-labelled-hr>
             
-                       
             
-            <div class="cp__addDetail">
-            	<!-- SEEKS PART -->
-	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown('seeks')" ng-class="{'closedDetail': !self.checkDropDown('seeks')}">
-	                  	<span class="nonHover">Search</span>
-	                  	<span class="hover" ng-if="!self.checkDropDown('seeks')">Create Search</span>
-	                    <span class="hover" ng-if="self.checkDropDown('seeks')">Close Search</span>
-	            </div>
-	            <div class="cp__detail__items" ng-if="self.checkDropDown('seeks')" >
-		            <div class="cp__mandatory-rest ng-if="self.checkDropDown('seeks')">
-				        <won-image-dropzone on-image-picked="::self.pickImage(image)">
-				        </won-image-dropzone>
-						<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
-					</div>
-					<div class="cp__textfield_instruction" ng-if="self.checkDropDown('seeks')">
-						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-					</div>
-	            </div>
-	            
-	            <!-- IS PART -->
-	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown('is')" ng-class="{'closedDetail': !self.checkDropDown('is')}">
-	                  	<span class="nonHover">Offer</span>
-	                  	<span class="hover" ng-if="!self.checkDropDown('is')">Create Offer</span>
-	                    <span class="hover" ng-if="self.checkDropDown('is')">Close Offer</span>
-	            </div>
-	            <div class="cp__detail__items" ng-if="self.checkDropDown('is')" >
-		            <div class="cp__mandatory-rest ng-if="self.checkDropDown('is')">
-				        <won-image-dropzone on-image-picked="::self.pickImage(image)">
-				        </won-image-dropzone>
-						<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
-					</div>
-					<div class="cp__textfield_instruction" ng-if="self.checkDropDown('is')">
-						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-					</div>
-	            </div>
- 
-	       	</div>
-	       	<won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+            <!--
+					Changes Here
+			-->
+			
+			<!-- Tab links -->
+			<div class="tab">
+			  <button id="searchButton" class="tablinks active" ng-click="[self.selectType('seeks'), self.openTab(event, 'Search', 'searchButton')]">Search</button>
+			  <button id="postButton" class="tablinks" ng-click="[self.selectType('is'), self.openTab(event, 'Post', 'postButton')]">Post</button>
+			</div>
+
+			<!-- Tab content -->
+			<div id="Search" class="tabcontent" style="display: block;">
+			 	<div class="cp__mandatory-rest ng-if="self.draft.type"">
+			        <won-image-dropzone on-image-picked="::self.pickImage(image)">
+			        </won-image-dropzone>
+					<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+				</div>
+				<div class="cp__textfield_instruction" ng-if="self.isValid()">
+					<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+				</div>
+				<!--
+				<div class="cp__location" ng-if="::self.isValid()">
+                    <won-location-picker id="seeksPicker" ng-show="::self.showPicker('seeks')" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+                </div>
+                -->
+			</div>
+			
+			<div id="Post" class="tabcontent">
+    			<div class="cp__mandatory-rest ng-if="self.draft.type"">
+			        <won-image-dropzone on-image-picked="::self.pickImage(image)">
+			        </won-image-dropzone>
+					<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+				</div>
+				<div class="cp__textfield_instruction" ng-if="self.isValid()">
+					<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+				</div>
+				<!--
+				<div class="cp__location" ng-if="detail === 'location'">
+                	<won-location-picker id="isPicker" ng-show="::self.showPicker('is')" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+                </div>
+    			-->
+    		</div>
+
+    		
+    		<!--
+			-->
+
+            <div class="cp__details" ng-repeat="detail in self.details[self.isSeeks] track by $index" ng-if="self.isValid()">
+                <div class="cp__tags" ng-if="detail === 'tags'">
+                    <div class="cp__header tags" ng-click="self.removeDetail($index)">
+                        <span class="nonHover">Tags</span>
+                        <span class="hover">Remove Tags</span>
+                    </div>
+                    <div class="cp__taglist">
+                        <span class="cp__taglist__tag" ng-repeat="tag in self.draftObject[self.isSeeks].tags">{{tag}}</span>
+                    </div>
+                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.isSeeks]" ng-keyup="::self.addTags()"/>
+                </div>
+                
+                
+                <div class="cp__location" ng-if="detail === 'location'">
+                    <div class="cp__header location" ng-click="self.removeDetail($index)">
+                        <span class="nonHover">Location</span>
+                        <span class="hover">Remove Location</span>
+                    </div>
+                  	<won-location-picker id="seeksPicker" ng-show="self.isSeeks == 'seeks'" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>				
+                	<won-location-picker id="isPicker" ng-show="self.isSeeks == 'is'" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+
+                </div>
+            </div>
+
+            <div class="cp__addDetail" ng-if="self.isValid()">
+                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail()" ng-class="{'closedDetail': !self.showDetail[self.isSeeks]}">
+                    <span class="nonHover">Add more detail</span>
+                    <span class="hover" ng-if="!self.showDetail[self.isSeeks]">Open more detail</span>
+                    <span class="hover" ng-if="self.showDetail[self.isSeeks]">Close more detail</span>
+                </div>
+                <div class="cp__detail__items" ng-if="self.showDetail[self.isSeeks]" >
+                    <div class="cp__detail__items__item location" 
+                        ng-click="!self.isDetailPresent('location', self.isSeeks) && self.addDetail('location')"
+                        ng-class="{'picked' : self.isDetailPresent('location', self.isSeeks)}">Address or Location</div>
+                        
+                    <div class="cp__detail__items__item tags"
+                        ng-click="!self.isDetailPresent('tags', self.isSeeks) && self.addDetail('tags')"
+                        ng-class="{'picked' : self.isDetailPresent('tags', self.isSeeks)}">Tags</div>
+                        
+                    <!-- <div class="cp__detail__items__item image" 
+                        ng-click="!self.isDetailPresent('image',self.isSeeks) && self.addDetail('image')"
+                        ng-class="{'picked' : self.isDetailPresent('image', self.isSeeks)}">Image or Media</div>
+                    <div class="cp__detail__items__item description" 
+                        ng-click="!self.isDetailPresent('description', self.isSeeks) && self.addDetail('description')"
+                        ng-class="{'picked' : self.isDetailPresent('description', self.isSeeks)}">Description</div>
+                    <div class="cp__detail__items__item timeframe" 
+                        ng-click="!self.isDetailPresent('timeframe', self.isSeeks) && self.addDetail('timeframe')"
+                        ng-class="{'picked' : self.isDetailPresent('timeframe', self.isSeeks)}">Deadline or Timeframe</div> -->
+                </div>
+            </div>
+            <won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+
+            <button type="submit" class="won-button--filled red cp__publish"
+                    ng-if="self.isValid()"
+                    ng-click="::self.publish()">
+                <span ng-show="!self.pendingPublishing">
+                    Publish
+                </span>
+                <span ng-show="self.pendingPublishing">
+                    Publishing&nbsp;&hellip;
+                </span>
+            </button>
         </div>
     `;
+
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
@@ -123,15 +195,8 @@ function genComponentConf() {
             this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
             this.draftSeeks = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
             this.draftObject = {is: this.draftIs, seeks: this.draftSeeks};
-            
-            this.isOpen = {is: false, seeks: false};
-            this.seeks = false;
-            
             this.isSeeks = 'seeks';
             
-            
-            
-            //Old variables
             this.pendingPublishing = false;
 
             this.showDetail = {is: false, seeks: false};
@@ -158,14 +223,6 @@ function genComponentConf() {
         showPicker(isSeeks){
         	return (this.isSeeks === isSeeks)? true : false;
         }
-        checkDropDown(dropDown){
-        	return this.isOpen[dropDown];
-        }
-        toggleDropDown(dropDown){
-        	this.isOpen[dropDown] = !this.isOpen[dropDown];
-        }
-      
-        
         openTab(evt, tabName, button) {
             // Declare all variables
             var i, tabcontent, tablinks;
