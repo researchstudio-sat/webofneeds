@@ -76,6 +76,14 @@ public class ProposalTest {
         test(input,expectedOutput);
     }
     
+    // This is the case where there is a proposal, but a missing clause
+    @Test
+    public void missingClausesTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-missing-clause.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-missing-clause.trig");
+        test(input,expectedOutput);
+    }
+  
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
         Dataset actual = proposalFunction.applyProposalFunction(input);
