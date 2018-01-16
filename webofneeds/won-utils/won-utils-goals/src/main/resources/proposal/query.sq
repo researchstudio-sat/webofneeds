@@ -8,6 +8,11 @@ PREFIX won: <http://purl.org/webofneeds/model#>
     GRAPH ?g1 {   
         ?prop agr:proposes ?clause .
     }
+    
+    ## This query will only work with Jena
+        GRAPH <urn:x-arq:UnionGraph> {
+         ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
+    }
 
     GRAPH ?clauseContent {
       ?s ?p ?o .
