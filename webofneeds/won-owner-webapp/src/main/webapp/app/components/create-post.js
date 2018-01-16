@@ -90,6 +90,11 @@ function genComponentConf() {
 				<div class="cp__textfield_instruction" ng-if="self.isValid()">
 					<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 				</div>
+				<!--
+				<div class="cp__location" ng-if="::self.isValid()">
+                    <won-location-picker id="seeksPicker" ng-show="::self.showPicker('seeks')" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+                </div>
+                -->
 			</div>
 			
 			<div id="Post" class="tabcontent">
@@ -101,6 +106,11 @@ function genComponentConf() {
 				<div class="cp__textfield_instruction" ng-if="self.isValid()">
 					<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 				</div>
+				<!--
+				<div class="cp__location" ng-if="detail === 'location'">
+                	<won-location-picker id="isPicker" ng-show="::self.showPicker('is')" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+                </div>
+    			-->
     		</div>
 
     		
@@ -119,12 +129,15 @@ function genComponentConf() {
                     <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.isSeeks]" ng-keyup="::self.addTags()"/>
                 </div>
                 
+                
                 <div class="cp__location" ng-if="detail === 'location'">
                     <div class="cp__header location" ng-click="self.removeDetail($index)">
                         <span class="nonHover">Location</span>
                         <span class="hover">Remove Location</span>
                     </div>
-                    <won-location-picker on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+                  	<won-location-picker id="seeksPicker" ng-show="self.isSeeks == 'seeks'" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>				
+                	<won-location-picker id="isPicker" ng-show="self.isSeeks == 'is'" on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
+
                 </div>
             </div>
 
@@ -191,6 +204,7 @@ function genComponentConf() {
             this.tagsString = {is: "", seeks: ""};
             this.tempTags = {is: [], seeks: []};
             
+            this.isNew = false;
             //this.selectType(0);
             //this.selectedTab = 'Search';          
             const selectFromState = (state) => {
@@ -206,8 +220,10 @@ function genComponentConf() {
             return this.draftObject[this.isSeeks] && this.draftObject[this.isSeeks].title && this.draftObject[this.isSeeks].title.length < this.characterLimit;
         }
 
-        
-       openTab(evt, tabName, button) {
+        showPicker(isSeeks){
+        	return (this.isSeeks === isSeeks)? true : false;
+        }
+        openTab(evt, tabName, button) {
             // Declare all variables
             var i, tabcontent, tablinks;
 
