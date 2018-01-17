@@ -6,7 +6,6 @@ import overviewTitleBarModule from '../visitor-title-bar.js';
 import compareToModule from '../../directives/compareTo.js';
 import accordionModule from '../accordion.js';
 import flexGridModule from '../flexgrid.js';
-import config from '../../config.js';
 import {
     attach, 
     getIn,

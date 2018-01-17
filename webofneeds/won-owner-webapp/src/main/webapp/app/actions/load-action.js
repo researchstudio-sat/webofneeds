@@ -23,8 +23,6 @@ import {
     logout,
 } from '../won-utils.js';
 
-import config from '../config.js';
-
 import {
     checkHttpStatus,
     getParameterByName,
