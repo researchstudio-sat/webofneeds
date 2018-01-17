@@ -37,7 +37,7 @@ public class AgreementOwnerTest {
     public void test() {
 
         // set this to some connection uri which is valid, reachable and permitted to be accessed by this test
-        final String CONNECTION_URI_WITH_CONVERSATION = "https://localhost:8443/won/page/connection/x5odxt1nsyepfvuo65p8";
+        final String CONNECTION_URI_WITH_CONVERSATION = "https://localhost:8443/won/resource/connection/662qkmmt804z6apnr8b4";
 
         int depth = 3;  // depth 3 from connection gives us the messages in the conversation
         int maxRequests = 1000;
