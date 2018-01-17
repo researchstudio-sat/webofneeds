@@ -32,7 +32,18 @@ public class AgreementController {
     @RequestMapping(value = "/getAgreements", method = RequestMethod.GET)
     public Dataset getAgreements(String connectionUri) {
 
-        //TODO: handle exceptions
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getAgreements(conversationDataset);
+    }
+
+    @RequestMapping(value = "/getProposals", method = RequestMethod.GET)
+    public Dataset getProposals(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getProposals(conversationDataset);
+    }
+
+    private Dataset retrieveConversationDataset(String connectionUri) {
 
         int depth = 3;  // depth 3 from connection gives us the messages in the conversation
         int maxRequests = 1000;
@@ -43,10 +54,7 @@ public class AgreementController {
         pmap.setNsPrefix("msg", WONMSG.getURI());
         propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
         propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-
-        Dataset conversationDataset = linkedDataSource.getDataForResourceWithPropertyPath(
+        return linkedDataSource.getDataForResourceWithPropertyPath(
                 URI.create(connectionUri), propertyPaths, maxRequests, depth, false);
-
-        return HighlevelProtocols.getAgreements(conversationDataset);
     }
 }
