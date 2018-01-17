@@ -42,8 +42,8 @@ import won.protocol.util.RdfUtils;
 
 public class ProposalTest {
 
-    private static final String inputFolder = "/won/utils/proposal/input/";
-    private static final String expectedOutputFolder = "/won/utils/proposal/expected/";
+    private static final String inputFolder = "/won/utils/proposalToCancel/input/";
+    private static final String expectedOutputFolder = "/won/utils/proposalToCancel/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -51,64 +51,8 @@ public class ProposalTest {
     	root.setLevel(Level.INFO);	
     }
     
-    // This is the case where there is one proposal...(can only exist in one envelope)
-    @Test
-    public void oneProposalTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "oneproposal-twoaccepts.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "oneproposal-twoaccepts.trig");
-        test(input,expectedOutput);
-    }
     
-    // This is the case where there are two proposals
-   // --OR-- This is the case where there are two proposal clauses in different envelopes
-    @Test
-    public void twoProposalTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "2proposal-one-agreement.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-agreement.trig");
-        test(input,expectedOutput);
-    }
-    
-    // This is the case where there are two proposal clauses in the same envelope
-    @Test
-    public void twoProposalClausesinOneProposalTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement-two-proposal-clauses.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-two-proposal-clauses.trig");
-        test(input,expectedOutput);
-    }
-    
-    // This is the case where there is a proposal, but a missing clause
-    @Test
-    public void missingClausesTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement-missing-clause.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-missing-clause.trig");
-        test(input,expectedOutput);
-    }
-  
-    
-    // This is a test case where the proposal comes before the proposes message... it should produce an empty result
-    @Test
-    public void temporalOrdering () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
-        test(input,expectedOutput);
-    }
-    
-    // This is a test case where the proposal proposes another proposal. This should result in two proposals..
-    @Test
-    public void proposedProposal () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
-        test(input,expectedOutput);
-    }
-    
-    
-    // This is a test case where the proposal proposes another proposal. This should result in two proposals..
-    @Test
-    public void proposalinNotContentMessage () throws IOException {
-        Dataset input = loadDataset( inputFolder + "false-agreement-using-success-responses.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "false-agreement-using-success-responses.trig");
-        test(input,expectedOutput);
-    }
+    // tests go here ...
     
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
@@ -121,8 +65,8 @@ public class ProposalTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        ProposalFunction proposalFunction = new ProposalFunction();
-        Dataset actual = proposalFunction.applyProposalFunction(input);
+        ProposalToCancelFunction proposalToCancelFunction = new ProposalToCancelFunction();
+        Dataset actual = proposalToCancelFunction.applyProposalToCancelFunction(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
