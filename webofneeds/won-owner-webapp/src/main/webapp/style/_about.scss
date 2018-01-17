@@ -149,5 +149,14 @@ main.about {
     .sub {
       font-size: $normalFontSize;
     }
+
+    a {
+      text-decoration: none; 
+      color: white;
+    }
+    
+    p {
+      margin-bottom: 1em;
+    }
   }
 }

@@ -111,10 +111,13 @@ class AboutController {
         const self = this;
         this.config = config;
 
+        window.ab4dbg = this;
+
         const select = (state) => {
             const theme = getIn(state, ['config','theme', 'name']);
             return { 
                 theme,
+                imprintTemplate: "./skin/" + theme + "/" + getIn(state, ['config', 'theme', 'imprintTemplate']), 
                 peopleGrid: peopleGrid({theme}),
             }
         };

@@ -30,12 +30,6 @@
     </section>
     <section class="imprint">
         <div class="title">Imprint</div>
-        <div class="sub title" >
-            <p>Research Studio Smart Agent Technologies<br/>
-                Thurngasse 8/16<br/>
-                1090 Vienna<br/>
-                Austria</p>
-            <a href="mailto:{{::self.config.adminEmail}}" style="text-decoration: none; color: white">{{::self.config.adminEmail}}</a>
-        </div>
+        <div class="sub title" ng-include="self.imprintTemplate"></div>
     </section>
 </main>
