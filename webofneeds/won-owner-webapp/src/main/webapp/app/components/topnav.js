@@ -13,7 +13,6 @@ import {
     getIn,
  } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
-import config from '../config.js';
 import {
     connect2Redux,
 } from '../won-utils.js';
@@ -126,8 +125,8 @@ function genTopnavConf() {
                     </p>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
-                        <a href="mailto:{{::self.config.adminEmail}}">
-                            {{::self.config.adminEmail}}
+                        <a href="mailto:{{self.adminEmail}}">
+                            {{self.adminEmail}}
                         </a>
                     </p>
                 </div>
@@ -149,6 +148,7 @@ function genTopnavConf() {
             const selectFromState = (state) => ({
                 themeName: getIn(state, ['config', 'theme', 'name']),
                 appTitle: getIn(state, ['config', 'theme', 'title']),
+                adminEmail: getIn(state, ['config', 'theme', 'adminEmail']),
                 WON: won.WON,
                 loginVisible: state.get('loginVisible'),
                 open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")
