@@ -70,7 +70,7 @@ public class ProposalTest {
     
     // This is the case where there are two proposal clauses in the same envelope
     @Test
-    public void twoProposalClausesTest () throws IOException {
+    public void twoProposalClausesinOneProposalTest () throws IOException {
         Dataset input = loadDataset( inputFolder + "one-agreement-two-proposal-clauses.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-two-proposal-clauses.trig");
         test(input,expectedOutput);
@@ -84,6 +84,23 @@ public class ProposalTest {
         test(input,expectedOutput);
     }
   
+    
+    // This is a test case where the proposal comes before the proposes message... it should produce an empty result
+    @Test
+    public void temporalOrdering () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
+        test(input,expectedOutput);
+    }
+    
+    // This is a test case where the proposal proposes another proposal. This should result in two proposals..
+    @Test
+    public void proposedProposal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
+        test(input,expectedOutput);
+    }
+    
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
         Dataset actual = proposalFunction.applyProposalFunction(input);
