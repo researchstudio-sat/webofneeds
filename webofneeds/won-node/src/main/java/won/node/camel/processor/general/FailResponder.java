@@ -101,8 +101,8 @@ public class FailResponder extends AbstractCamelProcessor
       WonMessage responseMessage = WonMessageBuilder
               .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
               .addContent(
-                errorMessageContent,
-                      null)
+                errorMessageContent
+              )
               .build();
 
       if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){

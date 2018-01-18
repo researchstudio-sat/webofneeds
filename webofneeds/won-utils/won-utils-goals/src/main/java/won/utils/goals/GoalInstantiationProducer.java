@@ -5,12 +5,15 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.topbraid.shacl.validation.ValidationUtil;
 import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
+import won.utils.shacl.ShaclReportWrapper;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.function.Function;
 
 /**
  * Class supports in producing goal instantiations that can be used to create proposals for instance.
@@ -23,13 +26,24 @@ public class GoalInstantiationProducer {
     private Dataset need2;
     private Dataset conversation;
     private Model combinedModelWithoutGoals;
+    private String variableUriPrefix;
     private String blendingUriPrefix;
 
-    public GoalInstantiationProducer(Dataset need1, Dataset need2, Dataset conversation, String blendingUriPrefix) {
+    /**
+     * Initialize the GoalInstantiationProducer
+     *
+     * @param need1 Dataset of need 1
+     * @param need2 Dataset of need 2
+     * @param conversation Dataset of the conversation between two needs
+     * @param variableUriPrefix uri prefix defines which resource URIs are considered for blending
+     * @param blendingUriPrefix uri prefix that is used to generate the result URIs of blended resources
+     */
+    public GoalInstantiationProducer(Dataset need1, Dataset need2, Dataset conversation, String variableUriPrefix, String blendingUriPrefix) {
 
         this.need1 = need1;
         this.need2 = need2;
         this.conversation = conversation;
+        this.variableUriPrefix = variableUriPrefix;
         this.blendingUriPrefix = blendingUriPrefix;
 
         // first remove all goals data and shapes graphs from needs
@@ -57,10 +71,13 @@ public class GoalInstantiationProducer {
     /**
      * Create a goal instantiation result from the attempt to instantiate two goals of two needs using all
      * the need data, the conversation data and the data and shapes of the two goals.
+     * If a model can be found that conforms to the shacl shapes of both needs this model is chosen to be returned
+     * in the GoalInstantiationResult. If no conforming model can be found, the model with the least
+     * shacl validation results (validation errors) is used.
      *
      * @param goal1 resource referencing goal from need1
      * @param goal2 resource referencing goal from need2
-     * @return
+     * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
      */
     private GoalInstantiationResult findInstantiationForGoals(Resource goal1, Resource goal2) {
 
@@ -86,14 +103,39 @@ public class GoalInstantiationProducer {
         Model extractedModel1 = GoalUtils.extractGoalData(combinedModelWithGoalData, shapesModel1);
         Model extractedModel2 = GoalUtils.extractGoalData(combinedModelWithGoalData, shapesModel2);
 
-        // blend the two extracted graphs
-        Model blendedModel = GoalUtils.blendGraphsSimple(extractedModel1, extractedModel2, blendingUriPrefix);
-
-        // check the blended graph against the shacl shape graphs of both goals
         Model combinedShapesModel = ModelFactory.createDefaultModel();
         combinedShapesModel.add(shapesModel1);
         combinedShapesModel.add(shapesModel2);
-        return new GoalInstantiationResult(blendedModel, combinedShapesModel);
+
+        int minValidationResults = Integer.MAX_VALUE;
+        GoalInstantiationResult bestGoalInstantiationResult = null;
+
+        // blend the two extracted graphs
+        GraphBlendingIterator blendingIterator = new GraphBlendingIterator(extractedModel1, extractedModel2, variableUriPrefix, blendingUriPrefix);
+        while (blendingIterator.hasNext()) {
+            Model blendedModel = blendingIterator.next();
+
+            // check if the blended model conforms to the combined shacl shapes of both needs
+            Resource report = ValidationUtil.validateModel(blendedModel, combinedShapesModel, false);
+            ShaclReportWrapper shaclReportWrapper = new ShaclReportWrapper(report);
+            if (shaclReportWrapper.isConform()) {
+
+                // if we found a blended model that is conform to the shacl shapes lets try to condense it
+                // as far as possible to get the minimum model that is still conform to the shapes
+                Function<Model, Boolean> modelTestingFunction = param -> GoalUtils.validateModelShaclConformity(param, combinedShapesModel);
+                Model condensedModel = RdfUtils.condenseModelByIterativeTesting(blendedModel, modelTestingFunction);
+                bestGoalInstantiationResult = new GoalInstantiationResult(condensedModel, combinedShapesModel);
+            } else {
+
+                // if the model is not conform save it if it has the least validation results found so far
+                if (shaclReportWrapper.getValidationResults().size() < minValidationResults) {
+                    minValidationResults = shaclReportWrapper.getValidationResults().size();
+                    bestGoalInstantiationResult = new GoalInstantiationResult(blendedModel, combinedShapesModel);
+                }
+            }
+        }
+
+        return bestGoalInstantiationResult;
     }
 
     /**

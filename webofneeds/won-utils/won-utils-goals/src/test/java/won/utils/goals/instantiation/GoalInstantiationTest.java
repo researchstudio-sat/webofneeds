@@ -1,7 +1,6 @@
 package won.utils.goals.instantiation;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
@@ -25,7 +24,7 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex1_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex1_conversation.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
 
         Assert.assertEquals(1, results.size());
@@ -42,14 +41,14 @@ public class GoalInstantiationTest {
         Dataset conversationWithPickupTime = loadDataset(baseFolder + "ex2_conversation.trig");
 
         // this conversation doas not contain the missing pickup time info so the goals cannot be fulfilled
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithoutPickupTime, "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithoutPickupTime, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
         Assert.assertFalse(results.iterator().next().isConform());
 
         // this conversation contains the missing pickup info so the goals can be fulfilled
-        goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime, "http://example.org/blended/");
+        goalInstantiation = new GoalInstantiationProducer(need1, need2, conversationWithPickupTime, "http://example.org/", "http://example.org/blended/");
         results = goalInstantiation.createAllGoalInstantiationResults();
         Assert.assertEquals(1, results.size());
         System.out.println(results.iterator().next().toString());
@@ -63,12 +62,8 @@ public class GoalInstantiationTest {
         Dataset need2 = loadDataset(baseFolder + "ex3_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex3_conversation.trig");
 
-        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/blended/");
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
-
-        for (GoalInstantiationResult r : results) {
-            System.out.println(r);
-        }
 
         // We have 4 and 2 goals so we expected 8 results
         Assert.assertEquals(8, results.size());
@@ -76,6 +71,25 @@ public class GoalInstantiationTest {
         // We expected three valid results
         Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
         Assert.assertEquals(3, validResults.size());
+        for (Model valid : validResults) {
+            valid.write(System.out, "TRIG");
+        }
+    }
+
+    @Test
+    public void example4_geoCoordinatesFulfilled() throws IOException {
+        Dataset need1 = loadDataset(baseFolder + "ex4_need.trig");
+        Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
+        Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");
+
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(need1, need2, conversation, "http://example.org/", "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createAllGoalInstantiationResults();
+
+        // We have only one goal on each side so we expect only one result
+        Assert.assertEquals(1, results.size());
+        // We expect also one valid result
+        Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
+        Assert.assertEquals(1, validResults.size());
         for (Model valid : validResults) {
             valid.write(System.out, "TRIG");
         }

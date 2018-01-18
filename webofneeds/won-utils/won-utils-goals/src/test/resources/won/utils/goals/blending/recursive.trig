@@ -3,7 +3,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix s: <http://schema.org/> .
 
-@prefix ex: <http://example.org/test#> .
+@prefix ex: <http://example.org/test/> .
 @prefix voc: <http://example.org/myvocabulary/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
@@ -17,7 +17,20 @@ ex:data2 {
     ex:test2 ex:testProperty2 ex:uri
 }
 
-ex:blended {
-    ex:blended1 ex:testProperty1 ex:blended0 .
-    ex:blended0 ex:testProperty2 ex:uri
+ex:blendedGraph0 {
+    ex:testa ex:testProperty1 ex:test1 .
+    ex:test1 ex:testProperty2 ex:uri .
+    ex:testb ex:testProperty1 ex:test2 .
+    ex:test2 ex:testProperty2 ex:uri .
+}
+
+ex:blendedGraph1 {
+    ex:testa ex:testProperty1 ex:blended1 .
+    ex:testb ex:testProperty1 ex:blended1 .
+    ex:blended1 ex:testProperty2 ex:uri .
+}
+
+ex:blendedGraph {
+    ex:blended2 ex:testProperty1 ex:blended1 .
+    ex:blended1 ex:testProperty2 ex:uri
 }
