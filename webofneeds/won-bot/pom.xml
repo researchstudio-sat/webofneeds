@@ -295,11 +295,6 @@
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
         </dependency>
-        <dependency>
-            <groupId>webofneeds</groupId>
-            <artifactId>won-utils-goals</artifactId>
-            <version>0.2-SNAPSHOT</version>
-        </dependency>
     </dependencies>
     <profiles>
         <profile>
