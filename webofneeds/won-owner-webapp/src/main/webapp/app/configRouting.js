@@ -65,7 +65,6 @@ export const constantParams = [
 export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
     //$urlRouterProvider.otherwise('/landingpage');
     $urlRouterProvider.otherwise(($injector, $location) => {
-        console.log('otherwise ', $injector, $location)
 
         //let updatedRoute =  $location.replace()
         //    .path('/landingpage') // change route to landingpage
@@ -185,7 +184,6 @@ function back(hasPreviousState, $ngRedux) {
 
 export const runAccessControl = [ '$transitions', '$rootScope', '$ngRedux', '$urlRouter',
     ($transitions, $rootScope, $ngRedux, $urlRouter) => {
-        console.log('transitions: ', $transitions);
         //TODO use access-control provided by $transitions.onStart()
         $rootScope.$on('$stateChangeStart',
             (event, toState, toParams, fromState, fromParams, options) =>

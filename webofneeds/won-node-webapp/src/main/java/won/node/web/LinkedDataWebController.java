@@ -111,7 +111,7 @@ import java.util.regex.Pattern;
 @RequestMapping("/")
 public class
 LinkedDataWebController {
-    final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     //full prefix of a need resource
     private String needResourceURIPrefix;
     //path of a need resource
@@ -223,7 +223,7 @@ LinkedDataWebController {
 
             URI connectionURI = uriService.createConnectionURIForId(identifier);
             String eventsURI = connectionURI.toString() + "/events";
-            Dataset rdfDataset = null;
+            Dataset rdfDataset;
             WonMessageType msgType = getMessageType(type);
 
             if (page == null && beforeId == null && afterId == null) {
@@ -321,7 +321,7 @@ LinkedDataWebController {
             Model model,
             HttpServletResponse response) throws IOException {
 
-        Dataset rdfDataset = null;
+        Dataset rdfDataset;
         NeedState needState = getNeedState(state);
 
 
@@ -485,7 +485,7 @@ LinkedDataWebController {
         logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
         if (redirectToURI.equals(requestUri)) {
             logger.debug("redirecting to same URI avoided, sending status 500 instead");
-            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //TODO: actually the expiry information should be the same as that of the resource that is redirected to
@@ -548,7 +548,7 @@ LinkedDataWebController {
         logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
         if (redirectToURI.equals(requestUri)) {
             logger.debug("redirecting to same URI avoided, sending status 500 instead");
-            return new ResponseEntity<String>("\"Could not redirect to linked data page\"", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("\"Could not redirect to linked data page\"", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         //TODO: actually the expiry information should be the same as that of the resource that is redirected to
         HttpHeaders headers = new HttpHeaders();
@@ -599,7 +599,7 @@ LinkedDataWebController {
                                                 @RequestParam(value = "state", required = false) String state) throws IOException, ParseException {
         logger.debug("listNeedURIs() for page " + page + " called");
 
-        Dataset rdfDataset = null;
+        Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
         String passableQuery = getPassableQueryMap("state", state);
@@ -652,7 +652,7 @@ LinkedDataWebController {
         addMutableResourceHeaders(headers);
         addCORSHeader(headers);
 
-        return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+        return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
     private NeedState getNeedState(final String state) {
@@ -699,7 +699,7 @@ LinkedDataWebController {
             @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
 
         logger.debug("listConnectionURIs() called");
-        Dataset rdfDataset = null;
+        Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
 
@@ -752,17 +752,17 @@ LinkedDataWebController {
             }
         } catch (ParseException e) {
             logger.warn("could not parse timestamp into Date:{}", timestamp);
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NoSuchConnectionException e) {
             logger
                     .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
-            return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
                 URI.create(this.connectionResourceURIPrefix));
         addMutableResourceHeaders(headers);
         addCORSHeader(headers);
-        return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+        return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
     }
 
 
@@ -823,9 +823,9 @@ LinkedDataWebController {
             //TODO: need information does change over time. The immutable need information should never expire, the mutable should
             HttpHeaders headers = new HttpHeaders();
             addCORSHeader(headers);
-            return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
+            return new ResponseEntity<>(dataset, headers, HttpStatus.OK);
         } catch (NoSuchNeedException | NoSuchConnectionException | NoSuchMessageException e) {
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
     }
@@ -839,14 +839,14 @@ LinkedDataWebController {
     public ResponseEntity<Dataset> readNode(
             HttpServletRequest request) {
         logger.debug("readNode() called");
-        URI nodeUri = URI.create(this.nodeResourceURIPrefix);
+        //URI nodeUri = URI.create(this.nodeResourceURIPrefix);
         Dataset model = linkedDataService.getNodeDataset();
         //TODO: need information does change over time. The immutable need information should never expire, the mutable should
         HttpHeaders headers = new HttpHeaders();
         addCORSHeader(headers);
         addHeadersForShortTermCaching(headers);
         headers.add(HttpHeaders.CACHE_CONTROL, "public");
-        return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+        return new ResponseEntity<>(model, headers, HttpStatus.OK);
     }
 
     @RequestMapping(
@@ -897,7 +897,7 @@ LinkedDataWebController {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.debug("readConnection() called");
-        Dataset rdfDataset = null;
+        Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
         URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
@@ -947,7 +947,7 @@ LinkedDataWebController {
             }
 
         } catch (NoSuchConnectionException e) {
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         //TODO: events list information does change over time, unless the connection is closed and cannot be reopened.
@@ -958,7 +958,7 @@ LinkedDataWebController {
         addCORSHeader(headers);
         stopWatch.stop();
         logger.debug("readConnectionEvents took " + stopWatch.getLastTaskTimeMillis() + " millis");
-        return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+        return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
 
     }
 
@@ -1049,14 +1049,10 @@ LinkedDataWebController {
         if (!data.isNotFound()) {
             HttpHeaders headers = new HttpHeaders();
             addCORSHeader(headers);
-            String mimeTypeOfResponse = RdfUtils.findFirst(data.getData(), new RdfUtils.ModelVisitor<String>() {
-                @Override
-                public String visit(org.apache.jena.rdf.model.Model model) {
-                    String content = getObjectOfPropertyAsString(model, CNT.BYTES);
-                    if (content == null) return null;
-                    String contentType = getObjectOfPropertyAsString(model, WONMSG.CONTENT_TYPE);
-                    return contentType;
-                }
+            String mimeTypeOfResponse = RdfUtils.findFirst(data.getData(), model -> {
+                String content = getObjectOfPropertyAsString(model, CNT.BYTES);
+                if (content == null) return null;
+                return getObjectOfPropertyAsString(model, WONMSG.CONTENT_TYPE);
             });
             if (mimeTypeOfResponse != null) {
                 //we found a base64 encoded attachment, we obtained its contentType, so we set it as the
@@ -1065,9 +1061,9 @@ LinkedDataWebController {
                 producibleMediaTypes.add(MediaType.valueOf(mimeTypeOfResponse));
                 request.setAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, producibleMediaTypes);
             }
-            return new ResponseEntity<Dataset>(data.getData(), headers, HttpStatus.OK);
+            return new ResponseEntity<>(data.getData(), headers, HttpStatus.OK);
         } else {
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -1117,7 +1113,7 @@ LinkedDataWebController {
 
         logger.debug("readConnectionsOfNeed() called");
         URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
-        Dataset rdfDataset = null;
+        Dataset rdfDataset;
         HttpHeaders headers = new HttpHeaders();
         Integer preferedSize = getPreferredSize(request);
         URI connectionsURI = URI.create(needUri.toString() + "/connections");
@@ -1166,18 +1162,18 @@ LinkedDataWebController {
             addMutableResourceHeaders(headers);
             addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI);
             addCORSHeader(headers);
-            return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+            return new ResponseEntity<>(rdfDataset, headers, HttpStatus.OK);
 
         } catch (ParseException e) {
             logger.warn("could not parse timestamp into Date:{}", timestamp);
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NoSuchNeedException e) {
             logger.warn("did not find need {}", e.getUnknownNeedURI());
-            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NoSuchConnectionException e) {
             logger
                     .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
-            return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -1355,14 +1351,15 @@ LinkedDataWebController {
 
     private <T> ResponseEntity<T> getResponseEntityForPossiblyNotModifiedResult(final DataWithEtag<T> datasetWithEtag,
                                                                                 final HttpHeaders headers) {
-        if (datasetWithEtag.isChanged()) {
-            if (datasetWithEtag != null) {
+
+        if (datasetWithEtag != null) {
+            if (datasetWithEtag.isChanged()) {
                 return new ResponseEntity<>(datasetWithEtag.getData(), headers, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
             }
         } else {
-            return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -1445,45 +1442,39 @@ LinkedDataWebController {
             produces = {"text/plain"})
     public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
             request) throws CertificateException, UnsupportedEncodingException {
-
         logger.debug("REGISTERING " + registeredType);
-        String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
-
-        if (registeredType == null) {
-            logger.info(supportedTypesMsg);
-            return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
-        }
         PreAuthenticatedAuthenticationToken authentication = (PreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
         if (!(authentication instanceof PreAuthenticatedAuthenticationToken)) {
             throw new BadCredentialsException("Could not register: PreAuthenticatedAuthenticationToken expected");
         }
-        Object principal = authentication.getPrincipal();
+        //Object principal = authentication.getPrincipal();
 
         Object credentials = authentication.getCredentials();
-        X509Certificate cert = null;
+        X509Certificate cert;
         if (credentials instanceof X509Certificate) {
             cert = (X509Certificate) credentials;
         } else {
             throw new BadCredentialsException("Could not register: expected to find a X509Certificate in the request");
         }
         try {
-            if (registeredType.equals("owner")) {
+            if ("owner".equals(registeredType)) {
                 String result = registrationServer.registerOwner(cert);
                 logger.debug("successfully registered owner");
-                return new ResponseEntity<String>(result, HttpStatus.OK);
+                return new ResponseEntity<>(result, HttpStatus.OK);
             }
-            if (registeredType.equals("node")) {
+            if ("node".equals(registeredType)) {
                 String result = registrationServer.registerNode(cert);
                 logger.debug("successfully registered node");
-                return new ResponseEntity<String>(result, HttpStatus.OK);
+                return new ResponseEntity<>(result, HttpStatus.OK);
             } else {
+                String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
                 logger.debug(supportedTypesMsg);
-                return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
             }
         } catch (WonProtocolException e) {
             logger.info("Could not register " + registeredType, e);
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

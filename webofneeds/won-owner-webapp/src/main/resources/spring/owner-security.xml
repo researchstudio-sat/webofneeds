@@ -44,6 +44,7 @@
 	<http use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
 		  security-context-repository-ref="securityContextRepository">
         <intercept-url pattern="/msg" access="isAnonymous()"/>
+        <intercept-url pattern="/sitemap.xml" access="permitAll()"/>
         <intercept-url pattern="/rest/users/" access="permitAll()"/>
         <intercept-url pattern="/rest/users/private" access="isAnonymous()"/>
         <intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
