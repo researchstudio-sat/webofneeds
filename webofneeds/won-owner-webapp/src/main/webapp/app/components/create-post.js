@@ -73,41 +73,161 @@ function genComponentConf() {
             
             <div class="cp__addDetail">
             	<!-- SEEKS PART -->
-	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown('seeks')" ng-class="{'closedDetail': !self.checkDropDown('seeks')}">
+            	
+	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
 	                  	<span class="nonHover">Search</span>
-	                  	<span class="hover" ng-if="!self.checkDropDown('seeks')">Create Search</span>
-	                    <span class="hover" ng-if="self.checkDropDown('seeks')">Close Search</span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Create Search</span>
+	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Close Search</span>
 	            </div>
-	            <div class="cp__detail__items" ng-if="self.checkDropDown('seeks')" >
-		            <div class="cp__mandatory-rest ng-if="self.checkDropDown('seeks')">
-				        <won-image-dropzone on-image-picked="::self.pickImage(image)">
+	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.seeks)" >
+		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.seeks)">
+				        <won-image-dropzone on-image-picked="::self.pickImage(image, self.seeks)">
 				        </won-image-dropzone>
-						<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+						<need-textfield on-draft-change="::self.setDraft(draft, self.seeks)"></need-textfield>
 					</div>
-					<div class="cp__textfield_instruction" ng-if="self.checkDropDown('seeks')">
+					<div class="cp__textfield_instruction" ng-if="self.checkDropDown(self.seeks)">
 						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 					</div>
+					
+					<!-- DETAILS -->
+					<!-- ng-repeat="detail in self.details[self.seeks] track by $index" -->
+					
+					<div class="cp__location"  ng-if="self.isDetailPresent('location', self.seeks)"">
+                    	<div class="cp__header location" ng-click="self.removeDetail($index, self.seeks)">
+	                        <span class="nonHover">Location</span>
+	                        <span class="hover">Remove Location</span>
+    					</div>
+                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.seeks)" location-is-saved="::self.locationIsSaved(self.seeks)"></won-location-picker>
+                	</div>
+                	<div id="seeksPost" class="tabcontent">
+		    			<div class="cp__mandatory-rest ng-if="self.isDetailPresent('tags', self.seeks)"">
+					        <won-image-dropzone on-image-picked="::self.pickImage(image, self.seeks)">
+					        </won-image-dropzone>
+							<need-textfield on-draft-change="::self.setDraft(draft, self.seeks)"></need-textfield>
+						</div>
+						<div class="cp__textfield_instruction" ng-if="self.isValid(self.seeks)">
+							<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+						</div>
+					</div>
+                	<!-- /DETAILS -->
+                	<!-- DETAILS Picker -->
+	    			 
+	    			<div class="cp__addDetail" ng-if="self.isValid(self.seeks)">
+		                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.seeks)" ng-class="{'closedDetail': !self.showDetail[self.seeks]}">
+		                    <span class="nonHover">Add more detail</span>
+		                    <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
+		                    <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
+		                </div>
+		                
+			            <div class="cp__detail__items" ng-if="self.showDetail[self.seeks]" >
+		                    <div class="cp__detail__items__item location" 
+		                        ng-click="!self.isDetailPresent('location', self.seeks) && self.addDetail('location', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('location', self.seeks)}">Address or Location</div>
+		                        
+		                    <div class="cp__detail__items__item tags"
+		                        ng-click="!self.isDetailPresent('tags', self.seeks) && self.addDetail('tags', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('tags', self.seeks)}">Tags</div>
+		                        
+		                    <!-- <div class="cp__detail__items__item image" 
+		                        ng-click="!self.isDetailPresent('image',self.seeks) && self.addDetail('image', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('image', self.seeks)}">Image or Media</div>
+		                    <div class="cp__detail__items__item description" 
+		                        ng-click="!self.isDetailPresent('description', self.seeks) && self.addDetail('description', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('description', self.seeks)}">Description</div>
+		                    <div class="cp__detail__items__item timeframe" 
+		                        ng-click="!self.isDetailPresent('timeframe', self.seeks) && self.addDetail('timeframe', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('timeframe', self.seeks)}">Deadline or Timeframe</div> -->
+		                </div>    
+		            </div>
+		            <!-- /DETAILS Picker/ -->
 	            </div>
+	            <!-- /SEEKS PART/ -->
+	            
+	            <won-labelled-hr label="::'and?'" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr>
 	            
 	            <!-- IS PART -->
-	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown('is')" ng-class="{'closedDetail': !self.checkDropDown('is')}">
+	          
+	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
 	                  	<span class="nonHover">Offer</span>
-	                  	<span class="hover" ng-if="!self.checkDropDown('is')">Create Offer</span>
-	                    <span class="hover" ng-if="self.checkDropDown('is')">Close Offer</span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create Offer</span>
+	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Close Offer</span>
 	            </div>
-	            <div class="cp__detail__items" ng-if="self.checkDropDown('is')" >
-		            <div class="cp__mandatory-rest ng-if="self.checkDropDown('is')">
-				        <won-image-dropzone on-image-picked="::self.pickImage(image)">
+	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
+		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.is)">
+				        <won-image-dropzone on-image-picked="::self.pickImage(image, self.is)">
 				        </won-image-dropzone>
-						<need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+						<need-textfield on-draft-change="::self.setDraft(draft, self.is)"></need-textfield>
 					</div>
-					<div class="cp__textfield_instruction" ng-if="self.checkDropDown('is')">
+					<div class="cp__textfield_instruction" ng-if="self.checkDropDown(self.is)">
 						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 					</div>
-	            </div>
- 
+					
+					<!-- DETAILS-->
+					
+					<div class="cp__location" ng-if="self.isDetailPresent('location', self.is)"">
+                    	<div class="cp__header location" ng-click="self.removeDetail($index, self.is)">
+	                        <span class="nonHover">Location</span>
+	                        <span class="hover">Remove Location</span>
+    					</div>
+                    	<won-location-picker id="isPicker" on-draft-change="::self.setDraft(draft, self.is)" location-is-saved="::self.locationIsSaved(self.is)"></won-location-picker>
+                	</div>
+                	
+                	<div id="isPost" class="tabcontent">
+		    			<div class="cp__mandatory-rest ng-if="self.isDetailPresent('tags', self.is)"">
+					        <won-image-dropzone on-image-picked="::self.pickImage(image, self.is)">
+					        </won-image-dropzone>
+							<need-textfield on-draft-change="::self.setDraft(draft, self.is)"></need-textfield>
+						</div>
+						<div class="cp__textfield_instruction" ng-if="self.isValid(self.is)">
+							<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
+						</div>
+					</div>
+	            	<!-- /DETAILS -->
+	            
+	    			 <!-- DETAILS Picker-->
+	    			 
+	    			<div class="cp__addDetail" ng-if="self.isValid(self.is)">
+		                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetail': !self.showDetail[self.is]}">
+		                    <span class="nonHover">Add more detail</span>
+		                    <span class="hover" ng-if="!self.showDetail[self.is]">Open more detail</span>
+		                    <span class="hover" ng-if="self.showDetail[self.is]">Close more detail</span>
+		                </div>
+		                
+			            <div class="cp__detail__items" ng-if="self.showDetail[self.is]" >
+		                    <div class="cp__detail__items__item location" 
+		                        ng-click="!self.isDetailPresent('location', self.is) && self.addDetail('location', self.is)"
+		                        ng-class="{'picked' : self.isDetailPresent('location', self.is)}">Address or Location</div>
+		                        
+		                    <div class="cp__detail__items__item tags"
+		                        ng-click="!self.isDetailPresent('tags', self.is) && self.addDetail('tags', self.is)"
+		                        ng-class="{'picked' : self.isDetailPresent('tags', self.is)}">Tags</div>
+		                        
+		                    <!-- <div class="cp__detail__items__item image" 
+		                        ng-click="!self.isDetailPresent('image',self.is) && self.addDetail('image', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('image', self.is)}">Image or Media</div>
+		                    <div class="cp__detail__items__item description" 
+		                        ng-click="!self.isDetailPresent('description', self.is) && self.addDetail('description', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('description', self.is)}">Description</div>
+		                    <div class="cp__detail__items__item timeframe" 
+		                        ng-click="!self.isDetailPresent('timeframe', self.is) && self.addDetail('timeframe', self.seeks)"
+		                        ng-class="{'picked' : self.isDetailPresent('timeframe', self.is)}">Deadline or Timeframe</div> -->
+		                </div>
+		            </div>
+		            <!-- /DETAIL Picker/ -->
+                </div>
+                <!-- /IS PART/ -->
 	       	</div>
 	       	<won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+	       	<button type="submit" class="won-button--filled red cp__publish"
+                    ng-if="self.isValid()"
+                    ng-click="::self.publish()">
+                <span ng-show="!self.pendingPublishing">
+                    Publish
+                </span>
+                <span ng-show="self.pendingPublishing">
+                    Publishing&nbsp;&hellip;
+                </span>
+            </button>
         </div>
     `;
 
@@ -125,13 +245,9 @@ function genComponentConf() {
             this.draftObject = {is: this.draftIs, seeks: this.draftSeeks};
             
             this.isOpen = {is: false, seeks: false};
-            this.seeks = false;
-            
-            this.isSeeks = 'seeks';
-            
-            
-            
-            //Old variables
+            this.is = 'is'
+            this.seeks = 'seeks';
+           
             this.pendingPublishing = false;
 
             this.showDetail = {is: false, seeks: false};
@@ -140,8 +256,7 @@ function genComponentConf() {
             this.tempTags = {is: [], seeks: []};
             
             this.isNew = false;
-            //this.selectType(0);
-            //this.selectedTab = 'Search';          
+                  
             const selectFromState = (state) => {
                 return {
                     existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
@@ -151,48 +266,35 @@ function genComponentConf() {
             // Using actionCreators like this means that every action defined there is available in the template.
             connect2Redux(selectFromState, actionCreators, [], this);
         }
-        isValid(){
-            return this.draftObject[this.isSeeks] && this.draftObject[this.isSeeks].title && this.draftObject[this.isSeeks].title.length < this.characterLimit;
+        isValid(isSeeks){
+        	if(isSeeks){
+        		return (this.draftObject[isSeeks]) 
+		        		&& (this.draftObject[isSeeks].title)
+		        		&& (this.draftObject[isSeeks].title.length < this.characterLimit);
+        	}
+        	
+            return (this.draftObject[this.is] || this.draftObject[this.seeks]) 
+            		&& (this.draftObject[this.is].title || this.draftObject[this.seeks].title)
+            		&& ((this.draftObject[this.is].title.length < this.characterLimit) || (this.draftObject[this.seeks].title.length < this.characterLimit));
         }
-
-        showPicker(isSeeks){
-        	return (this.isSeeks === isSeeks)? true : false;
+        checkDropDown(isSeeks){
+        	return this.isOpen[isSeeks];
+        }       
+        toggleDropDown(isSeeks){
+        	if(this.isOpen[isSeeks]){
+        		this.draftObject[isSeeks] = this.resetObject(isSeeks);
+         	}
+        	this.isOpen[isSeeks] = !this.isOpen[isSeeks];
+        	
         }
-        checkDropDown(dropDown){
-        	return this.isOpen[dropDown];
-        }
-        toggleDropDown(dropDown){
-        	this.isOpen[dropDown] = !this.isOpen[dropDown];
-        }
-      
-        
-        openTab(evt, tabName, button) {
-            // Declare all variables
-            var i, tabcontent, tablinks;
-
-            // Get all elements with class="tabcontent" and hide them
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-
-            // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-
-            // Show the current tab, and add an "active" class to the button that opened the tab
-            document.getElementById(tabName).style.display = "block";
-            document.getElementById(button).className += " active";
+        resetObject(isSeeks){
+        	this.showDetail[isSeeks] = false;
+        	this.details[isSeeks] = [];
+        	this.tagsString[isSeeks] = "";
+            this.tempTags[isSeeks] = [];
+        	return {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
         }
         
-        selectType(type) {
-        	this.isSeeks = type;
-        }
-        unselectType() {
-            this.draftObject[this.isSeeks].type = undefined;
-        }
         titlePicZoneNg() {
             return angular.element(this.titlePicZone())
         }
@@ -209,7 +311,7 @@ function genComponentConf() {
 
                 //TODO: Check for both and make tags + location independent
                 //Both with for;
-                var tmpList = ['is', 'seeks'];
+                var tmpList = [this.is, this.seeks];
                 for(i = 0; i < 2; i ++){
                 	var tmp = tmpList[i];
                 	if(!this.isDetailPresent("tags", tmp)){
@@ -242,55 +344,90 @@ function genComponentConf() {
             }
         }
 
-        setDraft(updatedDraft) {
-            if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags", this.isSeeks)){
+        setDraft(updatedDraft, isSeeks) {
+            if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags", isSeeks)){
                 this.addDetail("tags");
             }
-            this.tempTags[this.isSeeks] = updatedDraft.tags;
+            this.tempTags[isSeeks] = updatedDraft.tags;
             updatedDraft.tags = this.mergeTags();
-            Object.assign(this.draftObject[this.isSeeks], updatedDraft);
+            Object.assign(this.draftObject[isSeeks], updatedDraft);
         }
 
-        mergeTags() {
-            let detailTags = Immutable.Set(this.tagsString[this.isSeeks]? this.tagsString[this.isSeeks].match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
+        mergeTags(isSeeks) {
+            let detailTags = Immutable.Set(this.tagsString[isSeeks]? this.tagsString[isSeeks].match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
 
-            let combinedTags = this.tempTags[this.isSeeks]? detailTags.concat(this.tempTags[this.isSeeks]) : detailTags;
+            let combinedTags = this.tempTags[isSeeks]? detailTags.concat(this.tempTags[isSeeks]) : detailTags;
 
             const immutableTagSet = Immutable.Set(combinedTags);
             return immutableTagSet.toJS();
         }
 
-        addTags() {
-            this.draftObject[this.isSeeks].tags = this.mergeTags();
+        addTags(isSeeks) {
+            this.draftObject[isSeeks].tags = this.mergeTags(isSeeks);
         }
 
-        locationIsSaved() {
-            return this.isDetailPresent("location", this.isSeeks) && this.draftObject[this.isSeeks].location && this.draftObject[this.isSeeks].location.name;
+        locationIsSaved(isSeeks) {
+            return this.isDetailPresent("location", isSeeks) && this.draftObject[isSeeks].location && this.draftObject[isSeeks].location.name;
         }
 
-        pickImage(image) {
-            this.draftObject[this.isSeeks].thumbnail = image;
+        pickImage(image, isSeeks) {
+            this.draftObject[isSeeks].thumbnail = image;
         }
 
-        toggleDetail(){
-            this.showDetail[this.isSeeks] = !this.showDetail[this.isSeeks];
+        toggleDetail(isSeeks){
+        	if(this.showDetail[isSeeks]){
+        		this.details[isSeeks] = [];
+        	}
+            this.showDetail[isSeeks] = !this.showDetail[isSeeks];
         }
 
-        addDetail(detail) {
-            this.details[this.isSeeks].push(detail);
+        addDetail(detail, isSeeks) {
+            this.details[isSeeks].push(detail);
         }
 
-        removeDetail(detailIndex) {
-            var tempDetails = [];
-            for(var i=0; i < this.details[this.isSeeks].length; i++){
-                if(i!=detailIndex) tempDetails.push(this.details[this.isSeeks][i]);
-            }
-            this.details[this.isSeeks] = tempDetails;
+        removeDetail(detailIndex, isSeeks) {
+        	 var tempDetails = [];
+             for(var i=0; i < this.details[isSeeks].length; i++){
+                 if(i!=detailIndex) tempDetails.push(this.details[isSeeks][i]);
+             }
+             this.details[isSeeks] = tempDetails;
         }
 
         isDetailPresent(detail, isSeeks) {
             return this.details[isSeeks].indexOf(detail) > -1;
         }
+        
+        
+        /*
+        openTab(evt, tabName, button) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(button).className += " active";
+        }
+        
+        selectType(type) {
+        	this.isSeeks = type;
+        }
+        unselectType() {
+            this.draftObject[this.isSeeks].type = undefined;
+        }*/
+        
+        
 
         createWhatsAround(){
             if (!this.pendingPublishing) {
