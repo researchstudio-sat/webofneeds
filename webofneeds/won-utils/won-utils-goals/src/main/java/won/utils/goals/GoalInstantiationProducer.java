@@ -88,6 +88,10 @@ public class GoalInstantiationProducer {
         Model shapesModel2 = needWrapper2.getShapesGraph(goal2);
         Model dataModel2 = needWrapper2.getDataGraph(goal2);
 
+        if (shapesModel1 == null || shapesModel2 == null) {
+            throw new IllegalArgumentException("shapes model for goal not found");
+        }
+
         // create the combined model with need content, conversation data and the data of the two goals
         Model combinedModelWithGoalData = ModelFactory.createDefaultModel();
         combinedModelWithGoalData.add(combinedModelWithoutGoals);
@@ -139,12 +143,51 @@ public class GoalInstantiationProducer {
     }
 
     /**
+     * Create a goal instantiation result from the attempt to instantiate one goal with data of two needs using all
+     * the need data, the conversation data and the shapes data of the goal. The data is extracted and validated
+     * against the shacl shape of the goal.
+     *
+     * @param goal resource referencing goal from need1 or need2
+     * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
+     */
+    public GoalInstantiationResult findInstantiationForGoal(Resource goal) {
+
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
+        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
+        Model goalShapesModel = null;
+        Model goalDataModel = null;
+
+        if (needWrapper1.getGoals().contains(goal) && !needWrapper2.getGoals().contains(goal)) {
+            goalShapesModel = needWrapper1.getShapesGraph(goal);
+            goalDataModel = needWrapper1.getDataGraph(goal);
+        } else if (needWrapper2.getGoals().contains(goal) && !needWrapper1.getGoals().contains(goal)) {
+            goalShapesModel = needWrapper2.getShapesGraph(goal);
+            goalDataModel = needWrapper2.getDataGraph(goal);
+        } else {
+            throw new IllegalArgumentException("problem to identify goal resource in one of the two need models");
+        }
+
+        if (goalShapesModel == null) {
+            throw new IllegalArgumentException("shapes model for goal not found");
+        }
+
+        Model combinedModelWithGoalData = ModelFactory.createDefaultModel();
+        combinedModelWithGoalData.add(combinedModelWithoutGoals);
+        if (goalDataModel != null) {
+            combinedModelWithGoalData.add(goalDataModel);
+        }
+
+        Model extractedModel = GoalUtils.extractGoalData(combinedModelWithGoalData, goalShapesModel);
+        return new GoalInstantiationResult(extractedModel, goalShapesModel);
+    }
+
+    /**
      * create all possible goal instantiations between two needs.
      * That means trying to combine each two goals of the two needs.
      *
      * @return
      */
-    public Collection<GoalInstantiationResult> createAllGoalInstantiationResults() {
+    public Collection<GoalInstantiationResult> createAllGoalCombinationInstantiationResults() {
         NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
         NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
 
@@ -157,30 +200,6 @@ public class GoalInstantiationProducer {
         }
 
         return results;
-    }
-
-    /**
-     * create all possible goal instantiations between two needs and retrieve only those models
-     * that conform to the shape models of their goals.
-     *
-     * @return
-     */
-    public Collection<Model> createAllConformGoalInstantiationModels() {
-
-        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
-        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
-
-        Collection<Model> validInstantiationModels = new LinkedList<>();
-        for (Resource goal1 : needWrapper1.getGoals()) {
-            for (Resource goal2 : needWrapper2.getGoals()) {
-                GoalInstantiationResult instantiationResult = findInstantiationForGoals(goal1, goal2);
-                if (instantiationResult.isConform()) {
-                    validInstantiationModels.add(instantiationResult.getInstanceModel());
-                }
-            }
-        }
-
-        return validInstantiationModels;
     }
 
 }
