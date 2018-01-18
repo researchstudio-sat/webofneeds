@@ -6,8 +6,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.util.DefaultNeedModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
@@ -80,8 +78,6 @@ public class GoalInstantiationTest {
 
     @Test
     public void example4_geoCoordinatesFulfilled() throws IOException {
-        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper("needUri");
-
         Dataset need1 = loadDataset(baseFolder + "ex4_need.trig");
         Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");
@@ -91,36 +87,11 @@ public class GoalInstantiationTest {
 
         // We have only one goal on each side so we expect only one result
         Assert.assertEquals(1, results.size());
-
         // We expect also one valid result
         Collection<Model> validResults = goalInstantiation.createAllConformGoalInstantiationModels();
         Assert.assertEquals(1, validResults.size());
         for (Model valid : validResults) {
             valid.write(System.out, "TRIG");
-
-            String queryString =
-                    "prefix s:     <http://schema.org/> " +
-                    "prefix taxi:  <http://example.org/taxi/>  " +
-                    "select ?pickupLat ?pickupLon " +
-                        "where { " +
-                            "?main a taxi:Ride; " +
-                            "taxi:hasPickupLocation ?loc. " +
-                            "?loc s:latitude ?pickupLat; " +
-                                 "s:longitude ?pickupLon; " +
-                            "a s:GeoCoordinates. " +
-                        "}";
-            Query query = QueryFactory.create(queryString);
-            try(QueryExecution qexec = QueryExecutionFactory.create(query, valid)){
-                 ResultSet resultSet = qexec.execSelect();
-                 if (resultSet.hasNext()){
-                     QuerySolution solution = resultSet.nextSolution();
-                     double lat = solution.getLiteral("pickupLat").getDouble();
-                     double lon = solution.getLiteral("pickupLon").getDouble();
-                     System.out.println(lat + "   " + lon);
-                 }
-
-            }
-
         }
     }
 
