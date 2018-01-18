@@ -154,6 +154,10 @@ public class NeedModelWrapper {
         }
     }
 
+    private static Model getNeedModel(Dataset ds){
+        return getNeedModel(ds, null);
+    }
+
     private static Model getNeedModel(Dataset ds, String needModelGraphName) {
         Iterator<String> modelNameIter = ds.listNames();
 
@@ -170,6 +174,10 @@ public class NeedModelWrapper {
             }
         }
         return null;
+    }
+
+    protected static Model getSysInfoModel(Dataset ds) {
+        return getSysInfoModel(ds, null);
     }
 
     protected static Model getSysInfoModel(Dataset ds, String sysInfoGraphName) {
