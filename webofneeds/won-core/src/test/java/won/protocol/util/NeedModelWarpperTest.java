@@ -140,6 +140,12 @@ public class NeedModelWarpperTest {
     }
 
     @Test
+    public void createNeedWithShapesModel() throws IOException{
+        Dataset ds = Utils.createTestDataset("/needmodel/needwithshapes.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+    }
+
+    @Test
     public void createNeedModel() {
 
         // create a empty wrapper with a need uri, check that the need and sysinfo models are there
