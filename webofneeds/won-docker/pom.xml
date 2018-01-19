@@ -34,6 +34,7 @@
                                 <chmod file="deploy_live.sh" perm="777"/>
                                 <chmod file="deploy_int.sh" perm="777"/>
                                 <chmod file="deploy_master.sh" perm="777"/>
+                                <chmod file="deploy_uki.sh" perm="777"/>
                             </target>
                         </configuration>
                         <goals>

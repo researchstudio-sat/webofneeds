@@ -31,6 +31,7 @@ System.config({
     "babel-runtime": "npm:babel-runtime@5.8.35",
     "core-js": "npm:core-js@1.2.6",
     "fetch": "github:github/fetch@0.10.1",
+    "geopoint": "npm:geopoint@1.0.1",
     "immutable": "npm:immutable@3.7.5",
     "jsonld": "npm:jsonld@0.4.12",
     "leaflet": "npm:leaflet@0.7.7",

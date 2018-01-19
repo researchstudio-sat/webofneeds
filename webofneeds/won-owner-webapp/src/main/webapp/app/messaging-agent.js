@@ -24,6 +24,7 @@ import {
     watchImmutableRdxState,
     checkHttpStatus,
     is,
+    getIn,
 } from './utils.js';
 
 import {
@@ -36,9 +37,6 @@ import SockJS from 'sockjs-client';
 import * as messages from './actions/messages-actions.js';
 
 export function runMessagingAgent(redux) {
-
-    console.log('Starting messaging agent.');
-
 
     /**
      * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
@@ -235,18 +233,60 @@ export function runMessagingAgent(redux) {
         }
     ];
 
+    // processors that are used for reacting to certain messages after they 
+    // have been processed normally
+    const messagePostProcessingArray = [
+        function (message) {
+            if(message.isFromSystem() && message.isSuccessResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__successOwn(message));
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromSystem() && message.isFailureResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__failureOwn(message));
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromExternal() && message.isSuccessResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__successRemote(message));
+                return true;
+            }
+            return false;
+        },
+        function (message) {
+            if(message.isFromExternal() && message.isFailureResponse()) {
+                    redux.dispatch(actionCreators.messages__dispatchActionOn__failureRemote(message));
+                return true;
+            }
+            return false;
+        },
+
+    ]
+
     function onMessage(receivedMsg) {
+    	//reset the heartbeat counter when we receive a message.
+    	missedHeartbeats = 0;
+    	 
+    	 
         const data = JSON.parse(receivedMsg.data);
 
-        console.log('onMessage (jsonld)    : ', data);
         won.wonMessageFromJsonLd(data).then(message => {
-            console.log('onMessage (wonMessage): ', message);
             won.addJsonLdData(message.getMessageUri(), data);
 
             var messageProcessed = false;
     
+            //process message
             for(var i = 0; i < messageProcessingArray.length; i++) {
                 messageProcessed = messageProcessed || messageProcessingArray[i](message);
+            }
+            
+            //post-process message
+            for(var i = 0; i < messagePostProcessingArray.length; i++) {
+                messagePostProcessingArray[i](message);
             }
     
             if(!messageProcessed){
@@ -294,7 +334,6 @@ export function runMessagingAgent(redux) {
     };
 
     function onHeartbeat(e) {
-        console.debug('messaging-agent.js: received heartbeat',e);
         missedHeartbeats = 0; // reset the deadman count
     }
 
@@ -317,22 +356,32 @@ export function runMessagingAgent(redux) {
             redux.dispatch(actionCreators.reconnectSuccess());
         }
 
+        const sendFirstInBuffer = function(newMsgBuffer){
+        	if (newMsgBuffer && ! newMsgBuffer.isEmpty()) {
+            	try {
+                    const firstEntry = newMsgBuffer.entries().next().value;
+                    if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
+                    	if (firstEntry.length != 2){
+                    		console.error("Could not send message, did not find a uri/message pair in the message buffer. The first Entry in the buffer is:", firstEntry);
+                    		return;
+                    	}
+                        const [eventUri, msg] = firstEntry;
+                        ws.send(JSON.stringify(msg));
+                        //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
+
+                        // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
+                        redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
+                    }
+            	} catch (error){
+            		console.log("could not send message due to this error", error);
+            	}
+            }
+        };
+        
         if(unsubscribeWatches.length === 0) {
             const unsubscribeMsgQWatch = watchImmutableRdxState(
                 redux, ['messages', 'enqueued'],
-                (newMsgBuffer, oldMsgBuffer) => {
-                    if (newMsgBuffer) {
-                        const firstEntry = newMsgBuffer.entries().next().value;
-                        if (firstEntry && ws.readyState === SockJS.OPEN) { //undefined if queue is empty
-                            const [eventUri, msg] = firstEntry;
-                            ws.send(JSON.stringify(msg));
-                            //console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
-
-                            // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
-                            redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
-                        }
-                    }
-                }
+                (newMsgBuffer, oldMsgBuffer) => sendFirstInBuffer(newMsgBuffer)
             );
             const unsubscribeReconnectWatch = watchImmutableRdxState(
                 redux, ['messages', 'reconnecting'],
@@ -353,6 +402,10 @@ export function runMessagingAgent(redux) {
             unsubscribeWatches.push(unsubscribeMsgQWatch);
             unsubscribeWatches.push(unsubscribeReconnectWatch);
         }
+        
+        //if there are enqueued messages, send the first one, (sending the rest should be triggered by the watch we just created)
+        const currentMsgBuffer = getIn(redux.getState(), ['messages','enqueued']);
+        sendFirstInBuffer(currentMsgBuffer);
 
     };
     function onError(e) {

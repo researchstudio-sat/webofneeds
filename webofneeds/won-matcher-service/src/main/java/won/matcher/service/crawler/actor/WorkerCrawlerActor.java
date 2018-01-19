@@ -21,7 +21,6 @@ import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
-import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.NeedState;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
@@ -90,28 +89,29 @@ public class WorkerCrawlerActor extends UntypedActor {
             return;
         }
 
-        // URI message to process received
-        // start the crawling request
+        crawlUri(uriMsg);
+    }
+
+    private void crawlUri(CrawlUriMessage uriMsg) {
+
         Dataset ds = null;
         List<String> etags = null;
+        Lock lock = null;
 
-        // check if resource is already downloaded
-        if (uriMsg instanceof ResourceCrawlUriMessage) {
-            ResourceCrawlUriMessage resMsg = ((ResourceCrawlUriMessage) uriMsg);
-            if (resMsg.getSerializedResource() != null && resMsg.getSerializationFormat() != null) {
-                try {
+        try {
+
+            // check if resource is already downloaded
+            if (uriMsg instanceof ResourceCrawlUriMessage) {
+                ResourceCrawlUriMessage resMsg = ((ResourceCrawlUriMessage) uriMsg);
+                if (resMsg.getSerializedResource() != null && resMsg.getSerializationFormat() != null) {
                     // TODO: this should be optimized, why deserialize the resource here when we just want to save it in the RDF
                     // store? How to insert this serialized resource into the SPARQL endpoint?
                     ds = SparqlService.deserializeDataset(resMsg.getSerializedResource(), resMsg.getSerializationFormat());
-                } catch (Exception e) {
-                    throw new CrawlWrapperException(e, uriMsg);
                 }
             }
-        }
 
-        // download resource if not already downloaded
-        if (ds == null) {
-            try {
+            // download resource if not already downloaded
+            if (ds == null) {
 
                 // use ETag/If-None-Match Headers to make the process more efficient
                 HttpHeaders httpHeaders = new HttpHeaders();
@@ -140,51 +140,39 @@ public class WorkerCrawlerActor extends UntypedActor {
                             uriMsg.getWonNodeUri(), CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis(), null);
                     getSender().tell(newUriMsg, getSelf());
                 }
-
-            } catch (RestClientException e1) {
-                // happens if the fetch fails
-                throw new CrawlWrapperException(e1, uriMsg);
-            } catch (Exception e2) {
-                // for every other exception we also throw a CrawlWrapperException
-                // => Supervisor in MasterCrawlerActor will handle it
-                throw new CrawlWrapperException(e2, uriMsg);
             }
-        }
-        Lock lock = ds == null ? null : ds.getLock();
-        lock.enterCriticalSection(true);
 
-        // Save dataset to triple store
-        sparqlService.updateNamedGraphsOfDataset(ds);
-        String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
-        if (wonNodeUri == null) {
-            wonNodeUri = uriMsg.getWonNodeUri();
-        }
+            lock = ds == null ? null : ds.getLock();
+            lock.enterCriticalSection(true);
 
-        // do nothing more here if the STATUS of the message was SAVE
-        if (uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
-            log.debug("processed crawl uri event {} with status 'SAVE'", uriMsg);
-            return;
-        }
+            // Save dataset to triple store
+            sparqlService.updateNamedGraphsOfDataset(ds);
+            String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
+            if (wonNodeUri == null) {
+                wonNodeUri = uriMsg.getWonNodeUri();
+            }
 
-        // extract URIs from current resource and send extracted URI messages back to sender
-        log.debug("Extract URIs from message {}", uriMsg);
-        Set<CrawlUriMessage> newCrawlMessages = sparqlService.extractCrawlUriMessages(uriMsg.getBaseUri(), wonNodeUri);
-        for (CrawlUriMessage newMsg : newCrawlMessages) {
-            getSender().tell(newMsg, getSelf());
-        }
+            // do nothing more here if the STATUS of the message was SAVE
+            if (uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+                log.debug("processed crawl uri event {} with status 'SAVE'", uriMsg);
+                return;
+            }
 
-        // signal sender that this URI is processed and save meta data about crawling the URI.
-        // This needs to be done after all extracted URI messages have been sent to guarantee consistency
-        // in case of failure
-        sendDoneUriMessage(uriMsg, wonNodeUri, etags);
+            // extract URIs from current resource and send extracted URI messages back to sender
+            log.debug("Extract URIs from message {}", uriMsg);
+            Set<CrawlUriMessage> newCrawlMessages = sparqlService.extractCrawlUriMessages(uriMsg.getBaseUri(), wonNodeUri);
+            for (CrawlUriMessage newMsg : newCrawlMessages) {
+                getSender().tell(newMsg, getSelf());
+            }
 
-        // if this URI/dataset was a need then send an event to the distributed event bus
-        NeedModelWrapper needModelWrapper;
-        try {
+            // signal sender that this URI is processed and save meta data about crawling the URI.
+            // This needs to be done after all extracted URI messages have been sent to guarantee consistency
+            // in case of failure
+            sendDoneUriMessage(uriMsg, wonNodeUri, etags);
 
-            // only send active needs right now
-            needModelWrapper = new NeedModelWrapper(ds);
-            if (needModelWrapper.isANeed()) {
+            // if this URI/dataset was a need then send an event to the distributed event bu
+            if (NeedModelWrapper.isANeed(ds)) {
+                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
                 NeedState state = needModelWrapper.getNeedState();
 
                 NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
@@ -194,10 +182,13 @@ public class WorkerCrawlerActor extends UntypedActor {
                 pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
             }
 
-        } catch (DataIntegrityException e) {
-            log.debug("no valid need model found in dataset for uri {}", uriMsg.getUri());
+        } catch (RestClientException e1) {
+            // usually happens if the fetch of the dataset fails e.g. HttpServerErrorException, HttpClientErrorException
+            log.debug("Exception during crawling: " + e1);
+            throw new CrawlWrapperException(e1, uriMsg);
         } catch (Exception e) {
-            log.debug("caught exception trying to interpret as a need dataset: {}", uriMsg.getUri());
+            log.debug("Exception during crawling: " + e);
+            throw new CrawlWrapperException(e, uriMsg);
         } finally {
             if (lock != null) {
                 lock.leaveCriticalSection();

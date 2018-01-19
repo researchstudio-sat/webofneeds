@@ -64,11 +64,23 @@ public class NeedModelWrapper {
      * @param ds need dataset to load
      */
     public NeedModelWrapper(Dataset ds) {
+        this(ds, true);
+    }
+
+    /**
+     * Load a need dataset and extract the need and sysinfo models from it
+     *
+     * @param ds need dataset to load
+     * @param addDefaultGraphs if this is set to true a needModelGraph and a sysInfoGraph will be added to the dataset
+     */
+    public NeedModelWrapper(Dataset ds, boolean addDefaultGraphs) {
 
         needDataset = ds;
-        String needUri = getNeedUri();
+        Resource needNode = getNeedNode(NeedGraphType.NEED);
+        needNode = (needNode != null) ? needNode : getNeedNode(NeedGraphType.SYSINFO);
+        String needUri = (needNode != null) ? needNode.getURI() : null;
 
-        if (needUri != null) {
+        if (addDefaultGraphs && needUri != null) {
             if (getNeedModel() == null) {
                 Model needModel = ModelFactory.createDefaultModel();
                 needModel.createResource(needUri, WON.NEED);
@@ -139,8 +151,13 @@ public class NeedModelWrapper {
      * Indicates if the wrapped data looks like need data.
      * @return
      */
-    public boolean isANeed(){
-        return getNeedNode(NeedGraphType.NEED) != null;
+    public static boolean isANeed(Dataset ds){
+        try{
+            NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
+            return true;
+        }catch (DataIntegrityException e){
+            return false;
+        }
     }
 
 
@@ -205,9 +222,7 @@ public class NeedModelWrapper {
      * @param graph type specifies the need or sysinfo need node to return
      * @return need or sysinfo need node
      */
-    public Resource getNeedNode(NeedGraphType graph) {
-
-
+    protected Resource getNeedNode(NeedGraphType graph) {
         if (graph.equals(NeedGraphType.NEED) && getNeedModel() != null) {
             ResIterator iter = getNeedModel().listSubjectsWithProperty(RDF.type, WON.NEED);
             if (iter.hasNext()) {
@@ -224,21 +239,7 @@ public class NeedModelWrapper {
     }
 
     public String getNeedUri() {
-
-        Resource needNode = null;
-        Resource sysInfoNode = null;
-        try {
-            needNode = getNeedNode(NeedGraphType.NEED);
-        } catch (Exception e) {
-            sysInfoNode = getNeedNode(NeedGraphType.SYSINFO);
-        }
-
-        if (needNode != null) {
-            return needNode.getURI();
-        } else if (sysInfoNode != null) {
-            return sysInfoNode.getURI();
-        }
-        return null;
+        return getNeedNode(NeedGraphType.NEED).getURI();
     }
 
     public void addFlag(Resource flag) {

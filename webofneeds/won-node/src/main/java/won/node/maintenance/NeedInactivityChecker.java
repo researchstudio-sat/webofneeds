@@ -58,6 +58,8 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
     private int warnTimeout = -1;
 
     private int deactivateTimeout = -1;
+    
+    private int deactivateTimeoutDespiteEstablishedConnections = -1;
 
     private InactivityCheckTask inactivityCheckTask = null;
 
@@ -94,6 +96,10 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
     public void setWarnTimeout(int warnTimeout) {
         this.warnTimeout = warnTimeout;
     }
+    
+    public void setDeactivateTimeoutDespiteEstablishedConnections(int deactivateTimeoutDespiteEstablishedConnections) {
+		this.deactivateTimeoutDespiteEstablishedConnections = deactivateTimeoutDespiteEstablishedConnections;
+	}
 
     public void setDeactivateTimeout(int deactivateTimeout) {
         this.deactivateTimeout = deactivateTimeout;
@@ -125,6 +131,10 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
                 calendar.add(Calendar.SECOND, -deactivateTimeout);
                 Date deactivateThreshold = calendar.getTime();
 
+                calendar.setTime(now);
+                calendar.add(Calendar.SECOND, -deactivateTimeoutDespiteEstablishedConnections);
+                Date deactivateThresholdDespiteEstablishedConnections = calendar.getTime();
+                
                 //select needs that match our criteria:
                 Pageable firstPage = new PageRequest(0, 100);
 
@@ -139,13 +149,20 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
                         "from your side in the last " + getTimeString(warnTimeout) + ". It will be deactivated if there continues " +
                         "to be no activity for more than " + getTimeString(deactivateTimeout - warnTimeout) + ". Automatic deactivation is " +
                         "done to clean up abandoned postings. You can reactivate your posting at any time.";
+                
                 String deactivateMessage = "This posting is deactivated because it has no active connections, nor has " +
                         "there been any activity from your side in the last "
                         + getTimeString(deactivateTimeout) + ". Automatic deactivation is done to " +
                         "clean up abandoned postings. You can reactivate your posting at any time.";
+                
+                String deactivateDespiteEstablishedConnectionsMessage = "This posting is deactivated because there " +
+                        "has not been any activity from your side in the last "
+                        + getTimeString(deactivateTimeoutDespiteEstablishedConnections) + ". Automatic deactivation is done to " +
+                        "clean up abandoned postings. You can reactivate your posting at any time.";
+                
                 final AtomicInteger warned = new AtomicInteger(0);
                 final AtomicInteger deactivated = new AtomicInteger(0);
-                Slice<Need> needsToWarn = needRepository.findNeedsInactiveBetween(startWarningThreshold, stopWarningThreshold, firstPage);
+                Slice<Need> needsToWarn = needRepository.findNeedsInactiveBetweenAndNotConnected(startWarningThreshold, stopWarningThreshold, firstPage);
                 do {
                     if (cancelled.get()) {
                         return;
@@ -167,13 +184,13 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
                     }
                     if (needsToWarn.hasNext()) {
                         Pageable pageable = needsToWarn.nextPageable();
-                        needsToWarn = needRepository.findNeedsInactiveBetween(startWarningThreshold, stopWarningThreshold, pageable);
+                        needsToWarn = needRepository.findNeedsInactiveBetweenAndNotConnected(startWarningThreshold, stopWarningThreshold, pageable);
                     } else {
                         needsToWarn = null;
                     }
                 } while (needsToWarn != null && needsToWarn.hasContent());
 
-                Slice<Need> needsToDeactivate = needRepository.findNeedsInactiveSince(deactivateThreshold, firstPage);
+                Slice<Need> needsToDeactivate = needRepository.findNeedsInactiveSinceAndNotConnected(deactivateThreshold, firstPage);
                 do {
                     if (cancelled.get()) {
                         return;
@@ -195,7 +212,35 @@ public class NeedInactivityChecker implements InitializingBean, DisposableBean {
                     }
                     if (needsToDeactivate.hasNext()) {
                         Pageable pageable = needsToDeactivate.nextPageable();
-                        needsToDeactivate = needRepository.findNeedsInactiveSince(deactivateThreshold, pageable);
+                        needsToDeactivate = needRepository.findNeedsInactiveSinceAndNotConnected(deactivateThreshold, pageable);
+                    } else {
+                        needsToDeactivate = null;
+                    }
+                } while (needsToDeactivate != null && needsToDeactivate.hasContent());
+                
+                needsToDeactivate = needRepository.findNeedsInactiveSince(deactivateThresholdDespiteEstablishedConnections, firstPage);
+                do {
+                    if (cancelled.get()) {
+                        return;
+                    }
+                    needsToDeactivate.forEach(need -> {
+                        try {
+                            if (cancelled.get()) {
+                                return;
+                            }
+                            deactivated.incrementAndGet();
+                            logger.debug("Deactivating need {} ", need.getNeedURI());
+                            needManagementService.deactivateNeed(need.getNeedURI(), deactivateDespiteEstablishedConnectionsMessage);
+                        } catch (Exception e) {
+                            logger.warn("Caught and swallowed exception during deactivating an inactive need", e);
+                        }
+                    });
+                    if (cancelled.get()) {
+                        return;
+                    }
+                    if (needsToDeactivate.hasNext()) {
+                        Pageable pageable = needsToDeactivate.nextPageable();
+                        needsToDeactivate = needRepository.findNeedsInactiveSince(deactivateThresholdDespiteEstablishedConnections, pageable);
                     } else {
                         needsToDeactivate = null;
                     }

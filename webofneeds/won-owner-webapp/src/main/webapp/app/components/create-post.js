@@ -172,11 +172,9 @@ function genComponentConf() {
         }
 
         selectType(typeIdx) {
-            console.log('selected type ', postTypeTexts[typeIdx].type);
             this.draft.type = postTypeTexts[typeIdx].type;
         }
         unselectType() {
-            console.log('unselected type ');
             this.draft.type = undefined;
         }
         titlePicZoneNg() {
@@ -245,13 +243,11 @@ function genComponentConf() {
         }
 
         removeDetail(detailIndex) {
-            console.log("details before removal of idx: ", detailIndex, ":", this.details);
             var tempDetails = [];
             for(var i=0; i < this.details.length; i++){
                 if(i!=detailIndex) tempDetails.push(this.details[i]);
             }
             this.details = tempDetails;
-            console.log("details after removal of idx: ", detailIndex, ":", this.details);
         }
 
         isDetailPresent(detail) {
@@ -261,12 +257,10 @@ function genComponentConf() {
         createWhatsAround(){
             if (!this.pendingPublishing) {
                 this.pendingPublishing = true;
-                console.log("Create Whats Around");
 
                 if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(
                         currentLocation => {
-                            console.log(currentLocation);
                             const lat = currentLocation.coords.latitude;
                             const lng = currentLocation.coords.longitude;
                             const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
@@ -289,11 +283,10 @@ function genComponentConf() {
                                         whatsAround: true
                                     };
 
-                                    this.existingWhatsAroundNeeds.map(
-                                        need => this.needs__close(need.get("uri"))
-                                    );
+                                    this.existingWhatsAroundNeeds
+                                    	.filter( need => need.get("state") == "won:Active" )
+                                    	.map(need => this.needs__close(need.get("uri")) );
 
-                                    console.log("Creating Whats around with data: ", whatsAround);
 
                                     this.needs__create(
                                         whatsAround,

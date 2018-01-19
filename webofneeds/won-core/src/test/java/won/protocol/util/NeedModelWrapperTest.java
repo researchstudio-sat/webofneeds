@@ -20,7 +20,7 @@ import java.util.Collection;
 /**
  * Created by hfriedrich on 16.03.2017.
  */
-public class NeedModelWarpperTest {
+public class NeedModelWrapperTest {
     private final String NEED_URI = "https://node.matchat.org/won/resource/need/3030440624813201400";
 
     @Test
@@ -28,7 +28,8 @@ public class NeedModelWarpperTest {
 
         // load dataset and if the need and sysinfo models are there
         Dataset ds = Utils.createTestDataset("/needmodel/need1.trig");
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Assert.assertTrue(NeedModelWrapper.isANeed(ds));
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
         Assert.assertEquals(NEED_URI, needModelWrapper.getNeedNode(NeedGraphType.NEED).getURI());
         Assert.assertEquals(NEED_URI, needModelWrapper.getNeedNode(NeedGraphType.SYSINFO).getURI());
 
@@ -95,6 +96,7 @@ public class NeedModelWarpperTest {
     public void loadIsAndSeeksModel() throws IOException {
 
         Dataset ds = Utils.createTestDataset("/needmodel/need2.trig");
+        Assert.assertFalse(NeedModelWrapper.isANeed(ds));
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
 
         Assert.assertEquals(1, needModelWrapper.getContentNodes(NeedContentPropertyType.IS).size());
@@ -137,6 +139,13 @@ public class NeedModelWarpperTest {
         needModelWrapper.setWonNodeUri("https://wonnode1");
         needModelWrapper.setWonNodeUri("https://wonnode2");
         Assert.assertEquals("https://wonnode2", needModelWrapper.getWonNodeUri());
+    }
+
+    @Test
+    public void createNeedWithShapesModel() throws IOException{
+        Dataset ds = Utils.createTestDataset("/needmodel/needwithshapes.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
+        Assert.assertNotNull(needModelWrapper);
     }
 
     @Test
@@ -189,7 +198,7 @@ public class NeedModelWarpperTest {
 
         // compare model that is not changed by normalization
         Dataset ds = Utils.createTestDataset("/needmodel/need1.trig");
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
         Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         Assert.assertTrue(originalModel.isIsomorphicWith(normalizedModel));
@@ -267,6 +276,7 @@ public class NeedModelWarpperTest {
     public void normalizeNeedModel_Cycle5() throws IOException {
         // check case where "is" and "seeks" point to the same blank node
         Dataset ds = Utils.createTestDataset("/needmodel/need6.trig");
+        Assert.assertFalse(NeedModelWrapper.isANeed(ds));
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
         Model originalModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
         Model normalizedModel = needModelWrapper.normalizeNeedModel();

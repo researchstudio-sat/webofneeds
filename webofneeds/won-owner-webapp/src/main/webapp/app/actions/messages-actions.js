@@ -25,10 +25,8 @@ import {
 
 export function successfulCloseNeed(event) {
     return (dispatch, getState) => {
-        console.log("got response for DEACTIVATE: " + event.getMessageType());
         //TODO maybe refactor these response message handling
         if (getState().getIn(['messages', 'waitingForAnswer', event.getIsRemoteResponseTo()])) {
-            console.log("messages waitingForAnswer", event.getMessageUri());
             //dispatch(actionCreators.connections__denied(event));
         }
     }
@@ -90,20 +88,17 @@ export function failedCloseNeed(event) {
 export function successfulCloseConnection(event) {
     return (dispatch, getState) => {
         const state = getState();
-        console.log("got response for CLOSE: " + event.getMessageType());
         let eventUri = null;
         let receiverUri = null;
         let isRemoteResponse = false;
         //TODO maybe refactor these response message handling
         if (state.getIn(['messages', 'waitingForAnswer', event.getIsResponseTo()])) {
-            console.log("messages waitingForAnswer", event.getMessageUri());
             eventUri = event.getIsResponseTo();
             dispatch({
                 type: actionTypes.messages.close.success,
                 payload: event
             });
         } else if (state.getIn(['messages', 'waitingForAnswer', event.getIsRemoteResponseTo()])) {
-            console.log("messages waitingForAnswer", event.getMessageUri());
             eventUri = event.getIsRemoteResponseTo();
             dispatch({
                 type: actionTypes.messages.close.success,
@@ -141,7 +136,6 @@ export function successfulOpen(event){
 export function successfulCreate(event) {
     return (dispatch) => {
         //const state = getState();
-        console.log("got response for CREATE: " + event.getMessageType());
         //TODO: if negative, use alternative need URI and send again
         //fetch need data and store in local RDF store
         //get URI of newly created need from message
@@ -151,7 +145,6 @@ export function successfulCreate(event) {
 
         won.getNeed(needURI)
             .then((need) => {
-                console.log("Dispatching action " + won.EVENT.NEED_CREATED);
                 dispatch(actionCreators.needs__createSuccessful({
                     publishEventUri: event.getIsResponseTo(),
                     needUri: event.getSenderNeed(),
@@ -162,18 +155,46 @@ export function successfulCreate(event) {
 }
 
 export function openMessageReceived(event) {
-    return dispatch => {
-        won.invalidateCacheForNewMessage(event.getReceiver())
-        .then(() =>
-                getConnectionData(event))
-        .then(data => {
-                dispatch({
-                    type: actionTypes.messages.openMessageReceived,
-                    payload: data
-                })
-            }
-        )
-    }
+	 return (dispatch, getState) => {
+
+	        const ownConnectionUri = event.getReceiver();
+	        const ownNeedUri = event.getReceiverNeed();
+	        const theirNeedUri = event.getSenderNeed();
+
+	        const state = getState();
+	        let connectionP;
+	        if(state.getIn(['connections', ownConnectionUri])) {
+	            // already in state. invalidate the version in the rdf-store.
+	            connectionP = Promise.resolve(state.getIn(['connections', ownConnectionUri]))
+	            won.invalidateCacheForNewConnection(ownConnectionUri, ownNeedUri);
+	        } else {
+	            // need to fetch
+	            connectionP = won
+	                .getConnectionWithEventUris(ownConnectionUri, { requesterWebId: ownNeedUri })
+	                .then(cnct => Immutable.fromJS(cnct));
+	        }
+
+	        Promise.all([
+	            connectionP,
+	            won.getNeed(theirNeedUri),
+	            won.getNeed(ownNeedUri), //uses ownNeed (but does not need connections uris to be loaded) in connectMessageReceived
+	        ])
+	        .then(([connection, theirNeed, ownNeed]) => {
+	            dispatch({
+	                type: actionTypes.messages.openMessageReceived,
+	                payload: {
+	                    updatedConnection: ownConnectionUri,
+	                    connection:  connection,
+	                    ownNeedUri: ownNeedUri,
+	                    ownNeed: ownNeed,
+	                    remoteNeed: theirNeed,
+	                    receivedEvent: event.getMessageUri(), // the more relevant event. used for unread-counter.
+	                    message: event,
+	                }
+	            });
+	        });
+
+	    }
 }
 
 export function connectMessageReceived(event) {
@@ -322,8 +343,97 @@ export function hintMessageReceived(event) {
                     //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
                     //}
 
-                    console.log("handling hint message");
                 });
         }
     }
 }
+
+/**
+ * Dispatches actions registered for the "successOwn" event for the specified message uri.
+ * The corresponding reducer clears any registered actions for the "failureOwn" event
+ */
+export function dispatchActionOnSuccessOwn(event) {
+    return (dispatch, getState) => {
+		const toDispatchList = getState().getIn(['messages','dispatchOnSuccessOwn', event.getIsResponseTo()]);
+		if (toDispatchList){
+			toDispatchList.forEach( d => {
+				dispatch(d)
+			})
+		}
+		//the reducer will delete the toDispatchList for successOwn and failureOwn
+		dispatch({
+			type: actionTypes.messages.dispatchActionOn.successOwn,
+			payload: {
+				eventUri:  event.getIsResponseTo(),
+			}
+		})
+    }
+}
+
+/**
+ * Dispatches actions registered for the "failureOwn" event for the specified message uri.
+ * The corresponding reducer clears any registered actions for the "successOwn" event
+ */
+export function dispatchActionOnFailureOwn(event) {
+    return (dispatch, getState) => {
+		const toDispatchList = getState().getIn(['messages','dispatchOnFailureOwn', event.getIsResponseTo()]);
+		if (toDispatchList){
+			toDispatchList.forEach( d => {
+				dispatch(d)
+			})
+		}
+		//the reducer will delete the toDispatchList for successOwn and failureOwn
+		dispatch({
+			type: actionTypes.messages.dispatchActionOn.failureOwn,
+			payload: {
+				eventUri:  event.getIsResponseTo(),
+			}
+		})
+    }
+}
+
+/**
+ * Dispatches actions registered for the "successRemote" event for the specified message uri.
+ * The corresponding reducer clears any registered actions for the "failureRemote" event
+ */
+export function dispatchActionOnSuccessRemote(event) {
+    return (dispatch, getState) => {
+		const toDispatchList = getState().getIn(['messages','dispatchOnSuccessRemote', event.getIsRemoteResponseTo()]);
+		if (toDispatchList){
+			toDispatchList.forEach( d => {
+				dispatch(d)
+			})
+		}
+		//the reducer will delete the toDispatchList for successOwn and failureOwn
+		dispatch({
+			type: actionTypes.messages.dispatchActionOn.successRemote,
+			payload: {
+				eventUri:  event.getIsRemoteResponseTo(),
+			}
+		})
+    }
+}
+
+/**
+ * Dispatches actions registered for the "failureRemote" event for the specified message uri.
+ * The corresponding reducer clears any registered actions for the "successRemote" event
+ */
+export function dispatchActionOnFailureRemote(event) {
+    return (dispatch, getState) => {
+		const toDispatchList = getState().getIn(['messages','dispatchOnFailureRemote', event.getIsRemoteResponseTo()]);
+		if (toDispatchList){
+			toDispatchList.forEach( d => {
+				dispatch(d)
+			})
+		}
+		//the reducer will delete the toDispatchList for successOwn and failureOwn
+		dispatch({
+			type: actionTypes.messages.dispatchActionOn.failureRemote,
+			payload: {
+				eventUri:  event.getIsRemoteResponseTo(),
+			}
+		})
+    }
+}
+
+

@@ -460,7 +460,7 @@ import won from './won.js';
      * @param optionalSparqlPrefixes
      * @returns {*}
      */
-    won.resolvePropertyPathFromBaseUri = function resolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
+    won.resolvePropertyPathFromBaseUri = function resolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes, optionalSparqlFragment){
         var query = "";
         if (won.isNull(baseUri)){
             throw new Error("cannot evaluate property path: baseUri is null");
@@ -473,8 +473,12 @@ import won from './won.js';
         }
         query = query +
             "SELECT ?target where { \n" +
-            "<" + baseUri +"> " + propertyPath + " ?target. \n" +
-            "} ";
+            "<::baseUri::> " + propertyPath + " ?target. \n";
+        if (!won.isNull(optionalSparqlFragment)){
+        	query = query + optionalSparqlFragment;
+        }
+        query = query + "} ";
+        query = query.replace(/\:\:baseUri\:\:/g, baseUri);
         var resultObject = {};
         privateData.store.execute(query, [], [], function (success, results) {
             resultObject.result = [];
@@ -521,10 +525,6 @@ import won from './won.js';
             return Promise.resolve(uri);
         }
 
-
-        if(partialFetch) {
-            console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
-        }
 
         cacheItemMarkFetching(uri);
         return won.fetch(uri, fetchParams )
@@ -1292,20 +1292,21 @@ import won from './won.js';
         return Promise.resolve(ret);
     };
 
-    won.getEnvelopeDataforNewConnection = async function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
+    won.getEnvelopeDataforNewConnection = function(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri) {
         if (!ownNeedUri){
+        	console.log("no own need uri");
             throw {message : "getEnvelopeDataforNewConnection: ownNeedUri must not be null"};
         }
         if (!theirNeedUri){
+        	console.log("no remote need uri");
             throw {message : "getEnvelopeDataforNewConnection: theirNeedUri must not be null"};
         }
-
-        return Promise.resolve({
+        return {
             [won.WONMSG.hasSenderNeed]: ownNeedUri,
             [won.WONMSG.hasSenderNode]: ownNodeUri,
             [won.WONMSG.hasReceiverNeed]: theirNeedUri,
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
-        })
+        }
     };
 
 
@@ -1328,7 +1329,7 @@ import won from './won.js';
             [won.WONMSG.hasReceiverNode]: theirNodeUri,
         };
         try {
-            if (theirConnectionUri != null) {
+            if (theirConnectionUri) {
                 ret[won.WONMSG.hasReceiver] = theirConnectionUri;
             }
         } catch(err){}
@@ -1340,7 +1341,7 @@ import won from './won.js';
      * @return {*} the data of all connection-nodes referenced by that need
      */
     won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
-        won.getConnectionUrisOfNeed(needUri, requesterWebId)
+        won.getConnectionUrisOfNeed(needUri, requesterWebId,false)
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
@@ -1351,11 +1352,18 @@ import won from './won.js';
     /*
      * Loads all URIs of a need's connections.
      */
-    won.getConnectionUrisOfNeed = (needUri, requesterWebId) =>
-        won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId)
-            .then(
-                (result) =>  result.map( x => x.connection.value));
-
+    won.getConnectionUrisOfNeed = (needUri, requesterWebId, includeClosed=false) =>
+    	{
+    		if (includeClosed) {
+    			return won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId)
+            		.then(
+            			(result) =>  result.map( x => x.connection.value));
+    		} else {
+    			return won.executeCrawlableQuery(won.queries["getUnclosedConnectionUrisOfActiveNeed"], needUri, requesterWebId)
+        		.then(
+        			(result) =>  result.map( x => x.connection.value));
+    		}
+    	}	
 
     /**
      *
@@ -1669,7 +1677,8 @@ import won from './won.js';
                                 var foundUris = won.resolvePropertyPathFromBaseUri(
                                         baseUri,
                                         propertyPath.propertyPath,
-                                        propertyPath.prefixes);
+                                        propertyPath.prefixes,
+                                        propertyPath.fragment);
 
                                 //resolve all property paths, add to 'resolvedUris'
                                 Array.prototype.push.apply(resolvedUris, foundUris);
@@ -1758,6 +1767,43 @@ import won from './won.js';
                 "  ?connection won:belongsToNeed ?need; \n" +
                 "              won:hasRemoteNeed ?remoteNeed; \n"+
             "                  won:hasConnectionState ?connectionState. \n"+
+                "} \n"
+
+        },
+        /**
+         * Despite the name, returns the connections fo the specified need themselves. TODO rename
+         */
+        "getUnclosedConnectionUrisOfActiveNeed" : {
+            propertyPaths : [
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections",
+                    fragment: " filter exists {<::baseUri::> won:isInState won:Active} "
+                },
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections/rdfs:member",
+                    fragment: " filter exists {<::baseUri::> won:isInState won:Active} "
+                }
+            ],
+        query:
+                "prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                "select ?connection ?need ?remoteNeed ?connectionState  \n" +
+                " where { \n" +
+                " <::baseUri::> a won:Need; \n" +
+                "           won:hasConnections ?connections; \n" +
+                "           won:isInState ?needState.\n " +
+                "  ?connections rdfs:member ?connection. \n" +
+                "  ?connection won:belongsToNeed ?need; \n" +
+                "              won:hasRemoteNeed ?remoteNeed; \n"+
+                "                  won:hasConnectionState ?connectionState. \n"+
+                "  filter ( ?connectionState != won:Closed && ?needState = won:Active) \n" +
                 "} \n"
 
         },

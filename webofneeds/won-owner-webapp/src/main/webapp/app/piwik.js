@@ -78,7 +78,6 @@ export const piwikQueue = _paq;
  */
 let _currentUrl = window.location.href;
 window.addEventListener('hashchange', function() {
-    console.log('piwik.js -- onhashchange');
     //logUrlChange('' + window.location.hash.substr(1));
     logUrlChange();
 });
