@@ -1,4 +1,7 @@
 :root {
   --skinning-test-var:  rgb(165, 14, 185);
   --won-primary-color: #F04646;
+  --won-secondary-color: #00325A;
+  --won-secondary-color-light: #2266b4;
+  --won-secondary-color-lighter: #468CDC;
 }
