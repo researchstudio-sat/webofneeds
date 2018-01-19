@@ -12,7 +12,7 @@ PREFIX won: <http://purl.org/webofneeds/model#>
  # There may be some unnecessary replication in the next four graph matches..
  
    GRAPH ?openg1 {   
-        ?openprop agr:proposes ?openclause .
+        ?openprop agr:proposesToCancel ?openclause .
     }
           
     GRAPH <urn:x-arq:UnionGraph> {
@@ -36,7 +36,7 @@ PREFIX won: <http://purl.org/webofneeds/model#>
    filter (?prop != ?clause) .
    
    GRAPH ?g1 {   
-        ?prop agr:proposes ?clause .
+        ?prop agr:proposesToCancel ?clause .
     }
 
     GRAPH ?clauseContent {

@@ -51,11 +51,12 @@ public class ProposalToCancelTest {
     	root.setLevel(Level.INFO);	
     }
  
-    // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
+    // This is the case where there is one open proposal to cancel an agreement and no acceptance..
+    // This should show the content of the agreement... rather than the agreement envelope...(2 degrees of indirection...)
     @Test
-    public void oneOpenPropsoal () throws IOException {
-        Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-accepted.trig");
+    public void oneOpenCancellationPropsoal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-one-unacceptedcancellation.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.trig");
         test(input,expectedOutput);
     }
            
