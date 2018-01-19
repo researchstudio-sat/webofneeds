@@ -9,6 +9,8 @@ PREFIX won: <http://purl.org/webofneeds/model#>
    filter (?openprop = ?prop) .
   # filter (?openclause != ?clause) .
  
+ # There may be some unnecessary replication in the next four graph matches..
+ 
    GRAPH ?openg1 {   
         ?openprop agr:proposes ?openclause .
     }
