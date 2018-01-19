@@ -108,7 +108,6 @@ class AboutController {
         attach(this, serviceDependencies, arguments);
 
         const self = this;
-        this.config = config;
 
         window.ab4dbg = this;
 

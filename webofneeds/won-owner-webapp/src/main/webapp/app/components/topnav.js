@@ -141,7 +141,6 @@ function genTopnavConf() {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
             Object.assign(this, srefUtils); // bind srefUtils to scope
-            this.config = config;
 
             window.tnc4dbg = this;
 
