@@ -4,4 +4,12 @@
   --won-secondary-color: #00325A;
   --won-secondary-color-light: #2266b4;
   --won-secondary-color-lighter: #468CDC;
+
+  --won-light-gray: #F0F2F4; /*used for headings*/
+  --won-lighter-gray: #F8F9F9; /*used for background*/
+  --won-line-gray: #CBD2D1; /*use for lines*/
+  --won-subtitle-gray: #808080;
+  --won-helpbox-yellow: #FFFCE5;
+  --won-dark-purple: #673A68;
+  --won-dark-gray: #303A43;
 }

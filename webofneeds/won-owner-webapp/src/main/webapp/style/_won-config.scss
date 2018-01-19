@@ -8,13 +8,14 @@ $won-primary-color: var(--won-primary-color);
 $won-secondary-color: var(--won-secondary-color);
 $won-secondary-color-light: var(--won-secondary-color-light);
 $won-secondary-color-lighter: var(--won-secondary-color-lighter);
-$won-light-gray: #F0F2F4; //used for headings
-$won-lighter-gray: #F8F9F9; //used for background
-$won-line-gray: #CBD2D1; //use for lines
-$won-subtitle-gray: #808080;
-$won-helpbox-yellow: #FFFCE5;
-$won-dark-purple: #673A68;
-$won-dark-gray: #303A43;
+
+$won-light-gray: var(--won-light-gray); //used for headings
+$won-lighter-gray: var(--won-lighter-gray); //used for background
+$won-line-gray: var(--won-line-gray); //use for lines
+$won-subtitle-gray: var(--won-subtitle-gray);
+$won-helpbox-yellow: var(--won-helpbox-yellow);
+$won-dark-purple: var(--won-dark-purple);
+$won-dark-gray: var(--won-dark-gray);
 
 
 // sizes
