@@ -9,6 +9,7 @@ import {
     actionCreators,
 } from './actions';
 
+import loadCSS from 'loadcss';
 /**
  * Anything that is load-once, read-only, global app-config
  * should be initialized in this action. Ideally all of this
@@ -82,11 +83,22 @@ async function loadDefaultNodeUri() {
 
 }
 
+let _themeCssElement;
 async function loadSkinConfig(themeName) {
 
     if(!themeName) {
         return Promise.resolve({});
     } else {
+
+        // add config.css link to body
+        const cssPath = `skin/${themeName}/config.css`;
+        if(!_themeCssElement) {
+            _themeCssElement = loadCSS(cssPath)[0];
+        } else {
+            _themeCssElement.href = cssPath;
+        }
+
+        // load config.json
         return fetch(`skin/${themeName}/config.json`).then(resp => resp.json())
     }
 }

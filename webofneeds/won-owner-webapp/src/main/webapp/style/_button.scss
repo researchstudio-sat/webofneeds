@@ -3,8 +3,8 @@
   background: $bg_color;
   outline-color: $color;
 
-  &:active {
-    background: darken($bg_color, 15%);
+  &:active, &:hover {
+    filter: brightness(15%) saturate(15%);
   }
   &:disabled {
     /*Default disabled colors, can be changed or extracted will be used
@@ -24,9 +24,9 @@
     //outline: 0; // supress blue outline in chrome
   }
 
-  &:active {
+  &:active, &:hover {
     // background: rgba(255, 255, 255, 0.15);
-    background: rgba($color, 0.30);
+    background: rgba(white, 0.50);
   }
   &:disabled {
     /*Default disabled colors, can be changed or extracted will be used

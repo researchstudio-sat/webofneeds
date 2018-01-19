@@ -4,7 +4,7 @@ $responsivenessBreakPoint: 31rem;
 
 // colors
 
-$won-red: #F04646;
+$won-red: var(--won-primary-color);
 $won-light-gray: #F0F2F4; //used for headings
 $won-lighter-gray: #F8F9F9; //used for background
 $won-line-gray: #CBD2D1; //use for lines
