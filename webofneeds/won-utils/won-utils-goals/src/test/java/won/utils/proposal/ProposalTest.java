@@ -50,66 +50,33 @@ public class ProposalTest {
     	Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     	root.setLevel(Level.INFO);	
     }
-    
-    // This is the case where there is one proposal...(can only exist in one envelope)
+ 
+    // This is the case where there is no open proposal...(each exist in their own envelope, both are accepted in an agreement)
     @Test
-    public void oneProposalTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "oneproposal-twoaccepts.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "oneproposal-twoaccepts.trig");
+    public void noOpenProposal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-bothaccepted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-bothaccepted.trig");
         test(input,expectedOutput);
     }
     
-    // This is the case where there are two proposals
-   // --OR-- This is the case where there are two proposal clauses in different envelopes
+
+    // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
     @Test
-    public void twoProposalTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "2proposal-one-agreement.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-agreement.trig");
+    public void oneOpenPropsoal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-accepted.trig");
         test(input,expectedOutput);
     }
     
-    // This is the case where there are two proposal clauses in the same envelope
+    // This is the case where there are two open proposals ...(each exist in their own envelope)
     @Test
-    public void twoProposalClausesinOneProposalTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement-two-proposal-clauses.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-two-proposal-clauses.trig");
+    public void twoOpenProposals () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-noaccepted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-noaccepted.trig");
         test(input,expectedOutput);
     }
     
-    // This is the case where there is a proposal, but a missing clause
-    @Test
-    public void missingClausesTest () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement-missing-clause.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-missing-clause.trig");
-        test(input,expectedOutput);
-    }
-  
-    
-    // This is a test case where the proposal comes before the proposes message... it should produce an empty result
-    @Test
-    public void temporalOrdering () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
-        test(input,expectedOutput);
-    }
-    
-    // This is a test case where the proposal proposes another proposal. This should result in two proposals..
-    @Test
-    public void proposedProposal () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement.trig");
-        test(input,expectedOutput);
-    }
-    
-    
-    // This is a test case where the proposal proposes another proposal. This should result in two proposals..
-    @Test
-    public void proposalinNotContentMessage () throws IOException {
-        Dataset input = loadDataset( inputFolder + "false-agreement-using-success-responses.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "false-agreement-using-success-responses.trig");
-        test(input,expectedOutput);
-    }
-    
+       
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
         Dataset actual = proposalFunction.applyProposalFunction(input);

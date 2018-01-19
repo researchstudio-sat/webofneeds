@@ -49,7 +49,7 @@ public class ProposalFunction {
             Model currentProposalContent = ModelFactory.createDefaultModel();
             while (resultSet.hasNext()) {
                 QuerySolution solution = resultSet.next();
-                RDFNode proposalNode = solution.get("prop");
+                RDFNode proposalNode = solution.get("openprop");
                 if (currentProposal == null) {
                     //first solution: remember uri of first proposal
                     currentProposal = proposalNode;
@@ -65,9 +65,9 @@ public class ProposalFunction {
                     currentProposal = proposalNode;
                 }
                 //add current triple into currentAgreementModel
-                RDFNode s = solution.get("clause");
-                RDFNode p = solution.get("p");
-                RDFNode o = solution.get("o");
+                RDFNode s = solution.get("openclause");
+                RDFNode p = solution.get("openp");
+                RDFNode o = solution.get("openo");
                 Statement newStatement = new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o);
                 currentProposalContent.add(newStatement);
             }

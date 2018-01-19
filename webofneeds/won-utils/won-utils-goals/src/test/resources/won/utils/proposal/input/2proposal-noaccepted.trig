@@ -2061,8 +2061,7 @@
             msg:isRemoteResponseTo       event:00d5wzbbf8hzzt2eewcc ;
             msg:isResponseTo             event:krcmdz8802701wpzlzl8 ;
             msg:isResponseToMessageType  msg:ConnectionMessage ;
-            msg:protocolVersion          "1.0" ;
-            agr:accepts                  event:t1h3u3s5q6is5sewv843 .
+            msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/omh6mnwfqczgjimg3sch#envelope-b7qv>
             a                      msg:EnvelopeGraph ;
@@ -2345,7 +2344,8 @@
 
 <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
     event:usi9yhill1lo2xi70sjx
-            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .
+            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+            agr:proposes event:6671551888677331000 .
 }
 
 <https://localhost:8443/won/resource/event/2kt4vylzjcvoz4rtn5tn#envelope-1xbk> {
@@ -2551,7 +2551,8 @@
 
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
-            won:hasTextMessage  "I'm not sure I understand you fully." .
+            won:hasTextMessage  "I'm not sure I understand you fully." ;
+            agr:proposes event:5669098069340991000 .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1> {
@@ -2939,8 +2940,7 @@
             msg:hasSenderNode            <https://localhost:8443/won/resource> ;
             msg:isResponseTo             event:5669098069340991000 ;
             msg:isResponseToMessageType  msg:ConnectionMessage ;
-            msg:protocolVersion          "1.0" ;
-            agr:proposes                 event:6671551888677331000 .
+            msg:protocolVersion          "1.0" .
     
     <https://localhost:8443/won/resource/event/t1h3u3s5q6is5sewv843#envelope-i81z>
             a                      msg:EnvelopeGraph ;
