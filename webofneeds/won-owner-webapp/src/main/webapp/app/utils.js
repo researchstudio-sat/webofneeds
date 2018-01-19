@@ -1026,3 +1026,13 @@ export function ellipsizeString (string, size) {
         return string;
     }
 }
+
+// from https://github.com/gagan-bansal/parse-svg/blob/master/index.js
+export function parseSVG(xmlString) {
+    const div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+    div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg">' + xmlString + '</svg>';
+    const frag = document.createDocumentFragment();
+    while (div.firstChild.firstChild)
+        frag.appendChild(div.firstChild.firstChild);
+    return frag;
+}
