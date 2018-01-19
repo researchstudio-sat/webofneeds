@@ -4,10 +4,10 @@ $responsivenessBreakPoint: 31rem;
 
 // colors
 
-$won-red: var(--won-primary-color);
-$won-dark-blue: var(--won-secondary-color);
+$won-primary-color: var(--won-primary-color);
+$won-secondary-color: var(--won-secondary-color);
 $won-secondary-color-light: var(--won-secondary-color-light);
-$won-lighter-blue: var(--won-secondary-color-lighter);
+$won-secondary-color-lighter: var(--won-secondary-color-lighter);
 $won-light-gray: #F0F2F4; //used for headings
 $won-lighter-gray: #F8F9F9; //used for background
 $won-line-gray: #CBD2D1; //use for lines
@@ -38,7 +38,7 @@ $formInputHeight: 3.69rem;
 $thinBorderWidth: 0.0625rem; /* 1px @ 100% */
 $boldBorderWidth: 0.1875rem; /* 3px @ 100% */
 $thinGrayBorder: $thinBorderWidth solid $won-line-gray;
-$thinRedBorder: $thinBorderWidth solid $won-red;
+$thinRedBorder: $thinBorderWidth solid $won-primary-color;
 
 @mixin carretSized { //the small down-arrow
   /*

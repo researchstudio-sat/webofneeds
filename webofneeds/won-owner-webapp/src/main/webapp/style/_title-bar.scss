@@ -41,7 +41,7 @@
   }
 
   .#{$prefix}__tabs {
-    @include underlined-tabs($won-red);
+    @include underlined-tabs($won-primary-color);
   }
   .#{$prefix}__tabs__selected { @extend %tabs__selected }
   .#{$prefix}__tabs__unread { @extend %tabs__unread }

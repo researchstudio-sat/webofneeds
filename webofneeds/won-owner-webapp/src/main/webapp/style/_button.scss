@@ -60,7 +60,7 @@
 
   /*
   &.darkgray { @include button-color(white, $won-dark-gray); }
-  &.lighterblue { @include button-color(white, $won-lighter-blue); }
+  &.lighterblue { @include button-color(white, $won-secondary-color-lighter); }
   &.black { @include button-color(white, black); }
   */
 
@@ -69,9 +69,9 @@
   @include won-button--outlined;
 
   &.white { @include outline-button-color(white); }
-  &.red { @include outline-button-color($won-red); }
+  &.red { @include outline-button-color($won-primary-color); }
   &.darkgray { @include outline-button-color($won-dark-gray); }
-  &.lighterblue { @include outline-button-color($won-lighter-blue); }
+  &.lighterblue { @include outline-button-color($won-secondary-color-lighter); }
   &.black { @include outline-button-color(black); }
 
 }
@@ -94,9 +94,9 @@
   @include won-button--filled;
 
   /*Button color definitions*/
-  &.red { @include flat-button-color(white,$won-red); }
+  &.red { @include flat-button-color(white,$won-primary-color); }
   &.darkgray { @include flat-button-color(white, $won-dark-gray); }
-  &.lighterblue { @include flat-button-color(white, $won-lighter-blue); }
+  &.lighterblue { @include flat-button-color(white, $won-secondary-color-lighter); }
   &.black { @include flat-button-color(white, black); }
 }
 

@@ -99,7 +99,7 @@ won-create-post {
     padding: 0.5rem 0;
 
     .cp__header:hover {
-      color: $won_red;
+      color: $won-primary-color;
       background-image: url('icon-sprite.svg#ico36_close_circle');
     }
 
@@ -161,7 +161,7 @@ won-create-post {
         cursor: pointer;
 
         &:hover {
-          color: $won-red;
+          color: $won-primary-color;
           background-image: url('icon-sprite.svg#ico36_close_circle');
         }
 
@@ -254,7 +254,7 @@ won-create-post {
     }
 
     &.addDetail {
-      color: $won-red;
+      color: $won-primary-color;
       background-image: url('icon-sprite.svg#ico36_plus_circle');
 
       &:hover {

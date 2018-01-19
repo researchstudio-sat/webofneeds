@@ -145,11 +145,11 @@ hr {
 }
 
 a {
-  //color: $won-red;
-  color: $won-lighter-blue;
+  //color: $won-primary-color;
+  color: $won-secondary-color-lighter;
   text-decoration: none;
   &:visited {
-    //color: darken($won-red, 30%);
+    //color: darken($won-primary-color, 30%);
     color: $won-secondary-color-light;
   }
 }
