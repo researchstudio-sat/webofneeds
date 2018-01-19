@@ -17,6 +17,7 @@
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -56,30 +57,30 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
             ctx.getEventBus().publish(new NeedProducerExhaustedEvent());
             return;
         }
-        final Model needModel = ctx.getNeedProducer().create();
-        if (needModel == null) {
+        final Dataset needDataset = ctx.getNeedProducer().create();
+        if (needDataset == null) {
             logger.warn("needproducer failed to produce a need model, aborting need creation");
             return;
         }
         URI needUriFromProducer = null;
-        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needModel);
+        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needDataset);
         if (needResource.isURIResource()) {
             needUriFromProducer = URI.create(needResource.getURI().toString());
-            RdfUtils.replaceBaseURI(needModel, needResource.getURI());
+            RdfUtils.replaceBaseURI(needDataset, needResource.getURI());
         } else {
-            RdfUtils.replaceBaseResource(needModel, needResource);
+            RdfUtils.replaceBaseResource(needDataset, needResource);
         }
         final URI needUriBeforeCreation = needUriFromProducer;
         for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needModel, facetURI);
+            WonRdfUtils.FacetUtils.addFacet(needDataset, facetURI);
         }
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDataset), 150));
         WonNodeInformationService wonNodeInformationService =
                 ctx.getWonNodeInformationService();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-                needURI, wonNodeUri, needModel);
+                needURI, wonNodeUri, needDataset);
         //remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
@@ -87,7 +88,7 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
             @Override
             public void onEvent(Event event) throws Exception {
                 logger.debug("need creation successful, new need URI is {}", needURI);
-                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null, needUriBeforeCreation));
+                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needDataset, null, needUriBeforeCreation));
             }
         };
 

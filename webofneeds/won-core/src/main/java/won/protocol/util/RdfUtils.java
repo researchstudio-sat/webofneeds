@@ -189,6 +189,15 @@ public class RdfUtils
     model.setNsPrefix("", baseURI);
   }
 
+    public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
+        Iterator<String> graphNameIterator = dataset.listNames();
+
+        while(graphNameIterator.hasNext()) {
+            String graphName = graphNameIterator.next();
+            replaceBaseURI(dataset.getNamedModel(graphName), baseURI);
+        }
+    }
+
   /**
    * Replaces the base URI that's set as the model's default URI prfefix in all statements by replacement.
    *
@@ -203,6 +212,15 @@ public class RdfUtils
     replaceResourceInModel(baseUriResource, replacement);
     model.setNsPrefix("", replacement.getURI());
   }
+
+    public static void replaceBaseResource(final Dataset dataset,final Resource replacement) {
+        Iterator<String> graphNameIterator = dataset.listNames();
+
+        while(graphNameIterator.hasNext()) {
+            String graphName = graphNameIterator.next();
+            replaceBaseResource(dataset.getNamedModel(graphName), replacement);
+        }
+    }
 
   /**
    * Modifies the specified resources' model, replacing resource with replacement.

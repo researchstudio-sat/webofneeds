@@ -16,6 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -79,15 +80,18 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
         this.uriListName = uriListName;
     }
 
-    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Model needModel) throws WonMessageBuilderException {
-        return createWonMessage(wonNodeInformationService, needURI, wonNodeURI, needModel, usedForTesting, doNotMatch);
+    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Dataset needDataset) throws WonMessageBuilderException {
+        return createWonMessage(wonNodeInformationService, needURI, wonNodeURI, needDataset, usedForTesting, doNotMatch);
     }
 
-    protected WonMessage createWonMessage(
-        WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Model needModel,
-        final boolean usedForTesting, final boolean doNotMatch ) throws WonMessageBuilderException {
+    protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService,
+                                          URI needURI,
+                                          URI wonNodeURI,
+                                          Dataset needDataset,
+                                          final boolean usedForTesting,
+                                          final boolean doNotMatch ) throws WonMessageBuilderException {
 
-    NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
+    NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
 
     if (doNotMatch){
@@ -99,12 +103,12 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
       needModelWrapper.addFlag( WON.USED_FOR_TESTING);
     }
 
-        RdfUtils.replaceBaseURI(needModel, needURI.toString());
+        RdfUtils.replaceBaseURI(needDataset, needURI.toString());
 
         return WonMessageBuilder.setMessagePropertiesForCreate(
             wonNodeInformationService.generateEventURI(wonNodeURI),
             needURI,
-            wonNodeURI).addContent(needModelWrapper.copyNeedModel(NeedGraphType.NEED)).build();
+            wonNodeURI).addContent(needModelWrapper.copyDataset()).build();
     }
 
     public void setUsedForTesting(final boolean usedForTesting) {

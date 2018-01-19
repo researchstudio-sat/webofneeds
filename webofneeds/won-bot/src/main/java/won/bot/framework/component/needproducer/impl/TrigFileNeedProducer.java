@@ -24,6 +24,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
+import won.protocol.util.NeedModelWrapper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,26 +36,27 @@ import java.io.IOException;
  */
 public class TrigFileNeedProducer implements FileBasedNeedProducer
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public  synchronized Model readNeedFromFile(final File file) throws IOException
-  {
-    logger.debug("processing as turtle file: {} ", file);
-    try (FileInputStream fis = new FileInputStream(file)) {
-      Dataset dataset = DatasetFactory.createGeneral();
-      RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
-      // TODO this needs to be fixed according to the need trig format
-      // definition, i.e. the need/connection/event/etc. triples are in core
-      // and transient named graphs, and in default graph there can only be
-      // the graphs signatures. The Dataset should be returned instead of
-      // Model
-      return dataset.getDefaultModel();
-    } catch (Exception e) {
-      logger.debug("could not parse trig from file {} ", file, e);
-      throw e;
+    @Override
+    public  synchronized Dataset readNeedFromFile(final File file) throws IOException {
+        logger.debug("processing as turtle file: {} ", file);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            Dataset dataset = DatasetFactory.createGeneral();
+            RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
+            // TODO this needs to be fixed according to the need trig format
+            // definition, i.e. the need/connection/event/etc. triples are in core
+            // and transient named graphs, and in default graph there can only be
+            // the graphs signatures. The Dataset should be returned instead of
+            // Model
+            NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset, false); //to ensure the dataset contains a valid need (but expect both graphs to be present already)
+
+            return needModelWrapper.copyDataset();
+        } catch (Exception e) {
+            logger.debug("could not parse trig from file {} ", file, e);
+            throw e;
+        }
     }
-  }
 
 
 }

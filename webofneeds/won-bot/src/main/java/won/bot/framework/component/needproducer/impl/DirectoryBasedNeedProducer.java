@@ -16,6 +16,7 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
 import won.bot.framework.component.needproducer.NeedProducer;
+import won.protocol.exception.DataIntegrityException;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -55,7 +57,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
 
 
   @Override
-  public synchronized Model create()
+  public synchronized Dataset create()
   {
     //lazy init
     initializeLazily();
@@ -81,7 +83,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     this.fileIndex++;
     rewindIfNecessary();
 
-    return readModelFromFileWithIndex(fileIndexToUse);
+    return readDatasetFromFileWithIndex(fileIndexToUse);
   }
 
   public synchronized String getCurrentFileName() {
@@ -93,7 +95,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return this.files[this.fileIndex].isFile() && this.files[this.fileIndex].canRead();
   }
 
-  private Model readModelFromFileWithIndex(final int fileIndexToUse)
+  private Dataset readDatasetFromFileWithIndex(final int fileIndexToUse)
   {
     try {
       //make a need from it
@@ -101,6 +103,8 @@ public class DirectoryBasedNeedProducer implements NeedProducer
       return this.fileBasedNeedProducer.readNeedFromFile(this.files[fileIndexToUse]);
     } catch (IOException e) {
       logger.debug("could not read need from file {}", this.files[fileIndexToUse]);
+    } catch (DataIntegrityException e){
+      logger.debug("DataIntegrityException(need and sysinfo models must contain a resource of type won:Need");
     }
     return null;
   }

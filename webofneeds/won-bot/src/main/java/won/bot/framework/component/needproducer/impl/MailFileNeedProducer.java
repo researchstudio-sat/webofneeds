@@ -18,6 +18,7 @@ package won.bot.framework.component.needproducer.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,7 +48,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
   }
 
   @Override
-  public  synchronized Model readNeedFromFile(final File file) throws IOException
+  public  synchronized Dataset readNeedFromFile(final File file) throws IOException
   {
     logger.debug("processing as mail file: {} ", file);
     FileInputStream fis = new FileInputStream(file);
@@ -73,7 +74,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
       logger.debug("mail has attachments  : {}", parser.hasAttachments());
       logger.debug("mail plain content    : {}", StringUtils.abbreviate(parser.getPlainContent(), 200));
       logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(), 200));
-      return needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+      return needModelWrapper.copyDataset();
     } catch (Exception e) {
       logger.debug("could not parse email from file {} ", file, e);
     } finally {

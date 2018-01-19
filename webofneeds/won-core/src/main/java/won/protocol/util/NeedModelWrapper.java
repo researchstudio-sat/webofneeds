@@ -217,6 +217,15 @@ public class NeedModelWrapper {
     }
 
     /**
+     * get the complete dataset
+     *
+     * @return copy of needDataset
+     */
+    public Dataset copyDataset(){
+        return RdfUtils.cloneDataset(needDataset);
+    }
+
+    /**
      * get the node of the need of either the need model or the sysinfo model
      *
      * @param graph type specifies the need or sysinfo need node to return
@@ -825,5 +834,4 @@ public class NeedModelWrapper {
             model.remove(this.statementsToRemove);
         }
     }
-
 }

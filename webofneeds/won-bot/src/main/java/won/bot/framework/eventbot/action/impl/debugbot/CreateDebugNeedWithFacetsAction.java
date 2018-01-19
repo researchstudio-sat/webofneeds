@@ -18,7 +18,6 @@ package won.bot.framework.eventbot.action.impl.debugbot;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
@@ -38,7 +37,6 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -122,12 +120,12 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         for (URI facet : facets) {
             needModelWrapper.addFacetUri(facet.toString());
         }
-        final Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+        final Dataset debugNeedDataset = needModelWrapper.copyDataset();
         final Event origEvent = event;
 
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(debugNeedDataset), 150));
 
-        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, needModel);
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, debugNeedDataset);
         //remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
@@ -141,11 +139,11 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
                 getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToNeedUri, needURI);
 
                 if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
-                    bus.publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
+                    bus.publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, debugNeedDataset, null));
                 } else if ((origEvent instanceof ConnectDebugCommandEvent) || isInitialForConnect) {
-                    bus.publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, needModel, null));
+                    bus.publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, debugNeedDataset, null));
                 } else {
-                    bus.publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+                    bus.publish(new NeedCreatedEvent(needURI, wonNodeUri, debugNeedDataset, null));
                 }
             }
         };

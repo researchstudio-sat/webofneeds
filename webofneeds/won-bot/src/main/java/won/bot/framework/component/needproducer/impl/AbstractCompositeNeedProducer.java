@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.NeedProducer;
@@ -34,7 +34,7 @@ public abstract class AbstractCompositeNeedProducer implements NeedProducer
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public synchronized Model create()
+  public synchronized Dataset create()
   {
     logger.debug("starting to produce a need model");
     NeedProducer delegate = selectNonExhaustedNeedFactory();
