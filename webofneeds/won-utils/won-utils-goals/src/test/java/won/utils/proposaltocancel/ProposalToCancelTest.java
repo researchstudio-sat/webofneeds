@@ -1,4 +1,4 @@
-package won.utils.proposal;
+package won.utils.proposaltocancel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,20 +40,25 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.util.RdfUtils;
 
-public class ProposalTest {
+public class ProposalToCancelTest {
 
-    private static final String inputFolder = "/won/utils/proposalToCancel/input/";
-    private static final String expectedOutputFolder = "/won/utils/proposalToCancel/expected/";
+    private static final String inputFolder = "/won/utils/proposaltocancel/input/";
+    private static final String expectedOutputFolder = "/won/utils/proposaltocancel/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
     	Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     	root.setLevel(Level.INFO);	
     }
-    
-    
-    // tests go here ...
-    
+ 
+    // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
+    @Test
+    public void oneOpenPropsoal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-accepted.trig");
+        test(input,expectedOutput);
+    }
+           
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
         Dataset actual = proposalFunction.applyProposalFunction(input);
@@ -91,7 +96,7 @@ public class ProposalTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ProposalTest.class.getResourceAsStream(path);
+            is = ProposalToCancelTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {

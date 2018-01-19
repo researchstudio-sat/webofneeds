@@ -1,4 +1,4 @@
-package won.utils.proposal;
+package won.utils.proposaltocancel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +23,9 @@ import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 
 public class ProposalToCancelFunction {
-    private static final String PROPOSALTOCANCEL_SUFFIX = "";
+    private static final String PROPOSAL_TO_CANCEL_SUFFIX = "";
 	private String queryString;
-    private static String queryFile = "/proposalToCancel/query.sq";
+    private static String queryFile = "/proposaltocancel/query.sq";
 
     public ProposalToCancelFunction() {
         InputStream is  = ProposalToCancelFunction.class.getResourceAsStream(queryFile);
@@ -49,7 +49,7 @@ public class ProposalToCancelFunction {
             Model currentProposalContent = ModelFactory.createDefaultModel();
             while (resultSet.hasNext()) {
                 QuerySolution solution = resultSet.next();
-                RDFNode proposalNode = solution.get("acc");
+                RDFNode proposalNode = solution.get("openprop");
                 if (currentProposal == null) {
                     //first solution: remember uri of first proposal
                     currentProposal = proposalNode;
@@ -65,15 +65,15 @@ public class ProposalToCancelFunction {
                     currentProposal = proposalNode;
                 }
                 //add current triple into currentAgreementModel
-                RDFNode s = solution.get("s");
-                RDFNode p = solution.get("p");
-                RDFNode o = solution.get("o");
+                RDFNode s = solution.get("openclause");
+                RDFNode p = solution.get("openp");
+                RDFNode o = solution.get("openo");
                 Statement newStatement = new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o);
                 currentProposalContent.add(newStatement);
             }
             //add the last model
             if (currentProposal != null) {
-            	result.addNamedModel(currentProposal.asResource().getURI()+PROPOSALTOCANCEL_SUFFIX, currentProposalContent);
+            	result.addNamedModel(currentProposal.asResource().getURI()+PROPOSAL_TO_CANCEL_SUFFIX, currentProposalContent);
             }
             return result;
         } finally {
