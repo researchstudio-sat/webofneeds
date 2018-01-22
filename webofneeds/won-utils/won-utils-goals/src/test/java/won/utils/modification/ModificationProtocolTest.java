@@ -25,6 +25,7 @@ public class ModificationProtocolTest {
     // {copvOfRemote} : CR ,  {selfretract} : R , {subsequent}
 
      // BC.trig
+     // No Mod:retracts triples
     @Test
     public void d13NoModificationTest () throws IOException {
         Dataset input = loadDataset( inputFolder + "correct-no-retraction.trig");
@@ -33,6 +34,7 @@ public class ModificationProtocolTest {
     }
 
     // correct-remote-retract.trig
+    // One mod:retracts triple
     @Test
     public void d13CorrectOneRemoteRetractionTest () throws IOException {
         Dataset input = loadDataset( inputFolder + "correct-remote-retract.trig");
