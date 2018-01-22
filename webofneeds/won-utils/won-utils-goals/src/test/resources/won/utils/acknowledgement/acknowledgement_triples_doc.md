@@ -1,3 +1,4 @@
+## oneLocalMessageFailsLocallyTest
 **input**: all-messages-acknowledged.trig
 **output**: all-messages-acknowledged.trig
 **test name**: oneLocalMessageFailsLocallyTest
@@ -6,6 +7,7 @@
 
 ---------
 
+## oneLocalMessageFailsLocallyTest
 **input**: one-local-message-fails-locally.trig
 **output**: one-local-message-fails-locally.trig
 **test name**: oneLocalMessageFailsLocallyTest
@@ -334,7 +336,7 @@ event:ofx1afjv35cwpppp0wyg
 
 -----------------------------------
 ```
-
+## oneLocalMessageFailsLocallyUnrealisticTest
 **input**: one-local-message-fails-locally-unrealistic.trig
 **expected**: one-local-message-fails-locally-unrealistic.trig
 **test name**: oneLocalMessageFailsLocallyUnrealisticTest
@@ -356,6 +358,7 @@ event:ofx1afjv35cwpppp0wyg
 ```
 
 --------------------------
+## oneLocalMessageFailsRemotelyTest
 **input**: one-local-message-fails-remotely.trig
 **expected**: one-local-message-fails-remotely.trig
 **test name**: oneLocalMessageFailsRemotelyTest
@@ -379,7 +382,7 @@ event:ofx1afjv35cwpppp0wyg
 ```
 
 -------------------------
-
+## oneLocalMessageWithoutRemoteMessageTest
 **input**: one-local-message-without-remote-message.trig
 **expected**: one-local-message-without-remote-message.trig
 **test name**: oneLocalMessageWithoutRemoteMessageTest
@@ -663,7 +666,7 @@ event:ofx1afjv35cwpppp0wyg
 
 ---------
 ```
-
+## oneLocalMessageWithoutRemoteMessageTest
 **input**: one-local-message-without-remote-message.trig
 **expected**: one-local-message-without-remote-message.trig
 **test name**: oneLocalMessageWithoutRemoteMessageTest
@@ -761,8 +764,8 @@ event:ofx1afjv35cwpppp0wyg
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
 
 -----------
-```
 
+## oneLocalMessageWithoutRemoteResponseTest
 **input**: one-local-message-without-remote-response.trig 
 **expected**: one-local-message-without-remote-response.trig 
 **test name**: oneLocalMessageWithoutRemoteResponseTest
@@ -952,6 +955,7 @@ event:ofx1afjv35cwpppp0wyg
 ```
 
 --------------
+## oneLocalMessageWithoutRemoteRemoteResponseTest
 **input**: one-local-message-without-remote-remote-response.trig
 **expected**: one-local-message-without-remote-remote-response.trig
 **test name**: oneLocalMessageWithoutRemoteRemoteResponseTest
