@@ -75,7 +75,7 @@ public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
         attributes.put(SESSION_ATTR, session.getId());
         logger.debug("adding session attribute {}:{}", SESSION_ATTR, session.getId());
       } else {
-    	  logger.debug("no http session found, cannot pass attributes from session");
+    	  logger.warn("no http session found, cannot pass attributes from session");
       }
     }
   }
