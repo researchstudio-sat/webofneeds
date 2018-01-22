@@ -1,23 +1,26 @@
-*input*: all-messages-acknowledged.trig
-*output*: all-messages-acknowledged.trig
+**input**: all-messages-acknowledged.trig
+**output**: all-messages-acknowledged.trig
 
-*diff*:
+**diff**:
 
 ---------
 
-*input*: one-local-message-fails-locally.trig
-*output*: one-local-message-fails-locally.trig
+**input**: one-local-message-fails-locally.trig
+**output**: one-local-message-fails-locally.trig
 
-*diff*: 
+**diff**: 
 
+```
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
 < }
 < 
+```
 
-**diff* with all-messages-acknowledged.trig sample*:
+***diff** with all-messages-acknowledged.trig sample*:
 
+```
  event:49hcv8na1594ijbpx3hp
             a                            msg:FromSystem ;
             msg:hasCorrespondingRemoteMessage
@@ -52,9 +55,11 @@ event:ofx1afjv35cwpppp0wyg
             msg:hasPreviousMessage    event:eczqg8lp7xbukpzikd41 , event:273p25fz6re5tp6drfsd ;
             msg:hasReceivedTimestamp  1513170819939 ;
             msg:protocolVersion       "1.0" .
+```
 
-*diff* with all-messages-acknowledged.trig:
+**diff** with all-messages-acknowledged.trig:
 
+```
 441a442,450
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig> {
 >     <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig>
@@ -326,14 +331,16 @@ event:ofx1afjv35cwpppp0wyg
 
 
 -----------------------------------
+```
 
-*input*: one-local-message-fails-locally-unrealistic.trig
+**input**: one-local-message-fails-locally-unrealistic.trig
 expected: one-local-message-fails-locally-unrealistic.trig
 
-*diff*:
+**diff**:
 
-**diff* with all-messages-acknowledged.trig sample*:
+***diff** with all-messages-acknowledged.trig sample*:
 
+```
 4855c4855
 <             msg:hasMessageType           msg:FailureResponse ;
 ---
@@ -343,32 +350,38 @@ expected: one-local-message-fails-locally-unrealistic.trig
 >     event:eczqg8lp7xbukpzikd41
 >             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
 > }
+```
 
 --------------------------
-*input*: one-local-message-fails-remotely.trig
+**input**: one-local-message-fails-remotely.trig
 expected: one-local-message-fails-remotely.trig
 
-*diff*: 
+**diff**: 
+```
 8786,8789d8785
 < <https://localhost:8443/won/resource/event/152dum7y56zn95qyernf#content-19tl> {
 <     event:152dum7y56zn95qyernf
 <             won:hasTextMessage  "I'm not sure I understand you fully." .
 < }
+```
 
-**diff* with all-messages-acknowledged.trig sample*:
+***diff** with all-messages-acknowledged.trig sample*:
 
+```
 6751c6751
 <             msg:hasMessageType           msg:FailureResponse ;
 ---
 >             msg:hasMessageType           msg:SuccessResponse ;
+```
 
 -------------------------
 
-*input*: one-local-message-without-remote-message.trig
+**input**: one-local-message-without-remote-message.trig
 expected: one-local-message-without-remote-message.trig
 
-*diff*:
+**diff**:
 
+```
 8854c8854
 < 
 ---
@@ -379,9 +392,11 @@ expected: one-local-message-without-remote-message.trig
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
+```
 
-**diff* with all-messages-acknowledged.trig sample*:
+***diff** with all-messages-acknowledged.trig sample*:
 
+```
 441a442,450
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig> {
 >     <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig>
@@ -642,12 +657,13 @@ expected: one-local-message-without-remote-message.trig
 >             msg:containsSignature  <https://localhost:8443/won/resource/event/49hcv8na1594ijbpx3hp#envelope-swnq-sig> , <https://localhost:8443/won/resource/event/rrmkri9cdrtvp1bkjcnl#envelope-uqay-sig> ;
 
 ---------
+```
 
-*input*: one-local-message-without-remote-message.trig
+**input**: one-local-message-without-remote-message.trig
 expected: one-local-message-without-remote-message.trig
 
-*diff*:
-
+**diff**:
+```
 8854c8854
 < 
 ---
@@ -658,10 +674,10 @@ expected: one-local-message-without-remote-message.trig
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
+```
 
-
-**diff* with all-messages-acknowledged.trig sample*:
-
+***diff** with all-messages-acknowledged.trig sample*:
+```
 599,637d598
 < <https://localhost:8443/won/resource/event/49hcv8na1594ijbpx3hp#envelope-swnq> {
 <     <https://localhost:8443/won/resource/event/8950tg6pjze6lr52pq3y#envelope-7hiu-sig>
@@ -739,20 +755,22 @@ expected: one-local-message-without-remote-message.trig
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
 
 -----------
+```
 
-*input*: one-local-message-without-remote-response.trig 
+**input**: one-local-message-without-remote-response.trig 
 expected: one-local-message-without-remote-response.trig 
 
-*diff*:
-
+**diff**:
+```
 10039,10043d10038
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
 < }
+```
 
-**diff* with all-messages-acknowledged.trig sample*:
-
+***diff** with all-messages-acknowledged.trig sample*:
+```
 441a442,450
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig> {
 >     <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig>
@@ -924,21 +942,25 @@ expected: one-local-message-without-remote-response.trig
 >             msg:containsSignature  <https://localhost:8443/won/resource/event/49hcv8na1594ijbpx3hp#envelope-swnq-sig> , <https://localhost:8443/won/resource/event/rrmkri9cdrtvp1bkjcnl#envelope-uqay-sig> ;
 
 < 
+```
 
 --------------
-*input*: one-local-message-without-remote-remote-response.trig
+**input**: one-local-message-without-remote-remote-response.trig
 expected: one-local-message-without-remote-remote-response.trig
 
-*diff*:
+**diff**:
+```
 10094,10098d10093
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
 <     event:eczqg8lp7xbukpzikd41
 <             won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
 < }
 < 
+```
 
-**diff* with all-messages-acknowledged.trig sample*:
+***diff** with all-messages-acknowledged.trig sample*:
 
+```
 441a442,450
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig> {
 >     <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig>
@@ -1042,7 +1064,7 @@ expected: one-local-message-without-remote-remote-response.trig
 >  
 
 ------------
-
+```
 
 
 
