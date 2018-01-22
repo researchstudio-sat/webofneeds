@@ -771,6 +771,7 @@ event:ofx1afjv35cwpppp0wyg
 **test name**: oneLocalMessageWithoutRemoteResponseTest
 
 **diff**:
+
 ```
 10039,10043d10038
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
@@ -780,6 +781,7 @@ event:ofx1afjv35cwpppp0wyg
 ```
 
 ***diff** with all-messages-acknowledged.trig sample*:
+
 ```
 441a442,450
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig> {
@@ -793,7 +795,7 @@ event:ofx1afjv35cwpppp0wyg
 > }
 548c557,579
 < 
----
+
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-xvip> {
 >     event:pi2jpw9a1q00d11kr9ez
 >             a                     msg:FromExternal ;
@@ -986,7 +988,7 @@ event:ofx1afjv35cwpppp0wyg
 > }
 548c557,579
 < 
----
+
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-xvip> {
 >     event:pi2jpw9a1q00d11kr9ez
 >             a                     msg:FromExternal ;
@@ -1015,7 +1017,7 @@ event:ofx1afjv35cwpppp0wyg
 >                     event:pi2jpw9a1q00d11kr9ez ;
 2235c2268
 <             rdfs:member  event:kaj9nimgw0lkcgmb1asf , event:h6c8epmrvb3gxqrvs81d , event:f3u4lc7l1czvps18lemf , event:ivr0xermk4aeb3yhohk4 , event:v5rvsrlg0x3ogdqyfuy4 , event:u02ulpncdj9l8ae8x2aq , event:cbcccoqqqbec6bxkl3y3 , event:i1frxy9ikewwjuyjcznt , event:59gtirhola4ydvddyo0k , event:xbhopokox5b4vz78e59w , event:tlyivx8nn93zw41ujn1o , event:csvglzqkcoddoreep5w0 , event:alif190jj9we7toczas8 , event:mmdq8395owv3xy9iyl5q , event:lur3g5en41crth556538 , event:i3k0giied2bgp0p44h7u , event:253k6pqq8gyttmmfxc7l , event:vj2yzrtlf700wixuxujw , event:t87usy00t0o9h4f0d1p3 , event:s9a226k3n70ihhaurhdp , event:4e2ws6ap0hp93iv0oyu2 , event:6fvg967tlh9rho8axvbs , event:xqsfn58cdatb7ryp8lzt , event:8c6o81ry6mxeetm2d2pf , event:ofx1afjv35cwpppp0wyg , event:cw64ogmt2lv6n4kdjdxh , event:v66scoiidw56iam8q86p , event:2uf9sj4itmz9fpas7suo , event:wlv9kjrh93gfzetdojp4 , event:to3x48329wwbanylmar0 , event:pj2n6r9g6jt39rv99xh0 , event:mv0xoe06cxsxt08s7guf , event:6m7oi7hxwvoi2pmguo6d , event:2sbarcz1yu7cenpcghay , event:xu87g40eu8cx053lad08 , event:x7cjarywf0513459swe0 , event:iasuj1z9fva0svkfqb79 , event:8gvplnjrinoqay8ycrc2 , event:9uyongxoip0kz7t9tsa8 , event:1tr3o22co1907d6b6n7s , event:mthg8rh8r4grme5ph2eh , event:5s66o8cqv4rxv74xfepg , event:orj8iruy8pcer6zzxlra , event:zvx39rdagwj6o7nfiw1r , event:m8b6jvgclclzy48p7wqd , event:4y6xcnpgc0xk4relqfox , event:t6d7eq3cq6nq54a16k1w , event:izq6icbkftfbzm0clxeu , event:cgqt5h004iql2003me2n , event:152dum7y56zn95qyernf , event:9oa8ktxu7tqzll06rhw9 , event:rig33yoxaetjw059bzuw , event:0uouhqi6aym8jad508kd , event:ck5071fsyaned6upryxj , event:xsbbah2dhkcg6d3h13gk , event:s9zfgm2iika5vgvayt7h , event:8h7v5ml1aflqmoyem61a , event:0s55ww5ae82lf3j3gwaq , event:n5rqfwjqbcpdwqjjwpdw , event:eczqg8lp7xbukpzikd41 , event:5r6qvd7rennbi148vunk , event:fn87pwzr9g4a9v368h4m , event:csridlusp0h45v9gf9v6 , event:xpspyx3bpyev5v5p1vf6 , event:joo1uifc1fc2k6fk5z8t , event:plmfevq4c12f8itbisjf , event:xp44teiwtooczc14npe2 , event:4xjx598ewu7579zpl64p , event:bxwevm9gzqconmzxji4u , event:gv6zk2yqk6o8bl574n36 , event:ggbuodgi1pykilp8znve , event:collk6egdkt2tey39h8z , event:93e94yjsmx9l4lg8lu1b , event:eia6yrvml8v995ueq65m , event:cvloufr7mmg0siwflisg , event:xkeovy4cf48spd5euwj1 , event:4ongmje7w2v03mp7ztex , event:m4nq3rl0m1br8bea2n72 , event:eue8ar55z7as596cu33m , event:273p25fz6re5tp6drfsd , event:66nnn87elpe5995a5wjv , event:uu3ciy3btq6tg90crr3b , event:d3jq9fgiu47gdhclj7h0 , event:ih9v6gyllshhvo5kxyv0 , event:sdt7yr7q7t9iw8wcuu3m , event:dhdnzy40wlrnxh7ymr2b , event:cqvzpvoqvtkylzdybhej .
----
+
 >             rdfs:member  event:kaj9nimgw0lkcgmb1asf , event:h6c8epmrvb3gxqrvs81d , event:f3u4lc7l1czvps18lemf , event:ivr0xermk4aeb3yhohk4 , event:v5rvsrlg0x3ogdqyfuy4 , event:u02ulpncdj9l8ae8x2aq , event:cbcccoqqqbec6bxkl3y3 , event:i1frxy9ikewwjuyjcznt , event:59gtirhola4ydvddyo0k , event:xbhopokox5b4vz78e59w , event:tlyivx8nn93zw41ujn1o , event:csvglzqkcoddoreep5w0 , event:alif190jj9we7toczas8 , event:mmdq8395owv3xy9iyl5q , event:lur3g5en41crth556538 , event:i3k0giied2bgp0p44h7u , event:253k6pqq8gyttmmfxc7l , event:vj2yzrtlf700wixuxujw , event:t87usy00t0o9h4f0d1p3 , event:s9a226k3n70ihhaurhdp , event:4e2ws6ap0hp93iv0oyu2 , event:6fvg967tlh9rho8axvbs , event:xqsfn58cdatb7ryp8lzt , event:8c6o81ry6mxeetm2d2pf , event:ofx1afjv35cwpppp0wyg , event:cw64ogmt2lv6n4kdjdxh , event:v66scoiidw56iam8q86p , event:2uf9sj4itmz9fpas7suo , event:wlv9kjrh93gfzetdojp4 , event:to3x48329wwbanylmar0 , event:pj2n6r9g6jt39rv99xh0 , event:mv0xoe06cxsxt08s7guf , event:6m7oi7hxwvoi2pmguo6d , event:2sbarcz1yu7cenpcghay , event:xu87g40eu8cx053lad08 , event:x7cjarywf0513459swe0 , event:iasuj1z9fva0svkfqb79 , event:8gvplnjrinoqay8ycrc2 , event:9uyongxoip0kz7t9tsa8 , event:1tr3o22co1907d6b6n7s , event:mthg8rh8r4grme5ph2eh , event:5s66o8cqv4rxv74xfepg , event:orj8iruy8pcer6zzxlra , event:zvx39rdagwj6o7nfiw1r , event:m8b6jvgclclzy48p7wqd , event:4y6xcnpgc0xk4relqfox , event:t6d7eq3cq6nq54a16k1w , event:izq6icbkftfbzm0clxeu , event:cgqt5h004iql2003me2n , event:152dum7y56zn95qyernf , event:9oa8ktxu7tqzll06rhw9 , event:rig33yoxaetjw059bzuw , event:0uouhqi6aym8jad508kd , event:ck5071fsyaned6upryxj , event:xsbbah2dhkcg6d3h13gk , event:s9zfgm2iika5vgvayt7h , event:8h7v5ml1aflqmoyem61a , event:0s55ww5ae82lf3j3gwaq , event:n5rqfwjqbcpdwqjjwpdw , event:eczqg8lp7xbukpzikd41 , event:5r6qvd7rennbi148vunk , event:fn87pwzr9g4a9v368h4m , event:csridlusp0h45v9gf9v6 , event:xpspyx3bpyev5v5p1vf6 , event:pi2jpw9a1q00d11kr9ez , event:joo1uifc1fc2k6fk5z8t , event:plmfevq4c12f8itbisjf , event:xp44teiwtooczc14npe2 , event:4xjx598ewu7579zpl64p , event:bxwevm9gzqconmzxji4u , event:gv6zk2yqk6o8bl574n36 , event:ggbuodgi1pykilp8znve , event:collk6egdkt2tey39h8z , event:93e94yjsmx9l4lg8lu1b , event:eia6yrvml8v995ueq65m , event:cvloufr7mmg0siwflisg , event:xkeovy4cf48spd5euwj1 , event:4ongmje7w2v03mp7ztex , event:m4nq3rl0m1br8bea2n72 , event:eue8ar55z7as596cu33m , event:273p25fz6re5tp6drfsd , event:66nnn87elpe5995a5wjv , event:uu3ciy3btq6tg90crr3b , event:d3jq9fgiu47gdhclj7h0 , event:ih9v6gyllshhvo5kxyv0 , event:sdt7yr7q7t9iw8wcuu3m , event:dhdnzy40wlrnxh7ymr2b , event:cqvzpvoqvtkylzdybhej .
 7012a7046,7083
 > <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa> {
@@ -1058,15 +1060,15 @@ event:ofx1afjv35cwpppp0wyg
 > }
 7397c7468
 <             msg:hasPreviousMessage    event:8c6o81ry6mxeetm2d2pf ;
----
+
 >             msg:hasPreviousMessage    event:8c6o81ry6mxeetm2d2pf , event:pi2jpw9a1q00d11kr9ez ;
 7404c7475
 <             msg:containsSignature  <https://localhost:8443/won/resource/event/8c6o81ry6mxeetm2d2pf#envelope-g9px-sig>  , <https://localhost:8443/won/resource/event/eue8ar55z7as596cu33m#envelope-h4dx-sig> ;
----
+
 >             msg:containsSignature  <https://localhost:8443/won/resource/event/8c6o81ry6mxeetm2d2pf#envelope-g9px-sig> , <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig> , <https://localhost:8443/won/resource/event/eue8ar55z7as596cu33m#envelope-h4dx-sig> ;
 7416c7487,7494
 < 
----
+
 >     <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa-sig>
 >             a                               sig:Signature ;
 >             sig:hasSignatureValue           "MGUCMCxiytXBuh5w3NE7kdsAUsVjzJGK+tF2KgU5+AEyO3DTzGigsBoen0nQUM1l/n09XQIxAOnJ3IidktXW2rZHoBql+fazmmhrqXnDffE9Us5ux/rL+izk9q94Z/T8BcUHiKSzmQ==" ;
@@ -1075,8 +1077,6 @@ event:ofx1afjv35cwpppp0wyg
 >             msg:hasPublicKeyFingerprint     "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
 >             msg:hasSignedGraph              <https://localhost:8443/won/resource/event/pi2jpw9a1q00d11kr9ez#envelope-flqa> .
 >  
-
-------------
 ```
 
 
