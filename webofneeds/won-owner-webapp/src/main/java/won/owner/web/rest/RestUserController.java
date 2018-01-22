@@ -449,9 +449,10 @@ public class RestUserController
 	        //generate the keystore for the user
 			KeystoreHolder keystoreHolder = new KeystoreHolder();
 			try {
-				KeyStore keystore = keystoreHolder.getKeystore(keystorePassword.getPassword(password));
+			    // create the keystore if it doesnt exist yet
+				keystoreHolder.getKeystore(keystorePassword.getPassword(password));
 			} catch (Exception e) {
-				logger.warn("could not create keystore for user " + email);
+			    throw new IllegalStateException("could not create keystore for user " + email);
 			}
 			//keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
 			user.setKeystorePasswordHolder(keystorePassword);

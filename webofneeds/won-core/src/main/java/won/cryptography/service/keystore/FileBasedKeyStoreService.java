@@ -4,13 +4,11 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -65,11 +63,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 			return (PrivateKey) cachedElement.getObjectValue();
 		PrivateKey retrieved = null;
 		try {
-			// TODO if for storing the needs' keys an individual (e.g. per-user) password is
-			// used, then
-			// here should be the password of the user/need, not of the store. If not, then
-			// here is
-			// the password of the store used
 			retrieved = (PrivateKey) store.getKey(alias, storePW.toCharArray());
 		} catch (Exception e) {
 			logger.warn("Could not retrieve key for " + alias + " from ks " + storeFile.getName(), e);
@@ -96,9 +89,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 		return cert.getPublicKey();
 	}
 
-	// TODO is it OK to expose password like this? or should I specify password in
-	// config for each class that needs to
-	// access the 'underlayingkeystore' - key managers etc.
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -176,19 +166,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 	public synchronized void putKey(String alias, PrivateKey key, Certificate[] certificateChain, boolean replace)
 			throws IOException {
 
-		// try {
-		// if (!replace && store.containsAlias(alias)) {
-		// throw new IOException("Cannot put key - key store already contains entry for
-		// " + alias);
-		// }
-		// // TODO the password here should be the password of the user/need, not of the
-		// store
-		// store.setKeyEntry(alias, key, storePW.toCharArray(), certificateChain);
-		// saveStoreToFile();
-		// } catch (Exception e) {
-		// throw new IOException("Could not add key of " + alias + " to the key store",
-		// e);
-		// }
 		putEntry(alias, key, certificateChain, null, replace);
 	}
 
@@ -202,17 +179,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 	@Override
 	public synchronized void putCertificate(String alias, Certificate certificate, boolean replace) throws IOException {
 
-		// try {
-		// if (!replace && store.containsAlias(alias)) {
-		// throw new IOException("Cannot put certificate - key store already contains
-		// entry for " + alias);
-		// }
-		// store.setCertificateEntry(alias, certificate);
-		// saveStoreToFile();
-		// } catch (Exception e) {
-		// throw new IOException("Could not add certificate of " + alias + " to the key
-		// store", e);
-		// }
 		putEntry(alias, null, null, certificate, replace);
 	}
 

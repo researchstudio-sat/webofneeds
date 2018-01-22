@@ -1,28 +1,14 @@
 package won.cryptography.service.keystore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import won.cryptography.service.CertificateService;
-import won.cryptography.service.KeyPairService;
 
 public abstract class AbstractKeyStoreService implements KeyStoreService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -43,11 +29,6 @@ public abstract class AbstractKeyStoreService implements KeyStoreService {
 	@Override
 	public PrivateKey getPrivateKey(String alias) {
 		try {
-			// TODO if for storing the needs' keys an individual (e.g. per-user) password is
-			// used, then
-			// here should be the password of the user/need, not of the store. If not, then
-			// here is
-			// the password of the store used
 			return (PrivateKey) getUnderlyingKeyStore().getKey(alias, getPassword().toCharArray());
 		} catch (Exception e) {
 			logger.warn("Could not retrieve key for " + alias + " from keystore", e);
@@ -81,7 +62,7 @@ public abstract class AbstractKeyStoreService implements KeyStoreService {
 		try {
 			return getUnderlyingKeyStore().getCertificate(alias);
 		} catch (KeyStoreException e) {
-			logger.info("could not retrieve certificate for alias " + alias, e);
+			logger.warn("could not retrieve certificate for alias " + alias, e);
 		}
 		return null;
 	}
@@ -117,19 +98,6 @@ public abstract class AbstractKeyStoreService implements KeyStoreService {
 	public synchronized void putKey(String alias, PrivateKey key, Certificate[] certificateChain, boolean replace)
 			throws IOException {
 
-		// try {
-		// if (!replace && store.containsAlias(alias)) {
-		// throw new IOException("Cannot put key - key store already contains entry for
-		// " + alias);
-		// }
-		// // TODO the password here should be the password of the user/need, not of the
-		// store
-		// store.setKeyEntry(alias, key, storePW.toCharArray(), certificateChain);
-		// saveStoreToFile();
-		// } catch (Exception e) {
-		// throw new IOException("Could not add key of " + alias + " to the key store",
-		// e);
-		// }
 		putEntry(alias, key, certificateChain, null, replace);
 	}
 
@@ -143,17 +111,6 @@ public abstract class AbstractKeyStoreService implements KeyStoreService {
 	@Override
 	public synchronized void putCertificate(String alias, Certificate certificate, boolean replace) throws IOException {
 
-		// try {
-		// if (!replace && store.containsAlias(alias)) {
-		// throw new IOException("Cannot put certificate - key store already contains
-		// entry for " + alias);
-		// }
-		// store.setCertificateEntry(alias, certificate);
-		// saveStoreToFile();
-		// } catch (Exception e) {
-		// throw new IOException("Could not add certificate of " + alias + " to the key
-		// store", e);
-		// }
 		putEntry(alias, null, null, certificate, replace);
 	}
 
