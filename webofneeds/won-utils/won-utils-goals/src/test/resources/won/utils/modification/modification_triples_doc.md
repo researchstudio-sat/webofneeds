@@ -1,5 +1,12 @@
+**input**: correct-no-retraction.trig
+**expected**: correct-no-retraction.trig
+**test name**: d13NoModificationTest
+
+No triples were removed.
+
 **input**: correct-remote-retract.trig
 **expected**: correct-remote-retract.trig
+**test name**: d13CorrectOneRemoteRetractionTest
 
 **diff** : the following triples are removed in the **expected**:
 
@@ -21,6 +28,7 @@
 
 **input**: correct-local-retract-two-previous.trig
 **expected**: correct-local-retract-two-previous.trig
+**test name**: d13CorrectOneLocalRetractionOfDirectlyPreviousMessageTest
 
 **diff**: the following triples are removed in the **expected**:
 
@@ -43,6 +51,7 @@
 
 **input**: correct-local-retract-directly-previous.trig
 **expected**:  correct-local-retract-directly-previous.trig
+***test name***: d13CorrectOneLocalRetractionOfLastButOneMessageTest
 
 **diff**: the following triples are removed in the **expected**:
 
@@ -63,6 +72,7 @@
 
 **input**: correct-retractRetract-two-previous.trig
 **expected**: correct-retractRetract-two-previous.trig
+**test name**: d13CorrectRetractRetractOfLastButOneMessageTest
 
 **diff**: the following triples are removed in the **expected**:
 
@@ -91,6 +101,7 @@
 
 **input**: wrong-local-copyOfRemote-retract-local.trig
 **expected**: wrong-local-copyOfRemote-retract-local.trig
+**test name**: d13WrongLocalCopyRemoteRetractionTest 
 
 Comments:
 
@@ -126,6 +137,7 @@ Retract triples:
 ------------------
 **input**:  wrong-local-retract-remote.trig
 **expected**:  wrong-local-retract-remote.trig
+**test name**: d13WrongLocalRetractRemoteRetractionTest
 
 Retract triples:
 
@@ -155,6 +167,7 @@ Retract triples:
 ----------------------
 **input**: wrong-local-retract-subsequent.trig
 **expected**: wrong-local-retract-subsequent.trig
+**test name**: d13WrongLocalRetractSubsequentRetractionTest
 
 ```
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
@@ -173,6 +186,7 @@ Retract triples:
 
 **input**: wrong-local-selfretract.trig
 **expected**: wrong-local-selfretract.trig
+**test name**: d13WrongLocalSelfRetractionTest
 
 Retract triples:
 
@@ -188,6 +202,7 @@ Retract triples:
 
 **input**: wrong-remote-retract-local.trig
 **expected**: wrong-remote-retract-local.trig
+**test name**: d13WrongRemoteRetractLocalRetractionTest 
 
 Retract triples:
 
@@ -207,6 +222,7 @@ Retract triples:
 ------------------------
 **input**: wrong-remote-retract-subsequent.trig
 **expected**: wrong-remote-retract-subsequent.trig
+**test name**: d13WrongRemoteRetractSubsequentRetractionTest
 
 Retract triples:
 
@@ -226,6 +242,7 @@ Retract triples:
 --------------------------
 **input**: wrong-remote-selfretract.trig
 **expected**: wrong-remote-selfretract.trig
+**test name**: d13WrongRemoteSelfRetractRetractionTest
 
 Retract triples:
 

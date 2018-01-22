@@ -1,5 +1,6 @@
 **input**: all-messages-acknowledged.trig
 **output**: all-messages-acknowledged.trig
+**test name**: oneLocalMessageFailsLocallyTest
 
 **diff**:
 
@@ -7,6 +8,7 @@
 
 **input**: one-local-message-fails-locally.trig
 **output**: one-local-message-fails-locally.trig
+**test name**: oneLocalMessageFailsLocallyUnrealisticTest
 
 **diff**: 
 
@@ -334,7 +336,8 @@ event:ofx1afjv35cwpppp0wyg
 ```
 
 **input**: one-local-message-fails-locally-unrealistic.trig
-expected: one-local-message-fails-locally-unrealistic.trig
+**expected**: one-local-message-fails-locally-unrealistic.trig
+**test name**: oneLocalMessageFailsLocallyUnrealisticTest
 
 **diff**:
 
@@ -354,7 +357,8 @@ expected: one-local-message-fails-locally-unrealistic.trig
 
 --------------------------
 **input**: one-local-message-fails-remotely.trig
-expected: one-local-message-fails-remotely.trig
+**expected**: one-local-message-fails-remotely.trig
+**test name**: oneLocalMessageFailsRemotelyTest
 
 **diff**: 
 ```
@@ -377,7 +381,8 @@ expected: one-local-message-fails-remotely.trig
 -------------------------
 
 **input**: one-local-message-without-remote-message.trig
-expected: one-local-message-without-remote-message.trig
+**expected**: one-local-message-without-remote-message.trig
+**test name**: oneLocalMessageWithoutRemoteMessageTest
 
 **diff**:
 
@@ -660,7 +665,8 @@ expected: one-local-message-without-remote-message.trig
 ```
 
 **input**: one-local-message-without-remote-message.trig
-expected: one-local-message-without-remote-message.trig
+**expected**: one-local-message-without-remote-message.trig
+**test name**: oneLocalMessageWithoutRemoteMessageTest
 
 **diff**:
 ```
@@ -758,7 +764,8 @@ expected: one-local-message-without-remote-message.trig
 ```
 
 **input**: one-local-message-without-remote-response.trig 
-expected: one-local-message-without-remote-response.trig 
+**expected**: one-local-message-without-remote-response.trig 
+**test name**: oneLocalMessageWithoutRemoteResponseTest
 
 **diff**:
 ```
@@ -946,7 +953,8 @@ expected: one-local-message-without-remote-response.trig
 
 --------------
 **input**: one-local-message-without-remote-remote-response.trig
-expected: one-local-message-without-remote-remote-response.trig
+**expected**: one-local-message-without-remote-remote-response.trig
+**test name**: oneLocalMessageWithoutRemoteRemoteResponseTest
 
 **diff**:
 ```
