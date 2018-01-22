@@ -90,25 +90,27 @@ function genComponentConf() {
 					</div>
 					
 					<!-- DETAILS -->
-					<!-- ng-repeat="detail in self.details[self.seeks] track by $index" -->
-					
-					<div class="cp__location"  ng-if="self.isDetailPresent('location', self.seeks)"">
-                    	<div class="cp__header location" ng-click="self.removeDetail($index, self.seeks)">
-	                        <span class="nonHover">Location</span>
-	                        <span class="hover">Remove Location</span>
-    					</div>
-                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.seeks)" location-is-saved="::self.locationIsSaved(self.seeks)"></won-location-picker>
-                	</div>
-                	<div id="seeksPost" class="tabcontent">
-		    			<div class="cp__mandatory-rest ng-if="self.isDetailPresent('tags', self.seeks)"">
-					        <won-image-dropzone on-image-picked="::self.pickImage(image, self.seeks)">
-					        </won-image-dropzone>
-							<need-textfield on-draft-change="::self.setDraft(draft, self.seeks)"></need-textfield>
-						</div>
-						<div class="cp__textfield_instruction" ng-if="self.isValid(self.seeks)">
-							<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-						</div>
-					</div>
+					<div class="cp__details" ng-repeat="detail in self.details[self.seeks] track by $index" ng-if="self.isValid(self.seeks)">
+						<!-- LOCATION ng-if="self.isDetailPresent('location', self.seeks)"-->
+						<div class="cp__location"  ng-if="detail === 'location'">
+	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.seeks)">
+		                        <span class="nonHover">Location</span>
+		                        <span class="hover">Remove Location</span>
+	    					</div>
+	                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.seeks)" location-is-saved="::self.locationIsSaved(self.seeks)"></won-location-picker>
+	                	</div>
+	                	<!-- TAGS ng-if="self.isDetailPresent('tags', self.seeks)"-->
+	                	 <div class="cp__tags" ng-if="detail === 'tags'">
+		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.seeks)">
+		                        <span class="nonHover">Tags</span>
+		                        <span class="hover">Remove Tags</span>
+		                    </div>
+		                    <div class="cp__taglist">
+		                        <span class="cp__taglist__tag" ng-repeat="tag in self.draftObject[self.seeks].tags">{{tag}}</span>
+		                    </div>
+		                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.seeks]" ng-keyup="::self.addTags(self.seeks)"/>
+		                </div>
+		            </div>
                 	<!-- /DETAILS -->
                 	<!-- DETAILS Picker -->
 	    			 
@@ -162,37 +164,38 @@ function genComponentConf() {
 						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 					</div>
 					
-					<!-- DETAILS-->
-					
-					<div class="cp__location" ng-if="self.isDetailPresent('location', self.is)"">
-                    	<div class="cp__header location" ng-click="self.removeDetail($index, self.is)">
-	                        <span class="nonHover">Location</span>
-	                        <span class="hover">Remove Location</span>
-    					</div>
-                    	<won-location-picker id="isPicker" on-draft-change="::self.setDraft(draft, self.is)" location-is-saved="::self.locationIsSaved(self.is)"></won-location-picker>
-                	</div>
-                	
-                	<div id="isPost" class="tabcontent">
-		    			<div class="cp__mandatory-rest ng-if="self.isDetailPresent('tags', self.is)"">
-					        <won-image-dropzone on-image-picked="::self.pickImage(image, self.is)">
-					        </won-image-dropzone>
-							<need-textfield on-draft-change="::self.setDraft(draft, self.is)"></need-textfield>
-						</div>
-						<div class="cp__textfield_instruction" ng-if="self.isValid(self.is)">
-							<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-						</div>
-					</div>
-	            	<!-- /DETAILS -->
+					<!-- DETAILS -->
+					<div class="cp__details" ng-repeat="detail in self.details[self.is] track by $index" ng-if="self.isValid(self.is)">
+						<!-- LOCATION ng-if="self.isDetailPresent('location', self.is)"-->
+						<div class="cp__location"  ng-if="detail === 'location'">
+	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.is)">
+		                        <span class="nonHover">Location</span>
+		                        <span class="hover">Remove Location</span>
+	    					</div>
+	                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.is)" location-is-saved="::self.locationIsSaved(self.is)"></won-location-picker>
+	                	</div>
+	                	<!-- TAGS ng-if="self.isDetailPresent('tags', self.is)"-->
+	                	 <div class="cp__tags" ng-if="detail === 'tags'">
+		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.is)">
+		                        <span class="nonHover">Tags</span>
+		                        <span class="hover">Remove Tags</span>
+		                    </div>
+		                    <div class="cp__taglist">
+		                        <span class="cp__taglist__tag" ng-repeat="tag in self.draftObject[self.is].tags">{{tag}}</span>
+		                    </div>
+		                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.is]" ng-keyup="::self.addTags(self.is)"/>
+		                </div>
+		            </div>
+                	<!-- /DETAILS -->
 	            
-	    			 <!-- DETAILS Picker-->
+	    			 <!-- DETAILS Picker	{'closedDetail': !self.showDetail[self.is]}-->
 	    			 
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.is)">
-		                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetail': !self.showDetail[self.is]}">
+    					<div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetail': !self.showDetail[self.is]}">
 		                    <span class="nonHover">Add more detail</span>
-		                    <span class="hover" ng-if="!self.showDetail[self.is]">Open more detail</span>
-		                    <span class="hover" ng-if="self.showDetail[self.is]">Close more detail</span>
+		                    <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
+		                    <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
 		                </div>
-		                
 			            <div class="cp__detail__items" ng-if="self.showDetail[self.is]" >
 		                    <div class="cp__detail__items__item location" 
 		                        ng-click="!self.isDetailPresent('location', self.is) && self.addDetail('location', self.is)"
@@ -375,9 +378,10 @@ function genComponentConf() {
         }
 
         toggleDetail(isSeeks){
-        	if(this.showDetail[isSeeks]){
+        	//TODO decide if clear detail list or not
+        	/*if(this.showDetail[isSeeks]){
         		this.details[isSeeks] = [];
-        	}
+        	}*/
             this.showDetail[isSeeks] = !this.showDetail[isSeeks];
         }
 
@@ -385,10 +389,10 @@ function genComponentConf() {
             this.details[isSeeks].push(detail);
         }
 
-        removeDetail(detailIndex, isSeeks) {
+        removeDetail(detail, isSeeks) {
         	 var tempDetails = [];
              for(var i=0; i < this.details[isSeeks].length; i++){
-                 if(i!=detailIndex) tempDetails.push(this.details[isSeeks][i]);
+                 if(this.details[isSeeks][i] != detail) tempDetails.push(this.details[isSeeks][i]);
              }
              this.details[isSeeks] = tempDetails;
         }
