@@ -5,6 +5,16 @@
 
 package won.owner.web.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +22,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,33 +33,36 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import won.owner.model.KeystoreHolder;
+import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.UserPojo;
 import won.owner.pojo.UserSettingsPojo;
+import won.owner.repository.KeystoreHolderRepository;
+import won.owner.repository.KeystorePasswordRepository;
 import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
+import won.owner.service.impl.KeystoreEnabledPersistentRememberMeServices;
+import won.owner.service.impl.KeystoreEnabledUserDetails;
+import won.owner.service.impl.KeystorePasswordUtils;
+import won.owner.service.impl.UserAlreadyExistsException;
 import won.owner.service.impl.WONUserDetailService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: t.kozel
@@ -74,7 +88,16 @@ public class RestUserController
   private UserNeedRepository userNeedRepository;
 
   private UserRepository userRepository;
-
+  
+  @Autowired
+  private KeystoreHolderRepository keystoreHolderRepository;
+  
+  @Autowired
+  private KeystorePasswordRepository keystorePasswordRepository;
+  
+  @Autowired
+  private KeystoreEnabledPersistentRememberMeServices keystoreEnabledPersistentRememberMeServices;
+  
   @Autowired
   ServletContext context;
 
@@ -113,20 +136,18 @@ public class RestUserController
   @Transactional(propagation = Propagation.SUPPORTS)
   public ResponseEntity registerUser(@RequestBody UserPojo user, Errors errors) {
     try {
-      userRegisterValidator.validate(user, errors);
-      if (errors.hasErrors()) {
-        if (errors.getFieldErrorCount() > 0) {
-          // someone trying to go around js validation
-          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
-        } else {
-          // username is already in database
-          return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
-        }
-      } else {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        wonUserDetailService.save(new User(user.getUsername(), passwordEncoder.encode(user.getPassword())));
-      }
-    } catch (DataIntegrityViolationException e) {
+    	userRegisterValidator.validate(user, errors);
+	      if (errors.hasErrors()) {
+	        if (errors.getFieldErrorCount() > 0) {
+	          // someone trying to go around js validation
+	          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+	        } else {
+	          // username is already in database
+	          return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
+	        }
+	      } 
+    	registerUser(user.getUsername(), user.getPassword(), null);
+    } catch (UserAlreadyExistsException e) {
       // username is already in database
       return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
     }
@@ -248,11 +269,9 @@ public class RestUserController
           return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
         }
       } else {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        User userDetails = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), "ROLE_PRIVATE");
-        wonUserDetailService.save(userDetails);
+       registerUser(user.getUsername(),user.getPassword(), "ROLE_PRIVATE");
       }
-    } catch (DataIntegrityViolationException e) {
+    } catch (UserAlreadyExistsException e) {
       // username is already in database
       return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
     }
@@ -307,6 +326,7 @@ public class RestUserController
     produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
+  @Transactional(propagation = Propagation.REQUIRED)
   //TODO: move transactionality annotation into the service layer
   //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
   public ResponseEntity isSignedIn(HttpServletRequest request, HttpServletResponse response) {
@@ -319,18 +339,25 @@ public class RestUserController
     }
     if (authentication == null) {
       authentication = rememberMeServices.autoLogin(request, response);
+    } else if (authentication instanceof AnonymousAuthenticationToken) {
+    	//if we're anonymous, try to see if we can reactivate a remember-me session
+    	Authentication anonAuth = authentication;
+    	authentication = rememberMeServices.autoLogin(request, response);
+    	if (authentication == null) {
+    		authentication = anonAuth;
+    	}
     }
     if (authentication == null) {
       return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else if ("anonymousUser".equals(authentication.getPrincipal())) {
       return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else {
-      User user = (User) authentication.getPrincipal();
+      User user = ((KeystoreEnabledUserDetails)authentication.getPrincipal()).getUser();
       Map values = new HashMap<String, String>();
       values.put("username", user.getUsername());
       values.put("authorities", user.getAuthorities());
       values.put("role", user.getRole());
-
+      SecurityContextHolder.getContext().setAuthentication(authentication);	
       return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
   }
@@ -355,21 +382,19 @@ public class RestUserController
     }
   }
 
-  /**
-   * @return
-   */
   @RequestMapping(
     value = "/signout",
     method = RequestMethod.POST
   )
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
   public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
     SecurityContext context = SecurityContextHolder.getContext();
     if (context.getAuthentication() == null) {
       return new ResponseEntity("\"No user is signed in, ignoring this request.\"", HttpStatus.NOT_MODIFIED);
+    } else {
+    	keystoreEnabledPersistentRememberMeServices.logout(request, response, context.getAuthentication());
+    	new SecurityContextLogoutHandler().logout(request, response, context.getAuthentication());
     }
-    myLogoff(request, response);
     return new ResponseEntity("\"Signed out\"", HttpStatus.OK);
   }
 
@@ -392,15 +417,49 @@ public class RestUserController
     return null;
   }
 
-  private static void myLogoff(HttpServletRequest request, HttpServletResponse response) {
-    CookieClearingLogoutHandler cookieClearingLogoutHandler = new CookieClearingLogoutHandler(
-      AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
-    SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
-    cookieClearingLogoutHandler.logout(request, response, null);
-    securityContextLogoutHandler.logout(request, response, null);
-  }
 
   public void setRememberMeServices(RememberMeServices rememberMeServices) {
     this.rememberMeServices = rememberMeServices;
   }
+  
+  /**
+	 * Registers the specified user with password and an opional role.
+	 * Assumes values have already been checked for syntactic validity.
+	 * @param email
+	 * @param password
+	 * @param role
+	 * @throws UserAlreadyExistsException
+	 */
+	private void registerUser(String email, String password, String role) throws UserAlreadyExistsException {
+		User user = userRepository.findByUsername(email);
+		if(user != null) {
+			throw new UserAlreadyExistsException();
+		}
+		try {
+	        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	        user = new User(email, passwordEncoder.encode(password),role);
+	        user.setEmail(email);
+	        KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
+	        //generate a password for the keystore and save it in the database, encrypted with a symmetric key
+	        //derived from the user's password
+	        keystorePassword.setPassword(
+	        		KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES),
+	        			 	password);
+	        //keystorePassword = keystorePasswordRepository.save(keystorePassword);
+	        //generate the keystore for the user
+			KeystoreHolder keystoreHolder = new KeystoreHolder();
+			try {
+				KeyStore keystore = keystoreHolder.getKeystore(keystorePassword.getPassword(password));
+			} catch (Exception e) {
+				logger.warn("could not create keystore for user " + email);
+			}
+			//keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
+			user.setKeystorePasswordHolder(keystorePassword);
+			user.setKeystoreHolder(keystoreHolder);
+	        userRepository.save(user);
+		} catch (DataIntegrityViolationException e) {
+		      // username is already in database
+			throw new UserAlreadyExistsException();
+	    }
+	}
 }

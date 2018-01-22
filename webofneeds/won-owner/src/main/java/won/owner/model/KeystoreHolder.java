@@ -2,32 +2,18 @@ package won.owner.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.security.KeyStore;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,10 +40,6 @@ public class KeystoreHolder {
     @Column(name = "keystore_data", nullable = false, length = 10000000)
     private byte[] keystoreBytes;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    private User user;
-    
 
     public KeystoreHolder() {
 		super();
@@ -77,14 +59,6 @@ public class KeystoreHolder {
 
     public byte[] getKeystoreBytes() {
 		return keystoreBytes;
-	}
-    
-    public void setUser(User user) {
-		this.user = user;
-	}
-    
-    public User getUser() {
-		return user;
 	}
     
     /**
@@ -128,22 +102,20 @@ public class KeystoreHolder {
 			return store;
     	}
     	inputStream = new ByteArrayInputStream(getKeystoreBytes());
-		if (inputStream == null) {
+		try {
+			store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
+			store.load(inputStream, password.toCharArray());
+		} catch (Exception e) {
+			logger.error("Could not load key store "  + getId(), e);
+			throw e;
+		} finally {
 			try {
-				store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
-				store.load(inputStream, password.toCharArray());
+				inputStream.close();
 			} catch (Exception e) {
-				logger.error("Could not load key store "  + getId(), e);
+				logger.error("Error closing stream of keystore " + getId(), e);
 				throw e;
-			} finally {
-				try {
-					inputStream.close();
-				} catch (Exception e) {
-					logger.error("Error closing stream of keystore " + getId(), e);
-					throw e;
-				}
-
 			}
+
 		}
 		return store;
     }

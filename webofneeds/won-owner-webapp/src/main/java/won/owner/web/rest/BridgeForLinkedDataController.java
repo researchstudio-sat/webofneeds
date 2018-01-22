@@ -1,6 +1,5 @@
 package won.owner.web.rest;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -70,6 +70,10 @@ public class BridgeForLinkedDataController implements InitializingBean {
 
 	@Autowired
 	private WONUserDetailService wonUserDetailService;
+
+	@Autowired
+	private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfNeed;
+	
 
 	@Autowired
 	private LinkedDataRestBridge linkedDataRestBridge;
@@ -118,7 +122,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
 			// check if the currently logged in user owns that webid:
 			if (currentUserHasIdentity(requesterWebId)) {
 				// yes: let them use it
-				restTemplate = linkedDataRestBridge.getRestTemplate(requesterWebId);
+				restTemplate = linkedDataRestBridgeOnBehalfOfNeed.getRestTemplate(requesterWebId);
 			} else {
 				// no: that's fishy, but we let them make the request without the webid
 				restTemplate = linkedDataRestBridge.getRestTemplate();

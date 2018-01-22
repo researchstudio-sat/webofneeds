@@ -25,7 +25,7 @@ public class LinkedDataRestBridge
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private RestTemplate restTemplateWithoutWebId;
+  private RestTemplate restTemplateWithDefaultWebId;
 
   private Integer readTimeout;
   private Integer connectionTimeout;
@@ -46,12 +46,23 @@ public class LinkedDataRestBridge
 
   @PostConstruct
   public void initialize() {
-      restTemplateWithoutWebId = new RestTemplate();
+	  String defaultAlias = keyPairAliasDerivationStrategy.getAliasForNeedUri(null);
+	  if (defaultAlias != null) {
+		  //we are using a fixed alias strategy (or at least, there is a default alias set) 
+		  try {
+			//passing null here will cause the default alias to be used
+			this.restTemplateWithDefaultWebId = createRestTemplateForReadingLinkedData(null); 
+		} catch (Exception e) {
+			throw new RuntimeException("could not create rest template for default alias " + defaultAlias);
+		}
+	  } else {
+		  restTemplateWithDefaultWebId = new RestTemplate();
+	  }
   }
 
 
   public RestTemplate getRestTemplate() {
-    return restTemplateWithoutWebId;
+    return restTemplateWithDefaultWebId;
   }
 
   public RestTemplate getRestTemplate(String requesterWebID) {
@@ -69,7 +80,7 @@ public class LinkedDataRestBridge
 
   private RestTemplate getRestTemplateForReadingLinkedData(String webID) throws Exception {
     if (webID == null) {
-      return restTemplateWithoutWebId;
+      return restTemplateWithDefaultWebId;
     }
     return createRestTemplateForReadingLinkedData(webID);
   }

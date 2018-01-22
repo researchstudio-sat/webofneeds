@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.cryptography.webid.springsecurity;
+package won.node.springsecurity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,6 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.util.StopWatch;
 import won.cryptography.webid.AccessControlRules;
-import won.cryptography.webid.WonDefaultAccessControlRules;
 
 import java.util.ArrayList;
 import java.util.Collection;

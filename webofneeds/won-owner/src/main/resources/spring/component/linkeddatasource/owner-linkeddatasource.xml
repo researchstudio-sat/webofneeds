@@ -24,5 +24,9 @@
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
+    
+     <bean id="linkedDataSourceOnBehalfOfNeed" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
+        <property name="linkedDataRestClient" ref="linkedDataRestClientOnBehalfOfNeed" />
+    </bean>
 
 </beans>

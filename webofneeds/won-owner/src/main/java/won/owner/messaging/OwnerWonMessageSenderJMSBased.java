@@ -16,11 +16,17 @@
 
 package won.owner.messaging;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -30,11 +36,6 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.RdfUtils;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * User: LEIH-NB

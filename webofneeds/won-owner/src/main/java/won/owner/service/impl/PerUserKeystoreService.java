@@ -1,13 +1,6 @@
 package won.owner.service.impl;
 
-import java.math.BigInteger;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import won.cryptography.service.keystore.AbstractKeyStoreService;
 import won.owner.model.User;
-import won.owner.repository.UserRepository;
+import won.owner.repository.KeystoreHolderRepository;
 
 @Component
 public class PerUserKeystoreService extends AbstractKeyStoreService {
@@ -29,25 +22,31 @@ public class PerUserKeystoreService extends AbstractKeyStoreService {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	
-	@Autowired 
-	private UserRepository UserRepository;
+	@Autowired
+	private KeystoreHolderRepository keystoreHolderRepository;
 	
 	private String getUsername() {
 		 return (String) SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 	
+	private Authentication getAuthentication() {
+		if (AuthenticationThreadLocal.hasValue()) {
+			return  AuthenticationThreadLocal.get();
+		} 
+		return SecurityContextHolder.getContext().getAuthentication();
+	}
 	
-	private KeystoreUserDetails getKeystoreUserDetails() {
-		 return (KeystoreUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+	private KeystoreEnabledUserDetails getKeystoreUserDetails() {
+		return (KeystoreEnabledUserDetails) getAuthentication().getPrincipal();
 	}
 	
 	private User getUser() {
-		return  (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return   ((KeystoreEnabledUserDetails) getAuthentication().getPrincipal()).getUser();
 	}
 	
 	@Override
 	public String getPassword() {
-		 return getKeystoreUserDetails().getPassword();
+		 return getKeystoreUserDetails().getKeystorePassword();
 	}
 	
 	
@@ -60,14 +59,20 @@ public class PerUserKeystoreService extends AbstractKeyStoreService {
 	@Override
 	protected void persistStore() throws Exception {
 		//fetch keystore and password from details in the authentication object 
-		KeystoreUserDetails keystoreUserDetails = getKeystoreUserDetails();
+		KeystoreEnabledUserDetails keystoreUserDetails = getKeystoreUserDetails();
 		//write it back to the db
-		getUser().getKeystoreHolder().setKeystore(keystoreUserDetails.getKeyStore(), keystoreUserDetails.getPassword());
+		User user = getUser();
+		user.getKeystoreHolder().setKeystore(keystoreUserDetails.getKeyStore(), keystoreUserDetails.getKeystorePassword());
+		keystoreHolderRepository.save(user.getKeystoreHolder());
 	}
 	
     
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
+	}
+    
+    public void setKeystoreHolderRepository(KeystoreHolderRepository keystoreHolderRepository) {
+		this.keystoreHolderRepository = keystoreHolderRepository;
 	}
 
 }

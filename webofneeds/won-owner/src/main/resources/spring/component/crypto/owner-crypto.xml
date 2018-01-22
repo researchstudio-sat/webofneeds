@@ -47,8 +47,8 @@
 		<constructor-arg ref="keyStoreService" />
 		<constructor-arg name="defaultAlias" value="${uri.prefix.owner}" />
 	</bean>
-	
-	<bean id="wonMessagingCryptographyService" parent="cryptographyService" />
+	<!-- alias used here, but the owner webapp uses two different beans-->
+	<alias alias="CryptographyServiceOnBehalfOfNeed" name="cryptographyService" />
     
     <!-- if the fixedPrivateKeyAlias is empty or null, the processor generates 
         a new Keypair for every need, if it is a string, the processor uses the same 
@@ -69,6 +69,8 @@
                 factory-method="create" />
 		</constructor-arg>
 	</bean>
+	<!-- alias used here, but the owner webapp uses two different beans-->
+	<alias alias="linkedDataRestClientOnBehalfOfNeed" name="linkedDataRestClient" />
 	
 	<bean id="messagingContext" class="won.cryptography.ssl.MessagingContext">
 		<constructor-arg ref="keyStoreService" />
@@ -87,5 +89,7 @@
                 factory-method="create" />
         </constructor-arg>   
 	</bean>
+	<!-- alias used here, but the owner webapp uses two different beans-->
+	<alias name="linkedDataRestBridge" alias="linkedDataRestBridgeOnBehalfOfNeed"/>
 
 </beans>

@@ -49,7 +49,7 @@
 		<constructor-arg name="registrationQuery" value="?register=owner" />
 	</bean>
 
-	<bean id="wonMessagingCryptographyService" class="won.cryptography.service.CryptographyService">
+	<bean id="CryptographyServiceOnBehalfOfNeed" class="won.cryptography.service.CryptographyService">
 		<constructor-arg ref="perUserKeyStoreService" />
 		<!-- we don't set a default alias - that's not needed for the owner webapp -->
 	</bean>
@@ -78,7 +78,7 @@
 			ref="ownerUriAliasStrategy" />
 	</bean>
 
-	<bean id="wonMessageLinkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
+	<bean id="linkedDataRestClientOnBehalfOfNeed" class="won.protocol.rest.LinkedDataRestClientHttps">
 		<constructor-arg ref="perUserKeyStoreService" />
 		<constructor-arg ref="trustStoreService" />
 		<constructor-arg name="trustStrategy">
@@ -98,15 +98,24 @@
 	</bean>
 
 	<bean id="linkedDataRestBridge" class="won.protocol.rest.LinkedDataRestBridge">
-		<constructor-arg ref="perUserKeyStoreService" />
+		<constructor-arg ref="keyStoreService" />
 		<constructor-arg ref="trustStoreService" />
 		<constructor-arg name="trustStrategy">
 			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
 		</constructor-arg>
-		<constructor-arg name="keyPairAliasDerivationStrategy">
-			<bean factory-bean="keyPairAliasDerivationStrategyFactory"
-				factory-method="create" />
-		</constructor-arg>
+		<constructor-arg name="keyPairAliasDerivationStrategy" ref="ownerUriAliasStrategy" />
 	</bean>
+	
+	<bean id="linkedDataRestBridgeOnBehalfOfNeed" class="won.protocol.rest.LinkedDataRestBridge">
+        <constructor-arg ref="perUserKeyStoreService" />
+        <constructor-arg ref="trustStoreService" />
+        <constructor-arg name="trustStrategy">
+            <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
+        </constructor-arg>
+        <constructor-arg name="keyPairAliasDerivationStrategy">
+            <bean factory-bean="keyPairAliasDerivationStrategyFactory"
+                factory-method="create" />
+        </constructor-arg>
+    </bean>
 
 </beans>

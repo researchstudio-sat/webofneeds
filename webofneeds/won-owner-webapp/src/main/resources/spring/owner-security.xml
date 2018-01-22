@@ -43,7 +43,7 @@
 
 	<http use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
 		  security-context-repository-ref="securityContextRepository">
-        <intercept-url pattern="/msg" access="isAnonymous()"/>
+        <intercept-url pattern="/msg" access="isAnonymous() or isAuthenticated()"/>
         <intercept-url pattern="/sitemap.xml" access="permitAll()"/>
         <intercept-url pattern="/rest/users/" access="permitAll()"/>
         <intercept-url pattern="/rest/users/private" access="isAnonymous()"/>
@@ -71,7 +71,8 @@
 			Alternatively, we can inject a value through external configuration.
 			A suitable name for that property would be ${owner.webapp.rememberme.key}.
 		-->
-
+        <!--
+        remember-me beans are defined further below 
 		<remember-me
 				user-service-ref="wonUserDetailService"
 				use-secure-cookie="true"
@@ -81,7 +82,8 @@
 				token-validity-seconds="5184000"
 				data-source-ref="dataSource"
 				/>
-
+            -->
+            
 		<!-- use spring security's default http headers -->
 		<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
 		configuration in spring-security-3.2.9 -->
@@ -90,7 +92,31 @@
 		<csrf disabled="true" />
 	</http>
 
+    <!-- because we use a customization of the RememberMeServices, 
+    we cannot use the <remember-me namespace config and have to define the required beans manually -->
+    
+    <beans:bean id="rememberMeFilter" class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+        <beans:constructor-arg name="rememberMeServices" ref="rememberMeServices"/>
+        <beans:constructor-arg name="authenticationManager" ref="authenticationManager" />
+    </beans:bean>
 
+    <beans:bean id="rememberMeServices" class="won.owner.service.impl.KeystoreEnabledPersistentRememberMeServices">
+        <beans:constructor-arg name="userDetailsService" ref="wonUserDetailService"/>
+        <beans:constructor-arg name="key" value="${owner.webapp.rememberme.key}" />
+        <beans:constructor-arg name="tokenRepository" ref="tokenRepository"/>
+        <beans:property name="tokenValiditySeconds" value="5184000" />
+        <beans:property name="useSecureCookie" value="true" />
+    </beans:bean>
+    
+    
+    <beans:bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+        <beans:constructor-arg name="key" value="${owner.webapp.rememberme.key}"/>
+    </beans:bean>
+    
+    
+    <beans:bean id="tokenRepository" class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl" >
+        <beans:property name="dataSource" ref="dataSource" />
+    </beans:bean>
 
 	<beans:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 
@@ -111,9 +137,10 @@
 
 	<authentication-manager alias="authenticationManager">
 		<authentication-provider ref="authenticationProvider"/>
+		<authentication-provider ref="rememberMeAuthenticationProvider"/>
 	</authentication-manager>
 
 	<beans:bean id="securityContextRepository"
 						class='org.springframework.security.web.context.HttpSessionSecurityContextRepository' />
-
+						
 </beans:beans>

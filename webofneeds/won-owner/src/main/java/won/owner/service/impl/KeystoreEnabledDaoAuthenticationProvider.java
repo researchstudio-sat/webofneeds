@@ -1,13 +1,7 @@
 package won.owner.service.impl;
 
-import java.math.BigInteger;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -18,8 +12,10 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 
 import won.owner.model.KeystoreHolder;
+import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.User;
 import won.owner.repository.KeystoreHolderRepository;
+import won.owner.repository.KeystorePasswordRepository;
 import won.owner.repository.UserRepository;
 
 public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationProvider {
@@ -31,6 +27,9 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
 	@Autowired 
 	KeystoreHolderRepository keystoreHolderRepository;
 	
+	@Autowired
+	KeystorePasswordRepository keystorePasswordRepository;
+	
 	@Override
 	@Transactional
 	public Authentication authenticate(Authentication authentication) {
@@ -40,27 +39,47 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
 		User user = (User) auth.getPrincipal();
 		//can't use that object as it's detached. load the user again:
 		user = userRepository.findOne(user.getId());
+		KeystorePasswordHolder keystorePasswordHolder = user.getKeystorePasswordHolder();
+		if (keystorePasswordHolder == null) {
+			 keystorePasswordHolder = new KeystorePasswordHolder();
+		        //generate a password for the keystore and save it in the database, encrypted with a symmetric key
+		        //derived from the user's password
+		        keystorePasswordHolder.setPassword(
+		        		KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES),
+		        			 	password);
+		        //keystorePasswordHolder = keystorePasswordRepository.save(keystorePasswordHolder);
+		        //generate the keystore for the user
+		}		
+		String keystorePassword = keystorePasswordHolder.getPassword(password);
 		KeystoreHolder keystoreHolder = user.getKeystoreHolder();
+		KeyStore keystore = null;
 		if (keystoreHolder == null) {
 			//new user: create keystoreHolder
 			keystoreHolder = new KeystoreHolder();
+			keystore = openOrCreateKeyStore(keystorePassword, auth.getName(), keystoreHolder);
+			//keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
 			user.setKeystoreHolder(keystoreHolder);
-			keystoreHolder.setUser(user);
+		} else {
+			try {
+				keystore =  keystoreHolder.getKeystore(keystorePassword);
+			} catch (Exception e) {
+				throw new IllegalStateException("could not open keystore for user " + username);
+			}
 		}
-		password = createPassword(username + password);
+		userRepository.save(user);
+		KeystoreEnabledUserDetails ud = new KeystoreEnabledUserDetails(user, keystore, keystorePassword);
+		return new UsernamePasswordAuthenticationToken(ud, null, auth.getAuthorities());
+	}
+
+	private KeyStore openOrCreateKeyStore(String password, String username,
+			KeystoreHolder keystoreHolder) {
 		KeyStore keystore = null;
 		try {
 			keystore = keystoreHolder.getKeystore(password);
 		} catch (Exception e) {
-			throw new IllegalStateException("could not open keystore for user " + auth.getName());
+			throw new IllegalStateException("could not open keystore for user " + username);
 		}
-		KeystoreUserDetails keystoreUserDetails = new KeystoreUserDetails();
-		keystoreUserDetails.setKeyStore(keystore);
-		keystoreUserDetails.setPassword(password);
-		auth.setDetails(keystoreUserDetails);
-		keystoreHolderRepository.save(keystoreHolder);
-		userRepository.save(user);
-		return auth;
+		return keystore;
 	}
 		
 	public void setUserRepository(UserRepository userRepository) {
@@ -71,49 +90,6 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
 		this.keystoreHolderRepository = keystoreHolderRepository;
 	}
 	
-	private String createPassword(String toHash) {
-		 
-		 String password = null;
-		try {
-			logger.info("creating new password...");
-			password = generateHash(toHash);
-			logger.info("done");
-		} catch (Exception e) {
-			logger.info("could not generate hash",e);
-		} 
-		return password;
-	}
 	
-	private static String generateHash(String toHash) throws NoSuchAlgorithmException, InvalidKeySpecException
-    {
-        int iterations = 100;
-        char[] chars = toHash.toCharArray();
-        byte[] salt = getSalt();
-         
-        PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 50);
-        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        byte[] hash = skf.generateSecret(spec).getEncoded();
-        return iterations + ":" + toHex(salt) + ":" + toHex(hash);
-    }
-     
-    private static byte[] getSalt() throws NoSuchAlgorithmException
-    {
-        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
-        byte[] salt = new byte[16];
-        sr.nextBytes(salt);
-        return salt;
-    }
-     
-    private static String toHex(byte[] array) throws NoSuchAlgorithmException
-    {
-        BigInteger bi = new BigInteger(1, array);
-        String hex = bi.toString(16);
-        int paddingLength = (array.length * 2) - hex.length();
-        if(paddingLength > 0)
-        {
-            return String.format("%0"  +paddingLength + "d", 0) + hex;
-        }else{
-            return hex;
-        }
-    }
+
 }

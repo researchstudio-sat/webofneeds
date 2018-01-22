@@ -16,6 +16,14 @@
 
 package won.owner.web.websocket;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -23,19 +31,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * User: LEIH-NB
  * Date: 09.10.2014
  */
 public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
 {
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
   // TODO why do we need this if there is a session cookie?
-  public static final String SESSION_ATTR = "httpSession.id";
+  public static final String SESSION_ATTR = "HTTP.SESSION.ID";
   // TODO  probably we don't need it any more, the user in WonWebSocketHandler
   // is obtained directly from session.getPrincipal().getName();
   public static final String USERNAME_ATTR = "username";
@@ -57,6 +63,7 @@ public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
 
     addSessionIdAttribute(request, attributes);
     attributes.put(USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
+    logger.debug("adding session attribute {}:{}", USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
     return super.beforeHandshake(request, response, wsHandler, attributes);
   }
 
@@ -70,6 +77,9 @@ public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
       HttpSession session = servletRequest.getServletRequest().getSession(false);
       if (session != null) {
         attributes.put(SESSION_ATTR, session.getId());
+        logger.debug("adding session attribute {}:{}", SESSION_ATTR, session.getId());
+      } else {
+    	  logger.debug("no http session found, cannot pass attributes from session");
       }
     }
   }
