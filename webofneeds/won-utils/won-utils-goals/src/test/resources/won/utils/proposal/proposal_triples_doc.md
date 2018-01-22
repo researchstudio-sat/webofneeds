@@ -1,3 +1,4 @@
+### noOpenProposal
 **input**: 2proposal-bothaccepted.trig
 **output**: 2proposal-bothaccepted.trig
 **test name**: noOpenProposal
@@ -5,6 +6,7 @@
  
  output: none
  
+ ### oneOpenPropsoal
 **input**: 2proposal-one-accepted.trig
 **output**: 2proposal-one-accepted.trig
 **test name**:  oneOpenPropsoal
@@ -52,7 +54,8 @@
             won:hasTextMessage  "one" .
 }
  ```
- 
+
+### twoOpenProposals  
 **input**: 2proposal-noaccepted.trig
 **output**: 2proposal-noaccepted.trig
 **test name**: twoOpenProposals   
