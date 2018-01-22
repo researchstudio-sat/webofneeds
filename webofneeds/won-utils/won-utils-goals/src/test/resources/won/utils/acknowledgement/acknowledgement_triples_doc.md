@@ -961,6 +961,7 @@ event:ofx1afjv35cwpppp0wyg
 **test name**: oneLocalMessageWithoutRemoteRemoteResponseTest
 
 **diff**:
+
 ```
 10094,10098d10093
 < <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
