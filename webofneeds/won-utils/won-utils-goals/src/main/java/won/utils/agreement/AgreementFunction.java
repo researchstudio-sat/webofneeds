@@ -25,7 +25,7 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
 public class AgreementFunction {
     private static final String AGREEMENT_SUFFIX = "";
 	private String queryString;
-    private static String queryFile = "/agreement/query.sq";
+    private static final String queryFile = "/agreement/query.sq";
 
     public AgreementFunction() {
         InputStream is  = AgreementFunction.class.getResourceAsStream(queryFile);

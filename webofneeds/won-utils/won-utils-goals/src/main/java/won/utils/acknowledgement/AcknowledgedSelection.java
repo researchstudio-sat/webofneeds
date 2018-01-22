@@ -16,7 +16,7 @@ import java.io.StringWriter;
 
 public class AcknowledgedSelection {
     private String queryString;
-    private static String queryFile = "/acknowledgement/query.sq";
+    private static final String queryFile = "/acknowledgement/query.sq";
 
     public AcknowledgedSelection() {
         InputStream is  = AcknowledgedSelection.class.getResourceAsStream(queryFile);

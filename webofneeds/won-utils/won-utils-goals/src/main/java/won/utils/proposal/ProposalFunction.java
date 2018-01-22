@@ -25,7 +25,7 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
 public class ProposalFunction {
     private static final String PROPOSAL_SUFFIX = "";
 	private String queryString;
-    private static String queryFile = "/proposal/query.sq";
+    private static final String queryFile = "/proposal/query.sq";
 
     public ProposalFunction() {
         InputStream is  = ProposalFunction.class.getResourceAsStream(queryFile);

@@ -13,7 +13,7 @@ import java.io.StringWriter;
 public class ModifiedSelection {
 
     private String queryString;
-    private static String queryFile = "/modification/query.sq";
+    private static final String queryFile = "/modification/query.sq";
 
     public ModifiedSelection() {
         InputStream is  = ModifiedSelection.class.getResourceAsStream(queryFile);

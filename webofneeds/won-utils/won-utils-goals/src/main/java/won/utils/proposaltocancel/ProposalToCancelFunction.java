@@ -25,7 +25,7 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
 public class ProposalToCancelFunction {
     private static final String PROPOSAL_TO_CANCEL_SUFFIX = "";
 	private String queryString;
-    private static String queryFile = "/proposaltocancel/query.sq";
+    private static final String queryFile = "/proposaltocancel/query.sq";
 
     public ProposalToCancelFunction() {
         InputStream is  = ProposalToCancelFunction.class.getResourceAsStream(queryFile);
