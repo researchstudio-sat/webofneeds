@@ -8,7 +8,7 @@
 
 **input**: one-local-message-fails-locally.trig
 **output**: one-local-message-fails-locally.trig
-**test name**: oneLocalMessageFailsLocallyUnrealisticTest
+**test name**: oneLocalMessageFailsLocallyTest
 
 **diff**: 
 
