@@ -4,7 +4,7 @@
 ### oneAgreementTest 
 *one-agreement.trig (there is one agreement .. expect agreement in output)*
 
-`
+``
 <https://localhost:8443/won/resource/event/5669098069340991000#content> {
     event:5669098069340991000
             won:hasTextMessage  "one" .
@@ -19,4 +19,4 @@
             won:hasTextMessage  "Please go on." ;
             agr:accepts event:557600936467257340 .
 }
-`
+``
