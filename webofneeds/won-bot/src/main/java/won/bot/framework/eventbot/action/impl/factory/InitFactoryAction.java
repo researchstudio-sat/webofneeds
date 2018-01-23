@@ -1,7 +1,6 @@
 package won.bot.framework.eventbot.action.impl.factory;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
@@ -31,8 +30,6 @@ import won.bot.framework.eventbot.filter.impl.TargetCounterFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
-import won.protocol.model.NeedGraphType;
-import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -104,7 +101,7 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
                 Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(dataset);
 
                 if(needResource.isURIResource()){
-                    needUriFromProducer = URI.create(needResource.getURI().toString());
+                    needUriFromProducer = URI.create(needResource.getURI());
                 }
                 if(needUriFromProducer != null){
 
