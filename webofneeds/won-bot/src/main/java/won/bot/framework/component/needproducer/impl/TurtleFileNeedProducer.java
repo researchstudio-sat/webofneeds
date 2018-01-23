@@ -51,7 +51,7 @@ public class TurtleFileNeedProducer implements FileBasedNeedProducer
       return needModelWrapper.copyDataset();
 
     } catch (Exception e) {
-      logger.debug("could not parse turtle from file {} ", file, e);
+      logger.error("could not parse turtle from file {} ", file, e);
       throw e;
     }
   }

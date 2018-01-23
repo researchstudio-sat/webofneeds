@@ -102,9 +102,9 @@ public class DirectoryBasedNeedProducer implements NeedProducer
       if (fileIndexToUse >= this.files.length) return null;
       return this.fileBasedNeedProducer.readNeedFromFile(this.files[fileIndexToUse]);
     } catch (IOException e) {
-      logger.debug("could not read need from file {}", this.files[fileIndexToUse]);
+      logger.error("could not read need from file {}", this.files[fileIndexToUse]);
     } catch (DataIntegrityException e){
-      logger.debug("DataIntegrityException(need and sysinfo models must contain a resource of type won:Need");
+      logger.error("DataIntegrityException(need and sysinfo models must contain a resource of type won:Need");
     }
     return null;
   }

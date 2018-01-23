@@ -76,7 +76,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
       logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(), 200));
       return needModelWrapper.copyDataset();
     } catch (Exception e) {
-      logger.debug("could not parse email from file {} ", file, e);
+      logger.error("could not parse email from file {} ", file, e);
     } finally {
       if (fis != null) fis.close();
     }
