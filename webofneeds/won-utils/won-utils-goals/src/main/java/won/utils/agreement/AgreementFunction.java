@@ -45,6 +45,7 @@ public class AgreementFunction {
         Query query = QueryFactory.create(queryString);
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, conversationDataset)) {
             ResultSet resultSet = queryExecution.execSelect();
+            // Sets an object to hold the current agreement
             RDFNode currentAgreement = null;
             Model currentAgreementContent = ModelFactory.createDefaultModel();
             while (resultSet.hasNext()) {
@@ -68,7 +69,9 @@ public class AgreementFunction {
                 RDFNode s = solution.get("s");
                 RDFNode p = solution.get("p");
                 RDFNode o = solution.get("o");
+                // grabs the content of the agreement
                 Statement newStatement = new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o);
+                // places the contents of the agreement in the agreement graph by adding it the agreement object
                 currentAgreementContent.add(newStatement);
             }
             //add the last model
