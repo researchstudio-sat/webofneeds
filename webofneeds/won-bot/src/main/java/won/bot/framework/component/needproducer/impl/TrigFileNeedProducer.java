@@ -44,16 +44,11 @@ public class TrigFileNeedProducer implements FileBasedNeedProducer
         try (FileInputStream fis = new FileInputStream(file)) {
             Dataset dataset = DatasetFactory.createGeneral();
             RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
-            // TODO this needs to be fixed according to the need trig format
-            // definition, i.e. the need/connection/event/etc. triples are in core
-            // and transient named graphs, and in default graph there can only be
-            // the graphs signatures. The Dataset should be returned instead of
-            // Model
-            NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset, false); //to ensure the dataset contains a valid need (but expect both graphs to be present already)
+            NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
 
             return needModelWrapper.copyDataset();
         } catch (Exception e) {
-            logger.debug("could not parse trig from file {} ", file, e);
+            logger.error("could not parse trig from file {} ", file, e);
             throw e;
         }
     }
