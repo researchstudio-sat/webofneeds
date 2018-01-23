@@ -1,7 +1,7 @@
 package won.cryptography.ssl;
 
-import org.apache.http.conn.ssl.PrivateKeyDetails;
-import org.apache.http.conn.ssl.PrivateKeyStrategy;
+import org.apache.http.ssl.PrivateKeyDetails;
+import org.apache.http.ssl.PrivateKeyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

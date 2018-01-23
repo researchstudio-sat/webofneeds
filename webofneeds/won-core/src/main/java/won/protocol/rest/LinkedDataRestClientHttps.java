@@ -16,7 +16,7 @@
 
 package won.protocol.rest;
 
-import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +27,6 @@ import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.keymanagement.NeedUriAsAliasStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
