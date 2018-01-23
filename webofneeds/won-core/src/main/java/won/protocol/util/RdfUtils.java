@@ -190,12 +190,12 @@ public class RdfUtils
   }
 
     public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
-        Iterator<String> graphNameIterator = dataset.listNames();
-
-        while(graphNameIterator.hasNext()) {
-            String graphName = graphNameIterator.next();
-            replaceBaseURI(dataset.getNamedModel(graphName), baseURI);
-        }
+        visit(dataset,
+            model -> {
+                replaceBaseURI(model, baseURI);
+                return null;
+            }
+        );
     }
 
   /**
@@ -213,13 +213,14 @@ public class RdfUtils
     model.setNsPrefix("", replacement.getURI());
   }
 
-    public static void replaceBaseResource(final Dataset dataset,final Resource replacement) {
-        Iterator<String> graphNameIterator = dataset.listNames();
-
-        while(graphNameIterator.hasNext()) {
-            String graphName = graphNameIterator.next();
-            replaceBaseResource(dataset.getNamedModel(graphName), replacement);
-        }
+    public static void replaceBaseResource(Dataset dataset,final Resource replacement) {
+        visit(dataset, new ModelVisitor<Object>() {
+            @Override
+            public Object visit(Model model) {
+                replaceBaseResource(model, replacement);
+                return null;
+            }
+        });
     }
 
   /**

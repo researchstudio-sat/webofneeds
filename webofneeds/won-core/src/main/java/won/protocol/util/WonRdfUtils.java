@@ -29,6 +29,7 @@ import java.util.*;
 
 import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
+import static won.protocol.util.RdfUtils.visit;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -514,13 +515,10 @@ public class WonRdfUtils
     }
 
       public static void addFacet(final Dataset dataset, final URI facetURI) {
-          Iterator<String> graphNameIterator = dataset.listNames();
-
-          while(graphNameIterator.hasNext()) {
-              String graphName = graphNameIterator.next();
-              addFacet(dataset.getNamedModel(graphName), facetURI);
-              //TODO: NOT SURE IF THIS IS SUPPOSED TO BE THAT WAY
-          }
+          visit(dataset, model -> {
+              addFacet(model, facetURI);
+              return null;
+          });
       }
 
     /**
