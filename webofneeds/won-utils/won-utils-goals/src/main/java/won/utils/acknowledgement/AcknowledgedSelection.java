@@ -18,6 +18,7 @@ public class AcknowledgedSelection {
     private String queryString;
     private static final String queryFile = "/acknowledgement/query.sq";
 
+    // Function that reads in the query file to a string using Apache's IOUtils and java.utils
     public AcknowledgedSelection() {
         InputStream is  = AcknowledgedSelection.class.getResourceAsStream(queryFile);
         StringWriter writer = new StringWriter();
@@ -30,8 +31,13 @@ public class AcknowledgedSelection {
     }
 
     public Dataset applyAcknowledgedSelection(Dataset conversationDataset){
+    	// creates an update request by grabbing the queryString variable, populated by the Acknowledged Section method
         UpdateRequest update = UpdateFactory.create(queryString);
+       
+        // create a clone of the input datast ... See the RdfUtils class comments
         Dataset copy = RdfUtils.cloneDataset(conversationDataset);
+        
+        // perform a sparql update with the clone and the acknowledgement/query.sq
         UpdateProcessor updateProcessor = UpdateExecutionFactory.create(update,copy);
         updateProcessor.execute();
         return copy;
