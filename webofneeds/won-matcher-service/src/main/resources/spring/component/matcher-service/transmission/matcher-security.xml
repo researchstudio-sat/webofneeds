@@ -51,7 +51,7 @@
         <constructor-arg name ="trustStrategy">
             <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
         </constructor-arg>
-        <constructor-arg name="keyPairAliasDerivationStrategy" ref="predefinedAliasStrategy">
+        <constructor-arg name="keyPairAliasDerivationStrategy" ref="predefinedAliasStrategy" />
     </bean>
     <bean id="messagingContext" class="won.cryptography.ssl.MessagingContext" >
         <constructor-arg ref="keyStoreService"/>
