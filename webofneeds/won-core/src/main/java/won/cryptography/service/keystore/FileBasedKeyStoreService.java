@@ -159,19 +159,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see won.cryptography.service.KeyStoreService#putKey(java.lang.String,
-	 * java.security.PrivateKey, java.security.cert.Certificate[], boolean)
-	 */
-	@Override
-	public synchronized void putKey(String alias, PrivateKey key, Certificate[] certificateChain, boolean replace)
-			throws IOException {
-
-		putEntry(alias, key, certificateChain, null, replace);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * won.cryptography.service.KeyStoreService#putCertificate(java.lang.String,
 	 * java.security.cert.Certificate, boolean)
