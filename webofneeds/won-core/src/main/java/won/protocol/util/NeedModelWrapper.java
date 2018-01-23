@@ -153,7 +153,7 @@ public class NeedModelWrapper {
      */
     public static boolean isANeed(Dataset ds){
         try{
-            NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
+            new NeedModelWrapper(ds, false);
             return true;
         }catch (DataIntegrityException e){
             return false;
@@ -173,6 +173,12 @@ public class NeedModelWrapper {
         if(this.needModelGraphName != null && needDataset.getNamedModel(this.needModelGraphName) != null) {
             return needDataset.getNamedModel(this.needModelGraphName);
         }
+
+        Model defaultModel = needDataset.getDefaultModel();
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (defaultModel.listSubjectsWithProperty(WON.IS).hasNext() || defaultModel.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+            return defaultModel;
+        }
+
         while(modelNameIter.hasNext()) {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
@@ -190,6 +196,12 @@ public class NeedModelWrapper {
         if(this.sysInfoGraphName != null && needDataset.getNamedModel(this.sysInfoGraphName) != null) {
             return needDataset.getNamedModel(this.sysInfoGraphName);
         }
+
+        Model defaultModel = needDataset.getDefaultModel();
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (defaultModel.listSubjectsWithProperty(WON.IS).hasNext() || defaultModel.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+            return defaultModel;
+        }
+
         while(modelNameIter.hasNext()) {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
