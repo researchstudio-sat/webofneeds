@@ -68,12 +68,9 @@ function genComponentConf() {
                 </span>
             </button>
             <won-labelled-hr label="::' or be more specific '"></won-labelled-hr>
-            
-                       
-            
+         
             <div class="cp__addDetail">
-            	<!-- SEEKS PART -->
-            	
+            	<!-- SEEKS PART -->   	
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
 	                  	<span class="nonHover">Search</span>
 	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Create Search</span>
@@ -88,10 +85,9 @@ function genComponentConf() {
 					<div class="cp__textfield_instruction" ng-if="self.checkDropDown(self.seeks)">
 						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 					</div>
-					
 					<!-- DETAILS -->
 					<div class="cp__details" ng-repeat="detail in self.details[self.seeks] track by $index" ng-if="self.isValid(self.seeks)">
-						<!-- LOCATION ng-if="self.isDetailPresent('location', self.seeks)"-->
+						<!-- LOCATION -->
 						<div class="cp__location"  ng-if="detail === 'location'">
 	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.seeks)">
 		                        <span class="nonHover">Location</span>
@@ -99,7 +95,7 @@ function genComponentConf() {
 	    					</div>
 	                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.seeks)" location-is-saved="::self.locationIsSaved(self.seeks)"></won-location-picker>
 	                	</div>
-	                	<!-- TAGS ng-if="self.isDetailPresent('tags', self.seeks)"-->
+	                	<!-- TAGS -->
 	                	 <div class="cp__tags" ng-if="detail === 'tags'">
 		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.seeks)">
 		                        <span class="nonHover">Tags</span>
@@ -113,19 +109,16 @@ function genComponentConf() {
 		            </div>
                 	<!-- /DETAILS -->
                 	<!-- DETAILS Picker -->
-	    			 
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.seeks)">
 		                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.seeks)" ng-class="{'closedDetail': !self.showDetail[self.seeks]}">
 		                    <span class="nonHover">Add more detail</span>
 		                    <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
 		                    <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
 		                </div>
-		                
 			            <div class="cp__detail__items" ng-if="self.showDetail[self.seeks]" >
 		                    <div class="cp__detail__items__item location" 
 		                        ng-click="!self.isDetailPresent('location', self.seeks) && self.addDetail('location', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('location', self.seeks)}">Address or Location</div>
-		                        
+		                        ng-class="{'picked' : self.isDetailPresent('location', self.seeks)}">Address or Location</div>     
 		                    <div class="cp__detail__items__item tags"
 		                        ng-click="!self.isDetailPresent('tags', self.seeks) && self.addDetail('tags', self.seeks)"
 		                        ng-class="{'picked' : self.isDetailPresent('tags', self.seeks)}">Tags</div>
@@ -148,7 +141,6 @@ function genComponentConf() {
 	            <won-labelled-hr label="::'and?'" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr>
 	            
 	            <!-- IS PART -->
-	          
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
 	                  	<span class="nonHover">Offer</span>
 	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create Offer</span>
@@ -174,7 +166,7 @@ function genComponentConf() {
 	    					</div>
 	                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.is)" location-is-saved="::self.locationIsSaved(self.is)"></won-location-picker>
 	                	</div>
-	                	<!-- TAGS ng-if="self.isDetailPresent('tags', self.is)"-->
+	                	<!-- TAGS -->
 	                	 <div class="cp__tags" ng-if="detail === 'tags'">
 		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.is)">
 		                        <span class="nonHover">Tags</span>
@@ -187,9 +179,7 @@ function genComponentConf() {
 		                </div>
 		            </div>
                 	<!-- /DETAILS -->
-	            
-	    			 <!-- DETAILS Picker	{'closedDetail': !self.showDetail[self.is]}-->
-	    			 
+    				<!-- DETAILS Picker -->
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.is)">
     					<div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetail': !self.showDetail[self.is]}">
 		                    <span class="nonHover">Add more detail</span>
@@ -199,8 +189,7 @@ function genComponentConf() {
 			            <div class="cp__detail__items" ng-if="self.showDetail[self.is]" >
 		                    <div class="cp__detail__items__item location" 
 		                        ng-click="!self.isDetailPresent('location', self.is) && self.addDetail('location', self.is)"
-		                        ng-class="{'picked' : self.isDetailPresent('location', self.is)}">Address or Location</div>
-		                        
+		                        ng-class="{'picked' : self.isDetailPresent('location', self.is)}">Address or Location</div>   
 		                    <div class="cp__detail__items__item tags"
 		                        ng-click="!self.isDetailPresent('tags', self.is) && self.addDetail('tags', self.is)"
 		                        ng-class="{'picked' : self.isDetailPresent('tags', self.is)}">Tags</div>
