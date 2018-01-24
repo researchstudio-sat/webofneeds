@@ -91,7 +91,6 @@ services:
       - "db.sql.password=won"
       - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=changeit"
-      - "owner.webapp.rememberme.key=changeit"
     ports:
       - "8082:8443"
     volumes:

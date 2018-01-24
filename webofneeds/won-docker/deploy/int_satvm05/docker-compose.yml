@@ -176,7 +176,6 @@ services:
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "owner.webapp.rememberme.key=$rememberme_key"
       - "email.from.won.user=$MAIL_USER"
       - "email.from.won.password=$MAIL_PASS"
       - "email.from.won.smtp.host=$MAIL_HOST"
