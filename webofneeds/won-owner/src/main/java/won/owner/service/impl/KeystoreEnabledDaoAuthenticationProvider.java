@@ -40,7 +40,7 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
 		//can't use that object as it's detached. load the user again:
 		user = userRepository.findOne(user.getId());
 		KeystorePasswordHolder keystorePasswordHolder = user.getKeystorePasswordHolder();
-		if (keystorePasswordHolder == null) {
+		if (keystorePasswordHolder == null || keystorePasswordHolder.getEncryptedPassword() == null || keystorePasswordHolder.getEncryptedPassword().length()==0) {
 			 keystorePasswordHolder = new KeystorePasswordHolder();
 		        //generate a password for the keystore and save it in the database, encrypted with a symmetric key
 		        //derived from the user's password
@@ -53,8 +53,8 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
 		String keystorePassword = keystorePasswordHolder.getPassword(password);
 		KeystoreHolder keystoreHolder = user.getKeystoreHolder();
 		KeyStore keystore = null;
-		if (keystoreHolder == null) {
-			//new user: create keystoreHolder
+		if (keystoreHolder == null || keystoreHolder.getKeystoreBytes() == null || keystoreHolder.getKeystoreBytes().length == 0) {
+			//new user or legacy user that has no keystore yet: create keystoreHolder
 			keystoreHolder = new KeystoreHolder();
 			keystore = openOrCreateKeyStore(keystorePassword, auth.getName(), keystoreHolder);
 			//keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
