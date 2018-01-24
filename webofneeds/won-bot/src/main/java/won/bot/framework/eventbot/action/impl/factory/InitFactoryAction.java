@@ -40,7 +40,7 @@ import java.time.Duration;
  * completed
  */
 public class InitFactoryAction extends AbstractCreateNeedAction {
-    private static int FACTORYNEEDCREATION_DURATION_INMILLIS = 100;
+    private static int FACTORYNEEDCREATION_DURATION_INMILLIS = 250;
 
     private int targetInFlightCount;
     private int maxInFlightCount;
