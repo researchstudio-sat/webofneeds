@@ -16,15 +16,7 @@
 
 package won.protocol.message;
 
-import com.google.common.collect.Iterators;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.vocabulary.RDF;
-import org.junit.Assert;
-import org.junit.Test;
-import won.protocol.util.RdfUtils;
+import static won.protocol.message.WonMessageBuilder.wrap;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -32,7 +24,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static won.protocol.message.WonMessageBuilder.wrap;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.SKOS;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterators;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import won.protocol.util.RdfUtils;
 
 public class WonMessageBuilderTest
 {
@@ -45,6 +57,12 @@ public class WonMessageBuilderTest
   private static final URI CONNECTION_URI_1 = URI.create("http://example.com/won/res/con/1");
   private static final URI CONNECTION_URI_2 = URI.create("http://example.com/won/res/con/2");
 
+  @BeforeClass
+  public static void setLogLevel() {
+	  Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+	  root.setLevel(Level.INFO);	
+  }
+  
   @Test
   public void test_content_is_referenced_from_envelope(){
     WonMessage msg1 = createMessageWithContent().build();
@@ -168,6 +186,12 @@ public class WonMessageBuilderTest
   }
 
   @Test
+  public void test_get_content_in_message_with_content_dataset(){
+    final WonMessage msg = this.createMessageWithContentDataset().build();
+    check_get_content_in_message_with_content_dataset(msg);
+  }
+  
+  @Test
   public void test_get_content_in_wrapped_message_with_two_content_graphs(){
     WonMessage msg = this.createMessageWithTwoContentGraphs().build();
     msg = wrapMessage(msg).build();
@@ -195,6 +219,28 @@ public class WonMessageBuilderTest
       createDifferentContent()));
 
   }
+  
+  public void check_get_content_in_message_with_content_dataset(final WonMessage msg) {
+	    Dataset actualContentDataset = msg.getMessageContent();
+	    Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
+	      actualContentDataset.getDefaultModel().isEmpty());
+	    Set<String> names = new HashSet<String>();
+	    Iterators.addAll(names, actualContentDataset.listNames());
+	    Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
+	    
+	    RdfUtils.toNamedModelStream(actualContentDataset, false).forEach(namedModel -> {
+	    	String graphUri = namedModel.getName();
+	    	Model model = namedModel.getModel();
+	    	Assert.assertTrue("model does not contain its own graph uri",  model.containsResource(model.getResource(graphUri)));
+	    	Statement stmt = model.getResource(graphUri).getProperty(SKOS.related);
+	    	Assert.assertNotNull(stmt);
+	    	RDFNode otherGraph = stmt.getObject();
+	    	Assert.assertTrue("Reference to other model not found", actualContentDataset.containsNamedModel(otherGraph.asResource().getURI()));
+	    });
+	    
+
+	  }
+
 
   public boolean findContentGraphInMessage(final WonMessage msg, final Model expectedContent) {
     Dataset actualContentDataset = msg.getMessageContent();
@@ -220,11 +266,11 @@ public class WonMessageBuilderTest
 
 
   private WonMessageBuilder addContent(WonMessageBuilder builder) {
-    return builder.addContent(createDifferentContent(), null);
+    return builder.addContent(createDifferentContent());
   }
 
   private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
-    return builder.addContent(createDifferentContent(), null);
+    return builder.addContent(createDifferentContent());
   }
 
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
@@ -235,18 +281,25 @@ public class WonMessageBuilderTest
 
   private WonMessageBuilder createMessageWithContent(){
       return new WonMessageBuilder(MSG_URI_1)
-        .addContent(createContent(), null)
+        .addContent(createContent())
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
   private WonMessageBuilder createMessageWithTwoContentGraphs(){
     return new WonMessageBuilder(MSG_URI_1)
-      .addContent(createContent(), null)
-      .addContent(createDifferentContent(), null)
+      .addContent(createContent())
+      .addContent(createDifferentContent())
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
+  
+  private WonMessageBuilder createMessageWithContentDataset(){
+	    return new WonMessageBuilder(MSG_URI_1)
+	      .addContent(createContentDataset())
+	      .setWonMessageType(WonMessageType.HINT_MESSAGE)
+	      .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
+	  }
 
 
   private Model createContent(){
@@ -259,6 +312,17 @@ public class WonMessageBuilderTest
     Model Content = ModelFactory.createDefaultModel();
     Content.createResource(MSG_URI_2.toString(), Content.createResource(TYPE_URI_2.toString()));
     return Content;
+  }
+  
+  private Dataset createContentDataset() {
+	  Dataset contentDataset = DatasetFactory.createGeneral();
+	  Model contentGraph = createContent();
+	  contentGraph.getResource(CONTENT_GRAPH_URI_1.toString()).addProperty(SKOS.related, contentGraph.getResource(CONTENT_GRAPH_URI_2.toString()));
+	  contentDataset.addNamedModel(CONTENT_GRAPH_URI_1.toString(), contentGraph );
+	  contentGraph = createDifferentContent();
+	  contentGraph.getResource(CONTENT_GRAPH_URI_2.toString()).addProperty(SKOS.related, contentGraph.getResource(CONTENT_GRAPH_URI_1.toString()));
+	  contentDataset.addNamedModel(CONTENT_GRAPH_URI_2.toString(), contentGraph);
+	  return contentDataset;
   }
 
 }

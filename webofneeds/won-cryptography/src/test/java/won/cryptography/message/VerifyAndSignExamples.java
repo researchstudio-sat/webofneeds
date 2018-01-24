@@ -96,7 +96,7 @@ public class VerifyAndSignExamples
     // owner adds envelope
     WonMessage wonMessage = new WonMessageBuilder(URI.create(EVENT_ENV1_URI))
       .setSenderNeedURI(URI.create(NEED_URI))
-      .addContent(inputDataset.getNamedModel(NEED_CORE_DATA_URI), null)
+      .addContent(inputDataset.getNamedModel(NEED_CORE_DATA_URI))
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .build();
     Dataset outputDataset = wonMessage.getCompleteDataset();

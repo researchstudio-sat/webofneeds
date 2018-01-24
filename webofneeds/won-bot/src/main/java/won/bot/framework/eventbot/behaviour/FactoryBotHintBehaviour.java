@@ -8,7 +8,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import java.util.Optional;
 
 /**
- * InitFactoryBotBehaviour
+ * FactoryBotHintBehaviour
  */
 public class FactoryBotHintBehaviour extends BotBehaviour {
     public FactoryBotHintBehaviour(EventListenerContext context) {

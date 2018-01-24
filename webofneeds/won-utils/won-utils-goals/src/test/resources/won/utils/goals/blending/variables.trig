@@ -8,14 +8,21 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
 ex:data1 {
-    ex:test1 ex:testProperty ex:uri1
+    ex:test1 ex:testProperty "test" .
+    voc:test2 ex:testProperty "test" .
 }
 
 ex:data2 {
-    ex:test2 ex:testProperty ex:uri2
+    ex:test3 ex:testProperty "test" .
 }
 
-ex:blendedGraph {
-    ex:test1 ex:testProperty ex:uri1 .
-    ex:test2 ex:testProperty ex:uri2
+ex:blendedGraph0 {
+    ex:test1 ex:testProperty "test" .
+    voc:test2 ex:testProperty "test" .
+    ex:test3 ex:testProperty "test" .
+}
+
+ex:blendedGraph1 {
+    ex:blended1 ex:testProperty "test" .
+    voc:test2 ex:testProperty "test" .
 }

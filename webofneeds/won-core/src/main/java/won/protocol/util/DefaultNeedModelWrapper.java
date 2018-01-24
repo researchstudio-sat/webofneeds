@@ -10,6 +10,7 @@ import won.protocol.model.Coordinate;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.vocabulary.WON;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -42,6 +43,16 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
     public void setTitle(NeedContentPropertyType type, String title) {
         createContentNodeIfNonExist(type);
         setContentPropertyStringValue(type, DC.title, title);
+    }
+
+    public void setShapesGraphReference(URI shapesGraphReference) {
+        createContentNodeIfNonExist(NeedContentPropertyType.GOAL);
+
+        Collection<Resource> nodes = getContentNodes(NeedContentPropertyType.GOAL);
+        for (Resource node : nodes) {
+            node.removeAll(WON.HAS_SHAPES_GRAPH);
+            node.addProperty(WON.HAS_SHAPES_GRAPH, getNeedModel().getResource(shapesGraphReference.toString()));
+        }
     }
 
     public Collection<String> getTitlesFromIsOrAll() {
