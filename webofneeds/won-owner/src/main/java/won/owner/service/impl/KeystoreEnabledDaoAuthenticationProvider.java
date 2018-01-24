@@ -49,6 +49,7 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
 		        			 	password);
 		        //keystorePasswordHolder = keystorePasswordRepository.save(keystorePasswordHolder);
 		        //generate the keystore for the user
+		        user.setKeystorePasswordHolder(keystorePasswordHolder);
 		}		
 		String keystorePassword = keystorePasswordHolder.getPassword(password);
 		KeystoreHolder keystoreHolder = user.getKeystoreHolder();
