@@ -14,7 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.cryptography.service.CertificateService;
 import won.cryptography.service.KeyPairService;
-import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -120,7 +121,7 @@ public class TestSigningUtils {
     Security.addProvider(new BouncyCastleProvider());
 
     File keysFile = new File("test-keys2.jks");
-    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
+    FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
     storeService.init();
 
     KeyPairService keyPairService = new KeyPairService();
@@ -142,7 +143,7 @@ public class TestSigningUtils {
 
     Security.addProvider(new BouncyCastleProvider());
     //KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
-    KeyStoreService storeServiceOnOwner = new KeyStoreService(new File("owner-keys.jks"), "temp");
+    FileBasedKeyStoreService storeServiceOnOwner = new FileBasedKeyStoreService(new File("owner-keys.jks"), "temp");
     storeServiceOnOwner.init();
     //KeyStoreService storeServiceOnMatcher = new KeyStoreService(new File("matcher-keys.jks"));
     KeyPairService keyPairService = new KeyPairService();
@@ -169,7 +170,7 @@ public class TestSigningUtils {
   public void printCerts() throws IOException, CertificateException {
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
+    KeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
 
     printCerificate(storeService, needCertUri, needCertUri);
     printCerificate(storeService, ownerCertUri, ownerCertUri);

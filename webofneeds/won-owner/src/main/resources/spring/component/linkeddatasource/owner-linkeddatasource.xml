@@ -22,12 +22,11 @@
     <context:annotation-config />
 
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
-        <property name="linkedDataRestClient">
-            <bean factory-bean="wonTransmissionService" factory-method="getLinkedDataClient"></bean>
-        </property>
+        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
-
-    <bean id="linkedDataRestBridge" factory-bean="wonTransmissionService" factory-method="getLinkedDataRestBridge">
+    
+     <bean id="linkedDataSourceOnBehalfOfNeed" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
+        <property name="linkedDataRestClient" ref="linkedDataRestClientOnBehalfOfNeed" />
     </bean>
 
 </beans>

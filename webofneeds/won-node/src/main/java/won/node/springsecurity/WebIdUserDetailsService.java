@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.cryptography.webid.springsecurity;
+package won.node.springsecurity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

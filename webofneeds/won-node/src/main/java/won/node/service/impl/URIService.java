@@ -20,12 +20,16 @@ import won.protocol.model.Connection;
 import won.protocol.model.Need;
 
 import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * User: fkleedorfer
  * Date: 06.11.12
  */
-public class URIService
+public class URIService implements InitializingBean
 {
 
   //prefix of any URI
@@ -44,8 +48,64 @@ public class URIService
   private String resourceURIPrefix;
   //prefix for human readable pages
   private String pageURIPrefix;
+  
+  private Pattern connectionEventsPattern;
+  private Pattern connectionUriPattern;
+  private Pattern needEventsPattern;
+  private Pattern needUriPattern;
+  
+  @Override
+	public void afterPropertiesSet() throws Exception {
+	  this.connectionEventsPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+/events");
+	  this.connectionUriPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+");
+	  this.needEventsPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+/events");
+	  this.needUriPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+");
+	}
+  
+  
 
-
+  
+  public boolean isEventURI(URI toCheck) {
+	  if (toCheck == null) return false;
+	  return toCheck.toString().startsWith(eventResourceURIPrefix);
+  }
+  
+  public boolean isNeedURI(URI toCheck) {
+	  if (toCheck == null) return false;
+	  return toCheck.toString().startsWith(needResourceURIPrefix);
+  }
+  
+  public boolean isConnectionURI(URI toCheck) {
+	  if (toCheck == null) return false;
+	  return toCheck.toString().startsWith(connectionResourceURIPrefix);
+  }
+  
+  public boolean isNeedEventsURI(URI toCheck) {
+	  if (toCheck == null) return false;
+	  Matcher m = needEventsPattern.matcher(toCheck.toString());
+	  return m.lookingAt();
+  }
+   
+  public boolean isConnectionEventsURI(URI toCheck) {
+	  if (toCheck == null) return false;
+	  Matcher m = connectionEventsPattern.matcher(toCheck.toString());
+	  return m.lookingAt();
+  }
+  
+  public URI getConnectionURIofConnectionEventsURI(URI connectionEventsURI) {
+	  if (connectionEventsURI == null) return null;
+	  Matcher m = connectionUriPattern.matcher(connectionEventsURI.toString());
+	  m.find();
+	  return URI.create(m.group());
+  }
+  
+  public URI getNeedURIofNeedEventsURI(URI needEventsURI) {
+	  if (needEventsURI == null) return null;
+	  Matcher m = needUriPattern.matcher(needEventsURI.toString());
+	  m.find();
+	  return URI.create(m.group());
+  }
+  
   /**
    * Transforms the specified URI, which may be a resource URI or a page URI, to a data URI.
    * If the specified URI doesn't start with the right prefix, it's returned unchanged.

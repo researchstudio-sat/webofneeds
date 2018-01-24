@@ -16,6 +16,8 @@
 
 package won.owner.web.websocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -34,10 +36,10 @@ import java.util.Map;
  */
 public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
 {
-  // TODO why do we need this if there is a session cookie?
-  public static final String SESSION_ATTR = "httpSession.id";
-  // TODO  probably we don't need it any more, the user in WonWebSocketHandler
-  // is obtained directly from session.getPrincipal().getName();
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  public static final String SESSION_ATTR = "HTTP.SESSION.ID";
   public static final String USERNAME_ATTR = "username";
 
   private static final List<String> ATTRIBUTE_NAMES = new ArrayList<>(2);
@@ -57,6 +59,7 @@ public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
 
     addSessionIdAttribute(request, attributes);
     attributes.put(USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
+    logger.debug("adding session attribute {}:{}", USERNAME_ATTR, SecurityContextHolder.getContext().getAuthentication().getName());
     return super.beforeHandshake(request, response, wsHandler, attributes);
   }
 
@@ -70,6 +73,9 @@ public class WonHandshakeInterceptor  extends HttpSessionHandshakeInterceptor
       HttpSession session = servletRequest.getServletRequest().getSession(false);
       if (session != null) {
         attributes.put(SESSION_ATTR, session.getId());
+        logger.debug("adding session attribute {}:{}", SESSION_ATTR, session.getId());
+      } else {
+    	  logger.warn("no http session found, cannot pass attributes from session");
       }
     }
   }

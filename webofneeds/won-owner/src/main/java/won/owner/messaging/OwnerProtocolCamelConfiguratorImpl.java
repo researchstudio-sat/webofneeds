@@ -16,14 +16,23 @@
 
 package won.owner.messaging;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import won.cryptography.ssl.MessagingContext;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
@@ -33,13 +42,6 @@ import won.protocol.jms.OwnerProtocolCamelConfigurator;
 import won.protocol.model.MessagingType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * User: LEIH-NB

@@ -42,19 +42,9 @@
     </bean>
     <bean id="trustAllSelfSignedStrategy" class="org.apache.http.conn.ssl.TrustSelfSignedStrategy"/-->
 
-    <!--bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
-        <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
-    </bean>
-    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
-        <property name="transmissionConfig" ref="wonSecurityConfig"/>
-    </bean-->
-
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
-        <property name="linkedDataRestClient">
-            <bean factory-bean="wonTransmissionService" factory-method="getLinkedDataClient"></bean>
-        </property>
+        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
     </bean>
-    <!--bean id="linkedDataSource" factory-bean="wonSecurityConfig" factory-method="getLinkedDataSource">
-    </bean-->
+
 
 </beans>

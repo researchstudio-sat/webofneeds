@@ -34,8 +34,11 @@ ADD ./owner.war /usr/local/tomcat/webapps/
 RUN unzip /usr/local/tomcat/webapps/owner.war -d /usr/local/tomcat/webapps/owner
 RUN rm /usr/local/tomcat/webapps/owner.war
 
-# add the webofneeds libraries and configuration files for the application
-ADD ./tomcat-libs/* /usr/local/tomcat/lib/
+# add the bouncy castle libraries to the jre as well as to the java.security config (we need them in the jre, only tomcat lib folder doesn't work)
+ADD ./tomcat-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/
+ADD ./jce/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/
+
+# add the webofneeds configuration files for the application
 ADD ./conf/owner.properties /usr/local/tomcat/won/conf/owner.properties
 ADD ./conf/logback* /usr/local/tomcat/won/conf/
 

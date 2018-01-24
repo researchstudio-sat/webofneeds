@@ -1,11 +1,14 @@
 package won.cryptography.service;
 
-import org.apache.http.conn.ssl.PrivateKeyStrategy;
-import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.ssl.PrivateKeyStrategy;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+
+import won.cryptography.service.keystore.KeyStoreService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;

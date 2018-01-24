@@ -15,9 +15,23 @@
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
+    
+    <listener>
+        <description>Servlet listener that exposes the request to the current thread</description>
+        <display-name>RequestContextListener</display-name>  
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>  
+    </listener>
+    
+    <listener>
+        <description>Listener registered for informing the spring security session registry when the session is destroyed</description>
+        <display-name>HttpSessionEventPublilsher</display-name>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
+    
     <!--context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:/spring/owner-jmsonly.xml
+        <param-value>
+            classpath:/spring/owner-webapp-jmsonly.xml
 	        classpath:/spring/owner-security.xml
             classpath:/spring/owner-context.xml
             classpath:/spring/owner-mailer.xml

@@ -36,6 +36,7 @@
     <!--also scan the owner's model package -->
     <context:component-scan base-package="won.owner.model" />
 
+
     <!-- Database connection -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${db.sql.jdbcDriverClass}" />

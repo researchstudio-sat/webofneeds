@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.cryptography.webid.springsecurity;
+package won.node.springsecurity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

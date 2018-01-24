@@ -1,22 +1,8 @@
 package won.owner.web.rest;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -44,12 +30,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
-
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.RDFMediaType;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * User: ypanchenko Date: 03.09.2015
@@ -70,6 +67,10 @@ public class BridgeForLinkedDataController implements InitializingBean {
 
 	@Autowired
 	private WONUserDetailService wonUserDetailService;
+
+	@Autowired
+	private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfNeed;
+	
 
 	@Autowired
 	private LinkedDataRestBridge linkedDataRestBridge;
@@ -118,7 +119,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
 			// check if the currently logged in user owns that webid:
 			if (currentUserHasIdentity(requesterWebId)) {
 				// yes: let them use it
-				restTemplate = linkedDataRestBridge.getRestTemplate(requesterWebId);
+				restTemplate = linkedDataRestBridgeOnBehalfOfNeed.getRestTemplate(requesterWebId);
 			} else {
 				// no: that's fishy, but we let them make the request without the webid
 				restTemplate = linkedDataRestBridge.getRestTemplate();

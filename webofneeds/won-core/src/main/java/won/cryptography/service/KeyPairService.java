@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
 
 /**
- * All kind of stuff with cryptographic keys.
+ * Service responsible for generating key pairs.
  *
  * @author Fabian Salcher
  * @version 2014-07

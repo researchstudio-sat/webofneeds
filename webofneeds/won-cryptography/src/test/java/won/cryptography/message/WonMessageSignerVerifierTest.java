@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import won.cryptography.rdfsign.SignatureVerificationState;
-import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
@@ -58,8 +58,7 @@ public class WonMessageSignerVerifierTest
     //load public  keys:
     Security.addProvider(new BouncyCastleProvider());
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
-    storeService.setDefaultAlias(TestSigningUtils.ownerCertUri);
+    FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
     storeService.init();
 
     pubKeysMap.put(TestSigningUtils.needCertUri, storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());

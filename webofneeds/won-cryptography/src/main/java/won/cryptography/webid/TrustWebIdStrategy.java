@@ -1,6 +1,6 @@
 package won.cryptography.webid;
 
-import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.cryptography.service.CertificateService;
