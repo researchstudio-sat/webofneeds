@@ -72,7 +72,12 @@
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
         <property name="sendEmailChannel" ref="sendEmailChannel"/>
         <property name="mailGenerator" ref="mailGenerator"/>
-        <!--property name="needProducer" ref="needProducerFromMails" /-->
+        <property name="needProducer">
+            <bean class="won.bot.framework.component.needproducer.impl.NopNeedProducer" />
+        </property>
+
+
+
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <!--<property name="matcherNodeURISource" ref="matcherNodeURISource"/>-->
         <!--<property name="matcherUri" value="${matcher.uri}" />-->
