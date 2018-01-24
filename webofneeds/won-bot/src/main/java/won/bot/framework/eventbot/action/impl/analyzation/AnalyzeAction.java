@@ -61,7 +61,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             Dataset connectionDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getConnectionURI());
 
             GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, connectionDataset, "http://example.org/","http://example.org/blended/");
-            Collection<GoalInstantiationResult> results = goalInstantiationProducer.createAllGoalInstantiationResults();
+            Collection<GoalInstantiationResult> results = goalInstantiationProducer.createAllGoalCombinationInstantiationResults();
             Connection con = ((WonMessageReceivedOnConnectionEvent) event).getCon();
 
             for(GoalInstantiationResult result : results) {
