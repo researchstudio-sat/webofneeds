@@ -37,7 +37,7 @@
 		<constructor-arg name="predefinedAlias" value="${uri.prefix.owner}" />
 	</bean>
 
-	<bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps">
+	<bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps" depends-on="cryptographyService">
 		<constructor-arg ref="keyStoreService" />
 		<constructor-arg name="privateKeyStrategy" ref="fixedToOwnerPrivateKeyStrategy" />
 		<constructor-arg ref="trustStoreService" />
