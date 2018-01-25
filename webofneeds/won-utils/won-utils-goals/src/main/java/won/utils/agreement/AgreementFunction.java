@@ -41,6 +41,7 @@ public class AgreementFunction {
     public Dataset applyAgreementFunction(Dataset conversationDataset){
     	conversationDataset.begin(ReadWrite.READ);
         Dataset result = DatasetFactory.createGeneral();
+        // adds a write lock so this function has exclusive access tow write..
         result.begin(ReadWrite.WRITE);
         Query query = QueryFactory.create(queryString);
         try (QueryExecution queryExecution = QueryExecutionFactory.create(query, conversationDataset)) {
@@ -80,6 +81,7 @@ public class AgreementFunction {
             }
             return result;
         } finally {
+        	// this may still fail, and need to be changed... it may need another catch block at least
         	conversationDataset.commit();
         	result.commit();
         }
