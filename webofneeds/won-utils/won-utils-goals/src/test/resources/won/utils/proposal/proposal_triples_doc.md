@@ -1,3 +1,5 @@
+### This returns all open proposals...
+
 ### noOpenProposal
 **input**: 2proposal-bothaccepted.trig
 **output**: 2proposal-bothaccepted.trig

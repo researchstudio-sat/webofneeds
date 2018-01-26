@@ -1,3 +1,5 @@
+### This returns all open proposalsToCancel
+
  ### oneOpenCancellationPropsoal
  **input**: one-agreement-one-unacceptedcancellation.trig
  **output**: one-agreement-one-unacceptedcancellation.trig
