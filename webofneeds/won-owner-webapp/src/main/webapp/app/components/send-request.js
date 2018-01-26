@@ -53,7 +53,7 @@ function genComponentConf() {
           <button
             class="won-button--filled red"
             ng-click="self.sendRequest(self.message)">
-              Request Contact
+              Chat
           </button>
         </div>
         <a target="_blank"
