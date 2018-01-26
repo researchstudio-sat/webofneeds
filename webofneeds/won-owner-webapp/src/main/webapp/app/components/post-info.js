@@ -80,7 +80,7 @@ function genComponentConf() {
                 <button class="won-button--filled red" 
                         ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})"
                         ng-show="self.showRequestButton">
-                        Request Contact
+                        Chat
                 </button>
             </div>
         </div>
