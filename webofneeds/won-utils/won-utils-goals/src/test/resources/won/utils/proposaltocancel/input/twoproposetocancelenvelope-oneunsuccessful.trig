@@ -17,6 +17,7 @@
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix mod:   <http://purl.org/webofneeds/modification#> .
+@prefix agr: <http://purl.org/webofneeds/agreement#> .
 
 <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#envelope-cd9k-sig> {
     <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#envelope-cd9k-sig>

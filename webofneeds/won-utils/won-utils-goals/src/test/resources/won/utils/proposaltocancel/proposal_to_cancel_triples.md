@@ -33,6 +33,7 @@
 ```
 
 **output**:
+
 ```
 <https://localhost:8443/won/resource/event/1435888415723958200> {
     <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0>
@@ -90,6 +91,11 @@
             agr:accepts event:1107469913331435500 .
 }
 
+<https://localhost:8443/won/resource/event/4055709708568209400#content> {
+    event:4055709708568209400
+            won:hasTextMessage  "two" .
+}
+
 <https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n#content-lqq7> {
     event:cgqt5h004iql2003me2n
             won:hasTextMessage  "Please go on." ;
@@ -101,5 +107,15 @@
     event:8863100035920837000
             won:hasTextMessage  "validate" ;
             agr:accepts event:cgqt5h004iql2003me2n .
+}
+```
+
+**output**:
+
+```
+<https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n> {
+    event:4846251213444807000
+            won:hasTextMessage  "one" ;
+            agr:accepts event:cbcccoqqqbec6bxkl3y3 .
 }
 ```

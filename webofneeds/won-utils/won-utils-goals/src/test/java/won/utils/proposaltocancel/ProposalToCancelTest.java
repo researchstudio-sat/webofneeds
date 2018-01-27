@@ -59,6 +59,16 @@ public class ProposalToCancelTest {
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.trig");
         test(input,expectedOutput);
     }
+    
+    
+    // This is the case where there are two proposeToCancel in one evelope, and only one of them is valid...
+    @Test
+    public void twoProposetoCancelEnvelopeOneUnsuccessful () throws IOException {
+        Dataset input = loadDataset( inputFolder + "twoproposetocancelenvelope-oneunsuccessful.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "twoproposetocancelenvelope-oneunsuccessful.trig");
+        test(input,expectedOutput);
+    }
+   
            
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
