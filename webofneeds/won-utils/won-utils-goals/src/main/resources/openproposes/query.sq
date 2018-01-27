@@ -4,7 +4,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
- SELECT ?openprop ?openclause WHERE {
+ SELECT ?openprop ?openclause ?openp ?openo WHERE {
   
    filter (?openprop = ?prop) .
   # filter (?openclause != ?clause) .
