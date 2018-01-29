@@ -65,7 +65,7 @@ public class ProposalToCancelFunction {
                     currentProposal = proposalNode;
                 }
                 //add current triple into currentAgreementModel
-                RDFNode s = solution.get("openclause");
+                RDFNode s = solution.get("acc");
                 RDFNode p = solution.get("openp");
                 RDFNode o = solution.get("openo");
                 Statement newStatement = new StatementImpl(s.asResource(), new PropertyImpl(p.asResource().getURI()), o);
