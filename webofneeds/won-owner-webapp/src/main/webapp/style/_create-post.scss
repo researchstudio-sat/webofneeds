@@ -92,12 +92,13 @@ won-create-post {
   }
 
   .cp__details {
-    @include slideWithOpacityAnimation(1.0s, linear, 60rem, 0.5rem, 0.75rem);
+    @include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
 
     border-top: $thinBorderWidth solid $won-line-gray;
-    margin: 0.75rem 0;
+    margin: 1.5rem 1.5rem;
     padding: 0.5rem 0;
-
+    
+    
     .cp__header:hover {
       color: $won_red;
       background-image: url('icon-sprite.svg#ico36_close_circle');
@@ -145,15 +146,15 @@ won-create-post {
 
   .cp__addDetail {
     border-top: $thinBorderWidth solid $won-line-gray;
-    margin: .75rem 0;
     padding: .5rem 0;
     @include appearAnimation(0.5s, linear);
 
     .cp__detail__items {
-      @include slideWithOpacityAnimation(1.0s, linear, 20rem);
+      @include slideWithOpacityAnimation(.5s, linear, 20rem);
 
       .cp__detail__items__item {
         font-size: $normalFontSize;
+        margin: 0 1.5rem;
         padding: .5rem .5rem .5rem 2.5rem;
         background-position: 0 .15rem;
         background-size: 2rem;
@@ -218,12 +219,17 @@ won-create-post {
     width: 100%;
     box-sizing: border-box;
     font-size: $mediumFontSize;
-    font-weight: 300;
-    padding-bottom: 1rem;
-    padding-left: 2.5rem;
+    font-weight: 400;
+    padding: 0 0 1rem 2.5rem;
     background-position: 0 0.15rem;
     background-size: 2rem;
     background-repeat: no-repeat;
+
+    span.opt {
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+      padding: .5rem .5rem .5rem .5rem;   
+    }
 
     span.hover {
       display: none;
@@ -232,8 +238,8 @@ won-create-post {
     span.nonHover {
       display: inline;
     }
-
-    &:hover {
+    
+   &:hover {
       cursor: pointer;
 
       span.hover {
@@ -246,10 +252,14 @@ won-create-post {
     }
 
     &.tags {
+      font-size: $normalFontSize+.25rem;
+      padding: .5rem .5rem .5rem 2.5rem;
       background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
     }
 
     &.location {
+      font-size: $normalFontSize+.25rem;
+      padding: .5rem .5rem .5rem 2.5rem;
       background-image: url('icon-sprite.svg#ico36_area_circle_hi');
     }
 
@@ -261,8 +271,25 @@ won-create-post {
         background-image: url('icon-sprite.svg#ico36_close_circle_hi');
         color: black;
       }
-
+  
       &.closedDetail:hover {
+        background-image: url('icon-sprite.svg#ico36_plus_circle_hi');
+      }
+    }
+    
+    &.detailPicker {
+      color: $won-red;
+      font-size: $normalFontSize+.25rem;
+      margin: 0 1rem;
+      padding: .5rem .5rem .5rem 2.5rem;
+      background-image: url('icon-sprite.svg#ico36_plus_circle');
+
+      &:hover {
+        background-image: url('icon-sprite.svg#ico36_close_circle_hi');
+        color: black;
+      }
+  
+      &.closedDetailPicker:hover {
         background-image: url('icon-sprite.svg#ico36_plus_circle_hi');
       }
     }

@@ -72,9 +72,9 @@ function genComponentConf() {
             <div class="cp__addDetail">
             	<!-- SEEKS PART -->   	
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
-	                  	<span class="nonHover">Search</span>
+	                  	<span class="nonHover">Search in other Postings <span class="opt">(Optional)</span></span>
 	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Create Search</span>
-	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Close Search</span>
+	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Remove Search</span>
 	            </div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.seeks)" >
 		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.seeks)">
@@ -110,7 +110,7 @@ function genComponentConf() {
                 	<!-- /DETAILS -->
                 	<!-- DETAILS Picker -->
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.seeks)">
-		                <div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.seeks)" ng-class="{'closedDetail': !self.showDetail[self.seeks]}">
+		                <div class="cp__header detailPicker clickable" ng-click="self.toggleDetail(self.seeks)" ng-class="{'closedDetailPicker': !self.showDetail[self.seeks]}">
 		                    <span class="nonHover">Add more detail</span>
 		                    <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
 		                    <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
@@ -142,9 +142,9 @@ function genComponentConf() {
 	            
 	            <!-- IS PART -->
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-	                  	<span class="nonHover">Offer</span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create Offer</span>
-	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Close Offer</span>
+	                  	<span class="nonHover">Create Posting <span class="opt">(Optional)</span></span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create Posting</span>
+	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Posting</span>
 	            </div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
 		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.is)">
@@ -181,10 +181,10 @@ function genComponentConf() {
                 	<!-- /DETAILS -->
     				<!-- DETAILS Picker -->
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.is)">
-    					<div class="cp__header addDetail clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetail': !self.showDetail[self.is]}">
+    					<div class="cp__header detailPicker clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetailPicker': !self.showDetail[self.is]}">
 		                    <span class="nonHover">Add more detail</span>
-		                    <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
-		                    <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
+		                    <span class="hover" ng-if="!self.showDetail[self.is]">Open more detail</span>
+		                    <span class="hover" ng-if="self.showDetail[self.is]">Close more detail</span>
 		                </div>
 			            <div class="cp__detail__items" ng-if="self.showDetail[self.is]" >
 		                    <div class="cp__detail__items__item location" 
@@ -301,8 +301,6 @@ function genComponentConf() {
             if (!this.pendingPublishing) {
                 this.pendingPublishing = true;
 
-                //TODO: Check for both and make tags + location independent
-                //Both with for;
                 var tmpList = [this.is, this.seeks];
                 for(i = 0; i < 2; i ++){
                 	var tmp = tmpList[i];
@@ -312,24 +310,13 @@ function genComponentConf() {
                     if(!this.isDetailPresent("location", tmp)){
                     	this.draftObject[tmp].location = undefined;
                     }
+                    
+                    if(this.draftObject[tmp].title === "") {
+                    	this.draftObject[tmp] = undefined;
+                    }
                 }
                 
-                /*
-                if(!this.isDetailPresent("tags")){
-                    this.draftObject.is.tags = undefined;
-                }
-                if(!this.isDetailPresent("location")){
-                    this.draftObject.is.location = undefined;
-                }
-                
-                if(!this.isDetailPresent("tags")){
-                    this.draftObject[this.isSeeks].tags = undefined;
-                }
-                if(!this.isDetailPresent("location")){
-                    this.draftObject[this.isSeeks].location = undefined;
-                }*/
-
-                this.needs__create(
+               this.needs__create(
                     this.draftObject,
                 		this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
                 );
@@ -368,10 +355,7 @@ function genComponentConf() {
 
         toggleDetail(isSeeks){
         	//TODO decide if clear detail list or not
-        	/*if(this.showDetail[isSeeks]){
-        		this.details[isSeeks] = [];
-        	}*/
-            this.showDetail[isSeeks] = !this.showDetail[isSeeks];
+        	this.showDetail[isSeeks] = !this.showDetail[isSeeks];
         }
 
         addDetail(detail, isSeeks) {
@@ -390,38 +374,7 @@ function genComponentConf() {
             return this.details[isSeeks].indexOf(detail) > -1;
         }
         
-        
-        /*
-        openTab(evt, tabName, button) {
-            // Declare all variables
-            var i, tabcontent, tablinks;
-
-            // Get all elements with class="tabcontent" and hide them
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-
-            // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-
-            // Show the current tab, and add an "active" class to the button that opened the tab
-            document.getElementById(tabName).style.display = "block";
-            document.getElementById(button).className += " active";
-        }
-        
-        selectType(type) {
-        	this.isSeeks = type;
-        }
-        unselectType() {
-            this.draftObject[this.isSeeks].type = undefined;
-        }*/
-        
-        
-
+      
         createWhatsAround(){
             if (!this.pendingPublishing) {
                 this.pendingPublishing = true;

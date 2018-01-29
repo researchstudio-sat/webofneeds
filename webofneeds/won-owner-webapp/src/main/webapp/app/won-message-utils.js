@@ -265,8 +265,8 @@ export function buildCreateMessage(needData, wonNodeUri) {
     //   });
     //} else {
     let contentRdf = won.buildNeedRdf({ 
-           is: prepareContentNodeData(needData.is), 
-           seeks: prepareContentNodeData(needData.seeks)
+           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
+           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
         });
     
    

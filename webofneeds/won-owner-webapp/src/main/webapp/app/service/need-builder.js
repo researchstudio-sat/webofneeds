@@ -206,7 +206,7 @@ import won from './won.js';
             },
             //, <if _hasModalities> {... (see directly below) } </if>
             args.is? buildContentNode((isWhatsAround? '_:needContent' : '_:isNeedContent'), args.is, true) : {},
-            isWhatsAround? {} : (args.seeks? buildContentNode('_:seeksNeedContent', args.seeks, false) : {}),
+            args.seeks? (isWhatsAround? {} : (buildContentNode('_:seeksNeedContent', args.seeks, false))) : {},
         ];
         return {
             '@graph': graph,
