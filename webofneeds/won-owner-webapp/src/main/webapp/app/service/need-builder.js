@@ -186,10 +186,11 @@ import won from './won.js';
             //TODO images, time, currency(?)
         })
 
-        var isWhatsAround = args.is.whatsAround;
+        var isWhatsAround = args.is? args.is.whatsAround : args.seeks.whatsAround;
+        var noHints = args.is? args.is.noHints : args.seeks.noHints;
         var graph = [
             {
-                '@id': args.is.publishedContentUri?  args.is.publishedContentUri :  args.seeks.publishedContentUri,
+                '@id': args.is?  args.is.publishedContentUri :  args.seeks.publishedContentUri,
                 '@type': 'won:Need',
                 'won:is': isWhatsAround? { '@id': '_:needContent' } : (args.is? { '@id': '_:isNeedContent' } : undefined),
                 'won:seeks': isWhatsAround? { '@id': '_:needContent' } : (args.seeks? { '@id': '_:seeksNeedContent' } : undefined),
@@ -197,11 +198,11 @@ import won from './won.js';
                 'won:hasFlag': new Set([
                     won.debugmode? "won:UsedForTesting" : undefined,
                     		
-                    args.is.whatsAround? "won:WhatsAround" : undefined,
-                    args.is.whatsAround? "won:NoHintForCounterpart" : undefined,
+                    isWhatsAround? "won:WhatsAround" : undefined,
+                    isWhatsAround? "won:NoHintForCounterpart" : undefined,
                     		
-                    args.is.noHints? "won:NoHintForMe" : undefined,
-                    args.is.noHints? "won:NoHintForCounterpart" : undefined,
+                    noHints? "won:NoHintForMe" : undefined,
+                    noHints? "won:NoHintForCounterpart" : undefined,
                 ]),///.toArray().filter(f => f),
             },
             //, <if _hasModalities> {... (see directly below) } </if>

@@ -260,8 +260,8 @@ export function buildCreateMessage(needData, wonNodeUri) {
      
     
     let contentRdf = won.buildNeedRdf({ 
-           is: (needData.is? prepareContentNodeData(needData.is) : {}),
-           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : {}),
+           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
+           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
         });
     
    

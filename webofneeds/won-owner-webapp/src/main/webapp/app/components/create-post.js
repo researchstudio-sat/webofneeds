@@ -72,8 +72,8 @@ function genComponentConf() {
             <div class="cp__addDetail">
             	<!-- SEEKS PART -->   	
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
-	                  	<span class="nonHover">Search in other Postings <span class="opt" ng-if="self.isValid(self.is) && !self.isValid(self.seeks)">(Optional)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Create Search</span>
+	                  	<span class="nonHover">Search public Post<span class="opt" ng-if="self.isValid(self.is) && !self.isValid(self.seeks)">(Optional)</span></span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Search public Post</span>
 	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Remove Search</span>
 	            </div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.seeks)" >
@@ -142,9 +142,9 @@ function genComponentConf() {
 	            
 	            <!-- IS PART -->
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-	                  	<span class="nonHover">Create Posting <span class="opt" ng-if="self.isValid(self.seeks) && !self.isValid(self.is)">(Optional)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create Posting</span>
-	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Posting</span>
+	                  	<span class="nonHover">Create public Post<span class="opt" ng-if="self.isValid(self.seeks) && !self.isValid(self.is)">(Optional)</span></span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create public Post</span>
+	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Post</span>
 	            </div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
 		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.is)">
