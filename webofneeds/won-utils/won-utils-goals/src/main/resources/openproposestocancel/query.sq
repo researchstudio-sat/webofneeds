@@ -4,64 +4,56 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
- SELECT ?openprop ?openclause ?openp ?openo WHERE {
-  
-   filter (?openprop = ?prop) .
-  # filter (?openclause != ?clause) .
- 
- # There may be some unnecessary replication in the next four graph matches..
+CONSTRUCT { ?openprop agr:proposesToCancel ?acc . }
+WHERE {
+    
+   filter (?prop != ?clause) .
+   filter (?prop != ?acc) .
+ #  filter (?openprop != ?something) .
  
    GRAPH ?openg1 {   
-        ?openprop agr:proposes ?openclause .
-    }
-          
-    GRAPH <urn:x-arq:UnionGraph> {
-         ?openprop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?openclause .
-    }
-          
-    GRAPH ?openclauseContent {
-      ?opens ?openp ?openo .
-    }
-          
-    GRAPH ?openg3 {
-        ?openclause msg:hasContent ?openclauseContent .
-    }
-          
-  ## this query checks to see that the proposal exists in a content graph  
-    GRAPH ?openg4 {
-       ?adatagraph msg:hasContent ?openg1 .
-    }      
-   # end of edit ..
-   
-   filter (?prop != ?clause) .
-   
-   GRAPH ?g1 {   
-        ?prop agr:proposes ?clause .
-    }
-
-    GRAPH ?clauseContent {
-      ?s ?p ?o .
-    }
-
-   GRAPH ?g3 {
-        ?clause msg:hasContent ?clauseContent .
-    }
+        ?openprop agr:proposesToCancel ?acc .
+    }     
+    # something does not have to be ?acc, that is an agreement, but we do not want it if it is...
+      
+      GRAPH <urn:x-arq:UnionGraph> {   
+         ?openprop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?acc . 
+      }
+     # I am going to assume that there is a temporal ordering....it is a valid propose to cancel...it just has not been accepted....
     
-FILTER NOT EXISTS {
-    # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
+      GRAPH ?g11 {   
+        ?acc msg:hasContent ?clauseContento .
+     }
+     
+     GRAPH ?clauseContent {
+      ?s ?p ?o .
+     }
+    
+     GRAPH ?g1 {   
+        ?prop agr:proposes ?clause .
+     }
+           
+     GRAPH ?clauseContento {
+      ?opens ?openp ?openo .
+     }
+           
+     GRAPH ?g3 {
+        ?clause msg:hasContent ?clauseContent .
+     }    
+           
+      # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
     # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
     # THIS QUERY WILL ONLY WORK WITH JENA
-    filter (?prop != ?acc) .
-    GRAPH <urn:x-arq:UnionGraph> {
+      GRAPH <urn:x-arq:UnionGraph> {
         ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
         ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
-    }
+      }
     GRAPH ?g2 {
         ?acc agr:accepts ?prop .
     }
- }
- 
-# only report the first agreement if there are multiple accept messages:
+          
+    
+      # only report the first agreement if there are multiple accept messages:
     # make sure there is no earlier accept message than acc, 
     # and if there is an accept message that is at the same point in the conversation 
     # only accept the main solution if acc is lexicographically smaller than the other one
@@ -71,7 +63,7 @@ FILTER NOT EXISTS {
             ?acc2 agr:accepts ?prop .
             filter(?acc2 != ?acc) . #different from acc
         }   
-        GRAPH <urn:x-arq:UnionGraph> {
+           GRAPH <urn:x-arq:UnionGraph> {
             # also after prop
             ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
             # acc2 must not be before acc. If it is parallel, use lexicographically first uri
@@ -79,12 +71,11 @@ FILTER NOT EXISTS {
                 # if there is a path from acc to acc2, acc2 is earlier and we want the
                 # overall solution to be discarded.
                 ?acc msg:hasPreviousMessage+ ?acc2.
-            }
-         
-        }
+            }   
+        }     
     }
- 
-   # only report the first agreement if there are multiple accept messages:
+               
+     # only report the first agreement if there are multiple accept messages:
     # make sure there is no earlier accept message than acc, 
     # and if there is an accept message that is at the same point in the conversation 
     # only accept the main solution if acc is lexicographically smaller than the other one
@@ -94,7 +85,7 @@ FILTER NOT EXISTS {
             ?acc2 agr:accepts ?prop .
             filter(?acc2 != ?acc) . #different from acc
         }   
-        GRAPH <urn:x-arq:UnionGraph> {
+          GRAPH <urn:x-arq:UnionGraph> {
             # also after prop
             ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
             # acc2 must not be before acc. If it is parallel, use lexicographically first uri
@@ -104,10 +95,10 @@ FILTER NOT EXISTS {
                 ?acc msg:hasPreviousMessage+ ?acc2.
             }
             filter (STR(?acc2) < STR(?acc)) 
+            }
         }
-    }
-    
-   filter not exists {
+               
+    filter not exists {
       
       filter (?cancelProp != ?acc) .
       filter (?cancelAcc != ?cancelProp) .
@@ -118,10 +109,10 @@ FILTER NOT EXISTS {
       # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
       # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
       # THIS QUERY WILL ONLY WORK WITH JENA
-      GRAPH <urn:x-arq:UnionGraph> {      
+       GRAPH <urn:x-arq:UnionGraph> {    
           ?cancelProp msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?acc .
           ?cancelAcc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?cancelProp .
-      }
+       }
       GRAPH ?gc2 {
           ?cancelAcc agr:accepts ?cancelProp .
       }  
@@ -132,8 +123,7 @@ FILTER NOT EXISTS {
           ?cancelAcc msg:hasContent ?gc2.  
       }
                   
-    }
-            
-        
+}
+                             
 }
 order by ?openprop
