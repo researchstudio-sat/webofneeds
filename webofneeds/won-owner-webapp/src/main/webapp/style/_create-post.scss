@@ -145,8 +145,8 @@ won-create-post {
   }
 
   .cp__addDetail {
-    border-top: $thinBorderWidth solid $won-line-gray;
-    padding: .5rem 0;
+    //border-top: $thinBorderWidth solid $won-line-gray;
+    padding: 0 0 0 0;
     @include appearAnimation(0.5s, linear);
 
     .cp__detail__items {
@@ -253,13 +253,13 @@ won-create-post {
 
     &.tags {
       font-size: $normalFontSize+.25rem;
-      padding: .5rem .5rem .5rem 2.5rem;
+      padding: .25rem .5rem .5rem 2.5rem;
       background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
     }
 
     &.location {
       font-size: $normalFontSize+.25rem;
-      padding: .5rem .5rem .5rem 2.5rem;
+      padding: .25rem .5rem .5rem 2.5rem;
       background-image: url('icon-sprite.svg#ico36_area_circle_hi');
     }
 
@@ -281,7 +281,7 @@ won-create-post {
       color: $won-red;
       font-size: $normalFontSize+.25rem;
       margin: 0 1rem;
-      padding: .5rem .5rem .5rem 2.5rem;
+      padding: .25rem .5rem .5rem 2.5rem;
       background-image: url('icon-sprite.svg#ico36_plus_circle');
 
       &:hover {

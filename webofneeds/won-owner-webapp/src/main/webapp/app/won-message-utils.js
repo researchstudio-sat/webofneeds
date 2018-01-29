@@ -258,15 +258,10 @@ export function buildCreateMessage(needData, wonNodeUri) {
         noHints: needDataIsOrSeeks.noHints,
     })
      
-    //let contentRdf = "";
-    //if(needData.title === "What's Around?") {
-    //    contentRdf = won.buildNeedRdf({ 
-    //        seeks: prepareContentNodeData(needData)
-    //   });
-    //} else {
+    
     let contentRdf = won.buildNeedRdf({ 
-           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
-           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
+           is: (needData.is? prepareContentNodeData(needData.is) : {}),
+           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : {}),
         });
     
    
