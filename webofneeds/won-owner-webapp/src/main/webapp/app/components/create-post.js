@@ -72,7 +72,7 @@ function genComponentConf() {
             <div class="cp__addDetail">
             	<!-- SEEKS PART -->   	
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
-	                  	<span class="nonHover">Search in other Postings <span class="opt">(Optional)</span></span>
+	                  	<span class="nonHover">Search in other Postings <span class="opt" ng-if="self.isValid(self.is) && !self.isValid(self.seeks)">(Optional)</span></span>
 	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Create Search</span>
 	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Remove Search</span>
 	            </div>
@@ -142,7 +142,7 @@ function genComponentConf() {
 	            
 	            <!-- IS PART -->
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-	                  	<span class="nonHover">Create Posting <span class="opt">(Optional)</span></span>
+	                  	<span class="nonHover">Create Posting <span class="opt" ng-if="self.isValid(self.seeks) && !self.isValid(self.is)">(Optional)</span></span>
 	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Create Posting</span>
 	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Posting</span>
 	            </div>
@@ -302,22 +302,23 @@ function genComponentConf() {
                 this.pendingPublishing = true;
 
                 var tmpList = [this.is, this.seeks];
+                var newObject = {is: this.draftObject.is, seeks: this.draftObject.seeks}; 
                 for(i = 0; i < 2; i ++){
                 	var tmp = tmpList[i];
                 	if(!this.isDetailPresent("tags", tmp)){
-                		this.draftObject[tmp].tags = undefined;
+                		newObject[tmp].tags = undefined;
                     }
                     if(!this.isDetailPresent("location", tmp)){
-                    	this.draftObject[tmp].location = undefined;
+                    	newObject[tmp].location = undefined;
                     }
                     
-                    if(this.draftObject[tmp].title === "") {
-                    	this.draftObject[tmp] = undefined;
+                    if(newObject[tmp].title === "") {
+                    	delete newObject[tmp];
                     }
                 }
                 
                this.needs__create(
-                    this.draftObject,
+                    newObject,
                 		this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
                 );
             }
