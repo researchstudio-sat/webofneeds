@@ -70,6 +70,27 @@ public class ProposalToCancelTest {
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-onefail.trig");
         test(input,expectedOutput);
     }
+    
+    // This is the case where there is a proposal content graph with two proposaltocancel. Both are a proposaltocancel of 
+    // valid agreement. There are no open proposaltocancel since all valid agreements that have been proposedtocancel 
+    /// have been accepted.
+    @Test
+    public void twoClosedCancellationOneCancellationSameProposal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-bothsucceed.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-bothsucceed.trig");
+        test(input,expectedOutput);
+    }
+    
+    
+    // This is the case where there is a proposal content graph with two proposaltocancel. Both are a proposaltocancel of 
+    // valid agreement. There are two open proposaltocancel since all valid agreements that have been proposedtocancel 
+    /// have not been accepted.
+    @Test
+    public void twoOpenCancellationOneCancellationSameProposal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
+        test(input,expectedOutput);
+    }
            
 /*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
     	ProposalFunction proposalFunction = new ProposalFunction();
