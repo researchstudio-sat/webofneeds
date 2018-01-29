@@ -374,7 +374,6 @@ function genComponentConf() {
         isDetailPresent(detail, isSeeks) {
             return this.details[isSeeks].indexOf(detail) > -1;
         }
-        
       
         createWhatsAround(){
             if (!this.pendingPublishing) {
