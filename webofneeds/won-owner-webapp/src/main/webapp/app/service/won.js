@@ -117,6 +117,8 @@ import jsonld from 'jsonld';
     won.WON.BasicNeedTypeSupplyCompacted = won.WON.prefix + ":Supply";
     won.WON.BasicNeedTypeDotogether = won.WON.baseUri + "DoTogether";
     won.WON.BasicNeedTypeDotogetherCompacted = won.WON.prefix + ":DoTogether";
+    won.WON.BasicNeedTypeCombined = won.WON.baseUri + "Combined";
+    won.WON.BasicNeedTypeCombinedCompacted = won.WON.baseUri + ":Combined";
     won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
     won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
     won.WON.BasicNeedTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
