@@ -39,7 +39,8 @@ public class OpenProposesToCancelTest {
 	@Test
 	public void oneOpenCancellationPropsoal() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "one-agreement-one-unacceptedcancellation.trig");
-	//    Model expected = loadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
+	    // commented out because this does not work
+//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
 
 	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
       Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/one-agreement-one-unacceptedcancellation.ttl");
@@ -49,6 +50,7 @@ public class OpenProposesToCancelTest {
 	@Test
 	public void twoOpenCancellationOneCancellationSameProposal() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
+	    // renamed loadModel to customloadModel
 	//    Model expected = loadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
 
 	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
@@ -77,7 +79,7 @@ public class OpenProposesToCancelTest {
 }
 
 	
-    private static Model loadModel(String path) throws IOException {
+    private static Model customloadModel(String path) throws IOException {
 
         InputStream is = null;
         Model model = null;
