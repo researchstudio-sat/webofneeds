@@ -215,6 +215,18 @@ won-create-post {
     }
   }
 
+  .cp__title {
+    width: 100%;
+    color: $won-subtitle-gray;
+    @extend %center--absolute;
+    margin: 1.5rem 1rem -1.5rem -1.5rem;
+    text-align: center;
+    position: relative;
+    font-size: $mediumFontSize;
+    font-weight: 400;
+    padding: 0 0 1rem 2.5rem;
+   }
+
   .cp__header {
     width: 100%;
     box-sizing: border-box;
@@ -225,6 +237,9 @@ won-create-post {
     background-size: 2rem;
     background-repeat: no-repeat;
 
+    span.alternate {
+           
+    }
     span.opt {
       color: $won-subtitle-gray;
       font-size: $smallFontSize;
@@ -276,7 +291,7 @@ won-create-post {
         background-image: url('icon-sprite.svg#ico36_plus_circle_hi');
       }
     }
-    
+       
     &.detailPicker {
       color: $won-red;
       font-size: $normalFontSize+.25rem;
