@@ -184,6 +184,7 @@ function genComponentConf() {
             this.needs__reopen(this.postUri);
         }
     }
+    
     Controller.$inject = serviceDependencies;
     return {
         restrict: 'E',

@@ -65,8 +65,9 @@ function genComponentConf() {
 
             this.map = initLeaflet(this.mapMount());
             this.map.on('click', e => onMapClick(e, this));
-            this.determineCurrentLocation();
-
+            
+           	this.determineCurrentLocation();
+            
             window.lp4dbg = this;
 
             doneTypingBufferNg(
