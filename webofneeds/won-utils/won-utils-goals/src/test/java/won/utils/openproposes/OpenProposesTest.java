@@ -25,7 +25,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class OpenProposesToCancelTest {
+public class OpenProposesTest {
 	
     private static final String inputFolder = "/won/utils/openproposes/input/";
     private static final String expectedOutputFolder = "/won/utils/openproposes/expected/";
@@ -37,24 +37,13 @@ public class OpenProposesToCancelTest {
     }
 
 	@Test
-	public void oneOpenCancellationPropsoal() throws IOException {
-	    Dataset input = loadDataset( inputFolder + "one-agreement-one-unacceptedcancellation.trig");
+	public void twoProposalsBothAccepted() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-bothaccepted.trig");
 	    // commented out because this does not work
-//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
+//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
 
-	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/one-agreement-one-unacceptedcancellation.ttl");
-        test(input,expected);		
-	}
-	
-	@Test
-	public void twoOpenCancellationOneCancellationSameProposal() throws IOException {
-	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
-	    // renamed loadModel to customloadModel
-	//    Model expected = loadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
-
-	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.ttl");
+	  FileManager.get().addLocatorClassLoader(OpenProposesTest.class.getClassLoader());
+      Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposes/expected/2proposal-bothaccepted.ttl");
         test(input,expected);		
 	}
 	
@@ -62,7 +51,7 @@ public class OpenProposesToCancelTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = OpenProposesToCancelFunction.sparqlTest(input);
+		  Model actual = OpenProposesFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -84,7 +73,7 @@ public class OpenProposesToCancelTest {
         InputStream is = null;
         Model model = null;
         try {
-            is = OpenProposesToCancelTest.class.getResourceAsStream(path);
+            is = OpenProposesTest.class.getResourceAsStream(path);
             model = ModelFactory.createDefaultModel();
             RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
         } finally {
