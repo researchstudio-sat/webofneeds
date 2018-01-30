@@ -17,5 +17,6 @@
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix mod:   <http://purl.org/webofneeds/modification#> .
+@prefix agr: <http://purl.org/webofneeds/agreement#> .
 
 event:ow321nn1va6clfidc4s0 agr:accepts event:557600936467257340 .
