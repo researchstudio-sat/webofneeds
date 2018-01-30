@@ -74,16 +74,20 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
         }
 
         final URI needUriBeforeCreation = needUriFromProducer;
+
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
+
         for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needDataset, facetURI);
+            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
         }
+        final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDataset), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDatasetWithFacets), 150));
         WonNodeInformationService wonNodeInformationService =
                 getEventListenerContext().getWonNodeInformationService();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-                needURI, wonNodeUri, needDataset, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
+                needURI, wonNodeUri, needDatasetWithFacets, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
         //remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(getEventListenerContext(), needURI, createNeedCommandEvent.getUriListName());
 

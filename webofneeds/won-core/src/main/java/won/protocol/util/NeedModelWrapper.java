@@ -167,7 +167,7 @@ public class NeedModelWrapper {
         }
     }
 
-    protected Model getNeedModel() {
+    public Model getNeedModel() {
         Iterator<String> modelNameIter = needDataset.listNames();
 
         if(this.needModelGraphName != null && needDataset.getNamedModel(this.needModelGraphName) != null) {
@@ -191,7 +191,7 @@ public class NeedModelWrapper {
         return null;
     }
 
-    protected Model getSysInfoModel() {
+    public Model getSysInfoModel() {
         Iterator<String> modelNameIter = needDataset.listNames();
         if(this.sysInfoGraphName != null && needDataset.getNamedModel(this.sysInfoGraphName) != null) {
             return needDataset.getNamedModel(this.sysInfoGraphName);

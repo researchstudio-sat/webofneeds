@@ -30,6 +30,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -71,16 +72,20 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
             RdfUtils.replaceBaseResource(needDataset, needResource);
         }
         final URI needUriBeforeCreation = needUriFromProducer;
+
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
+
         for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needDataset, facetURI);
+            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
         }
+        final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDataset), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDatasetWithFacets), 150));
         WonNodeInformationService wonNodeInformationService =
                 ctx.getWonNodeInformationService();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-                needURI, wonNodeUri, needDataset);
+                needURI, wonNodeUri, needDatasetWithFacets);
         //remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
@@ -88,7 +93,7 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction {
             @Override
             public void onEvent(Event event) throws Exception {
                 logger.debug("need creation successful, new need URI is {}", needURI);
-                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needDataset, null, needUriBeforeCreation));
+                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needDatasetWithFacets, null, needUriBeforeCreation));
             }
         };
 
