@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -79,12 +80,12 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     needModelWrapper.addFacetUri(facet.toString());
                 }
 
-                Model model = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+                Dataset dataset = needModelWrapper.copyDataset();
 
-                logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
+                logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(dataset), 150));
 
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
-                                                                model, isUsedForTesting, isDoNotMatch);
+                                                                dataset, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
                 botContextWrapper.addUriMimeMessageRelation(needURI, message);
 

@@ -10,6 +10,7 @@ import won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProd
 import won.matcher.solr.evaluation.SolrMatcherEvaluation;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.spring.SolrTestAppConfiguration;
+import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class SolrNeedIndexer {
 
         // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
         NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
-        Model needModel = needProducer.create();
+        Model needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
 
         int needs = 0;
         while (!needProducer.isExhausted()) {
@@ -46,7 +47,7 @@ public class SolrNeedIndexer {
             if (needs % 100 == 0) {
                 System.out.println("Indexed " + needs + " needs.");
             }
-            needModel = needProducer.create();
+            needModel = new NeedModelWrapper(needProducer.create()).copyNeedModel(NeedGraphType.NEED);
         }
         System.out.println("Indexed " + needs + " needs.");
         System.exit(0);

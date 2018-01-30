@@ -153,7 +153,7 @@ public class NeedModelWrapper {
      */
     public static boolean isANeed(Dataset ds){
         try{
-            NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
+            new NeedModelWrapper(ds, false);
             return true;
         }catch (DataIntegrityException e){
             return false;
@@ -167,12 +167,18 @@ public class NeedModelWrapper {
         }
     }
 
-    protected Model getNeedModel() {
+    public Model getNeedModel() {
         Iterator<String> modelNameIter = needDataset.listNames();
 
         if(this.needModelGraphName != null && needDataset.getNamedModel(this.needModelGraphName) != null) {
             return needDataset.getNamedModel(this.needModelGraphName);
         }
+
+        Model defaultModel = needDataset.getDefaultModel();
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (defaultModel.listSubjectsWithProperty(WON.IS).hasNext() || defaultModel.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+            return defaultModel;
+        }
+
         while(modelNameIter.hasNext()) {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
@@ -185,11 +191,17 @@ public class NeedModelWrapper {
         return null;
     }
 
-    protected Model getSysInfoModel() {
+    public Model getSysInfoModel() {
         Iterator<String> modelNameIter = needDataset.listNames();
         if(this.sysInfoGraphName != null && needDataset.getNamedModel(this.sysInfoGraphName) != null) {
             return needDataset.getNamedModel(this.sysInfoGraphName);
         }
+
+        Model defaultModel = needDataset.getDefaultModel();
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (defaultModel.listSubjectsWithProperty(WON.IS).hasNext() || defaultModel.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+            return defaultModel;
+        }
+
         while(modelNameIter.hasNext()) {
             String tempModelName = modelNameIter.next();
             Model model = needDataset.getNamedModel(tempModelName);
@@ -214,6 +226,15 @@ public class NeedModelWrapper {
         } else {
             return RdfUtils.cloneModel(getSysInfoModel());
         }
+    }
+
+    /**
+     * get the complete dataset
+     *
+     * @return copy of needDataset
+     */
+    public Dataset copyDataset(){
+        return RdfUtils.cloneDataset(needDataset);
     }
 
     /**
@@ -825,5 +846,4 @@ public class NeedModelWrapper {
             model.remove(this.statementsToRemove);
         }
     }
-
 }

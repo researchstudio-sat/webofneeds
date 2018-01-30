@@ -16,6 +16,7 @@
 
 package won.bot.framework.eventbot.event.impl.debugbot;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.protocol.model.FacetType;
@@ -28,13 +29,13 @@ import java.net.URI;
 public class NeedCreatedEventForDebugHint extends BaseNeedSpecificEvent
 {
   private final URI wonNodeUri;
-  private final Model needModel;
+  private final Dataset needDataset;
   private final FacetType facetType;
 
-  public NeedCreatedEventForDebugHint(final URI needURI, final URI wonNodeUri, final Model needModel, final FacetType facetType) {
+  public NeedCreatedEventForDebugHint(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType) {
     super(needURI);
     this.wonNodeUri = wonNodeUri;
-    this.needModel = needModel;
+    this.needDataset = needDataset;
     this.facetType = facetType;
   }
 
@@ -43,9 +44,9 @@ public class NeedCreatedEventForDebugHint extends BaseNeedSpecificEvent
     return wonNodeUri;
   }
 
-  public Model getNeedModel()
+  public Dataset getNeedDataset()
   {
-    return needModel;
+    return needDataset;
   }
 
 

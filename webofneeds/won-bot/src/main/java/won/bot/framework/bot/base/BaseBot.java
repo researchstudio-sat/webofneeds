@@ -122,7 +122,7 @@ public abstract class BaseBot implements Bot
   }
 
   @Override
-  public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
+  public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needDataset) throws Exception;
 
   @Override
   public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
@@ -149,7 +149,7 @@ public abstract class BaseBot implements Bot
   public abstract void onMatcherRegistered(final URI wonNodeUri);
 
   @Override
-  public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);
+  public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needDataset);
 
   @Override
   public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);

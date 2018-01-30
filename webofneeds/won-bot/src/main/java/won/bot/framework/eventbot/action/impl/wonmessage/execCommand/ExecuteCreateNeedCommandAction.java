@@ -17,7 +17,7 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -55,35 +55,39 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         if (!(event instanceof CreateNeedCommandEvent)) return;
         CreateNeedCommandEvent createNeedCommandEvent = (CreateNeedCommandEvent) event;
-        Model needModel = createNeedCommandEvent.getNeedModel();
+        Dataset needDataset = createNeedCommandEvent.getNeedDataset();
 
         List<URI> facets = createNeedCommandEvent.getFacets();
-        if (needModel == null) {
+        if (needDataset == null) {
             logger.warn("CreateNeedCommandEvent did not contain a need model, aborting need creation");
             getEventListenerContext().getEventBus().publish(new NeedCreationAbortedEvent(null, null, createNeedCommandEvent, "CreateNeedCommandEvent did not contain a need model, aborting need creation"));
             return;
         }
 
         URI needUriFromProducer = null;
-        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needModel);
+        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needDataset);
         if (needResource.isURIResource()) {
             needUriFromProducer = URI.create(needResource.getURI().toString());
-            RdfUtils.replaceBaseURI(needModel, needResource.getURI());
+            RdfUtils.replaceBaseURI(needDataset, needResource.getURI());
         } else {
-            RdfUtils.replaceBaseResource(needModel, needResource);
+            RdfUtils.replaceBaseResource(needDataset, needResource);
         }
 
         final URI needUriBeforeCreation = needUriFromProducer;
+
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
+
         for (URI facetURI : facets) {
-            WonRdfUtils.FacetUtils.addFacet(needModel, facetURI);
+            WonRdfUtils.FacetUtils.addFacet(needModelWrapper.getNeedModel(), facetURI);
         }
+        final Dataset needDatasetWithFacets = needModelWrapper.copyDataset();
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDatasetWithFacets), 150));
         WonNodeInformationService wonNodeInformationService =
                 getEventListenerContext().getWonNodeInformationService();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-                needURI, wonNodeUri, needModel, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
+                needURI, wonNodeUri, needDatasetWithFacets, createNeedCommandEvent.isUsedForTesting(), createNeedCommandEvent.isDoNotMatch());
         //remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(getEventListenerContext(), needURI, createNeedCommandEvent.getUriListName());
 
@@ -115,10 +119,12 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
     }
 
     private WonMessage createWonMessage(
-            WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Model needModel,
+            WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Dataset needDataset,
             final boolean usedForTesting, final boolean doNotMatch) throws WonMessageBuilderException {
 
-        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
+        RdfUtils.replaceBaseURI(needDataset, needURI.toString());
+
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needDataset);
 
 
         if (doNotMatch){
@@ -130,13 +136,10 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
             needModelWrapper.addFlag(WON.USED_FOR_TESTING);
         }
 
-        RdfUtils.replaceBaseURI(needModel, needURI.toString());
-
         return WonMessageBuilder.setMessagePropertiesForCreate(
-                wonNodeInformationService.generateEventURI(
-                        wonNodeURI),
+                wonNodeInformationService.generateEventURI(wonNodeURI),
                 needURI,
-                wonNodeURI).addContent(needModel).build();
+                wonNodeURI).addContent(needModelWrapper.copyDataset()).build();
     }
 
 

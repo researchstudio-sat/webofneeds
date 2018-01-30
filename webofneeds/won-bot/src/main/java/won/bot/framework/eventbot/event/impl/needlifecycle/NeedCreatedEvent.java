@@ -16,7 +16,7 @@
 
 package won.bot.framework.eventbot.event.impl.needlifecycle;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.protocol.model.FacetType;
 
@@ -29,19 +29,19 @@ public class NeedCreatedEvent extends BaseNeedSpecificEvent
 {
   private final URI needUriBeforeCreation;
   private final URI wonNodeUri;
-  private final Model needModel;
+  private final Dataset needDataset;
   private final FacetType facetType;
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Model needModel, final FacetType facetType, final URI needUriBeforeCreation) {
+  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType, final URI needUriBeforeCreation) {
     super(needURI);
     this.wonNodeUri = wonNodeUri;
-    this.needModel = needModel;
+    this.needDataset = needDataset;
     this.facetType = facetType;
     this.needUriBeforeCreation = needUriBeforeCreation;
   }
 
-  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Model needModel, final FacetType facetType) {
-    this(needURI, wonNodeUri, needModel, facetType, null);
+  public NeedCreatedEvent(final URI needURI, final URI wonNodeUri, final Dataset needDataset, final FacetType facetType) {
+    this(needURI, wonNodeUri, needDataset, facetType, null);
   }
 
   public URI getWonNodeUri()
@@ -49,9 +49,8 @@ public class NeedCreatedEvent extends BaseNeedSpecificEvent
     return wonNodeUri;
   }
 
-  public Model getNeedModel()
-  {
-    return needModel;
+  public Dataset getNeedDataset() {
+    return needDataset;
   }
 
   public URI getNeedUriBeforeCreation() {

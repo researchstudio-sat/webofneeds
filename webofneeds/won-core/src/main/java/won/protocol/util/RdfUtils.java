@@ -189,6 +189,15 @@ public class RdfUtils
     model.setNsPrefix("", baseURI);
   }
 
+    public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
+        visit(dataset,
+            model -> {
+                replaceBaseURI(model, baseURI);
+                return null;
+            }
+        );
+    }
+
   /**
    * Replaces the base URI that's set as the model's default URI prfefix in all statements by replacement.
    *
@@ -203,6 +212,16 @@ public class RdfUtils
     replaceResourceInModel(baseUriResource, replacement);
     model.setNsPrefix("", replacement.getURI());
   }
+
+    public static void replaceBaseResource(Dataset dataset,final Resource replacement) {
+        visit(dataset, new ModelVisitor<Object>() {
+            @Override
+            public Object visit(Model model) {
+                replaceBaseResource(model, replacement);
+                return null;
+            }
+        });
+    }
 
   /**
    * Modifies the specified resources' model, replacing resource with replacement.
