@@ -1,35 +1,34 @@
-PREFIX mod: http://purl.org/webofneeds/modification#
-PREFIX rdfs: http://www.w3.org/2000/01/rdf-schema#
-PREFIX msg: http://purl.org/webofneeds/message#
-PREFIX won: http://purl.org/webofneeds/model#
+PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
 
 CONSTRUCT { ?retractingMsg mod:retracts ?retractedMsg . }
 WHERE
-{
-GRAPH ?retractingMessageEnvelope {
-?retractingMsg msg:hasContent ?retractingMessageContent
-}
-GRAPH ?retractingMessageContent {
-?retractingMsg mod:retracts ?retractedMsg .
-?rs ?rp ?ro .
-}
-GRAPH ?e2 {
-?retractingMsg msg:hasSender ?sender
-}
-GRAPH ?e3 {
-?retractedMsg msg:hasSender ?sender
-}
-# Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
-# Jena provides the special graph name urn:x-arq:UnionGraph for querying the union of all the query's graphs
-# THIS QUERY WILL ONLY WORK WITH JENA
-   GRAPH <urn:x-arq:UnionGraph> {
-    ?retractingMsg msg:hasPreviousMessage+ ?retractedMsg
-   }
-GRAPH ?retractedMessageEnvelope {
-    ?retractedMsg msg:hasContent ?retractedMessageContent
-}
-GRAPH ?retractedMessageContent {
-    ?s ?p ?o
-}
-
-}
+ {
+    GRAPH ?retractingMessageEnvelope {
+         ?retractingMsg msg:hasContent ?retractingMessageContent
+    }
+    GRAPH ?retractingMessageContent {
+        ?retractingMsg mod:retracts ?retractedMsg .
+        ?rs ?rp ?ro .
+    }
+    GRAPH ?e2 {
+        ?retractingMsg msg:hasSender ?sender
+    }
+    GRAPH ?e3 {
+        ?retractedMsg msg:hasSender ?sender
+    }
+    # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
+    # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
+    # THIS QUERY WILL ONLY WORK WITH JENA
+    GRAPH <urn:x-arq:UnionGraph> {
+        ?retractingMsg msg:hasPreviousMessage+ ?retractedMsg
+    }
+    GRAPH ?retractedMessageEnvelope {
+        ?retractedMsg msg:hasContent ?retractedMessageContent
+    }
+    GRAPH ?retractedMessageContent {
+        ?s ?p ?o
+    }
+ }
