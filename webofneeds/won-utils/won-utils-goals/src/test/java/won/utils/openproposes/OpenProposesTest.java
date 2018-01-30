@@ -91,7 +91,7 @@ public class OpenProposesTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ProposalToCancelTest.class.getResourceAsStream(path);
+            is = OpenProposesTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {

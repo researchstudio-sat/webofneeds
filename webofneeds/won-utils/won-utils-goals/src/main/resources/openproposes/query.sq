@@ -17,9 +17,9 @@ CONSTRUCT { ?openprop agr:proposes ?openclause  . }
         ?openprop agr:proposes ?openclause .
     }
           
-    
+      GRAPH <urn:x-arq:UnionGraph> { 
          ?openprop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?openclause .
-    
+      }
           
     GRAPH ?openclauseContent {
       ?opens ?openp ?openo .
@@ -54,10 +54,10 @@ FILTER NOT EXISTS {
     # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
     # THIS QUERY WILL ONLY WORK WITH JENA
     filter (?prop != ?acc) .
-   
+     GRAPH <urn:x-arq:UnionGraph> {
         ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
         ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
-    
+     }
     GRAPH ?g2 {
         ?acc agr:accepts ?prop .
     }
@@ -73,7 +73,7 @@ FILTER NOT EXISTS {
             ?acc2 agr:accepts ?prop .
             filter(?acc2 != ?acc) . #different from acc
         }   
-        
+          GRAPH <urn:x-arq:UnionGraph> { 
             # also after prop
             ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
             # acc2 must not be before acc. If it is parallel, use lexicographically first uri
@@ -83,7 +83,7 @@ FILTER NOT EXISTS {
                 ?acc msg:hasPreviousMessage+ ?acc2.
             }
          
-        
+         }
     }
  
    # only report the first agreement if there are multiple accept messages:
@@ -96,7 +96,7 @@ FILTER NOT EXISTS {
             ?acc2 agr:accepts ?prop .
             filter(?acc2 != ?acc) . #different from acc
         }   
-        
+          GRAPH <urn:x-arq:UnionGraph> {
             # also after prop
             ?acc2 msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
             # acc2 must not be before acc. If it is parallel, use lexicographically first uri
@@ -106,7 +106,7 @@ FILTER NOT EXISTS {
                 ?acc msg:hasPreviousMessage+ ?acc2.
             }
             filter (STR(?acc2) < STR(?acc)) 
-        
+          }
     }
     
    filter not exists {
@@ -120,10 +120,10 @@ FILTER NOT EXISTS {
       # Note: for this pattern, we need the union of all graphs that contain msg:hasPreviousMessage triples,
       # Jena provides the special graph name <urn:x-arq:UnionGraph> for querying the union of all the query's graphs
       # THIS QUERY WILL ONLY WORK WITH JENA
-          
+        GRAPH <urn:x-arq:UnionGraph> {   
           ?cancelProp msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?acc .
           ?cancelAcc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?cancelProp .
-      
+        }
       GRAPH ?gc2 {
           ?cancelAcc agr:accepts ?cancelProp .
       }  
