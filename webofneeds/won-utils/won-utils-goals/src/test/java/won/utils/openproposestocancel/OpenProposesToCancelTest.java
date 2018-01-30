@@ -37,7 +37,7 @@ public class OpenProposesToCancelTest {
     }
 
 	@Test
-	public void testModel() throws IOException {
+	public void oneOpenCancellationPropsoal() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "one-agreement-one-unacceptedcancellation.trig");
 	//    Model expected = loadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
 
@@ -45,7 +45,16 @@ public class OpenProposesToCancelTest {
       Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/one-agreement-one-unacceptedcancellation.ttl");
         test(input,expected);		
 	}
+	
+	@Test
+	public void twoOpenCancellationOneCancellationSameProposal() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
+	//    Model expected = loadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
 
+	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+      Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.ttl");
+        test(input,expected);		
+	}
 	
 	public void test(Dataset input, Model expectedOutput) {
 
