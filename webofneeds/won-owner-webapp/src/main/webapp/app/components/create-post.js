@@ -75,8 +75,8 @@ function genComponentConf() {
 
 	            <!-- IS PART -->
     			<div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-	                  	<span class="nonHover">Add Description<span class="opt">(allows others to find your post)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Add Description</span>
+	                  	<span class="nonHover"><span ng-if="!self.checkDropDown(self.is)">Add </span>Description<span class="opt">(allows others to find your post)</span></span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Add Description<span class="opt">(allows others to find your post)</span></span>
 	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Description</span>
     			</div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
@@ -142,12 +142,12 @@ function genComponentConf() {
                 </div>
                 <!-- /IS PART/ -->
                     
-	            <won-labelled-hr label="::'and'" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr> 
+	            <won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr> 
                 
                 <!-- SEEKS PART -->   	
 	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
-	                  	<span class="nonHover">Add Search<span class="opt">(search in other posts)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Add Search</span>
+	                  	<span class="nonHover"><span ng-if="!self.checkDropDown(self.seeks)">Add </span>Search<span class="opt">(search in other posts)</span></span>
+	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Add Search<span class="opt">(search in other posts)</span></span>
 	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Remove Search</span>
 	        	</div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.seeks)" >
