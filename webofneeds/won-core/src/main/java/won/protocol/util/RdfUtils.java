@@ -186,7 +186,7 @@ public class RdfUtils
 
 
 
-  private static boolean areModelsIsomorphic(Model model, Model otherModel) {
+  public static boolean areModelsIsomorphic(Model model, Model otherModel) {
     if (model != null){
       if (otherModel == null) {
         return false;
