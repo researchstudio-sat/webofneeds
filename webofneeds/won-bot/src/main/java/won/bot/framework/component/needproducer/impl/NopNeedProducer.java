@@ -1,5 +1,6 @@
 package won.bot.framework.component.needproducer.impl;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.component.needproducer.NeedProducer;
 
@@ -13,7 +14,7 @@ public class NopNeedProducer implements NeedProducer {
 
 
     @Override
-    public Model create() {
+    public Dataset create() {
         throw new UnsupportedOperationException("This NeedProducer implementation does not expect to be used");
     }
 
