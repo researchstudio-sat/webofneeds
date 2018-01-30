@@ -4,12 +4,12 @@ import {deepFreeze} from './utils.js';
 
 export const labels = deepFreeze({
     type: {
-        [won.WON.BasicNeedTypeDemandCompacted]: 'I want something',
-        [won.WON.BasicNeedTypeSupplyCompacted]: 'I offer something',
-        [won.WON.BasicNeedTypeDotogetherCompacted]: 'I want to do something together',
+        [won.WON.BasicNeedTypeDemandCompacted]: 'Search',//'I want something',
+        [won.WON.BasicNeedTypeSupplyCompacted]: 'Post',//'I offer something',
+        [won.WON.BasicNeedTypeDotogetherCompacted]: 'Post + Search',//'I want to do something together',
         //TODO: Find right declaration
-        [won.WON.BasicNeedTypeCombinedCompacted]: 'I want to post and search',
-        [won.WON.BasicNeedTypeCritiqueCompacted]: 'I want to change something',
+        [won.WON.BasicNeedTypeCombinedCompacted]:'Post + Search', //'I want to post and search',
+        [won.WON.BasicNeedTypeCritiqueCompacted]: 'Post', //'I want to change something',
         [won.WON.BasicNeedTypeWhatsAroundCompacted]: 'What\'s Around',
     },
     connectionState: {
