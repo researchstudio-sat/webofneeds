@@ -1,4 +1,4 @@
-package won.utils.closedproposescancelledagreement;
+package won.utils.closedacceptscancelledagreement;
 
 
 import java.io.IOException;
@@ -22,10 +22,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class ClosedProposesCancelledAgreementTest {
+public class ClosedAcceptsCancelledAgreementTest {
 	  
-    private static final String inputFolder = "/won/utils/closedproposescancelledagreement/input/";
-    private static final String expectedOutputFolder = "/won/utils/closedproposescancelledagreement/expected/";
+    private static final String inputFolder = "/won/utils/closedacceptscancelledagreement/input/";
+    private static final String expectedOutputFolder = "/won/utils/closedacceptscancelledagreement/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -44,7 +44,7 @@ public class ClosedProposesCancelledAgreementTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = ClosedProposesCancelledAgreementFunction.sparqlTest(input);
+		  Model actual = ClosedAcceptsCancelledAgreementFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -75,7 +75,7 @@ public class ClosedProposesCancelledAgreementTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ClosedProposesCancelledAgreementTest.class.getResourceAsStream(path);
+            is = ClosedAcceptsCancelledAgreementTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
