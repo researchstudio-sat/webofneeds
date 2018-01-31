@@ -17,6 +17,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
+import won.utils.openproposestocancel.OpenProposesToCancelTest;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -28,7 +29,7 @@ import org.apache.jena.riot.RDFFormat;
 public class ClosedProposesTest {
 	
     private static final String inputFolder = "/won/utils/closedproposes/input/";
-    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/closedproposes/expected/";
+    private static final String expectedOutputFolder = "/won/utils/closedproposes/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -37,15 +38,58 @@ public class ClosedProposesTest {
     }
 
 	@Test
-	public void oneValidProposal() throws IOException {
+	public void oneValidProposal () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "one-agreement.trig");
-	    // commented out because this does not work
-//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
-
-	  FileManager.get().addLocatorClassLoader(ClosedProposesTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel( expectedOutputFolder + "one-agreement.ttl");
+   	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement.ttl");
         test(input,expected);		
 	}
+	
+	// This considers a proposal from a valid agreement that has been validly cancelled as non-existent
+	// Look at the functionality of closedacceptsproposaltocancel if you want agreements containing proposals
+	// from cancelled agreements.
+	@Test
+	public void oneValidProposalwithOneAgreementOneCancellationTest () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation.trig");
+   	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-one-cancellation.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void oneValidProposalWithOneAgreementOneCancellationTestProposalError () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation-proposal-error.trig");
+   	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-one-cancellation-proposal-error.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void twoValidProposalWithoneAgreementTwoProposalClauses () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-two-proposal-clauses.trig");
+   	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-two-proposal-clauses.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void noValidProposaloneAgreementMissingProposal () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-missing-proposal.trig");
+   	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-missing-proposal.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void noValidProposaloneAgreementMissingClause () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-missing-clause.trig");
+   	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-missing-clause.ttl");
+        test(input,expected);		
+	}
+	
+	// a proposal that was unaccepted, so it is an open not closed proposal
+	@Test
+	public void validProposalNoAcceptanceNoAgreementOneCancellationError () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "no-agreement-one-cancellation-error.trig");
+   	    Model expected = customLoadModel( expectedOutputFolder + "no-agreement-one-cancellation-error.ttl");
+        test(input,expected);		
+	}
+	
 	
 	public void test(Dataset input, Model expectedOutput) {
 
@@ -68,22 +112,15 @@ public class ClosedProposesTest {
 }
 
 	
-    private static Model customloadModel(String path) throws IOException {
+	private static Model customLoadModel(String path) throws IOException {
 
-        InputStream is = null;
-        Model model = null;
-        try {
-            is = ClosedProposesTest.class.getResourceAsStream(path);
-            model = ModelFactory.createDefaultModel();
-            RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-        }
-
-        return model;
-    }
+		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
+        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+        Model model = FileManager.get().loadModel(prefix + path);
+          
+       return model;
+   }
+    
     
 	
     private static Dataset loadDataset(String path) throws IOException {
