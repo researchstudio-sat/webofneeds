@@ -44,9 +44,16 @@ public class OpenProposesToCancelTest {
 	}
 	
 	@Test
-	public void twoOpenCancellationOneCancellationSameProposal() throws IOException {
+	public void twoOpenCancellationClausesOneProposalNoneAccepted() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
 	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.ttl");    
+        test(input,expected);		
+	}
+	
+	@Test
+	public void twoOpenCancellationClausesOneProposaOneAccepted() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.ttl");    
         test(input,expected);		
 	}
 	
@@ -70,7 +77,7 @@ public class OpenProposesToCancelTest {
 
 }
 
-	  private static Model customLoadModel(String path) throws IOException {
+	private static Model customLoadModel(String path) throws IOException {
 
           String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
           FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
