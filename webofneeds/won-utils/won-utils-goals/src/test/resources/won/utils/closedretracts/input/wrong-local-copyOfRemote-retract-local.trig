@@ -1,3 +1,9 @@
+# This example contains no valid retractions. 
+# There is one invalid retraction: the correspondingRemoteMessage of event:4846251213444807000 has an 
+# additional content graph that contains the retraction.
+# It should not be possible to create this example with correctly operating WoN nodes
+# For checking the validity of the retraction, checking the happen-before relationship is not sufficient
+
 @prefix msg:   <http://purl.org/webofneeds/message#> .
 @prefix conn:  <https://localhost:8443/won/resource/connection/> .
 @prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
@@ -1200,8 +1206,7 @@
 
 <https://localhost:8443/won/resource/event/orj8iruy8pcer6zzxlra#content-wi31> {
     event:orj8iruy8pcer6zzxlra
-            won:hasTextMessage  "    'close':       close the current connection" ;
-            mod:retracts event:m8b6jvgclclzy48p7wqd .
+            won:hasTextMessage  "    'close':       close the current connection" .
 }
 
 <https://localhost:8443/won/resource/event/xpspyx3bpyev5v5p1vf6#envelope-9lws> {
@@ -4681,9 +4686,7 @@
 
 <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
     event:m8b6jvgclclzy48p7wqd
-            won:hasTextMessage  "    'hint':        create a new need and send hint to it" ;
-			mod:retracts event:cbcccoqqqbec6bxkl3y3 .
-			
+            won:hasTextMessage  "    'hint':        create a new need and send hint to it" .
 }
 
 <https://localhost:8443/won/resource/event/qyg9hv3nohv4ykv8ryev#envelope-d4wr> {
@@ -7194,7 +7197,9 @@
             msg:hasCorrespondingRemoteMessage
                     event:4846251213444807000 ;
             msg:hasSentTimestamp  1513170829703 ;
-            msg:protocolVersion   "1.0" .
+            msg:protocolVersion   "1.0" ;
+			# link to extra message content used to try to break the retraction code
+			msg:hasContent <https://localhost:8443/won/resource/event/5s66o8cqv4rxv74xfepg#added-content> .
     
     <https://localhost:8443/won/resource/event/5s66o8cqv4rxv74xfepg#envelope-y4li>
             a                      msg:EnvelopeGraph ;
@@ -7211,6 +7216,12 @@
             msg:hasPublicKeyFingerprint     "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
             msg:hasSignedGraph              <https://localhost:8443/won/resource/event/4846251213444807000#envelope-tsng> .
 }
+
+# extra message content used to try to break the retraction code
+<https://localhost:8443/won/resource/event/5s66o8cqv4rxv74xfepg#added-content> {
+  event:5s66o8cqv4rxv74xfepg mod:retracts event:gv6zk2yqk6o8bl574n36 .
+}
+
 
 <https://localhost:8443/won/resource/event/obhgk474mxybc4fobdub#envelope-siv8> {
     <https://localhost:8443/won/resource/event/xu87g40eu8cx053lad08#envelope-ew53-sig>

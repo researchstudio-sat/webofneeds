@@ -91,7 +91,7 @@ No triples were removed.
 < <https://localhost:8443/won/resource/event/orj8iruy8pcer6zzxlra#content-wi31> {
 <     event:orj8iruy8pcer6zzxlra
 <             won:hasTextMessage  "    'close':       close the current connection" ;
-<             mod:retracts event:m8b6jvgclclzy48p7wqd.
+<             mod:retracts event:m8b6jvgclclzy48p7wqd .
 < }
 < 
 4680,4686d4668

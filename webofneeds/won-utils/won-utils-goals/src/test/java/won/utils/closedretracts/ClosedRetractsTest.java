@@ -39,7 +39,7 @@ public class ClosedRetractsTest {
 
     // One mod:retracts triple
 	@Test
-	public void CorrectOneRemoteRetractionTest () throws IOException {
+	public void correctOneRemoteRetractionTest () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "correct-remote-retract.trig"); 
 	    Model expected = customLoadModel( expectedOutputFolder  + "correct-remote-retract.ttl");
         test(input,expected);		
@@ -47,12 +47,82 @@ public class ClosedRetractsTest {
 	
 	   // No Mod:retracts triples
     @Test
-    public void NoModificationTest () throws IOException {
+    public void noModificationTest () throws IOException {
         Dataset input = loadDataset( inputFolder + "correct-no-retraction.trig");
         Model expected = customLoadModel( expectedOutputFolder + "correct-no-retraction.ttl");
         test(input,expected);
     }
+    
+    @Test
+    public void correctOneLocalRetractionOfDirectlyPreviousMessageTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "correct-local-retract-two-previous.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "correct-local-retract-two-previous.ttl");
+        test(input,expected);
+    } 
+    
+    @Test
+    public void correctOneLocalRetractionOfLastButOneMessageTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "correct-local-retract-directly-previous.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "correct-local-retract-directly-previous.ttl");
+        test(input,expected);
+    }    
+   
+    @Test
+    public void correctRetractRetractOfLastButOneMessageTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "correct-retractRetract-two-previous.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "correct-retractRetract-two-previous.ttl");
+        test(input,expected);
+    }  
+    
+    @Test
+    public void wrongLocalCopyRemoteRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-local-copyOfRemote-retract-local.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-local-copyOfRemote-retract-local.ttl");
+        test(input,expected);
+    }
+    
+    @Test
+    public void wrongLocalRetractRemoteRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-local-retract-remote.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-local-retract-remote.ttl");
+        test(input,expected);
+    }
+    
+    @Test
+    public void wrongLocalRetractSubsequentRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-local-retract-subsequent.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-local-retract-subsequent.ttl");
+        test(input,expected);
+    }
+    
+    @Test
+    public void wrongLocalSelfRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-local-selfretract.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-local-selfretract.ttl");
+        test(input,expected);
+    }
+    
+    @Test
+    public void wrongRemoteRetractLocalRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-remote-retract-local.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-remote-retract-local.ttl");
+        test(input,expected);
+    }
 	
+    @Test
+    public void wrongRemoteRetractSubsequentRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-remote-retract-subsequent.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-remote-retract-subsequent.ttl");
+        test(input,expected);
+    }
+    
+    @Test
+    public void wrongRemoteSelfRetractRetractionTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "wrong-remote-selfretract.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "wrong-remote-selfretract.ttl");
+        test(input,expected);
+    }
+    
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...

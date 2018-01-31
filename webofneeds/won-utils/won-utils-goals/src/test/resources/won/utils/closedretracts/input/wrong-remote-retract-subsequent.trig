@@ -1200,8 +1200,7 @@
 
 <https://localhost:8443/won/resource/event/orj8iruy8pcer6zzxlra#content-wi31> {
     event:orj8iruy8pcer6zzxlra
-            won:hasTextMessage  "    'close':       close the current connection" ;
-            mod:retracts event:m8b6jvgclclzy48p7wqd .
+            won:hasTextMessage  "    'close':       close the current connection" .
 }
 
 <https://localhost:8443/won/resource/event/xpspyx3bpyev5v5p1vf6#envelope-9lws> {
@@ -3525,7 +3524,8 @@
 
 <https://localhost:8443/won/resource/event/4846251213444807000#content> {
     event:4846251213444807000
-            won:hasTextMessage  "one" .
+            won:hasTextMessage  "one" ;
+			mod:retracts event:4055709708568209400 .
 }
 
 <https://localhost:8443/won/resource/event/5151909952739158000#data> {
@@ -4681,9 +4681,7 @@
 
 <https://localhost:8443/won/resource/event/m8b6jvgclclzy48p7wqd#content-9icc> {
     event:m8b6jvgclclzy48p7wqd
-            won:hasTextMessage  "    'hint':        create a new need and send hint to it" ;
-			mod:retracts event:cbcccoqqqbec6bxkl3y3 .
-			
+            won:hasTextMessage  "    'hint':        create a new need and send hint to it" .
 }
 
 <https://localhost:8443/won/resource/event/qyg9hv3nohv4ykv8ryev#envelope-d4wr> {
