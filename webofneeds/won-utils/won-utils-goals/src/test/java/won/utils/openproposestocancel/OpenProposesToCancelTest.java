@@ -27,8 +27,8 @@ import org.apache.jena.riot.RDFFormat;
 
 public class OpenProposesToCancelTest {
 	
-    private static final String inputFolder = "/won/utils/proposaltocancel/input/";
-    private static final String expectedOutputFolder = "/won/utils/proposaltocancel/expected/";
+    private static final String inputFolder = "/won/utils/openproposestocancel/input/";
+    private static final String expectedOutputFolder = "/won/utils/openproposestocancel/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -39,22 +39,14 @@ public class OpenProposesToCancelTest {
 	@Test
 	public void oneOpenCancellationPropsoal() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "one-agreement-one-unacceptedcancellation.trig");
-	    // commented out because this does not work
-//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
-
-	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/one-agreement-one-unacceptedcancellation.ttl");
+	    Model expected = customLoadModel( expectedOutputFolder  + "one-agreement-one-unacceptedcancellation.ttl");
         test(input,expected);		
 	}
 	
 	@Test
 	public void twoOpenCancellationOneCancellationSameProposal() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
-	    // renamed loadModel to customloadModel
-	//    Model expected = loadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	    
-
-	  FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel("file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/openproposestocancel/expected/2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.ttl");
+	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.ttl");    
         test(input,expected);		
 	}
 	
@@ -78,24 +70,15 @@ public class OpenProposesToCancelTest {
 
 }
 
+	  private static Model customLoadModel(String path) throws IOException {
+
+          String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
+          FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+          Model model = FileManager.get().loadModel(prefix + path);
+		  
+          return model;
+   }
 	
-    private static Model customloadModel(String path) throws IOException {
-
-        InputStream is = null;
-        Model model = null;
-        try {
-            is = OpenProposesToCancelTest.class.getResourceAsStream(path);
-            model = ModelFactory.createDefaultModel();
-            RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-        }
-
-        return model;
-    }
-    
 	
     private static Dataset loadDataset(String path) throws IOException {
 
