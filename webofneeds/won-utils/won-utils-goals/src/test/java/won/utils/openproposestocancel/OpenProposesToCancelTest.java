@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.camel.main.Main;
+import org.apache.jena.atlas.logging.Log;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -44,19 +45,40 @@ public class OpenProposesToCancelTest {
 	}
 	
 	@Test
-	public void twoOpenCancellationClausesOneProposalNoneAccepted() throws IOException {
+	public void twoOpenCancellationOneCancellationSameProposal () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
 	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.ttl");    
         test(input,expected);		
 	}
 	
 	@Test
-	public void twoOpenCancellationClausesOneProposaOneAccepted() throws IOException {
+	public void twoProposaltwoAgreementstwoCancellationProposalClausesOneAccepted () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.trig");
 	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.ttl");    
         test(input,expected);		
 	}
 	
+	@Test
+	public void twoProposaltwoAgreementstwoCancellationProposalClausesBothAccepted () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.ttl");    
+        test(input,expected);		
+	}	
+	
+	@Test
+	public void oneClosedCancellationOneCancellationErrorSameProposal () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-onefail.trig");
+	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-2agreements-1cancellationproposal-2clauses-onefail.ttl");    
+        test(input,expected);		
+	}
+	
+    @Test
+    public void twoClosedCancellationOneCancellationSameProposal () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-bothsucceed.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-bothsucceed.ttl");
+        test(input,expected);	
+    }
+		
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
@@ -79,11 +101,11 @@ public class OpenProposesToCancelTest {
 
 	private static Model customLoadModel(String path) throws IOException {
 
-          String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
-          FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
-          Model model = FileManager.get().loadModel(prefix + path);
-		  
-          return model;
+		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
+        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+        Model model = FileManager.get().loadModel(prefix + path);
+          
+       return model;
    }
 	
 	
