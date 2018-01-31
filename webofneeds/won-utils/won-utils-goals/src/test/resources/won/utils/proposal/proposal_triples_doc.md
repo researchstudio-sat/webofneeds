@@ -8,10 +8,10 @@
  
  output: none
  
- ### oneOpenPropsoal
+ ### oneOpenProposal
 **input**: 2proposal-one-accepted.trig
 **output**: 2proposal-one-accepted.trig
-**test name**:  oneOpenPropsoal
+**test name**:  oneOpenProposal
 *// This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)*
 
 **input**:

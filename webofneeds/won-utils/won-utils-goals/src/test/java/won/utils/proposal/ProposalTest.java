@@ -62,7 +62,7 @@ public class ProposalTest {
 
     // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
     @Test
-    public void oneOpenPropsoal () throws IOException {
+    public void oneOpenProposal () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-accepted.trig");
         test(input,expectedOutput);
