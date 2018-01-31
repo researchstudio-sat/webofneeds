@@ -17,6 +17,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
+import won.utils.openproposestocancel.OpenProposesToCancelTest;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -28,7 +29,7 @@ import org.apache.jena.riot.RDFFormat;
 public class ClosedRetractsTest {
 	
     private static final String inputFolder = "/won/utils/closedretracts/input/";
-    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources/won/utils/closedretracts/expected/";
+    private static final String expectedOutputFolder = "/won/utils/closedretracts/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -36,16 +37,21 @@ public class ClosedRetractsTest {
     	root.setLevel(Level.INFO);	
     }
 
+    // One mod:retracts triple
 	@Test
-	public void oneValidRetract() throws IOException {
-	    Dataset input = loadDataset( inputFolder + "correct-remote-retract.trig");
-	    // commented out because this does not work
-//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
-
-	  FileManager.get().addLocatorClassLoader(ClosedRetractsTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel( expectedOutputFolder + "correct-remote-retract.ttl");
+	public void CorrectOneRemoteRetractionTest () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "correct-remote-retract.trig"); 
+	    Model expected = customLoadModel( expectedOutputFolder  + "correct-remote-retract.ttl");
         test(input,expected);		
 	}
+	
+	   // No Mod:retracts triples
+    @Test
+    public void NoModificationTest () throws IOException {
+        Dataset input = loadDataset( inputFolder + "correct-no-retraction.trig");
+        Model expected = customLoadModel( expectedOutputFolder + "correct-no-retraction.ttl");
+        test(input,expected);
+    }
 	
 	public void test(Dataset input, Model expectedOutput) {
 
@@ -68,22 +74,14 @@ public class ClosedRetractsTest {
 }
 
 	
-    private static Model customloadModel(String path) throws IOException {
+	private static Model customLoadModel(String path) throws IOException {
 
-        InputStream is = null;
-        Model model = null;
-        try {
-            is = ClosedRetractsTest.class.getResourceAsStream(path);
-            model = ModelFactory.createDefaultModel();
-            RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-        }
-
-        return model;
-    }
+		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
+        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+        Model model = FileManager.get().loadModel(prefix + path);
+          
+       return model;
+   }
     
 	
     private static Dataset loadDataset(String path) throws IOException {

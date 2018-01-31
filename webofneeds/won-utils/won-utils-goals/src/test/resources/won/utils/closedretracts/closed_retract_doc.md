@@ -1,5 +1,6 @@
-### This query functions like modifcation (or Modifcation.java), but it utilizes a construct query that builds
-### triples instead of building named graphs with a select query
+ This query functions like modifcation (or Modifcation.java), but it utilizes a construct query that builds
+ triples instead of building named graphs with a select query
+ 
 ### oneValidRetract
 **input**: correct-remote-retract.trig
 **output**: correct-remote-retract.ttl
@@ -24,4 +25,12 @@
  event:4055709708568209400  mod:retracts event:6149800720990867000 .
  ```
  
-### TODO ... add more tests from modification protocol
+### NoModificationTest
+**input**: correct-no-retraction.trig
+**output**: correct-no-retraction.ttl
+**test name**: oneValidRetract
+*// This is the case where there is no mod:retract triple*
+
+**input**: Nothing except conversation without mod:retracts
+
+**output**:  NOTHING
