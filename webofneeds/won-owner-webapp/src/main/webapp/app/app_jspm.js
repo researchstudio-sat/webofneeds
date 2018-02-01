@@ -23,6 +23,7 @@ import {
     firstToLowerCase,
     delay,
     parseSVG,
+    inlineSVGSpritesheet,
 } from './utils.js';
 
 //---------- Config -----------
@@ -172,19 +173,4 @@ angular.bootstrap(document, ['won.owner'], {
 });
 
 
-/**
- * Fetch and inline the icon-spritemap so it can be colored using css-variables.
- */
-fetch("./generated/icon-sprite.svg")
-.then(res => res.text())
-.then(xmlString => parseSVG(xmlString))
-.then(svgDocumentFragment => {
-    if(!svgDocumentFragment) throw new Exception("Couldn't parse icon-spritesheet.");
-    document.body.appendChild(svgDocumentFragment);
-    const svgNode = document.body.lastChild; // the node resulting from the fragment we just appended
-    svgNode.style.display = "none"
-    svgNode.id = "icon-sprite";
-    //svgNode.style.display = "none"; // don't want it to show up in full, only via the fragment-references to it.
-    window.svgNode4dbg = svgNode;
-    window.foo4dbg = document.body.appendChild(svgNode);
-})
+inlineSVGSpritesheet("./generated/icon-sprite.svg", "icon-sprite");
