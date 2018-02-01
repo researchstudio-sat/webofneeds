@@ -28,6 +28,9 @@ function genLogoutConf() {
                 <img
                     src="generated/icon-sprite.svg#ico16_arrow_down"
                     class="topnav__carret">
+
+                <svg class="topnav__button__icon"><use xlink:href="#ico36_person"></use></svg>
+                <svg class="topnav__button__icon" style="stroke:red; fill: blue;"><use xlink:href="#ico36_person_confable"></use></svg>
                 <img
                     class="topnav__button__icon"
                     src="generated/icon-sprite.svg#ico36_person">

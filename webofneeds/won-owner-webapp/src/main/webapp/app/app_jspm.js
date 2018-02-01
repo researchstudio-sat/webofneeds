@@ -173,4 +173,5 @@ angular.bootstrap(document, ['won.owner'], {
 });
 
 
-inlineSVGSpritesheet("./generated/icon-sprite.svg", "icon-sprite");
+//inlineSVGSpritesheet("./generated/icon-sprite.svg", "icon-sprite");
+inlineSVGSpritesheet("./generated/symbol/svg/sprite.symbol.svg", "icon-sprite");

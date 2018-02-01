@@ -1040,7 +1040,7 @@ export function parseSVG(xmlString) {
 /**
  * Fetch and inline an icon-spritemap so it can be colored using css-variables.
  */
-function inlineSVGSpritesheet(path, id) {
+export function inlineSVGSpritesheet(path, id) {
     return fetch(path)
     .then(res => res.text())
     .then(xmlString => parseSVG(xmlString))
@@ -1048,7 +1048,9 @@ function inlineSVGSpritesheet(path, id) {
         if(!svgDocumentFragment) throw new Exception("Couldn't parse icon-spritesheet.");
         document.body.appendChild(svgDocumentFragment);
         const svgNode = document.body.lastChild; // the node resulting from the fragment we just appended
-        svgNode.style.display = "none"
+        if(svgNode && svgNode.style) { 
+          svgNode.style.display = "none"
+        }
         if(id) {
             svgNode.id = id;
         }

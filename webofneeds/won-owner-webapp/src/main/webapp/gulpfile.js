@@ -102,6 +102,9 @@ var svgSpriteConf = {
         }
     },
     mode : {
+        inline: true,
+        symbol: true, // generate sprite with icons wrapped in <symbol>-tags, that can be used via `<svg><use href="#.."></use></svg>`
+        /*
         view : {
             //example: true //generates html with usage-demo
 
@@ -114,7 +117,7 @@ var svgSpriteConf = {
                   better but, alas, is not available.
                 * `mode.view.layout: 'diagonal'` seems to be a better solution, which solves the issue for all
                   except adjacent rectangular icons.
-             */
+             * /
             layout: 'diagonal',
 
             //default would be './view'
@@ -127,6 +130,7 @@ var svgSpriteConf = {
             // circumvent cache staleness, but makes referencing the sprite hard)
             bust: false
         }
+        */
     }
 };
 gulp.task('iconsprite', function(done) {
