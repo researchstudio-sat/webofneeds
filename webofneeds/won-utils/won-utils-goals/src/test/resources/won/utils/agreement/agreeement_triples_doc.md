@@ -292,6 +292,56 @@ agr:proposes event:6671551888677331000 .
             agr:accepts event:1435888415723958200 .
 }
 ```
+### twoProposalOneAgreementError
+*2proposal-one-agreement-errormsg.trig (a text message instead of a proposal is accepted in an agreement, making one of the proposals in the agreement invalid  ... produces a file an agreement with only the valid clause content
+
+```
+<https://localhost:8443/won/resource/event/6671551888677331000#content> {
+    event:6671551888677331000
+            won:hasFacet        won:OwnerFacet ;
+            won:hasRemoteFacet  won:OwnerFacet ;
+            won:hasTextMessage  "hi" .
+}
+<https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx#content-klsc> {
+    event:usi9yhill1lo2xi70sjx
+            won:hasTextMessage  "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." ;
+agr:proposes event:6671551888677331000 .
+}
+
+<https://localhost:8443/won/resource/event/5669098069340991000#content> {
+    event:5669098069340991000
+            won:hasTextMessage  "one" .
+}
+
+<https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
+    event:00d5wzbbf8hzzt2eewcc
+            won:hasTextMessage  "I'm not sure I understand you fully." ;
+            agr:proposes event:5669098069340991000 .
+}
+
+<https://localhost:8443/won/resource/event/557600936467257340#content> {
+    event:557600936467257340
+            won:hasTextMessage  "two" ;
+            agr:accepts event:usi9yhill1lo2xi70sjx ;
+            agr:accepts event:5669098069340991000 .
+}
+```
+
+**output**:
+
+```
+<https://localhost:8443/won/resource/event/557600936467257340> {
+    <https://localhost:8443/won/resource/event/6671551888677331000>
+            <http://purl.org/webofneeds/model#hasFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasRemoteFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasTextMessage>
+                    "hi" .
+}
+```
+
+
 
 ### twoProposalOneAgreementOneCancellationError
 *2proposal-one-agreement-errormsg-one-cancellation.trig (a text message instead of a proposal is accepted in an agreement, making one of the proposals in the agreement invalid  … produces a blank file)*

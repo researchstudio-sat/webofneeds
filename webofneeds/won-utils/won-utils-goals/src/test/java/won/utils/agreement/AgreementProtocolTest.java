@@ -153,6 +153,14 @@ public class AgreementProtocolTest {
         test(input,expectedOutput);
     }
     
+    // This test allows for an agreement with an invalid and valid accept in the same agreement envelope
+    @Test
+    public void twoProposalOneAgreementError () throws IOException {
+        Dataset input = loadDataset( inputFolder + "2proposal-one-agreement-errormsg.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-agreement-errormsg.trig");
+        test(input,expectedOutput);
+    }
+    
     // This is one agreement and two cancellation agreements of the same initial agreement. The result should look like oneAgreementOneCancellationTest ()   
     @Test
     public void oneAgreementTwoCancellationSameAgreement () throws IOException {
