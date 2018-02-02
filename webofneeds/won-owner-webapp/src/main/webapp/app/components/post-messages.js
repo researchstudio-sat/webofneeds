@@ -76,15 +76,17 @@ function genComponentConf() {
                           ng-show="self.showRdfIcon && message.get('outgoingMessage')"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
-                            <img class="rdflink__small clickable"
-                                src="generated/icon-sprite.svg#rdf_logo_2">
+                            <svg class="rdflink__small clickable">
+                                    <use xlink:href="#rdf_logo_2"></use>
+                            </svg>
                         </a>
                          <a
                           ng-show="self.showRdfIcon && !message.get('outgoingMessage')"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
-                            <img class="rdflink__small clickable"
-                                src="generated/icon-sprite.svg#rdf_logo_2">
+                            <svg class="rdflink__small clickable">
+                                <use xlink:href="#rdf_logo_2"></use>
+                            </svg>
                         </a>
                     </div>
             </div>
@@ -103,9 +105,9 @@ function genComponentConf() {
         <div>
             <a class="rdflink withlabel clickable"
                ng-click="self.showRdf()">
-                   <img 
-                       class="rdflink__small"
-                       src="generated/icon-sprite.svg#rdf_logo_1">
+                   <svg class="rdflink__small">
+                       <use xlink:href="#rdf_logo_1"></use>
+                   </svg>
                   <span class="rdflink__text">[{{self.showhide}}]</span> 
             </a>
         </div>

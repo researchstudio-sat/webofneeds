@@ -25,7 +25,10 @@ function genComponentConf() {
       <div class="or__header">
         <a ng-click="self.router__stateGoCurrent({connectionUri: null})"
            class="clickable">
-          <img class="or__header__icon clickable" src="generated/icon-sprite.svg#ico36_close"/>
+            <svg style="--local-primary:var(--won-primary-color);"
+              class="or__header__icon clickable">
+                <use xlink:href="#ico36_close"></use>
+            </svg>
         </a>
 
         <won-post-header
@@ -53,7 +56,9 @@ function genComponentConf() {
           <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Chat</button>
         </div>
         <a target="_blank" href="{{self.connectionUri}}">
-            <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">
+            <svg class="rdflink__big clickable">
+                <use xlink:href="#rdf_logo_1"></use>
+            </svg>
         </a>
     </div>
     `;

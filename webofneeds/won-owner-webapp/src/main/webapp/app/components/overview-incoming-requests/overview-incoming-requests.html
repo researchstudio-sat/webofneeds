@@ -7,12 +7,18 @@
     <div class="opc__inner empty" ng-if="!self.hasRequests">
         <div class="opc__empty">
             <div class="opc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_incoming_grey" class="opc__empty__description__icon">
+                <svg class="opc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico36_incoming"></use>
+                </svg>
                 <span class="opc__empty__description__text">Here you will see all incoming requests for your needs, but
                     currently there are none. Check again later!</span>
             </div>
             <a ng-click="self.router__stateGoResetParams('createNeed')" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_plus" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use xlink:href="#ico36_plus"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Create a Need</span>
             </a>
         </div>

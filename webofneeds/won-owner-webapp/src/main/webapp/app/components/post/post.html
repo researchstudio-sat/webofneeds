@@ -25,21 +25,34 @@
     <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Suggested && !self.hasMatches">
         <div class="opc__empty">
             <div class="opc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_match_grey" class="opc__empty__description__icon">
-                    <span class="opc__empty__description__text">The matches to this need will be listed here.
-                     You cannot influence the matching process. It might take some time, or maybe there is nothing to
-                        be found for you, yet. Check back later!</span>
+                <svg class="opc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico36_match"></use>
+                </svg>
+                <span class="opc__empty__description__text">
+                    The matches to this need will be listed here.
+                    You cannot influence the matching process. It might take some time, or maybe there is nothing to
+                    be found for you, yet. Check back later!
+                </span>
             </div>
         </div>
     </div>
     <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Connected && !self.hasConversations">
         <div class="opc__empty">
             <div class="opc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_message_grey" class="opc__empty__description__icon">
-                <span class="opc__empty__description__text">You will be able to communicate with others once there are accepted connections. Accept a request or send requests and wait until the counterpart accepts it.</span>
+                <svg class="opc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico36_message"></use>
+                </svg>
+                <span class="opc__empty__description__text">
+                    You will be able to communicate with others once there are accepted connections. Accept a request or send requests and wait until the counterpart accepts it.
+                </span>
             </div>
             <a ng-click="self.router__stateGoCurrent({connectionType: self.won.RequestReceived})" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_incoming" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use xlink:href="#ico36_incoming"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Accept requests</span>
             </a>
         </div>
@@ -47,15 +60,26 @@
     <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestReceived && !self.hasReceivedRequests">
         <div class="opc__empty">
             <div class="opc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_incoming_grey" class="opc__empty__description__icon">
-                <span class="opc__empty__description__text">This view shows you all the incoming request for this specific need. Wait until someone tries to connect with you.</span>
+                <svg class="opc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico36_incoming"></use>
+                </svg>
+                <span class="opc__empty__description__text">
+                    This view shows you all the incoming request for this specific need. Wait until someone tries to connect with you.
+                </span>
             </div>
             <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Connected})" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_message" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use xlink:href="#ico36_message"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Go to conversations</span>
             </a>
             <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Suggested})" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_match" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use xlink:href="#ico36_match"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Go to matches</span>
             </a>
         </div>
@@ -63,15 +87,26 @@
     <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestSent && !self.hasSentRequests">
         <div class="opc__empty">
             <div class="opc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_outgoing_grey" class="opc__empty__description__icon">
-                <span class="opc__empty__description__text">This view shows you all your sent requests for this specific need. Connect with a match to see it here.</span>
+                <svg class="opc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico36_outgoing"></use>
+                </svg>
+                <span class="opc__empty__description__text">
+                    This view shows you all your sent requests for this specific need. Connect with a match to see it here.
+                </span>
             </div>
             <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Connected})" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_message" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use xlink:href="#ico36_message"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Go to conversations</span>
             </a>
             <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Suggested})" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_match" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use xlink:href="#ico36_match"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Go to matches</span>
             </a>
         </div>

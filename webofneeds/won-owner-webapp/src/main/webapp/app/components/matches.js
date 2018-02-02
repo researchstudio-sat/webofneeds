@@ -33,13 +33,19 @@ let template = `
     <div class="omc__inner" ng-class="{'empty' : !self.hasMatches}">
         <div class="omc__empty" ng-if="!self.hasMatches">
             <div class="omc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_match_grey" class="omc__empty__description__icon">
+                <svg class="omc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico36_match"></use>
+                </svg>
                 <span class="omc__empty__description__text">The matches to all your needs will be listed here. 
                  You cannot influence the matching process. It might take some time, or maybe there is nothing to
                     be found for you, yet. Check back later or post more needs!</span>
             </div>
             <a ng-click="self.router__stateGoResetParams('createNeed')" class="omc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_plus" class="omc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="omc__empty__link__icon">
+                        <use xlink:href="#ico36_plus"></use>
+                </svg>
                 <span class="omc__empty__link__caption">Create a Need</span>
             </a>
         </div>
@@ -48,18 +54,24 @@ let template = `
             <div class="omc__header__viewtype">
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.TILES})"
                    class="clickable">
-                    <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
-                     class="omc__header__viewtype__icon clickable"/>
+                    <svg class="omc__header__viewtype__icon clickable" 
+                        style="--local-primary:{{self.layout === 'tiles' ? 'black' : 'var(--won-primary-color)'}};">
+                            <use xlink:href="#ico-filter_tile"></use>
+                    </svg>
                 </a>
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.LIST})"
                    class="clickable">
-                    <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
-                     class="omc__header__viewtype__icon clickable"/>
+                    <svg class="omc__header__viewtype__icon clickable" 
+                        style="--local-primary:{{self.layout === 'list' ? 'black' : 'var(--won-primary-color)'}};">
+                            <use xlink:href="#ico-filter_list"></use>
+                    </svg>
                 </a>                
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
                    class="clickable">
-                    <img ng-src="{{self.layout === 'map' ? 'generated/icon-sprite.svg#ico-filter_map_selected' : 'generated/icon-sprite.svg#ico-filter_map'}}"
-                     class="omc__header__viewtype__icon clickable"/>
+                    <svg class="omc__header__viewtype__icon clickable" 
+                        style="--local-primary:{{self.layout === 'map' ? 'black' : 'var(--won-primary-color)'}};">
+                            <use xlink:href="#ico-filter_map"></use>
+                    </svg>
                 </a>
             </div>
         </div>

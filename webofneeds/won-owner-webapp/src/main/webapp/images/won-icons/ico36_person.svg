@@ -106,7 +106,7 @@
          transform="matrix(1.25,0,0,-1.25,116.67858,159.02076)">
         <path
            d="M 0,0 C 9.65,0 17.5,7.851 17.5,17.5 17.5,27.149 9.65,35 0,35 -9.65,35 -17.5,27.149 -17.5,17.5 -17.5,7.851 -9.65,0 0,0"
-           style="fill:#f04646;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           style="fill:var(--local-primary);fill-opacity:1;fill-rule:nonzero;stroke:none"
            id="path206" />
       </g>
       <g
@@ -130,7 +130,7 @@
          transform="matrix(1.25,0,0,-1.25,116.73315,159.28965)">
         <path
            d="M 0,0 C 9.65,0 17.5,7.851 17.5,17.5 17.5,27.149 9.65,35 0,35 -9.65,35 -17.5,27.149 -17.5,17.5 -17.5,7.851 -9.65,0 0,0 Z"
-           style="fill:none;stroke:#f04646;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;stroke:var(--local-primary);stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            id="path230" />
       </g>
     </g>
@@ -141,7 +141,7 @@
     <g
        id="g21">
       <path
-         style="fill:none;stroke:#f04646;stroke-width:2"
+         style="fill:none;stroke:var(--local-primary);stroke-width:2"
          id="path23"
          d="M 18,35 C 27.373,35 35,27.374 35,18 35,8.626 27.373,1 18,1 8.626,1 1,8.626 1,18 1,27.374 8.626,35 18,35 l 0,0 z" />
     </g>

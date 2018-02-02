@@ -18,7 +18,10 @@ function genComponentConf() {
         <nav class="settings-tab-bar" ng-cloak ng-show="{{true}}">
             <div class="astb__inner">
                 <a class="astb__inner__left" ng-click="self.back()">
-                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="astb__icon">
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="astb__icon">
+                            <use xlink:href="#ico36_backarrow"></use>
+                    </svg>
                 </a>
                 <div class="astb__inner__center">
                     <h1 class="astb__title">Account Settings</h1>

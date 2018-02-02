@@ -33,8 +33,10 @@ function genComponentConf() {
                     </div>
                     <div class="pil__description__subtitle">
                         <span class="pil__description__subtitle__group" ng-show="self.need.get('group')">
-                            <img src="generated/icon-sprite.svg#ico36_group"
+                            <svg style="--local-primary:var(--won-primary-color);"
                                  class="pil__description__subtitle__group__icon">
+                                    <use xlink:href="#ico36_group"></use>
+                            </svg>
                              {{self.ownNeed.get('group')}}
                              <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                         </span>
@@ -49,58 +51,81 @@ function genComponentConf() {
                     class="pil__indicators__item clickable"
                     ng-show="self.hasConversations"
                     ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})">
-                        <img src="generated/icon-sprite.svg#ico36_message_light"
-                             ng-show="!self.unreadConversationsCount"
-                             class="pil__indicators__item__icon">
-                        <img src="generated/icon-sprite.svg#ico36_message"
+                        <svg class="pil__indicators__item__icon"
+                            style="--local-primary:#F09F9F;"
+                            ng-show="!self.unreadConversationsCount">
+                                <use xlink:href="#ico36_message"></use>
+                        </svg>
+
+                        <svg style="--local-primary:var(--won-primary-color);"
                              ng-show="self.unreadConversationsCount"
                              class="pil__indicators__item__icon">
+                                <use xlink:href="#ico36_message"></use>
+                        </svg>
+
                         <span class="pil__indicators__item__caption">
                             {{ self.unreadConversationsCount }}
                         </span>
                 </a>
                 <div class="pil__indicators__item" ng-show="!self.hasConversations">
-                    <img src="generated/icon-sprite.svg#ico36_message_grey"
-                         class="pil__indicators__item__icon">
+                    <svg class="pil__indicators__item__icon"
+                        style="--local-primary:#CCD2D2;">
+                            <use xlink:href="#ico36_message"></use>
+                    </svg>
                      <span class="pil__indicators__item__caption"></span>
                 </div>
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasRequests"
                     ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.RequestReceived})">
-                        <img src="generated/icon-sprite.svg#ico36_incoming_light"
-                                 ng-show="!self.unreadRequestsCount"
-                                 class="pil__indicators__item__icon">
-                        <img src="generated/icon-sprite.svg#ico36_incoming"
-                             ng-show="self.unreadRequestsCount"
-                             class="pil__indicators__item__icon">
+
+                        <svg class="pil__indicators__item__icon"
+                            style="--local-primary:#F09F9F;"
+                            ng-show="!self.unreadRequestsCount">
+                                <use xlink:href="#ico36_incoming"></use>
+                        </svg>
+                        <svg style="--local-primary:var(--won-primary-color);"
+                            ng-show="self.unreadRequestsCount"
+                            class="pil__indicators__item__icon">
+                                <use xlink:href="#ico36_incoming"></use>
+                        </svg>
                         <span class="pil__indicators__item__caption">
                             {{ self.unreadRequestsCount }}
                         </span>
                 </a>
                 <div class="pil__indicators__item" ng-show="!self.hasRequests">
-                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"
-                         class="pil__indicators__item__icon">
+                    <svg class="pil__indicators__item__icon"
+                        style="--local-primary:#CCD2D2;">
+                            <use xlink:href="#ico36_incoming"></use>
+                    </svg>
                      <span class="pil__indicators__item__caption"></span>
                 </div>
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasMatches"
                     ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Suggested})">
-                        <img src="generated/icon-sprite.svg#ico36_match_light"
-                             ng-show="!self.unreadMatchesCount"
-                             class="pil__indicators__item__icon">
-                        <img src="generated/icon-sprite.svg#ico36_match"
-                             ng-show="self.unreadMatchesCount"
-                             class="pil__indicators__item__icon">
+
+                        <svg class="pil__indicators__item__icon"
+                            style="--local-primary:#F09F9F;"
+                            ng-show="!self.unreadMatchesCount">
+                                <use xlink:href="#ico36_match"></use>
+                        </svg>
+
+                        <svg style="--local-primary:var(--won-primary-color);"
+                            ng-show="self.unreadMatchesCount"
+                            class="pil__indicators__item__icon">
+                                <use xlink:href="#ico36_match"></use>
+                        </svg>
                         <span class="pil__indicators__item__caption">
                             {{ self.unreadMatchesCount }}
                         </span>
                 </a>
                 <div class="pil__indicators__item" ng-show="!self.hasMatches">
-                    <img src="generated/icon-sprite.svg#ico36_match_grey"
-                         class="pil__indicators__item__icon">
-                     <span class="pil__indicators__item__caption"></span>
+                    <svg class="pil__indicators__item__icon"
+                        style="--local-primary:#CCD2D2;">
+                            <use xlink:href="#ico36_match"></use>
+                    </svg>
+                    <span class="pil__indicators__item__caption"></span>
                 </div>
             </div>
     `;

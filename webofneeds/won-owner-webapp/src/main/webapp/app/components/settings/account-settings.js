@@ -31,7 +31,10 @@ function genComponentConf() {
         </div>
         <div class="flexbuttons">
             <a class="ac__button clickable">
-                <img src="generated/icon-sprite.svg#ico36_close_circle" class="ac__button__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="ac__button__icon">
+                        <use xlink:href="#ico36_close_circle"></use>
+                </svg>
                 <span class="ac__button__caption">Remove this account</span>
             </a>
             <button class="won-button--filled red" ng-click="settings.saveAccount()">Save Settings</button>

@@ -21,8 +21,9 @@ function genComponentConf() {
         <div
           class="pc__text"
           ng-show="self.need.getIn(['location', 's:name'])">
-            <img class="pc__icon"
-              src="generated/icon-sprite.svg#ico16_indicator_location"/>
+            <svg class="pc_icon" style="--local-primary:#939598;">
+                <use xlink:href="#ico16_indicator_location"></use>
+            </svg>
             <span>{{ self.need.getIn(['location', 's:name']) }}</span>
         </div>
       <!--
@@ -36,34 +37,35 @@ function genComponentConf() {
       -->
         <!--
         <div class="pc__datetime">
-          <img class="pc__icon"
-            src="generated/icon-sprite.svg#ico16_indicator_time"/>
+          <svg class="pc_icon" style="--local-primary:#939598;">
+              <use xlink:href="#ico16_indicator_time"></use>
+          </svg>
           <span>Available until 5th May</span>
         </div>
         -->
         <div class="pc__text"
           ng-show="!!self.need.get('description')">
-          <img
-            class="pc__icon"
-            src="generated/icon-sprite.svg#ico16_indicator_description"/>
+          <svg class="pc_icon" style="--local-primary:#939598;">
+              <use xlink:href="#ico16_indicator_description"></use>
+          </svg>
           <span>
             {{ self.need.get('description') }}
           </span>
         </div>
         <div class="pc__text"
           ng-show="!!self.need.get('location')">
-          <img
-            class="pc__icon"
-            src="generated/icon-sprite.svg#ico16_indicator_location"/>
+          <svg class="pc_icon" style="--local-primary:#939598;">
+              <use xlink:href="#ico16_indicator_location"></use>
+          </svg>
           <span>
             {{ self.need.getIn(['location','address']) }}
           </span>
         </div>
         <div class="pc__text"
           ng-show="!!self.textMessage">
-          <img
-            class="pc__icon"
-            src="generated/icon-sprite.svg#ico16_indicator_message"/>
+          <svg class="pc_icon" style="--local-primary:#939598;">
+              <use xlink:href="#ico16_indicator_message"></use>
+          </svg>
           <span>
             {{ self.textMessage }}
           </span>

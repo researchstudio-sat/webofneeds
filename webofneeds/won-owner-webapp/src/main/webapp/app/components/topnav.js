@@ -23,8 +23,9 @@ function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
-            <img class="si__icon"
-                src="generated/icon-sprite.svg#ico16_indicator_warning_white"/>
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning"></use>
+            </svg>
             <span class="si__text">
                 Lost connection &ndash; make sure your internet-connection
                 is working, then click &ldquo;reconnect&rdquo;.
@@ -60,8 +61,9 @@ function genTopnavConf() {
                     <a href="{{ self.resetParamsHRef(self.$state, 'createNeed') }}"
                        class="topnav__button"
                        ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
-                        <img src="generated/icon-sprite.svg#ico36_plus"
-                            class="topnav__button__icon logo">
+                        <svg class="topnav__button__icon logo" style="--local-primary:var(--won-primary-color);">
+                            <use xlink:href="#ico36_plus"></use>
+                        </svg>
                         <span class="topnav__button__caption">New Post</span>
                     </a>
                 </div>
@@ -112,10 +114,11 @@ function genTopnavConf() {
                         'error' : toast.get('type') === self.WON.errorToast
                       }"
             ng-repeat="toast in self.toastsArray">
-                <img
-                    class="topnav__toasts__element__close clickable"
+                <svg class="topnav__toasts__element__close clickable"
                     ng-click="self.toasts__delete(toast)"
-                    src="generated/icon-sprite.svg#ico27_close"/>
+                    style="--local-primary:var(--won-primary-color);">
+                        <use xlink:href="#ico27_close"></use>
+                </svg>
                 <div class="topnav__toasts__element__text">
                     <p ng-show="!toast.get('unsafeHtmlEnabled')">
                         {{toast.get('msg')}}

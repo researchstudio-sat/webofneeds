@@ -7,7 +7,10 @@ function genComponentConf() {
         <nav class="create-need-title" ng-cloak ng-show="{{true}}">
             <!--<div class="cntb__inner">
                 <a class="cntb__inner__left clickable" ng-click="self.back()">
-                    <img  src="generated/icon-sprite.svg#ico27_close" class="cntb__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="cntb__icon">
+                        <use xlink:href="#ico27_close"></use>
+                </svg>
                 </a>
                 <h1 class="cntb__inner__center cntb__title">Post</div>
             </div>-->

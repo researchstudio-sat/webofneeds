@@ -4,7 +4,7 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
 <g>
-	<polygon fill="#F04646" points="19.415,18 25.778,11.636 24.364,10.222 18,16.585 11.636,10.222 10.222,11.636 16.586,18 
+	<polygon fill="var(--local-primary)" points="19.415,18 25.778,11.636 24.364,10.222 18,16.585 11.636,10.222 10.222,11.636 16.586,18 
 		10.222,24.364 11.636,25.778 18,19.413 24.364,25.778 25.778,24.364 19.415,18 	"/>
 </g>
 </svg>

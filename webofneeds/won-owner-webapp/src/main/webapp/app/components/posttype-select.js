@@ -23,10 +23,14 @@ function genComponentConf() {
                 won-enter="self.unSelect($index)"
                 tabindex="0">
                     <span>{{o.text}}&nbsp;&hellip;</span>
-                    <img src="generated/icon-sprite.svg#ico36_help"
-                         ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
-                         class="ts__option__help-btn clickable">
-                    <img src="generated/icon-sprite.svg#ico16_arrow_down_hi" class="ts__option__carret">
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
+                        class="ts__option__help-btn clickable">
+                            <use xlink:href="#ico36_help"></use>
+                    </svg>
+                    <svg class="ts__option__carret" style="--local-primary:black;">
+                        <use xlink:href="#ico16_arrow_down"></use>
+                    </svg>
                     <div class="ts__option__help"
                          ng-show="self.isHelpVisible($index)"> {{o.helpText}} </div>
             </li>

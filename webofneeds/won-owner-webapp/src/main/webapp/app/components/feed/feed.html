@@ -6,9 +6,10 @@
     <div class="fc__inner" ng-class="{'empty' : self.ownNeedUris.length == 0}">
         <div class="fc__empty" ng-if="self.showPlaceholder">
             <div class="fc__empty__description">
-
-                <img src="generated/icon-sprite.svg#ico-filter_list_grey"
-                     class="fc__empty__description__icon">
+                <svg class="fc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use xlink:href="#ico-filter_list"></use>
+                </svg>
                 <span class="fc__empty__description__text">
                     This is the news feed. It is currently empty because
                     there are no recent events for any of your needs. You will
@@ -17,7 +18,10 @@
             </div>
 
             <a href="{{ self.resetParamsHRef(self.$state, 'createNeed') }}" class="fc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_plus" class="fc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="fc__empty__link__icon">
+                        <use xlink:href="#ico36_plus"></use>
+                </svg>
                 <span class="fc__empty__link__caption">Create a Need</span>
             </a>
         </div>

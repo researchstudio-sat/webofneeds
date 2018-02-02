@@ -10,8 +10,16 @@ function genComponentConf() {
                     <img class="fgi__image" ng-src="{{item.imageSrc}}"/>
                     <span class="fgi__text" ng-show="item.text2 === undefined && item.separatorText === undefined">{{item.text}}</span>
                     <span class="fgi__text" ng-show="item.text2 !== undefined && item.separatorText !== undefined">{{item.text}}<won-labelled-hr label="::item.separatorText"></won-labelled-hr>{{item.text2}}</span>
-                    <img class="fgi__arrow" ng-show="item.detail !== undefined && $index === self.selectedIdx" src="generated/icon-sprite.svg#ico16_arrow_up"/>
-                    <img class="fgi__arrow" ng-show="item.detail !== undefined && $index !== self.selectedIdx" src="generated/icon-sprite.svg#ico16_arrow_down"/>
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="fgi__arrow"
+                        ng-show="item.detail !== undefined && $index === self.selectedIdx">
+                            <use xlink:href="#ico16_arrow_up"></use>
+                    </svg>
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="fgi__arrow"
+                        ng-show="item.detail !== undefined && $index !== self.selectedIdx">
+                            <use xlink:href="#ico16_arrow_down"></use>
+                    </svg>
                 </div>
                 <span class="fgi__additionaltext" ng-show="item.detail !== undefined && $index === self.selectedIdx">{{item.detail}}</span>
             </div>
