@@ -101,7 +101,7 @@ const reducers = {
 
 
     //config: createReducer(
-    config: (config = Immutable.fromJS({theme: {name: 'matchat'}}), action = {}) => {
+    config: (config = Immutable.fromJS({theme: {name: 'current'}}), action = {}) => {
         switch(action.type) {
 
             case actionTypes.config.init:
