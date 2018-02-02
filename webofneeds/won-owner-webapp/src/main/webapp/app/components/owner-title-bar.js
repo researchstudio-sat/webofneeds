@@ -89,7 +89,7 @@ function genComponentConf() {
                                 class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Connected, postUri: self.postUri})"
                                     ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
-                                    Messages
+                                    Chats
                                     <span class="ntb__tabs__unread">{{ self.unreadMessagesCount }}</span>
                                 </a>
                             </li>
