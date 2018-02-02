@@ -31,6 +31,8 @@ public class HighlevelProtocols {
 	
 	/**
 	 * Calculates all open proposals present in the specified conversation dataset.
+	 * Returns the envelope graph of the proposal with the contents of the proposed
+	 * message inside.
 	 * @param conversationDataset
 	 * @return
 	 */
@@ -50,6 +52,8 @@ public class HighlevelProtocols {
 	
 	/**
 	 * Calculates all open proposals to cancel present in the specified conversation dataset.
+	 * returns envelope graph of the proposaltocancel with the contents of the target agreement to 
+	 * cancel inside.
 	 * @param conversationDataset
 	 * @return
 	 */
@@ -66,9 +70,9 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?proposal agr:proposes ?clause .
-	 * ?proposal == unaccepted propsal
-	 * ?clause == proposed clause
+	 * Returns ?openprop agr:proposes ?openclause  .
+	 * ?openprop == unaccepted propsal
+	 * ?openclause == proposed clause that is unaccepted
 	 * @param conversationDataset
 	 * @return
 	 */
@@ -77,8 +81,8 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?cancellationproposal agr:proposesToCancel ?acc 
-	 * ?cancellationproposal == unaccepted proposal to cancel
+	 * Returns ?openprop agr:proposesToCancel ?acc . 
+	 * ?openprop == unaccepted proposal to cancel
 	 * ?acc == agreement proposed for cancellation
 	 * @param conversationDataset
 	 * @return
@@ -88,8 +92,8 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?proposal agr:proposes ?clause
-	 * ?proposal == accepted proposal in an agreement
+	 * Returns ?prop agr:proposes ?clause  .
+	 * ?prop == accepted proposal in an agreement
 	 * ?clause == accepted clause in an agreement
 	 * @param conversationDataset
 	 * @return
@@ -99,8 +103,8 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?acc agr:accepts ?prop
-	 * ?propo == accepted proposal in an agreement
+	 * Returns ?acc agr:accepts ?prop .
+	 * ?prop == accepted proposal in an agreement
 	 * ?acc == agreement 
 	 * @param conversationDataset
 	 * @return
@@ -110,8 +114,8 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?cancellationproposal agr:proposesToCancel ?acc 
-	 * ?proposal == accepted proposal to cancel
+	 * Returns ?cancelProp2 agr:proposesToCancel ?acc .
+	 * ?cancelProp2 == accepted proposal to cancel
 	 * ?acc == agreement proposed for cancellation
 	 * @param conversationDataset
 	 * @return
@@ -121,9 +125,9 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?cancacc agr:accepts ?cancellationproposal 
-	 * ?cancellationproposal == accepted proposal to cancel
-	 * ?canacc == cancallation agreement 
+	 * Returns ?cancelAcc2 agr:accepts ?cancelProp2 .
+	 * ?cancelProp2 . == accepted proposal to cancel
+	 * ?cancelAcc2 == cancallation agreement 
 	 * @param conversationDataset
 	 * @return
 	 */
@@ -132,7 +136,7 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?prop agr:proposes ?clause 
+	 * Returns ?prop agr:proposes ?clause .
 	 * ?prop == accepted proposal in agreement that was cancelled
 	 * ?clause == accepted clause in an agreement that was cancelled
 	 * @param conversationDataset
@@ -144,7 +148,7 @@ public class HighlevelProtocols {
 	
 	
 	/**
-	 * Returns ?acc agr:accepts ?prop
+	 * Returns ?acc agr:accepts ?prop .
 	 * ?acc == agreement that was cancelled
 	 * ?prop == accepted proposal in agreement that was cancelled
 	 * @param conversationDataset
@@ -155,9 +159,9 @@ public class HighlevelProtocols {
 	}
 	
 	/**
-	 * Returns ?retractingMessage mod:retracts ?retractedMessage
-	 * ?retractingMessage == message containing mod:retracts
-	 * ?retractedMessage == message that was retracted
+	 * Returns ?retractingMsg mod:retracts ?retractedMsg .
+	 * ?retractingMsg == message containing mod:retracts
+	 * ?retractedMsg == message that was retracted
 	 * @param conversationDataset
 	 * @return
 	 */
