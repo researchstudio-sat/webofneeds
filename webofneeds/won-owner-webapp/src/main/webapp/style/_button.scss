@@ -4,7 +4,7 @@
   outline-color: $color;
 
   &:active, &:hover {
-    filter: brightness(90%) saturate(90%);
+    filter: brightness(85%);
   }
   &:disabled {
     /*Default disabled colors, can be changed or extracted will be used
