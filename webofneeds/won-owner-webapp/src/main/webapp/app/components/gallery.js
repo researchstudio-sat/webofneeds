@@ -27,11 +27,11 @@ function genComponentConf() {
         <div class="won-gallery__controls">
             <svg style="--local-primary:var(--won-primary-color);"
                 class="won-gallery__back">
-                    <use xlink:href="#ico36_backarrow"></use>
+                    <use href="#ico36_backarrow"></use>
             </svg>
             <svg style="--local-primary:var(--won-primary-color);"
                 class="won-gallery__forward">
-                    <use xlink:href="#ico36_backarrow"></use>
+                    <use href="#ico36_backarrow"></use>
             </svg>
         </div>`
 

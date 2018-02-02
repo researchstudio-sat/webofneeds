@@ -50,7 +50,7 @@ function genComponentConf() {
                     <span class="fi__description__subtitle__group" ng-show="self.ownNeed.group">
                         <svg style="--local-primary:var(--won-primary-color);"
                             class="fi__description__subtitle__group__icon">
-                                <use xlink:href="#ico36_group"></use>
+                                <use href="#ico36_group"></use>
                         </svg>
                         {{self.ownNeed.group}}
                         <span class="fi__description__subtitle__group__dash"> &ndash; </span>
@@ -100,7 +100,7 @@ function genComponentConf() {
                    ng-show="self.unreadMatchesCount">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="fi__footer__indicators__item__icon">
-                            <use xlink:href="#ico36_match"></use>
+                            <use href="#ico36_match"></use>
                     </svg>
                     <span class="fi__footer__indicators__item__caption">
                        {{ self.unreadMatchesCount }}
@@ -112,7 +112,7 @@ function genComponentConf() {
                    ng-show="self.unreadRequestsCount">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="fi__footer__indicators__item__icon">
-                            <use xlink:href="#ico36_incoming"></use>
+                            <use href="#ico36_incoming"></use>
                     </svg>
                     <span class="fi__footer__indicators__item__caption">
                         {{self.unreadRequestsCount}}

@@ -27,11 +27,11 @@ function genLogoutConf() {
                 </span>
 
                 <svg class="topnav__carret" style="--local-primary:var(--won-primary-color);">
-                    <use xlink:href="#ico16_arrow_down"></use>
+                    <use href="#ico16_arrow_down"></use>
                 </svg>
 
                 <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);">
-                    <use xlink:href="#ico36_person"></use>
+                    <use href="#ico36_person"></use>
                 </svg>
 
             </won-dd-header>

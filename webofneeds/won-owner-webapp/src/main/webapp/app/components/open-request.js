@@ -27,7 +27,7 @@ function genComponentConf() {
            class="clickable">
             <svg style="--local-primary:var(--won-primary-color);"
               class="or__header__icon clickable">
-                <use xlink:href="#ico36_close"></use>
+                <use href="#ico36_close"></use>
             </svg>
         </a>
 
@@ -57,7 +57,7 @@ function genComponentConf() {
         </div>
         <a target="_blank" href="{{self.connectionUri}}">
             <svg class="rdflink__big clickable">
-                <use xlink:href="#rdf_logo_1"></use>
+                <use href="#rdf_logo_1"></use>
             </svg>
         </a>
     </div>

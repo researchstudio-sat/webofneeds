@@ -29,7 +29,7 @@ function genComponentConf() {
                     <a ng-click="self.router__stateGoResetParams('overviewPosts')" class="clickable">
                         <svg style="--local-primary:var(--won-primary-color);"
                             class="ntb__icon">
-                                <use xlink:href="#ico36_backarrow"></use>
+                                <use href="#ico36_backarrow"></use>
                         </svg>
                     </a>
                     <won-square-image

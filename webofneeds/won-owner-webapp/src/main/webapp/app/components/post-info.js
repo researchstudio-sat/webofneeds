@@ -74,7 +74,7 @@ function genComponentConf() {
                  <a href="{{self.post.get('uri')}}"
                     target="_blank">
                     <svg class="rdflink__big clickable">
-                        <use xlink:href="#rdf_logo_1"></use>
+                        <use href="#rdf_logo_1"></use>
                     </svg>
                   </a>
                 </p>

@@ -14,7 +14,7 @@ function genComponentConf() {
              style="background-image: url({{self.imageDataUrl}})">
                 <input type="file" accept="image/*" />
                 <svg class="wid__dropzone__default-bg" style="--local-primary:#CCD2D2;">
-                    <use xlink:href="#illu_drag_here"></use>
+                    <use href="#illu_drag_here"></use>
                 </svg>
                      <!--
                 <img ng-src="{{self.imageDataUrl}}"

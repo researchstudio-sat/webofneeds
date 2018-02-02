@@ -35,7 +35,7 @@ let template = `
             <div class="omc__empty__description">
                 <svg class="omc__empty__description__icon"
                     style="--local-primary:#CCD2D2;">
-                        <use xlink:href="#ico36_match"></use>
+                        <use href="#ico36_match"></use>
                 </svg>
                 <span class="omc__empty__description__text">The matches to all your needs will be listed here. 
                  You cannot influence the matching process. It might take some time, or maybe there is nothing to
@@ -44,7 +44,7 @@ let template = `
             <a ng-click="self.router__stateGoResetParams('createNeed')" class="omc__empty__link clickable">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="omc__empty__link__icon">
-                        <use xlink:href="#ico36_plus"></use>
+                        <use href="#ico36_plus"></use>
                 </svg>
                 <span class="omc__empty__link__caption">Create a Need</span>
             </a>
@@ -56,21 +56,21 @@ let template = `
                    class="clickable">
                     <svg class="omc__header__viewtype__icon clickable" 
                         style="--local-primary:{{self.layout === 'tiles' ? 'black' : 'var(--won-primary-color)'}};">
-                            <use xlink:href="#ico-filter_tile"></use>
+                            <use href="#ico-filter_tile"></use>
                     </svg>
                 </a>
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.LIST})"
                    class="clickable">
                     <svg class="omc__header__viewtype__icon clickable" 
                         style="--local-primary:{{self.layout === 'list' ? 'black' : 'var(--won-primary-color)'}};">
-                            <use xlink:href="#ico-filter_list"></use>
+                            <use href="#ico-filter_list"></use>
                     </svg>
                 </a>                
                 <a ng-click="self.router__stateGoCurrent({layout: self.LAYOUT.MAP})"
                    class="clickable">
                     <svg class="omc__header__viewtype__icon clickable" 
                         style="--local-primary:{{self.layout === 'map' ? 'black' : 'var(--won-primary-color)'}};">
-                            <use xlink:href="#ico-filter_map"></use>
+                            <use href="#ico-filter_map"></use>
                     </svg>
                 </a>
             </div>

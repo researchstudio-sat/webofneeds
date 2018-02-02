@@ -77,7 +77,7 @@ function genComponentConf() {
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
                             <svg class="rdflink__small clickable">
-                                    <use xlink:href="#rdf_logo_2"></use>
+                                    <use href="#rdf_logo_2"></use>
                             </svg>
                         </a>
                          <a
@@ -85,7 +85,7 @@ function genComponentConf() {
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
                             <svg class="rdflink__small clickable">
-                                <use xlink:href="#rdf_logo_2"></use>
+                                <use href="#rdf_logo_2"></use>
                             </svg>
                         </a>
                     </div>
@@ -106,7 +106,7 @@ function genComponentConf() {
             <a class="rdflink withlabel clickable"
                ng-click="self.showRdf()">
                    <svg class="rdflink__small">
-                       <use xlink:href="#rdf_logo_1"></use>
+                       <use href="#rdf_logo_1"></use>
                    </svg>
                   <span class="rdflink__text">[{{self.showhide}}]</span> 
             </a>

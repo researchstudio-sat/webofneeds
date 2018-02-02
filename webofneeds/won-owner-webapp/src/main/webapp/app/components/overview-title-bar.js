@@ -60,7 +60,7 @@ function genComponentConf() {
                     <a class="mtb__searchbtn clickable">
                         <svg style="--local-primary:var(--won-primary-color);"
                             class="mtb__icon">
-                                <use xlink:href="#ico36_search_nomargin"></use>
+                                <use href="#ico36_search_nomargin"></use>
                         </svg>
                     </a>
                 </div>

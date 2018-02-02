@@ -59,7 +59,7 @@ function genComponentConf() {
         <a target="_blank"
           href="{{self.sendAdHocRequest ? self.postUriToConnectTo : self.connectionUri}}">
             <svg class="rdflink__big clickable">
-                <use xlink:href="#rdf_logo_1"></use>
+                <use href="#rdf_logo_1"></use>
             </svg>
         </a>
       </div>

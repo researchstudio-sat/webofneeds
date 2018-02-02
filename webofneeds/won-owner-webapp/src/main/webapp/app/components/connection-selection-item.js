@@ -40,7 +40,7 @@ function genComponentConf() {
         <svg class="conn__icon clickable"
             style="--local-primary:#CCD2D2;"
             ng-click="self.settingsOpen = true">
-                <use xlink:href="#ico_settings"></use>
+                <use href="#ico_settings"></use>
         </svg>
       </div>
 
@@ -49,7 +49,7 @@ function genComponentConf() {
           <svg class="conn__icon clickable" 
             style="--local-primary:black;"
             ng-click="self.settingsOpen = false">
-                <use xlink:href="#ico_settings"></use>
+                <use href="#ico_settings"></use>
           </svg>
           <button
             class="won-button--filled thin red"

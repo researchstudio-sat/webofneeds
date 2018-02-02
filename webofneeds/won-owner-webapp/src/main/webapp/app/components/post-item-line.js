@@ -35,7 +35,7 @@ function genComponentConf() {
                         <span class="pil__description__subtitle__group" ng-show="self.need.get('group')">
                             <svg style="--local-primary:var(--won-primary-color);"
                                  class="pil__description__subtitle__group__icon">
-                                    <use xlink:href="#ico36_group"></use>
+                                    <use href="#ico36_group"></use>
                             </svg>
                              {{self.ownNeed.get('group')}}
                              <span class="pil__description__subtitle__group__dash"> &ndash; </span>
@@ -54,13 +54,13 @@ function genComponentConf() {
                         <svg class="pil__indicators__item__icon"
                             style="--local-primary:#F09F9F;"
                             ng-show="!self.unreadConversationsCount">
-                                <use xlink:href="#ico36_message"></use>
+                                <use href="#ico36_message"></use>
                         </svg>
 
                         <svg style="--local-primary:var(--won-primary-color);"
                              ng-show="self.unreadConversationsCount"
                              class="pil__indicators__item__icon">
-                                <use xlink:href="#ico36_message"></use>
+                                <use href="#ico36_message"></use>
                         </svg>
 
                         <span class="pil__indicators__item__caption">
@@ -70,7 +70,7 @@ function genComponentConf() {
                 <div class="pil__indicators__item" ng-show="!self.hasConversations">
                     <svg class="pil__indicators__item__icon"
                         style="--local-primary:#CCD2D2;">
-                            <use xlink:href="#ico36_message"></use>
+                            <use href="#ico36_message"></use>
                     </svg>
                      <span class="pil__indicators__item__caption"></span>
                 </div>
@@ -82,12 +82,12 @@ function genComponentConf() {
                         <svg class="pil__indicators__item__icon"
                             style="--local-primary:#F09F9F;"
                             ng-show="!self.unreadRequestsCount">
-                                <use xlink:href="#ico36_incoming"></use>
+                                <use href="#ico36_incoming"></use>
                         </svg>
                         <svg style="--local-primary:var(--won-primary-color);"
                             ng-show="self.unreadRequestsCount"
                             class="pil__indicators__item__icon">
-                                <use xlink:href="#ico36_incoming"></use>
+                                <use href="#ico36_incoming"></use>
                         </svg>
                         <span class="pil__indicators__item__caption">
                             {{ self.unreadRequestsCount }}
@@ -96,7 +96,7 @@ function genComponentConf() {
                 <div class="pil__indicators__item" ng-show="!self.hasRequests">
                     <svg class="pil__indicators__item__icon"
                         style="--local-primary:#CCD2D2;">
-                            <use xlink:href="#ico36_incoming"></use>
+                            <use href="#ico36_incoming"></use>
                     </svg>
                      <span class="pil__indicators__item__caption"></span>
                 </div>
@@ -108,13 +108,13 @@ function genComponentConf() {
                         <svg class="pil__indicators__item__icon"
                             style="--local-primary:#F09F9F;"
                             ng-show="!self.unreadMatchesCount">
-                                <use xlink:href="#ico36_match"></use>
+                                <use href="#ico36_match"></use>
                         </svg>
 
                         <svg style="--local-primary:var(--won-primary-color);"
                             ng-show="self.unreadMatchesCount"
                             class="pil__indicators__item__icon">
-                                <use xlink:href="#ico36_match"></use>
+                                <use href="#ico36_match"></use>
                         </svg>
                         <span class="pil__indicators__item__caption">
                             {{ self.unreadMatchesCount }}
@@ -123,7 +123,7 @@ function genComponentConf() {
                 <div class="pil__indicators__item" ng-show="!self.hasMatches">
                     <svg class="pil__indicators__item__icon"
                         style="--local-primary:#CCD2D2;">
-                            <use xlink:href="#ico36_match"></use>
+                            <use href="#ico36_match"></use>
                     </svg>
                     <span class="pil__indicators__item__caption"></span>
                 </div>

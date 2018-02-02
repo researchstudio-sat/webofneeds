@@ -20,7 +20,7 @@ function genComponentConf() {
                 <div class="vtb__inner__left">
                     <a ng-click="self.back()" class="clickable">
                         <svg class="vtb__icon" style="--local-primary:var(--won-primary-color);">
-                            <use xlink:href="#ico36_backarrow"></use>
+                            <use href="#ico36_backarrow"></use>
                         </svg>
                     </a>
                     <won-square-image 
