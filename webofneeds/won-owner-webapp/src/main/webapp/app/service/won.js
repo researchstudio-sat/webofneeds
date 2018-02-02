@@ -1105,7 +1105,14 @@ import jsonld from 'jsonld';
             }
             return won.getSafeJsonLdValue(val);
         },
-
+        getContentGraphs: function(){
+        	// walk over graphs, copy all graphs to result that are content graphs 
+        	// we identify content graphs by finding their URI in messageStructure.containedContent
+        	return this.graphs.filter(graph => this.contentGraphUris.indexOf(graph['@id']) > -1 );
+        },
+        getContentGraphsAsJsonLD: function(){
+        	return JSON.stringify(this.getContentGraphs());
+        },
         getMessageType: function () {
             return this.getProperty("http://purl.org/webofneeds/message#hasMessageType");
         },
@@ -1245,6 +1252,7 @@ import jsonld from 'jsonld';
         isResponseToDeactivateMessage: function () {
             return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#DeactivateMessage";
         },
+        
 
         __getMessageDirection: function (messageStructure) {
             if (messageStructure.messageDirection) {
@@ -1275,7 +1283,7 @@ import jsonld from 'jsonld';
             const nodes = {};
             let unreferencedEnvelopes = [];
             const innermostEnvelopes = [];
-            const contentGraphs = [];
+            const contentGraphUris =[];
             //first pass: create one node per envelope/content graph
             this.graphs.forEach(graph => {
                 let graphUri = graph["@id"];
@@ -1323,7 +1331,7 @@ import jsonld from 'jsonld';
                         if (containedContent.length > 0) {
                             node.containedContent = containedContent.map(uri => nodes[uri]);
                             //remember the content graphs
-                            containedContent.forEach(uri => contentGraphs.push(uri));
+                            containedContent.forEach(uri => contentGraphUris.push(uri));
                         }
                     }
                 }
@@ -1364,7 +1372,7 @@ import jsonld from 'jsonld';
                 this.parseErrors.push("more than one unreferenced (i.e. outermost) envelope found");
             }
             this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
-
+            this.contentGraphUris = contentGraphUris;
         },
 
         __isEnvelopeGraph: graph => {

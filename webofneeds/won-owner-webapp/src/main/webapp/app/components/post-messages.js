@@ -1,6 +1,7 @@
 ;
 
 import angular from 'angular';
+import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
@@ -21,6 +22,9 @@ import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
 } from '../selectors.js';
+import myformats from 'rdf-formats-common';
+
+window.rdfFormats4dbg = myformats;
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -59,7 +63,7 @@ function genComponentConf() {
                         ng-show="!message.get('outgoingMessage')">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text">
+                        <div class="pm__content__message__content__text" title="{{ self.convertToTRIG(message.get('contentGraphs')) }}">
                             {{ message.get('text') }}
                         </div>
                         <div
@@ -178,7 +182,14 @@ function genComponentConf() {
                     this.updateScrollposition()
                 )
             )
+            
+           
 
+        }
+        
+        async convertToTRIG(jsonld){
+        	const rdf = formats.parsers.find('application/ld+json').parse(jsonld);
+        	return formats.serializers.find('application/trig').serialize(rdf);
         }
 
         ensureMessagesAreLoaded() {
