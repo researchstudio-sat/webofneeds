@@ -42,7 +42,70 @@ public class AgreementController {
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getProposals(conversationDataset);
     }
+    
+    @RequestMapping(value = "/getAgreementsProposedToBeCancelled", method = RequestMethod.GET)
+    public Dataset getProposalsToCancel(String connectionUri) {
 
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getProposalsToCancel(conversationDataset);
+    }
+
+    @RequestMapping(value = "/getOpenProposals", method = RequestMethod.GET)
+    public Dataset getOpenProposes(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getOpenProposes(conversationDataset);
+    }
+    
+    @RequestMapping(value = "/getOpenProposalsToCancelAgreements", method = RequestMethod.GET)
+    public Dataset getOpenProposesToCancel(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getOpenProposesToCancel(conversationDataset);
+    }
+    
+    @RequestMapping(value = "/getClosedProposals", method = RequestMethod.GET)
+    public Dataset getClosedProposes(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getClosedProposes(conversationDataset);
+    }
+    
+    @RequestMapping(value = "/getClosedAcceptsOfProposals", method = RequestMethod.GET)
+    public Dataset getClosedAcceptsProposes(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getClosedAcceptsProposes(conversationDataset);
+    }
+    
+    @RequestMapping(value = "/getClosedPropsalsToCancel", method = RequestMethod.GET)
+    public Dataset getClosedProposesToCancel(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getClosedProposesToCancel(conversationDataset);
+    }
+    
+    @RequestMapping(value = "/getClosedAcceptsOfPropsalsToCancel", method = RequestMethod.GET)
+    public Dataset getClosedAcceptsProposesToCancel(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getClosedAcceptsProposesToCancel(conversationDataset);
+    }
+
+    @RequestMapping(value = "/getClosedProposalsInCancelledAgreements", method = RequestMethod.GET)
+    public Dataset getClosedProposesInCancelledAgreement(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getClosedProposesInCancelledAgreement(conversationDataset);
+    }
+    
+    @RequestMapping(value = "/getClosedAcceptsOfProposalsInCancelledAgreements", method = RequestMethod.GET)
+    public Dataset getClosedAcceptsInCancelledAgreement(String connectionUri) {
+
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getClosedAcceptsInCancelledAgreement(conversationDataset);
+    }
+    
     private Dataset retrieveConversationDataset(String connectionUri) {
 
         int depth = 3;  // depth 3 from connection gives us the messages in the conversation

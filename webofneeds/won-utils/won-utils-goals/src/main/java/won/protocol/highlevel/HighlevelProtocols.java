@@ -1,6 +1,7 @@
 package won.protocol.highlevel;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 
 import won.utils.acknowledgement.AcknowledgedSelection;
 import won.utils.agreement.AgreementFunction;
@@ -8,9 +9,14 @@ import won.utils.modification.ModifiedSelection;
 import won.utils.proposal.ProposalFunction;
 import won.utils.proposaltocancel.ProposalToCancelFunction;
 import won.utils.openproposestocancel.OpenProposesToCancelFunction;
-
-// Add missing imports here...
-
+import won.utils.openproposes.OpenProposesFunction;
+import won.utils.closedretracts.ClosedRetractsFunction;
+import won.utils.closedproposestocancel.ClosedProposesToCancelFunction;
+import won.utils.closedproposescancelledagreement.ClosedProposesCancelledAgreementFunction;
+import won.utils.closedproposes.ClosedProposesFunction;
+import won.utils.closedacceptsproposestocancel.ClosedAcceptsProposesToCancelFunction;
+import won.utils.closedacceptsproposal.ClosedAcceptsProposalFunction;
+import won.utils.closedacceptscancelledagreement.ClosedAcceptsCancelledAgreementFunction;
 
 
 public class HighlevelProtocols {
@@ -77,6 +83,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getOpenProposes(Dataset conversationDataset) {
+		Model openproposes = OpenProposesFunction.sparqlTest(conversationDataset);
 		return openproposes;
 	}
 	
@@ -88,6 +95,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getOpenProposesToCancel(Dataset conversationDataset) {
+		Model openproposestocancel = OpenProposesToCancelFunction.sparqlTest(conversationDataset);
 		return openproposestocancel;
 	}
 	
@@ -99,7 +107,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedProposes(Dataset conversationDataset) {
-		return closednproposes;
+		Model closedproposes = ClosedProposesFunction.sparqlTest(conversationDataset);
+		return closedproposes;
 	}
 	
 	/**
@@ -110,7 +119,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedAcceptsProposes(Dataset conversationDataset) {
-		return closedproposestocancel;
+		Model closedacceptsproposes = ClosedAcceptsProposalFunction.sparqlTest(conversationDataset);
+		return closedacceptsproposes;
 	}
 	
 	/**
@@ -121,6 +131,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedProposesToCancel(Dataset conversationDataset) {
+		Model closedproposestocancel = ClosedProposesToCancelFunction.sparqlTest(conversationDataset);
 		return closedproposestocancel;
 	}
 	
@@ -132,6 +143,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedAcceptsProposesToCancel(Dataset conversationDataset) {
+		Model closedacceptsproposestocancel = ClosedAcceptsProposesToCancelFunction.sparqlTest(conversationDataset);
 		return closedacceptsproposestocancel;
 	}
 	
@@ -143,6 +155,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedProposesInCancelledAgreement(Dataset conversationDataset) {
+		Model closedproposescancelledagreement = ClosedProposesCancelledAgreementFunction.sparqlTest(conversationDataset);
 		return closedproposescancelledagreement;
 	}
 	
@@ -155,6 +168,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedAcceptsInCancelledAgreement(Dataset conversationDataset) {
+		Model closedacceptscancelledagreement = ClosedAcceptsCancelledAgreementFunction.sparqlTest(conversationDataset);
 		return closedacceptscancelledagreement;
 	}
 	
@@ -166,6 +180,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedRetracts(Dataset conversationDataset) {
+		Model closedretracts = ClosedRetractsFunction.sparqlTest(conversationDataset);
 		return closedretracts;
 	}
 	
