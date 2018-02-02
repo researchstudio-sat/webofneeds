@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needconsumer;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 
 /**
  *
@@ -28,7 +28,7 @@ public interface NeedConsumer
    * may be passed to multiple consumers.
    * @param need
    */
-  public void consume(Model need);
+  public void consume(Dataset need);
 
   /**
    * Returns true if the consumer is prepared to consume another need object.

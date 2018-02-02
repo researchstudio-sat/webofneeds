@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 
 /**
  * Interface for producing needs. The needs produced must be suitable as the 'model'
@@ -28,9 +28,9 @@ public interface NeedProducer
 {
   /**
    * Returns a new Model that represents the created need or null if no more needs can be created.
-   * @return a model or null
+   * @return a dataset or null
    */
-  public Model create();
+  public Dataset create();
 
   /**
    * Indicates that no more needs will be created by this factory.

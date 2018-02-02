@@ -42,4 +42,12 @@ public interface ConnectionEventContainerRepository extends WonRepository<Connec
     @Query("select c from ConnectionEventContainer c join  MessageEventPlaceholder msg on msg.parentURI = c.parentUri where msg.messageURI = :messageUri")
     public ConnectionEventContainer findOneByContainedMessageUriForUpdate(@Param("messageUri") URI messageUri);
 
+    @Query("select case when (count(con) > 0) then true else false end " +
+            "from Connection con "+
+            " where con.connectionURI = :connectionUri and ( " +
+            "   con.needURI = :webId " +
+            "   or con.remoteNeedURI = :webId " +
+            ")")
+    public boolean isReadPermittedForWebID(@Param("connectionUri") URI connectionUri, @Param("webId") URI webId);
+    
 }

@@ -85,6 +85,7 @@
                 won:hasShapesGraph ex2:p2g-shapes ;
                 won:hasDataGraph ex2:p2g-data ;
             ] .
+
 }
 
 ex2:p2g-data {

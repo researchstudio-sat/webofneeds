@@ -1,6 +1,6 @@
 package won.cryptography.ssl;
 
-import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.cryptography.service.TrustStoreService;
@@ -21,7 +21,7 @@ import java.security.cert.X509Certificate;
 public class TOFUStrategy implements TrustStrategy
 {
   private TrustStoreService trustStoreService;
-  private AliasGenerator aliasGenerator;
+  private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 

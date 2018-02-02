@@ -34,17 +34,13 @@
         <constructor-arg name="type" value="OwnerProtocol"/>
     </bean>
 
-    <bean id="messagingContext" factory-bean="wonTransmissionService" factory-method="getClientMessagingContext">
-    </bean>
-
-
-
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
     <bean id="ownerProtocolCommunicationService" class="won.owner.messaging.OwnerProtocolCommunicationServiceImpl">
        <property name="activeMQService" ref="ownerActiveMQService"/>
         <!--TODO chicken-egg - use only registration client here... -->
-        <property name="registrationClient" ref="registrationClient"></property>
+        <property name="registrationClient" ref="registrationClient" />
+        <property name="cryptographyService" ref="cryptographyService" />
     </bean>
 
     <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerWonMessageSenderJMSBased">

@@ -4,17 +4,34 @@
 
 package won.owner.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.persistence.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+
+import org.springframework.data.domain.Persistable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 'wonuser' used as table name because 'user' is a Postgres keyword
@@ -26,7 +43,7 @@ import java.util.Set;
 		uniqueConstraints = @UniqueConstraint(columnNames = {"username"})
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements UserDetails{
+public class User implements UserDetails, Persistable<Long>{
 
 	@Id
 	@GeneratedValue
@@ -50,7 +67,17 @@ public class User implements UserDetails{
 
   @Column(name = "email")
   private String email;
+  
+  @JoinColumn(name = "keystore_id")
+  @OneToOne(cascade = CascadeType.ALL,
+  fetch = FetchType.LAZY, optional = false)
+  private KeystoreHolder keystoreHolder;
 
+  @JoinColumn(name = "keystore_password_id")
+  @OneToOne(cascade = CascadeType.ALL,
+  fetch = FetchType.LAZY, optional = false)
+  private KeystorePasswordHolder keystorePasswordHolder;
+  
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
   @ElementCollection( fetch = FetchType.EAGER)
@@ -72,9 +99,18 @@ public class User implements UserDetails{
   public User(final String username, final String password, String role) {
     this.username = username;
     this.password = password;
-    this.role = role;
+    if (role == null) {
+    	this.role = "ROLE_ACCOUNT";
+    } else {
+    	this.role = role;
+    }
   }
 
+  @Override
+  public boolean isNew() {
+	  return this.id == null;
+  }
+  
 	@Override
 	public String toString() {
 		return "User{" +
@@ -137,7 +173,23 @@ public class User implements UserDetails{
   public void setPassword(final String password) {
     this.password = password;
   }
+  
+  public KeystoreHolder getKeystoreHolder() {
+	return keystoreHolder;
+  }
 
+  public void setKeystoreHolder(KeystoreHolder keystoreHolder) {
+	this.keystoreHolder = keystoreHolder;
+  }
+  
+  public void setKeystorePasswordHolder(KeystorePasswordHolder keystorePassword) {
+	this.keystorePasswordHolder = keystorePassword;
+  }
+  
+  public KeystorePasswordHolder getKeystorePasswordHolder() {
+	return keystorePasswordHolder;
+  }
+  
   /*
 	public List<Need> getNeeds() {
 		return needs;

@@ -1,10 +1,19 @@
 package won.protocol.message;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
@@ -13,9 +22,6 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
-
-import java.net.URI;
-import java.util.*;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -486,7 +492,7 @@ public class WonMessageBuilder
       .setSenderNodeURI(localWonNode)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .addContent(facetModel, null)
+      .addContent(facetModel)
       .setSentTimestampToNow();
   }
 
@@ -528,7 +534,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
       .setSentTimestampToNow()
-      .addContent(contentModel, null);
+      .addContent(contentModel);
   }
 
   public static WonMessageBuilder setMessagePropertiesForHintFeedback(
@@ -552,7 +558,7 @@ public class WonMessageBuilder
       .setSenderNeedURI(needURI)
       .setSenderURI(connectionURI)
       .setSentTimestampToNow()
-      .addContent(contentModel, null);
+      .addContent(contentModel);
   }
 
   public static WonMessageBuilder setMessagePropertiesForHintNotification(
@@ -581,7 +587,7 @@ public class WonMessageBuilder
       .setReceiverURI(needConnectionURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
-      .addContent(contentModel, null)
+      .addContent(contentModel)
       .setSentTimestampToNow();
   }
 
@@ -604,7 +610,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnection)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .addContent(content, null)
+      .addContent(content)
       .setSentTimestampToNow();
   }
 
@@ -767,22 +773,76 @@ public class WonMessageBuilder
    * @param content
    * @return
    */
-  public WonMessageBuilder addContent(Model content, Model signature) {
-    URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
-      new RdfUtils.GraphNameCheck()
-      {
-        @Override
-        public boolean isGraphUriOk(final String graphUri) {
+  public WonMessageBuilder addContent(Model content) {
+	    addContentInternal(content);
+	    return this;
+  }
 
-          return !contentMap.keySet().contains(URI.create(graphUri));
-        }
-      });
-    contentMap.put(contentGraphUri, content);
-    if (signature != null)
-      signatureMap.put(contentGraphUri, signature);
+  	private URI addContentInternal(Model content) {
+  		URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
+		      new RdfUtils.GraphNameCheck()
+		      {
+		        @Override
+		        public boolean isGraphUriOk(final String graphUri) {
+
+		          return !contentMap.keySet().contains(URI.create(graphUri));
+		        }
+		      });
+	    contentMap.put(contentGraphUri, content);
+	    return contentGraphUri;
+  }
+
+  /**
+   * Adds all graphs in the specified dataset as content graphs to
+   * the message. In this process, unique graph URIs are generated for
+   * all graphs in the dataset, including the default graph (if present).
+   * If graphs are referenced within the dataset through a triple in which
+   * the graph uri is the object, all such references are changed to refer
+   * to the newly generated graph uri.
+   * @param dataset
+   * @return
+   */
+  public WonMessageBuilder addContent(Dataset dataset) {
+	  Dataset toAdd = RdfUtils.cloneDataset(dataset);
+	  //we can add the default model without remembering the newly
+	  //generated URI because there cannot be a reference
+	  //to the default model in the other graphs
+	  Model model = toAdd.getDefaultModel();
+	  if (model != null && model.size() > 0) {
+		  addContent(model);
+	  }
+	  //add each model, remembering a mapping between the old
+	  //and the new graph uri
+	  final Map<String, String> changedGraphUris = new HashMap<>();
+	  RdfUtils.toNamedModelStream(toAdd, false).forEach(namedModel -> {
+		  if (namedModel.getModel().size() == 0) return;
+		  URI newUri = addContentInternal(namedModel.getModel());
+		  changedGraphUris.put(namedModel.getName(), newUri.toString());
+	  });
+	  //replace the old graph uris with the new graph
+	  //uris in all graphs of our dataset
+	  RdfUtils.visit(toAdd, new RdfUtils.ModelVisitor<Object>() {
+		  @Override
+		public Object visit(Model model) {
+			if (model.size() == 0) return null;
+			changedGraphUris.entrySet().stream().forEach(graphNameMapping -> {
+				// in the model, get both the old and new resource, then replace
+				// the old by the new. Note: This will create a resource in the
+				// model if it is not in there yet.
+				Resource refToOld = model.getResource(graphNameMapping.getKey());
+				Resource refToNew = model.getResource(graphNameMapping.getValue());
+				// replace resource, modifying the model (which is already in
+				// the builder's content map
+				RdfUtils.replaceResourceInModel(refToOld, refToNew);
+			});
+			return null;
+		}
+	  });
     return this;
   }
 
+
+  
   /**
    * Retrieves one of the possibly multiple Models that does not have a signature yet. If there is none
    * (all are signed or none is found at all), a new model is created, added to the internal contentMap
@@ -794,7 +854,7 @@ public class WonMessageBuilder
       //no content graphs yet. Make one and return it.
       Model contentGraph = ModelFactory.createDefaultModel();
       RdfUtils.replaceBaseURI(contentGraph, this.messageURI.toString());
-      addContent(contentGraph, null);
+      addContent(contentGraph);
       return contentGraph;
     }
     //content map is not empty. find one without a signature:
@@ -804,7 +864,7 @@ public class WonMessageBuilder
     //all content graphs are signed. add a new one.
     Model contentGraph = ModelFactory.createDefaultModel();
     RdfUtils.replaceBaseURI(contentGraph, this.messageURI.toString());
-    addContent(contentGraph, null);
+    addContent(contentGraph);
     return contentGraph;
   }
 

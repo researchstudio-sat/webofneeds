@@ -1,7 +1,8 @@
 package won.cryptography.utils;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import won.cryptography.service.KeyStoreService;
+
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
 
 import java.io.File;
 import java.security.PrivateKey;
@@ -27,8 +28,7 @@ public class TestingKeys
 
     //load keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
-    storeService.setDefaultAlias(TestSigningUtils.ownerCertUri);
+    FileBasedKeyStoreService storeService = new FileBasedKeyStoreService(keysFile, "temp");
     storeService.init();
 
     privateKeys.put(TestSigningUtils.needCertUri, storeService.getPrivateKey(TestSigningUtils.needCertUri));

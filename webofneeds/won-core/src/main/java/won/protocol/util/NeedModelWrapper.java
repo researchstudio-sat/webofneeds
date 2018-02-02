@@ -35,6 +35,9 @@ public class NeedModelWrapper {
     // holds all the need data with its different (default and named) models
     protected Dataset needDataset;
 
+    private String sysInfoGraphName;
+    private String needModelGraphName;
+
     /**
      * Create a new need model (incluing sysinfo)
      *
@@ -49,8 +52,10 @@ public class NeedModelWrapper {
         Model sysInfoModel = ModelFactory.createDefaultModel();
         DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
         sysInfoModel.createResource(needUri, WON.NEED);
-        needDataset.addNamedModel("dummy#need", needModel);
-        needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
+        this.needModelGraphName = "dummy#need";
+        needDataset.addNamedModel(this.needModelGraphName, needModel);
+        this.sysInfoGraphName = "dummy#sysinfo";
+        needDataset.addNamedModel(this.sysInfoGraphName, sysInfoModel);
     }
 
     /**
@@ -59,32 +64,41 @@ public class NeedModelWrapper {
      * @param ds need dataset to load
      */
     public NeedModelWrapper(Dataset ds) {
+        this(ds, true);
+    }
+
+    /**
+     * Load a need dataset and extract the need and sysinfo models from it
+     *
+     * @param ds need dataset to load
+     * @param addDefaultGraphs if this is set to true a needModelGraph and a sysInfoGraph will be added to the dataset
+     */
+    public NeedModelWrapper(Dataset ds, boolean addDefaultGraphs) {
 
         needDataset = ds;
-        Resource needNode = getNeedNode(NeedGraphType.NEED, needDataset);
-        needNode = (needNode != null) ? needNode : getNeedNode(NeedGraphType.SYSINFO, needDataset);
+        Resource needNode = getNeedNode(NeedGraphType.NEED);
+        needNode = (needNode != null) ? needNode : getNeedNode(NeedGraphType.SYSINFO);
         String needUri = (needNode != null) ? needNode.getURI() : null;
 
-        if (needUri != null) {
+        if (addDefaultGraphs && needUri != null) {
             if (getNeedModel() == null) {
                 Model needModel = ModelFactory.createDefaultModel();
                 needModel.createResource(needUri, WON.NEED);
                 DefaultPrefixUtils.setDefaultPrefixes(needModel);
-                needDataset.addNamedModel("dummy#need", needModel);
-
+                this.needModelGraphName = "dummy#need";
+                needDataset.addNamedModel(this.needModelGraphName, needModel);
             }
 
             if (getSysInfoModel() == null) {
                 Model sysInfoModel = ModelFactory.createDefaultModel();
                 sysInfoModel.createResource(needUri, WON.NEED);
                 DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
-                needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
+                this.sysInfoGraphName = "dummy#sysinfo";
+                needDataset.addNamedModel(this.sysInfoGraphName, sysInfoModel);
             }
         }
 
-        if (!isANeed(needDataset)) {
-            throw new DataIntegrityException("need and sysinfo models must contain a resource of type won:Need");
-        }
+        checkModels();
     }
 
     /**
@@ -99,13 +113,15 @@ public class NeedModelWrapper {
         String needUri = null;
 
         if (sysInfoModel != null) {
-            needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
-            needUri = getNeedNode(NeedGraphType.SYSINFO, needDataset).getURI();
+            this.sysInfoGraphName = "dummy#sysinfo";
+            needDataset.addNamedModel(this.sysInfoGraphName, sysInfoModel);
+            needUri = getNeedNode(NeedGraphType.SYSINFO).getURI();
         }
 
         if (needModel != null) {
-            needDataset.addNamedModel("dummy#need", needModel);
-            needUri = getNeedNode(NeedGraphType.NEED, needDataset).getURI();
+            this.needModelGraphName = "dummy#need";
+            needDataset.addNamedModel(this.needModelGraphName, needModel);
+            needUri = getNeedNode(NeedGraphType.NEED).getURI();
         }
 
         if (needUri != null) {
@@ -114,7 +130,8 @@ public class NeedModelWrapper {
                 sysInfoModel = ModelFactory.createDefaultModel();
                 DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
                 sysInfoModel.createResource(needUri, WON.NEED);
-                needDataset.addNamedModel("dummy#sysinfo", sysInfoModel);
+                this.sysInfoGraphName = "dummy#sysinfo";
+                needDataset.addNamedModel(this.sysInfoGraphName, sysInfoModel);
             }
 
             if (needModel == null) {
@@ -122,13 +139,12 @@ public class NeedModelWrapper {
                 needModel = ModelFactory.createDefaultModel();
                 DefaultPrefixUtils.setDefaultPrefixes(needModel);
                 needModel.createResource(needUri, WON.NEED);
-                needDataset.addNamedModel("dummy#need", needModel);
+                this.needModelGraphName = "dummy#need";
+                needDataset.addNamedModel(this.needModelGraphName, needModel);
             }
         }
 
-        if (!isANeed(needDataset)) {
-            throw new DataIntegrityException("need and sysinfo models must contain a resource of type won:Need");
-        }
+        checkModels();
     }
 
     /**
@@ -136,40 +152,66 @@ public class NeedModelWrapper {
      * @return
      */
     public static boolean isANeed(Dataset ds){
-        return (getNeedNode(NeedGraphType.NEED, ds) != null && getNeedNode(NeedGraphType.SYSINFO, ds) != null);
+        try{
+            new NeedModelWrapper(ds, false);
+            return true;
+        }catch (DataIntegrityException e){
+            return false;
+        }
     }
 
-    private static Model getNeedModel(Dataset ds) {
-        Iterator<String> modelNameIter = ds.listNames();
-        while(modelNameIter.hasNext()) {
-            String modelName = modelNameIter.next();
 
-            // need content graphs usually end with "#need" the debug bot creates content graphs
-            // with the pattern "#content-". we must detect all possibilities here
-            if (modelName.endsWith("#need") || modelName.contains("#content-")) {
-                return ds.getNamedModel(modelName);
+    private void checkModels() {
+        if (getNeedNode(NeedGraphType.SYSINFO) == null || getNeedNode(NeedGraphType.NEED) == null) {
+            throw new DataIntegrityException("need and sysinfo models must contain a resource of type won:Need");
+        }
+    }
+
+    public Model getNeedModel() {
+        Iterator<String> modelNameIter = needDataset.listNames();
+
+        if(this.needModelGraphName != null && needDataset.getNamedModel(this.needModelGraphName) != null) {
+            return needDataset.getNamedModel(this.needModelGraphName);
+        }
+
+        Model defaultModel = needDataset.getDefaultModel();
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (defaultModel.listSubjectsWithProperty(WON.IS).hasNext() || defaultModel.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+            return defaultModel;
+        }
+
+        while(modelNameIter.hasNext()) {
+            String tempModelName = modelNameIter.next();
+            Model model = needDataset.getNamedModel(tempModelName);
+
+            if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (model.listSubjectsWithProperty(WON.IS).hasNext() || model.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+                this.needModelGraphName = tempModelName;
+                return model;
             }
         }
         return null;
     }
 
-    private static Model getSysInfoModel(Dataset ds) {
-        Iterator<String> modelNameIter = ds.listNames();
+    public Model getSysInfoModel() {
+        Iterator<String> modelNameIter = needDataset.listNames();
+        if(this.sysInfoGraphName != null && needDataset.getNamedModel(this.sysInfoGraphName) != null) {
+            return needDataset.getNamedModel(this.sysInfoGraphName);
+        }
+
+        Model defaultModel = needDataset.getDefaultModel();
+        if(defaultModel.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && (defaultModel.listSubjectsWithProperty(WON.IS).hasNext() || defaultModel.listSubjectsWithProperty(WON.SEEKS).hasNext()) ){
+            return defaultModel;
+        }
+
         while(modelNameIter.hasNext()) {
-            String modelName = modelNameIter.next();
-            if (modelName.endsWith("#sysinfo")) {
-                return ds.getNamedModel(modelName);
+            String tempModelName = modelNameIter.next();
+            Model model = needDataset.getNamedModel(tempModelName);
+
+            if(model.listSubjectsWithProperty(RDF.type, WON.NEED).hasNext() && model.listSubjectsWithProperty(WON.IS_IN_STATE).hasNext()){
+                this.sysInfoGraphName = tempModelName;
+                return model;
             }
         }
         return null;
-    }
-
-    protected Model getNeedModel() {
-        return getNeedModel(needDataset);
-    }
-
-    protected Model getSysInfoModel() {
-        return getSysInfoModel(needDataset);
     }
 
     /**
@@ -187,31 +229,34 @@ public class NeedModelWrapper {
     }
 
     /**
+     * get the complete dataset
+     *
+     * @return copy of needDataset
+     */
+    public Dataset copyDataset(){
+        return RdfUtils.cloneDataset(needDataset);
+    }
+
+    /**
      * get the node of the need of either the need model or the sysinfo model
      *
      * @param graph type specifies the need or sysinfo need node to return
      * @return need or sysinfo need node
      */
-    public static Resource getNeedNode(NeedGraphType graph, Dataset ds) {
-
-
-        if (graph.equals(NeedGraphType.NEED) && getNeedModel(ds) != null) {
-            ResIterator iter = getNeedModel(ds).listSubjectsWithProperty(RDF.type, WON.NEED);
+    protected Resource getNeedNode(NeedGraphType graph) {
+        if (graph.equals(NeedGraphType.NEED) && getNeedModel() != null) {
+            ResIterator iter = getNeedModel().listSubjectsWithProperty(RDF.type, WON.NEED);
             if (iter.hasNext()) {
                 return iter.next();
             }
-        } else if (graph.equals(NeedGraphType.SYSINFO) && getSysInfoModel(ds) != null) {
-            ResIterator iter = getSysInfoModel(ds).listSubjectsWithProperty(RDF.type, WON.NEED);
+        } else if (graph.equals(NeedGraphType.SYSINFO) && getSysInfoModel() != null) {
+            ResIterator iter = getSysInfoModel().listSubjectsWithProperty(RDF.type, WON.NEED);
             if (iter.hasNext()) {
                 return iter.next();
             }
         }
 
         return null;
-    }
-
-    public Resource getNeedNode(NeedGraphType graph) {
-        return getNeedNode(graph, needDataset);
     }
 
     public String getNeedUri() {
@@ -365,6 +410,8 @@ public class NeedModelWrapper {
         } else if (NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
             needNode.addProperty(WON.IS, contentNode);
             needNode.addProperty(WON.SEEKS, contentNode);
+        } else if (NeedContentPropertyType.GOAL.equals(type)) {
+            needNode.addProperty(WON.GOAL, contentNode);
         }
     }
 
@@ -403,6 +450,7 @@ public class NeedModelWrapper {
         String isAndSeeksClause = "{ ?needNode a won:Need. ?needNode won:is ?contentNode. ?needNode won:seeks ?contentNode. }";
         String seeksClause = "{ ?needNode a won:Need. ?needNode won:seeks ?contentNode. FILTER NOT EXISTS { ?needNode won:seeks/won:seeks ?contentNode. } }";
         String seeksSeeksClause = "{ ?needNode a won:Need. ?needNode won:seeks/won:seeks ?contentNode. }";
+        String goalClause = "{ ?needNode a won:Need. ?needNode won:goal ?contentNode. }";
 
         switch (type) {
             case IS:
@@ -416,6 +464,9 @@ public class NeedModelWrapper {
                 break;
             case SEEKS_SEEKS:
                 queryClause = seeksSeeksClause;
+                break;
+            case GOAL:
+                queryClause = goalClause;
                 break;
             case ALL:
                 queryClause = isClause + "UNION \n" + seeksClause + "UNION \n" + seeksSeeksClause;
@@ -795,5 +846,4 @@ public class NeedModelWrapper {
             model.remove(this.statementsToRemove);
         }
     }
-
 }

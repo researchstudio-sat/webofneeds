@@ -16,11 +16,21 @@
 
 package won.owner.web.websocket;
 
+import java.io.IOException;
+import java.net.URI;
+import java.security.Principal;
+import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,22 +41,21 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
+import won.owner.service.impl.AuthenticationThreadLocal;
+import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
-import won.protocol.message.*;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDecoder;
+import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.util.WonRdfUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * User: syim
@@ -173,8 +182,14 @@ public class WonWebSocketHandler
     URI needUri = wonMessage.getSenderNeedURI();
     logger.debug("binding session to need URI {}", needUri);
     this.webSocketSessionService.addMapping(needUri, session);
-
-    ownerApplicationService.sendWonMessage(wonMessage);
+    try  {
+	    AuthenticationThreadLocal.set((Authentication) session.getPrincipal());
+	    ownerApplicationService.sendWonMessage(wonMessage);
+    } finally {
+    	//be sure to remove the principal from the threadlocal
+	    AuthenticationThreadLocal.remove();
+    }
+	    
   }
 
   /* update the session last accessed time, - spring-session was added to synchronize
@@ -202,7 +217,7 @@ public class WonWebSocketHandler
   }
 
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(final WonMessage wonMessage) {
 
     String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
@@ -357,10 +372,17 @@ public class WonWebSocketHandler
     if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
       && WonMessageType.CREATE_NEED ==wonMessage.getIsResponseToMessageType()){
 
-      if (session.getPrincipal() != null) {
+      try {
         saveNeedUriWithUser(wonMessage, session);
-      } else {
-        logger.warn("could not associate need {} with currently logged in user: no principal found in session");
+      } catch (Exception e) {
+        logger.warn("could not associate need {} with currently logged in user, cannot send message", needUri, e);
+        if (user != null){
+        	webSocketSessionService.removeMapping(user, session);
+        }
+	    if (needUri != null) {
+	    	webSocketSessionService.removeMapping(needUri, session);
+	    }
+        return;
       }
     }
     try {
@@ -382,6 +404,9 @@ public class WonWebSocketHandler
     User user = getUserForSession(session);
     URI needURI = wonMessage.getReceiverNeedURI();
     UserNeed userNeed = new UserNeed(needURI);
+    // reload the user so we can save it 
+    // (the user object we get from getUserForSession is detached)
+    user = userRepository.findOne(user.getId());
     userNeedRepository.save(userNeed);
     user.addNeedUri(userNeed);
     userRepository.save(user);
@@ -394,8 +419,11 @@ public class WonWebSocketHandler
     if (session.getPrincipal() == null){
       return null;
     }
-    String username = session.getPrincipal().getName();
-    return userRepository.findByUsername(username);
+    Principal principal = session.getPrincipal();
+    if (principal instanceof Authentication) {
+    	return ((KeystoreEnabledUserDetails) ((Authentication)principal).getPrincipal()).getUser();
+    }
+    throw new IllegalStateException("no user found in session");
   }
 
 

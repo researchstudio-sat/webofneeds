@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 import won.bot.framework.component.needproducer.NeedProducer;
 
 /**
@@ -40,7 +40,7 @@ public abstract class AbstractNeedProducerWrapper implements NeedProducerWrapper
   }
 
   @Override
-  public synchronized Model create()
+  public synchronized Dataset create()
   {
     return wrappedProducer.create();
   }

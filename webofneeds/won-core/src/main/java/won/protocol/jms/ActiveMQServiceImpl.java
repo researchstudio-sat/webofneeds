@@ -16,6 +16,11 @@
 
 package won.protocol.jms;
 
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
@@ -23,18 +28,15 @@ import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
+
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * User: sbyim
@@ -65,6 +67,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     }
 
     @Autowired
+    @Qualifier("default")
     protected LinkedDataSource linkedDataSource;
 
     @Override

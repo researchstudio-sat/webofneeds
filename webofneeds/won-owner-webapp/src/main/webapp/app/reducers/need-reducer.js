@@ -70,6 +70,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.needs.create: // optimistic need adding
         	return addNeedInCreation(allNeedsInState, action.payload.need, action.payload.needUri)
+        	//return addNeedInCreation(allNeedsInState, action.payload.needList, action.payload.needUri);
         case actionTypes.needs.createSuccessful:
             return addNeed(allNeedsInState, action.payload.need, true);
 
@@ -590,6 +591,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         const is = jsonldNeedImm.get("won:is");
         const seeks = jsonldNeedImm.get("won:seeks");
 
+        //TODO We need to decide which is the main title? Or combine?
         const title = isPresent ? is.get("dc:title") : (seeksPresent ? seeks.get("dc:title") : undefined);
 
         if(!!uri && !!title){
@@ -635,8 +637,10 @@ function parseNeed(jsonldNeed, ownNeed) {
         let tags = undefined;
         let location = undefined;
 
+        //TODO: Type concept?
         if(isPresent){
-            type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+            //type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+        	type = seeksPresent ? won.WON.BasicNeedTypeCombinedCompacted : won.WON.BasicNeedTypeSupplyCompacted;
             description = is.get("dc:description");
             tags = is.get("won:hasTag");
             location = parseLocation(is.get("won:hasLocation"));

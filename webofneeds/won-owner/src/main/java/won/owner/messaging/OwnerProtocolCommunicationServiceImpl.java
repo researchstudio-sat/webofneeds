@@ -16,26 +16,6 @@
 
 package won.owner.messaging;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.service.CryptographyService;
-import won.cryptography.service.KeyStoreService;
-import won.cryptography.service.RegistrationClient;
-import won.cryptography.service.RegistrationRestClientHttps;
-import won.cryptography.ssl.AliasFromFingerprintGenerator;
-import won.cryptography.ssl.AliasGenerator;
-import won.protocol.exception.CamelConfigurationFailedException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.jms.*;
-import won.protocol.model.Connection;
-import won.protocol.model.Need;
-import won.protocol.model.WonNode;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.WonNodeRepository;
-import won.protocol.util.DataAccessUtils;
-
 import java.net.URI;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -45,6 +25,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import won.cryptography.service.CryptographyService;
+import won.cryptography.service.RegistrationClient;
+import won.cryptography.service.RegistrationRestClientHttps;
+import won.cryptography.service.keystore.KeyStoreService;
+import won.cryptography.ssl.AliasFromFingerprintGenerator;
+import won.cryptography.ssl.AliasGenerator;
+import won.protocol.exception.CamelConfigurationFailedException;
+import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.jms.ActiveMQService;
+import won.protocol.jms.CamelConfiguration;
+import won.protocol.jms.MessagingService;
+import won.protocol.jms.OwnerProtocolCamelConfigurator;
+import won.protocol.jms.OwnerProtocolCommunicationService;
+import won.protocol.model.Connection;
+import won.protocol.model.Need;
+import won.protocol.model.WonNode;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.repository.WonNodeRepository;
+import won.protocol.util.DataAccessUtils;
 
 /**
  * User: syim

@@ -172,7 +172,7 @@ public class WorkerCrawlerActor extends UntypedActor {
 
             // if this URI/dataset was a need then send an event to the distributed event bu
             if (NeedModelWrapper.isANeed(ds)) {
-                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
                 NeedState state = needModelWrapper.getNeedState();
 
                 NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;

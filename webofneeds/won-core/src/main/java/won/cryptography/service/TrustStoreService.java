@@ -3,6 +3,8 @@ package won.cryptography.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -17,14 +19,14 @@ public class TrustStoreService
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private KeyStoreService serviceImpl;
+  private FileBasedKeyStoreService serviceImpl;
 
   public TrustStoreService(String filePath, String storePW) {
-    serviceImpl = new KeyStoreService(filePath, storePW);
+    serviceImpl = new FileBasedKeyStoreService(filePath, storePW);
   }
 
   public TrustStoreService(File storeFile, String storePW) {
-    serviceImpl = new KeyStoreService(storeFile, storePW);
+    serviceImpl = new FileBasedKeyStoreService(storeFile, storePW);
   }
 
   public void init() throws Exception {
