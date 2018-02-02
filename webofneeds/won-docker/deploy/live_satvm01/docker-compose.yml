@@ -148,6 +148,7 @@ services:
     ports:
       - "8082:8443"
     volumes:
+      - $base_folder/custom_owner_skin:/usr/local/tomcat/webapps/owner/skin/custom/
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
       - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
     depends_on:
