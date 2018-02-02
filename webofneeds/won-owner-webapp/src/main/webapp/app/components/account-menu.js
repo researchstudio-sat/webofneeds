@@ -29,13 +29,9 @@ function genLogoutConf() {
                     src="generated/icon-sprite.svg#ico16_arrow_down"
                     class="topnav__carret">
 
-                <!--
-                <svg class="topnav__button__icon"><use xlink:href="#ico36_person"></use></svg>
-                <svg class="topnav__button__icon" style="stroke:red; fill: blue;"><use xlink:href="#ico36_person_confable"></use></svg>
-                -->
-                <img
-                    class="topnav__button__icon"
-                    src="generated/icon-sprite.svg#ico36_person">
+                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);">
+                    <use xlink:href="#ico36_person_confable2"></use>
+                </svg>
 
 
             </won-dd-header>
