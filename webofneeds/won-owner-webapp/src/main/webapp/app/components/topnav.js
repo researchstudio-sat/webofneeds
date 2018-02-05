@@ -114,11 +114,25 @@ function genTopnavConf() {
                         'error' : toast.get('type') === self.WON.errorToast
                       }"
             ng-repeat="toast in self.toastsArray">
-                <svg class="topnav__toasts__element__close clickable"
-                    ng-click="self.toasts__delete(toast)"
-                    style="--local-primary:var(--won-primary-color);">
-                        <use href="#ico27_close"></use>
+
+                <svg class="topnav__toasts__element__icon"
+                    ng-show="toast.get('type') === self.WON.infoToast"
+                    style="--local-primary:#CCD2D2">
+                        <use href="#ico16_indicator_info"></use>
                 </svg>
+
+                <svg class="topnav__toasts__element__icon"
+                    ng-show="toast.get('type') === self.WON.warnToast"
+                    style="--local-primary:#CCD2D2">
+                        <use href="#ico16_indicator_warning"></use>
+                </svg>
+
+                <svg class="topnav__toasts__element__icon"
+                    ng-show="toast.get('type') === self.WON.errorToast"
+                    style="--local-primary:#CCD2D2">
+                        <use href="#ico16_indicator_error"></use>
+                </svg>
+
                 <div class="topnav__toasts__element__text">
                     <p ng-show="!toast.get('unsafeHtmlEnabled')">
                         {{toast.get('msg')}}
@@ -133,6 +147,12 @@ function genTopnavConf() {
                         </a>
                     </p>
                 </div>
+
+                <svg class="topnav__toasts__element__close clickable"
+                    ng-click="self.toasts__delete(toast)"
+                    style="--local-primary:var(--won-primary-color);">
+                        <use href="#ico27_close"></use>
+                </svg>
 
             </div>
         </div>
