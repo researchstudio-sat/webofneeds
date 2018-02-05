@@ -74,10 +74,24 @@ function genComponentConf() {
             <div class="cp__addDetail">
 
 	            <!-- IS PART -->
-    			<div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-	                  	<span class="nonHover"><span ng-if="!self.checkDropDown(self.is)">Add </span>Description<span class="opt">(allows others to find your post)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Add Description<span class="opt">(allows others to find your post)</span></span>
-	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Description</span>
+                <div class="cp__header addDetail clickable" 
+                    ng-click="self.toggleDropDown(self.is)" 
+                    ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
+
+                    <svg class="ad__icon" ng-show="!self.checkDropDown(self.is)">
+                        <use href="#ico36_plus_circle"></use>
+                    </svg>
+                    <svg class="ad__icon" ng-show="self.checkDropDown(self.is)">
+                        <use href="#ico36_close_circle"></use>
+                    </svg>
+                    <span ng-show="!self.checkDropDown(self.is)">
+                        Add 
+                    </span>
+                    <span class="hover" ng-show="self.checkDropDown(self.is)">
+                        Remove
+                    </span>
+                    Description
+                    <span class="opt">(allows others to find your post)</span>
     			</div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
 		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.is)">
