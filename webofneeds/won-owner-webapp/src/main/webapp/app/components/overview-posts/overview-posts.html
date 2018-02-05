@@ -28,6 +28,12 @@
             ng-show="self.activePostsCount != 0 || self.activePostsCount != 0">
             Active Posts
             <span class="title__counter">{{self.activePostsCount}}</span>
+            <svg class="title__carret" ng-show="!self.activePostsOpen">
+                <use href="#ico16_arrow_down"></use>
+            </svg>
+            <svg class="title__carret" ng-show="self.activePostsOpen">
+                <use href="#ico16_arrow_up"></use>
+            </svg>
         </div>
         <won-post-item-line ng-show="self.activePostsOpen"
                             ng-repeat="needUri in self.activePostsUris"
@@ -40,6 +46,12 @@
              ng-show="self.inactivePostsCount != 0 || self.inactivePostsCount != 0">
             Closed
             <span class="title__counter">{{self.inactivePostsCount}}</span>
+            <svg class="title__carret" ng-show="!self.closedPostsOpen">
+                <use href="#ico16_arrow_down"></use>
+            </svg>
+            <svg class="title__carret" ng-show="self.closedPostsOpen">
+                <use href="#ico16_arrow_up"></use>
+            </svg>
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
                             need-uri="needUri"
