@@ -93,9 +93,9 @@ public class ClosedProposesCancelledAgreementTest {
 	
 	// I am not sure why this fails...it should not...it worked fine in BlazeGraph
 	@Test
-	public void twoProposaltwoAgreementstwoCancellationProposalClausesBothAccepted () throws IOException {
-	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.trig");
-	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.ttl");
+	public void twoProposaltwoAgreementstwoCancellationProposalClausesTwoAccepted () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-twoaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-twoaccepted.ttl");
         test(input,expected);		
 	}
 	
