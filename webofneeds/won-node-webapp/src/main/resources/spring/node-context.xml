@@ -58,10 +58,9 @@
     verification step is not needed, and we can be more open about caching.
      -->
     <sec:http request-matcher="regex"
-              pattern="dontmatch(/(resource|data|page)/event/.+|/(resource|data|page)/need/[a-zA-z0-9]+/deep.*|/(resource|data|page)/need/[a-zA-z0-9]+/events/.+|/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true)"
+              pattern="/(resource|data|page)/((event/.+)|(need/[a-zA-Z0-9]+/((deep.*)|(events/.+)))|(connection/[a-zA-Z0-9]+/events.*))"
               entry-point-ref="authorizationEntryPoint"
               authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
-              use-expressions="true"
               access-decision-manager-ref="webIdBasedAccessDecisionManager">
         <sec:headers defaults-disabled="true">
             <sec:content-type-options />
@@ -72,13 +71,7 @@
         <!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
         <sec:custom-filter ref="clientCertificateWebIdFilter" position="X509_FILTER" />
-        <sec:intercept-url pattern = "dontmatch/(resource|data|page)/event/.+" access="hasRole('ROLE_WEBID')" />
-        <sec:intercept-url pattern = "dontmatch/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" access="hasRole('ROLE_WEBID')" />
-        <sec:intercept-url pattern = "dontmatch/(resource|data|page)/need/[a-zA-z0-9]+/events/.+"
-                           access="hasRole('ROLE_WEBID')" />
-        <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true"
-                           access="hasRole('ROLE_WEBID')" />
-        <sec:intercept-url pattern=".*" access="denyAll" />
+        <sec:intercept-url pattern=".*" access="hasRole('ROLE_WEBID')" />
         <!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
         <sec:csrf disabled="true" />
     </sec:http>
@@ -89,8 +82,7 @@
     <sec:http request-matcher="regex"
               pattern="/resource\?register=.+"
               entry-point-ref="authorizationEntryPoint"
-              authentication-manager-ref="clientCertificateNoWebIdAuthenticationManager"
-              use-expressions="true">
+              authentication-manager-ref="clientCertificateNoWebIdAuthenticationManager">
         <sec:headers defaults-disabled="true">
             <sec:cache-control/>
             <sec:content-type-options />
@@ -102,19 +94,17 @@
          extension of the X.509 filter -->
         <sec:custom-filter ref="clientCertificateNoWebIdFilter" position="X509_FILTER" />
         <!-- we allow self-signed certificates that need not be webids -->
-        <sec:intercept-url pattern = "/resource\?register=.+" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')" />
-        <sec:intercept-url pattern=".*" access="denyAll" />
+        <sec:intercept-url pattern=".*" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')" />
         <!-- we do not need CSRF protection for 'register': the client does not necessarily make
             a call to the server prior to registering, so there may be no way to pass a X-CSRF-Token to the client.
             Also, we do not rely on sessions for registering -->
         <sec:csrf disabled="true" />
     </sec:http>
 
-    <!-- config for public acces -->
-    <bean id="webAuthenticationDetailsSource" class="org.springframework.security.web.authentication.WebAuthenticationDetailsSource" />
-     <sec:http entry-point-ref="authorizationEntryPoint"
-              authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
-                use-expressions="false">
+    <!-- config for all other request including public access-->
+    <sec:http request-matcher="regex"
+              entry-point-ref="authorizationEntryPoint"
+              authentication-manager-ref="clientCertificateWebIdAuthenticationManager">
         <sec:headers defaults-disabled="true">
             <!-- no cache-control for public resources to allow for storing-->
             <sec:content-type-options />
@@ -122,21 +112,26 @@
             <sec:frame-options />
             <sec:xss-protection />
         </sec:headers>
-         <!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
-         <sec:csrf disabled="true" />
-     </sec:http>
+        <sec:intercept-url pattern="/(resource|data|page)(/need)?(((\?.*)|/)?)" access="permitAll"/>
+        <sec:intercept-url pattern="/(resource|data|page)/connection(((\?.*)|/)?)" access="permitAll"/>
+        <sec:intercept-url pattern="/(resource|data|page)/((need/[a-zA-Z0-9]+(/connections)?)|(connection/[a-zA-Z0-9]+))(((\?.*)|/)?)" access="permitAll"/>
+        <sec:intercept-url pattern=".*" access="denyAll"/>
+        <!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
+        <sec:csrf disabled="true" />
+    </sec:http>
 
 
+    <bean id="webAuthenticationDetailsSource" class="org.springframework.security.web.authentication.WebAuthenticationDetailsSource" />
 
     <!-- beans for access control based on self-signed client certificate (no webid) -->
     <bean id="clientCertificateNoWebIdFilter"
-          class="won.cryptography.webid.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
+          class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
         <constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
         <property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
         <property name="authenticationManager" ref="clientCertificateNoWebIdAuthenticationManager" />
     </bean>
     <bean id="authorizationEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
-    <bean id="clientCertificateNoWebIdUserDetailsService" class="won.cryptography.webid.springsecurity.ClientCertificateNoWebIdUserDetailsService" />
+    <bean id="clientCertificateNoWebIdUserDetailsService" class="won.node.springsecurity.ClientCertificateNoWebIdUserDetailsService" />
     <bean id="clientCertificateNoWebIdPreAuthenticationProvider"
           class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
         <property name="preAuthenticatedUserDetailsService" ref="clientCertificateNoWebIdUserDetailsService" />
@@ -149,7 +144,7 @@
 
     <!-- beans for access control based on self-signed client certificate with webid -->
     <bean id="clientCertificateWebIdFilter"
-          class="won.cryptography.webid.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
+          class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
         <constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
         <property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
         <property name="authenticationManager" ref="clientCertificateWebIdAuthenticationManager" />
@@ -157,8 +152,8 @@
     <bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent">
         <property name="linkedDataSource" ref="linkedDataSource" />
     </bean>
-    <bean id="acl" class="won.cryptography.webid.WonDefaultAccessControlRules"/>
-    <bean id="webIdUserDetailsService" class="won.cryptography.webid.springsecurity.WebIdUserDetailsService" />
+    <bean id="acl" class="won.node.springsecurity.WonDefaultAccessControlRules"/>
+    <bean id="webIdUserDetailsService" class="won.node.springsecurity.WebIdUserDetailsService" />
     <bean id="preAuthenticationProvider"
           class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
         <property name="preAuthenticatedUserDetailsService" ref="webIdUserDetailsService" />
@@ -169,7 +164,7 @@
     <bean id="webIdBasedAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
         <constructor-arg>
             <list>
-                <bean class="won.cryptography.webid.springsecurity.DefaultWoNAccessDecisionVoter" />
+                <bean class="won.node.springsecurity.DefaultWoNAccessDecisionVoter" />
             </list>
         </constructor-arg>
     </bean>

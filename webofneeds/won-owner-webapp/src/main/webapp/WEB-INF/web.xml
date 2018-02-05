@@ -2,7 +2,9 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns:util="http://www.springframework.org/schema/util"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-         version="3.0">
+         version="3.0"
+         metadata-complete="true">
+    <absolute-ordering /> 
 
     <display-name>WON Owner Webapp</display-name>
 
@@ -13,9 +15,23 @@
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
+    
+    <listener>
+        <description>Servlet listener that exposes the request to the current thread</description>
+        <display-name>RequestContextListener</display-name>  
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>  
+    </listener>
+    
+    <listener>
+        <description>Listener registered for informing the spring security session registry when the session is destroyed</description>
+        <display-name>HttpSessionEventPublilsher</display-name>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
+    
     <!--context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:/spring/owner-jmsonly.xml
+        <param-value>
+            classpath:/spring/owner-webapp-jmsonly.xml
 	        classpath:/spring/owner-security.xml
             classpath:/spring/owner-context.xml
             classpath:/spring/owner-mailer.xml

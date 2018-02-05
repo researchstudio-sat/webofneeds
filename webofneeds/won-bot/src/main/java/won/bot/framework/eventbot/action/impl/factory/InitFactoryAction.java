@@ -1,6 +1,6 @@
 package won.bot.framework.eventbot.action.impl.factory;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
@@ -40,7 +40,7 @@ import java.time.Duration;
  * completed
  */
 public class InitFactoryAction extends AbstractCreateNeedAction {
-    private static int FACTORYNEEDCREATION_DURATION_INMILLIS = 100;
+    private static int FACTORYNEEDCREATION_DURATION_INMILLIS = 250;
 
     private int targetInFlightCount;
     private int maxInFlightCount;
@@ -90,18 +90,18 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
                 }
                 adjustTriggerInterval(createFactoryNeedTrigger, messagesInFlightCounter);
                 NeedProducer needProducer = ctx.getNeedProducer(); //defined via spring
-                Model model = needProducer.create();
+                Dataset dataset = needProducer.create();
 
-                if(model == null && needProducer.isExhausted()) {
+                if(dataset == null && needProducer.isExhausted()) {
                     bus.publish(new NeedProducerExhaustedEvent());
                     bus.unsubscribe(executingListener);
                     return;
                 }
                 URI needUriFromProducer = null;
-                Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(model);
+                Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(dataset);
 
                 if(needResource.isURIResource()){
-                    needUriFromProducer = URI.create(needResource.getURI().toString());
+                    needUriFromProducer = URI.create(needResource.getURI());
                 }
                 if(needUriFromProducer != null){
 
@@ -110,7 +110,7 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
                     if(needURI != null){
                         bus.publish(new FactoryNeedCreationSkippedEvent());
                     }else{
-                        bus.publish(new CreateNeedCommandEvent(model, botContextWrapper.getFactoryListName(), usedForTesting, doNotMatch));
+                        bus.publish(new CreateNeedCommandEvent(dataset, botContextWrapper.getFactoryListName(), usedForTesting, doNotMatch));
                     }
                 }
             }

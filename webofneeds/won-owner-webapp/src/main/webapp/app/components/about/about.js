@@ -33,10 +33,10 @@ const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text
     {imageSrc: 'generated/icon-sprite.svg#ico36_message', text: 'Interact and exchange', detail: 'You found someone' +
     ' who has what you need, wants to meet or change something in your common environment? Go chat with them! '}];
 
-const peopleGrid = [{imageSrc: 'images/face1.png', text: '"I have something to offer"'},
-    {imageSrc: 'images/face2.png', text: '"I want something"'},
-    {imageSrc: 'images/face3.png', text: '"I want to do something together"'},
-    {imageSrc: 'images/face4.png', text: '"I want to change something"'}];
+const peopleGrid = [{imageSrc: 'skin/images/face1.png', text: '"I have something to offer"'},
+    {imageSrc: 'skin/images/face2.png', text: '"I want something"'},
+    {imageSrc: 'skin/images/face3.png', text: '"I want to do something together"'},
+    {imageSrc: 'skin/images/face4.png', text: '"I want to change something"'}];
 
 const questions = [
     {title: "Do I need to register?", detail: "Currently, you have to register, but we're working on a feature to" +

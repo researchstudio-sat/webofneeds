@@ -16,6 +16,7 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
@@ -23,6 +24,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
+import won.protocol.util.NeedModelWrapper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,15 +39,19 @@ public class TurtleFileNeedProducer implements FileBasedNeedProducer
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public  synchronized Model readNeedFromFile(final File file) throws IOException
+  public synchronized Dataset readNeedFromFile(final File file) throws IOException
   {
     logger.debug("processing as turtle file: {} ", file);
     try (FileInputStream fis = new FileInputStream(file)) {
       Model model = ModelFactory.createDefaultModel();
       RDFDataMgr.read(model, fis, RDFFormat.TURTLE.getLang());
-      return model;
+
+      NeedModelWrapper needModelWrapper = new NeedModelWrapper(model, null); //Use needmodelwrapper to ensure that the sysinfo graph is added already
+
+      return needModelWrapper.copyDataset();
+
     } catch (Exception e) {
-      logger.debug("could not parse turtle from file {} ", file, e);
+      logger.error("could not parse turtle from file {} ", file, e);
       throw e;
     }
   }

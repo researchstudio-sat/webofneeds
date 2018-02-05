@@ -1,9 +1,10 @@
 package won.cryptography.ssl;
 
-import org.apache.http.conn.ssl.PrivateKeyStrategy;
-import org.apache.http.conn.ssl.TrustStrategy;
-import won.cryptography.service.KeyStoreService;
+import org.apache.http.ssl.PrivateKeyStrategy;
+import org.apache.http.ssl.TrustStrategy;
+
 import won.cryptography.service.TrustStoreService;
+import won.cryptography.service.keystore.KeyStoreService;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;

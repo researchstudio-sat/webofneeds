@@ -22,7 +22,7 @@ package won.cryptography.keymanagement;
 public class NeedUriAsAliasStrategy implements KeyPairAliasDerivationStrategy{
     @Override
     public String getAliasForNeedUri(String needURI) {
-        if (needURI == null || needURI.trim().length() == 0) throw new IllegalArgumentException("Cannot use empty or null URI as alias");
+    	// we allow null to be passed here so clients can check for a default alias
         return needURI;
     }
 }

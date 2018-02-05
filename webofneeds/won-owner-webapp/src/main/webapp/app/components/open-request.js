@@ -41,7 +41,7 @@ function genComponentConf() {
       </won-post-content>
 
       <div class="or__footer" ng-show="self.isSentRequest">
-        Waiting for them to accept your contact request.
+        Waiting for them to accept your chat request.
       </div>
 
       <div class="or__footer" ng-show="self.isReceivedRequest">
@@ -49,8 +49,8 @@ function genComponentConf() {
         <div class="flexbuttons">
           <button
             class="won-button--filled black"
-            ng-click="self.closeRequest()">Decline</button>
-          <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
+            ng-click="self.closeRequest()">Remove</button>
+          <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Chat</button>
         </div>
         <a target="_blank" href="{{self.connectionUri}}">
             <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">

@@ -16,6 +16,7 @@
 
 package won.bot.framework.component.needconsumer.impl;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -27,7 +28,7 @@ import won.bot.framework.component.needconsumer.NeedConsumer;
 public class SysoutNeedConsumer implements NeedConsumer
 {
   @Override
-  public void consume(final Model need)
+  public void consume(final Dataset need)
   {
     RDFDataMgr.write(System.out, need, Lang.TTL);
   }

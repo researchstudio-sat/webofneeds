@@ -29,6 +29,7 @@
         <property name="inactivityCheckInterval" value="${need.inactivity.check.interval}"/>
         <property name="warnTimeout" value="${need.inactivity.warn.timeout}"/>
         <property name="deactivateTimeout" value="${need.inactivity.deactivate.timeout}"/>
+        <property name="deactivateTimeoutDespiteEstablishedConnections" value="${need.inactivity.deactivateDespiteEstablishedConnections.timeout}" />
     </bean>
 
 </beans>

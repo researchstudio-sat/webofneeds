@@ -8,7 +8,7 @@
 
     <!-- TODO merge into one file cryptographyServices.xml and owner-security? -->
     <import resource="classpath:/spring/component/cryptographyServices.xml" />
-    <import resource="classpath:/spring/component/transmission/owner-security.xml" />
+    <import resource="classpath:/spring/component/crypto/owner-crypto.xml" />
     <import resource="classpath:/spring/core/owner-core.xml" />
     <import resource="classpath:/spring/component/ehcache/spring-owner-ehcache.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" />

@@ -16,7 +16,10 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -32,8 +35,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * User: fkleedorfer
@@ -59,10 +61,14 @@ public class OpenConnectionAction extends BaseEventBotAction
       return;
     } else if (event instanceof OpenFromOtherNeedEvent){
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
-      if (((OpenFromOtherNeedEvent) event).getCon().getState() == ConnectionState.REQUEST_RECEIVED) {
+       
+      URI connectionState = WonLinkedDataUtils.getConnectionStateforConnectionURI(connectEvent.getConnectionURI(), getEventListenerContext().getLinkedDataSource());
+      if (ConnectionState.REQUEST_RECEIVED.getURI().equals(connectionState)) {
         logger.debug("auto-replying to open(REQUEST_RECEIVED) with open for connection {}",
           connectEvent.getConnectionURI());
         getEventListenerContext().getWonMessageSender().sendWonMessage(createOpenWonMessage(connectEvent.getConnectionURI()));
+      } else {
+          // else do not respond - we assume the connection is now established.    	  
       }
       return;
     } else if (event instanceof HintFromMatcherEvent) {
