@@ -164,11 +164,9 @@ won-create-post {
         &:hover {
           color: $won-primary-color;
           --local-primary: $won-primary-color; // for the svg-icons
-          // background-image: url('icon-sprite.svg#ico36_close_circle');
         }
 
         &.picked {
-          // background-image: url('icon-sprite.svg#ico36_added_circle_grey');
           color: $won-line-gray;
           --local-primary: $won-line-gray; // for the svg-icons
           cursor: default;
@@ -252,12 +250,10 @@ won-create-post {
 
     &.tags {
       font-size: $normalFontSize+.25rem;
-      // background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
     }
 
     &.location {
       font-size: $normalFontSize+.25rem;
-      // background-image: url('icon-sprite.svg#ico36_area_circle_hi');
     }
 
     &.addDetail, &.detailPicker {
@@ -265,13 +261,8 @@ won-create-post {
       --local-primary: $won-primary-color; // for the svg-icons
 
       &:hover {
-        //background-image: url('icon-sprite.svg#ico36_close_circle_hi');
         color: black;
         --local-primary: black; // for the svg-icons
-      }
-  
-      &.closedDetail:hover {
-        //background-image: url('icon-sprite.svg#ico36_plus_circle_hi');
       }
     }
        
