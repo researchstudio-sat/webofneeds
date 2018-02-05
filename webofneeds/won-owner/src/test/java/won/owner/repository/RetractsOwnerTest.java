@@ -5,7 +5,6 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,10 @@ import java.util.List;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
+// Just use the owner-agreement-test.xml configuration file and do not try to create owner-retracts-test.xml configuration...(interpreting Heinko's suggestion)
+// The configuration should be the same..
 @ContextConfiguration({"classpath:/spring/owner-agreement-test.xml"})
-public class AgreementOwnerTest {
+public class RetractsOwnerTest {
 
     public void setLinkedDataSource(LinkedDataSourceBase linkedDataSource) {
         this.linkedDataSource = linkedDataSource;
@@ -33,8 +34,7 @@ public class AgreementOwnerTest {
     @Autowired
     private LinkedDataSource linkedDataSource;
 
-    // Heinko says to ignore this test and use Florian#s test cases. I think this is Issue #1406
-    @Ignore
+    //@Ignore
     @Test
     public void test() {
 

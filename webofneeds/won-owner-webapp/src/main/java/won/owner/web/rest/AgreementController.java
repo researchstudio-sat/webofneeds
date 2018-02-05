@@ -50,6 +50,8 @@ public class AgreementController {
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getProposalsToCancel(conversationDataset);
     }
+    
+    
 
     @RequestMapping(value = "/getOpenProposals", method = RequestMethod.GET)
     public Model getOpenProposes(String connectionUri) {
@@ -106,6 +108,8 @@ public class AgreementController {
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedAcceptsInCancelledAgreement(conversationDataset);
     }
+    
+  
     
     private Dataset retrieveConversationDataset(String connectionUri) {
 
