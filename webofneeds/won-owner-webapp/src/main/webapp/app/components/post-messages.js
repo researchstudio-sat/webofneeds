@@ -22,9 +22,6 @@ import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
 } from '../selectors.js';
-import myformats from 'rdf-formats-common';
-
-window.rdfFormats4dbg = myformats;
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -63,7 +60,7 @@ function genComponentConf() {
                         ng-show="!message.get('outgoingMessage')">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text" title="{{ self.convertToTRIG(message.get('contentGraphs')) }}">
+                        <div class="pm__content__message__content__text" title="{{ self.showRdfIcon ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
                             {{ message.get('text') }}
                         </div>
                         <div
@@ -187,9 +184,8 @@ function genComponentConf() {
 
         }
         
-        async convertToTRIG(jsonld){
-        	const rdf = formats.parsers.find('application/ld+json').parse(jsonld);
-        	return formats.serializers.find('application/trig').serialize(rdf);
+        rdfToString(jsonld){
+        	return JSON.stringify(jsonld);
         }
 
         ensureMessagesAreLoaded() {
