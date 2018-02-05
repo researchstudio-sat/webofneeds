@@ -1,6 +1,7 @@
 package won.owner.web.rest;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
@@ -51,56 +52,56 @@ public class AgreementController {
     }
 
     @RequestMapping(value = "/getOpenProposals", method = RequestMethod.GET)
-    public Dataset getOpenProposes(String connectionUri) {
+    public Model getOpenProposes(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getOpenProposes(conversationDataset);
     }
     
     @RequestMapping(value = "/getOpenProposalsToCancelAgreements", method = RequestMethod.GET)
-    public Dataset getOpenProposesToCancel(String connectionUri) {
+    public Model getOpenProposesToCancel(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getOpenProposesToCancel(conversationDataset);
     }
     
     @RequestMapping(value = "/getClosedProposals", method = RequestMethod.GET)
-    public Dataset getClosedProposes(String connectionUri) {
+    public Model getClosedProposes(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedProposes(conversationDataset);
     }
     
     @RequestMapping(value = "/getClosedAcceptsOfProposals", method = RequestMethod.GET)
-    public Dataset getClosedAcceptsProposes(String connectionUri) {
+    public Model getClosedAcceptsProposes(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedAcceptsProposes(conversationDataset);
     }
     
     @RequestMapping(value = "/getClosedPropsalsToCancel", method = RequestMethod.GET)
-    public Dataset getClosedProposesToCancel(String connectionUri) {
+    public Model getClosedProposesToCancel(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedProposesToCancel(conversationDataset);
     }
     
     @RequestMapping(value = "/getClosedAcceptsOfPropsalsToCancel", method = RequestMethod.GET)
-    public Dataset getClosedAcceptsProposesToCancel(String connectionUri) {
+    public Model getClosedAcceptsProposesToCancel(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedAcceptsProposesToCancel(conversationDataset);
     }
 
     @RequestMapping(value = "/getClosedProposalsInCancelledAgreements", method = RequestMethod.GET)
-    public Dataset getClosedProposesInCancelledAgreement(String connectionUri) {
+    public Model getClosedProposesInCancelledAgreement(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedProposesInCancelledAgreement(conversationDataset);
     }
     
     @RequestMapping(value = "/getClosedAcceptsOfProposalsInCancelledAgreements", method = RequestMethod.GET)
-    public Dataset getClosedAcceptsInCancelledAgreement(String connectionUri) {
+    public Model getClosedAcceptsInCancelledAgreement(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedAcceptsInCancelledAgreement(conversationDataset);

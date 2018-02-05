@@ -1,6 +1,7 @@
 package won.owner.web.rest;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
@@ -30,7 +31,7 @@ public class RetractsController {
     }
 
     @RequestMapping(value = "/getRetracts", method = RequestMethod.GET)
-    public Dataset getClosedRetracts(String connectionUri) {
+    public Model getClosedRetracts(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
         return HighlevelProtocols.getClosedRetracts(conversationDataset);
