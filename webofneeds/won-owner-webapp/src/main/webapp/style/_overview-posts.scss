@@ -31,6 +31,9 @@
       // visually center icon on line
       position: relative;
       top: 0.3em;
+
+      color: $won-primary-color;
+      --local-primary: $won-primary-color; // coloring svg
     }
 
     @media (max-width: $responsivenessBreakPoint){
@@ -46,7 +49,7 @@
 
       .title__carret:not(.ng-hide) { 
         display: inline; 
-        margin-left: auto; // push it right
+        float: right;
       }
     }
 
