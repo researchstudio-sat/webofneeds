@@ -40,6 +40,57 @@ public class ClosedProposesCancelledAgreementTest {
         test(input,expected);		
 	}
 	
+	@Test
+	public void twoProposalOneAgreementOneCancellationError () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-one-agreement-errormsg-one-cancellation.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-one-agreement-errormsg-one-cancellation.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void twoProposalOneAgreementOneCancellationmsgError () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-one-agreement-one-cancellation-msgerror.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-one-agreement-one-cancellation-msgerror.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void twoProposalOneAgreementOneCancellation () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-one-agreement-one-cancellation.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-one-agreement-one-cancellation.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void twoProposaltwoAgreementstwoCancellationProposalClausesOneAccepted () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.ttl");
+        test(input,expected);		
+	}
+	
+	// cancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes
+	@Test
+	public void cancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.ttl");
+        test(input,expected);		
+	}	
+	
+	@Test
+	public void oneAgreementOneCancellationTestProposalError () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation-proposal-error.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-one-cancellation-proposal-error.ttl");
+        test(input,expected);		
+	}	
+	
+	
+	@Test
+	public void oneAgreementTwoCancellationSameAgreement () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-two-cancellation-same-agreement.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-two-cancellation-same-agreement.ttl");
+        test(input,expected);		
+	}	
+	
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
