@@ -42,4 +42,39 @@
 event:1435888415723958200 agr:proposesToCancel  event:ow321nn1va6clfidc4s0 .  
  ```
  
-### TODO ... add more tests from agreement protocol
+### twoProposalOneAgreementOneCancellation
+**input**: 2proposal-one-agreement-one-cancellation.trig
+**output**: 2proposal-one-agreement-one-cancellation.ttl
+**test name**: twoProposalOneAgreementOneCancellation
+*// This is the case where there is one valid proposal*
+
+### oneAgreementTwoCancellationSameAgreement
+**input**: one-agreement-two-cancellation-same-agreement.trig
+**output**: one-agreement-two-cancellation-same-agreement.ttl
+**test name**: oneAgreementTwoCancellationSameAgreement
+*// This is the case where there is one valid proposal*
+
+### oneAgreementOneCancellationTestProposalError
+**input**: one-agreement-one-cancellation-proposal-error.trig
+**output**: one-agreement-one-cancellation-proposal-error.ttl
+**test name**: oneAgreementOneCancellationTestProposalError
+*// This is the case where there is one valid proposal*
+
+
+### cancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes
+**input**: cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.trig
+**output**: cancelled-Two-Agreements-Sharing-Envelopes-for-Accepts-Purposes.ttl
+**test name**: cancelledTwoAgreementsSharingEnvelopesforAcceptsPurposes
+*// This is the case where there is one valid proposal*
+
+### twoProposalOneAgreementOneCancellationError 
+**input**: 2proposal-one-agreement-errormsg-one-cancellation.trig
+**output**: 2proposal-one-agreement-errormsg-one-cancellation.ttl
+**test name**: twoProposalOneAgreementOneCancellationError
+*// This is the case where there is one valid proposal*
+
+### twoProposalOneAgreementOneCancellationmsgError
+**input**: 2proposal-one-agreement-one-cancellation-msgerror.trig
+**output**: 2proposal-one-agreement-one-cancellation-msgerror.ttl
+**test name**: twoProposalOneAgreementOneCancellationError
+*// This is the case where there is one valid proposal*
