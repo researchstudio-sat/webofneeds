@@ -91,6 +91,14 @@ public class ClosedProposesCancelledAgreementTest {
         test(input,expected);		
 	}	
 	
+	// I am not sure why this fails...it should not...it worked fine in BlazeGraph
+	@Test
+	public void twoProposaltwoAgreementstwoCancellationProposalClausesBothAccepted () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.ttl");
+        test(input,expected);		
+	}
+	
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
