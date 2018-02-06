@@ -1,4 +1,4 @@
-package won.utils.closedproposescancelledagreement;
+package won.utils.proposescancelledagreement;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 import won.utils.QueryLoader;
 
-public class ClosedProposesCancelledAgreementFunction {
+public class ProposesCancelledAgreementFunction {
 	
-	private static final String queryFile = "/closedproposescancelledagreement/query.sq";
+	private static final String queryFile = "/proposescancelledagreement/query.sq";
 	
 	public static Model sparqlTest(Dataset dataset)
 	{

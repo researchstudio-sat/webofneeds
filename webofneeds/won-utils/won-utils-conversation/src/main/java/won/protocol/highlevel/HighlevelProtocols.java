@@ -14,9 +14,9 @@ import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
 import won.utils.proposal.ProposalFunction;
 import won.utils.proposaltocancel.ProposalToCancelFunction;
+import won.utils.proposescancelledagreement.ProposesCancelledAgreementFunction;
 import won.utils.pendingproposes.PendingProposesFunction;
 import won.utils.pendingproposestocancel.PendingProposesToCancelFunction;
-import won.utils.closedproposescancelledagreement.ClosedProposesCancelledAgreementFunction;
 
 
 public class HighlevelProtocols {
@@ -155,7 +155,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedProposesInCancelledAgreement(Dataset conversationDataset) {
-		Model closedproposescancelledagreement = ClosedProposesCancelledAgreementFunction.sparqlTest(conversationDataset);
+		Model closedproposescancelledagreement = ProposesCancelledAgreementFunction.sparqlTest(conversationDataset);
 		return closedproposescancelledagreement;
 	}
 	
