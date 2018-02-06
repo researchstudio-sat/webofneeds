@@ -5,8 +5,6 @@ won-topnav {
     position: absolute;
     z-index: 999;
     right: 0rem;
-    max-width: 15rem;
-    min-width: 15rem;
 
     &__element {
       margin: 1rem;
@@ -15,25 +13,22 @@ won-topnav {
       box-shadow: 0.1rem 0.1rem 0.5rem rgba(0, 0, 0, 0.3);
       min-height: 2rem;
 
-      background-position: 0.5rem 0.5rem;
-      background-size: $toastIconSize;
       background-color: white;
-      background-repeat: no-repeat;
 
-      &.warn {
-        background-image: url('icon-sprite.svg#ico16_indicator_warning');
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start; // = top
+      
+      &__icon {
+        @include fixed-square($toastIconSize);
       }
-      &.error {
-        background-image: url('icon-sprite.svg#ico16_indicator_error');
-      }
-      &.info {
-        background-image: url('icon-sprite.svg#ico16_indicator_info');
-      }
-
       &__text {
         font-size: $smallFontSize;
-        padding-right: 1rem;
-        padding-left: 2.5rem;
+        margin-right: 1rem;
+        margin-left: 1rem;
+        max-width: 10rem;
+        min-width: 10rem;
       }
 
       &__close {

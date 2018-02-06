@@ -6,7 +6,7 @@ won-account-menu {
   //display: block;
   won-dd-header {
     @include flex-row();
-    color: $won-red;
+    color: $won-primary-color;
   }
 
   .dd--open .topnav__carret {
@@ -42,7 +42,7 @@ won-login-form {
 
   .wl__errormsg {
     font-size: $smallFontSize;
-    color: $won-red;
+    color: $won-primary-color;
   }
 
   .wl__table{

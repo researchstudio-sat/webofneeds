@@ -25,13 +25,14 @@ function genLogoutConf() {
                 <span class="topnav__button__caption hide-in-responsive">
                     {{self.loggedIn? self.getEmail() : "Sign In"}}
                 </span>
-                <img
-                    src="generated/icon-sprite.svg#ico16_arrow_down"
-                    class="topnav__carret">
-                <img
-                    class="topnav__button__icon"
-                    src="generated/icon-sprite.svg#ico36_person">
 
+                <svg class="topnav__carret" style="--local-primary:var(--won-primary-color);">
+                    <use href="#ico16_arrow_down"></use>
+                </svg>
+
+                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);">
+                    <use href="#ico36_person"></use>
+                </svg>
 
             </won-dd-header>
             <won-dd-menu>

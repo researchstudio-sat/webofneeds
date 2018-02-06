@@ -14,13 +14,13 @@
 			<clipPath id="SVGID_2_">
 				<use xlink:href="#SVGID_1_"  overflow="visible"/>
 			</clipPath>
-			<polygon clip-path="url(#SVGID_2_)" fill="#F04646" points="19.414,18 25.777,11.636 24.363,10.222 18,16.586 11.636,10.222 
+			<polygon clip-path="url(#SVGID_2_)" fill="var(--local-primary)" points="19.414,18 25.777,11.636 24.363,10.222 18,16.586 11.636,10.222 
 				10.222,11.636 16.586,18 10.222,24.364 11.636,25.777 18,19.414 24.363,25.777 25.777,24.364 			"/>
 		</g>
 	</g>
 	<g>
 		<g>
-			<path fill="none" stroke="#F04646" stroke-width="2" d="M18,35c9.373,0,17-7.626,17-17S27.373,1,18,1C8.626,1,1,8.626,1,18
+			<path fill="none" stroke="var(--local-primary)" stroke-width="2" d="M18,35c9.373,0,17-7.626,17-17S27.373,1,18,1C8.626,1,1,8.626,1,18
 				S8.626,35,18,35L18,35z"/>
 		</g>
 	</g>

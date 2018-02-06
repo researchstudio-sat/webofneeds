@@ -74,10 +74,24 @@ function genComponentConf() {
             <div class="cp__addDetail">
 
 	            <!-- IS PART -->
-    			<div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.is)" ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-	                  	<span class="nonHover"><span ng-if="!self.checkDropDown(self.is)">Add </span>Description<span class="opt">(allows others to find your post)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.is)">Add Description<span class="opt">(allows others to find your post)</span></span>
-	                    <span class="hover" ng-if="self.checkDropDown(self.is)">Remove Description</span>
+                <div class="cp__header addDetail clickable" 
+                    ng-click="self.toggleDropDown(self.is)" 
+                    ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
+
+                    <svg class="cp__circleicon" ng-show="!self.checkDropDown(self.is)">
+                        <use href="#ico36_plus_circle"></use>
+                    </svg>
+                    <svg class="cp__circleicon" ng-show="self.checkDropDown(self.is)">
+                        <use href="#ico36_close_circle"></use>
+                    </svg>
+                    <span ng-show="!self.checkDropDown(self.is)">
+                        Add 
+                    </span>
+                    <span class="hover" ng-show="self.checkDropDown(self.is)">
+                        Remove
+                    </span>
+                    Description
+                    <span class="opt">(allows others to find your post)</span>
     			</div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
 		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.is)">
@@ -94,6 +108,9 @@ function genComponentConf() {
 						<!-- LOCATION ng-if="self.isDetailPresent('location', self.is)"-->
 						<div class="cp__location"  ng-if="detail === 'location'">
 	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.is)">
+                                <svg class="cp__circleicon">
+                                    <use href="#ico36_location_circle"></use>
+                                </svg>
 		                        <span class="nonHover">Location</span>
 		                        <span class="hover">Remove Location</span>
 	    					</div>
@@ -102,6 +119,9 @@ function genComponentConf() {
 	                	<!-- TAGS -->
 	                	 <div class="cp__tags" ng-if="detail === 'tags'">
 		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.is)">
+                                <svg class="cp__circleicon">
+                                    <use href="#ico36_tags_circle"></use>
+                                </svg>
 		                        <span class="nonHover">Tags</span>
 		                        <span class="hover">Remove Tags</span>
 		                    </div>
@@ -114,42 +134,70 @@ function genComponentConf() {
                 	<!-- /DETAILS -->
     				<!-- DETAILS Picker -->
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.is)">
-    					<div class="cp__header detailPicker clickable" ng-click="self.toggleDetail(self.is)" ng-class="{'closedDetailPicker': !self.showDetail[self.is]}">
-		                    <span class="nonHover">Add more detail</span>
-		                    <span class="hover" ng-if="!self.showDetail[self.is]">Open more detail</span>
-		                    <span class="hover" ng-if="self.showDetail[self.is]">Close more detail</span>
+                        <div class="cp__header detailPicker clickable" 
+                            ng-click="self.toggleDetail(self.is)" 
+                            ng-class="{'closedDetailPicker': !self.showDetail[self.is]}">
+                                <span class="nonHover">Add more detail</span>
+                                <span class="hover" ng-if="!self.showDetail[self.is]">Open more detail</span>
+                                <span class="hover" ng-if="self.showDetail[self.is]">Close more detail</span>
+                                <svg class="cp__carret" ng-show="!self.showDetail[self.is]">
+                                    <use href="#ico16_arrow_down"></use>
+                                </svg>
+                                <svg class="cp__carret" ng-show="self.showDetail[self.is]">
+                                    <use href="#ico16_arrow_up"></use>
+                                </svg>
 		                </div>
 			            <div class="cp__detail__items" ng-if="self.showDetail[self.is]" >
 		                    <div class="cp__detail__items__item location" 
 		                        ng-click="!self.isDetailPresent('location', self.is) && self.addDetail('location', self.is)"
-		                        ng-class="{'picked' : self.isDetailPresent('location', self.is)}">Address or Location</div>   
+                                ng-class="{'picked' : self.isDetailPresent('location', self.is)}">
+                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('location', self.is)">
+                                        <use href="#ico36_location_circle"></use>
+                                    </svg>
+                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('location', self.is)">
+                                        <use href="#ico36_added_circle"></use>
+                                    </svg>
+                                    Address or Location
+                                </div>   
 		                    <div class="cp__detail__items__item tags"
 		                        ng-click="!self.isDetailPresent('tags', self.is) && self.addDetail('tags', self.is)"
-		                        ng-class="{'picked' : self.isDetailPresent('tags', self.is)}">Tags</div>
-		                        
-		                    <!-- <div class="cp__detail__items__item image" 
-		                        ng-click="!self.isDetailPresent('image',self.is) && self.addDetail('image', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('image', self.is)}">Image or Media</div>
-		                    <div class="cp__detail__items__item description" 
-		                        ng-click="!self.isDetailPresent('description', self.is) && self.addDetail('description', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('description', self.is)}">Description</div>
-		                    <div class="cp__detail__items__item timeframe" 
-		                        ng-click="!self.isDetailPresent('timeframe', self.is) && self.addDetail('timeframe', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('timeframe', self.is)}">Deadline or Timeframe</div> -->
+                                ng-class="{'picked' : self.isDetailPresent('tags', self.is)}">
+                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('tags', self.is)">
+                                        <use href="#ico36_tags_circle"></use>
+                                    </svg>
+                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('tags', self.is)">
+                                        <use href="#ico36_added_circle"></use>
+                                    </svg>
+                                    Tags
+                            </div>
 		                </div>
 		            </div>
 		            <!-- /DETAIL Picker/ -->
                 </div>
                 <!-- /IS PART/ -->
                     
-	            <won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr> 
+                <won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr> 
                 
                 <!-- SEEKS PART -->   	
-	            <div class="cp__header addDetail clickable" ng-click="self.toggleDropDown(self.seeks)" ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
-	                  	<span class="nonHover"><span ng-if="!self.checkDropDown(self.seeks)">Add </span>Search<span class="opt">(search in other posts)</span></span>
-	                  	<span class="hover" ng-if="!self.checkDropDown(self.seeks)">Add Search<span class="opt">(search in other posts)</span></span>
-	                    <span class="hover" ng-if="self.checkDropDown(self.seeks)">Remove Search</span>
-	        	</div>
+                <div class="cp__header addDetail clickable" 
+                    ng-click="self.toggleDropDown(self.seeks)" 
+                    ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
+
+                    <svg class="cp__circleicon" ng-show="!self.checkDropDown(self.seeks)">
+                        <use href="#ico36_plus_circle"></use>
+                    </svg>
+                    <svg class="cp__circleicon" ng-show="self.checkDropDown(self.seeks)">
+                        <use href="#ico36_close_circle"></use>
+                    </svg>
+                    <span ng-show="!self.checkDropDown(self.seeks)">
+                        Add 
+                    </span>
+                    <span class="hover" ng-show="self.checkDropDown(self.seeks)">
+                        Remove
+                    </span>
+                    Search
+                    <span class="opt">(search in other posts)</span>
+    			</div>
 	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.seeks)" >
 		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.seeks)">
 				        <won-image-dropzone on-image-picked="::self.pickImage(image, self.seeks)">
@@ -159,11 +207,15 @@ function genComponentConf() {
 					<div class="cp__textfield_instruction" ng-if="self.checkDropDown(self.seeks)">
 						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
 					</div>
+					
 					<!-- DETAILS -->
 					<div class="cp__details" ng-repeat="detail in self.details[self.seeks] track by $index" ng-if="self.isValid(self.seeks)">
-						<!-- LOCATION -->
+						<!-- LOCATION ng-if="self.isDetailPresent('location', self.seeks)"-->
 						<div class="cp__location"  ng-if="detail === 'location'">
 	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.seeks)">
+                                <svg class="cp__circleicon">
+                                    <use href="#ico36_location_circle"></use>
+                                </svg>
 		                        <span class="nonHover">Location</span>
 		                        <span class="hover">Remove Location</span>
 	    					</div>
@@ -172,6 +224,9 @@ function genComponentConf() {
 	                	<!-- TAGS -->
 	                	 <div class="cp__tags" ng-if="detail === 'tags'">
 		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.seeks)">
+                                <svg class="cp__circleicon">
+                                    <use href="#ico36_tags_circle"></use>
+                                </svg>
 		                        <span class="nonHover">Tags</span>
 		                        <span class="hover">Remove Tags</span>
 		                    </div>
@@ -182,34 +237,48 @@ function genComponentConf() {
 		                </div>
 		            </div>
                 	<!-- /DETAILS -->
-                	<!-- DETAILS Picker -->
+    				<!-- DETAILS Picker -->
 	    			<div class="cp__addDetail" ng-if="self.isValid(self.seeks)">
-		                <div class="cp__header detailPicker clickable" ng-click="self.toggleDetail(self.seeks)" ng-class="{'closedDetailPicker': !self.showDetail[self.seeks]}">
-		                    <span class="nonHover">Add more detail</span>
-		                    <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
-		                    <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
+                        <div class="cp__header detailPicker clickable" 
+                            ng-click="self.toggleDetail(self.seeks)" 
+                            ng-class="{'closedDetailPicker': !self.showDetail[self.seeks]}">
+                                <span class="nonHover">Add more detail</span>
+                                <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
+                                <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
+                                <svg class="cp__carret" ng-show="!self.showDetail[self.seeks]">
+                                    <use href="#ico16_arrow_down"></use>
+                                </svg>
+                                <svg class="cp__carret" ng-show="self.showDetail[self.seeks]">
+                                    <use href="#ico16_arrow_up"></use>
+                                </svg>
 		                </div>
 			            <div class="cp__detail__items" ng-if="self.showDetail[self.seeks]" >
 		                    <div class="cp__detail__items__item location" 
 		                        ng-click="!self.isDetailPresent('location', self.seeks) && self.addDetail('location', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('location', self.seeks)}">Address or Location</div>     
+                                ng-class="{'picked' : self.isDetailPresent('location', self.seeks)}">
+                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('location', self.seeks)">
+                                        <use href="#ico36_location_circle"></use>
+                                    </svg>
+                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('location', self.seeks)">
+                                        <use href="#ico36_added_circle"></use>
+                                    </svg>
+                                    Address or Location
+                                </div>   
 		                    <div class="cp__detail__items__item tags"
 		                        ng-click="!self.isDetailPresent('tags', self.seeks) && self.addDetail('tags', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('tags', self.seeks)}">Tags</div>
-		                        
-		                    <!-- <div class="cp__detail__items__item image" 
-		                        ng-click="!self.isDetailPresent('image',self.seeks) && self.addDetail('image', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('image', self.seeks)}">Image or Media</div>
-		                    <div class="cp__detail__items__item description" 
-		                        ng-click="!self.isDetailPresent('description', self.seeks) && self.addDetail('description', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('description', self.seeks)}">Description</div>
-		                    <div class="cp__detail__items__item timeframe" 
-		                        ng-click="!self.isDetailPresent('timeframe', self.seeks) && self.addDetail('timeframe', self.seeks)"
-		                        ng-class="{'picked' : self.isDetailPresent('timeframe', self.seeks)}">Deadline or Timeframe</div> -->
-		                </div>    
+                                ng-class="{'picked' : self.isDetailPresent('tags', self.seeks)}">
+                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('tags', self.seeks)">
+                                        <use href="#ico36_tags_circle"></use>
+                                    </svg>
+                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('tags', self.seeks)">
+                                        <use href="#ico36_added_circle"></use>
+                                    </svg>
+                                    Tags
+                            </div>
+		                </div>
 		            </div>
-		            <!-- /DETAILS Picker/ -->
-	            </div>
+		            <!-- /DETAIL Picker/ -->
+                </div>
 	            <!-- /SEEKS PART/ -->
 	       	</div>
 	       	<won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>

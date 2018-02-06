@@ -7,12 +7,18 @@
     <div class="opc__inner" ng-class="{'empty' : (self.inactivePostsCount == 0 && self.activePostsCount == 0)}">
         <div class="opc__empty" ng-if="self.inactivePostsCount == 0 && self.activePostsCount == 0">
             <div class="opc__empty__description">
-                <img src="generated/icon-sprite.svg#ico-filter_list_grey" class="opc__empty__description__icon">
+                <svg class="opc__empty__description__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use href="#ico-filter_list"></use>
+                </svg>
                 <span class="opc__empty__description__text">This is the overview of your postings. It is currently
                     empty. When you create needs, they will be listed here.</span>
             </div>
             <a ng-click="self.router__stateGoResetParams('createNeed')" class="opc__empty__link clickable">
-                <img src="generated/icon-sprite.svg#ico36_plus" class="opc__empty__link__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="opc__empty__link__icon">
+                        <use href="#ico36_plus"></use>
+                </svg>
                 <span class="opc__empty__link__caption">Create a Need</span>
             </a>
         </div>
@@ -22,6 +28,12 @@
             ng-show="self.activePostsCount != 0 || self.activePostsCount != 0">
             Active Posts
             <span class="title__counter">{{self.activePostsCount}}</span>
+            <svg class="title__carret" ng-show="!self.activePostsOpen">
+                <use href="#ico16_arrow_down"></use>
+            </svg>
+            <svg class="title__carret" ng-show="self.activePostsOpen">
+                <use href="#ico16_arrow_up"></use>
+            </svg>
         </div>
         <won-post-item-line ng-show="self.activePostsOpen"
                             ng-repeat="needUri in self.activePostsUris"
@@ -34,6 +46,12 @@
              ng-show="self.inactivePostsCount != 0 || self.inactivePostsCount != 0">
             Closed
             <span class="title__counter">{{self.inactivePostsCount}}</span>
+            <svg class="title__carret" ng-show="!self.closedPostsOpen">
+                <use href="#ico16_arrow_down"></use>
+            </svg>
+            <svg class="title__carret" ng-show="self.closedPostsOpen">
+                <use href="#ico16_arrow_up"></use>
+            </svg>
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
                             need-uri="needUri"

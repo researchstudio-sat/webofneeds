@@ -12,18 +12,35 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
             <a class="feedback clickable" ng-click="self.rateMatch(0); self.router__stateGoCurrent({connectionUri : self.connectionUri})">
-                <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_good"/>
-                <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_good_white"/>
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="feedback__icon unselected">
+                        <use href="#ico36_feedback_good"></use>
+                </svg>
+                <svg style="--local-primary:white;"
+                    class="feedback__icon selected">
+                        <use href="#ico36_feedback_good"></use>
+                </svg>
                 <span class="feedback__text">Good match - connect!</span>
             </a>
             <!--div class="feedback" ng-click="self.rateMatch(1)">
-                <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_ok"/>
-                <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_ok_white"/>
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="feedback__icon unselected">
+                        <use href="#ico36_feedback_ok"></use>
+                </svg>
+                <svg style="--local-primary:white;"
+                     class="feedback__icon selected">
+                        <use href="#ico36_feedback_ok"></use>
+                </svg>
                 <span class="feedback__text">OK - request conversation</span>
             </div-->
             <div class="feedback clickable" ng-click="self.rateMatch(2)">
-                <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_notatall_hi"/>
-                <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_notatall_white"/>
+                <svg class="feedback__icon unselected" style="--local-primary:black;">
+                    <use href="#ico36_feedback_notatall"></use>
+                </svg>
+                <svg style="--local-primary:white;"
+                    class="feedback__icon selected">
+                        <use href="#ico36_feedback_notatall"></use>
+                </svg>
                 <span class="feedback__text">Bad match - remove!</span>
             </div>
         `;
