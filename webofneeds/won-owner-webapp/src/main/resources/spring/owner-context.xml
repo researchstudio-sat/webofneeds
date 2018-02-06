@@ -29,8 +29,10 @@
     <!-- was in jpabased-rdf-storage.xml within owner-jmsonly.xml--><!-- within jdbc-storage.xml within owner-jmsonly.xml-->
     <!-- was in owner-mailer.xml -->
 
+    <!-- owner webapp crypto config -->
+    <import resource="classpath:/spring/crypto/owner-webapp-crypto.xml"/>
     <!-- owner functioning -->
-    <import resource="classpath:/spring/owner-jmsonly.xml"/>
+    <import resource="classpath:/spring/owner-webapp-jmsonly.xml"/>
     <!-- servlet filters -->
     <import resource="classpath:/spring/owner-security.xml"/>
     <!-- owner message processing -->

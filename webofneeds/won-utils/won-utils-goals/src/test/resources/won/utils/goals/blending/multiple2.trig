@@ -1,0 +1,59 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix s: <http://schema.org/> .
+
+@prefix ex: <http://example.org/test/> .
+@prefix voc: <http://example.org/myvocabulary/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+ex:data1 {
+    ex:test1 ex:testProperty "test" .
+    ex:test2 ex:testProperty "test" .
+}
+
+ex:data2 {
+    ex:test3 ex:testProperty "test" .
+    ex:test4 ex:testProperty "test" .
+}
+
+ex:blendedGraph0 {
+    ex:test1 ex:testProperty "test" .
+    ex:test2 ex:testProperty "test" .
+    ex:test3 ex:testProperty "test" .
+    ex:test4 ex:testProperty "test" .
+}
+
+ex:blendedGraph13 {
+    ex:blended1 ex:testProperty "test" .
+    ex:test2 ex:testProperty "test" .
+    ex:test4 ex:testProperty "test" .
+}
+
+ex:blendedGraph14 {
+    ex:blended1 ex:testProperty "test" .
+    ex:test2 ex:testProperty "test" .
+    ex:test3 ex:testProperty "test" .
+}
+
+ex:blendedGraph23 {
+    ex:blended1 ex:testProperty "test" .
+    ex:test1 ex:testProperty "test" .
+    ex:test4 ex:testProperty "test" .
+}
+
+ex:blendedGraph24 {
+    ex:blended1 ex:testProperty "test" .
+    ex:test1 ex:testProperty "test" .
+    ex:test3 ex:testProperty "test" .
+}
+
+ex:blendedGraph1324 {
+    ex:blended1 ex:testProperty "test" .
+    ex:blended2 ex:testProperty "test" .
+}
+
+ex:blendedGraph1423 {
+    ex:blended1 ex:testProperty "test" .
+    ex:blended2 ex:testProperty "test" .
+}

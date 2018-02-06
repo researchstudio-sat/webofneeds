@@ -111,7 +111,7 @@ class Controller {
             // either of 'tiles', 'list'
             let layout = getIn(state, ['router','currentParams','layout']);
             if(!layout) {
-                layout = isWhatsAround? 'map' : 'tiles';
+                layout = 'list';
             }
 
             const isOverview = displayingOverview(state);

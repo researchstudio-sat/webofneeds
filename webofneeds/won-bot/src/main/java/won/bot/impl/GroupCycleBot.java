@@ -16,6 +16,7 @@
 
 package won.bot.impl;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
 import won.bot.framework.bot.base.EventBot;
@@ -50,7 +51,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 
@@ -150,8 +150,8 @@ public class GroupCycleBot extends EventBot {
         @Override
         protected void onActivate(Optional<Object> message) {
             GroupBotContextWrapper botContextWrapper = (GroupBotContextWrapper) getBotContextWrapper();
-            Model model = createNeedModel("Group Need", "Used for testing if groups suppress echos");
-            CommandEvent command = new CreateNeedCommandEvent(model, botContextWrapper.getGroupListName(), true, true, FacetType.OwnerFacet.getURI(), FacetType.GroupFacet.getURI());
+            Dataset needDataset = createNeedDataset("Group Need", "Used for testing if groups suppress echos");
+            CommandEvent command = new CreateNeedCommandEvent(needDataset, botContextWrapper.getGroupListName(), true, true, FacetType.OwnerFacet.getURI(), FacetType.GroupFacet.getURI());
             subscribeWithAutoCleanup(
                     CreateNeedCommandResultEvent.class,
                     new ActionOnFirstEventListener(context, new CommandResultFilter(command), new BaseEventBotAction(context) {
@@ -189,8 +189,8 @@ public class GroupCycleBot extends EventBot {
             Set<URI> members = new HashSet<URI>();
             //create N group members
             for (int i = 0; i < NUMBER_OF_GROUPMEMBERS; i++) {
-                Model model = createNeedModel("Group Memeber Need", "Used for testing if groups suppress echos");
-                CommandEvent command = new CreateNeedCommandEvent(model, botContextWrapper.getGroupMembersListName(), true, true, FacetType.OwnerFacet.getURI());
+                Dataset needDataset = createNeedDataset("Group Memeber Need", "Used for testing if groups suppress echos");
+                CommandEvent command = new CreateNeedCommandEvent(needDataset, botContextWrapper.getGroupMembersListName(), true, true, FacetType.OwnerFacet.getURI());
                 subscribeWithAutoCleanup(
                         CreateNeedCommandResultEvent.class,
                         new ActionOnFirstEventListener(context, new CommandResultFilter(command), new BaseEventBotAction(context) {
@@ -656,11 +656,11 @@ public class GroupCycleBot extends EventBot {
     }
 
 
-    private Model createNeedModel(String title, String description) {
+    private Dataset createNeedDataset(String title, String description) {
         URI needURI = getEventListenerContext().getWonNodeInformationService().generateNeedURI();
         NeedModelWrapper needModelWrapper = new NeedModelWrapper(needURI.toString());
         needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.title, title);
         needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.description, description);
-        return needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+        return needModelWrapper.copyDataset();
     }
 }

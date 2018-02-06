@@ -1,6 +1,6 @@
 package won.cryptography.ssl;
 
-import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.ssl.TrustStrategy;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;

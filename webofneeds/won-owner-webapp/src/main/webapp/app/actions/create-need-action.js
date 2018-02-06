@@ -40,7 +40,7 @@ export function needCreate(draft, nodeUri) {
              * there be a previous privateId, we don't want to change
              * back to that later.
              */
-            delete prevParams.privateId;
+        	 delete prevParams.privateId;
         }
 
         return ensureLoggedIn(dispatch, getState)
@@ -48,23 +48,14 @@ export function needCreate(draft, nodeUri) {
                 if (currentState === 'landingpage') {
                     return dispatch(actionCreators.router__stateGoAbs('feed'))
                 } else if (currentState === 'createNeed') {
-                    /*
-                     * go to view that was open before the create-view was opened, but
-                     * don't revert any new privateID or remove the create-gui from the
-                     * history stack.
-                     */
-                    if(prevState)  {
-                        return dispatch(actionCreators.router__stateGoAbs(prevState, prevParams))
-                    } else {
-                        return dispatch(actionCreators.router__stateGoDefault())
-                    }
+                    return dispatch(actionCreators.router__stateGoDefault())
                 }
             })
             .then(() => {
                 const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
                 return dispatch({
                     type: actionTypes.needs.create,
-                    payload: {eventUri, message, needUri}
+                    payload: {eventUri, message, needUri, need: draft}
                 })
 
             });

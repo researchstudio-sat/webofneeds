@@ -1,0 +1,21 @@
+PREFIX sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+PREFIX msg: <http://purl.org/webofneeds/message#>  
+
+DELETE
+ {
+    GRAPH ?g { ?s ?p ?o }
+ }
+WHERE
+  {
+    {
+      GRAPH ?g {
+        ?s a sig:Signature.
+        ?s ?p ?o
+      }         
+    } union {
+      GRAPH ?g {
+        ?s msg:containsSignature ?o .
+        ?s ?p ?o
+      }           
+    } 
+}

@@ -17,6 +17,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.Match;
+import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SFSIG;
@@ -24,13 +25,11 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
 import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
+import static won.protocol.util.RdfUtils.visit;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -515,6 +514,13 @@ public class WonRdfUtils
       baseRes.addProperty(WON.HAS_FACET, content.createResource(facetURI.toString()));
     }
 
+      public static void addFacet(final Dataset dataset, final URI facetURI) {
+          visit(dataset, model -> {
+              addFacet(model, facetURI);
+              return null;
+          });
+      }
+
     /**
      * Adds a triple to the model of the form <> won:hasRemoteFacet [facetURI].
      * @param content
@@ -647,6 +653,17 @@ public class WonRdfUtils
           }
           else
               return null;
+      }
+
+      /**
+       * searches for a subject of type won:Need and returns the NeedURI
+       *
+       * @param dataset <code>Dataset</code> object which will be searched for the NeedURI
+       * @return <code>URI</code> which is of type won:Need
+       */
+      public static Resource getNeedResource(Dataset dataset) {
+          Model model = new NeedModelWrapper(dataset).copyNeedModel(NeedGraphType.NEED);
+          return getNeedResource(model);
       }
 
     public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {

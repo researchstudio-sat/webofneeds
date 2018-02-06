@@ -1,10 +1,43 @@
 package won.protocol.util;
 
-import com.google.common.collect.Iterators;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -18,12 +51,10 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.IncorrectPropertyCountException;
 
-import java.io.*;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import com.google.common.collect.Iterators;
+
+import won.protocol.exception.IncorrectPropertyCountException;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -333,6 +364,15 @@ public class RdfUtils
     model.setNsPrefix("", baseURI);
   }
 
+    public static void replaceBaseURI(final Dataset dataset, final String baseURI) {
+        visit(dataset,
+            model -> {
+                replaceBaseURI(model, baseURI);
+                return null;
+            }
+        );
+    }
+
   /**
    * Replaces the base URI that's set as the model's default URI prfefix in all statements by replacement.
    *
@@ -348,12 +388,22 @@ public class RdfUtils
     model.setNsPrefix("", replacement.getURI());
   }
 
+    public static void replaceBaseResource(Dataset dataset,final Resource replacement) {
+        visit(dataset, new ModelVisitor<Object>() {
+            @Override
+            public Object visit(Model model) {
+                replaceBaseResource(model, replacement);
+                return null;
+            }
+        });
+    }
+
   /**
    * Modifies the specified resources' model, replacing resource with replacement.
    * @param resource
    * @param replacement
    */
-  private static void replaceResourceInModel(final Resource resource, final Resource replacement)
+  public static void replaceResourceInModel(final Resource resource, final Resource replacement)
   {
     logger.debug("replacing resource '{}' with resource '{}'", resource, replacement);
     if (!resource.getModel().equals(replacement.getModel())) throw new IllegalArgumentException("resource and replacement must be from the same model");
@@ -486,6 +536,8 @@ public class RdfUtils
     }
     return result;
   }
+  
+  
 
   /**
    * Adds the specified objectModel to the model of the specified subject. In the objectModel, the resource
@@ -974,6 +1026,51 @@ public class RdfUtils
     }
   }
 
+	public static Stream<Model> toModelStream(final Dataset dataset) {
+      List<Model> ret = new LinkedList<Model>();
+      Model model = dataset.getDefaultModel();
+      if (model != null) {
+        ret.add(model);
+      }
+      for (Iterator<String> modelNames = dataset.listNames(); modelNames.hasNext(); ){
+        ret.add(dataset.getNamedModel(modelNames.next()));
+      }
+      return ret.stream();
+    }
+	
+	public static Stream<NamedModel> toNamedModelStream(final Dataset dataset, boolean includeDefaultModel) {
+	  List<NamedModel> ret = new LinkedList<NamedModel>();
+	  if (includeDefaultModel) {
+	      Model model = dataset.getDefaultModel();
+	      if (model != null) {
+	        ret.add(new NamedModel(null,model));
+	      }
+	  }
+	  for (Iterator<String> modelNames = dataset.listNames(); modelNames.hasNext(); ){
+		  String name = modelNames.next();
+		  ret.add(new NamedModel(name, dataset.getNamedModel(name)));
+	  }
+      return ret.stream();
+    }
+	
+	
+	public static class NamedModel{
+		private String name;
+		private Model model;
+	
+		public NamedModel(String name, Model model) {
+			super();
+			this.name = name;
+			this.model = model;
+		}
+		public String getName() {
+			return name;
+		}
+		public Model getModel() {
+			return model;
+		}
+	}
+  
   private static ModelSelector DEFAULT_MODEL_SELECTOR = new DefaultModelSelector();
 
   /**
@@ -1518,6 +1615,36 @@ public class RdfUtils
         return null;
       }
     });
+  }
+
+    /**
+     * Condense a model to a minimum of statements by iteratively removing single statements and testing if the
+     * condensed model is still valid. A test function is used that can be passed to test for the validity of the
+     * model in every step.
+     *
+     * @param model input model to be condensed
+     * @param isModelValidTest test function should return true if the model is valid (previous condensation step was ok)
+     *                         and false otherwise
+     * @return the condensed model
+     */
+  public static Model condenseModelByIterativeTesting(Model model, Function<Model, Boolean> isModelValidTest) {
+
+      Model condensedModel = RdfUtils.cloneModel(model);
+      boolean done = false;
+      while (!done) {
+          done = true;
+          for (Statement stmt : condensedModel.listStatements().toList()) {
+              Model backupModel = RdfUtils.cloneModel(condensedModel);
+              condensedModel.remove(stmt);
+              if (isModelValidTest.apply(condensedModel)) {
+                  done = false;
+              } else {
+                  condensedModel = backupModel;
+              }
+          }
+      }
+
+      return condensedModel;
   }
 
   public static interface GraphNameCheck

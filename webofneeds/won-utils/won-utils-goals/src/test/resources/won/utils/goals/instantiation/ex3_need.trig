@@ -200,6 +200,14 @@ ex2:p4g-shapes {
 
 ex2:p5g-shapes {
 
+  ex2:selfShape
+      a sh:NodeShape ;
+      sh:targetNode need:6462959329580403000 ;
+      sh:property [
+          sh:path [ sh:inversePath taxi:hasClient ];
+          sh:class taxi:AlternativeRide ;
+      ] .
+
    ex2:TaxiRideShape
    	a sh:NodeShape;
        sh:targetClass taxi:AlternativeRide ;

@@ -16,12 +16,16 @@
 
 package won.bot.framework.component.needproducer.impl;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import won.protocol.model.NeedGraphType;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
@@ -38,18 +42,21 @@ public class TemplateBasedNeedProducer extends AbstractNeedProducerWrapper
   private boolean initialized = false;
 
   @Override
-  public synchronized Model create()
+  public synchronized Dataset create()
   {
     initializeLazily();
     return wrapModel(getWrappedProducer().create());
   }
 
-  private Model wrapModel(final Model wrappedModel)
+  private Dataset wrapModel(final Dataset wrappedDataset)
   {
     if (this.templateModel != null) {
-      return RdfUtils.mergeModelsCombiningBaseResource(wrappedModel, this.templateModel);
+        //TODO: TEMPLATE BASED PRODUCER IS WEIRD NOW
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(wrappedDataset);
+        Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+        Model wrappedModel = RdfUtils.mergeModelsCombiningBaseResource(needModel, this.templateModel);
     }
-    return wrappedModel;
+    return wrappedDataset;
   }
 
   private void initializeLazily()

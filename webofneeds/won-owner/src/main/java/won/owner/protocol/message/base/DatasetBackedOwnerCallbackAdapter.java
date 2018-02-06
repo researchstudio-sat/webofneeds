@@ -16,11 +16,20 @@
 
 package won.owner.protocol.message.base;
 
-import org.apache.jena.query.*;
+import java.net.URI;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.message.WonMessage;
@@ -32,8 +41,6 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
 
 /**
  * Implementation of the WonMessageHandlerAdapter that uses a Dataset for

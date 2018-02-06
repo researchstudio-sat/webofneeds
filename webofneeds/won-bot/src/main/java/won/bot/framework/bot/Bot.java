@@ -34,7 +34,7 @@ public interface Bot extends OwnerCallback
   public boolean knowsNodeURI(URI wonNodeURI);
 
 
-  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
+  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Dataset needModel) throws Exception;
 
   public void onMatcherRegistered(URI wonNodeUri);
   public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);

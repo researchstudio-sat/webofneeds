@@ -1,6 +1,6 @@
 echo renew letsencrypt certificate
 certbot certonly --webroot -w /usr/share/nginx/html --email $certificate_email --text --non-interactive --agree-tos \
--d matchat.org -d www.matchat.org -d node.matchat.org
+$domain_params
 
 # create pfx key store
 echo create pfx key store: $pfx_store_file

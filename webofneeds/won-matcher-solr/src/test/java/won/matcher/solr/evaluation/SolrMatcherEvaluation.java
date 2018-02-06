@@ -125,10 +125,8 @@ public class SolrMatcherEvaluation
 
     while(!needProducer.isExhausted()) {
       String needFileName = needProducer.getCurrentFileName();
-      Model needModel = needProducer.create();
 
-      Dataset ds = DatasetFactory.createTxnMem();
-      ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
+      Dataset ds = needProducer.create();
       String needId = createNeedId(ds);
 
 

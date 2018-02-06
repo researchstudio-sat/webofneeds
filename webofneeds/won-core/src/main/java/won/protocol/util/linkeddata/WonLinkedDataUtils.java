@@ -37,6 +37,13 @@ public class WonLinkedDataUtils
 {
   private static final Logger logger = LoggerFactory.getLogger(WonLinkedDataUtils.class);
 
+  public static URI getConnectionStateforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+	    assert linkedDataSource != null : "linkedDataSource must not be null";
+	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Path propertyPath = PathParser.parse("<" + WON.HAS_CONNECTION_STATE+ ">", PrefixMapping.Standard);
+	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
+	}
+  
   public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);

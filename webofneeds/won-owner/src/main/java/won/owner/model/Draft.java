@@ -20,11 +20,19 @@
 
 package won.owner.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import won.protocol.model.URIConverter;
-
-import javax.persistence.*;
 import java.net.URI;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import won.protocol.model.URIConverter;
 
 /**
  * I used wonuser as table name because user is Postgres keyword - http://www.postgresql.org/message-id/Pine.NEB.4.10.10008291649550.4357-100000@scimitar.caravan.com

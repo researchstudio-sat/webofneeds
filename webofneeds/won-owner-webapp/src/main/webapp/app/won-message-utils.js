@@ -127,20 +127,6 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
 }
 
 
-/**
- * Creates json-ld for a connect-message, where there's no connection yet (i.e. we
- * only know which own we want to connect with which remote need)
- * @param ownNeedUri
- * @param theirNeedUri
- * @param textMessage
- * @returns {{eventUri, message}|*}
- */
-export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage) {
-    return won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri)
-    .then(envelopeData =>
-        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
-    );
-}
 
 /**
  * Builds json-ld for a connect-message in reaction to a need.
@@ -148,28 +134,24 @@ export async function buildAdHocConnectMessage(ownNeedUri, theirNeedUri, ownNode
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export async function buildConnectMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, textMessage){
-    return won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
-    .then(envelopeData =>
-        buildConnectMessageForEnvelopeData(envelopeData, textMessage)
-    );
-}
-
-function buildConnectMessageForEnvelopeData(envelopeData, textMessage) {
+export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri){
+    const envelopeData = won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri);
+    if (optionalOwnConnectionUri){
+       envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
+    }
     //TODO: use event URI pattern specified by WoN node
     var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
     var message = new won.MessageBuilder(won.WONMSG.connectMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
-        .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
-        .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+        .hasFacet(won.WON.OwnerFacet) 
+        .hasRemoteFacet(won.WON.OwnerFacet)
         .hasTextMessage(textMessage)
         .hasOwnerDirection()
         .hasSentTimestamp(new Date().getTime().toString())
         .build();
 
-    //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
-    return {eventUri:eventUri,message:message};
+    return {eventUri:eventUri,message:message};  
 }
 
 export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {
@@ -245,9 +227,12 @@ export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNod
  * }}
  */
 export function buildCreateMessage(needData, wonNodeUri) {
+    //Check for is and seeks
+    /*
     if(!needData.type || !needData.title)
         throw new Error('Tried to create post without type or title. ', needData);
-
+    */
+    
     const publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
 
     const imgs = needData.images;
@@ -258,18 +243,28 @@ export function buildCreateMessage(needData, wonNodeUri) {
     }
 
     //if type === create -> use needBuilder as well
-
-    const contentRdf = won.buildNeedRdf({
-        type : won.toCompacted(needData.type), //mandatory
-        title: needData.title, //mandatory
-        description: needData.description,
+    const prepareContentNodeData = (needDataIsOrSeeks) => ({
+        type : won.toCompacted(needDataIsOrSeeks.type), //mandatory
+        title: needDataIsOrSeeks.title, //mandatory
+        description: needDataIsOrSeeks.description,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: needData.tags,
+        tags: needDataIsOrSeeks.tags,
+        
+        //TODO attach to either is or seeks?
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-        location: getIn(needData, ['location']),
-        whatsAround: needData.whatsAround,
-        noHints: needData.noHints,
-    });
+        
+        location: getIn(needDataIsOrSeeks, ['location']),
+        whatsAround: needDataIsOrSeeks.whatsAround,
+        noHints: needDataIsOrSeeks.noHints,
+    })
+     
+    
+    let contentRdf = won.buildNeedRdf({ 
+           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
+           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
+        });
+    
+   
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {
         receiverNode : wonNodeUri, //mandatory
@@ -340,7 +335,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     // wait for the own needs to be dispatched then load connections
     const allConnectionsPromise = allOwnNeedsPromise.then(() =>
         Promise.all(ownNeedUris.map(uri =>
-            won.getConnectionUrisOfNeed(uri)
+            won.getConnectionUrisOfNeed(uri, false)
                 .then(connectionUris =>
                     urisToLookupMap(connectionUris, uri =>
                             fetchConnectionAndDispatch(uri, curriedDispatch)

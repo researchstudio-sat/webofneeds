@@ -16,11 +16,11 @@
 
 package won.owner.protocol.message;
 
+import java.net.URI;
+
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
-
-import java.net.URI;
 
 /**
  * Interface for owner implementations providing methods for receiving specific messages and sending

@@ -1,16 +1,17 @@
 package won.owner.protocol.message;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
-
-import java.net.URI;
 
 /**
  * User: ypanchenko
@@ -26,7 +27,13 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor
     this.linkedDataSource = linkedDataSource;
   }
 
+  public void setLinkedDataSourceOnBehalfOfNeed(CachingLinkedDataSource linkedDataSourceOnBehalfOfNeed) {
+	this.linkedDataSourceOnBehalfOfNeed = linkedDataSourceOnBehalfOfNeed;
+  }
+  
   private CachingLinkedDataSource linkedDataSource;
+  
+  private CachingLinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
 
   @Override
@@ -38,6 +45,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor
       logger.debug("invalidating events list for need " + message.getReceiverNeedURI() + " for connection " + message
         .getReceiverURI());
       linkedDataSource.invalidate(message.getReceiverURI());
+      if (linkedDataSourceOnBehalfOfNeed != linkedDataSource) {
+    	  linkedDataSourceOnBehalfOfNeed.invalidate(message.getReceiverURI());
+      }
     }
 
 
@@ -50,6 +60,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor
       NeedModelWrapper wrapper = new NeedModelWrapper(need);
       URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
       linkedDataSource.invalidate(connectionsListUri);
+      if (linkedDataSourceOnBehalfOfNeed != linkedDataSource) {
+    	  linkedDataSourceOnBehalfOfNeed.invalidate(connectionsListUri);
+      }
     }
 
     return message;

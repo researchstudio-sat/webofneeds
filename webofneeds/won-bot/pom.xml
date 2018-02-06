@@ -164,6 +164,11 @@
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-utils-goals</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- RDF -->
         <dependency>
             <groupId>org.apache.jena</groupId>

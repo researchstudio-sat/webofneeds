@@ -38,8 +38,7 @@ public class SolrMatcherQueryTest {
 
         while (!needProducer.isExhausted()) { //&& needs < 20) {
 
-            Dataset ds = DatasetFactory.createTxnMem();
-            ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needProducer.create());
+            Dataset ds = needProducer.create();
 
             try {
 

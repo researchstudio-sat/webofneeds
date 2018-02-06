@@ -97,7 +97,7 @@
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
 
     <!--
-    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
+    <bean id="keyStoreService" class="won.cryptography.service.keystore.FileBasedKeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
     </bean>
     <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
