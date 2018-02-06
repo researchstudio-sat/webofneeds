@@ -111,7 +111,7 @@ public class ClosedProposesToCancelTest {
 	
 	private static Model customLoadModel(String path) throws IOException {
 
-		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
+		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
         FileManager.get().addLocatorClassLoader(ClosedProposesToCancelTest.class.getClassLoader());
         Model model = FileManager.get().loadModel(prefix + path);
           

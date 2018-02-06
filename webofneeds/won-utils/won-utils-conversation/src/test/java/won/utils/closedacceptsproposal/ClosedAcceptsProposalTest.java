@@ -1,4 +1,4 @@
-package won.utils.openproposes;
+package won.utils.closedacceptsproposal;
 
 
 import java.io.IOException;
@@ -17,7 +17,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
-import won.utils.openproposestocancel.OpenProposesToCancelTest;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -26,10 +25,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class OpenProposesTest {
+public class ClosedAcceptsProposalTest {
 	
-    private static final String inputFolder = "/won/utils/openproposes/input/";
-    private static final String expectedOutputFolder = "/won/utils/openproposes/expected/";
+    private static final String inputFolder = "/won/utils/closedacceptsproposal/input/";
+    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources/won/utils/closedacceptsproposal/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -37,27 +36,14 @@ public class OpenProposesTest {
     	root.setLevel(Level.INFO);	
     }
 
- // This is the case where there is no open proposal...(each exist in their own envelope, both are accepted in an agreement)
 	@Test
-	public void noOpenProposal () throws IOException {
-	    Dataset input = loadDataset( inputFolder + "2proposal-bothaccepted.trig");	    
-	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-bothaccepted.ttl");
-        test(input,expected);		
-	}
-	
-	 // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
-	@Test
-	public void oneOpenProposal () throws IOException {
-	    Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");	    
-	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-one-accepted.ttl");
-        test(input,expected);		
-	}
-	
-	// This is the case where there are two open proposals ...(each exist in their own envelope)
-	@Test
-	public void twoOpenProposals () throws IOException {
-	    Dataset input = loadDataset( inputFolder + "2proposal-noaccepted.trig");	    
-	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-noaccepted.ttl");
+	public void oneValidAccept() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement.trig");
+	    // commented out because this does not work
+//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
+
+	  FileManager.get().addLocatorClassLoader(ClosedAcceptsProposalTest.class.getClassLoader());
+      Model expected = FileManager.get().loadModel( expectedOutputFolder + "one-agreement.ttl");
         test(input,expected);		
 	}
 	
@@ -65,7 +51,7 @@ public class OpenProposesTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = OpenProposesFunction.sparqlTest(input);
+		  Model actual = ClosedAcceptsProposalFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -82,14 +68,22 @@ public class OpenProposesTest {
 }
 
 	
-	private static Model customLoadModel(String path) throws IOException {
+    private static Model customloadModel(String path) throws IOException {
 
-		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-goals/src/test/resources";
-        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
-        Model model = FileManager.get().loadModel(prefix + path);
-          
-       return model;
-   }
+        InputStream is = null;
+        Model model = null;
+        try {
+            is = ClosedAcceptsProposalTest.class.getResourceAsStream(path);
+            model = ModelFactory.createDefaultModel();
+            RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+
+        return model;
+    }
     
 	
     private static Dataset loadDataset(String path) throws IOException {
@@ -97,7 +91,7 @@ public class OpenProposesTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = OpenProposesTest.class.getResourceAsStream(path);
+            is = ClosedAcceptsProposalTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
