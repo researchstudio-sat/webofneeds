@@ -1,4 +1,4 @@
-package won.utils.closedproposes;
+package won.utils.acceptedproposes;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 import won.utils.QueryLoader;
 
-public class ClosedProposesFunction {
+public class AcceptedProposesFunction {
 	
-	private static final String queryFile = "/closedproposes/query.sq";
+	private static final String queryFile = "/acceptedproposes/query.sq";
 	
 	public static Model sparqlTest(Dataset dataset)
 	{
