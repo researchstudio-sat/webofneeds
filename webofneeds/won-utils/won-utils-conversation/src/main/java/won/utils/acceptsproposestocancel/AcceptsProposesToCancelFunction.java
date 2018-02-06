@@ -1,4 +1,4 @@
-package won.utils.closedacceptsproposestocancel;
+package won.utils.acceptsproposestocancel;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 import won.utils.QueryLoader;
 
-public class ClosedAcceptsProposesToCancelFunction {
+public class AcceptsProposesToCancelFunction {
 	
-	private static final String queryFile = "/closedacceptsproposestocancel/query.sq";
+	private static final String queryFile = "/acceptsproposestocancel/query.sq";
 	
 	public static Model sparqlTest(Dataset dataset)
 	{

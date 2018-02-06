@@ -1,4 +1,4 @@
-package won.utils.closedacceptsproposestocancel;
+package won.utils.acceptsproposestocancel;
 
 
 import java.io.IOException;
@@ -17,6 +17,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
+import won.utils.acceptsproposestocancel.AcceptsProposesToCancelFunction;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -25,10 +26,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class ClosedAcceptsProposesToCancelTest {
+public class AcceptsProposesToCancelTest {
 	
-    private static final String inputFolder = "/won/utils/closedacceptsproposesTocancel/input/";
-    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources/won/utils/closedacceptsproposestocancel/expected/";
+    private static final String inputFolder = "/won/utils/acceptsproposesTocancel/input/";
+    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources/won/utils/acceptsproposestocancel/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -42,7 +43,7 @@ public class ClosedAcceptsProposesToCancelTest {
 	    // commented out because this does not work
 //	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
 
-	  FileManager.get().addLocatorClassLoader(ClosedAcceptsProposesToCancelTest.class.getClassLoader());
+	  FileManager.get().addLocatorClassLoader(AcceptsProposesToCancelTest.class.getClassLoader());
       Model expected = FileManager.get().loadModel( expectedOutputFolder + "one-agreement-one-cancellation.ttl");
         test(input,expected);		
 	}
@@ -51,7 +52,7 @@ public class ClosedAcceptsProposesToCancelTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = ClosedAcceptsProposesToCancelFunction.sparqlTest(input);
+		  Model actual = AcceptsProposesToCancelFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -73,7 +74,7 @@ public class ClosedAcceptsProposesToCancelTest {
         InputStream is = null;
         Model model = null;
         try {
-            is = ClosedAcceptsProposesToCancelTest.class.getResourceAsStream(path);
+            is = AcceptsProposesToCancelTest.class.getResourceAsStream(path);
             model = ModelFactory.createDefaultModel();
             RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
         } finally {
@@ -91,7 +92,7 @@ public class ClosedAcceptsProposesToCancelTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ClosedAcceptsProposesToCancelTest.class.getResourceAsStream(path);
+            is = AcceptsProposesToCancelTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
