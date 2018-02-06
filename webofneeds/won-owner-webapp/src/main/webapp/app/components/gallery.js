@@ -25,8 +25,14 @@ function genComponentConf() {
             </div>
         </div>
         <div class="won-gallery__controls">
-            <img src="generated/icon-sprite.svg#ico36_backarrow" class="won-gallery__back">
-            <img src="generated/icon-sprite.svg#ico36_backarrow" class="won-gallery__forward">
+            <svg style="--local-primary:var(--won-primary-color);"
+                class="won-gallery__back">
+                    <use href="#ico36_backarrow"></use>
+            </svg>
+            <svg style="--local-primary:var(--won-primary-color);"
+                class="won-gallery__forward">
+                    <use href="#ico36_backarrow"></use>
+            </svg>
         </div>`
 
     return {

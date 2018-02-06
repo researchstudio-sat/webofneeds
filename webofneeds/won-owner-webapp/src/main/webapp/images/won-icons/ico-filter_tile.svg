@@ -3,11 +3,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="27px" height="27px" viewBox="0 0 27 27" enable-background="new 0 0 27 27" xml:space="preserve">
-<rect x="11" y="6" fill="#EF4746" width="5" height="3"/>
-<rect x="18" y="6" fill="#EF4746" width="5" height="8"/>
-<rect x="11" y="10" fill="#EF4746" width="5" height="8"/>
-<rect x="4" y="6" fill="#EF4746" width="5" height="9"/>
-<rect x="18" y="15" fill="#EF4746" width="4.999" height="6"/>
-<rect x="11" y="19" fill="#EF4746" width="4.999" height="2"/>
-<rect x="4" y="16" fill="#EF4746" width="5" height="5"/>
+<rect x="11" y="6" fill="var(--local-primary)" width="5" height="3"/>
+<rect x="18" y="6" fill="var(--local-primary)" width="5" height="8"/>
+<rect x="11" y="10" fill="var(--local-primary)" width="5" height="8"/>
+<rect x="4" y="6" fill="var(--local-primary)" width="5" height="9"/>
+<rect x="18" y="15" fill="var(--local-primary)" width="4.999" height="6"/>
+<rect x="11" y="19" fill="var(--local-primary)" width="4.999" height="2"/>
+<rect x="4" y="16" fill="var(--local-primary)" width="5" height="5"/>
 </svg>

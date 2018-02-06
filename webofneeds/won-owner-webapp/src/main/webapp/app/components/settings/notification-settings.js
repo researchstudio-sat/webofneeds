@@ -35,23 +35,35 @@ function genComponentConf() {
                     </div>
                     <div class="flexbuttons">
                         <a class="ac__button clickable">
-                            <img src="generated/icon-sprite.svg#ico36_close_circle" class="ac__button__icon">
+                            <svg style="--local-primary:var(--won-primary-color);"
+                                class="ac__button__icon" >
+                                    <use href="#ico36_close_circle"></use>
+                            </svg>
                             <span class="ac__button__caption">Remove</span>
                         </a>
                         <button class="won-button--filled red" ng-click="settings.saveAccount()">Save</button>
                     </div>
                 </div>
                 <a class="ac__button clickable">
-                    <img src="generated/icon-sprite.svg#ico36_plus" class="ac__button__icon">
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="ac__button__icon">
+                            <use href="#ico36_plus"></use>
+                    </svg>
                     <span class="ac__button__caption">Add new notification settings</span>
                 </a>
             </div>
             <div class="nonotifications" ng-show="!self.items">
-                <img class="nonotifications__icon" src="generated/icon-sprite.svg#ico36_notification_circle_grey"/>
+                <svg class="nonotifications__icon"
+                    style="--local-primary:#CCD2D2;">
+                        <use href="#ico36_notification_circle"></use>
+                </svg>
                 <div class="title">You don't use Notification settings yet</div>
                 <div class="description">You can specify your default Notifications to be at hand when posting needs. Notifications can be set individually on create posts page as well.</div>
                 <a class="ac__button clickable">
-                    <img src="generated/icon-sprite.svg#ico36_plus" class="ac__button__icon">
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="ac__button__icon">
+                            <use href="#ico36_plus"></use>
+                    </svg>
                     <span class="ac__button__caption">Add new notification settings</span>
                 </a>
             <div>

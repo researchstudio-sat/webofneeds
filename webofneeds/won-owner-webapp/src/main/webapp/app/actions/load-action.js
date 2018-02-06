@@ -23,8 +23,6 @@ import {
     logout,
 } from '../won-utils.js';
 
-import config from '../config.js';
-
 import {
     checkHttpStatus,
     getParameterByName,
@@ -159,31 +157,3 @@ function dispatchInitialPageLoad(dispatch) {
 }
 
 /////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF PAGELOAD
-
-/**
- * Anything that is load-once, read-only, global app-config
- * should be initialized in this action. Ideally all of this
- * should be baked-in/prerendered when shipping the code, in
- * future versions => TODO
- */
-export function configInit() {
-    return (dispatch) =>
-        /* this allows the owner-app-server to dynamically switch default nodes. */
-        fetch(/*relativePathToConfig=*/'appConfig/getDefaultWonNodeUri')
-            .then(checkHttpStatus)
-            .then(resp => resp.json())
-            .catch(err => {
-                const defaultNodeUri = `${location.protocol}://${location.host}/won/resource`;
-                console.info(
-                    'Failed to fetch default node uri at the relative path `',
-                    'appConfig/getDefaultWonNodeUri',
-                    '` (is the API endpoint there up and reachable?) -> falling back to the default ',
-                    defaultNodeUri
-                );
-                return defaultNodeUri;
-            })
-            .then(defaultNodeUri =>
-                dispatch(actionCreators.config__update({defaultNodeUri}))
-        )
-}
-

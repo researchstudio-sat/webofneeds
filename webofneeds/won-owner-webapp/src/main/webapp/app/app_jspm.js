@@ -22,6 +22,8 @@ import {
     hyphen2Camel,
     firstToLowerCase,
     delay,
+    parseSVG,
+    inlineSVGSpritesheet,
 } from './utils.js';
 
 //---------- Config -----------
@@ -169,3 +171,7 @@ angular.bootstrap(document, ['won.owner'], {
     // and https://docs.angularjs.org/guide/di#dependency-annotation
     strictDi: true
 });
+
+
+//inlineSVGSpritesheet("./generated/icon-sprite.svg", "icon-sprite");
+inlineSVGSpritesheet("./generated/symbol/svg/sprite.symbol.svg", "icon-sprite");
