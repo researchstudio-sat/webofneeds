@@ -8,10 +8,10 @@ import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
 import won.utils.proposal.ProposalFunction;
 import won.utils.proposaltocancel.ProposalToCancelFunction;
-import won.utils.openproposestocancel.OpenProposesToCancelFunction;
 import won.utils.pendingproposes.PendingProposesFunction;
-import won.utils.closedretracts.ClosedRetractsFunction;
+import won.utils.pendingproposestocancel.PendingProposesToCancelFunction;
 import won.utils.closedproposestocancel.ClosedProposesToCancelFunction;
+import won.utils.closedretracts.ClosedRetractsFunction;
 import won.utils.closedproposescancelledagreement.ClosedProposesCancelledAgreementFunction;
 import won.utils.closedproposes.ClosedProposesFunction;
 import won.utils.closedacceptsproposestocancel.ClosedAcceptsProposesToCancelFunction;
@@ -95,7 +95,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getOpenProposesToCancel(Dataset conversationDataset) {
-		Model openproposestocancel = OpenProposesToCancelFunction.sparqlTest(conversationDataset);
+		Model openproposestocancel = PendingProposesToCancelFunction.sparqlTest(conversationDataset);
 		return openproposestocancel;
 	}
 	

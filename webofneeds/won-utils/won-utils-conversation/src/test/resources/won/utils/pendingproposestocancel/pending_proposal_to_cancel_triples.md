@@ -1,4 +1,4 @@
-This returns all open proposalsToCancel .. it is like proposaltocancel, but it returns triples containing the proposaltocancel instead of agreements that have been proposed to be cancelled.
+This returns all pending proposalsToCancel .. it is like proposaltocancel, but it returns triples containing the proposaltocancel instead of agreements that have been proposed to be cancelled.
 
  ### oneOpenCancellationPropsoal
  **input**: one-agreement-one-unacceptedcancellation.trig

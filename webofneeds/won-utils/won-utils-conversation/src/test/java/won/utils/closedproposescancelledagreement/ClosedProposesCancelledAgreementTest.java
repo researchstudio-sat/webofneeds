@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.util.RdfUtils;
-import won.utils.openproposestocancel.OpenProposesToCancelTest;
+import won.utils.pendingproposestocancel.PendingProposesToCancelTest;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -123,7 +123,7 @@ public class ClosedProposesCancelledAgreementTest {
 	private static Model customLoadModel(String path) throws IOException {
 
 		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
-        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+        FileManager.get().addLocatorClassLoader(PendingProposesToCancelTest.class.getClassLoader());
         Model model = FileManager.get().loadModel(prefix + path);
           
        return model;

@@ -1,4 +1,4 @@
-package won.utils.openproposestocancel;
+package won.utils.pendingproposestocancel;
 
 
 import java.io.IOException;
@@ -18,6 +18,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
+import won.utils.pendingproposestocancel.PendingProposesToCancelFunction;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -26,10 +27,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class OpenProposesToCancelTest {
+public class PendingProposesToCancelTest {
 	
-    private static final String inputFolder = "/won/utils/openproposestocancel/input/";
-    private static final String expectedOutputFolder = "/won/utils/openproposestocancel/expected/";
+    private static final String inputFolder = "/won/utils/pendingproposestocancel/input/";
+    private static final String expectedOutputFolder = "/won/utils/pendingproposestocancel/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -83,7 +84,7 @@ public class OpenProposesToCancelTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = OpenProposesToCancelFunction.sparqlTest(input);
+		  Model actual = PendingProposesToCancelFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -102,7 +103,7 @@ public class OpenProposesToCancelTest {
 	private static Model customLoadModel(String path) throws IOException {
 
 		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
-        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+        FileManager.get().addLocatorClassLoader(PendingProposesToCancelTest.class.getClassLoader());
         Model model = FileManager.get().loadModel(prefix + path);
           
        return model;
@@ -114,7 +115,7 @@ public class OpenProposesToCancelTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ProposalToCancelTest.class.getResourceAsStream(path);
+            is = PendingProposesToCancelTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
