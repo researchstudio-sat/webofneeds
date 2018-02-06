@@ -1,4 +1,4 @@
-package won.utils.closedretracts;
+package won.utils.acceptedretracts;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 import won.utils.QueryLoader;
 
-public class ClosedRetractsFunction {
+public class AcceptedRetractsFunction {
 	
-	private static final String queryFile = "/closedretracts/query.sq";
+	private static final String queryFile = "/acceptedretracts/query.sq";
 	
 	public static Model sparqlTest(Dataset dataset)
 	{

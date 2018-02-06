@@ -3,6 +3,7 @@ package won.protocol.highlevel;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
+import won.utils.acceptedretracts.AcceptedRetractsFunction;
 import won.utils.acknowledgement.AcknowledgedSelection;
 import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
@@ -11,7 +12,6 @@ import won.utils.proposaltocancel.ProposalToCancelFunction;
 import won.utils.pendingproposes.PendingProposesFunction;
 import won.utils.pendingproposestocancel.PendingProposesToCancelFunction;
 import won.utils.closedproposestocancel.ClosedProposesToCancelFunction;
-import won.utils.closedretracts.ClosedRetractsFunction;
 import won.utils.closedproposescancelledagreement.ClosedProposesCancelledAgreementFunction;
 import won.utils.closedproposes.ClosedProposesFunction;
 import won.utils.closedacceptsproposestocancel.ClosedAcceptsProposesToCancelFunction;
@@ -180,7 +180,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedRetracts(Dataset conversationDataset) {
-		Model closedretracts = ClosedRetractsFunction.sparqlTest(conversationDataset);
+		Model closedretracts = AcceptedRetractsFunction.sparqlTest(conversationDataset);
 		return closedretracts;
 	}
 	
