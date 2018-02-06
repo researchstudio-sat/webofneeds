@@ -1,4 +1,4 @@
-#openproposes with 2proposal-noaccepted.trig
+#pendingproposes with 2proposal-noaccepted.trig
 PREFIX mod: <http://purl.org/webofneeds/modification#>
 PREFIX agr: <http://purl.org/webofneeds/agreement#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

@@ -9,7 +9,7 @@ import won.utils.modification.ModifiedSelection;
 import won.utils.proposal.ProposalFunction;
 import won.utils.proposaltocancel.ProposalToCancelFunction;
 import won.utils.openproposestocancel.OpenProposesToCancelFunction;
-import won.utils.openproposes.OpenProposesFunction;
+import won.utils.pendingproposes.PendingProposesFunction;
 import won.utils.closedretracts.ClosedRetractsFunction;
 import won.utils.closedproposestocancel.ClosedProposesToCancelFunction;
 import won.utils.closedproposescancelledagreement.ClosedProposesCancelledAgreementFunction;
@@ -83,7 +83,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getOpenProposes(Dataset conversationDataset) {
-		Model openproposes = OpenProposesFunction.sparqlTest(conversationDataset);
+		Model openproposes = PendingProposesFunction.sparqlTest(conversationDataset);
 		return openproposes;
 	}
 	

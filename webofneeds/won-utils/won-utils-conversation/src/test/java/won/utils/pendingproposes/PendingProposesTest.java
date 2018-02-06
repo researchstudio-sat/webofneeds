@@ -1,35 +1,30 @@
-package won.utils.openproposes;
+package won.utils.pendingproposes;
 
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.camel.main.Main;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileManager;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
-import won.utils.openproposestocancel.OpenProposesToCancelTest;
-import won.utils.proposaltocancel.ProposalToCancelTest;
-
+import won.utils.pendingproposes.PendingProposesFunction;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class OpenProposesTest {
+public class PendingProposesTest {
 	
-    private static final String inputFolder = "/won/utils/openproposes/input/";
-    private static final String expectedOutputFolder = "/won/utils/openproposes/expected/";
+    private static final String inputFolder = "/won/utils/pendingproposes/input/";
+    private static final String expectedOutputFolder = "/won/utils/pendingproposes/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -65,7 +60,7 @@ public class OpenProposesTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = OpenProposesFunction.sparqlTest(input);
+		  Model actual = PendingProposesFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -85,7 +80,7 @@ public class OpenProposesTest {
 	private static Model customLoadModel(String path) throws IOException {
 
 		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
-        FileManager.get().addLocatorClassLoader(OpenProposesToCancelTest.class.getClassLoader());
+        FileManager.get().addLocatorClassLoader(PendingProposesTest.class.getClassLoader());
         Model model = FileManager.get().loadModel(prefix + path);
           
        return model;
@@ -97,7 +92,7 @@ public class OpenProposesTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = OpenProposesTest.class.getResourceAsStream(path);
+            is = PendingProposesTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {

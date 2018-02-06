@@ -1,4 +1,4 @@
-package won.utils.openproposes;
+package won.utils.pendingproposes;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -10,9 +10,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 import won.utils.QueryLoader;
 
-public class OpenProposesFunction {
+public class PendingProposesFunction {
 	
-	private static final String queryFile = "/openproposes/query.sq";
+	private static final String queryFile = "/pendingproposes/query.sq";
 	
 	public static Model sparqlTest(Dataset dataset)
 	{
