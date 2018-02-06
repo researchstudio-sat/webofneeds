@@ -1,4 +1,4 @@
-package won.utils.closedacceptsproposal;
+package won.utils.acceptsproposal;
 
 
 import java.io.IOException;
@@ -17,6 +17,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
 import won.protocol.util.RdfUtils;
+import won.utils.acceptsproposal.AcceptsProposalFunction;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -25,10 +26,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class ClosedAcceptsProposalTest {
+public class AcceptsProposalTest {
 	
-    private static final String inputFolder = "/won/utils/closedacceptsproposal/input/";
-    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources/won/utils/closedacceptsproposal/expected/";
+    private static final String inputFolder = "/won/utils/acceptsproposal/input/";
+    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources/won/utils/acceptsproposal/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -42,7 +43,7 @@ public class ClosedAcceptsProposalTest {
 	    // commented out because this does not work
 //	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
 
-	  FileManager.get().addLocatorClassLoader(ClosedAcceptsProposalTest.class.getClassLoader());
+	  FileManager.get().addLocatorClassLoader(AcceptsProposalTest.class.getClassLoader());
       Model expected = FileManager.get().loadModel( expectedOutputFolder + "one-agreement.ttl");
         test(input,expected);		
 	}
@@ -51,7 +52,7 @@ public class ClosedAcceptsProposalTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = ClosedAcceptsProposalFunction.sparqlTest(input);
+		  Model actual = AcceptsProposalFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -73,7 +74,7 @@ public class ClosedAcceptsProposalTest {
         InputStream is = null;
         Model model = null;
         try {
-            is = ClosedAcceptsProposalTest.class.getResourceAsStream(path);
+            is = AcceptsProposalTest.class.getResourceAsStream(path);
             model = ModelFactory.createDefaultModel();
             RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
         } finally {
@@ -91,7 +92,7 @@ public class ClosedAcceptsProposalTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ClosedAcceptsProposalTest.class.getResourceAsStream(path);
+            is = AcceptsProposalTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
