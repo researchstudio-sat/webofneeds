@@ -75,13 +75,6 @@ public class AcknowledgementProtocolTest {
         test(input,expectedOutput);
     }
     
-    @Test
-    public void oneSelfAcceptedAgreementSameGraph () throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-self-accepted-agreement-same-graph.trig ");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-self-accepted-agreement-same-graph.trig ");
-        test(input,expectedOutput);
-    }
-
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
@@ -90,7 +83,6 @@ public class AcknowledgementProtocolTest {
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (diff.getFirst().isEmpty() && diff.getSecond().isEmpty()) {
-            System.out.println("expected equals actual");
         } else {
             System.out.println("diff - only in expected:");
             RDFDataMgr.write(System.out, diff.getFirst(), Lang.TRIG);

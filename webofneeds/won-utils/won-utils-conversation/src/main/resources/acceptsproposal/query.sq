@@ -14,10 +14,6 @@ WHERE {
         ?prop agr:proposes ?clause .
     }
 
-    GRAPH ?clauseContent {
-      ?s ?p ?o .
-    }
-
    GRAPH ?g3 {
         ?clause msg:hasContent ?clauseContent .
     }

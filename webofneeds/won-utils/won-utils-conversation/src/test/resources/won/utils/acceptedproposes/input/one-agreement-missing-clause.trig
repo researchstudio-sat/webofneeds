@@ -142,33 +142,6 @@
             msg:hasSignedGraph              <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#envelope-ua55> .
 }
 
-<https://localhost:8443/won/resource/event/5669098069340991000#data> {
-    event:5669098069340991000
-            a                     msg:FromOwner ;
-            msg:hasContent        <https://localhost:8443/won/resource/event/5669098069340991000#content> ;
-            msg:hasMessageType    msg:ConnectionMessage ;
-            msg:hasReceiver       conn:4t9deo4t6bqx83jxk5ex ;
-            msg:hasReceiverNeed   need:nte803gz4pbiw6equ3qa ;
-            msg:hasReceiverNode   <https://localhost:8443/won/resource> ;
-            msg:hasSender         conn:xq6jofxo2w8o05io6dre ;
-            msg:hasSenderNeed     need:7820503869697675000 ;
-            msg:hasSenderNode     <https://localhost:8443/won/resource> ;
-            msg:hasSentTimestamp  "1513345783513" .
-    
-    <https://localhost:8443/won/resource/event/5669098069340991000#data>
-            a                      msg:EnvelopeGraph ;
-            msg:containsSignature  <https://localhost:8443/won/resource/event/5669098069340991000#content-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:5669098069340991000 .
-    
-    <https://localhost:8443/won/resource/event/5669098069340991000#content-sig>
-            a                               sig:Signature ;
-            sig:hasSignatureValue           "MGUCMGweBf3N9MAUNbvZcxpfueo4VIZWXgAW2EEbKyXDA4wea9SMq3q/5haZtAfLJv7FmAIxANdTyTcQ6IqlKhP8a655QF2gLdbEjMNao9xbgc7o5XotOKLUPVc145JnVXGIe1pvxg==" ;
-            sig:hasVerificationCertificate  need:7820503869697675000 ;
-            msg:hasHash                     "ALNs2UTDIodwFyAkA57/S4xpXn6pTLvNmZqzm2oMxTdmypt/0/Y4eQ4AdVjOQetMTxvAiQ6J/tIRzEMWFTU0qrCVmaiEL2d5EhVqdEnQtqUO27UM/i5/5eGaBqNGJXiPrdrO3BNwsmUNd4KsjhR8QVfCiS/rmmpiE3JNYI1b0t1z" ;
-            msg:hasPublicKeyFingerprint     "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
-            msg:hasSignedGraph              <https://localhost:8443/won/resource/event/5669098069340991000#content> .
-}
 
 <https://localhost:8443/won/resource/event/cl6l8nmpfd357179u8ks#envelope-2w83> {
     event:cl6l8nmpfd357179u8ks
@@ -1070,15 +1043,6 @@
             msg:hasSignedGraph              <https://localhost:8443/won/resource/event/q3wcoxjougj7awlo805f#envelope-5mhl> .
 }
 
-<https://localhost:8443/won/resource/event/5669098069340991000#envelope-ma7y-sig> {
-    <https://localhost:8443/won/resource/event/5669098069340991000#envelope-ma7y-sig>
-            a                               sig:Signature ;
-            sig:hasSignatureValue           "MGUCMQD0H3I+Y3Y27WJgS6B3lLpDPhtI1odks1YXXd61zmYE0/DVLLWiMQoyDn6H8JQKY/ACMGz1OKAt2e+rg9xCOm53tP56gctuzUS6Qi6Es9Q6fZep8j20iihafRyE41uYcxvAtQ==" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
-            msg:hasHash                     "C8nYCZS1IgqOdjLk3f73I9dSekaGxFlNEPKwAAfBFuA/P3aoLEE8ypNLylRearbSS+xx4CuRwulCIfdRxDkZlydctRvVPOFr48u1lS04nPNlL43EMI4r21myMUbjIlo1VEjopgSJoUc/M1IlXcBcN1ir/p4W5zVc5GMy+2Jh5eo=" ;
-            msg:hasPublicKeyFingerprint     "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
-            msg:hasSignedGraph              <https://localhost:8443/won/resource/event/5669098069340991000#envelope-ma7y> .
-}
 
 <https://localhost:8443/won/resource/event/thb06izkap5889x5gi2y#envelope-lv03> {
     event:thb06izkap5889x5gi2y
@@ -2279,38 +2243,6 @@
             msg:hasSignedGraph              <https://localhost:8443/won/resource/event/omh6mnwfqczgjimg3sch#envelope-b7qv> .
 }
 
-<https://localhost:8443/won/resource/event/5669098069340991000#envelope-ma7y> {
-    <https://localhost:8443/won/resource/event/qy3k0igvj310ejofcqa9#envelope-1vve-sig>
-            a                               sig:Signature ;
-            sig:hasSignatureValue           "MGQCMGIEULjL8oMlO9l9FCFJ7T54P1yld2FvzFineIVu9CHzJygmf6k01TC8ZFXeLE3E+wIwN05ci2M22pvCkbU/C53MKmsm3p2IYl8bRmeUxKkh30CwI+o4LHhhTjZ1Ke5p/O6o" ;
-            sig:hasVerificationCertificate  <https://localhost:8443/won/resource> ;
-            msg:hasHash                     "AIcBYYzZ38UvybEJgDktKQWzJpW75o2hryGDKWTWdOTMJifc1hz1ti4yZPZjesgLK7rzODjktk4E98qBnsYi53v83wUGGqB6zhjKHLfsdPl9pfTpo3RCW8RfG9pKKW/416pF6dWitXCOSQiaZ1GkjsfMbfZ5qmKQW6seolj9Qczo" ;
-            msg:hasPublicKeyFingerprint     "Sk7FwsKgm/SxPIjRVipweRj/6PYMlJlh9ubLMqz3myY=" ;
-            msg:hasSignedGraph              <https://localhost:8443/won/resource/event/qy3k0igvj310ejofcqa9#envelope-1vve> .
-    
-    event:5669098069340991000
-            a                         msg:FromOwner ;
-            msg:hasCorrespondingRemoteMessage
-                    event:ej27d16ryg5cg6hos72l ;
-            msg:hasPreviousMessage    event:qy3k0igvj310ejofcqa9 ;
-            msg:hasReceivedTimestamp  1513345783581 ;
-            msg:protocolVersion       "1.0" .
-    
-    <https://localhost:8443/won/resource/event/5669098069340991000#envelope-ma7y>
-            a                      msg:EnvelopeGraph ;
-            msg:containsEnvelope   <https://localhost:8443/won/resource/event/5669098069340991000#data> ;
-            msg:containsSignature  <https://localhost:8443/won/resource/event/qy3k0igvj310ejofcqa9#envelope-1vve-sig> , <https://localhost:8443/won/resource/event/5669098069340991000#data-sig> ;
-            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:5669098069340991000 .
-    
-    <https://localhost:8443/won/resource/event/5669098069340991000#data-sig>
-            a                               sig:Signature ;
-            sig:hasSignatureValue           "MGQCMG2FKmIWT4Je9NzII0nUfiVfNC1l4G9lvPLmivGGbIdl5SYbfcYFgyETOPnpehwbLAIwFUVG5usf2rREyNPSf3+2joHobgl/LR6Q3sK5SJc+T1Dev9mPRhgqMlSkb2aJK/xX" ;
-            sig:hasVerificationCertificate  need:7820503869697675000 ;
-            msg:hasHash                     "AI4OATbuvyw1inYycES79iLVi64uv8dwPoVVnfcFlQdJeB5rFr4C9c/tVMTYKGHaYtYdV80A9FLgjIv7KkRgqtUSI2hZ+vQn+aVFhk9QvigtY2Ho4puE3XmmLMf/bA/myt8u8xBfDMc43rvSIiEi26PcOaY2kEXAZbwH5gRannoK" ;
-            msg:hasPublicKeyFingerprint     "YzPNeEnZ9wqC07mPx/vlU1hx0RQV18YJpdvTnPO4qOA=" ;
-            msg:hasSignedGraph              <https://localhost:8443/won/resource/event/5669098069340991000#data> .
-}
 
 <https://localhost:8443/won/resource/event/4672813835273634000#data> {
     event:4672813835273634000

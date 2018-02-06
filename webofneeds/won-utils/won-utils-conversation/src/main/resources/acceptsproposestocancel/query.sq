@@ -23,10 +23,6 @@ CONSTRUCT { ?cancelAcc2 agr:accepts ?cancelProp2 . }
         ?prop agr:proposes ?clause .
     }
             
-    GRAPH ?clauseContent {
-      ?s ?p ?o .
-    }
-    
      GRAPH ?g3 {
         ?clause msg:hasContent ?clauseContent .
     }

@@ -28,7 +28,4 @@ WHERE
     GRAPH ?retractedMessageEnvelope {
         ?retractedMsg msg:hasContent ?retractedMessageContent
     }
-    GRAPH ?retractedMessageContent {
-        ?s ?p ?o
-    }
  }

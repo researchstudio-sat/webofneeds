@@ -23,10 +23,6 @@ PREFIX won: <http://purl.org/webofneeds/model#>
       GRAPH ?g11 {   
         ?acc msg:hasContent ?clauseContento .
      }
-     
-     GRAPH ?clauseContent {
-      ?s ?p ?o .
-     }
     
      GRAPH ?g1 {   
         ?prop agr:proposes ?clause .

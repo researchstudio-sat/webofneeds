@@ -132,7 +132,6 @@ public class ModificationProtocolTest {
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (diff.getFirst().isEmpty() && diff.getSecond().isEmpty()) {
-            System.out.println("expected equals actual");
         } else {
             System.out.println("diff - only in expected:");
             RDFDataMgr.write(System.out, diff.getFirst(), Lang.TRIG);
