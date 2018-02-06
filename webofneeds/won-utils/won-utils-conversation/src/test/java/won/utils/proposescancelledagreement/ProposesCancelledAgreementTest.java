@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.util.RdfUtils;
-import won.utils.pendingproposestocancel.PendingProposesToCancelTest;
 import won.utils.proposescancelledagreement.ProposesCancelledAgreementFunction;
 
 import org.junit.Assert;

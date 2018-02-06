@@ -52,6 +52,11 @@
             <artifactId>won-utils-goals</artifactId>            
             <version>${project.version}</version>
         </dependency>
+         <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-utils-conversation</artifactId>            
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- apache commons -->
         <dependency>

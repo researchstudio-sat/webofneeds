@@ -34,7 +34,7 @@ public class RetractsController {
     public Model getClosedRetracts(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedRetracts(conversationDataset);
+        return HighlevelProtocols.getAcceptedRetracts(conversationDataset);
     }
     
     private Dataset retrieveConversationDataset(String connectionUri) {

@@ -82,7 +82,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getOpenProposes(Dataset conversationDataset) {
+	public static Model getPendingProposes(Dataset conversationDataset) {
 		Model openproposes = PendingProposesFunction.sparqlTest(conversationDataset);
 		return openproposes;
 	}
@@ -94,7 +94,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getOpenProposesToCancel(Dataset conversationDataset) {
+	public static Model getPendingProposesToCancel(Dataset conversationDataset) {
 		Model openproposestocancel = PendingProposesToCancelFunction.sparqlTest(conversationDataset);
 		return openproposestocancel;
 	}
@@ -106,7 +106,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedProposes(Dataset conversationDataset) {
+	public static Model getAcceptedProposes(Dataset conversationDataset) {
 		Model closedproposes = AcceptedProposesFunction.sparqlTest(conversationDataset);
 		return closedproposes;
 	}
@@ -118,7 +118,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedAcceptsProposes(Dataset conversationDataset) {
+	public static Model getAcceptsProposes(Dataset conversationDataset) {
 		Model closedacceptsproposes = AcceptsProposalFunction.sparqlTest(conversationDataset);
 		return closedacceptsproposes;
 	}
@@ -130,7 +130,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedProposesToCancel(Dataset conversationDataset) {
+	public static Model getAcceptedProposesToCancel(Dataset conversationDataset) {
 		Model closedproposestocancel = AcceptedProposesToCancelFunction.sparqlTest(conversationDataset);
 		return closedproposestocancel;
 	}
@@ -142,7 +142,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedAcceptsProposesToCancel(Dataset conversationDataset) {
+	public static Model getAcceptsProposesToCancel(Dataset conversationDataset) {
 		Model closedacceptsproposestocancel = AcceptsProposesToCancelFunction.sparqlTest(conversationDataset);
 		return closedacceptsproposestocancel;
 	}
@@ -154,7 +154,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedProposesInCancelledAgreement(Dataset conversationDataset) {
+	public static Model getProposesInCancelledAgreement(Dataset conversationDataset) {
 		Model closedproposescancelledagreement = ProposesCancelledAgreementFunction.sparqlTest(conversationDataset);
 		return closedproposescancelledagreement;
 	}
@@ -167,7 +167,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedAcceptsInCancelledAgreement(Dataset conversationDataset) {
+	public static Model getAcceptsInCancelledAgreement(Dataset conversationDataset) {
 		Model closedacceptscancelledagreement = AcceptsCancelledAgreementFunction.sparqlTest(conversationDataset);
 		return closedacceptscancelledagreement;
 	}
@@ -179,7 +179,7 @@ public class HighlevelProtocols {
 	 * @param conversationDataset
 	 * @return
 	 */
-	public static Model getClosedRetracts(Dataset conversationDataset) {
+	public static Model getAcceptedRetracts(Dataset conversationDataset) {
 		Model closedretracts = AcceptedRetractsFunction.sparqlTest(conversationDataset);
 		return closedretracts;
 	}

@@ -53,60 +53,60 @@ public class AgreementController {
     
     
 
-    @RequestMapping(value = "/getOpenProposals", method = RequestMethod.GET)
+    @RequestMapping(value = "/getPendingProposals", method = RequestMethod.GET)
     public Model getOpenProposes(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getOpenProposes(conversationDataset);
+        return HighlevelProtocols.getPendingProposes(conversationDataset);
     }
     
-    @RequestMapping(value = "/getOpenProposalsToCancelAgreements", method = RequestMethod.GET)
+    @RequestMapping(value = "/getPendingProposalsToCancelAgreements", method = RequestMethod.GET)
     public Model getOpenProposesToCancel(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getOpenProposesToCancel(conversationDataset);
+        return HighlevelProtocols.getPendingProposesToCancel(conversationDataset);
     }
     
-    @RequestMapping(value = "/getClosedProposals", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAcceptedProposals", method = RequestMethod.GET)
     public Model getClosedProposes(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedProposes(conversationDataset);
+        return HighlevelProtocols.getAcceptedProposes(conversationDataset);
     }
     
-    @RequestMapping(value = "/getClosedAcceptsOfProposals", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAcceptsOfProposals", method = RequestMethod.GET)
     public Model getClosedAcceptsProposes(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedAcceptsProposes(conversationDataset);
+        return HighlevelProtocols.getAcceptsProposes(conversationDataset);
     }
     
-    @RequestMapping(value = "/getClosedPropsalsToCancel", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAcceptedPropsalsToCancel", method = RequestMethod.GET)
     public Model getClosedProposesToCancel(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedProposesToCancel(conversationDataset);
+        return HighlevelProtocols.getAcceptedProposesToCancel(conversationDataset);
     }
     
-    @RequestMapping(value = "/getClosedAcceptsOfPropsalsToCancel", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAcceptsOfPropsalsToCancel", method = RequestMethod.GET)
     public Model getClosedAcceptsProposesToCancel(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedAcceptsProposesToCancel(conversationDataset);
+        return HighlevelProtocols.getAcceptsProposesToCancel(conversationDataset);
     }
 
-    @RequestMapping(value = "/getClosedProposalsInCancelledAgreements", method = RequestMethod.GET)
+    @RequestMapping(value = "/getProposalsInCancelledAgreements", method = RequestMethod.GET)
     public Model getClosedProposesInCancelledAgreement(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedProposesInCancelledAgreement(conversationDataset);
+        return HighlevelProtocols.getProposesInCancelledAgreement(conversationDataset);
     }
     
-    @RequestMapping(value = "/getClosedAcceptsOfProposalsInCancelledAgreements", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAcceptsInCancelledAgreements", method = RequestMethod.GET)
     public Model getClosedAcceptsInCancelledAgreement(String connectionUri) {
 
         Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-        return HighlevelProtocols.getClosedAcceptsInCancelledAgreement(conversationDataset);
+        return HighlevelProtocols.getAcceptsInCancelledAgreement(conversationDataset);
     }
     
   
