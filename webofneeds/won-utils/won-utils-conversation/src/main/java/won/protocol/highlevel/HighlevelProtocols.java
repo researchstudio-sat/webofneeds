@@ -5,6 +5,7 @@ import org.apache.jena.rdf.model.Model;
 
 import won.utils.acceptedproposestocancel.AcceptedProposesToCancelFunction;
 import won.utils.acceptedretracts.AcceptedRetractsFunction;
+import won.utils.acceptscancelledagreement.AcceptsCancelledAgreementFunction;
 import won.utils.acknowledgement.AcknowledgedSelection;
 import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
@@ -16,7 +17,6 @@ import won.utils.closedproposescancelledagreement.ClosedProposesCancelledAgreeme
 import won.utils.closedproposes.ClosedProposesFunction;
 import won.utils.closedacceptsproposestocancel.ClosedAcceptsProposesToCancelFunction;
 import won.utils.closedacceptsproposal.ClosedAcceptsProposalFunction;
-import won.utils.closedacceptscancelledagreement.ClosedAcceptsCancelledAgreementFunction;
 
 
 public class HighlevelProtocols {
@@ -168,7 +168,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getClosedAcceptsInCancelledAgreement(Dataset conversationDataset) {
-		Model closedacceptscancelledagreement = ClosedAcceptsCancelledAgreementFunction.sparqlTest(conversationDataset);
+		Model closedacceptscancelledagreement = AcceptsCancelledAgreementFunction.sparqlTest(conversationDataset);
 		return closedacceptscancelledagreement;
 	}
 	

@@ -1,4 +1,4 @@
-package won.utils.closedacceptscancelledagreement;
+package won.utils.acceptscancelledagreement;
 
 
 import java.io.IOException;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.util.RdfUtils;
+import won.utils.acceptscancelledagreement.AcceptsCancelledAgreementFunction;
 import won.utils.pendingproposestocancel.PendingProposesToCancelTest;
 
 import org.junit.Assert;
@@ -22,10 +23,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
-public class ClosedAcceptsCancelledAgreementTest {
+public class AcceptsCancelledAgreementTest {
 	  
-    private static final String inputFolder = "/won/utils/closedacceptscancelledagreement/input/";
-    private static final String expectedOutputFolder = "/won/utils/closedacceptscancelledagreement/expected/";
+    private static final String inputFolder = "/won/utils/acceptscancelledagreement/input/";
+    private static final String expectedOutputFolder = "/won/utils/acceptscancelledagreement/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -44,7 +45,7 @@ public class ClosedAcceptsCancelledAgreementTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = ClosedAcceptsCancelledAgreementFunction.sparqlTest(input);
+		  Model actual = AcceptsCancelledAgreementFunction.sparqlTest(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -64,7 +65,7 @@ public class ClosedAcceptsCancelledAgreementTest {
 	private static Model customLoadModel(String path) throws IOException {
 
 		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
-        FileManager.get().addLocatorClassLoader(PendingProposesToCancelTest.class.getClassLoader());
+        FileManager.get().addLocatorClassLoader(AcceptsCancelledAgreementTest.class.getClassLoader());
         Model model = FileManager.get().loadModel(prefix + path);
           
        return model;
@@ -75,7 +76,7 @@ public class ClosedAcceptsCancelledAgreementTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = ClosedAcceptsCancelledAgreementTest.class.getResourceAsStream(path);
+            is = AcceptsCancelledAgreementTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {

@@ -39,7 +39,8 @@
  **output**: 
  
  ```
-event:1435888415723958200 agr:proposesToCancel  event:ow321nn1va6clfidc4s0 .  
+event:ow321nn1va6clfidc4s0  agr:accepts   event:557600936467257340 .
  ```
  
 ### TODO ... add more tests from agreement protocol
+
