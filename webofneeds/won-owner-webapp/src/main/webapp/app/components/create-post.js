@@ -14,6 +14,7 @@ import needTextfieldModule from './need-textfield.js';
 import imageDropzoneModule from './image-dropzone.js';
 import locationPickerModule from './location-picker.js';
 import {
+	getIn,
     attach,
     reverseSearchNominatim,
     nominatim2draftLocation,
@@ -285,13 +286,15 @@ function genComponentConf() {
 	       	
 	       	<div class="cp__detail" ng-if="self.isValid()">
 		       	<div class="cp__header context">
-		       		<span>Context <span class="opt">(only finds other post within the same context)</span></span><br/>
+		       		<span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
 		       	</div>
 			    <div class="cp__taglist">
 			          <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
 			    </div>
 			    <input class="cp__tags__input" placeholder="e.g. uki" type="text" ng-model="self.matchingContextString" ng-keyup="::self.addMatchingContext()"/>
-	    		
+	    		<div class="cp__textfield_instruction">
+						<span>use whitespace to separate context names</span>
+					</div>
     		</div>
 	       	
 	       	<won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
@@ -334,16 +337,21 @@ function genComponentConf() {
             this.details = {is: [], seeks: []};
             this.tagsString = {is: "", seeks: ""};
             this.tempTags = {is: [], seeks: []};
-            this.tempMatchingContext = ["uki"];
-            this.matchingContextString = "uki";
+            
             this.isNew = false;
                   
             const selectFromState = (state) => {
-                return {
+            	const tempMContext = getIn(state, ['config', 'theme', 'defaultContext']);
+            	const tempMatchingContext = this.tempMContext? this.tempMContext.toJS() : [];
+                const tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
+               
+            	return {
                     existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+                    tempMContext, tempMatchingContext, tempMatchingContext
                 }
             };
-
+            
+            
             // Using actionCreators like this means that every action defined there is available in the template.
             connect2Redux(selectFromState, actionCreators, [], this);
         }
@@ -528,7 +536,8 @@ function genComponentConf() {
                                         tags: undefined,
                                         location: location,
                                         thumbnail: undefined,
-                                        whatsAround: true
+                                        whatsAround: true,
+                                        matchingContext: this.tempMatchingContext
                                     };
 
                                     this.existingWhatsAroundNeeds
