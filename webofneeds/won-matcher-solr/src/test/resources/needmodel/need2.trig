@@ -20,6 +20,7 @@
     need:3030440624813201401
         a                       won:Need ;
         won:hasFlag             won:UsedForTesting ;
+        won:hasMatchingContext  "uki", "matchat" ;
         won:hasMatchingBehavior won:Mutual ;
         won:is                  _:is_and_seeks ;
         won:seeks               _:is_and_seeks ;
