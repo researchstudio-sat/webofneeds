@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 public class ProposalToCancelTest {
@@ -123,8 +124,7 @@ public class ProposalToCancelTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        ProposalToCancelFunction proposalToCancelFunction = new ProposalToCancelFunction();
-        Dataset actual = proposalToCancelFunction.applyProposalToCancelFunction(input);
+        Dataset actual =  HighlevelFunctionFactory.getProposalToCancelFunction().apply(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

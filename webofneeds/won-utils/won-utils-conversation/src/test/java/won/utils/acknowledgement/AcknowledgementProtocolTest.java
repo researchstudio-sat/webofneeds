@@ -9,6 +9,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
@@ -78,8 +80,7 @@ public class AcknowledgementProtocolTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        AcknowledgedSelection ackSel = new AcknowledgedSelection();
-        Dataset actual = ackSel.applyAcknowledgedSelection(input);
+        Dataset actual = HighlevelFunctionFactory.getAcknowledgedSelection().apply(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (diff.getFirst().isEmpty() && diff.getSecond().isEmpty()) {

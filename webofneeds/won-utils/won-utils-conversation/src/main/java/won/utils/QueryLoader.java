@@ -10,10 +10,10 @@ import org.apache.commons.io.IOUtils;
 public class QueryLoader {
 
 	private String queryString;
-	private static String queryFile;
+	private String queryFile;
 	
 	  public QueryLoader(String queryFile) {
-		 QueryLoader.queryFile = queryFile;
+		 this.queryFile = queryFile;
 		 InputStream is  = QueryLoader.class.getResourceAsStream(queryFile);
 		 StringWriter writer = new StringWriter();
 		 try {

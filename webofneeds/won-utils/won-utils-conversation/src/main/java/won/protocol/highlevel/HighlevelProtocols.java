@@ -1,22 +1,22 @@
 package won.protocol.highlevel;
 
+import java.util.function.Function;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
-import won.utils.acceptedproposes.AcceptedProposesFunction;
+import won.protocol.util.DatasetSelectionBySparqlFunction;
 import won.utils.acceptedproposestocancel.AcceptedProposesToCancelFunction;
 import won.utils.acceptedretracts.AcceptedRetractsFunction;
 import won.utils.acceptscancelledagreement.AcceptsCancelledAgreementFunction;
 import won.utils.acceptsproposal.AcceptsProposalFunction;
 import won.utils.acceptsproposestocancel.AcceptsProposesToCancelFunction;
-import won.utils.acknowledgement.AcknowledgedSelection;
 import won.utils.agreement.AgreementFunction;
 import won.utils.modification.ModifiedSelection;
-import won.utils.proposal.ProposalFunction;
-import won.utils.proposaltocancel.ProposalToCancelFunction;
-import won.utils.proposescancelledagreement.ProposesCancelledAgreementFunction;
 import won.utils.pendingproposes.PendingProposesFunction;
 import won.utils.pendingproposestocancel.PendingProposesToCancelFunction;
+import won.utils.proposal.ProposalFunction;
+import won.utils.proposescancelledagreement.ProposesCancelledAgreementFunction;
 
 
 public class HighlevelProtocols {
@@ -24,11 +24,11 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		AcknowledgedSelection acknowledgedSelection = new AcknowledgedSelection();
+		DatasetSelectionBySparqlFunction acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
         ModifiedSelection modifiedSelection = new ModifiedSelection();
         AgreementFunction agreementFunction = new AgreementFunction();
 
-		Dataset acknowledged = acknowledgedSelection.applyAcknowledgedSelection(conversationDataset);
+		Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
         Dataset modified = modifiedSelection.applyModificationSelection(acknowledged);
         Dataset agreed = agreementFunction.applyAgreementFunction(modified);
 		
@@ -43,11 +43,11 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
-        AcknowledgedSelection acknowledgedSelection = new AcknowledgedSelection();
+		DatasetSelectionBySparqlFunction acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
         ModifiedSelection modifiedSelection = new ModifiedSelection();
         ProposalFunction proposalFunction = new ProposalFunction();
 
-        Dataset acknowledged = acknowledgedSelection.applyAcknowledgedSelection(conversationDataset);
+        Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
         Dataset modified = modifiedSelection.applyModificationSelection(acknowledged);
         Dataset proposed = proposalFunction.applyProposalFunction(modified);
 
@@ -64,13 +64,15 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
-		AcknowledgedSelection acknowledgedSelection = new AcknowledgedSelection();
+		Function<Dataset, Dataset> acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
         ModifiedSelection modifiedSelection = new ModifiedSelection();
-        ProposalToCancelFunction proposalToCancelFunction = new ProposalToCancelFunction();
+        Function<Dataset, Dataset> proposalToCancelFunction = HighlevelFunctionFactory.getProposalToCancelFunction();
         
-        Dataset acknowledged = acknowledgedSelection.applyAcknowledgedSelection(conversationDataset);
+        Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
         Dataset modified = modifiedSelection.applyModificationSelection(acknowledged);
-        Dataset proposedtocancel = proposalToCancelFunction.applyProposalToCancelFunction(modified);
+        Dataset proposedtocancel = proposalToCancelFunction.apply(modified);
+
+        
         
 		return proposedtocancel;
 	}
@@ -107,7 +109,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposes(Dataset conversationDataset) {
-		Model closedproposes = AcceptedProposesFunction.sparqlTest(conversationDataset);
+		Model closedproposes = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(conversationDataset);
 		return closedproposes;
 	}
 	

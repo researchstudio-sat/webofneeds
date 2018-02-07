@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
-import won.utils.acceptedproposes.AcceptedProposesFunction;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.apache.jena.riot.Lang;
@@ -90,7 +90,7 @@ public class AcceptedProposesTest {
 
 		  // perform a sparql query to convert input into actual...
 	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = AcceptedProposesFunction.sparqlTest(input);
+		  Model actual = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 

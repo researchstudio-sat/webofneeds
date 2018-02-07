@@ -4,8 +4,8 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
- SELECT ?openprop ?acc ?openp ?openo WHERE {
-    
+ SELECT ?g ?s ?p ?o WHERE {
+   
    filter (?prop != ?clause) .
    filter (?prop != ?acc) .
  #  filter (?openprop != ?something) .
@@ -119,6 +119,10 @@ PREFIX won: <http://purl.org/webofneeds/model#>
       }
                   
 }
+   BIND (?openprop as ?g) 
+   BIND(?acc as ?s)
+   BIND(?openp as ?p)
+   BIND(?openo as ?o) 
                              
 }
 order by ?openprop
