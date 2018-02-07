@@ -41,7 +41,7 @@ function genComponentConf() {
                              <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                         </span>
                         <span class="pil__description__subtitle__type">
-                             {{self.labels.type[self.get('type')]}}
+                             {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : ' (no matching context specified)' }}
                         </span>
                     </div>
                 </a>

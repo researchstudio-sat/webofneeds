@@ -57,7 +57,7 @@ function genComponentConf() {
                     </span>
                     -->
                     <span class="fi__description__subtitle__type">
-                        {{self.labels.type[self.ownNeed.get("type")]}}
+                        {{self.labels.type[self.ownNeed.get("type")]}}{{self.ownNeed.get('matchingContexts')? ' in '+ self.ownNeed.get('matchingContexts').join(', ') : ' (no matching context specified)' }}
                     </span>
                 </div>
             </div>

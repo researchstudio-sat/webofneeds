@@ -291,7 +291,7 @@ function genComponentConf() {
 			    <div class="cp__taglist">
 			          <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
 			    </div>
-			    <input class="cp__tags__input" placeholder="e.g. uki" type="text" ng-model="self.matchingContextString" ng-keyup="::self.addMatchingContext()"/>
+			    <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
 	    		<div class="cp__textfield_instruction">
 						<span>use whitespace to separate context names</span>
 					</div>
@@ -339,15 +339,15 @@ function genComponentConf() {
             this.tempTags = {is: [], seeks: []};
             
             this.isNew = false;
-                  
+            
+            this.tempMContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
+            this.tempMatchingContext = this.tempMContext? this.tempMContext.toJS() : [];
+            this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
+            
             const selectFromState = (state) => {
-            	const tempMContext = getIn(state, ['config', 'theme', 'defaultContext']);
-            	const tempMatchingContext = this.tempMContext? this.tempMContext.toJS() : [];
-                const tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
-               
+ 
             	return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
-                    tempMContext, tempMatchingContext, tempMatchingContext
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround"))
                 }
             };
             
@@ -448,13 +448,13 @@ function genComponentConf() {
             this.draftObject[isSeeks].tags = this.mergeTags(isSeeks);
         }
         
-        mergeMatchingContext(isSeeks) {
+        mergeMatchingContext() {
         	
         	//return (this.matchingContextString? this.matchingContextString.match(/(\S+)/gi) : []);
         	
         	//var names = ["Mike","Matt","Nancy","Adam","Jenny","Nancy","Carl"];
 
-        	var list = this.matchingContextString? this.matchingContextString.match(/(\S+)/gi) : [];
+        	var list = this.tempMatchingString? this.tempMatchingString.match(/(\S+)/gi) : [];
         	var uniq = list.reduce(function(a,b){
         	    if (a.indexOf(b) < 0 ) a.push(b);
         	    return a;

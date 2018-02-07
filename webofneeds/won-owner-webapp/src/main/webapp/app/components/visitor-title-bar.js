@@ -30,7 +30,7 @@ function genComponentConf() {
                     </won-square-image>
                     <hgroup>
                         <h1 class="vtb__title">{{ self.post.get('title') }}</h1>
-                        <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}</div>
+                        <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : ' (no matching context specified)' }}</div>
                     </hgroup>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
