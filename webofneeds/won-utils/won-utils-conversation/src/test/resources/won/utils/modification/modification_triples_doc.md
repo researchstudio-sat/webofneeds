@@ -254,6 +254,8 @@ Retract triples:
 **expected**: wrong-remote-selfretract.trig
 **test name**: d13WrongRemoteSelfRetractRetractionTest
 
+*This test tries a retracting triple that retracts its own content graph. This should not be possible*
+
 Retract triples:
 
 ```

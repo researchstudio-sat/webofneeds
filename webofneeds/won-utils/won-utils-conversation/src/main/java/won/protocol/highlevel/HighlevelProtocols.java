@@ -6,17 +6,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 
 import won.protocol.util.DatasetSelectionBySparqlFunction;
-import won.utils.acceptedproposestocancel.AcceptedProposesToCancelFunction;
-import won.utils.acceptedretracts.AcceptedRetractsFunction;
-import won.utils.acceptscancelledagreement.AcceptsCancelledAgreementFunction;
-import won.utils.acceptsproposal.AcceptsProposalFunction;
-import won.utils.acceptsproposestocancel.AcceptsProposesToCancelFunction;
-import won.utils.agreement.AgreementFunction;
-import won.utils.modification.ModifiedSelection;
-import won.utils.pendingproposes.PendingProposesFunction;
-import won.utils.pendingproposestocancel.PendingProposesToCancelFunction;
-import won.utils.proposal.ProposalFunction;
-import won.utils.proposescancelledagreement.ProposesCancelledAgreementFunction;
 
 
 public class HighlevelProtocols {
@@ -25,12 +14,12 @@ public class HighlevelProtocols {
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
 		DatasetSelectionBySparqlFunction acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
-        ModifiedSelection modifiedSelection = new ModifiedSelection();
-        AgreementFunction agreementFunction = new AgreementFunction();
+		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
+        Function<Dataset, Dataset> agreementFunction = HighlevelFunctionFactory.getAgreementFunction();
 
 		Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
-        Dataset modified = modifiedSelection.applyModificationSelection(acknowledged);
-        Dataset agreed = agreementFunction.applyAgreementFunction(modified);
+        Dataset modified = modifiedSelection.apply(acknowledged);
+        Dataset agreed = agreementFunction.apply(modified);
 		
 		return agreed;
 	}
@@ -44,12 +33,12 @@ public class HighlevelProtocols {
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
 		DatasetSelectionBySparqlFunction acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
-        ModifiedSelection modifiedSelection = new ModifiedSelection();
-        ProposalFunction proposalFunction = new ProposalFunction();
+		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
+        Function<Dataset, Dataset> proposalFunction = HighlevelFunctionFactory.getProposalFunction();
 
         Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
-        Dataset modified = modifiedSelection.applyModificationSelection(acknowledged);
-        Dataset proposed = proposalFunction.applyProposalFunction(modified);
+        Dataset modified = modifiedSelection.apply(acknowledged);
+        Dataset proposed = proposalFunction.apply(modified);
 
         return proposed;
 	}
@@ -65,15 +54,13 @@ public class HighlevelProtocols {
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
 		Function<Dataset, Dataset> acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
-        ModifiedSelection modifiedSelection = new ModifiedSelection();
+		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
         Function<Dataset, Dataset> proposalToCancelFunction = HighlevelFunctionFactory.getProposalToCancelFunction();
         
         Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
-        Dataset modified = modifiedSelection.applyModificationSelection(acknowledged);
+        Dataset modified = modifiedSelection.apply(acknowledged);
         Dataset proposedtocancel = proposalToCancelFunction.apply(modified);
-
-        
-        
+       
 		return proposedtocancel;
 	}
 	
@@ -85,9 +72,10 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getPendingProposes(Dataset conversationDataset) {
-		Model openproposes = PendingProposesFunction.sparqlTest(conversationDataset);
-		return openproposes;
+		Model pendingproposes  = HighlevelFunctionFactory.getPendingProposesFunction().apply(conversationDataset);
+		return pendingproposes;
 	}
+	
 	
 	/**
 	 * Returns ?openprop agr:proposesToCancel ?acc . 
@@ -97,8 +85,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getPendingProposesToCancel(Dataset conversationDataset) {
-		Model openproposestocancel = PendingProposesToCancelFunction.sparqlTest(conversationDataset);
-		return openproposestocancel;
+		Model pendingproposestocancel  = HighlevelFunctionFactory.getPendingProposesToCancelFunction().apply(conversationDataset);
+		return pendingproposestocancel;
 	}
 	
 	/**
@@ -109,8 +97,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposes(Dataset conversationDataset) {
-		Model closedproposes = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(conversationDataset);
-		return closedproposes;
+		Model acceptedproposes = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(conversationDataset);
+		return acceptedproposes;
 	}
 	
 	/**
@@ -121,8 +109,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsProposes(Dataset conversationDataset) {
-		Model closedacceptsproposes = AcceptsProposalFunction.sparqlTest(conversationDataset);
-		return closedacceptsproposes;
+		Model acceptsproposes = HighlevelFunctionFactory.getAcceptsProposesFunction().apply(conversationDataset);
+		return acceptsproposes;
 	}
 	
 	/**
@@ -133,8 +121,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposesToCancel(Dataset conversationDataset) {
-		Model closedproposestocancel = AcceptedProposesToCancelFunction.sparqlTest(conversationDataset);
-		return closedproposestocancel;
+		Model acceptedproposestocancel = HighlevelFunctionFactory.getAcceptedProposesToCancelFunction().apply(conversationDataset);
+		return acceptedproposestocancel;
 	}
 	
 	/**
@@ -145,8 +133,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsProposesToCancel(Dataset conversationDataset) {
-		Model closedacceptsproposestocancel = AcceptsProposesToCancelFunction.sparqlTest(conversationDataset);
-		return closedacceptsproposestocancel;
+		Model acceptsproposestocancel = HighlevelFunctionFactory.getAcceptsProposesToCancelFunction().apply(conversationDataset);
+		return acceptsproposestocancel;
 	}
 	
 	/**
@@ -157,8 +145,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getProposesInCancelledAgreement(Dataset conversationDataset) {
-		Model closedproposescancelledagreement = ProposesCancelledAgreementFunction.sparqlTest(conversationDataset);
-		return closedproposescancelledagreement;
+		Model  proposesincancelledagreement = HighlevelFunctionFactory.getProposesInCancelledAgreementFunction().apply(conversationDataset);
+		return proposesincancelledagreement;
 	}
 	
 	
@@ -170,8 +158,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsInCancelledAgreement(Dataset conversationDataset) {
-		Model closedacceptscancelledagreement = AcceptsCancelledAgreementFunction.sparqlTest(conversationDataset);
-		return closedacceptscancelledagreement;
+		Model  acceptscancelledagreement = HighlevelFunctionFactory.getAcceptsInCancelledAgreementFunction().apply(conversationDataset);
+		return acceptscancelledagreement;
 	}
 	
 	/**
@@ -182,8 +170,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedRetracts(Dataset conversationDataset) {
-		Model closedretracts = AcceptedRetractsFunction.sparqlTest(conversationDataset);
-		return closedretracts;
+		Model  acceptedretracts = HighlevelFunctionFactory.getAcceptedRetractsFunction().apply(conversationDataset);
+		return acceptedretracts;
 	}
 	
 }

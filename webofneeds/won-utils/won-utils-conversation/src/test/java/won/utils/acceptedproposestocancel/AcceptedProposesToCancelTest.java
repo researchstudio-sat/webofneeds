@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import junit.framework.TestCase;
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
-import won.utils.acceptedproposestocancel.AcceptedProposesToCancelFunction;
 import won.utils.proposaltocancel.ProposalToCancelTest;
 
 import org.junit.Assert;
@@ -93,8 +93,7 @@ public class AcceptedProposesToCancelTest {
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
-	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = AcceptedProposesToCancelFunction.sparqlTest(input);
+		  Model actual = HighlevelFunctionFactory.getAcceptedProposesToCancelFunction().apply(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 

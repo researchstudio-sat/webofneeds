@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 public class AgreementProtocolTest {
@@ -305,8 +306,7 @@ public class AgreementProtocolTest {
     }
     
     private static boolean passesTest(Dataset input, Dataset expectedOutput) {
-    	AgreementFunction agreementFunction = new AgreementFunction();
-        Dataset actual = agreementFunction.applyAgreementFunction(input);
+        Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
         return RdfUtils.isIsomorphicWith(expectedOutput, actual);
     }
     
@@ -314,8 +314,9 @@ public class AgreementProtocolTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        AgreementFunction agreementFunction = new AgreementFunction();
-        Dataset actual = agreementFunction.applyAgreementFunction(input);
+    //    AgreementFunction agreementFunction = new AgreementFunction();
+    //    Dataset actual = agreementFunction.applyAgreementFunction(input);
+        Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
@@ -405,11 +406,13 @@ public class AgreementProtocolTest {
     }
     
     private static String readCondensationQuery() {
-	    InputStream is  = AgreementFunction.class.getResourceAsStream("/won/utils/agreement/condensation-query.sq");
+//	    InputStream is  = AgreementFunction.class.getResourceAsStream("/won/utils/agreement/condensation-query.sq");
+  // Not used...not checking if the next line works...
+    	InputStream is = HighlevelFunctionFactory.getAgreementFunction().getClass().getResourceAsStream("/won/utils/agreement/condensation-query.sq");
 	    StringWriter writer = new StringWriter();
 	    try {
 	        IOUtils.copy(is, writer, Charsets.UTF_8);
-	    } catch (IOException e) {
+	    } catch (IOException e) {;
 	        throw new IllegalStateException("Could not read queryString file", e);
 	    }
     	return writer.toString();

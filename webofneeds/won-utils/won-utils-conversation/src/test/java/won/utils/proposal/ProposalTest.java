@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 public class ProposalTest {
@@ -88,8 +89,7 @@ public class ProposalTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        ProposalFunction proposalFunction = new ProposalFunction();
-        Dataset actual = proposalFunction.applyProposalFunction(input);
+        Dataset actual =  HighlevelFunctionFactory.getProposalFunction().apply(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

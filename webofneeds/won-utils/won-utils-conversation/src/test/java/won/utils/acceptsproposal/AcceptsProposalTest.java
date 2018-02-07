@@ -4,7 +4,6 @@ package won.utils.acceptsproposal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.camel.main.Main;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -15,11 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import junit.framework.TestCase;
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
-import won.utils.acceptsproposal.AcceptsProposalFunction;
-import won.utils.proposaltocancel.ProposalToCancelTest;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.apache.jena.riot.Lang;
@@ -51,8 +47,7 @@ public class AcceptsProposalTest {
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
-	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
-		  Model actual = AcceptsProposalFunction.sparqlTest(input);
+		  Model actual = HighlevelFunctionFactory.getAcceptsProposesFunction().apply(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 

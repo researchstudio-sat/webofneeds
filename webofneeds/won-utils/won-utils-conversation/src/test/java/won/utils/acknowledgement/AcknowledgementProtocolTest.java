@@ -12,8 +12,6 @@ import org.junit.Test;
 
 import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
-import won.utils.agreement.AgreementFunction;
-import won.utils.modification.ModifiedSelection;
 
 import java.io.IOException;
 import java.io.InputStream;

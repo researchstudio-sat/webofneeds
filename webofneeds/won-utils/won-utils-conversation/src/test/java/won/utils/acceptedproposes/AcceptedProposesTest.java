@@ -89,7 +89,6 @@ public class AcceptedProposesTest {
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
-	//	  OpenProposesToCancelFunction instance = new OpenProposesToCancelFunction();
 		  Model actual = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 

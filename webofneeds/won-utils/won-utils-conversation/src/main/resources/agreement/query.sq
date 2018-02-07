@@ -4,7 +4,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
- SELECT ?acc ?s ?p ?o WHERE {
+ SELECT ?g ?s ?p ?o WHERE {
     
     filter (?prop != ?clause) .
     filter (?prop != ?acc) .
@@ -105,7 +105,9 @@ PREFIX won: <http://purl.org/webofneeds/model#>
                   
     }
     
-    
 
+    BIND (?acc as ?g) 
+
+                      
 }
 order by ?acc

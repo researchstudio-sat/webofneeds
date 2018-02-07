@@ -7,6 +7,8 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+
+import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
@@ -127,8 +129,9 @@ public class ModificationProtocolTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        ModifiedSelection mod = new ModifiedSelection();
-        Dataset actual = mod.applyModificationSelection(input);
+   //     ModifiedSelection mod = new ModifiedSelection();
+  //      Dataset actual = mod.applyModificationSelection(input);
+        Dataset actual = HighlevelFunctionFactory.getModifiedSelection().apply(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (diff.getFirst().isEmpty() && diff.getSecond().isEmpty()) {
