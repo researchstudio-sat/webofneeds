@@ -1,0 +1,84 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+<https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-nfp3> {
+    need:ize9ntwo0vjyqbdvb4cu
+            a             won:Need ;
+            won:goal      [ won:hasShapesGraph  <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> ] ;
+            won:hasFacet  won:OwnerFacet ;
+            won:hasFlag   won:NoHintForCounterpart , won:NoHintForMe ;
+            won:is        [ dc:description  "This is a automatically created need by the TaxiBot" ;
+                            dc:title        "Taxi in Wien<->Taxi"
+                          ] ;
+
+            cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                              woncrypt:ecc_algorithm  "EC" ;
+                                              woncrypt:ecc_curveId    "secp384r1" ;
+                                              woncrypt:ecc_qx         "2f5b2fd7bcaca4530dd120f5a4c5206267f979080950dc02b0696f1cf250d0f92540d073faca4e05a5a640e5b8d738a7" ;
+                                              woncrypt:ecc_qy         "afc4cec7b13bb2bb44d8d284dbba2ec129125410d019d004de08efc340f622d508e5f9d49d6d726be1f2b82b99cf2f66"
+                                            ] ] .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGQCMAUd2kqL2fwONeaCKPYSlteJ0jccZuNYHWCMfzdXmOlDC3by1bWIm0CnACIdlMzPHwIwdOWItUGJnS4k/ZQN7ej0n1pW/+fYpaHZ2Q/W6Ose3YzmbyPfHCPWRvYDjV7+1Uz1" ;
+            sig:hasVerificationCertificate  need:ize9ntwo0vjyqbdvb4cu ;
+            msg:hasHash                     "ekR9ls5KaS9yp2W3mFvw7wnBJsvIemm0eFnO/Kjx1wWcFAqgTaFviFL3Q7dq264FHmJnn54D8yj7d1V6GL/RDXJOpmkz9M4553PSz13omWVjgycjs47MhjZOmAxYfKmGipSVaooFsRY09HwVFFC9Nie/Vd6Q1QWEhoUjqIdLCvw=" ;
+            msg:hasPublicKeyFingerprint     "5s/qPiYhn2Gs+gJW9HWEpt9VzV+8SHAYV8c4LiJ7e+g=" ;
+            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#envelope-uhuo> .
+}
+
+<https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu#sysinfo> {
+    <https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu#events>
+            a            won:EventContainer ;
+            rdfs:member  event:qkrivynfftr9gtl3u8im , event:eib70oqplhbcs5hxu1ex .
+
+    need:ize9ntwo0vjyqbdvb4cu
+            a                      won:Need ;
+            <http://purl.org/dc/terms/created>
+                    "2018-02-07T07:30:38.761Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-02-07T07:30:38.766Z"^^xsd:dateTime ;
+            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu/connections> ;
+            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/ize9ntwo0vjyqbdvb4cu#events> ;
+            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:isInState          won:Active .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> {
+    <http://example.org/2/TaxiRideShape>
+            a                     sh:NodeShape ;
+            sh:closed             true ;
+            sh:ignoredProperties  ( rdf:type ) ;
+            sh:property           [
+                                    sh:hasValue "48.218727" ;
+                                    sh:maxCount  1 ;
+                                    sh:minCount  1 ;
+                                    sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasNorthWestCorner s:latitude )
+                                  ] ;
+            sh:property           [ sh:class     s:GeoCoordinates ;
+                                    sh:maxCount  1 ;
+                                    sh:minCount  1 ;
+                                    sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasSouthEastCorner )
+                                  ] ;
+
+
+            sh:targetClass        won:Need .
+}
