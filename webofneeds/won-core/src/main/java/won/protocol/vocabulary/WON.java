@@ -172,10 +172,11 @@ public class WON {
     public static final Resource USED_FOR_TESTING = m.createResource(BASE_URI + "UsedForTesting");
 
     public static final Resource WHATS_AROUND = m.createResource(BASE_URI + "WhatsAround");
-
+    
     // hint behaviour
     public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI + "NoHintForCounterpart");
     public static final Resource NO_HINT_FOR_ME = m.createResource(BASE_URI + "NoHintForMe");
+    public static final Property HAS_MATCHING_CONTEXT = m.createProperty(BASE_URI + "hasMatchingContext");
 
     public static final Property HAS_GRAPH = m.createProperty(BASE_URI, "hasGraph");
 
