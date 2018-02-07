@@ -270,6 +270,24 @@ public class NeedModelWrapper {
     public boolean hasFlag(Resource flag) {
         return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_FLAG, flag);
     }
+    
+    public void addMatchingContext(String context) {
+    	getNeedNode(NeedGraphType.NEED).addProperty(WON.HAS_MATCHING_CONTEXT, context);
+    }
+    
+    public boolean hasMatchingContext(String context) {
+    	return getNeedNode(NeedGraphType.NEED).hasProperty(WON.HAS_MATCHING_CONTEXT, context);
+    }
+    
+    public Collection<String> getMatchingContexts() {
+        Collection<String> matchingContexts = new LinkedList<>();
+        NodeIterator iter = getNeedModel().listObjectsOfProperty(getNeedNode(NeedGraphType.NEED), WON.HAS_MATCHING_CONTEXT);
+        while (iter.hasNext()) {
+            matchingContexts.add(iter.next().asLiteral().getString());
+        }
+        return matchingContexts;
+    }
+
 
     public void addFacetUri(String facetUri) {
 

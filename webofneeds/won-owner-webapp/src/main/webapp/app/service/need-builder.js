@@ -188,6 +188,7 @@ import won from './won.js';
 
         var isWhatsAround = args.is? args.is.whatsAround : args.seeks.whatsAround;
         var noHints = args.is? args.is.noHints : args.seeks.noHints;
+        var matchingContext = args.is? args.is.matchingContext : args.seeks.matchingContext;
         var graph = [
             {
                 '@id': args.is?  args.is.publishedContentUri :  args.seeks.publishedContentUri,
@@ -202,8 +203,9 @@ import won from './won.js';
                     isWhatsAround? "won:NoHintForCounterpart" : undefined,
                     		
                     noHints? "won:NoHintForMe" : undefined,
-                    noHints? "won:NoHintForCounterpart" : undefined,
+                    noHints? "won:NoHintForCounterpart" : undefined,  		
                 ]),///.toArray().filter(f => f),
+                'won:hasMatchingContext': matchingContext? matchingContext : undefined,
             },
             //, <if _hasModalities> {... (see directly below) } </if>
             args.is? buildContentNode((isWhatsAround? '_:needContent' : '_:isNeedContent'), args.is, true) : {},

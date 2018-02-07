@@ -90,6 +90,9 @@ public class NeedModelWrapperTest {
         }
         Assert.assertFalse(needModelWrapper.getShapesGraph(blank).isEmpty());
         Assert.assertFalse(needModelWrapper.getDataGraph(blank).isEmpty());
+        
+        //make sure we don't find a matching context:
+        Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
     }
 
     @Test
@@ -106,6 +109,9 @@ public class NeedModelWrapperTest {
         Assert.assertEquals("title1", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title));
         Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title, null).size());
         Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, null).size());
+
+        //make sure we don't find a matching context:
+        Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
     }
 
     @Test
@@ -139,6 +145,9 @@ public class NeedModelWrapperTest {
         needModelWrapper.setWonNodeUri("https://wonnode1");
         needModelWrapper.setWonNodeUri("https://wonnode2");
         Assert.assertEquals("https://wonnode2", needModelWrapper.getWonNodeUri());
+
+        //make sure we don't find a matching context:
+        Assert.assertTrue("did not expect to find matching contexts", needModelWrapper.getMatchingContexts().isEmpty());
     }
 
     @Test
@@ -282,4 +291,22 @@ public class NeedModelWrapperTest {
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
     }
+    
+    @Test
+    public void testMultipleMatchingContexts() throws IOException{
+    	Dataset ds = Utils.createTestDataset("/needmodel/need7.trig");
+    	NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Assert.assertEquals(3, needModelWrapper.getMatchingContexts().size());
+        Assert.assertTrue("expected matching context 'TU_Wien'", needModelWrapper.getMatchingContexts().contains("TU_Wien"));
+        Assert.assertTrue("expected matching context 'Vienna'", needModelWrapper.getMatchingContexts().contains("Vienna"));
+        Assert.assertTrue("expected matching context 'Ball'", needModelWrapper.getMatchingContexts().contains("Ball"));
+    }
+    
+    @Test
+    public void testSingleMatchingContext() throws IOException{
+    	Dataset ds = Utils.createTestDataset("/needmodel/need8.trig");
+    	NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Assert.assertEquals(1, needModelWrapper.getMatchingContexts().size());
+        Assert.assertTrue("expected matching context 'TU_Wien'", needModelWrapper.getMatchingContexts().contains("TU_Wien"));
+   }
 }
