@@ -314,8 +314,6 @@ public class AgreementProtocolTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-    //    AgreementFunction agreementFunction = new AgreementFunction();
-    //    Dataset actual = agreementFunction.applyAgreementFunction(input);
         Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
@@ -406,7 +404,7 @@ public class AgreementProtocolTest {
     }
     
     private static String readCondensationQuery() {
-//	    InputStream is  = AgreementFunction.class.getResourceAsStream("/won/utils/agreement/condensation-query.sq");
+	//    InputStream is  = AgreementFunction.class.getResourceAsStream("/won/utils/agreement/condensation-query.sq");
   // Not used...not checking if the next line works...
     	InputStream is = HighlevelFunctionFactory.getAgreementFunction().getClass().getResourceAsStream("/won/utils/agreement/condensation-query.sq");
 	    StringWriter writer = new StringWriter();

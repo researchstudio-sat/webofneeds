@@ -26,63 +26,63 @@ public class HighlevelFunctionFactory {
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
 		if (acceptedProposesFunction == null) {
-			acceptedProposesFunction = new DatasetToModelBySparqlFunction("/acceptedproposes/query.sq");
+			acceptedProposesFunction = new DatasetToModelBySparqlFunction("/acceptedproposes/query.rq");
 		}
 		return acceptedProposesFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getPendingProposesFunction() {
 		if (pendingProposesFunction == null) {
-			pendingProposesFunction = new DatasetToModelBySparqlFunction("/pendingproposes/query.sq");
+			pendingProposesFunction = new DatasetToModelBySparqlFunction("/pendingproposes/query.rq");
 		}
 		return pendingProposesFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getPendingProposesToCancelFunction() {
 		if (pendingProposesToCancelFunction == null) {
-			pendingProposesToCancelFunction = new DatasetToModelBySparqlFunction("/pendingproposestocancel/query.sq");
+			pendingProposesToCancelFunction = new DatasetToModelBySparqlFunction("/pendingproposestocancel/query.rq");
 		}
 		return pendingProposesToCancelFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptsProposesFunction() {
 		if (acceptsProposesFunction == null) {
-			acceptsProposesFunction = new DatasetToModelBySparqlFunction("/acceptsproposal/query.sq");
+			acceptsProposesFunction = new DatasetToModelBySparqlFunction("/acceptsproposal/query.rq");
 		}
 		return acceptsProposesFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesToCancelFunction() {
 		if (acceptedProposesToCancelFunction == null) {
-			acceptedProposesToCancelFunction = new DatasetToModelBySparqlFunction("/acceptedproposestocancel/query.sq");
+			acceptedProposesToCancelFunction = new DatasetToModelBySparqlFunction("/acceptedproposestocancel/query.rq");
 		}
 		return acceptedProposesToCancelFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptsProposesToCancelFunction() {
 		if (acceptsProposesToCancelFunction == null) {
-			acceptsProposesToCancelFunction = new DatasetToModelBySparqlFunction("/acceptsproposestocancel/query.sq");
+			acceptsProposesToCancelFunction = new DatasetToModelBySparqlFunction("/acceptsproposestocancel/query.rq");
 		}
 		return acceptsProposesToCancelFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getProposesInCancelledAgreementFunction() {
 		if (proposesInCancelledAgreement == null) {
-			proposesInCancelledAgreement = new DatasetToModelBySparqlFunction("/proposescancelledagreement/query.sq");
+			proposesInCancelledAgreement = new DatasetToModelBySparqlFunction("/proposescancelledagreement/query.rq");
 		}
 		return proposesInCancelledAgreement;
 	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptsInCancelledAgreementFunction() {
 		if (acceptsCancelledAgreement == null) {
-			acceptsCancelledAgreement = new DatasetToModelBySparqlFunction("/acceptscancelledagreement/query.sq");
+			acceptsCancelledAgreement = new DatasetToModelBySparqlFunction("/acceptscancelledagreement/query.rq");
 		}
 		return acceptsCancelledAgreement;
 	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptedRetractsFunction() {
 		if (acceptedRetracts == null) {
-			acceptedRetracts = new DatasetToModelBySparqlFunction("/acceptedretracts/query.sq");
+			acceptedRetracts = new DatasetToModelBySparqlFunction("/acceptedretracts/query.rq");
 		}
 		return acceptedRetracts;
 	}
@@ -91,14 +91,14 @@ public class HighlevelFunctionFactory {
 	// the original class name was AcknowledgedSelection
 	public static DatasetSelectionBySparqlFunction getAcknowledgedSelection() {
 		if (acknowledgedSelection == null) {
-			acknowledgedSelection = new DatasetSelectionBySparqlFunction("/acknowledgement/query.sq");
+			acknowledgedSelection = new DatasetSelectionBySparqlFunction("/acknowledgement/query.rq");
 		}
 		return acknowledgedSelection;
 	}
 	
 	public static DatasetSelectionBySparqlFunction getModifiedSelection() {
 		if (modifiedSelection == null) {
-			modifiedSelection = new DatasetSelectionBySparqlFunction("/modification/query.sq");
+			modifiedSelection = new DatasetSelectionBySparqlFunction("/modification/query.rq");
 		}
 		return modifiedSelection;
 	}
@@ -108,21 +108,21 @@ public class HighlevelFunctionFactory {
 	// The original class name was ProposalToCancelFunction
 	public static DatasetToDatasetBySparqlGSPOSelectFunction getProposalToCancelFunction() {
 		if (proposalToCancelFunction == null) {
-			proposalToCancelFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/proposaltocancel/query.sq");
+			proposalToCancelFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/proposaltocancel/query.rq");
 		}
 		return proposalToCancelFunction;
 	}
 	
 	public static DatasetToDatasetBySparqlGSPOSelectFunction getProposalFunction() {
 		if (proposalFunction == null) {
-			proposalFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/proposal/query.sq");
+			proposalFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/proposal/query.rq");
 		}
 		return proposalFunction;
 	}
 	
 	public static DatasetToDatasetBySparqlGSPOSelectFunction getAgreementFunction() {
 		if (agreementFunction == null) {
-			agreementFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/agreement/query.sq");
+			agreementFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/agreement/query.rq");
 		}
 		return agreementFunction;
 	}
