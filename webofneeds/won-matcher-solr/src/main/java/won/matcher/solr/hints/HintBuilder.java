@@ -1,5 +1,6 @@
 package won.matcher.solr.hints;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -10,14 +11,12 @@ import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
+import won.matcher.solr.query.factory.MatchingContextQueryFactory;
 import won.matcher.solr.utils.Kneedle;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -122,20 +121,38 @@ public class HintBuilder {
                 log.debug("omitting matched need: could not extract need URI");
                 continue;
             }
+
             List<String> flags = getValueList(doc, HAS_FLAG_SOLR_FIELD);
             boolean matchedNeedNoHintForMe = flags.contains(WON.NO_HINT_FOR_ME.toString());
             boolean matchedNeedNoHintForCounterpart = flags.contains(WON.NO_HINT_FOR_COUNTERPART.toString());
 
-            // suppress hints for current if its flags or its counterparts flags say so or if it was specified in the calling parameters
-            doSuppressHintForNeed = noHintForMe || matchedNeedNoHintForCounterpart || doSuppressHintForNeed;
+            // check the matching contexts of the two needs that are supposed to be matched
+            // send only hints to needs if their matching contexts overlap (if one need has empty matching context it always receives hints)
+            Collection<Object> contextSolrFieldValues = doc.getFieldValues(MatchingContextQueryFactory.MATCHING_CONTEXT_SOLR_FIELD);
+            Collection<String> matchedNeedMatchingContexts = new LinkedList<>();
+            if (contextSolrFieldValues != null) {
+                matchedNeedMatchingContexts = contextSolrFieldValues.stream().map(a -> (String) a).collect(Collectors.toList());
+            }
+            Collection<String> matchingContexts = needModelWrapper.getMatchingContexts();
+            if (matchingContexts == null) {
+                matchingContexts = new LinkedList<>();
+            }
+            boolean contextOverlap = CollectionUtils.intersection(matchedNeedMatchingContexts, matchingContexts).size() > 0;
+            boolean suppressHintsForMyContexts = !contextOverlap && !(CollectionUtils.isEmpty(matchingContexts));
+            boolean suppressHintsForCounterpartContexts = !contextOverlap && !(CollectionUtils.isEmpty(matchedNeedMatchingContexts));
 
-            // suppress hints for matched need if its flags or its counterparts flags say so or if it was specified in the calling parameters
-            doSuppressHintForMatchedNeeds = noHintForCounterpart || matchedNeedNoHintForMe || doSuppressHintForMatchedNeeds;
+            // suppress hints for current if its flags or its counterparts flags say so or if it was specified in the calling parameters or matching contexts
+            doSuppressHintForNeed = noHintForMe || matchedNeedNoHintForCounterpart || doSuppressHintForNeed || suppressHintsForMyContexts;
+
+            // suppress hints for matched need if its flags or its counterparts flags say so or if it was specified in the calling parameters or matching contexts
+            doSuppressHintForMatchedNeeds = noHintForCounterpart || matchedNeedNoHintForMe || doSuppressHintForMatchedNeeds || suppressHintsForCounterpartContexts;
 
             if (log.isDebugEnabled()) {
                 log.debug("matched need has NoHintForMe: {}, NoHintForCounterpart: {}", matchedNeedNoHintForMe, matchedNeedNoHintForCounterpart);
                 log.debug("need will receive a hint: {} (uri: {})", !doSuppressHintForNeed, need.getUri());
                 log.debug("matched need need will receive a hint: {} (uri: {})", !doSuppressHintForMatchedNeeds, matchedNeedUri);
+                log.debug("need matching contexts: {}", matchingContexts);
+                log.debug("matched need matching contexts: {}", matchedNeedMatchingContexts);
             }
             if (doSuppressHintForNeed && doSuppressHintForMatchedNeeds) {
                 log.debug("no hints to be sent because of Suppress settings");
