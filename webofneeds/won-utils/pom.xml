@@ -13,8 +13,9 @@
 <modules>
     <module>won-utils-import</module>
     <module>won-utils-mail</module>
-    <module>won-utils-crawl</module>
-    <module>won-utils-goals</module>
+    <module>won-utils-crawl</module>   
+    <module>won-utils-goals</module> 
+    <module>won-utils-conversation</module>
 </modules>
 <packaging>pom</packaging>
 

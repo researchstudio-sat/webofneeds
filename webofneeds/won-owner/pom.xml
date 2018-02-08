@@ -86,6 +86,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
         </dependency>
+         <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-utils-goals</artifactId>            
+            <version>${project.version}</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -108,7 +113,12 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <scope>compile</scope>
         </dependency>
-        
+
+        <dependency>
+        	<groupId>webofneeds</groupId>
+        	<artifactId>won-utils-conversation</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
 	</dependencies>
 
     <build>
