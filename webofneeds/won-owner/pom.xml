@@ -113,7 +113,12 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <scope>compile</scope>
         </dependency>
-        
+
+        <dependency>
+        	<groupId>webofneeds</groupId>
+        	<artifactId>won-utils-conversation</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
 	</dependencies>
 
     <build>
