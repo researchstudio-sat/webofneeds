@@ -582,6 +582,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         creationDate: undefined,
         ownNeed: !!ownNeed,
         isWhatsAround: false,
+        matchingContexts: undefined,
     };
 
     if(jsonldNeedImm){
@@ -619,6 +620,8 @@ function parseNeed(jsonldNeed, ownNeed) {
                 })
                 .size > 0;
 
+        const wonHasMatchingContexts = jsonldNeedImm.get("won:hasMatchingContext");
+                
         const creationDate = jsonldNeedImm.get("dct:created");
         if(creationDate){
             parsedNeed.creationDate = creationDate;
@@ -652,11 +655,12 @@ function parseNeed(jsonldNeed, ownNeed) {
             location = parseLocation(seeks.get("won:hasLocation"));
         }
 
-        parsedNeed.tags = tags ? tags : undefined;
+        parsedNeed.tags = tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined;
         parsedNeed.description = description ? description : undefined;
         parsedNeed.isWhatsAround = !!isWhatsAround;
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
         parsedNeed.location = location;
+        parsedNeed.matchingContexts =  wonHasMatchingContexts ? ( Immutable.List.isList(wonHasMatchingContexts) ? wonHasMatchingContexts : Immutable.List.of(wonHasMatchingContexts) ) : undefined;
         parsedNeed.nodeUri = nodeUri;
     }else{
         console.error('Cant parse need, data is an invalid need-object: ', jsonldNeedImm && jsonldNeedImm.toJS());

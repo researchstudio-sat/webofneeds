@@ -14,6 +14,7 @@ import needTextfieldModule from './need-textfield.js';
 import imageDropzoneModule from './image-dropzone.js';
 import locationPickerModule from './location-picker.js';
 import {
+	getIn,
     attach,
     reverseSearchNominatim,
     nominatim2draftLocation,
@@ -281,7 +282,23 @@ function genComponentConf() {
                 </div>
 	            <!-- /SEEKS PART/ -->
 	       	</div>
+	       	<won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+	       	
+	       	<div class="cp__detail" ng-if="self.isValid()">
+		       	<div class="cp__header context">
+		       		<span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
+		       	</div>
+			    <div class="cp__taglist">
+			          <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
+			    </div>
+			    <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
+	    		<div class="cp__textfield_instruction">
+						<span>use whitespace to separate context names</span>
+					</div>
+    		</div>
+	       	
 	       	<won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+	       	
 	       	<button type="submit" class="won-button--filled red cp__publish"
                     ng-if="self.isValid()"
                     ng-click="::self.publish()">
@@ -304,8 +321,8 @@ function genComponentConf() {
 
             this.postTypeTexts = postTypeTexts;
             this.characterLimit = 140; //TODO move to conf
-            this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
-            this.draftSeeks = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+            this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
+            this.draftSeeks = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
             this.draftObject = {is: this.draftIs, seeks: this.draftSeeks};
             
             this.isOpen = {is: false, seeks: false};
@@ -322,13 +339,19 @@ function genComponentConf() {
             this.tempTags = {is: [], seeks: []};
             
             this.isNew = false;
-                  
+            
+            this.tempMContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
+            this.tempMatchingContext = this.tempMContext? this.tempMContext.toJS() : [];
+            this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
+            
             const selectFromState = (state) => {
-                return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+ 
+            	return {
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround"))
                 }
             };
-
+            
+            
             // Using actionCreators like this means that every action defined there is available in the template.
             connect2Redux(selectFromState, actionCreators, [], this);
         }
@@ -358,7 +381,7 @@ function genComponentConf() {
         	this.details[isSeeks] = [];
         	this.tagsString[isSeeks] = "";
             this.tempTags[isSeeks] = [];
-        	return {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined};
+        	return {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
         }
         
         titlePicZoneNg() {
@@ -377,6 +400,7 @@ function genComponentConf() {
 
                 var tmpList = [this.is, this.seeks];
                 var newObject = {is: this.draftObject.is, seeks: this.draftObject.seeks}; 
+                
                 for(i = 0; i < 2; i ++){
                 	var tmp = tmpList[i];
                 	if(!this.isDetailPresent("tags", tmp)){
@@ -384,6 +408,10 @@ function genComponentConf() {
                     }
                     if(!this.isDetailPresent("location", tmp)){
                     	newObject[tmp].location = undefined;
+                    }
+                    
+                    if(this.tempMatchingContext.length > 0){
+                    	newObject[tmp].matchingContext = this.tempMatchingContext;
                     }
                     
                     if(newObject[tmp].title === "") {
@@ -418,6 +446,39 @@ function genComponentConf() {
 
         addTags(isSeeks) {
             this.draftObject[isSeeks].tags = this.mergeTags(isSeeks);
+        }
+        
+        mergeMatchingContext() {
+        	
+        	//return (this.matchingContextString? this.matchingContextString.match(/(\S+)/gi) : []);
+        	
+        	//var names = ["Mike","Matt","Nancy","Adam","Jenny","Nancy","Carl"];
+
+        	var list = this.tempMatchingString? this.tempMatchingString.match(/(\S+)/gi) : [];
+        	var uniq = list.reduce(function(a,b){
+        	    if (a.indexOf(b) < 0 ) a.push(b);
+        	    return a;
+        	  },[]);
+
+        	//console.log(uniq, names) // [ 'Mike', 'Matt', 'Nancy', 'Adam', 'Jenny', 'Carl' ]
+
+        	// one liner
+        	return list.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
+        	
+        	/*
+            //let detailContext = Immutable.Set(this.matchingContextString? this.matchingContextString.match(/(\S+)/gi) : []).map(context => context.substr(1)).toJS();
+        	let detailContext = Immutable.Set(this.matchingContextString? this.matchingContextString.match(/#(\S+)/gi) : []).map(context => context.substr(1)).toJS();
+        	
+            let combinedContext = this.tempMatchingContext? detailContext.concat(this.tempMatchingContext) : detailContext;
+
+            const immutableContextSet = Immutable.Set(combinedContext);
+            return immutableContextSet.toJS();
+            */
+            
+        }
+        
+        addMatchingContext() {
+            this.tempMatchingContext = this.mergeMatchingContext();
         }
 
         locationIsSaved(isSeeks) {
@@ -475,7 +536,8 @@ function genComponentConf() {
                                         tags: undefined,
                                         location: location,
                                         thumbnail: undefined,
-                                        whatsAround: true
+                                        whatsAround: true,
+                                        matchingContext: this.tempMatchingContext
                                     };
 
                                     this.existingWhatsAroundNeeds

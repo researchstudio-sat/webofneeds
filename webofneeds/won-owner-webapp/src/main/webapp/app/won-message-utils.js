@@ -283,6 +283,7 @@ export function buildCreateMessage(needData, wonNodeUri) {
         description: needDataIsOrSeeks.description,
         publishedContentUri: publishedContentUri, //mandatory
         tags: needDataIsOrSeeks.tags,
+        matchingContext: needDataIsOrSeeks.matchingContext,
         
         //TODO attach to either is or seeks?
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below

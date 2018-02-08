@@ -825,6 +825,7 @@ import won from './won.js';
                 {node: "won:hasWonNode"},
                 {node: "won:isInState"},
                 {node: "won:hasFlag"},
+                {node: "won:hasMatchingContext"},
                 {node: "won:hasFacet"},
                 {node: "dct:created"},
                 {

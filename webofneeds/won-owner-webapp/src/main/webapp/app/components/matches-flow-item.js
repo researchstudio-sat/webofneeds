@@ -69,7 +69,7 @@ function genComponentConf() {
                         {{ self.ownNeed.get('title') }}
                     </div>
                     <div class="mfi__match__description__type">
-                        {{ self.labels.type[ self.ownNeed.get("type") ] }}
+                        {{self.labels.type[self.ownNeed.get("type")]}}{{self.ownNeed.get('matchingContexts')? ' in '+ self.ownNeed.get('matchingContexts').join(', ') : ' (no matching context specified)' }}
                     </div>
                 </div>
                 <won-square-image
