@@ -338,10 +338,10 @@ function genComponentConf() {
             this.tagsString = {is: "", seeks: ""};
             this.tempTags = {is: [], seeks: []};
             
-            this.isNew = false;
+            this.isNew = true;
             
             this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
-            this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : ["uki"];
+            this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : [];
             this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
             
             const selectFromState = (state) => {
@@ -427,6 +427,14 @@ function genComponentConf() {
         }
 
         setDraft(updatedDraft, isSeeks) {
+        	if(this.isNew){
+        		this.isNew = false;
+        		if(!this.defaultContext) {
+	        		this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
+	                this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : [];
+	                this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
+        		}
+        	}
             if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags", isSeeks)){
                 this.addDetail("tags", isSeeks);
             }
