@@ -17,11 +17,11 @@ public class HighlevelProtocols {
 		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
         Function<Dataset, Dataset> agreementFunction = HighlevelFunctionFactory.getAgreementFunction();
 
-        // wrap this code with in andThen loop see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
-		Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
+        // wrap this code with in andThen function see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
+        
+        Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
         Dataset modified = modifiedSelection.apply(acknowledged);
-        Dataset agreed = agreementFunction.apply(modified);
-		
+        Dataset agreed = agreementFunction.apply(modified);       
 		return agreed;
 	}
 	
@@ -37,7 +37,9 @@ public class HighlevelProtocols {
 		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
         Function<Dataset, Dataset> proposalFunction = HighlevelFunctionFactory.getProposalFunction();
 
-     // wrap this code with in andThen loop see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
+     // wrap this code with in andThen function see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
+      // Try something like: 
+     // proposed -> acknowledgedSelection.andThen(modifiedSelection).andThen(proposalFunction).apply(proposed)
         Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
         Dataset modified = modifiedSelection.apply(acknowledged);
         Dataset proposed = proposalFunction.apply(modified);
@@ -59,7 +61,7 @@ public class HighlevelProtocols {
 		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
         Function<Dataset, Dataset> proposalToCancelFunction = HighlevelFunctionFactory.getProposalToCancelFunction();
         
-     // wrap this code with in andThen loop see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
+     // wrap this code with in andThen function see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
         Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
         Dataset modified = modifiedSelection.apply(acknowledged);
         Dataset proposedtocancel = proposalToCancelFunction.apply(modified);
