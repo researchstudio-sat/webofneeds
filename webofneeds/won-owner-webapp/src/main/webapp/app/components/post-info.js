@@ -73,8 +73,9 @@ function genComponentConf() {
                 <p class="post-info__details">
                  <a href="{{self.post.get('uri')}}"
                     target="_blank">
-                     <img class="rdflink__big clickable"
-                         src="generated/icon-sprite.svg#rdf_logo_1">
+                    <svg class="rdflink__big clickable">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
                   </a>
                 </p>
                 <button class="won-button--filled red" 

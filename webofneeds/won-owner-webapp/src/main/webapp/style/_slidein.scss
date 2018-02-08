@@ -7,7 +7,7 @@
 
   color: white;
 
-  background: $won-red;
+  background: $won-primary-color;
 
   padding: 1rem;
 
@@ -17,7 +17,7 @@
 
   & > .si__icon {
     margin-left: 1rem;
-
+    @include fixed-square(2rem);
   }
 
   & > .si__text {

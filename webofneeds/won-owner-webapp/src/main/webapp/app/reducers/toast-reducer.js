@@ -6,7 +6,6 @@ import {
     getIn,
     generateIdString,
 } from '../utils.js';
-import config from '../config.js';
 
 const initialState = Immutable.fromJS({
 });

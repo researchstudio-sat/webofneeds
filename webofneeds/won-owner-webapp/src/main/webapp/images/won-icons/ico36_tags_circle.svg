@@ -14,13 +14,13 @@
 			<clipPath id="SVGID_2_">
 				<use xlink:href="#SVGID_1_"  overflow="visible"/>
 			</clipPath>
-			<path clip-path="url(#SVGID_2_)" fill="#F04646" d="M26,16.894V9.822h-7.07L8.322,20.43l7.071,7.07L26,16.894L26,16.894z M24,14
+			<path clip-path="url(#SVGID_2_)" fill="var(--local-primary)" d="M26,16.894V9.822h-7.07L8.322,20.43l7.071,7.07L26,16.894L26,16.894z M24,14
 				c0,1.105-0.895,2-2,2s-2-0.895-2-2c0-1.104,0.895-2,2-2S24,12.896,24,14L24,14z"/>
 		</g>
 	</g>
 	<g>
 		<g>
-			<path fill="none" stroke="#F04646" stroke-width="2" d="M18,35c9.374,0,17-7.626,17-17S27.374,1,18,1S1,8.626,1,18
+			<path fill="none" stroke="var(--local-primary)" stroke-width="2" d="M18,35c9.374,0,17-7.626,17-17S27.374,1,18,1S1,8.626,1,18
 				S8.626,35,18,35L18,35z"/>
 		</g>
 	</g>

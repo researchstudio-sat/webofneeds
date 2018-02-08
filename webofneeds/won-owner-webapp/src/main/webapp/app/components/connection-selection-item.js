@@ -36,18 +36,21 @@ function genComponentConf() {
         <div class="conn__unreadCount">
           {{ self.unreadCount }}
         </div>
-        <img
-          class="conn__icon clickable"
-          src="generated/icon-sprite.svg#ico_settings_grey"
-          ng-click="self.settingsOpen = true">
+
+        <svg class="conn__icon clickable"
+            style="--local-primary:#CCD2D2;"
+            ng-click="self.settingsOpen = true">
+                <use href="#ico_settings"></use>
+        </svg>
       </div>
 
       <div class="conn__contextmenu"
         ng-show="self.settingsOpen">
-          <img
-            class="conn__icon clickable"
-            src="generated/icon-sprite.svg#ico_settings_hi"
+          <svg class="conn__icon clickable" 
+            style="--local-primary:black;"
             ng-click="self.settingsOpen = false">
+                <use href="#ico_settings"></use>
+          </svg>
           <button
             class="won-button--filled thin red"
             ng-click="self.closeConnection()">
