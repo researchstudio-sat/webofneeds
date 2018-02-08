@@ -69,7 +69,7 @@ function genComponentConf() {
                 </span>
             </button>
             
-            <won-labelled-hr label="::' or create a specific '"></won-labelled-hr>
+            <won-labelled-hr label="::' or create a specific '" style="margin-top: 2rem; margin-bottom: 2rem;" ></won-labelled-hr>
            
            <div class="cp__title">Post</div>
             <div class="cp__addDetail">
