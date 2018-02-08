@@ -13,16 +13,11 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		DatasetSelectionBySparqlFunction acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
-		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
-        Function<Dataset, Dataset> agreementFunction = HighlevelFunctionFactory.getAgreementFunction();
 
-        // wrap this code with in andThen function see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
-        
-        Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
-        Dataset modified = modifiedSelection.apply(acknowledged);
-        Dataset agreed = agreementFunction.apply(modified);       
-		return agreed;
+		return HighlevelFunctionFactory.getAcknowledgedSelection()
+				.andThen(HighlevelFunctionFactory.getModifiedSelection())
+				.andThen(HighlevelFunctionFactory.getAgreementFunction())
+				.apply(conversationDataset);
 	}
 	
 	/**
@@ -33,18 +28,10 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
-		DatasetSelectionBySparqlFunction acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
-		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
-        Function<Dataset, Dataset> proposalFunction = HighlevelFunctionFactory.getProposalFunction();
-
-     // wrap this code with in andThen function see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
-      // Try something like: 
-     // proposed -> acknowledgedSelection.andThen(modifiedSelection).andThen(proposalFunction).apply(proposed)
-        Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
-        Dataset modified = modifiedSelection.apply(acknowledged);
-        Dataset proposed = proposalFunction.apply(modified);
-
-        return proposed;
+		return HighlevelFunctionFactory.getAcknowledgedSelection()
+					.andThen(HighlevelFunctionFactory.getModifiedSelection())
+					.andThen(HighlevelFunctionFactory.getProposalFunction())
+					.apply(conversationDataset);
 	}
 	
 	/** reveiw and rewrite the JavaDoc descriptions below **/
@@ -57,16 +44,11 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
-		Function<Dataset, Dataset> acknowledgedSelection = HighlevelFunctionFactory.getAcknowledgedSelection();
-		DatasetSelectionBySparqlFunction modifiedSelection = HighlevelFunctionFactory.getModifiedSelection();
-        Function<Dataset, Dataset> proposalToCancelFunction = HighlevelFunctionFactory.getProposalToCancelFunction();
-        
-     // wrap this code with in andThen function see : https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html
-        Dataset acknowledged = acknowledgedSelection.apply(conversationDataset);
-        Dataset modified = modifiedSelection.apply(acknowledged);
-        Dataset proposedtocancel = proposalToCancelFunction.apply(modified);
-       
-		return proposedtocancel;
+		
+		return HighlevelFunctionFactory.getAcknowledgedSelection()
+				.andThen(HighlevelFunctionFactory.getModifiedSelection())
+				.andThen(HighlevelFunctionFactory.getProposalToCancelFunction())
+				.apply(conversationDataset);
 	}
 	
 	/**
