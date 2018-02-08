@@ -17,34 +17,49 @@
                            ng-model="self.email" ng-class="{'ng-invalid': self.registerError}" required type="email"
                            ng-keyup="self.formKeyup($event)"/>
 
-                    <span class="tg__errormsg" ng-show="registerForm.email.$error.email">
+                    <div class="tg__errormsg" ng-show="registerForm.email.$error.email">
+                        <svg class="tg__errormsg__icon">
+                            <use href="#ico16_indicator_warning"></use>
+                        </svg>
                         Not a valid E-Mail address
-                    </span>
-                    <span class="tg__errormsg" ng-show="self.registerError">
+                    </div>
+                    <div class="tg__errormsg" ng-show="self.registerError">
+                        <svg class="tg__errormsg__icon">
+                            <use href="#ico16_indicator_warning"></use>
+                        </svg>
                         {{self.registerError}}
-                    </span>
+                    </div>
 
                     <input name="password" placeholder="Password" ng-minlength="6"
                            ng-model="self.password" required type="password"
                            ng-keyup="self.formKeyup($event)"/>
 
-                    <span class="tg__errormsg" ng-show="registerForm.password.$error.minlength">
+                    <div class="tg__errormsg" ng-show="registerForm.password.$error.minlength">
+                        <svg class="tg__errormsg__icon">
+                            <use href="#ico16_indicator_warning"></use>
+                        </svg>
                         Password too short, must be at least 6 Characters
-                    </span>
+                    </div>
 
                     <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6"
                            ng-model="self.passwordAgain" required type="password" compare-to="self.password"
                            ng-keyup="self.formKeyup($event)"/>
 
-                    <input
+                    <div class="tg__errormsg"
+                          ng-show="registerForm.password_repeat.$error.compareTo">
+                        <svg class="tg__errormsg__icon">
+                            <use href="#ico16_indicator_warning"></use>
+                        </svg>
+                        Password is not equal
+                    </div>
+
+                    <div>
+                        <input
                             id="remember-me"
                             ng-model="self.rememberMe"
-                            type="checkbox"/> remember me
-
-                    <span class="tg__errormsg"
-                          ng-show="registerForm.password_repeat.$error.compareTo">
-                        Password is not equal
-                    </span>
+                            type="checkbox"/> 
+                        remember me
+                    </div>
                 </div>
                 <button id="signup" class="won-button--filled red"
                         ng-disabled="registerForm.$invalid"
