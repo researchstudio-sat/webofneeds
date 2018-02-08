@@ -35,6 +35,7 @@ System.config({
     "immutable": "npm:immutable@3.7.5",
     "jsonld": "npm:jsonld@0.4.12",
     "leaflet": "npm:leaflet@0.7.7",
+    "loadcss": "npm:loadcss@0.0.2",
     "medium.js": "npm:medium.js@1.0.1",
     "ng-redux": "npm:ng-redux@3.4.1",
     "rangy": "npm:rangy@1.3.0",
@@ -54,7 +55,7 @@ System.config({
       "buffer": "npm:buffer@3.6.0"
     },
     "github:jspm/nodelibs-buffer@0.1.1": {
-      "buffer": "npm:buffer@5.0.7"
+      "buffer": "npm:buffer@5.0.8"
     },
     "github:jspm/nodelibs-events@0.1.1": {
       "events": "npm:events@1.0.2"
@@ -114,9 +115,12 @@ System.config({
       "isarray": "npm:isarray@1.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:buffer@5.0.7": {
+    "npm:buffer@5.0.8": {
       "base64-js": "npm:base64-js@1.2.1",
       "ieee754": "npm:ieee754@1.1.8"
+    },
+    "npm:callasync@1.0.2": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:core-js@1.2.6": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -149,6 +153,9 @@ System.config({
     "npm:jsonld@0.4.12": {
       "es6-promise": "npm:es6-promise@2.0.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:loadcss@0.0.2": {
+      "callasync": "npm:callasync@1.0.2"
     },
     "npm:lodash._baseassign@3.2.0": {
       "lodash._basecopy": "npm:lodash._basecopy@3.0.1",

@@ -19,7 +19,9 @@ function genComponentConf() {
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
                     <a ng-click="self.back()" class="clickable">
-                        <img src="generated/icon-sprite.svg#ico36_backarrow" class="vtb__icon">
+                        <svg class="vtb__icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_backarrow"></use>
+                        </svg>
                     </a>
                     <won-square-image 
                         title="self.post.get('title')"
@@ -28,7 +30,7 @@ function genComponentConf() {
                     </won-square-image>
                     <hgroup>
                         <h1 class="vtb__title">{{ self.post.get('title') }}</h1>
-                        <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}</div>
+                        <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : ' (no matching context specified)' }}</div>
                     </hgroup>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">

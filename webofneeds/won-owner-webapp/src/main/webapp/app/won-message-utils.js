@@ -227,9 +227,12 @@ export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNod
  * }}
  */
 export function buildCreateMessage(needData, wonNodeUri) {
+    //Check for is and seeks
+    /*
     if(!needData.type || !needData.title)
         throw new Error('Tried to create post without type or title. ', needData);
-
+    */
+    
     const publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
 
     const imgs = needData.images;
@@ -240,18 +243,29 @@ export function buildCreateMessage(needData, wonNodeUri) {
     }
 
     //if type === create -> use needBuilder as well
-
-    const contentRdf = won.buildNeedRdf({
-        type : won.toCompacted(needData.type), //mandatory
-        title: needData.title, //mandatory
-        description: needData.description,
+    const prepareContentNodeData = (needDataIsOrSeeks) => ({
+        type : won.toCompacted(needDataIsOrSeeks.type), //mandatory
+        title: needDataIsOrSeeks.title, //mandatory
+        description: needDataIsOrSeeks.description,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: needData.tags,
+        tags: needDataIsOrSeeks.tags,
+        matchingContext: needDataIsOrSeeks.matchingContext,
+        
+        //TODO attach to either is or seeks?
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-        location: getIn(needData, ['location']),
-        whatsAround: needData.whatsAround,
-        noHints: needData.noHints,
-    });
+        
+        location: getIn(needDataIsOrSeeks, ['location']),
+        whatsAround: needDataIsOrSeeks.whatsAround,
+        noHints: needDataIsOrSeeks.noHints,
+    })
+     
+    
+    let contentRdf = won.buildNeedRdf({ 
+           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
+           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
+        });
+    
+   
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {
         receiverNode : wonNodeUri, //mandatory

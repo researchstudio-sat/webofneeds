@@ -51,7 +51,7 @@ main.about {
   }
 
   .welcome {
-      background-color: $won-dark-blue;
+      background-color: $won-secondary-color;
       color: white;
       font-family: $font-family-sans-serif;
 
@@ -85,7 +85,7 @@ main.about {
 
           .wd__title {
             display: block;
-            color: $won-red;
+            color: $won-primary-color;
             font-size: $normalFontSize;
             border-top: $thinBorderWidth solid $won-dark-purple;
             padding-top: 0.5rem;
@@ -101,7 +101,7 @@ main.about {
           }
 
           .wd__more {
-            color: $won-red;
+            color: $won-primary-color;
           }
 
           .wd__arrow {
@@ -138,7 +138,7 @@ main.about {
   }
 
   .imprint {
-    background-color: $won-red;
+    background-color: $won-primary-color;
 
     .title {
       position: relative;
@@ -148,6 +148,15 @@ main.about {
 
     .sub {
       font-size: $normalFontSize;
+    }
+
+    a {
+      text-decoration: none; 
+      color: white;
+    }
+    
+    p {
+      margin-bottom: 1em;
     }
   }
 }

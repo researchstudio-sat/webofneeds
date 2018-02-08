@@ -40,7 +40,7 @@
 
   a:not(.topnav__signupbtn),
   a:visited:not(.topnav__signupbtn) {
-    color: $won-red;
+    color: $won-primary-color;
   }
 
 
@@ -89,7 +89,7 @@
   }
 
   .topnav__signupbtn {
-    @include won-button--filled(white, $won-lighter-blue);
+    @include won-button--filled(white, $won-secondary-color-lighter);
     @include hide-in-responsive;
     @extend .topnav__button;
   }

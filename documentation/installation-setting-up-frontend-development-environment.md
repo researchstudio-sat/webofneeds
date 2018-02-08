@@ -73,3 +73,8 @@ If you want to enable gzip-compression on you local tomcat (e.g. because you're 
     compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/x-font-ttf"
    .../>
 ```
+
+### Adding js dependencies
+For example, for adding a dependecy to `rdf-formats-common`, do this:
+
+`node_modules\.bin\jspm install github:rdf-ext/rdf-formats-common`

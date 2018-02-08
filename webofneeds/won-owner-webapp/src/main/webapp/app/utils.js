@@ -1026,3 +1026,36 @@ export function ellipsizeString (string, size) {
         return string;
     }
 }
+
+// from https://github.com/gagan-bansal/parse-svg/blob/master/index.js
+export function parseSVG(xmlString) {
+    const div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+    div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg">' + xmlString + '</svg>';
+    const frag = document.createDocumentFragment();
+    while (div.firstChild.firstChild)
+        frag.appendChild(div.firstChild.firstChild);
+    return frag;
+}
+
+/**
+ * Fetch and inline an icon-spritemap so it can be colored using css-variables.
+ */
+export function inlineSVGSpritesheet(path, id) {
+    return fetch(path)
+    .then(res => res.text())
+    .then(xmlString => parseSVG(xmlString))
+    .then(svgDocumentFragment => {
+        if(!svgDocumentFragment) throw new Exception("Couldn't parse icon-spritesheet.");
+        document.body.appendChild(svgDocumentFragment);
+        const svgNode = document.body.lastChild; // the node resulting from the fragment we just appended
+        if(svgNode && svgNode.style) { 
+          svgNode.style.display = "none"
+        }
+        if(id) {
+            svgNode.id = id;
+        }
+        //svgNode.style.display = "none"; // don't want it to show up in full, only via the fragment-references to it.
+        //window.svgNode4dbg = svgNode;
+        //window.foo4dbg = document.body.appendChild(svgNode);
+    })
+}

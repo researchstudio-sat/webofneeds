@@ -101,16 +101,12 @@ const reducers = {
 
 
     //config: createReducer(
-    config: (config = Immutable.Map(), action = {}) => {
+    config: (config = Immutable.fromJS({theme: {name: 'current'}}), action = {}) => {
         switch(action.type) {
 
+            case actionTypes.config.init:
             case actionTypes.config.update:
-                /*
-                 * `.merge` assumes a flat config-object. should the config
-                 * become nested, use `mergeDeep` instead or use a
-                 * custom merging-function (or more fine-grained actions)
-                 */
-                return config.merge(action.payload);
+                return config.mergeDeep(action.payload);
 
             default:
                 return config;

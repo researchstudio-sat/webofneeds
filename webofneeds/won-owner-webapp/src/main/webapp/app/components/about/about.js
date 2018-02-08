@@ -6,9 +6,9 @@ import overviewTitleBarModule from '../visitor-title-bar.js';
 import compareToModule from '../../directives/compareTo.js';
 import accordionModule from '../accordion.js';
 import flexGridModule from '../flexgrid.js';
-import config from '../../config.js';
 import {
-    attach,
+    attach, 
+    getIn,
 } from '../../utils.js';
 import { actionCreators }  from '../../actions/actions.js';
 
@@ -33,10 +33,12 @@ const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text
     {imageSrc: 'generated/icon-sprite.svg#ico36_message', text: 'Interact and exchange', detail: 'You found someone' +
     ' who has what you need, wants to meet or change something in your common environment? Go chat with them! '}];
 
-const peopleGrid = [{imageSrc: 'skin/images/face1.png', text: '"I have something to offer"'},
-    {imageSrc: 'skin/images/face2.png', text: '"I want something"'},
-    {imageSrc: 'skin/images/face3.png', text: '"I want to do something together"'},
-    {imageSrc: 'skin/images/face4.png', text: '"I want to change something"'}];
+const peopleGrid = ({theme}) => ([
+        {imageSrc: `skin/${theme}/images/face1.png`, text: '"I have something to offer"'},
+        {imageSrc: `skin/${theme}/images/face2.png`, text: '"I want something"'},
+        {imageSrc: `skin/${theme}/images/face3.png`, text: '"I want to do something together"'},
+        {imageSrc: `skin/${theme}/images/face4.png`, text: '"I want to change something"'}
+    ]);
 
 const questions = [
     {title: "Do I need to register?", detail: "Currently, you have to register, but we're working on a feature to" +
@@ -106,16 +108,24 @@ class AboutController {
         attach(this, serviceDependencies, arguments);
 
         const self = this;
-        this.config = config;
 
-        const select = (state) => ({ });
+        window.ab4dbg = this;
+
+        const select = (state) => {
+            const theme = getIn(state, ['config','theme', 'name']);
+            return { 
+                theme,
+                imprintTemplate: "./skin/" + theme + "/" + getIn(state, ['config', 'theme', 'imprintTemplate']), 
+                peopleGrid: peopleGrid({theme}),
+            }
+        };
         const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
 
 
         this.$scope.$on('$destroy',disconnect);
 
         this.questions = questions;
-        this.peopleGrid = peopleGrid;
+        this.peopleGrid = [];
         this.workGrid = workGrid;
         this.moreInfo = false;
     }

@@ -96,7 +96,7 @@
        id="g4192">
       <path
          id="path202"
-         style="fill:#f04646;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         style="fill:var(--local-primary);fill-opacity:1;fill-rule:nonzero;stroke:none"
          d="m 803.2031,597.7021 c 9.941,0 18,8.059 18,18 0,9.941 -8.059,18 -18,18 -9.941,0 -18,-8.059 -18,-18 0,-9.941 8.059,-18 18,-18" />
       <path
          id="path582"

@@ -6,19 +6,28 @@ import avatarImageSelectorModule from '../settings/avatarimage-selector.js';
 function genComponentConf() {
     let template = `
             <div class="noavatars" ng-show="!self.items">
-                <img class="avataricon" src="generated/icon-sprite.svg#ico36_person"/>
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="avataricon">
+                        <use href="#ico36_person"></use>
+                </svg>
                 <div class="title">You don't use any avatars yet</div>
                 <div class="description">While WON is anonymous, avatars are only used for communication with in groups. Introduction text thea explains the general concept. Mi, offici dolut quid maximaio dolupta dis intotatquam fuga. Ut acero venest as solore minctemporia cus est, volore ne im qui volorem ipiciuscium velibus ciendusto distibustrum asin repe re laborerum ent, sam con es eaque endempos apienimet fuga.</div>
 
                 <a class="ac__button clickable">
-                    <img src="generated/icon-sprite.svg#ico36_plus" class="ac__button__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="ac__button__icon">
+                        <use href="#ico36_plus"></use>
+                </svg>
                     <span class="ac__button__caption">Create new Avatar</span>
                 </a>
             </div>
 
             <div class="flexbuttons top" ng-show="self.items">
                 <a class="ac__button clickable">
-                    <img src="generated/icon-sprite.svg#ico36_plus" class="ac__button__icon">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="ac__button__icon">
+                        <use href="#ico36_plus"></use>
+                </svg>
                     <span class="ac__button__caption">Create new Avatar</span>
                 </a>
             </div>
@@ -31,8 +40,14 @@ function genComponentConf() {
                                 <div class="subtitle">Created on {{item.creationDate}}</div>
                             </div>
                             <a class="avatar__header__button clickable" ng-click="item.open = true">
-                                <img class="avatar__header__button__iconsmall" src="generated/icon-sprite.svg#ico36_person"/>
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="avatar__header__button__carret">
+                                <svg style="--local-primary:var(--won-primary-color);"
+                                    class="avatar__header__button__iconsmall">
+                                        <use href="#ico36_person"></use>
+                                </svg>
+                                <svg style="--local-primary:var(--won-primary-color);"
+                                    class="avatar__header__button__carret">
+                                        <use href="#ico16_arrow_down"></use>
+                                </svg>
                             </a>
                         </div>
                         <div class="avatar__overlay">
@@ -66,7 +81,10 @@ function genComponentConf() {
                             <label class="label" ng-show="!item.usedInGroups">none yet</label>
                         </div>
                         <a class="ac__button clickable">
-                            <img src="generated/icon-sprite.svg#ico36_close_circle" class="ac__button__icon">
+                            <svg style="--local-primary:var(--won-primary-color);"
+                                class="ac__button__icon">
+                                    <use href="#ico36_close_circle"></use>
+                            </svg>
                             <span class="ac__button__caption">Remove this avatar</span>
                         </a>
                     </div>

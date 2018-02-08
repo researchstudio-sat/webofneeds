@@ -8,9 +8,11 @@ import angular from 'angular';
 //import logoutComponent from './logout.js';
 import dropdownModule from './covering-dropdown.js';
 import accountMenuModule from './account-menu.js';
-import { attach } from '../utils.js';
+import { 
+    attach,
+    getIn,
+ } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
-import config from '../config.js';
 import {
     connect2Redux,
 } from '../won-utils.js';
@@ -21,8 +23,9 @@ function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
-            <img class="si__icon"
-                src="generated/icon-sprite.svg#ico16_indicator_warning_white"/>
+            <svg class="si__icon" style="--local-primary:white;">
+                <use href="#ico16_indicator_warning"></use>
+            </svg>
             <span class="si__text">
                 Lost connection &ndash; make sure your internet-connection
                 is working, then click &ldquo;reconnect&rdquo;.
@@ -47,10 +50,10 @@ function genTopnavConf() {
                 <div class="topnav__inner__left">
                     <a href="{{ self.resetParamsHRef(self.$state, self.loggedIn ? 'feed' : 'landingpage') }}"
                         class="topnav__button">
-                            <img src="generated/icon-sprite.svg#WON_ico_header"
+                            <img src="skin/{{self.themeName}}/images/logo.svg"
                                 class="topnav__button__icon">
                             <span class="topnav__page-title topnav__button__caption">
-                                Web of Needs &ndash; Beta
+                                {{ self.appTitle }}
                             </span>
                     </a>
                 </div>
@@ -58,8 +61,9 @@ function genTopnavConf() {
                     <a href="{{ self.resetParamsHRef(self.$state, 'createNeed') }}"
                        class="topnav__button"
                        ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
-                        <img src="generated/icon-sprite.svg#ico36_plus"
-                            class="topnav__button__icon logo">
+                        <svg class="topnav__button__icon logo" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_plus"></use>
+                        </svg>
                         <span class="topnav__button__caption">New Post</span>
                     </a>
                 </div>
@@ -110,10 +114,25 @@ function genTopnavConf() {
                         'error' : toast.get('type') === self.WON.errorToast
                       }"
             ng-repeat="toast in self.toastsArray">
-                <img
-                    class="topnav__toasts__element__close clickable"
-                    ng-click="self.toasts__delete(toast)"
-                    src="generated/icon-sprite.svg#ico27_close"/>
+
+                <svg class="topnav__toasts__element__icon"
+                    ng-show="toast.get('type') === self.WON.infoToast"
+                    style="--local-primary:#CCD2D2">
+                        <use href="#ico16_indicator_info"></use>
+                </svg>
+
+                <svg class="topnav__toasts__element__icon"
+                    ng-show="toast.get('type') === self.WON.warnToast"
+                    style="--local-primary:#CCD2D2">
+                        <use href="#ico16_indicator_warning"></use>
+                </svg>
+
+                <svg class="topnav__toasts__element__icon"
+                    ng-show="toast.get('type') === self.WON.errorToast"
+                    style="--local-primary:#CCD2D2">
+                        <use href="#ico16_indicator_error"></use>
+                </svg>
+
                 <div class="topnav__toasts__element__text">
                     <p ng-show="!toast.get('unsafeHtmlEnabled')">
                         {{toast.get('msg')}}
@@ -123,11 +142,17 @@ function genTopnavConf() {
                     </p>
                     <p ng-show="toast.get('type') === self.WON.errorToast">
                         If the problem persists please contact
-                        <a href="mailto:{{::self.config.adminEmail}}">
-                            {{::self.config.adminEmail}}
+                        <a href="mailto:{{self.adminEmail}}">
+                            {{self.adminEmail}}
                         </a>
                     </p>
                 </div>
+
+                <svg class="topnav__toasts__element__close clickable"
+                    ng-click="self.toasts__delete(toast)"
+                    style="--local-primary:var(--won-primary-color);">
+                        <use href="#ico27_close"></use>
+                </svg>
 
             </div>
         </div>
@@ -139,11 +164,13 @@ function genTopnavConf() {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
             Object.assign(this, srefUtils); // bind srefUtils to scope
-            this.config = config;
 
             window.tnc4dbg = this;
 
             const selectFromState = (state) => ({
+                themeName: getIn(state, ['config', 'theme', 'name']),
+                appTitle: getIn(state, ['config', 'theme', 'title']),
+                adminEmail: getIn(state, ['config', 'theme', 'adminEmail']),
                 WON: won.WON,
                 loginVisible: state.get('loginVisible'),
                 open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")
