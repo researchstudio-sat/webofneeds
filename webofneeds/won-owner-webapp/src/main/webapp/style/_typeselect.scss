@@ -29,8 +29,13 @@ $minHeight: $iconSize + $verticalPadding * 2;
 
     @include flex-row-spaced;
 
-    &:hover, &:focus { background-color: $won-light-gray; }
-    &:active { background-color: darken($won-light-gray, 10%) }
+    &:hover, &:focus { 
+      background-color: $won-light-gray; 
+    }
+    &:active { 
+      background-color: $won-light-gray;
+      filter: brightness(90%);
+    }
 
     .ts__option__carret {
       @include carretSized;

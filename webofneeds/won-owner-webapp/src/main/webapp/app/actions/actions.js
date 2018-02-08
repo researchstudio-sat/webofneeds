@@ -80,10 +80,10 @@ import {
 
 import * as cnct from './connections-actions.js';
 import * as messages from './messages-actions.js';
+import * as configActions from './config-actions.js';
 
 import {
-    configInit,
-    pageLoadAction
+    pageLoadAction,
 } from './load-action.js';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
@@ -232,8 +232,8 @@ const actionHierarchy = {
         test: INJ_DEFAULT
     },
     config: {
-        init: configInit,
-        update: INJ_DEFAULT,
+        init: configActions.configInit,
+        update: configActions.update,
     },
     tick: startTicking,
 

@@ -164,7 +164,7 @@
     }
     &__caption {
       white-space: nowrap;
-      color: $won-red;
+      color: $won-primary-color;
       padding-left: 0.5rem;
     }
   }
@@ -295,7 +295,7 @@
 
               a {
                 font-size: 0.75rem;
-                color: $won-red;
+                color: $won-primary-color;
                 text-decoration: none;
               }
             }

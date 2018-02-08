@@ -27,7 +27,10 @@ function genComponentConf() {
 
                 <div class="ntb__inner__left">
                     <a ng-click="self.router__stateGoResetParams('overviewPosts')" class="clickable">
-                        <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
+                        <svg style="--local-primary:var(--won-primary-color);"
+                            class="ntb__icon">
+                                <use href="#ico36_backarrow"></use>
+                        </svg>
                     </a>
                     <won-square-image
                         ng-class="{'inactive' : !self.isActive}"
@@ -44,7 +47,7 @@ function genComponentConf() {
                     <div class ="ntb__inner__right__upper">
                         <hgroup>
                             <h1 class="ntb__title">{{ self.post.get('title') }}</h1>
-                            <div class="ntb__titles__type">{{self.labels.type[self.post.get('type')]}}</div>
+                            <div class="ntb__titles__type">{{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : ' (no matching context specified)' }}</div>
                         </hgroup>
                         <img
                             class="ntb__icon clickable"

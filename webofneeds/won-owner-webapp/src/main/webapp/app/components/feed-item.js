@@ -48,13 +48,16 @@ function genComponentConf() {
                 <div class="fi__description__subtitle">
                 <!--
                     <span class="fi__description__subtitle__group" ng-show="self.ownNeed.group">
-                        <img src="generated/icon-sprite.svg#ico36_group" class="fi__description__subtitle__group__icon">
+                        <svg style="--local-primary:var(--won-primary-color);"
+                            class="fi__description__subtitle__group__icon">
+                                <use href="#ico36_group"></use>
+                        </svg>
                         {{self.ownNeed.group}}
                         <span class="fi__description__subtitle__group__dash"> &ndash; </span>
                     </span>
                     -->
                     <span class="fi__description__subtitle__type">
-                        {{self.labels.type[self.ownNeed.get("type")]}}
+                        {{self.labels.type[self.ownNeed.get("type")]}}{{self.ownNeed.get('matchingContexts')? ' in '+ self.ownNeed.get('matchingContexts').join(', ') : ' (no matching context specified)' }}
                     </span>
                 </div>
             </div>
@@ -95,7 +98,10 @@ function genComponentConf() {
                         { connectionType: self.WON.Suggested, postUri: self.needUri }
                     ) }}"
                    ng-show="self.unreadMatchesCount">
-                    <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="fi__footer__indicators__item__icon">
+                            <use href="#ico36_match"></use>
+                    </svg>
                     <span class="fi__footer__indicators__item__caption">
                        {{ self.unreadMatchesCount }}
                        Match{{self.unreadMatchesCount > 1 ? 'es' : ''}}
@@ -104,7 +110,10 @@ function genComponentConf() {
                 <a class="fi__footer__indicators__item clickable"
                    ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestReceived, postUri: self.needUri})"
                    ng-show="self.unreadRequestsCount">
-                    <img src="generated/icon-sprite.svg#ico36_incoming" class="fi__footer__indicators__item__icon"/>
+                    <svg style="--local-primary:var(--won-primary-color);"
+                        class="fi__footer__indicators__item__icon">
+                            <use href="#ico36_incoming"></use>
+                    </svg>
                     <span class="fi__footer__indicators__item__caption">
                         {{self.unreadRequestsCount}}
                         Incoming Request{{ self.unreadRequestsCount > 1 ? 's' : ''}}

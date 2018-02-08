@@ -79,6 +79,14 @@
          rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
+###  http://purl.org/webofneeds/model#hasMatchingContext
+:hasFlag rdf:type owl:ObjectProperty ;
+         rdfs:domain :Need ;
+         rdfs:range xsd:String ;
+         rdfs:comment "Specifies a 'matching context' for the Need. Matchers should only send hints to this Need if the counterpart specifies the same matching context. If no matching context is specified, matching is not restricted, and matchers may send hints with counterparts that do specify matching contexts."@en ;
+         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+
 ###  http://purl.org/webofneeds/model#hasLocation
 :hasLocation rdf:type owl:ObjectProperty ;
              rdfs:range :LocationSpecification ;
