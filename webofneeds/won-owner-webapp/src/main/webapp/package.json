@@ -36,7 +36,7 @@
       "immutable": "npm:immutable@3.7.5",
       "jsonld": "npm:jsonld@0.4.12",
       "leaflet": "npm:leaflet@0.7.7",
-      "loadcss": "npm:loadcss@^0.0.2",
+      "loadcss": "npm:loadcss@0.0.2",
       "medium.js": "npm:medium.js@1.0.1",
       "n3": "npm:n3@0.11.2",
       "ng-redux": "npm:ng-redux@x3.4.1",
