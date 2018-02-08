@@ -37,6 +37,7 @@ System.config({
     "leaflet": "npm:leaflet@0.7.7",
     "loadcss": "npm:loadcss@0.0.2",
     "medium.js": "npm:medium.js@1.0.1",
+    "n3": "npm:n3@0.11.2",
     "ng-redux": "npm:ng-redux@3.4.1",
     "rangy": "npm:rangy@1.3.0",
     "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
@@ -50,9 +51,6 @@ System.config({
     "undo.js": "npm:undo.js@0.2.0",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
-    },
-    "github:jspm/nodelibs-buffer@0.1.0": {
-      "buffer": "npm:buffer@3.6.0"
     },
     "github:jspm/nodelibs-buffer@0.1.1": {
       "buffer": "npm:buffer@5.0.8"
@@ -107,14 +105,6 @@ System.config({
     "npm:babel-runtime@5.8.35": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:buffer@3.6.0": {
-      "base64-js": "npm:base64-js@0.0.8",
-      "child_process": "github:jspm/nodelibs-child_process@0.1.0",
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "ieee754": "npm:ieee754@1.1.8",
-      "isarray": "npm:isarray@1.0.0",
-      "process": "github:jspm/nodelibs-process@0.1.2"
-    },
     "npm:buffer@5.0.8": {
       "base64-js": "npm:base64-js@1.2.1",
       "ieee754": "npm:ieee754@1.1.8"
@@ -129,7 +119,7 @@ System.config({
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:core-util-is@1.0.2": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0"
+      "buffer": "github:jspm/nodelibs-buffer@0.1.1"
     },
     "npm:es6-promise@2.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -146,9 +136,6 @@ System.config({
     "npm:invariant@2.2.2": {
       "loose-envify": "npm:loose-envify@1.3.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
-    },
-    "npm:isarray@1.0.0": {
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
     "npm:jsonld@0.4.12": {
       "es6-promise": "npm:es6-promise@2.0.1",
@@ -201,6 +188,11 @@ System.config({
     "npm:medium.js@1.0.1": {
       "rangy": "npm:rangy@1.3.0",
       "undo.js": "npm:undo.js@0.2.0"
+    },
+    "npm:n3@0.11.2": {
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "stream": "github:jspm/nodelibs-stream@0.1.0",
+      "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:ng-redux@3.4.1": {
       "invariant": "npm:invariant@2.2.2",
@@ -256,7 +248,7 @@ System.config({
       "readable-stream": "npm:readable-stream@1.1.14"
     },
     "npm:string_decoder@0.10.31": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0"
+      "buffer": "github:jspm/nodelibs-buffer@0.1.1"
     },
     "npm:undo.js@0.2.0": {
       "process": "github:jspm/nodelibs-process@0.1.2"
