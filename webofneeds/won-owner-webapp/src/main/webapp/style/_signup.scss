@@ -57,6 +57,14 @@
 
     .tg__errormsg {
       font-size: $smallFontSize;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      color: $won-primary-color;
+
+      &__icon {
+        @include fixed-square(1em);
+        --local-primary: $won-primary-color;
+      }
     }
 
     input[type=text],
@@ -64,10 +72,6 @@
     input[type=email] {
       margin: 1rem 0;
       width: 100%;
-    }
-
-    input.ng-invalid {
-      margin: 1rem 0 0 0;
     }
   }
 }

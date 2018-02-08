@@ -489,6 +489,10 @@
     <field name="_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag"
            type="text_standard" termVectors="true" multiValued="true" indexed="true" stored="true"/>
 
+    <!-- Do not use stemming or synonyms for multivalued matching context field -->
+    <field name="_graph.http___purl.org_webofneeds_model_hasMatchingContext"
+           type="text_standard" termVectors="true" multiValued="true" indexed="true" stored="true"/>
+
     <!-- location fields for spatial queries -->
     <!-- make these fields multivalued since we can have several is/seeks branches -->
     <field name="is_need_location" type="location" multiValued="true" indexed="true" stored="true"/>
