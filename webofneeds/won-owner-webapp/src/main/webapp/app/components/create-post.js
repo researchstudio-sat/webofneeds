@@ -318,7 +318,7 @@ function genComponentConf() {
 
             //TODO debug; deleteme
             window.cnc = this;
-
+           
             this.postTypeTexts = postTypeTexts;
             this.characterLimit = 140; //TODO move to conf
             this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
@@ -338,16 +338,16 @@ function genComponentConf() {
             this.tagsString = {is: "", seeks: ""};
             this.tempTags = {is: [], seeks: []};
             
-            this.isNew = false;
+            this.isNew = true;
             
-            this.tempMContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
-            this.tempMatchingContext = this.tempMContext? this.tempMContext.toJS() : [];
+            this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
+            this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : [];
             this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
             
             const selectFromState = (state) => {
  
             	return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround"))
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")) 
                 }
             };
             
@@ -427,6 +427,14 @@ function genComponentConf() {
         }
 
         setDraft(updatedDraft, isSeeks) {
+        	if(this.isNew){
+        		this.isNew = false;
+        		if(!this.defaultContext) {
+	        		this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
+	                this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : [];
+	                this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
+        		}
+        	}
             if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags", isSeeks)){
                 this.addDetail("tags", isSeeks);
             }
@@ -449,32 +457,13 @@ function genComponentConf() {
         }
         
         mergeMatchingContext() {
-        	
-        	//return (this.matchingContextString? this.matchingContextString.match(/(\S+)/gi) : []);
-        	
-        	//var names = ["Mike","Matt","Nancy","Adam","Jenny","Nancy","Carl"];
-
         	var list = this.tempMatchingString? this.tempMatchingString.match(/(\S+)/gi) : [];
         	var uniq = list.reduce(function(a,b){
         	    if (a.indexOf(b) < 0 ) a.push(b);
         	    return a;
         	  },[]);
 
-        	//console.log(uniq, names) // [ 'Mike', 'Matt', 'Nancy', 'Adam', 'Jenny', 'Carl' ]
-
-        	// one liner
-        	return list.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);
-        	
-        	/*
-            //let detailContext = Immutable.Set(this.matchingContextString? this.matchingContextString.match(/(\S+)/gi) : []).map(context => context.substr(1)).toJS();
-        	let detailContext = Immutable.Set(this.matchingContextString? this.matchingContextString.match(/#(\S+)/gi) : []).map(context => context.substr(1)).toJS();
-        	
-            let combinedContext = this.tempMatchingContext? detailContext.concat(this.tempMatchingContext) : detailContext;
-
-            const immutableContextSet = Immutable.Set(combinedContext);
-            return immutableContextSet.toJS();
-            */
-            
+        	return list.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);          
         }
         
         addMatchingContext() {
