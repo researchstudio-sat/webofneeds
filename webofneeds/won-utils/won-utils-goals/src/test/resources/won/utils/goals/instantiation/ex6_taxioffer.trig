@@ -65,20 +65,12 @@
 <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> {
     <http://example.org/2/TaxiRideShape>
             a                     sh:NodeShape ;
-            sh:closed             true ;
+            sh:closed             false ;
             sh:ignoredProperties  ( rdf:type ) ;
-            sh:property           [
-                                    sh:hasValue "48.218727" ;
-                                    sh:maxCount  1 ;
-                                    sh:minCount  1 ;
-                                    sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasNorthWestCorner s:latitude )
-                                  ] ;
-            sh:property           [ sh:class     s:GeoCoordinates ;
-                                    sh:maxCount  1 ;
-                                    sh:minCount  1 ;
-                                    sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasSouthEastCorner )
-                                  ] ;
 
+            sh:property [
 
-            sh:targetClass        won:Need .
+                            sh:path      s:latitude;
+                        ] ;
+            sh:targetClass       s:GeoCoordinates .
 }

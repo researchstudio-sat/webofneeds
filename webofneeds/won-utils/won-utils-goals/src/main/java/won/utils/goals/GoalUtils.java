@@ -62,6 +62,10 @@ public class GoalUtils {
      */
     public static Model extractGoalData(Model dataModel, Model shaclShapesModel) {
 
+        System.out.println("DATAMODEL OUTPUT-------------------");
+        dataModel.write(System.out, "TRIG");
+        System.out.println("-----------------------------------------------");
+
         Resource report = ValidationUtil.validateModel(dataModel, shaclShapesModel, false);
         Model combinedModel = ModelFactory.createDefaultModel();
         combinedModel.add(dataModel);
@@ -70,6 +74,10 @@ public class GoalUtils {
         Query query = QueryFactory.create(goalExtractionQuery);
         QueryExecution qexec = QueryExecutionFactory.create(query ,combinedModel);
         Model result = qexec.execConstruct();
+
+        System.out.println("RETURN VALUE EXTRACTGOALDATA-------------------");
+        result.write(System.out, "TRIG");
+        System.out.println("-----------------------------------------------");
         return result;
     }
 

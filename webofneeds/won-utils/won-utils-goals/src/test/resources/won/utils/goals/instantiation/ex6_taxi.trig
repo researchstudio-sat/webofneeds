@@ -17,6 +17,8 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 
+@prefix exTaxi: <http://example.org/Taxi/> .
+
 <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig> {
     <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig>
             a                               sig:Signature ;

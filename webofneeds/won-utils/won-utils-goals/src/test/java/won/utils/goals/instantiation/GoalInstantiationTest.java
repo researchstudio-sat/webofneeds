@@ -166,6 +166,30 @@ public class GoalInstantiationTest {
         Assert.assertTrue(result.isConform());
     }
 
+    @Test
+    public void exampleTaxi_validity() throws IOException {
+        Dataset taxiOffer = loadDataset(baseFolder + "ex6_taxioffer.trig");
+        Dataset taxiDemand = loadDataset(baseFolder + "ex6_taxi.trig");
+
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+
+        for(GoalInstantiationResult res : results) {
+            //System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
+            //System.out.println(res.toString());
+
+            if(res.isConform()){
+                //System.out.println("GETTING THE INSTANCEMODEL OF THE RESULT");
+                //res.getInstanceModel().write(System.err, "TRIG");
+            }
+        }
+
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(taxiOffer);
+        Resource goal = needWrapper1.getGoals().iterator().next();
+        GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
+        Assert.assertTrue(result.isConform());
+    }
+
     private Dataset loadDataset(String path) throws IOException {
 
         InputStream is = null;
