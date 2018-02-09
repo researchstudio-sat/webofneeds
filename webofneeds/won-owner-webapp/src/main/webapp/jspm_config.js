@@ -37,7 +37,6 @@ System.config({
     "leaflet": "npm:leaflet@0.7.7",
     "loadcss": "npm:loadcss@0.0.2",
     "medium.js": "npm:medium.js@1.0.1",
-    "n3": "npm:n3@0.11.2",
     "ng-redux": "npm:ng-redux@3.4.1",
     "rangy": "npm:rangy@1.3.0",
     "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
@@ -188,11 +187,6 @@ System.config({
     "npm:medium.js@1.0.1": {
       "rangy": "npm:rangy@1.3.0",
       "undo.js": "npm:undo.js@0.2.0"
-    },
-    "npm:n3@0.11.2": {
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "stream": "github:jspm/nodelibs-stream@0.1.0",
-      "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:ng-redux@3.4.1": {
       "invariant": "npm:invariant@2.2.2",
