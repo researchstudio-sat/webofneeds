@@ -67,10 +67,17 @@
             a                     sh:NodeShape ;
             sh:closed             false ;
             sh:ignoredProperties  ( rdf:type ) ;
-
             sh:property [
-
-                            sh:path      s:latitude;
+                            sh:class     s:GeoCoordinates ;
+                            sh:maxCount  1 ;
+                            sh:minCount  1 ;
+                            sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasNorthWestCorner )
                         ] ;
-            sh:targetClass       s:GeoCoordinates .
+            sh:property [
+                            sh:class     s:GeoCoordinates ;
+                            sh:maxCount  1 ;
+                            sh:minCount  1 ;
+                            sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasSouthEastCorner )
+                        ] ;
+            sh:targetClass       won:Need .
 }
