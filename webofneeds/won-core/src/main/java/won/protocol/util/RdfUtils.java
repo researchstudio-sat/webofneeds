@@ -168,6 +168,181 @@ public class RdfUtils
     return clonedDataset;
   }
 
+  /**
+   * Applies Model.isIsomorphicWith to all models in both datasets that have the same
+   * name, and checks that there are no more models in one than in the other.
+   * @param dataset
+   * @param otherDataset
+   * @return
+   */
+  public static boolean isIsomorphicWith(Dataset dataset, Dataset otherDataset){
+      if (dataset == null) throw new IllegalArgumentException("dataset must not be null");
+      if (otherDataset== null) throw new IllegalArgumentException("otherDataset must not be null");
+      //first, check the default graph:
+      Model defaultModel = dataset.getDefaultModel();
+      Model otherDefaultModel = otherDataset.getDefaultModel();
+      if (!areModelsIsomorphic(defaultModel, otherDefaultModel)){
+        return false;
+      }
+      //now, check all named models
+      Iterator<String> namesIt = dataset.listNames();
+      while(namesIt.hasNext()) {
+        String name = namesIt.next();
+        Model model = dataset.getNamedModel(name);
+        if (!otherDataset.containsNamedModel(name)){
+          //treat empty named graphs same as non-existent ones: check if the named graph in the otherDataset is empty
+          if (dataset.getNamedModel(name).isEmpty()){
+            return true;
+          }
+        }
+        Model otherModel = otherDataset.getNamedModel(name);
+        if (!areModelsIsomorphic(model, otherModel)){
+          return false;
+        }
+      }
+      //check if the other dataset contains named models not contained in the dataset
+      namesIt = otherDataset.listNames();
+      while(namesIt.hasNext()) {
+        String name = namesIt.next();
+        if (!dataset.containsNamedModel(name)){
+          //treat empty named graphs same as non-existent ones: check if the named graph in the otherDataset is empty
+          if (otherDataset.getNamedModel(name).isEmpty()){
+            return true;
+          }
+          return false;
+        }
+      }
+      return true;
+  }
+
+
+
+  public static boolean areModelsIsomorphic(Model model, Model otherModel) {
+    if (model != null){
+      if (otherModel == null) {
+        return false;
+      } else {
+        return model.isIsomorphicWith(otherModel);
+      }
+    } else {
+      if (otherModel != null) {
+        return false;
+      }
+    }
+    throw new IllegalArgumentException("both models are null");
+  }
+
+  public static Pair<Model> diff(Model firstModel, Model secondModel){
+    if (firstModel == null && secondModel == null) return null;
+    Model cloneFirst = null;
+    Model cloneSecond = null;
+    if (firstModel != null) {
+      cloneFirst = cloneModel(firstModel);
+    }
+    if (secondModel != null) {
+      cloneSecond = cloneModel(secondModel);
+    }
+    if (firstModel == null || secondModel == null) {
+      return new Pair<Model>(cloneFirst, cloneSecond);
+    }
+    //both models are non-null:
+    //remove all statements from clones that exist in the other one, too (excluding blank nodes)
+    StmtIterator it = firstModel.listStatements();
+    while (it.hasNext()){
+      Statement stmt = it.nextStatement();
+      if (stmt.getSubject().isAnon() ||
+            stmt.getObject().isAnon()) {
+        Resource s = stmt.getSubject();
+        Property p = stmt.getPredicate();
+        RDFNode o = stmt.getObject();
+        if(s.isAnon()) s = null;
+        if(o.isAnon()) o = null;
+        StmtIterator it2 = cloneSecond.listStatements(s, p, o);
+        while (it2.hasNext()) {
+          Statement toRemove = it2.nextStatement();
+          if (stmt.getSubject().isAnon() && ! toRemove.getSubject().isAnon()) continue;
+          if (stmt.getObject().isAnon() && ! toRemove.getObject().isAnon()) continue;
+          it2.remove();
+        }
+      } else {
+        cloneSecond.remove(stmt);
+      }
+    }
+    it = secondModel.listStatements();
+    while (it.hasNext()){
+      Statement stmt = it.nextStatement();
+      if (stmt.getSubject().isAnon() ||
+              stmt.getObject().isAnon()) {
+        Resource s = stmt.getSubject();
+        Property p = stmt.getPredicate();
+        RDFNode o = stmt.getObject();
+        if(s.isAnon()) s = null;
+        if(o.isAnon()) o = null;
+        StmtIterator it2 =cloneFirst.listStatements(s, p, o);
+        while (it2.hasNext()) {
+          Statement toRemove = it2.nextStatement();
+          if (stmt.getSubject().isAnon() && ! toRemove.getSubject().isAnon()) continue;
+          if (stmt.getObject().isAnon() && ! toRemove.getObject().isAnon()) continue;
+          it2.remove();
+        }
+      } else {
+        cloneFirst.remove(stmt);
+      }
+    }
+    return new Pair<Model>(cloneFirst, cloneSecond);
+  }
+
+  public static Pair<Dataset> diff(Dataset firstDataset, Dataset secondDataset){
+    Dataset firstResultDataset = DatasetFactory.createGeneral();
+    Dataset secondResultDataset = DatasetFactory.createGeneral();
+    //first, diff the default models:
+    Pair<Model> modelDiff = diff(firstDataset.getDefaultModel(), secondDataset.getDefaultModel());
+    firstResultDataset.setDefaultModel(modelDiff.getFirst());
+    secondResultDataset.setDefaultModel(modelDiff.getSecond());
+    //now find models of same name and diff them
+    Iterator<String> namesIt = firstDataset.listNames();
+    while (namesIt.hasNext()){
+      String name = namesIt.next();
+      if (secondDataset.containsNamedModel(name)) {
+        modelDiff = diff(firstDataset.getNamedModel(name), secondDataset.getNamedModel(name));
+        if (modelDiff.getFirst() != null && !modelDiff.getFirst().isEmpty()) {
+          firstResultDataset.addNamedModel(name, modelDiff.getFirst());
+        }
+        if (modelDiff.getSecond() != null && ! modelDiff.getSecond().isEmpty()) {
+          secondResultDataset.addNamedModel(name, modelDiff.getSecond());
+        }
+      } else {
+        firstResultDataset.addNamedModel(name, cloneModel(firstDataset.getNamedModel(name)));
+      }
+    }
+    namesIt = secondDataset.listNames();
+    while (namesIt.hasNext()){
+      String name = namesIt.next();
+      if (!firstDataset.containsNamedModel(name)){
+        secondResultDataset.addNamedModel(name, cloneModel(secondDataset.getNamedModel(name)));
+      }
+    }
+    return new Pair<Dataset>(firstResultDataset, secondResultDataset);
+  }
+
+
+  public static class Pair<E> {
+    private E first;
+    private E second;
+
+    public Pair(E first, E second) {
+      this.first = first;
+      this.second = second;
+    }
+
+    public E getFirst() {
+      return first;
+    }
+
+    public E getSecond() {
+      return second;
+    }
+  }
 
   public static void replaceBaseURI(final Model model, final String baseURI)
   {

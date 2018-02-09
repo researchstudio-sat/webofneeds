@@ -1,0 +1,36 @@
+PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+
+DELETE
+ {
+    GRAPH ?g { ?s ?p ?o }
+ }
+WHERE
+ {
+    GRAPH ?g {   
+        ?s ?p ?o .
+        filter(
+            ?p != agr:proposes 
+            && ?p != agr:accepts
+            && ?p != agr:proposesToCancel
+            && ?p != msg:hasPreviousMessage
+            && ?p != msg:hasCorrespondingRemoteMessage
+            && ?p != msg:hasContent
+            && ?p != msg:hasMessageType
+            && ?p != msg:hasSender
+            && ?p != msg:hasSenderNeed
+            && ?p != msg:hasReceiver
+            && ?p != msg:hasReceiverNeed
+        )
+    } filter not exists {
+        GRAPH ?g2 {
+            ?clause msg:hasContent ?g .
+        }
+        GRAPH ?g {
+          ?s ?p ?o .
+        }
+    }
+}

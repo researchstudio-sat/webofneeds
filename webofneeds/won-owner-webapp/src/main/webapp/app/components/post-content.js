@@ -21,7 +21,7 @@ function genComponentConf() {
         <div
           class="pc__text"
           ng-show="self.need.getIn(['location', 's:name'])">
-            <svg class="pc_icon" style="--local-primary:#939598;">
+            <svg class="pc__icon" style="--local-primary:#939598;">
                 <use href="#ico16_indicator_location"></use>
             </svg>
             <span>{{ self.need.getIn(['location', 's:name']) }}</span>
@@ -37,7 +37,7 @@ function genComponentConf() {
       -->
         <!--
         <div class="pc__datetime">
-          <svg class="pc_icon" style="--local-primary:#939598;">
+          <svg class="pc__icon" style="--local-primary:#939598;">
               <use href="#ico16_indicator_time"></use>
           </svg>
           <span>Available until 5th May</span>
@@ -45,7 +45,7 @@ function genComponentConf() {
         -->
         <div class="pc__text"
           ng-show="!!self.need.get('description')">
-          <svg class="pc_icon" style="--local-primary:#939598;">
+          <svg class="pc__icon" style="--local-primary:#939598;">
               <use href="#ico16_indicator_description"></use>
           </svg>
           <span>
@@ -54,7 +54,7 @@ function genComponentConf() {
         </div>
         <div class="pc__text"
           ng-show="!!self.need.get('location')">
-          <svg class="pc_icon" style="--local-primary:#939598;">
+          <svg class="pc__icon" style="--local-primary:#939598;">
               <use href="#ico16_indicator_location"></use>
           </svg>
           <span>
@@ -63,7 +63,7 @@ function genComponentConf() {
         </div>
         <div class="pc__text"
           ng-show="!!self.textMessage">
-          <svg class="pc_icon" style="--local-primary:#939598;">
+          <svg class="pc__icon" style="--local-primary:#939598;">
               <use href="#ico16_indicator_message"></use>
           </svg>
           <span>
