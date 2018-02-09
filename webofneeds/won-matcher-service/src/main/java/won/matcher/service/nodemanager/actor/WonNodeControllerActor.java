@@ -264,6 +264,10 @@ public class WonNodeControllerActor extends UntypedActor
 
     // try register at won node
     try {
+      if (failedWonNodeUris.contains(wonNodeUri)) {
+    	  log.info("Refusing to add previously failed won node for crawling: {}", wonNodeUri);
+    	  return null;
+      }
       registrationClient.register(wonNodeUri);
       ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
     } catch (RestClientException e) {
