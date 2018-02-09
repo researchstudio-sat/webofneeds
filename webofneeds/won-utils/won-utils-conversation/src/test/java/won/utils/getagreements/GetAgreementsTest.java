@@ -1,4 +1,4 @@
-package won.utils.agreement;
+package won.utils.getagreements;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,20 +39,29 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
+import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.util.RdfUtils;
 
-public class AgreementProtocolTest {
 
+public class GetAgreementsTest {
+
+	// for agreement protocol::
     private static final String inputFolder = "/won/utils/agreement/input/";
     private static final String expectedOutputFolder = "/won/utils/agreement/expected/";
+    
+    // Boolean that sets whether we include the base level agreement protocol tests
+    private static final Boolean agreementTests = true;
 
+    // for getAgreements with acknowledgement, modification, and agreement protocol...
+    private static final String getAGinputFolder = "/won/utils/getagreements/input/";
+    private static final String getAGexpectedOutputFolder = "/won/utils/getagreements/expected/";
 
     @BeforeClass
     public static void setLogLevel() {
     	Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     	root.setLevel(Level.INFO);	
     }
-    
+       	
     // This is the case where there are no agreements, that is no predicates from the agreement protocol. The output should be nothing...
     @Test
     public void noAgreementsTest () throws IOException {
@@ -305,13 +314,22 @@ public class AgreementProtocolTest {
         test(input,expectedOutput);
     }
     
-    // This includes a Proposal that is retracted
+    // This includes a Accept that is retracted
     @Test
-    public void oneAgreementProposalRetracted() throws IOException {
-        Dataset input = loadDataset( inputFolder + "one-agreement-proposes-retracted.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-proposes-retracted.trig");
+    public void oneAgreementAcceptsRetracted() throws IOException {
+        Dataset input = loadDataset( getAGinputFolder + "one-agreement-accepts-retracted.trig");
+        Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-accepts-retracted.trig");
         test(input,expectedOutput);
-     }
+        
+    }
+        
+     // This includes a Proposal that is retracted
+        @Test
+        public void oneAgreementProposalRetracted() throws IOException {
+            Dataset input = loadDataset( getAGinputFolder + "one-agreement-proposes-retracted.trig");
+            Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-proposes-retracted.trig");
+            test(input,expectedOutput);
+    }
     
     private static boolean passesTest(Dataset input, Dataset expectedOutput) {
         Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
@@ -322,7 +340,7 @@ public class AgreementProtocolTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
+        Dataset actual =  HighlevelProtocols.getAgreements(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
@@ -346,7 +364,7 @@ public class AgreementProtocolTest {
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = AgreementProtocolTest.class.getResourceAsStream(path);
+            is = GetAgreementsTest.class.getResourceAsStream(path);
             dataset = DatasetFactory.create();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
@@ -396,7 +414,7 @@ public class AgreementProtocolTest {
     }
     
     private static List<String> getClasspathEntriesByPath(String path) throws IOException {
-        InputStream is = AgreementProtocolTest.class.getClassLoader().getResourceAsStream(path);
+        InputStream is = GetAgreementsTest.class.getClassLoader().getResourceAsStream(path);
 
         StringBuilder sb = new StringBuilder();
         while (is.available()>0) {
