@@ -1,0 +1,60 @@
+PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>
+
+DELETE {
+  GRAPH ?contentGraph { ?s ?p ?o }.
+}
+WHERE
+ {
+	GRAPH ?gm2 {
+    	?m a ?messageDirection .
+        filter (?messageDirection != msg:FromExternal)
+    }
+	GRAPH ?gm3 {
+    	?m msg:hasMessageType ?mtype .
+        filter (?mtype != msg:SuccessResponse && ?mtype != msg:FailureResponse)
+    }
+    GRAPH ?gm4 {
+        	?m msg:hasContent ?contentGraph .
+    }
+    optional {
+      	GRAPH ?gr11 {
+          ?r1 msg:isResponseTo ?m .
+        }
+        GRAPH ?gr12 {
+          ?r1 msg:hasMessageType ?r1type .
+        }
+    }
+   	optional {
+    	GRAPH ?gm1 {
+    		?m msg:hasCorrespondingRemoteMessage ?rm .
+        }
+        optional {
+            GRAPH ?gr21 {
+                ?r2 msg:isResponseTo ?rm .
+            }
+            GRAPH ?gr22 {
+                ?r2 msg:hasMessageType ?r2type .
+            }
+
+            optional {
+                GRAPH ?gr31 {
+                    ?r3 msg:hasCorrespondingRemoteMessage ?r2 .
+                }
+                filter (bound(?r2))
+            }
+        }
+    }
+	filter (
+      	!bound(?r1) || ?r1type = msg:FailureResponse
+        || ( ?mtype in ( msg:ConnectionMessage, msg:ConnectMessage, msg:OpenMessage, msg:CloseMessage ) && ! bound(?rm))
+        || (bound(?rm) && (!bound(?r2) || ?r2type = msg:FailureResponse || !bound(?r3)))
+	)
+
+	GRAPH ?contentGraph {
+    	?s ?p ?o .
+    }
+ }

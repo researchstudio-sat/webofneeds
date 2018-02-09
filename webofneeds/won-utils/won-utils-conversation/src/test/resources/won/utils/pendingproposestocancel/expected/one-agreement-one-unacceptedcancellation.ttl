@@ -1,0 +1,23 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://localhost:8443/won/resource/connection/> .
+@prefix mod:   <http://purl.org/webofneeds/modification#> .
+@prefix need:  <https://localhost:8443/won/resource/need/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix agr:   <http://purl.org/webofneeds/agreement#> .
+@prefix local: <https://localhost:8443/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://localhost:8443/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+event:1435888415723958200
+        agr:proposesToCancel  event:ow321nn1va6clfidc4s0 .
