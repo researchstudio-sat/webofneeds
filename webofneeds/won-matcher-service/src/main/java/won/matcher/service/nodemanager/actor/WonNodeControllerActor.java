@@ -11,7 +11,6 @@ import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 import scala.concurrent.duration.Duration;
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.ssl.MessagingContext;
@@ -159,7 +158,8 @@ public class WonNodeControllerActor extends UntypedActor {
             WonNodeEvent event = (WonNodeEvent) message;
 
             if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED) ||
-                    event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING)) {
+                    event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING) ||
+                    event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE)) {
 
                 // continue crawling of known won nodes
                 if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
@@ -185,7 +185,8 @@ public class WonNodeControllerActor extends UntypedActor {
                 }
 
                 // try the connect to won node
-                WonNodeConnection wonNodeConnection = addWonNodeForCrawling(event.getWonNodeUri());
+                boolean logRegisterWarningForWonNode = event.getStatus().equals(WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE);
+                WonNodeConnection wonNodeConnection = addWonNodeForCrawling(event.getWonNodeUri(), logRegisterWarningForWonNode);
 
                 // connection failed ?
                 if (failedWonNodeUris.contains(event.getWonNodeUri())) {
@@ -259,9 +260,10 @@ public class WonNodeControllerActor extends UntypedActor {
      * Try to register at won nodes and add them for crawling
      *
      * @param wonNodeUri URI of the won node meta data resource
+     * @param logWonNodeRegisterWarning if true then log the failed register attempts as warning, otherwise as debug level
      * @return won node connection if successfully connected, otherwise null
      */
-    private WonNodeConnection addWonNodeForCrawling(String wonNodeUri) {
+    private WonNodeConnection addWonNodeForCrawling(String wonNodeUri, boolean logWonNodeRegisterWarning) {
 
         WonNodeConnection con = null;
         Dataset ds = null;
@@ -271,15 +273,15 @@ public class WonNodeControllerActor extends UntypedActor {
         try {
             registrationClient.register(wonNodeUri);
             ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
-        } catch (RestClientException e) {
-            addFailedWonNode(wonNodeUri, con);
-            log.warning("Error requesting won node information from {}", wonNodeUri);
-            log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
-            return null;
         } catch (Exception e) {
             addFailedWonNode(wonNodeUri, con);
-            log.warning("Error requesting won node information from {}", wonNodeUri);
-            log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+            if (logWonNodeRegisterWarning) {
+                log.warning("Error requesting won node information from {}", wonNodeUri);
+                log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+            } else {
+                log.debug("Error requesting won node information from {}", wonNodeUri);
+                log.debug("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+            }
             return null;
         }
 
@@ -321,7 +323,7 @@ public class WonNodeControllerActor extends UntypedActor {
 
         for (String uri : failedNodes) {
             // try register at the wonnode again
-            WonNodeEvent e = new WonNodeEvent(uri, WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+            WonNodeEvent e = new WonNodeEvent(uri, WonNodeEvent.STATUS.RETRY_REGISTER_FAILED_WON_NODE);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
         }
     }
