@@ -22,8 +22,8 @@ import java.io.InputStream;
 
 public class AcceptsProposesToCancelTest {
 	
-    private static final String inputFolder = "/won/utils/acceptsproposesTocancel/input/";
-    private static final String expectedOutputFolder = "/won/utils/acceptsproposesTocancel/expected/";
+    private static final String inputFolder = "/won/utils/acceptsproposestocancel/input/";
+    private static final String expectedOutputFolder = "/won/utils/acceptsproposestocancel/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
