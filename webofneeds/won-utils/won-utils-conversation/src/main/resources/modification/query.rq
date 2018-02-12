@@ -43,16 +43,6 @@ WHERE
    filter not exists {
          
             ?retractingMsg mod:retracts ?retractedMsg .
-            
-       #    GRAPH ?retractingMessageContent {
-       #         ?retractingMsg mod:retracts ?retractedMsg .
-       #         ?rs ?rp ?ro .
-       #         }
-         
-       #    GRAPH <urn:x-arq:UnionGraph> {
-       #         ?retractingMsg msg:hasPreviousMessage+ ?retractedMsg
-        #      }
-    
           
          filter ( ?prop = ?retractedMsg || ?acc = ?retractedMsg ) .
 
