@@ -125,6 +125,22 @@ public class ModificationProtocolTest {
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "wrong-remote-selfretract.trig");
         test(input,expectedOutput);
     }
+    
+    // one-agreement-accepts-retracted.trig
+    @Test
+    public void oneAgreementAcceptsRetracted () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-accepts-retracted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-accepts-retracted.trig");
+        test(input,expectedOutput);
+    }
+    
+    // one-agreement-accepts-retracted.trig
+    @Test
+    public void oneAgreementProposesRetracted () throws IOException {
+        Dataset input = loadDataset( inputFolder + "one-agreement-proposes-retracted.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-proposes-retracted.trig");
+        test(input,expectedOutput);
+    }
 
     public void test(Dataset input, Dataset expectedOutput) {
 

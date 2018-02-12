@@ -23,6 +23,8 @@ public class HighlevelFunctionFactory {
 	private static DatasetToModelBySparqlFunction acceptsCancelledAgreement;
 	private static DatasetToModelBySparqlFunction acceptedRetracts;
 	private static DatasetSelectionBySparqlFunction modifiedSelection;
+	// Code for testing minified version of the modification query..
+	private static DatasetSelectionBySparqlFunction miniMod;
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
 		if (acceptedProposesFunction == null) {
@@ -101,6 +103,15 @@ public class HighlevelFunctionFactory {
 			modifiedSelection = new DatasetSelectionBySparqlFunction("/modification/query.rq");
 		}
 		return modifiedSelection;
+	}
+	
+	// Code for testing minified version of the modification query..
+	
+	public static DatasetSelectionBySparqlFunction getMiniMod() {
+		if ( miniMod == null) {
+			miniMod = new DatasetSelectionBySparqlFunction("/minimod/query-new.rq");
+		}
+		return miniMod;
 	}
 	
 // Insert some special code here for modifications ...
