@@ -1,27 +1,24 @@
 package won.utils.acceptscancelledagreement;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.util.FileManager;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelFunctionFactory;
-import won.protocol.util.RdfUtils;
-import won.utils.pendingproposestocancel.PendingProposesToCancelTest;
-
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+import won.protocol.highlevel.HighlevelFunctionFactory;
+import won.protocol.util.RdfUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class AcceptsCancelledAgreementTest {
 	  
@@ -60,24 +57,33 @@ public class AcceptsCancelledAgreementTest {
 
 }
 
-	
-	private static Model customLoadModel(String path) throws IOException {
 
-		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
-        FileManager.get().addLocatorClassLoader(AcceptsCancelledAgreementTest.class.getClassLoader());
-        Model model = FileManager.get().loadModel(prefix + path);
-          
-       return model;
-   }
-	
-    private static Dataset loadDataset(String path) throws IOException {
+    private Model customLoadModel(String path) throws IOException {
+        InputStream is = null;
+        Model model = null;
+        try {
+            is = getClass().getResourceAsStream(path);
+            model = ModelFactory.createDefaultModel();
+            RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+
+        return model;
+    }
+
+
+
+    private Dataset loadDataset(String path) throws IOException {
 
         InputStream is = null;
         Dataset dataset = null;
         try {
-            is = AcceptsCancelledAgreementTest.class.getResourceAsStream(path);
+            is = getClass().getResourceAsStream(path);
             dataset = DatasetFactory.create();
-        	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+            RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
             if (is != null) {
                 is.close();
