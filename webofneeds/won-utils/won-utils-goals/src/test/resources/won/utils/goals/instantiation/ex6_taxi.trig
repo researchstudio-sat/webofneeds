@@ -35,11 +35,12 @@
             won:hasFacet  won:OwnerFacet ;
             won:seeks     [ dc:title         "Taxi" ;
                             won:hasLocation  [ a                   s:Place ;
-                                               won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
+                                               won:hasBoundingBox  [
+                                                                    won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218727" ;
                                                                                                s:longitude  "16.360141"
                                                                                              ] ;
-                                                                     won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
+                                                                    won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
                                                                                                s:latitude   "48.218828" ;
                                                                                                s:longitude  "16.360241"
                                                                                              ]
@@ -49,7 +50,26 @@
                                                                      s:longitude  "16.360191"
                                                                    ] ;
                                                s:name              "8, Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
-                                             ]
+                                             ] ;
+                            <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#ride>  [
+                                              a              s:TravelAction ;
+                                              s:fromLocation [
+                                                                a       s:Place ;
+                                                                s:geo   [
+                                                                            a       s:GeoCoordinates ;
+                                                                            s:latitude   "10.0" ;
+                                                                            s:longitude  "11.0"
+                                                                        ] ;
+                                                             ] ;
+                                              s:toLocation   [
+                                                                a       s:Place;
+                                                                s:geo   [
+                                                                            a       s:GeoCoordinates ;
+                                                                            s:latitude   "12.0" ;
+                                                                            s:longitude  "13.0"
+                                                                        ] ;
+                                                             ] ;
+                                            ] ;
                           ] ;
             cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                               woncrypt:ecc_algorithm  "EC" ;
