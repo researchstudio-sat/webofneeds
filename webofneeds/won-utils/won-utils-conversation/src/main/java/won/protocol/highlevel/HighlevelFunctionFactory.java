@@ -105,15 +105,6 @@ public class HighlevelFunctionFactory {
 		return modifiedSelection;
 	}
 	
-	// Code for testing minified version of the modification query..
-	
-	public static DatasetSelectionBySparqlFunction getMiniMod() {
-		if ( miniMod == null) {
-			miniMod = new DatasetSelectionBySparqlFunction("/minimod/query-new.rq");
-		}
-		return miniMod;
-	}
-	
 // Insert some special code here for modifications ...
 	
 	// The original class name was ProposalToCancelFunction
