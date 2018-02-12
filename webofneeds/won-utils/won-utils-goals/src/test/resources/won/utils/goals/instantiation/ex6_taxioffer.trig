@@ -63,21 +63,57 @@
 }
 
 <https://satvm05.researchstudio.at/won/resource/event/qkrivynfftr9gtl3u8im#content-fsw0> {
+    <http://example.org/2/SelfShape>
+            a   sh:NodeShape ;
+            sh:targetNode   s:TravelAction ;
+            sh:property [
+                            sh:path [ sh:inversePath rdf:type ];
+                            sh:minCount 1 ;
+                            sh:maxCount 1 ;
+                        ] .
     <http://example.org/2/TaxiRideShape>
             a                     sh:NodeShape ;
-            sh:closed             false ;
+            sh:closed             true ;
             sh:ignoredProperties  ( rdf:type ) ;
             sh:property [
-                            sh:class     s:GeoCoordinates ;
-                            sh:maxCount  1 ;
-                            sh:minCount  1 ;
-                            sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasNorthWestCorner )
+                            sh:path s:fromLocation ;
+                            sh:class s:Place ;
+                            sh:minCount 1;
+                            sh:maxCount 1;
                         ] ;
             sh:property [
-                            sh:class     s:GeoCoordinates ;
-                            sh:maxCount  1 ;
-                            sh:minCount  1 ;
-                            sh:path      ( won:seeks won:hasLocation won:hasBoundingBox won:hasSouthEastCorner )
+                            sh:path s:toLocation;
+                            sh:class s:Place ;
+                            sh:minCount 0;
+                            sh:maxCount 1;
                         ] ;
-            sh:targetClass       won:Need .
+            sh:targetClass       s:TravelAction .
+
+    <http://example.org/2/PlaceShape>
+        a sh:NodeShape;
+        sh:targetClass s:Place ;
+        sh:property [
+            sh:path s:geo ;
+            sh:class s:GeoCoordinates ;
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+        sh:ignoredProperties ( rdf:type ) ;
+        sh:closed true .
+
+    <http://example.org/2/GeoCoordinateShape>
+        a sh:NodeShape;
+        sh:targetClass s:GeoCoordinates ;
+        sh:property [
+            sh:path s:latitude ;
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+        sh:property [
+            sh:path s:longitude ;
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+        sh:ignoredProperties ( rdf:type ) ;
+        sh:closed true .
 }
