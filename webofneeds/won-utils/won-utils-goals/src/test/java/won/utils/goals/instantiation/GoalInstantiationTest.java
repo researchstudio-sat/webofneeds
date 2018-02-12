@@ -7,6 +7,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.Test;
+import won.protocol.model.Coordinate;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.NeedModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
@@ -166,21 +167,92 @@ public class GoalInstantiationTest {
         Assert.assertTrue(result.isConform());
     }
 
+    private static final String latLngPickupQuery = "prefix s:     <http://schema.org/>\n" +
+            "prefix taxi:  <http://example.org/taxi/> \n" +
+            "\n" +
+            "select ?lat ?lon\n" +
+            "\n" +
+            "where {\n" +
+            "\t?main a s:TravelAction;\n" +
+            "    \t  s:fromLocation ?location.\n" +
+            "  \t?location a s:Place;\n" +
+            "          s:geo ?geo.\n" +
+            "  \t?geo a s:GeoCoordinates;\n" +
+            "          s:latitude ?lat;\n" +
+            "          s:longitude ?lon.\n" +
+            "}";
+
+    private static final String latLngDropoffQuery = "prefix s:     <http://schema.org/>\n" +
+            "prefix taxi:  <http://example.org/taxi/> \n" +
+            "\n" +
+            "select ?lat ?lon\n" +
+            "\n" +
+            "where {\n" +
+            "\t?main a s:TravelAction;\n" +
+            "    \t  s:toLocation ?location.\n" +
+            "  \t?location a s:Place;\n" +
+            "          s:geo ?geo.\n" +
+            "  \t?geo a s:GeoCoordinates;\n" +
+            "          s:latitude ?lat;\n" +
+            "          s:longitude ?lon.\n" +
+            "}";
+
+
+    public static Coordinate getDepartureAdress(Model payload){
+        QuerySolution solution = executeQuery(latLngPickupQuery, payload);
+
+        if(solution != null){
+            float lat = solution.getLiteral("lat").getFloat();
+            float lon = solution.getLiteral("lon").getFloat();
+            return new Coordinate(lat, lon);
+        }else{
+            return null;
+        }
+    }
+
+    public static Coordinate getDestinationAdress(Model payload){
+        QuerySolution solution = executeQuery(latLngDropoffQuery, payload);
+
+        if(solution != null){
+            float lat = solution.getLiteral("lat").getFloat();
+            float lon = solution.getLiteral("lon").getFloat();
+            return new Coordinate(lat, lon);
+        }else{
+            return null;
+        }
+    }
+
+    private static QuerySolution executeQuery(String queryString, Model payload) {
+        Query query = QueryFactory.create(queryString);
+        try(QueryExecution qexec = QueryExecutionFactory.create(query, payload)){
+            ResultSet resultSet = qexec.execSelect();
+            if (resultSet.hasNext()){
+                QuerySolution solution = resultSet.nextSolution();
+                return solution;
+            }
+        }
+        return null;
+    }
+
     @Test
     public void exampleTaxi_validity() throws IOException {
         Dataset taxiOffer = loadDataset(baseFolder + "ex6_taxioffer.trig");
         Dataset taxiDemand = loadDataset(baseFolder + "ex6_taxi.trig");
+        Dataset taxiDemandNoLoc = loadDataset(baseFolder + "ex6_taxi_noloc.trig");
+        Dataset taxiDemandTwoLoc = loadDataset(baseFolder + "ex6_taxi_twoloc.trig");
 
         GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
         Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
         for(GoalInstantiationResult res : results) {
-            //System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
-            //System.out.println(res.toString());
+            System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
+            System.out.println(res.toString());
+            if(res.isConform()) {
+                Coordinate departureAdress = getDepartureAdress(res.getInstanceModel());
+                Coordinate destinationAdress = getDestinationAdress(res.getInstanceModel());
 
-            if(res.isConform()){
-                //System.out.println("GETTING THE INSTANCEMODEL OF THE RESULT");
-                //res.getInstanceModel().write(System.err, "TRIG");
+                Assert.assertEquals(departureAdress, new Coordinate(10.0f, 11.0f));
+                Assert.assertEquals(destinationAdress, new Coordinate(12.0f, 13.0f));
             }
         }
 
@@ -188,6 +260,20 @@ public class GoalInstantiationTest {
         Resource goal = needWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
+
+        goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandNoLoc, null, "http://example.org/", "http://example.org/blended/");
+        results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+
+        for(GoalInstantiationResult res : results) {
+            Assert.assertFalse(res.isConform());
+        }
+
+        goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandTwoLoc, null, "http://example.org/", "http://example.org/blended/");
+        results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+
+        for(GoalInstantiationResult res : results) {
+            Assert.assertFalse(res.isConform());
+        }
     }
 
     private Dataset loadDataset(String path) throws IOException {
