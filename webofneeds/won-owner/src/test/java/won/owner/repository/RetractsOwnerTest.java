@@ -5,6 +5,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class RetractsOwnerTest {
     @Autowired
     private LinkedDataSource linkedDataSource;
 
-    //@Ignore
+    @Ignore
     @Test
     public void test() {
 
