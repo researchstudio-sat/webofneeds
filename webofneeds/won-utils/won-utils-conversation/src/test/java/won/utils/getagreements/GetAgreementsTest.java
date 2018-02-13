@@ -339,6 +339,14 @@ public class GetAgreementsTest {
             test(input,expectedOutput);
     }
         
+        // This tests a retraction of a proposal before an accept
+        @Test
+        public void retractProposalBeforeAccept() throws IOException {
+            Dataset input = loadDataset( getAGinputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
+            Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
+            test(input,expectedOutput);
+    }
+        
     private static boolean passesTest(Dataset input, Dataset expectedOutput) {
         Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
         return RdfUtils.isIsomorphicWith(expectedOutput, actual);
