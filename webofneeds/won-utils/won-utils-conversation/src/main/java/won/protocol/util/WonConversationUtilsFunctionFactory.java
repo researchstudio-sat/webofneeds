@@ -2,9 +2,12 @@ package won.protocol.util;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
+
+import com.github.andrewoma.dexx.collection.HashMap;
 
 public class WonConversationUtilsFunctionFactory {
 	

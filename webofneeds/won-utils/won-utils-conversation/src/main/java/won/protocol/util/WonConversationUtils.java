@@ -16,13 +16,14 @@ public class WonConversationUtils {
 		return WonConversationUtilsFunctionFactory.getAllMessagesFunction().apply(conversationDataset);
 	}
 
-	
 	/**
-	 * Returns the create message of the need that this connection belongs to.
+	 * Returns the URI of the create message of the need that the specified connection belongs to.
 	 * @param connectionURI
 	 * @return
 	 */
 	public static URI getCreateMessageURI(URI connectionURI, Dataset conversationDataset) {
 		throw new UnsupportedOperationException("not yet implemented");
 	}
+	
+	
 }
