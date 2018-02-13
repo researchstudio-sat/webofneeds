@@ -1,3 +1,10 @@
+# Query for extracting data based on a SHACL validation resultPath.
+# Returns triples that match the shape, extracted SHACL shape elements for extraction are:
+# * target nodes
+# * rdf:type for target classes
+# * direct properties in propoerty paths
+# * sequence propoerties in property paths
+
 prefix dash: <http://datashapes.org/dash#>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -42,6 +49,13 @@ construct {
      bind (?node as ?s)
      bind (?prop as ?p)
      ?s ?p ?o .
+   } union {
+    #include all properties listed in a sequence path
+    ?shape sh:property ?propShape .
+    ?propShape sh:path ?pathStart .
+    ?pathStart rdf:rest*/rdf:first ?prop .
+    ?s ?prop ?o .
+    bind (?prop as ?p)
    } union {
      # include rdf:type for all focus nodes that get referenced by sh:targetClass
      ?node rdf:type ?val .

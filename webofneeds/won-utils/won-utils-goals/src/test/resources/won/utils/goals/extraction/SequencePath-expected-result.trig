@@ -1,0 +1,22 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.org/ns#> .
+
+ex:Bob
+    a schema:Person ;
+    schema:familyName "Junior" ;
+    schema:birthPlace ex:Paris ;
+    ex:level1 [ ex:level2 [ ex:level3 "test" ] ] ;
+    schema:address [
+        schema:postalCode 19404
+    ] .
+
+ex:Paris
+    schema:name "Paris"@en;
+    schema:name "Paris"@fr;
+    schema:name "Paris"@de.
+
