@@ -6,8 +6,12 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
@@ -19,7 +23,11 @@ public class ModificationProtocolTest {
     private static final String inputFolder = "/won/utils/modification/input/";
     private static final String expectedOutputFolder = "/won/utils/modification/expected/";
 
-
+    @BeforeClass
+    public static void setLogLevel() {
+    	Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+    	root.setLevel(Level.INFO);	
+    }
 
     // Add new tests for modification
     // file name key for the tests below ...
