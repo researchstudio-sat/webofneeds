@@ -55,7 +55,9 @@ public class GoalInstantiationProducer {
         Dataset combinedDataset = DatasetFactory.create();
         combinedDataset.addNamedModel("need1", strippedNeed1);
         combinedDataset.addNamedModel("need2", strippedNeed2);
-        RdfUtils.addDatasetToDataset(combinedDataset, conversation, false);
+        if(conversation != null){
+            RdfUtils.addDatasetToDataset(combinedDataset, conversation, false);
+        }
         combinedModelWithoutGoals = RdfUtils.mergeAllDataToSingleModel(combinedDataset);
     }
 
@@ -202,4 +204,60 @@ public class GoalInstantiationProducer {
         return results;
     }
 
+
+    /**
+     * create all possible goal instantiations between two needs.
+     * Including the separate goals of each need as well.
+     *
+     * @return
+     */
+    public Collection<GoalInstantiationResult> createAllGoalInstantiationResults() {
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(need1);
+        NeedModelWrapper needWrapper2 = new NeedModelWrapper(need2);
+
+        Collection<GoalInstantiationResult> results = new LinkedList<>();
+
+        boolean addedGoal2s = false;
+
+        for (Resource goal1 : needWrapper1.getGoals()) {
+            results.add(findInstantiationForGoal(goal1));
+            for (Resource goal2 : needWrapper2.getGoals()) {
+                GoalInstantiationResult instantiationResult = findInstantiationForGoals(goal1, goal2);
+                results.add(instantiationResult);
+
+                if(!addedGoal2s){
+                    results.add(findInstantiationForGoal(goal2));
+                }
+            }
+            addedGoal2s = true;
+        }
+
+        if(!addedGoal2s) {
+            for (Resource goal2 : needWrapper2.getGoals()) {
+                results.add(findInstantiationForGoal(goal2));
+            }
+        }
+
+        return results;
+    }
+
+    public Collection<GoalInstantiationResult> createGoalInstantiationResultsForNeed1() {
+        return createGoalInstantiationResults(need1);
+    }
+
+    public Collection<GoalInstantiationResult> createGoalInstantiationResultsForNeed2() {
+        return createGoalInstantiationResults(need2);
+    }
+
+    private Collection<GoalInstantiationResult> createGoalInstantiationResults(Dataset need) {
+        NeedModelWrapper needWrapper = new NeedModelWrapper(need);
+
+        Collection<GoalInstantiationResult> results = new LinkedList<>();
+
+        for(Resource goal : needWrapper.getGoals()){
+            results.add(findInstantiationForGoal(goal));
+        }
+
+        return results;
+    }
 }

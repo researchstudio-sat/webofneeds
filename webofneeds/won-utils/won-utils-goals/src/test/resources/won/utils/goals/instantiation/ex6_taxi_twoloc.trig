@@ -1,0 +1,116 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://satvm05.researchstudio.at/won/resource/connection/> .
+@prefix need:  <https://satvm05.researchstudio.at/won/resource/need/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://satvm05.researchstudio.at/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satvm05.researchstudio.at/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+@prefix exTaxi: <http://example.org/Taxi/> .
+
+<https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig> {
+    <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGQCMAzda/lBqGSJooCjNlbh1T1/HNUJkAenddz7RiPjuVux/Axidt7iTD5sC+oZMYUgOQIwfp6qafpB1TiX9CO3WzPCXvVWir+EoCpZRIPhHV6lghk9u2LmP4bY3cwfIyWx3H2D" ;
+            sig:hasVerificationCertificate  need:1196850096998977500 ;
+            msg:hasHash                     "VtB15TtDYg102taFc5PYGL6y/1OEsk1RgPJBxvOJp1DAPme0QbuVikuLvOB16jlxnwpvRgurtUwtAdFuxlcRKFyE3AzAV5/7+Rs4N8qWwbkmZdUf+rhW+MAj2v+dQ/NCizSAZA48ZYbX9pCBn45MDIkKMUMHJ+ghAP7wuxgrspQ=" ;
+            msg:hasPublicKeyFingerprint     "l/HpKKFqtQrTvP75OOuOGJlypz5fucujvPCZuQk2BzE=" ;
+            msg:hasSignedGraph              <https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#envelope> .
+}
+
+<https://satvm05.researchstudio.at/won/resource/event/7684802668741646000#need> {
+    need:1196850096998977500
+            a             won:Need ;
+            won:hasFacet  won:OwnerFacet ;
+            won:seeks     [ dc:title         "Taxi" ;
+                            won:hasLocation  [ a                   s:Place ;
+                                               won:hasBoundingBox  [
+                                                                    won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
+                                                                                               s:latitude   "48.218727" ;
+                                                                                               s:longitude  "16.360141"
+                                                                                             ] ;
+                                                                    won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
+                                                                                               s:latitude   "48.218828" ;
+                                                                                               s:longitude  "16.360241"
+                                                                                             ]
+                                                                   ] ;
+                                               s:geo               [ a            s:GeoCoordinates ;
+                                                                     s:latitude   "48.218778" ;
+                                                                     s:longitude  "16.360191"
+                                                                   ] ;
+                                               s:name              "8, Thurngasse, KG Alsergrund, Alsergrund, Wien, 1090, Österreich"
+                                             ] ;
+                            <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#ride>  [
+                                              a              s:TravelAction ;
+                                              s:fromLocation [
+                                                                a       s:Place ;
+                                                                s:geo   [
+                                                                            a       s:GeoCoordinates ;
+                                                                            s:latitude   "20.0" ;
+                                                                            s:longitude  "21.0"
+                                                                        ] ;
+                                                             ] ;
+                                              s:toLocation   [
+                                                                a       s:Place;
+                                                                s:geo   [
+                                                                            a       s:GeoCoordinates ;
+                                                                            s:latitude   "22.0" ;
+                                                                            s:longitude  "23.0"
+                                                                        ] ;
+                                                             ] ;
+                                            ] ;
+                            <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#ride2>  [
+                                          a              s:TravelAction ;
+                                          s:fromLocation [
+                                                            a       s:Place ;
+                                                            s:geo   [
+                                                                        a       s:GeoCoordinates ;
+                                                                        s:latitude   "10.0" ;
+                                                                        s:longitude  "11.0"
+                                                                    ] ;
+                                                         ] ;
+                                          s:toLocation   [
+                                                            a       s:Place;
+                                                            s:geo   [
+                                                                        a       s:GeoCoordinates ;
+                                                                        s:latitude   "12.0" ;
+                                                                        s:longitude  "13.0"
+                                                                    ] ;
+                                                         ] ;
+                                        ] ;
+                          ] ;
+            cert:key      [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
+                                              woncrypt:ecc_algorithm  "EC" ;
+                                              woncrypt:ecc_curveId    "secp384r1" ;
+                                              woncrypt:ecc_qx         "7f278726c0b16722ad00ae7bc73adfa591fb8945bfec65a228d15b4d0d927a169f1c75820443f27fb9c0247c719f1461" ;
+                                              woncrypt:ecc_qy         "2c49a2a6c66159566fff4f8961a331111a344a99b4aa6c352adc9d558d9200e027f33c8b4cfdbfa47e6032a73a1deaa"
+                                            ] ] .
+}
+
+<https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#sysinfo> {
+    need:1196850096998977500
+            a                      won:Need ;
+            <http://purl.org/dc/terms/created>
+                    "2018-02-06T09:58:28.707Z"^^xsd:dateTime ;
+            <http://purl.org/dc/terms/modified>
+                    "2018-02-06T09:58:28.715Z"^^xsd:dateTime ;
+            won:hasConnections     <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500/connections> ;
+            won:hasEventContainer  <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#events> ;
+            won:hasWonNode         <https://satvm05.researchstudio.at/won/resource> ;
+            won:isInState          won:Active .
+
+    <https://satvm05.researchstudio.at/won/resource/need/1196850096998977500#events>
+            a            won:EventContainer ;
+            rdfs:member  event:7684802668741646000 , event:52gobium7bjl5h0yorb0 .
+}
