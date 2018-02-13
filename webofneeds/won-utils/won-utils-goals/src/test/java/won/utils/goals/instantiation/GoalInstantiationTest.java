@@ -1,10 +1,13 @@
 package won.utils.goals.instantiation;
 
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.shared.NotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import won.protocol.model.Coordinate;
@@ -15,6 +18,7 @@ import won.utils.goals.GoalInstantiationResult;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -197,31 +201,6 @@ public class GoalInstantiationTest {
             "          s:longitude ?lon.\n" +
             "}";
 
-
-    public static Coordinate getDepartureAdress(Model payload){
-        QuerySolution solution = executeQuery(latLngPickupQuery, payload);
-
-        if(solution != null){
-            float lat = solution.getLiteral("lat").getFloat();
-            float lon = solution.getLiteral("lon").getFloat();
-            return new Coordinate(lat, lon);
-        }else{
-            return null;
-        }
-    }
-
-    public static Coordinate getDestinationAdress(Model payload){
-        QuerySolution solution = executeQuery(latLngDropoffQuery, payload);
-
-        if(solution != null){
-            float lat = solution.getLiteral("lat").getFloat();
-            float lon = solution.getLiteral("lon").getFloat();
-            return new Coordinate(lat, lon);
-        }else{
-            return null;
-        }
-    }
-
     private static QuerySolution executeQuery(String queryString, Model payload) {
         Query query = QueryFactory.create(queryString);
         try(QueryExecution qexec = QueryExecutionFactory.create(query, payload)){
@@ -248,11 +227,11 @@ public class GoalInstantiationTest {
             System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
             System.out.println(res.toString());
             if(res.isConform()) {
-                Coordinate departureAdress = getDepartureAdress(res.getInstanceModel());
-                Coordinate destinationAdress = getDestinationAdress(res.getInstanceModel());
+                Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.sq"), res.getInstanceModel());
+                Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.sq"), res.getInstanceModel());
 
-                Assert.assertEquals(departureAdress, new Coordinate(10.0f, 11.0f));
-                Assert.assertEquals(destinationAdress, new Coordinate(12.0f, 13.0f));
+                Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
+                Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
             }
         }
 
@@ -276,6 +255,31 @@ public class GoalInstantiationTest {
         }
     }
 
+    @Test
+    public void exampleTaxiFakeLocation_validity() throws IOException {
+        Dataset taxiOffer = loadDataset(baseFolder + "ex7_taxioffer.trig");
+        Dataset taxiDemand = loadDataset(baseFolder + "ex7_taxi.trig");
+
+        GoalInstantiationProducer goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemand, null, "http://example.org/", "http://example.org/blended/");
+        Collection<GoalInstantiationResult> results = goalInstantiation.createGoalInstantiationResultsForNeed1();
+
+        for(GoalInstantiationResult res : results) {
+            res.getInstanceModel().write(System.out, "TRIG");
+            Assert.assertTrue(res.isConform());
+
+            Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/northWestCornerQuery.sq"), res.getInstanceModel());
+            Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/southEastCornerQuery.sq"), res.getInstanceModel());
+
+            Assert.assertEquals(departureAddress, new Coordinate(48.218727f, 16.360141f));
+            Assert.assertEquals(destinationAddress, new Coordinate(48.218828f, 16.360241f));
+        }
+
+        NeedModelWrapper needWrapper1 = new NeedModelWrapper(taxiOffer);
+        Resource goal = needWrapper1.getGoals().iterator().next();
+        GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
+        Assert.assertTrue(result.isConform());
+    }
+
     private Dataset loadDataset(String path) throws IOException {
 
         InputStream is = null;
@@ -291,5 +295,33 @@ public class GoalInstantiationTest {
         }
 
         return dataset;
+    }
+
+    private static String loadSparqlQuery(String filePath) {
+        InputStream is  = GoalInstantiationTest.class.getResourceAsStream(filePath);
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(is, writer, Charsets.UTF_8);
+        } catch (IOException e) {
+            throw new NotFoundException("failed to load resource: " + filePath);
+        } finally {
+            try {
+                is.close();
+            } catch (Exception e) {
+            }
+        }
+        return writer.toString();
+    }
+
+    private static Coordinate getAddress(String query, Model payload){
+        QuerySolution solution = executeQuery(query, payload);
+
+        if(solution != null){
+            float lat = solution.getLiteral("lat").getFloat();
+            float lon = solution.getLiteral("lon").getFloat();
+            return new Coordinate(lat, lon);
+        }else{
+            return null;
+        }
     }
 }
