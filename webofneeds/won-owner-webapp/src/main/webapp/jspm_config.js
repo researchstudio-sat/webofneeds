@@ -118,7 +118,7 @@ System.config({
       "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:core-util-is@1.0.2": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.1"
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
     "npm:es6-promise@2.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -135,6 +135,9 @@ System.config({
     "npm:invariant@2.2.2": {
       "loose-envify": "npm:loose-envify@1.3.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:isarray@1.0.0": {
+      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
     "npm:jsonld@0.4.12": {
       "es6-promise": "npm:es6-promise@2.0.1",
