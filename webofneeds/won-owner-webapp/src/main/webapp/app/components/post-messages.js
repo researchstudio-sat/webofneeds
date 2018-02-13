@@ -60,7 +60,7 @@ function genComponentConf() {
                         ng-show="!message.get('outgoingMessage')">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text" title="{{ self.showRdfIcon ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
+                        <div class="pm__content__message__content__text" title="{{ self.shouldShowRdf ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
                             {{ message.get('text') }}
                         </div>
                         <div
@@ -74,7 +74,7 @@ function genComponentConf() {
                                 {{ self.relativeTime(self.lastUpdateTime, message.get('date')) }}
                         </div>
                         <a
-                          ng-show="self.showRdfIcon && message.get('outgoingMessage')"
+                          ng-show="self.shouldShowRdf && message.get('outgoingMessage')"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
                             <svg class="rdflink__small clickable">
@@ -82,7 +82,7 @@ function genComponentConf() {
                             </svg>
                         </a>
                          <a
-                          ng-show="self.showRdfIcon && !message.get('outgoingMessage')"
+                          ng-show="self.shouldShowRdf && !message.get('outgoingMessage')"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
                             <svg class="rdflink__small clickable">
@@ -105,11 +105,11 @@ function genComponentConf() {
         </div>
         <div>
             <a class="rdflink withlabel clickable"
-               ng-click="self.showRdf()">
+               ng-click="self.toggleRdfDisplay()">
                    <svg class="rdflink__small">
                        <use href="#rdf_logo_1"></use>
                    </svg>
-                  <span class="rdflink__text">[{{self.showhide}}]</span> 
+                  <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span> 
             </a>
         </div>
     `;
@@ -123,12 +123,6 @@ function genComponentConf() {
             window.pm4dbg = this;
 
             const self = this;
-            this.showhide = "SHOW";
-            this.showRdfIcon = won.showRdf;
-
-            if(won.showRdf){
-                this.showhide = "HIDE";
-            }
 
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
 
@@ -159,6 +153,7 @@ function genComponentConf() {
                     lastUpdateTime: state.get('lastUpdateTime'),
                     chatMessages: sortedMessages,
                     debugmode: won.debugmode,
+                    shouldShowRdf: state.get('showRdf'),
 
                     // if the connect-message is here, everything else should be as well
                     allLoaded,
@@ -259,23 +254,6 @@ function genComponentConf() {
             const trimmedMsg = this.chatMessage.trim();
             if(trimmedMsg) {
                this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
-            }
-        }
-
-        showRdf() {
-            if(won.showRdf) {
-                won.showRdf = false;
-                this.showRdfIcon = false;
-                this.showhide = "SHOW";
-            } else {
-                won.showRdf = true;
-                this.showRdfIcon = true;
-                this.showhide = "HIDE";
-            }
-            try {
-                this.connections__showMoreMessages(this.connectionUri);
-            } catch(Exception) {
-                //this.connections__showMoreMessages();
             }
         }
     }
