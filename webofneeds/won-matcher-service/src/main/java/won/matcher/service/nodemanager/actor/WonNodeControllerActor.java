@@ -164,6 +164,11 @@ public class WonNodeControllerActor extends UntypedActor {
                 // won node has already been discovered and connected
                 if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
                     log.debug("Won node uri '{}' already discovered", event.getWonNodeUri());
+                    if (event.equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING)) {
+                        WonNodeInfo wonNodeInfo = crawlWonNodes.get(event.getWonNodeUri()).getWonNodeInfo();
+                        WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE, wonNodeInfo);
+                        pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
+                    }
                     return;
                 }
 
