@@ -636,30 +636,52 @@ function parseNeed(jsonldNeed, ownNeed) {
             parsedNeed.state = won.WON.InactiveCompacted;
         }
 
+        let isPart = undefined;
+        let seeksPart = undefined;
         let type = undefined;
+        
+        /*
         let description = undefined;
         let tags = undefined;
         let location = undefined;
-
+		*/
         //TODO: Type concept?
         if(isPresent){
-            //type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
-        	type = seeksPresent ? won.WON.BasicNeedTypeCombinedCompacted : won.WON.BasicNeedTypeSupplyCompacted;
-            description = is.get("dc:description");
-            tags = is.get("won:hasTag");
-            location = parseLocation(is.get("won:hasLocation"));
-        }else if(seeksPresent){
-            type = won.WON.BasicNeedTypeDemandCompacted;
-            description = seeks.get("dc:description");
-            tags = seeks.get("won:hasTag");
-            location = parseLocation(seeks.get("won:hasLocation"));
+            type = seeksPresent ? won.WON.BasicNeedTypeCombinedCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+            let description = is.get("dc:description");
+            let tags = is.get("won:hasTag");
+            let location = parseLocation(is.get("won:hasLocation"));
+            isPart = {
+            		title: is.get("dc:title"),
+            		type: type, 
+            		description: description ? description : undefined, 
+            		tags: (tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
+            		location: location	
+            };
+        }
+        if(seeksPresent){
+        	type = isPresent? type : won.WON.BasicNeedTypeDemandCompacted;
+            let description = seeks.get("dc:description");
+            let tags = seeks.get("won:hasTag");
+            let location = parseLocation(seeks.get("won:hasLocation"));
+            seeksPart = {
+            		title: seeks.get("dc:title"),
+            		type: type, 
+            		description: description ? description : undefined, 
+            		tags: (tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
+            		location: location	
+            };
         }
 
-        parsedNeed.tags = tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined;
-        parsedNeed.description = description ? description : undefined;
-        parsedNeed.isWhatsAround = !!isWhatsAround;
+        parsedNeed.is = isPart;
+        parsedNeed.seeks = seeksPart;
+        
+        //parsedNeed.tags = tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined;
+        //parsedNeed.description = description ? description : undefined;
+        //parsedNeed.location = location;
+        
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
-        parsedNeed.location = location;
+        parsedNeed.isWhatsAround = !!isWhatsAround;
         parsedNeed.matchingContexts =  wonHasMatchingContexts ? ( Immutable.List.isList(wonHasMatchingContexts) ? wonHasMatchingContexts : Immutable.List.of(wonHasMatchingContexts) ) : undefined;
         parsedNeed.nodeUri = nodeUri;
     }else{
