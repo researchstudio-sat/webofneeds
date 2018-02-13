@@ -227,7 +227,7 @@ public class WonNodeControllerActor extends UntypedActor {
 
         // hint duplicate filter
         if (hintDatabase.mightHintSaved(hint)) {
-            log.warning("Hint " + hint + " is filtered out by duplicate filter!");
+            log.debug("Hint " + hint + " is filtered out by duplicate filter!");
             hintDatabase.saveHint(hint);
             return;
         }
