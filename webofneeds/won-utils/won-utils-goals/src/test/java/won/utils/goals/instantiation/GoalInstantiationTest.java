@@ -11,7 +11,6 @@ import org.apache.jena.shared.NotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import won.protocol.model.Coordinate;
-import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.NeedModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
@@ -227,8 +226,8 @@ public class GoalInstantiationTest {
             System.out.println("Result::::::::::::::::::::::::::::::"+res.isConform());
             System.out.println(res.toString());
             if(res.isConform()) {
-                Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.sq"), res.getInstanceModel());
-                Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.sq"), res.getInstanceModel());
+                Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/fromLocationQuery.rq"), res.getInstanceModel());
+                Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/toLocationQuery.rq"), res.getInstanceModel());
 
                 Assert.assertEquals(departureAddress, new Coordinate(10.0f, 11.0f));
                 Assert.assertEquals(destinationAddress, new Coordinate(12.0f, 13.0f));
@@ -267,8 +266,8 @@ public class GoalInstantiationTest {
             res.getInstanceModel().write(System.out, "TRIG");
             Assert.assertTrue(res.isConform());
 
-            Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/northWestCornerQuery.sq"), res.getInstanceModel());
-            Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/southEastCornerQuery.sq"), res.getInstanceModel());
+            Coordinate departureAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/northWestCornerQuery.rq"), res.getInstanceModel());
+            Coordinate destinationAddress = getAddress(loadSparqlQuery("/won/utils/goals/extraction/address/southEastCornerQuery.rq"), res.getInstanceModel());
 
             Assert.assertEquals(departureAddress, new Coordinate(48.218727f, 16.360141f));
             Assert.assertEquals(destinationAddress, new Coordinate(48.218828f, 16.360241f));

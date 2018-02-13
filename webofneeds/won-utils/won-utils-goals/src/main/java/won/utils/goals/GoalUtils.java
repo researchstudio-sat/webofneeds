@@ -25,7 +25,7 @@ public class GoalUtils {
     private static final String goalExtractionQuery;
 
     static {
-        goalExtractionQuery = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-only-referenced-properties.sq");
+        goalExtractionQuery = loadSparqlQuery("/won/utils/goals/extraction/goal-extraction-only-referenced-properties.rq");
     }
 
     private static String loadSparqlQuery(String filePath) {
@@ -51,7 +51,7 @@ public class GoalUtils {
      * specifies which data will be extracted. The extracted data will contain all focus nodes that were actually
      * referenced in the shapes model and only these properties that were referenced in the shapes model.
      * For details on the extraction refer to the sparql queries:
-     * /won/utils/goals/extraction/goal-extraction-only-referenced-properties.sq
+     * /won/utils/goals/extraction/goal-extraction-only-referenced-properties.rq
      *
      * @param dataModel The data model is expected to contain the rdf data which is usually the merged data of two
      *                  needs and their conversation from which the goal data is gonna be extracted.
