@@ -40,6 +40,19 @@ public class GoalDataExtractionTest {
         Assert.assertTrue(actual.isIsomorphicWith(expected));
     }
 
+    @Test
+    public void sequencePath() throws IOException {
+        Dataset ds = loadDataset(baseFolder + "SequencePath.trig");
+        Model dataModel = ds.getNamedModel("http://example.org/ns#data");
+        Model shapesModel = ds.getNamedModel("http://example.org/ns#shapes");
+        Model actual = GoalUtils.extractGoalData(dataModel, shapesModel);
+        Model expected = loadModel(baseFolder + "SequencePath-expected-result.trig");
+        RDFDataMgr.write(System.out, actual, Lang.TRIG);
+
+        RDFDataMgr.write(System.out, expected, Lang.TRIG);
+        Assert.assertTrue(actual.isIsomorphicWith(expected));
+    }
+
     private Model loadModel(String path) throws IOException {
         InputStream is = null;
         Model model = null;

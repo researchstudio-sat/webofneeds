@@ -404,9 +404,9 @@ public class AgreementProtocolTest {
     }
     
     private static String readCondensationQuery() {
-	//    InputStream is  = AgreementFunction.class.getResourceAsStream("/won/utils/agreement/condensation-query.sq");
+	//    InputStream is  = AgreementFunction.class.getResourceAsStream("/won/utils/agreement/condensation-query.rq");
   // Not used...not checking if the next line works...
-    	InputStream is = HighlevelFunctionFactory.getAgreementFunction().getClass().getResourceAsStream("/won/utils/agreement/condensation-query.sq");
+    	InputStream is = HighlevelFunctionFactory.getAgreementFunction().getClass().getResourceAsStream("/won/utils/agreement/condensation-query.rq");
 	    StringWriter writer = new StringWriter();
 	    try {
 	        IOUtils.copy(is, writer, Charsets.UTF_8);

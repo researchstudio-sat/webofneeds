@@ -89,15 +89,16 @@
 
 ex2:p2g-data {
 	ex2:myRide a taxi:Ride.
+	ex2:myRide taxi:hasClient need:6462959329580403000 .
     ex2:myRide taxi:hasPickupLocation ex2:myPickupLocation .
-    ex2:myRide taxi:hasDropoffLocation ex2:myDropoffLocation .
-    ex2:myRide taxi:hasClient need:6462959329580403000 .
     ex2:myPickupLocation a s:GeoCoordinates ;
-        s:latitude   "48.213814" ;
-        s:longitude  "16.340870" .
-    ex2:myDropoffLocation a s:GeoCoordinates ;
+            s:latitude   "48.213814" ;
+            s:longitude  "16.340870" .
+    ex2:myRide taxi:hasDropoffLocation [
+        a s:GeoCoordinates ;
         s:latitude   "40.213814" ;
-        s:longitude  "12.340870" .
+        s:longitude  "12.340870"
+    ] ;
 }
 
 ex2:p2g-shapes {
