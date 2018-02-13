@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MatchingContextQueryFactory extends SolrQueryFactory {
 
-    private static final String MATCHING_CONTEXT_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_hasMatchingContext";
+    public static final String MATCHING_CONTEXT_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_hasMatchingContext";
 
     Collection<String> matchingContexts;
 

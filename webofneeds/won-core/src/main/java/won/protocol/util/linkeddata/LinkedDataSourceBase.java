@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
  */
 public class LinkedDataSourceBase implements LinkedDataSource
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(LinkedDataSourceBase.class);
   protected LinkedDataRestClient linkedDataRestClient;
 
     /**
@@ -135,13 +135,13 @@ public class LinkedDataSourceBase implements LinkedDataSource
         //add all models from urisToCrawl
         Dataset currentModel =  getDataForResource(currentURI);
         RdfUtils.addDatasetToDataset(dataset, currentModel);
-        newlyDiscoveredURIs.addAll(getURIsToCrawl(currentModel, crawledURIs, properties));
         crawledURIs.add(currentURI);
         requests++;
         logger.debug("current Request: "+requests);
         if (requests >= maxRequest) break OUTER;
 
       }
+      newlyDiscoveredURIs.addAll(getURIsToCrawl(dataset, crawledURIs, properties));
       depth++;
       logger.debug("current Depth: "+depth);
     }
@@ -165,13 +165,13 @@ public class LinkedDataSourceBase implements LinkedDataSource
         //add all models from urisToCrawl
         Dataset currentModel =  getDataForResource(currentURI, requesterWebID);
         RdfUtils.addDatasetToDataset(dataset, currentModel);
-        newlyDiscoveredURIs.addAll(getURIsToCrawl(currentModel, crawledURIs, properties));
         crawledURIs.add(currentURI);
         requests++;
         logger.debug("current Request: "+requests);
         if (requests >= maxRequest) break OUTER;
 
       }
+      newlyDiscoveredURIs.addAll(getURIsToCrawl(dataset, crawledURIs, properties));
       depth++;
       logger.debug("current Depth: "+depth);
     }
@@ -204,13 +204,13 @@ public class LinkedDataSourceBase implements LinkedDataSource
         } else {
           RdfUtils.addDatasetToDataset(resultDataset, currentDataset);
         }
-        newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(resultDataset, resourceURI, crawledURIs, properties));
         crawledURIs.add(currentURI);
         requests++;
         logger.debug("current Request: "+requests);
         if (requests >= maxRequest) break OUTER;
 
       }
+      newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(resultDataset, resourceURI, crawledURIs, properties));
       depth++;
       logger.debug("current Depth: "+depth);
     }
@@ -242,13 +242,12 @@ public class LinkedDataSourceBase implements LinkedDataSource
         } else {
           RdfUtils.addDatasetToDataset(resultDataset, currentDataset);
         }
-        newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(resultDataset, resourceURI, crawledURIs, properties));
         crawledURIs.add(currentURI);
         requests++;
         logger.debug("current Request: "+requests);
         if (requests >= maxRequest) break OUTER;
-
       }
+      newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(resultDataset, resourceURI, crawledURIs, properties));
       depth++;
       logger.debug("current Depth: "+depth);
     }

@@ -40,36 +40,88 @@ function genComponentConf() {
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.post.get('description')">
+                    ng-show="self.isPart.is.get('description')">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.post.get('description')">
-                    {{ self.post.get('description')}}
+                    ng-show="self.isPart.is.get('description')">
+                    {{ self.isPart.is.get('description')}}
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.post.get('tags')">
+                    ng-show="self.isPart.is.get('tags')">
                     Tags
                 </h2>
                 <div class="post-info__details post-info__tags"
-                    ng-show="self.post.get('tags')">
-                        <span class="post-info__tags__tag" ng-repeat="tag in self.post.get('tags').toJS()">{{tag}}</span>
+                    ng-show="self.isPart.is.get('tags')">
+                        <span class="post-info__tags__tag" ng-repeat="tag in self.isPart.is.get('tags').toJS()">{{tag}}</span>
                 </div>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.location">
+                    ng-show="self.isPart.location">
                     Location
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.address">
-                    {{ self.address }}
+                    ng-show="self.isPart.address">
+                    {{ self.isPart.address }}
                 </p>                
                 <won-need-map 
-                    uri="self.post.get('uri')"
-                    ng-show="self.location">
+                    uri="self.post.get('uri')+'#is'"
+                    isSeeks="self.isPart.isString"
+                    ng-show="self.isPart.location">
                 </won-need-map>
                 <br/>
+                
+                <div ng-show="self.seeksPart">
+	                
+	                <won-labelled-hr label="::'Search'" class="cp__labelledhr"></won-labelled-hr>
+	                <!--
+	                <h1 class="ntb_title ng-binding"
+	                    ng-show="self.seeksPart.seeks.get('title')">
+	                     {{ self.seeksPart.seeks.get('title')}}
+	                </h1> -->
+	                <h2 class="post-info__heading"
+	                    ng-show="self.seeksPart.seeks.get('title')">
+	                    Title
+	                </h2>
+	                <p class="post-info__details"
+	                    ng-show="self.seeksPart.seeks.get('title')">
+	                    {{ self.seeksPart.seeks.get('title')}}
+	                </p>
+	                <h2 class="post-info__heading"
+	                    ng-show="self.seeksPart.seeks.get('description')">
+	                    Description
+	                </h2>
+	                <p class="post-info__details"
+	                    ng-show="self.seeksPart.seeks.get('description')">
+	                    {{ self.seeksPart.seeks.get('description')}}
+	                </p>
+	
+	                <h2 class="post-info__heading"
+	                    ng-show="self.seeksPart.seeks.get('tags')">
+	                    Tags
+	                </h2>
+	                <div class="post-info__details post-info__tags"
+	                    ng-show="self.seeksPart.seeks.get('tags')">
+	                        <span class="post-info__tags__tag" ng-repeat="tag in self.seeksPart.seeks.get('tags').toJS()">{{tag}}</span>
+	                </div>
+	
+	                <h2 class="post-info__heading"
+	                    ng-show="self.seeksPart.location">
+	                    Location
+	                </h2>
+	                <p class="post-info__details"
+	                    ng-show="self.seeksPart.address">
+	                    {{ self.seeksPart.address }}
+	                </p>                
+	                <won-need-map 
+	                    uri="self.post.get('uri')+'#seeks'"
+	                    isSeeks="self.seeksPart.seeksString"
+	                    ng-show="self.seeksPart.location">
+	                </won-need-map>
+                </div>
+                
+                </br>
                 <p class="post-info__details">
                  <a href="{{self.post.get('uri')}}"
                     target="_blank">
@@ -97,12 +149,24 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
-                const location = post && post.get('location');
-
+                const is = post? post.get('is') : undefined;
+                const seeks = post? post.get('seeks') : undefined;
+                //const isLocation = is && is.get('location');
+                
                 return {
+                	isPart: is? {
+                		is: is,
+                		isString: 'is',
+                		location: is && is.get('location'),
+                		address: is.get('location') && is.get('location').get('address'),
+                	}: undefined,
+                	seeksPart: seeks? {
+                		seeks: seeks,
+                		seeksString: 'seeks',
+                		location: seeks && seeks.get('location'),
+                		address: seeks.get('location') && seeks.get('location').get('address'),
+                	}: undefined,
                     post,
-                    location: location,
-                    address: location && location.get('address'),
                     showRequestButton: post && !post.get('ownNeed') && !post.get('isWhatsAround'),
                     friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
