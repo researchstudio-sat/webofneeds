@@ -11,6 +11,9 @@ import {
     getIn,
 } from './utils.js';
 
+import N3 from '../scripts/N3/n3-browserify.js';
+import jsonld from 'jsonld';
+
 export function initLeaflet(mapMount) {
     if(!L) {
         throw new Exception("Tried to initialize a leaflet widget while leaflet wasn't loaded.");
@@ -238,3 +241,46 @@ export function parseCredentials(credentials) {
         privateId2Credentials(credentials.privateId) :
         credentials;
 }
+
+
+export async function n3Parse(rdf) {
+    const parser = N3.Parser();
+    return new Promise((resolve, reject) => {
+        let triples = [];
+        parser.parse( rdf, (error, triple, prefixes) => {
+            if(error) {
+                reject(error);
+            } else if (triple) {
+                triples.push(triple);
+            } else {
+                // all triples collected
+                resolve(triples, prefixes);
+            }
+        })
+    });
+}
+
+export async function ttlToJsonLd(ttl) {
+    return n3Parse(ttl)
+    .then((triples, prefixes) => {
+        triples.forEach(triple => console.log(triple.subject, triple.predicate, triple.object, '.', triple));
+
+        console.log('TODO useme:', prefixes); //TODO
+
+        const graphUri = 'http://TODO.org'; // TODO
+
+        const nquads = triples.map(t => `<${t.subject}> <${t.predicate}> <${t.object}> <${graphUri}>.` ).join('\n');
+
+        return jsonld.promises.fromRDF(nquads, {format: 'application/nquads'});
+    })
+    .then(jsonld => {
+        console.log('parsed jsonld: ', jsonld);
+        return jsonld;
+    })
+    .catch(e => {
+        console.error('error while parsing turtle: ', e)
+        throw e;
+    })
+}
+
+window.ttlToJsonLd4dbg = ttlToJsonLd;
