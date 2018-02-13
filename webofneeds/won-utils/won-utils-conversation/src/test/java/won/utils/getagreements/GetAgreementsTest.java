@@ -331,6 +331,14 @@ public class GetAgreementsTest {
             test(input,expectedOutput);
     }
     
+        // This includes a Proposal that is retracted
+        @Test
+        public void oneProposalTwoAcceptsFirstRetractedFirstCancelled() throws IOException {
+            Dataset input = loadDataset( getAGinputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
+            Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
+            test(input,expectedOutput);
+    }
+        
     private static boolean passesTest(Dataset input, Dataset expectedOutput) {
         Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
         return RdfUtils.isIsomorphicWith(expectedOutput, actual);

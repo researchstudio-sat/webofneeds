@@ -582,7 +582,7 @@
 <https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3#content-3j4j> {
     event:cbcccoqqqbec6bxkl3y3
             won:hasTextMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your need." ;
-            agr:proposes event:gv6zk2yqk6o8bl574n36 .
+            agr:accepts event:1107469913331435500 .
 }
 
 <https://localhost:8443/won/resource/event/8h7v5ml1aflqmoyem61a#content-7rw4> {
@@ -1446,7 +1446,8 @@
 
 <https://localhost:8443/won/resource/event/uu3ciy3btq6tg90crr3b#content-fswl> {
     event:uu3ciy3btq6tg90crr3b
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
+            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            agr:accepts event:8863100035920837000 .
 }
 
 <https://localhost:8443/won/resource/event/saegwhiwygztg1mpf4xh#envelope-oh63-sig> {
@@ -3526,8 +3527,7 @@
 
 <https://localhost:8443/won/resource/event/4846251213444807000#content> {
     event:4846251213444807000
-            won:hasTextMessage  "one" ;
-            mod:retracts event:1107469913331435500 .
+            won:hasTextMessage  "one" .
 }
 
 <https://localhost:8443/won/resource/event/5151909952739158000#data> {
@@ -3868,7 +3868,7 @@
 <https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n#content-lqq7> {
     event:cgqt5h004iql2003me2n
             won:hasTextMessage  "Please go on." ;
-            agr:proposesToCancel event:1107469913331435500 .
+            agr:accepts event:1107469913331435500 .
 }
 
 <https://localhost:8443/won/resource/event/fdxtdqeonqc6mk01crog#envelope-tbl3-sig> {
@@ -5313,8 +5313,7 @@
 
 <https://localhost:8443/won/resource/event/4055709708568209400#content> {
     event:4055709708568209400
-            won:hasTextMessage  "two" ;
-            agr:accepts event:cbcccoqqqbec6bxkl3y3 .
+            won:hasTextMessage  "two" .
 }
 
 <https://localhost:8443/won/resource/event/6149800720990867000#envelope-bx9x-sig> {
@@ -8790,7 +8789,8 @@
 
 <https://localhost:8443/won/resource/event/152dum7y56zn95qyernf#content-19tl> {
     event:152dum7y56zn95qyernf
-            won:hasTextMessage  "I'm not sure I understand you fully." .
+            won:hasTextMessage  "I'm not sure I understand you fully." ;
+            mod:retracts event:cbcccoqqqbec6bxkl3y3 .
 } 
 
 <https://localhost:8443/won/resource/event/5946672495584215000#envelope> {
@@ -8970,7 +8970,7 @@
 <https://localhost:8443/won/resource/event/1107469913331435500#content> {
     event:1107469913331435500
             won:hasTextMessage  "usage" ;
-            agr:accepts  event:cbcccoqqqbec6bxkl3y3 .
+            agr:proposes event:6149800720990867000 .
 }
 
 <https://localhost:8443/won/resource/event/xp44teiwtooczc14npe2#envelope-6e2s-sig> {
@@ -9992,7 +9992,7 @@
 <https://localhost:8443/won/resource/event/8863100035920837000#content> {
     event:8863100035920837000
             won:hasTextMessage  "validate" ;
-            agr:accepts event:cgqt5h004iql2003me2n .
+            agr:proposesToCancel event:cbcccoqqqbec6bxkl3y3 .
 }
 
 <https://localhost:8443/won/resource/event/xkeovy4cf48spd5euwj1#envelope-0x2u-sig> {
