@@ -179,35 +179,24 @@ async function messageGraphToEvent(eventUri, messageGraph) {
 
 
 function generateResponseNeedTo(theirNeed) {
-    let reNeedType, descriptionPhrase;
-    const theirNeedType = get(theirNeed, 'type');
-    if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
-        reNeedType = won.WON.BasicNeedTypeSupply;
-    } else if(theirNeedType === won.WON.BasicNeedTypeSupplyCompacted) {
-        reNeedType = won.WON.BasicNeedTypeDemand;
-    } else if(theirNeedType === won.WON.BasicNeedTypeDotogetherCompacted) {
-        reNeedType = won.WON.BasicNeedTypeDotogether;
-    } else {
-        console.error(
-            'The need responded to (' + get(theirNeed, 'uri') + ') doesn\'t ' +
-            'have a need type recognized by ad-hoc-connect method. Type: ',
-            theirNeedType
-        );
-        reNeedType = undefined;
-    }
-    descriptionPhrase = 'Direct response to : ';
+    const theirSeeks = get(theirNeed, 'seeks');
+    const theirIs = get(theirNeed, 'is');
+    return {
+        is: theirSeeks? generateResponseContentNodeTo(theirSeeks) : undefined,
+        seeks: theirIs? generateResponseContentNodeTo(theirIs) : undefined,
+    };
+}
 
-    let theirTitle = get(theirNeed, 'title');
-
+function generateResponseContentNodeTo(contentNode) {
+    const theirTitle = get(contentNode, 'title');
     return {
         title: 'Re: ' + theirTitle,
-        description: descriptionPhrase + theirTitle,
-        type: reNeedType,
-        tags: cloneAsMutable(get(theirNeed, 'tags')),
-        location: cloneAsMutable(get(theirNeed, 'location')),
+        description: 'Direct response to : ' + theirTitle,
+        //type: reNeedType,
+        tags: cloneAsMutable(get(contentNode, 'tags')),
+        location: cloneAsMutable(get(contentNode, 'location')),
         noHints: true,
     };
-
 }
 
 export function connectionsClose(connectionUri) {
