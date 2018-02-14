@@ -354,6 +354,14 @@ public class GetAgreementsTest {
                 Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-proposaltocancel-retracted.trig");
                 test(input,expectedOutput);
              }
+            
+            // This retracts a proposaltocancel before the accept message
+            @Test
+            public void retractProposalTocancelBeforeAccept() throws IOException {
+                Dataset input = loadDataset( getAGinputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
+                Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
+                test(input,expectedOutput);
+             }
         
     private static boolean passesTest(Dataset input, Dataset expectedOutput) {
         Dataset actual =  HighlevelFunctionFactory.getAgreementFunction().apply(input);
