@@ -52,6 +52,20 @@
 
 **output**:  NOTHING
 
+**present output**:
+
+```
+<https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n> {
+    <https://localhost:8443/won/resource/event/6149800720990867000>
+            <http://purl.org/webofneeds/model#hasFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasRemoteFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasTextMessage>
+                    "Hello, debugbot!" .
+}
+```
+
 ### oneAgreementProposalRetracted
 **input**: one-agreement-proposes-retracted.trig
 **output**: one-agreement-proposes-retracted.trig
@@ -217,3 +231,18 @@
 ```
 
 **output**:  NOTHING
+
+**present output**:
+
+```
+<https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3> {
+    <https://localhost:8443/won/resource/event/6149800720990867000>
+            <http://purl.org/webofneeds/model#hasFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasRemoteFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasTextMessage>
+                    "Hello, debugbot!" .
+}
+
+```
