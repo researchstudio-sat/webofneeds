@@ -140,9 +140,7 @@
 }
 ```
 
-**output**: NOTHING
-
-**present output**:
+**output**:
 
 ```
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0> {
