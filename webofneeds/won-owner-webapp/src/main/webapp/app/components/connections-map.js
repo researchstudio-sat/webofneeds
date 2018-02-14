@@ -82,7 +82,7 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const post = postUri && state.getIn(["needs", postUri]);
                 const isWhatsAround = post && post.get("isWhatsAround");
-                const postLocation = post && post.get('location');
+                const postLocation = post && (post.get('is')? post.get('is').get('location') : post.get('seeks').get('location'));
                 const connectionType = connectionTypeInParams || this.connectionType;
                 const connections = isOverview ?
                                         selectAllConnections(state).filter(conn => conn.get("state") === connectionType) :

@@ -41,7 +41,7 @@ function genComponentConf() {
                 ng-show="(true || !self.remoteNeed.get('location')) && self.images.length == 0">
             </won-square-image>
             <won-need-map
-                uri="self.remoteNeed.get('uri')"
+                uri="self.remoteNeed.get('uri')+'#is'"
                 ng-if="false && self.remoteNeed.get('location') && self.images.length == 0">
             </won-need-map>
         </div>
