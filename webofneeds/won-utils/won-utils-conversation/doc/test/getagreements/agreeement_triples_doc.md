@@ -171,3 +171,49 @@
 ```
 
 **output**: NOTHING
+
+### retractProposalTocancelAfterAgreement
+**input**: one-agreement-proposaltocancel-retracted.trig
+**output**: one-agreement-proposaltocancel-retracted.trig
+**test name**:  retractProposalTocancelAfterAgreement
+
+```
+<https://localhost:8443/won/resource/event/6149800720990867000#content> {
+    event:6149800720990867000
+            won:hasFacet        won:OwnerFacet ;
+            won:hasRemoteFacet  won:OwnerFacet ;
+            won:hasTextMessage  "Hello, debugbot!" .
+}
+
+<https://localhost:8443/won/resource/event/1107469913331435500#content> {
+    event:1107469913331435500
+            won:hasTextMessage  "usage" ;
+            agr:proposes  event:6149800720990867000 .
+}
+
+<https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3#content-3j4j> {
+    event:cbcccoqqqbec6bxkl3y3
+            won:hasTextMessage  "You are connected to the debug bot. You can issue commands that will cause interactions with your need." ;
+            agr:accepts event:1107469913331435500 .
+}
+
+<https://localhost:8443/won/resource/event/8863100035920837000#content> {
+    event:8863100035920837000
+            won:hasTextMessage  "validate" ;
+            agr:proposesToCancel event:cbcccoqqqbec6bxkl3y3 .
+}
+
+<https://localhost:8443/won/resource/event/uu3ciy3btq6tg90crr3b#content-fswl> {
+    event:uu3ciy3btq6tg90crr3b
+            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
+            agr:accepts  event:8863100035920837000 .
+}
+
+<https://localhost:8443/won/resource/event/6834006177130613000#content> {
+    event:6834006177130613000
+            won:hasTextMessage  "validate" ;
+            mod:retracts event:8863100035920837000 .
+}
+```
+
+**output**:  NOTHING
