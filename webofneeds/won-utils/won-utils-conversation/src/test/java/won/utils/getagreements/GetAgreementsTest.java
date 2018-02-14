@@ -341,7 +341,7 @@ public class GetAgreementsTest {
         
         // This tests a retraction of a proposal before an accept
         @Test
-        public void retractProposalBeforeAccept() throws IOException {
+        public void oneAgreementProposalRetractedb4Accept() throws IOException {
             Dataset input = loadDataset( getAGinputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
             Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
             test(input,expectedOutput);
