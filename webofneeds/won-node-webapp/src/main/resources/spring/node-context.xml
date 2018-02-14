@@ -125,13 +125,13 @@
 
     <!-- beans for access control based on self-signed client certificate (no webid) -->
     <bean id="clientCertificateNoWebIdFilter"
-          class="won.cryptography.webid.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
+          class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
         <constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
         <property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
         <property name="authenticationManager" ref="clientCertificateNoWebIdAuthenticationManager" />
     </bean>
     <bean id="authorizationEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
-    <bean id="clientCertificateNoWebIdUserDetailsService" class="won.cryptography.webid.springsecurity.ClientCertificateNoWebIdUserDetailsService" />
+    <bean id="clientCertificateNoWebIdUserDetailsService" class="won.node.springsecurity.ClientCertificateNoWebIdUserDetailsService" />
     <bean id="clientCertificateNoWebIdPreAuthenticationProvider"
           class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
         <property name="preAuthenticatedUserDetailsService" ref="clientCertificateNoWebIdUserDetailsService" />
@@ -144,7 +144,7 @@
 
     <!-- beans for access control based on self-signed client certificate with webid -->
     <bean id="clientCertificateWebIdFilter"
-          class="won.cryptography.webid.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
+          class="won.node.springsecurity.ReverseProxyCompatibleX509AuthenticationFilter">
         <constructor-arg name="behindProxy" value="${client.authentication.behind.proxy}" />
         <property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource" />
         <property name="authenticationManager" ref="clientCertificateWebIdAuthenticationManager" />
@@ -152,8 +152,8 @@
     <bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent">
         <property name="linkedDataSource" ref="linkedDataSource" />
     </bean>
-    <bean id="acl" class="won.cryptography.webid.WonDefaultAccessControlRules"/>
-    <bean id="webIdUserDetailsService" class="won.cryptography.webid.springsecurity.WebIdUserDetailsService" />
+    <bean id="acl" class="won.node.springsecurity.WonDefaultAccessControlRules"/>
+    <bean id="webIdUserDetailsService" class="won.node.springsecurity.WebIdUserDetailsService" />
     <bean id="preAuthenticationProvider"
           class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
         <property name="preAuthenticatedUserDetailsService" ref="webIdUserDetailsService" />
@@ -164,7 +164,7 @@
     <bean id="webIdBasedAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
         <constructor-arg>
             <list>
-                <bean class="won.cryptography.webid.springsecurity.DefaultWoNAccessDecisionVoter" />
+                <bean class="won.node.springsecurity.DefaultWoNAccessDecisionVoter" />
             </list>
         </constructor-arg>
     </bean>

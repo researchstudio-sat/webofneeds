@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -97,10 +98,10 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                     wrapper.addFacetUri(facet.toString());
                 }
 
-                Model model = wrapper.copyNeedModel(NeedGraphType.NEED);
-                logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
+                Dataset needDataset = wrapper.copyDataset();
+                logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needDataset), 150));
 
-                WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model, isUsedForTesting, isDoNotMatch);
+                WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, needDataset, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
                 botContextWrapper.addChatIdWonURIRelation(chatId, new WonURI(needURI, UriType.NEED));
                 botContextWrapper.addURIChatIdRelation(needURI, chatId);

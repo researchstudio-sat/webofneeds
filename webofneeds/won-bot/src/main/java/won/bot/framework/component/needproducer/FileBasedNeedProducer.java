@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,5 +27,5 @@ import java.io.IOException;
  */
 public interface FileBasedNeedProducer
 {
-  public Model readNeedFromFile(File file) throws IOException;
+  public Dataset readNeedFromFile(File file) throws IOException;
 }

@@ -23,7 +23,7 @@
 ### Tomcat integration:
 
 1.  Create Server: File >> New >> Other >> Server
-2.  Choose Tomcat 
+2.  Choose Tomcat, then press "next" (not "finish")
 3.  Make sure you use a Java 8 JDK or JRE, not java 9, or tomcat will not start up and throw a JAXB-related exception.
 4.  Add node and owner and click finish 
       1. If you do not have the options to add the owner and node application to the tomcat (also accessible via Server >> [your tomcat server] >> Add and Remove), something went wrong.
@@ -84,11 +84,11 @@
 	*  Open launch configuration >> (x)= Arguments >> VM arguments
 		* append the following, replacing the placeholders `<PROJECT_FOLDER>` to the webofneeds project location and the `<TOMCAT_FOLDER>` to the installation directory of your tomcat: `-Djava.library.path="<TOMCAT_FOLDER>\bin" -XX:PermSize=512m -XX:MaxPermSize=512m -DWON_CONFIG_DIR="<PROJECT_FOLDER>\webofneeds\conf.local" -Dlogback.configurationFile="<PROJECT_FOLDER>\webofneeds\conf.local\logback.xml"` 
 	*  Add the JSTL jar to your tomcat's classpath libs (or tomcat cannot be run in `Serve modules without publishing` mode, see `Server Options` below):
-	*  Open Launch Configuration >> Classpath >> User Entries >> Add External JARs ... 
+		*  Open Launch Configuration >> Classpath >> User Entries >> Add External JARs ... 
 		* Navigate to your maven repository (default location: [user home]\.m2\repository; if it's not there, look into [user home]\.m2\settings.xml)
 		* find javax\servlet\jstl\1.2\jstl-1.2.jar
 		* if you don't find it
-			* build the whole project with `mvn install`
+			* build the whole project with `mvn install -Dmaven.test.skip=true`
 			* try again      
 	*  Server Locations: Use Workspace Metadata
 	*  Server Options
@@ -109,7 +109,7 @@
 		*  In the eclipse navigator view, open Servers >> Tomcat 8.0 *(your server config)* 
 		*  edit `server.xml` 
 		*  find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"` 
-8.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure that you have the `tcnative-1.dll` **in the tomcat bin folder!**, and that you correctly point to it with the `-Djava.library.path` varialbe (Step 7). Otherwise you will get Invalid KeystoreFormat Exceptions at server startup and an info message which says "The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path => following path where to put the .dll" 
-9.  Add the bouncy castle libraries `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to "Open launch configuration" >> "Classpath" as "Add External JARs..." and to the tomcat lib folder
+8.  Follow instructions on https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md and make sure that you have the `tcnative-1.dll` **in the tomcat bin folder!**, and that you correctly point to it with the `-Djava.library.path` variable (Step 7). Otherwise you will get `InvalidKeystoreFormatException`s at server startup and an info message which says `The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path` => following path where to put the .dll 
+9.  Add the bouncy castle libraries `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to "Open launch configuration" >> "Classpath" >> "UserEntries" >> "Add External JARs...". The two jars can be found in the `[your m2 repo]/org/bouncycastle` folder. Hint: Do **not** add the bouncycastle libraries to the "Installed JRE".
 10.  Start server
 11.  Run the gulpfile outside eclipse: `npm run build` in `wepapp`, refresh the `won-owner-webapp` in eclipse (F5), click on the server –> "Publish"

@@ -3,11 +3,7 @@
 @import 'needtextfield';
 @import 'locationpicker';
 @import 'animate';
-
-
-.create-post {
-
-}
+@import 'sizing-utils';
 
 won-create-post {
 
@@ -92,15 +88,18 @@ won-create-post {
   }
 
   .cp__details {
-    @include slideWithOpacityAnimation(1.0s, linear, 60rem, 0.5rem, 0.75rem);
+    @include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
 
     border-top: $thinBorderWidth solid $won-line-gray;
-    margin: 0.75rem 0;
+    margin: 1.5rem 1.5rem;
     padding: 0.5rem 0;
 
+
+    color: black;
+    --local-primary: black; // for the svg-icons
     .cp__header:hover {
-      color: $won_red;
-      background-image: url('icon-sprite.svg#ico36_close_circle');
+      color: $won-primary-color;
+      --local-primary: $won-primary-color; // for the svg-icons
     }
 
     .cp__tags {
@@ -144,69 +143,37 @@ won-create-post {
   }
 
   .cp__addDetail {
-    border-top: $thinBorderWidth solid $won-line-gray;
-    margin: .75rem 0;
-    padding: .5rem 0;
+    //border-top: $thinBorderWidth solid $won-line-gray;
+    padding: 0 0 0 0;
     @include appearAnimation(0.5s, linear);
 
     .cp__detail__items {
-      @include slideWithOpacityAnimation(1.0s, linear, 20rem);
+      @include slideWithOpacityAnimation(.5s, linear, 20rem);
 
       .cp__detail__items__item {
         font-size: $normalFontSize;
+        margin: 0 1.5rem;
         padding: .5rem .5rem .5rem 2.5rem;
         background-position: 0 .15rem;
         background-size: 2rem;
         background-repeat: no-repeat;
         cursor: pointer;
 
+        color: black;
+        --local-primary: black; // for the svg-icons
         &:hover {
-          color: $won-red;
-          background-image: url('icon-sprite.svg#ico36_close_circle');
+          color: $won-primary-color;
+          --local-primary: $won-primary-color; // for the svg-icons
         }
 
-        &.location {
-          background-image: url('icon-sprite.svg#ico36_location_circle_hi');
-
-          &:hover {
-            background-image: url('icon-sprite.svg#ico36_location_circle');
-          }
-        }
-        &.tags {
-          background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
-
-          &:hover {
-            background-image: url('icon-sprite.svg#ico36_tags_circle');
-          }
-        }
-        &.image {
-          background-image: url('icon-sprite.svg#ico36_media_circle_hi');
-
-          &:hover {
-            background-image: url('icon-sprite.svg#ico36_media_circle');
-          }
-        }
-        &.description {
-          background-image: url('icon-sprite.svg#ico36_description_circle_hi');
-
-          &:hover {
-            background-image: url('icon-sprite.svg#ico36_description_circle');
-          }
-        }
-        &.timeframe {
-          background-image: url('icon-sprite.svg#ico36_time_circle_hi');
-
-          &:hover {
-            background-image: url('icon-sprite.svg#ico36_time_circle');
-          }
-        }
         &.picked {
-          background-image: url('icon-sprite.svg#ico36_added_circle_grey');
           color: $won-line-gray;
+          --local-primary: $won-line-gray; // for the svg-icons
           cursor: default;
 
           &:hover {
             color: $won-line-gray;
+            --local-primary: $won-line-gray; // for the svg-icons
             cursor: default;
           }
         }
@@ -214,16 +181,52 @@ won-create-post {
     }
   }
 
+  .cp__title {
+    width: 100%;
+    color: $won-subtitle-gray;
+    @extend %center--absolute;
+    margin: 1.5rem 1rem -1.5rem -1.5rem;
+    text-align: center;
+    position: relative;
+    font-size: $mediumFontSize;
+    font-weight: 400;
+    padding: 0 0 1rem 2.5rem;
+  }
+
+  .cp__carret {
+    @include fixed-square(1rem);
+
+    // visually center icon on line
+    position: relative;
+    top: 0.1em;
+  }
+  .cp__circleicon {
+    @include fixed-square(2rem);
+
+    // visually center icon on line
+    position: relative;
+    top: 0.3em;
+  }
+
   .cp__header {
     width: 100%;
     box-sizing: border-box;
     font-size: $mediumFontSize;
-    font-weight: 300;
+    font-weight: 400;
     padding-bottom: 1rem;
-    padding-left: 2.5rem;
     background-position: 0 0.15rem;
     background-size: 2rem;
     background-repeat: no-repeat;
+
+
+    span.alternate {
+           
+    }
+    span.opt {
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+      padding: .5rem .5rem .5rem .5rem;   
+    }
 
     span.hover {
       display: none;
@@ -232,8 +235,8 @@ won-create-post {
     span.nonHover {
       display: inline;
     }
-
-    &:hover {
+    
+   &:hover {
       cursor: pointer;
 
       span.hover {
@@ -246,25 +249,28 @@ won-create-post {
     }
 
     &.tags {
-      background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
+      font-size: $normalFontSize+.25rem;
     }
 
     &.location {
-      background-image: url('icon-sprite.svg#ico36_area_circle_hi');
+      font-size: $normalFontSize+.25rem;
     }
 
-    &.addDetail {
-      color: $won-red;
-      background-image: url('icon-sprite.svg#ico36_plus_circle');
+    &.addDetail, &.detailPicker {
+      color: $won-primary-color;
+      --local-primary: $won-primary-color; // for the svg-icons
 
       &:hover {
-        background-image: url('icon-sprite.svg#ico36_close_circle_hi');
         color: black;
+        --local-primary: black; // for the svg-icons
       }
-
-      &.closedDetail:hover {
-        background-image: url('icon-sprite.svg#ico36_plus_circle_hi');
-      }
+    }
+       
+    &.detailPicker {
+      font-size: $normalFontSize+.25rem;
+      margin: 0 1rem;
+      padding: .25rem .5rem .5rem 1.6rem;
+      
     }
   }
 }

@@ -30,6 +30,8 @@ import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
@@ -112,8 +114,10 @@ public class SolrMatcherActor extends UntypedActor {
             queryString = qf.createQuery();
         }
 
-        // add filters to the query: default filters are need status active and creation date overlap 1 month
-        String[] filterQueries = null;
+        // add filters to the query: default filters are
+        // - need status active
+        // - creation date overlap 1 month
+        // - OR-filtering for matching contexts if any were specified
 
         // now create three slightly different queries for different lists of needs:
         // 1) needs without NoHintForCounterpart => hints for current need
@@ -122,15 +126,18 @@ public class SolrMatcherActor extends UntypedActor {
         // to achieve this use a different filters for these queries
 
         // case 1) needs without NoHintForCounterpart => hints for current need
-        filterQueries = new String[3];
-        filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
-        filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-        filterQueries[2] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery();
+        List<String> filterQueries = new LinkedList<>();
+        filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
+        filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_COUNTERPART)).createQuery());
+        if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
+            filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
+        }
         if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME)) {
 
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 1 (without NoHintForCounterpart)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
@@ -154,16 +161,19 @@ public class SolrMatcherActor extends UntypedActor {
         }
 
         // case 2) needs without NoHintForSelf, excluding WhatsAround needs => hints for needs in index that are not WhatsAround
-        filterQueries = new String[4];
-        filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
-        filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-        filterQueries[2] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery();
-        filterQueries[3] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery();
+        filterQueries = new LinkedList<>();
+        filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
+        filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery());
+        if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
+            filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
+        }
         if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
 
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, perform knee detection)
@@ -180,16 +190,19 @@ public class SolrMatcherActor extends UntypedActor {
         }
 
         // case 3) needs without NoHintForSelf that are only WhatsAround needs => hints for needs in index that are WhatsAround
-        filterQueries = new String[4];
-        filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
-        filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-        filterQueries[2] = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery();
-        filterQueries[3] = new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND).createQuery();
+        filterQueries = new LinkedList<>();
+        filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
+        filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
+        filterQueries.add(new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND).createQuery());
+        if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
+            filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
+        }
         if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
 
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries);
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, do not perform knee detection)

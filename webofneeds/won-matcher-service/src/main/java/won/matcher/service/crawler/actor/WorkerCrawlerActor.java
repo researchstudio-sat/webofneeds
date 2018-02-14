@@ -172,7 +172,7 @@ public class WorkerCrawlerActor extends UntypedActor {
 
             // if this URI/dataset was a need then send an event to the distributed event bu
             if (NeedModelWrapper.isANeed(ds)) {
-                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+                NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds, false);
                 NeedState state = needModelWrapper.getNeedState();
 
                 NeedEvent.TYPE type = state.equals(NeedState.ACTIVE) ? NeedEvent.TYPE.ACTIVE : NeedEvent.TYPE.INACTIVE;
@@ -218,7 +218,7 @@ public class WorkerCrawlerActor extends UntypedActor {
                 sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
         String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues()) : "<None>";
         String responseETags = etags != null ? String.join(", ", etags) : "<None>";
-        log.info("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})", uriDoneMsg.getUri(), responseETags, ifNoneMatch);
+        log.debug("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})", uriDoneMsg.getUri(), responseETags, ifNoneMatch);
         getSender().tell(uriDoneMsg, getSelf());
     }
 

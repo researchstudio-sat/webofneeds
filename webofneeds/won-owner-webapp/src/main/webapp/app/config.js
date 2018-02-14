@@ -4,5 +4,4 @@ import {
 
 export default deepFreeze({
     piwik : { baseUrl : '' },
-    adminEmail: 'office.sat@researchstudio.at',
 });

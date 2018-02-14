@@ -80,11 +80,11 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
             needModelWrapper.addFacetUri(facetUri.toString());
         }
 
-        final Model needModel = needModelWrapper.copyNeedModel(NeedGraphType.NEED);
+        final Dataset echoNeedDataset = needModelWrapper.copyDataset();
 
-        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
+        logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(echoNeedDataset), 150));
 
-        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, needModel);
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, echoNeedDataset);
         //remember the need URI so we can react to success/failure responses
         EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
@@ -95,7 +95,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
 
                 // save the mapping between the original and the reaction in to the context.
                 getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToNeedUri, needURI);
-                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, echoNeedDataset, null));
             }
         };
 

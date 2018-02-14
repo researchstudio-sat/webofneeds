@@ -16,6 +16,7 @@
 
 package won.bot.framework.eventbot.event.impl.command.create;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
@@ -32,7 +33,7 @@ import java.util.List;
  */
 public class CreateNeedCommandEvent implements MessageCommandEvent {
     //the model of the need's content
-    private Model needModel;
+    private Dataset needDataset;
     //the facets the new need should have
     private List<URI> facets;
     //the name of the need uri list to save the need uri to
@@ -42,8 +43,8 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
     //sets the do not match flag
     private boolean doNotMatch = false;
 
-    public CreateNeedCommandEvent(Model needModel, String uriListName, boolean usedForTesting, boolean doNotMatch, URI... facets) {
-        this.needModel = needModel;
+    public CreateNeedCommandEvent(Dataset needDataset, String uriListName, boolean usedForTesting, boolean doNotMatch, URI... facets) {
+        this.needDataset = needDataset;
         if (this.uriListName != null) {
             this.uriListName = uriListName;
         }
@@ -55,20 +56,20 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
         this.usedForTesting = usedForTesting;
         this.doNotMatch = doNotMatch;
     }
-    public CreateNeedCommandEvent(Model needModel, String uriListName, URI... facets) {
-        this(needModel, uriListName, false, false, facets);
+    public CreateNeedCommandEvent(Dataset needDataset, String uriListName, URI... facets) {
+        this(needDataset, uriListName, false, false, facets);
     }
 
-    public CreateNeedCommandEvent(Model needModel) {
-        this(needModel, null, null);
+    public CreateNeedCommandEvent(Dataset needDataset) {
+        this(needDataset, null, null);
     }
 
-    public CreateNeedCommandEvent(Model needModel, URI... facets) {
-        this(needModel, null, facets);
+    public CreateNeedCommandEvent(Dataset needDataset, URI... facets) {
+        this(needDataset, null, facets);
     }
 
-    public CreateNeedCommandEvent(Model needModel, String uriListName) {
-        this(needModel, uriListName, null);
+    public CreateNeedCommandEvent(Dataset needDataset, String uriListName) {
+        this(needDataset, uriListName, null);
     }
 
     @Override
@@ -78,8 +79,8 @@ public class CreateNeedCommandEvent implements MessageCommandEvent {
 
 
 
-    public Model getNeedModel() {
-        return needModel;
+    public Dataset getNeedDataset() {
+        return needDataset;
     }
 
     public String getUriListName() {

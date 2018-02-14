@@ -2,6 +2,14 @@
 //#body-id {
 
 
+$skinningTestVar: --skinning-test-var;
+:root {
+  //--skinning-test-var:  rgb(54, 54, 158);
+}
+// a {
+//   background-color: var($skinningTestVar) !important;
+// }
+
 
 @import 'reset';
 
@@ -137,12 +145,12 @@ hr {
 }
 
 a {
-  //color: $won-red;
-  color: $won-lighter-blue;
+  //color: $won-primary-color;
+  color: $won-secondary-color-lighter;
   text-decoration: none;
   &:visited {
-    //color: darken($won-red, 30%);
-    color: darken($won-lighter-blue, 15%);
+    //color: darken($won-primary-color, 30%);
+    color: $won-secondary-color-light;
   }
 }
 
@@ -174,3 +182,4 @@ a {
 @import 'post-owner';
 @import 'connections-map';
 @import 'covering-dropdown';
+@import 'tab';

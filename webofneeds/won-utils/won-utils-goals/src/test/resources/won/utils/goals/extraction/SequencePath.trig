@@ -1,0 +1,69 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.org/ns#> .
+
+ex:data {
+
+ex:Bob
+    a schema:Person ;
+    schema:givenName "Robert" ;
+    schema:familyName "Junior" ;
+    schema:birthDate "1971-07-07"^^xsd:date ;
+    schema:deathDate "1968-09-10"^^xsd:date ;
+    ex:level1 [ ex:level2 [ ex:level3 "test" ] ] ;
+	schema:birthPlace ex:Paris ;
+    schema:address [
+        a schema:Address ;
+        schema:streetAddress "1600 Amphitheatre Pkway" ;
+        schema:postalCode 19404
+    ] .
+
+ex:Paris a schema:Place;
+	schema:name "Paris"@en;
+	schema:name "Paris"@fr;
+	schema:name "Paris"@de.
+
+}
+
+ex:shapes {
+schema:PersonShape
+    a sh:NodeShape ;
+    sh:targetClass schema:Person ;
+
+    # path with single property
+    sh:property [
+            sh:path schema:familyName ;
+            sh:minCount 1 ;
+            sh:maxCount 1 ;
+        ] ;
+
+    # sequence path with two propoerties
+    sh:property [
+        sh:path ( schema:birthPlace schema:name ) ;
+        sh:minCount 1 ;
+    ] ;
+
+    # sequence path with two propoerties with blank node in between
+    sh:property [
+        sh:path ( schema:address schema:postalCode ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue 19409 ;
+    ] ;
+
+    # sequence path with three propoerties
+    sh:property [
+        sh:path ( ex:level1 ex:level2 ex:level3 ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue "test" ;
+    ] .
+}
+
+ex:result {
+
+}

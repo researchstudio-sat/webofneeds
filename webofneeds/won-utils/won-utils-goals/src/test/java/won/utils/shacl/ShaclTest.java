@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.topbraid.shacl.util.ModelPrinter;
 import org.topbraid.shacl.validation.ValidationUtil;
 import org.topbraid.shacl.vocabulary.SH;
-import won.utils.goals.GoalUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,18 +91,5 @@ public class ShaclTest {
             Assert.assertEquals("Less than 1 values", result.getResultMessage());
             Assert.assertEquals(SH.MinCountConstraintComponent, result.getSourceConstraintComponent());
         }
-    }
-
-    @Test
-    public void validateBlendedDataWithShapes() {
-
-        Model blended = GoalUtils.blendGraphsSimple(p1DataModel, p2DataModel, "http://example.org/blended#");
-        Resource report = ValidationUtil.validateModel(blended, p1ShapeModel, false);
-        ShaclReportWrapper reportWrapper = new ShaclReportWrapper(report);
-        Assert.assertTrue(reportWrapper.isConform());
-
-        report = ValidationUtil.validateModel(blended, p2ShapeModel, false);
-        reportWrapper = new ShaclReportWrapper(report);
-        Assert.assertTrue(reportWrapper.isConform());
     }
 }

@@ -6,7 +6,7 @@
 1. Goto <http://nodejs.org/download/> and download the NodeJS version you need.<br>
 2. install NodeJS<br>
 3. make sure that NodeJS is correctly installed by opening a Windows Command Console and typing `node -v` then enter. If it didn't work, check whether or not your node-directory are in your system-path-variable<br>
-4. Windows users need to install msygit(http://msysgit.github.io/) with the right option. see the bower installation instruction for the right option.<br>
+4. Windows users need to install msygit(http://msysgit.github.io/) with the right option. see the bower installation instruction for the right option. Windows users will also need to run `npm install -g windows-build-tools` (otherwise building sass might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet) 
 5. the maven install task will download and install bower and jspm for you that in turn will be used to install the owner-apps dependencies. However maven isn't yet configured to run `jspm install` as there's no easy integration via maven-frontend as with npm.
 
 Tip: if you get the error "err Registry bower not found", you need to execute the following two commands:
@@ -73,3 +73,8 @@ If you want to enable gzip-compression on you local tomcat (e.g. because you're 
     compressableMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/x-font-ttf"
    .../>
 ```
+
+### Adding js dependencies
+For example, for adding a dependecy to `rdf-formats-common`, do this:
+
+`node_modules\.bin\jspm install github:rdf-ext/rdf-formats-common`

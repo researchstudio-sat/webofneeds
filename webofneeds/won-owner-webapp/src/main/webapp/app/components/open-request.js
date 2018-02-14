@@ -25,7 +25,10 @@ function genComponentConf() {
       <div class="or__header">
         <a ng-click="self.router__stateGoCurrent({connectionUri: null})"
            class="clickable">
-          <img class="or__header__icon clickable" src="generated/icon-sprite.svg#ico36_close"/>
+            <svg style="--local-primary:var(--won-primary-color);"
+              class="or__header__icon clickable">
+                <use href="#ico36_close"></use>
+            </svg>
         </a>
 
         <won-post-header
@@ -41,7 +44,7 @@ function genComponentConf() {
       </won-post-content>
 
       <div class="or__footer" ng-show="self.isSentRequest">
-        Waiting for them to accept your contact request.
+        Waiting for them to accept your chat request.
       </div>
 
       <div class="or__footer" ng-show="self.isReceivedRequest">
@@ -49,11 +52,13 @@ function genComponentConf() {
         <div class="flexbuttons">
           <button
             class="won-button--filled black"
-            ng-click="self.closeRequest()">Decline</button>
-          <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
+            ng-click="self.closeRequest()">Remove</button>
+          <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Chat</button>
         </div>
         <a target="_blank" href="{{self.connectionUri}}">
-            <img class="rdflink__big clickable" src="generated/icon-sprite.svg#rdf_logo_1">
+            <svg class="rdflink__big clickable">
+                <use href="#rdf_logo_1"></use>
+            </svg>
         </a>
     </div>
     `;

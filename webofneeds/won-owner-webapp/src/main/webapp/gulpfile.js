@@ -102,6 +102,8 @@ var svgSpriteConf = {
         }
     },
     mode : {
+        inline: true,
+        symbol: true, // generate sprite with icons wrapped in <symbol>-tags, that can be used via `<svg><use href="#.."></use></svg>`
         view : {
             //example: true //generates html with usage-demo
 

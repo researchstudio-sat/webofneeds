@@ -3,7 +3,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix s: <http://schema.org/> .
 
-@prefix ex: <http://example.org/test#> .
+@prefix ex: <http://example.org/test/> .
 @prefix voc: <http://example.org/myvocabulary/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
@@ -15,7 +15,7 @@ ex:data2 {
     ex:test1 ex:testProperty2 "test"
 }
 
-ex:blended {
+ex:blendedGraph {
     ex:test1 ex:testProperty1 "test" .
     ex:test1 ex:testProperty2 "test"
 }

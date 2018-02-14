@@ -58,7 +58,10 @@ function genComponentConf() {
                 </ul>
                 <div class="mtb__inner__right">
                     <a class="mtb__searchbtn clickable">
-                        <img src="generated/icon-sprite.svg#ico36_search_nomargin" class="mtb__icon">
+                        <svg style="--local-primary:var(--won-primary-color);"
+                            class="mtb__icon">
+                                <use href="#ico36_search_nomargin"></use>
+                        </svg>
                     </a>
                 </div>
             </div>

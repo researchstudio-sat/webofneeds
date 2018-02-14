@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needconsumer.impl;
 
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
 import won.bot.framework.component.needconsumer.NeedConsumer;
 
 /**
@@ -26,7 +26,7 @@ import won.bot.framework.component.needconsumer.NeedConsumer;
 public class NopNeedConsumer implements NeedConsumer
 {
   @Override
-  public void consume(final Model need)
+  public void consume(final Dataset need)
   {
     //don't do anything
   }
