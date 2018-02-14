@@ -44,10 +44,16 @@ function genComponentConf() {
             );
 
             const selectFromState = (state) => {
-                const post = this.uri && state.getIn(["needs", this.uri]);
-                const location = post && post.get('location');
+                const post = this.uri && state.getIn(["needs", this.uri.substr(0, this.uri.indexOf('#'))]);
+                
+                const isSeeksPart = this.uri && post.get(this.uri.substr(this.uri.indexOf('#')+1));
+                
+                               
+                const location = isSeeksPart && isSeeksPart.get('location');
+                
                 return {
                     post: post,
+                    isSeeksPart: isSeeksPart,
                     location: location,
                 }
             };

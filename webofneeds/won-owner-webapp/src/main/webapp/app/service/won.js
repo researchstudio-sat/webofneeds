@@ -336,6 +336,9 @@ import jsonld from 'jsonld';
      * @param longValue
      */
     won.toCompacted = function(longValue) {
+        if(!longValue) {
+            return undefined;
+        }
         var propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
         propertyPath[propertyPath.length - 1] += 'Compacted';
         //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
