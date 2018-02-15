@@ -539,6 +539,7 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         data: {
             uri: wonMessage.getMessageUri(),
             text: wonMessage.getTextMessage(),
+            contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: outgoingMessage,
             newMessage: !!newMessage,

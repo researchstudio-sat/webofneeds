@@ -164,13 +164,36 @@ export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNe
              * Build the json-ld message that's signed on the owner-server
              * and then send to the won-node.
              */
-            const message = new won.MessageBuilder(won.WONMSG.connectionMessage)
+            const wonMessageBuilder = new won.MessageBuilder(won.WONMSG.connectionMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .addContentGraphData(won.WON.hasTextMessage, chatMessage)
                 .hasOwnerDirection()
-                .hasSentTimestamp(new Date().getTime().toString())
-                .build();
+                .hasSentTimestamp(new Date().getTime().toString());
+            
+
+            if (chatMessage.startsWith("::msg::")) {
+              let candidateTripleString = chatMessage.replace(/&lt;/g,"<").replace(/&gt;/g,">")
+              // triple syntax: parse chat message. if it has exactly three elements, 
+              // separated by white space, interpret as triples:
+              const tripleCandidate = candidateTripleString.split(/\s+/);
+              if (tripleCandidate.length == 3){
+                const predicate = tripleCandidate[1];
+                const object = tripleCandidate[2];
+                const objectUri = getUri(object);
+                if (objectUri){ 
+                  //object is an uri, add JSON-LD URI
+                  wonMessageBuilder.addContentGraphData(predicate, {'@id':objectUri});
+                } else {
+                  //object is interpreted as string
+                  wonMessageBuilder.addContentGraphData(predicate, object);
+                }
+              }
+            }   
+            
+            //add the chatMessage as normal text message (even if it's a triple too).
+            wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
+                
+            const message = wonMessageBuilder.build();
 
             return {
                 eventUri,
@@ -179,6 +202,17 @@ export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNe
         })
     return messageP;
 
+}
+
+/*
+ * If the specified candidate is a string enclosed in '<' and '>', return the enclosed string.
+ * Returns null in any other case. 
+ */
+function getUri(candidate){
+  const matched = candidate.match(/^<([^<>]+)>$/)
+  if (matched == null) return null;
+  if (matched.length != 2) return null;
+  return matched[1];
 }
 
 export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {

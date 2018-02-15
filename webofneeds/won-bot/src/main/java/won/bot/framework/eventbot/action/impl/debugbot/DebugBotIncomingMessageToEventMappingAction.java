@@ -38,6 +38,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,19 +57,33 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     Pattern PATTERN_CHATTY_OFF = Pattern.compile("^chatty\\s+off$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_SEND_N = Pattern.compile("^send ([1-9])$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_VALIDATE = Pattern.compile("^validate$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_RETRACT = Pattern.compile("^retract$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_RETRACT_MINE = Pattern.compile("^retract mine$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_PROPOSE = Pattern.compile("^propose$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_PROPOSE_MINE = Pattern.compile("^propose mine$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_ACCEPT = Pattern.compile("^accept$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_PROPOSE_TO_CANCEL = Pattern.compile("^propose cancel$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_ACCEPT_PROPOSAL_TO_CANCEL = Pattern.compile("^accept cancel$", Pattern.CASE_INSENSITIVE);
 
 
     public static final String[] USAGE_MESSAGES = {
             "You are connected to the debug bot. You can issue commands that will cause interactions with your need.",
             "Usage:",
-            "    'hint':        create a new need and send hint to it",
-            "    'connect':     create a new need and send connection request to it",
-            "    'close':       close the current connection",
-            "    'deactivate':  deactivate remote need of the current connection",
-            "    'chatty on|off': (do not) send chat messages spontaneously every now and then (default: on)",
-            "    'send N':      send N messages, one per second. N must be an integer between 1 and 9",
-            "    'validate':    download the connection data and validate it",
-            "    'usage':       display this message"
+            "    'hint':          create a new need and send hint to it",
+            "    'connect':       create a new need and send connection request to it",
+            "    'close':         close the current connection",
+            "    'deactivate':    deactivate remote need of the current connection",
+            "    'chatty on|off': send chat messages spontaneously every now and then? (default: on)",
+            "    'send N':        send N messages, one per second. N must be an integer between 1 and 9",
+            "    'validate':      download the connection data and validate it",
+            "    'retract':       retract the last message sent",
+            "    'retract mine':  retract the last message you sent (should not have any effect)",
+            "    'propose':       propose my last message for an agreement",
+            "    'propose mine':  propose your last message for an agreement",
+            "    'accept':        accept the last proposal made",
+            "    'propose cancel: propose to cancel the newest agreement",
+            "    'accept cancel:  accept latest proposal to cancel",
+            "    'usage':         display this message"
     };
 
     public static final String[] N_MESSAGES = {
@@ -184,6 +199,41 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                         }
                     });
                     validateConnectionDataBehaviour.activate();
+                } else if (PATTERN_RETRACT.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby retracting my last message (not yet implemented)");
+                    messageModel = WonRdfUtils.MessageUtils.addRetracts(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_RETRACT_MINE.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby retracting your last message (not yet implemented)");
+                    messageModel = WonRdfUtils.MessageUtils.addRetracts(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_PROPOSE.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby proposing my last message for an agreement (not yet implemented)");
+                    messageModel = WonRdfUtils.MessageUtils.addProposes(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_PROPOSE_MINE.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                	Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby proposing your last message for an agreement (not yet implemented)");
+                	messageModel = WonRdfUtils.MessageUtils.addProposes(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_ACCEPT.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby accepting the newest open proposal I find (not yet implemented)");
+                    messageModel = WonRdfUtils.MessageUtils.addAccepts(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_ACCEPT_PROPOSAL_TO_CANCEL.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby accepting the lates proposal to cancel I find (not yet implemented)");
+                    messageModel = WonRdfUtils.MessageUtils.addAccepts(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_PROPOSE_TO_CANCEL.matcher(message).matches()) {
+                	URI targetUri = URI.create("https://example.com/to/be/implemented");
+                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby proposing to cancel the latest agreement I find (not yet implemented)");
+                    messageModel = WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, targetUri);
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                 } else {
                     //default: answer with eliza.
                     bus.publish(new MessageToElizaEvent(con, message));

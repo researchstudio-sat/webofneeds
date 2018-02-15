@@ -10,6 +10,7 @@ import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
+import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -22,6 +23,8 @@ import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONAGR;
+import won.protocol.vocabulary.WONMOD;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -248,6 +251,54 @@ public class WonRdfUtils
       baseRes.addProperty(predicate, object);
       return messageModel;
     }
+    
+    public static Model addToMessage(Model messageModel, Property predicate, Resource object) {
+        Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+        baseRes.addProperty(predicate, object);
+        return messageModel;
+    }
+    
+    
+    public static Model retractsMessage(URI toRetract) {
+        return addRetracts(createModelWithBaseResource(), toRetract);
+    }
+    
+    public static Model proposesMessage(URI toPropose) {
+        return addProposes(createModelWithBaseResource(), toPropose);
+    }
+    
+    public static Model acceptsMessage(URI toAccept) {
+        return addAccepts(createModelWithBaseResource(), toAccept);
+    }
+ 
+    public static Model proposesToCancelMessage(URI toProposeToCancel) {
+        return addProposesToCancel(createModelWithBaseResource(), toProposeToCancel);
+    }
+    
+    public static Model addRetracts(Model messageModel, URI toRetract) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	baseRes.addProperty(WONMOD.RETRACTS, baseRes.getModel().getResource(toRetract.toString()));
+    	return messageModel;
+    }
+    
+    public static Model addProposes(Model messageModel, URI toPropose) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	baseRes.addProperty(WONAGR.PROPOSES, baseRes.getModel().getResource(toPropose.toString()));
+    	return messageModel;
+    }
+    
+    public static Model addAccepts(Model messageModel, URI toAccept) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(toAccept.toString()));
+    	return messageModel;
+    }
+    
+    public static Model addProposesToCancel(Model messageModel, URI toProposeToCancel) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(toProposeToCancel.toString()));
+    	return messageModel;
+    }
+        
 
     /**
      * Creates an RDF model containing a feedback message referring to the specified resource
@@ -587,6 +638,19 @@ public class WonRdfUtils
       return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
+    
+    public static URI getLastMessageSentByLocalNeed(Dataset dataset, final URI connectionURI) {
+    	throw new NotYetImplementedException();
+    }
+    
+    public static URI getLastMessageSentByRemoteNeed(Dataset dataset, final URI connectionURI) {
+    	throw new NotYetImplementedException();
+    }
+    
+    public static List<URI> getMessageURIs(){
+    	throw new NotYetImplementedException();
+    }
+    
   }
 
   private static Model createModelWithBaseResource() {

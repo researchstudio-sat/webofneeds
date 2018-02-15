@@ -1,0 +1,28 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+SELECT distinct ?first (?msg as ?uri) ?distance ?text ?msgType ?time ?rem ?sender WHERE {
+ {
+   SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
+     GRAPH <urn:x-arq:UnionGraph> {
+       ?msg msg:hasPreviousMessage* ?mid .
+       ?mid msg:hasPreviousMessage+ ?first .
+       FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}
+     }            
+   }
+   GROUP BY ?msg ?first 
+ }
+ GRAPH <urn:x-arq:UnionGraph> {
+   OPTIONAL {
+     ?msg won:hasTextMessage ?text.
+     ?msg msg:hasMessageType ?msgType.
+   }
+   OPTIONAL {
+      ?msg msg:hasCorrespondingRemoteMessage ?rem . 
+      ?rem won:hasTextMessage ?text.
+      ?rem msg:hasMessageType ?msgType.
+   }
+   ?msg msg:hasReceivedTimestamp ?time.
+   ?msg msg:hasSender ?sender.
+ }  
+} ORDER BY ?distance ?time
