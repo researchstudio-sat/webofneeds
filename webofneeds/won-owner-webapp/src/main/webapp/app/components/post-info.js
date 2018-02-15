@@ -61,14 +61,20 @@ function genComponentConf() {
                     ng-show="self.isPart.location">
                     Location
                 </h2>
-                <p class="post-info__details"
-                    ng-show="self.isPart.address">
-                    {{ self.isPart.address }}
-                </p>                
+                <p class="post-info__details clickable"
+	                ng-show="self.isPart.address"  ng-click="self.toggleMap(self.is)">
+	                {{ self.isPart.address }}
+    				<svg class="post-info__carret" ng-show="!self.showMap.is">
+			            <use href="#ico16_arrow_down"></use>
+			        </svg>
+		            <svg class="post-info__carret" ng-show="self.showMap.is">
+		                 <use href="#ico16_arrow_up"></use>
+		            </svg>
+	            </p>                     
                 <won-need-map 
                     uri="self.post.get('uri')+'#is'"
                     isSeeks="self.isPart.isString"
-                    ng-show="self.isPart.location">
+                    ng-if="self.isPart.location && self.showMap.is">
                 </won-need-map>
                 <br/>
                 
@@ -110,18 +116,24 @@ function genComponentConf() {
 	                    ng-show="self.seeksPart.location">
 	                    Location
 	                </h2>
-	                <p class="post-info__details"
-	                    ng-show="self.seeksPart.address">
+	                <p class="post-info__details clickable"
+	                    ng-show="self.seeksPart.address"  ng-click="self.toggleMap(self.seeks)">
 	                    {{ self.seeksPart.address }}
+    					<svg class="post-info__carret" ng-show="!self.showMap.seeks">
+			               <use href="#ico16_arrow_down"></use>
+			            </svg>
+		                <svg class="post-info__carret" ng-show="self.showMap.seeks">
+		                   <use href="#ico16_arrow_up"></use>
+		                </svg>
 	                </p>                
 	                <won-need-map 
 	                    uri="self.post.get('uri')+'#seeks'"
 	                    isSeeks="self.seeksPart.seeksString"
-	                    ng-show="self.seeksPart.location">
+	                    ng-if="self.seeksPart.location && self.showMap.seeks">
 	                </won-need-map>
-                </div>
-                
+
                 </br>
+                <hr>
                 <p class="post-info__details">
                  <a href="{{self.post.get('uri')}}"
                     target="_blank">
@@ -145,7 +157,11 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
 
             window.pi4dbg = this;
-
+            
+            this.is = 'is';
+            this.seeks = 'seeks';
+            this.showMap = {is: false, seeks: false};
+            
             const selectFromState = (state) => {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
@@ -175,6 +191,10 @@ function genComponentConf() {
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
+        }
+        
+        toggleMap(isSeeks) {
+        	this.showMap[isSeeks] = !this.showMap[isSeeks];
         }
 }
 Controller.$inject = serviceDependencies;
