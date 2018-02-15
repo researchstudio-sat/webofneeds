@@ -48,11 +48,9 @@ WHERE
             ################# begin filter by agreements ##################
             filter (?prop != ?clause) .
             filter (?prop != ?acc) .
-            filter (?cancelProp != ?acc) .
-            filter (?cancelAcc != ?cancelProp) .
             
             GRAPH ?g1 {   
-               { ?prop agr:proposes ?clause . } UNION { ?cancelProp agr:proposesToCancel ?acc . }
+                ?prop agr:proposes ?clause .
             }
         
             GRAPH ?g3 {
@@ -65,11 +63,9 @@ WHERE
             GRAPH <urn:x-arq:UnionGraph> {
                 ?prop msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?clause .
                 ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
-                ?cancelProp msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage? ?acc .
-                ?cancelAcc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?cancelProp .
             }
             GRAPH ?g2 {
-                { ?acc agr:accepts ?prop . } UNION {  ?cancelAcc agr:accepts ?cancelProp . }
+                ?acc agr:accepts ?prop .
             }
             
             # only report the first agreement if there are multiple accept messages:
