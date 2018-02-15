@@ -330,7 +330,8 @@ public class GetAgreementsTest {
             Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "one-agreement-proposes-retracted.trig");
             test(input,expectedOutput);
     }
-    
+  
+        
         // This includes a Proposal that is retracted
         @Test
         public void oneProposalTwoAcceptsFirstRetractedFirstCancelled() throws IOException {
@@ -338,6 +339,7 @@ public class GetAgreementsTest {
             Dataset expectedOutput = loadDataset( getAGexpectedOutputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
             test(input,expectedOutput);
     }
+    
         
         // This tests a retraction of a proposal before an accept
         @Test

@@ -23,8 +23,9 @@ public class HighlevelFunctionFactory {
 	private static DatasetToModelBySparqlFunction acceptsCancelledAgreement;
 	private static DatasetToModelBySparqlFunction acceptedRetracts;
 	private static DatasetSelectionBySparqlFunction modifiedSelection;
-	// Code for testing minified version of the modification query..
-	private static DatasetSelectionBySparqlFunction miniMod;
+	// variable for getAgreements Function that gets all accepts messages
+	private static DatasetToModelBySparqlFunction allaccepts;
+	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
 		if (acceptedProposesFunction == null) {
@@ -128,4 +129,15 @@ public class HighlevelFunctionFactory {
 		}
 		return agreementFunction;
 	}
+	
+	// Add functionality to get all accept messages 
+	public static DatasetToModelBySparqlFunction getAllAccepts() {
+		if (allaccepts == null) {
+			allaccepts = new DatasetToModelBySparqlFunction("/allaccepts/query.rq");
+		}
+		return allaccepts;
+		
+	}
+	
 }
+
