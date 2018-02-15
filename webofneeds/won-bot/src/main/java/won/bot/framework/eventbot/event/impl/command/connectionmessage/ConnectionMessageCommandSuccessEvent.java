@@ -18,17 +18,24 @@ package won.bot.framework.eventbot.event.impl.command.connectionmessage;
 
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.command.base.AbstractMessageCommandResultEvent;
+import won.protocol.message.WonMessage;
 
 /**
  * Indicates that the bot has successfully sent a connection message.
  */
 public class ConnectionMessageCommandSuccessEvent extends AbstractMessageCommandResultEvent implements MessageCommandSuccessEvent, ConnectionMessageCommandResultEvent {
-    public ConnectionMessageCommandSuccessEvent(ConnectionMessageCommandEvent originalCommandEvent) {
+    private WonMessage wonMessage;
+    public ConnectionMessageCommandSuccessEvent(ConnectionMessageCommandEvent originalCommandEvent, WonMessage wonMessage) {
         super(originalCommandEvent, originalCommandEvent.getCon());
+        this.wonMessage = wonMessage;
     }
 
     @Override
     public boolean isSuccess() {
         return true;
+    }
+
+    public WonMessage getWonMessage() {
+        return wonMessage;
     }
 }
