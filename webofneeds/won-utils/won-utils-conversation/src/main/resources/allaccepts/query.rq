@@ -1,4 +1,3 @@
-
 PREFIX rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>
 PREFIX mod: <http://purl.org/webofneeds/modification#>
 PREFIX agr: <http://purl.org/webofneeds/agreement#>
@@ -9,7 +8,6 @@ PREFIX won: <http://purl.org/webofneeds/model#>
 CONSTRUCT { ?acc agr:accepts ?prop . }
 WHERE
  {
-	  GRAPH ?g2 {
         ?acc agr:accepts ?prop .
-    }
+        ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
  }
