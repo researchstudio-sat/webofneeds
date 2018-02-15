@@ -44,6 +44,29 @@ public class AcceptsProposalTest {
         test(input,expected);		
 	}
 	
+	@Test
+	public void twoAccept() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "oneproposal-twoaccepts.trig");
+	    // commented out because this does not work
+//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
+
+	  FileManager.get().addLocatorClassLoader(AcceptsProposalTest.class.getClassLoader());
+      Model expected = FileManager.get().loadModel( expectedOutputFolder + "oneproposal-twoaccepts.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	public void getAcceptsCancelledAgreement() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation.trig");
+	    // commented out because this does not work
+//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
+
+	  FileManager.get().addLocatorClassLoader(AcceptsProposalTest.class.getClassLoader());
+      Model expected = FileManager.get().loadModel( expectedOutputFolder + "one-agreement-one-cancellation.ttl");
+        test(input,expected);		
+	}
+	
+	
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...

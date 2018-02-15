@@ -52,14 +52,14 @@ public class HighlevelProtocols {
 			}
 		}
 		return result;
+	
 		
-		
-		/*
+	/*	
 		return HighlevelFunctionFactory.getAcknowledgedSelection()
 				.andThen(HighlevelFunctionFactory.getModifiedSelection())
 				.andThen(HighlevelFunctionFactory.getAgreementFunction())
 				.apply(conversationDataset);
-				*/
+	 */			
 	}
 	
 	private static List<URI> getRetractedAgreements(Dataset conversationDataset, URI acceptsMessageURI) {
