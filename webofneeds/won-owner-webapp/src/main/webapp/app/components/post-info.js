@@ -131,7 +131,8 @@ function genComponentConf() {
 	                    isSeeks="self.seeksPart.seeksString"
 	                    ng-if="self.seeksPart.location && self.showMap.seeks">
 	                </won-need-map>
-
+    			</div>
+                
                 </br>
                 <hr>
                 <p class="post-info__details">
