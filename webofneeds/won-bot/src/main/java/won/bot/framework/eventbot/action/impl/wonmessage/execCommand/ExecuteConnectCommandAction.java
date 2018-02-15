@@ -22,6 +22,7 @@ import won.bot.framework.eventbot.event.impl.command.*;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandSuccessEvent;
+import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.protocol.exception.WonMessageBuilderException;
@@ -60,6 +61,11 @@ public class ExecuteConnectCommandAction extends ExecuteSendMessageCommandAction
     @Override
     protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(ConnectCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return null;
+    }
+
+    @Override
+    protected MessageCommandNotSentEvent createMessageNotSentEvent(ConnectCommandEvent originalCommand, String message) {
+        return new MessageCommandNotSentEvent<ConnectCommandEvent>(message, originalCommand);
     }
 
     protected WonMessage createWonMessage(ConnectCommandEvent connectCommandEvent)
