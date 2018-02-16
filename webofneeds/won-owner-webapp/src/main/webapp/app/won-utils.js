@@ -263,8 +263,6 @@ export async function n3Parse(rdf) {
 export async function ttlToJsonLd(ttl) {
     return n3Parse(ttl)
     .then((triples, prefixes) => {
-        triples.forEach(triple => console.log(triple.subject, triple.predicate, triple.object, '.', triple));
-
         const graphUri = 'ignoredgraphuri:placeholder';
 
         /* 
