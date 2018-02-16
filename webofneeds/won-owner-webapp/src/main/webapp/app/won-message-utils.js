@@ -134,7 +134,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri){
+export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri }){
     const envelopeData = won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri);
     if (optionalOwnConnectionUri){
        envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
@@ -154,7 +154,7 @@ export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirN
     return {eventUri:eventUri,message:message};  
 }
 
-export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {
+export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri}) {
     const messageP =
         won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {

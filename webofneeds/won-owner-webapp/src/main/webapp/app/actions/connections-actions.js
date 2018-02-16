@@ -55,7 +55,15 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
        const theirNeed = getState().getIn(["needs", theirNeedUri]);
        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-       buildChatMessage(chatMessage, connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
+       buildChatMessage({
+            chatMessage: chatMessage, 
+            connectionUri,
+            ownNeedUri: ownNeed.get("uri"), 
+            theirNeedUri: theirNeedUri,
+            ownNodeUri: ownNeed.get("nodeUri"), 
+            theirNodeUri: theirNeed.get("nodeUri"), 
+            theirConnectionUri,
+        })
        .then(msgData =>
             Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
        .then(([optimisticEvent, jsonldMessage]) => {
@@ -124,7 +132,13 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-    const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
+    const cnctMsg = buildConnectMessage({
+        ownNeedUri: needUri,
+        theirNeedUri: theirNeedUri,
+        ownNodeUri: nodeUri,
+        theirNodeUri: theirNeed.get("nodeUri"),
+        textMessage: textMessage,
+    });
     
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
     
