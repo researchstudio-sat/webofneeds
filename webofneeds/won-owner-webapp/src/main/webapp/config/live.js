@@ -4,5 +4,6 @@ import {
 
 export default deepFreeze({
     piwik : { baseUrl : '//matchat.org/piwik/' },
-    adminEmail: 'office.sat@researchstudio.at',
 });
+
+export const postTitleCharacterLimit = 140;
