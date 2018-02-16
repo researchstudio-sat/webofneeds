@@ -102,7 +102,25 @@ function genComponentConf() {
             submit-button-label="::'Send'"
             >
         </chat-textfield>
-        <textarea won-textarea-autogrow style="resize: none; height: auto;"></textarea>
+        <!-- 
+        quick'n'dirty textfield and button so flo can use it for his branch. 
+        TODO implement and style chat-textfield-simple and use that instead.
+        -->
+        <div style="display: flex;">
+            <textarea 
+                class="rdfTxtTmpDeletme" 
+                ng-show="self.shouldShowRdf" 
+                won-textarea-autogrow 
+                style="resize: none; height: auto;   flex-grow: 1;"></textarea>
+            <button 
+                class="rdfMsgBtnTmpDeletme" 
+                ng-show="self.shouldShowRdf" 
+                ng-click="self.sendRdfTmpDeletme()">
+                    Send RDF
+            </button>
+        </div>
+
+
         <div>
             <a class="rdflink withlabel clickable"
                ng-click="self.toggleRdfDisplay()">
@@ -255,6 +273,14 @@ function genComponentConf() {
             if(trimmedMsg) {
                this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
             }
+        }
+
+        sendRdfTmpDeletme() {
+            const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
+            if(rdftxtEl) {
+                console.log('found rdftxtel: ', rdftxtEl.value);
+            }
+
         }
     }
     Controller.$inject = serviceDependencies;
