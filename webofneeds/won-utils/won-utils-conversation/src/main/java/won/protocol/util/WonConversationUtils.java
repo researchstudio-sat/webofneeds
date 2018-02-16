@@ -43,12 +43,40 @@ public class WonConversationUtils {
 				*/
 	}
 	
+	public static URI getNthLatestMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
+		return (URI) getFirstOrNull(conversationDataset,
+				WonConversationQueryBuilder.getBuilderForMessageUris()
+					.noResponses()
+					.newestFirst()
+					.limit(1)
+					.offset(n-1)
+					.senderNeed(senderNeed)
+					.build());
+		/*
+		return (URI) getFirstOrNull(conversationDataset, WonLatestMessageQueryBuilder.getBuilderForMessageUris()
+				.senderNeed(senderNeed)
+				.build());
+				*/
+	}
+	
 	public static URI getLatestAcceptsMessageOfNeed(Dataset conversationDataset, URI senderNeed){
 		return (URI) getFirstOrNull(conversationDataset,
 				WonConversationQueryBuilder.getBuilderForMessageUris()
 					.noResponses()
 					.newestFirst()
 					.limit(1)
+					.senderNeed(senderNeed)
+					.isAcceptsMessage()
+					.build());
+	}
+	
+	public static URI getNthLatestAcceptsMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
+		return (URI) getFirstOrNull(conversationDataset,
+				WonConversationQueryBuilder.getBuilderForMessageUris()
+					.noResponses()
+					.newestFirst()
+					.limit(1)
+					.offset(n-1)
 					.senderNeed(senderNeed)
 					.isAcceptsMessage()
 					.build());
@@ -64,12 +92,35 @@ public class WonConversationUtils {
 					.build());
 	}
 	
+	public static URI getNthLatestAcceptsMessage(Dataset conversationDataset,int n){
+		return (URI) getFirstOrNull(conversationDataset,
+				WonConversationQueryBuilder.getBuilderForMessageUris()
+					.noResponses()
+					.newestFirst()
+					.limit(1)
+					.offset(n-1)
+					.isAcceptsMessage()
+					.build());
+	}
+	
 	public static URI getLatestRetractsMessageOfNeed(Dataset conversationDataset, URI senderNeed){
 		return (URI) getFirstOrNull(conversationDataset,
 				WonConversationQueryBuilder.getBuilderForMessageUris()
 				.noResponses()
 				.newestFirst()
 				.limit(1)
+				.senderNeed(senderNeed)
+				.isRetractsMessage()
+				.build());
+	}
+	
+	public static URI getNthLatestRetractsMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
+		return (URI) getFirstOrNull(conversationDataset,
+				WonConversationQueryBuilder.getBuilderForMessageUris()
+				.noResponses()
+				.newestFirst()
+				.limit(1)
+				.offset(n-1)
 				.senderNeed(senderNeed)
 				.isRetractsMessage()
 				.build());
@@ -86,6 +137,18 @@ public class WonConversationUtils {
 				.build());
 	}
 	
+	public static URI getNthLatestProposesMessageOfNeed(Dataset conversationDataset, URI senderNeed,int n){
+		return (URI) getFirstOrNull(conversationDataset,
+				WonConversationQueryBuilder.getBuilderForMessageUris()
+				.noResponses()
+				.newestFirst()
+				.limit(1)
+				.offset(n-1)
+				.senderNeed(senderNeed)
+				.isProposesMessage()
+				.build());
+	}
+		
 	public static URI getLatestProposesToCancelMessageOfNeed(Dataset conversationDataset, URI senderNeed){
 		return (URI) getFirstOrNull(conversationDataset,
 				WonConversationQueryBuilder.getBuilderForMessageUris()
@@ -97,8 +160,17 @@ public class WonConversationUtils {
 				.build());
 	}
 	
-	
-	
+	public static URI getNthLatestProposesToCancelMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
+		return (URI) getFirstOrNull(conversationDataset,
+				WonConversationQueryBuilder.getBuilderForMessageUris()
+				.noResponses()
+				.newestFirst()
+				.limit(1)
+				.offset(n-1)
+				.senderNeed(senderNeed)
+				.isProposesToCancelMessage()
+				.build());
+	}
 	
 	public static String getTextMessage(Dataset conversationDataset, URI messageUri) {
 		return (String) getFirstOrNull(conversationDataset,
