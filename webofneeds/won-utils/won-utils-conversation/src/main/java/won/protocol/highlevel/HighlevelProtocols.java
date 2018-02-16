@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
@@ -74,6 +76,10 @@ public class HighlevelProtocols {
 
 	private static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {
 		// TODO Auto-generated method stub
+		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
+		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
+		initialBinding.add("terminatinggraph", name);
+		
 		return null;
 	}
 
