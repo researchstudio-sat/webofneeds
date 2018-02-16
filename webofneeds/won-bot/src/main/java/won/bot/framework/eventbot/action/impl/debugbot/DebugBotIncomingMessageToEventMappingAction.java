@@ -44,6 +44,7 @@ import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandEvent;
+import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
@@ -59,6 +60,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.validation.WonConnectionValidator;
 
 
 /**
@@ -182,41 +184,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
                     bus.publish(new SendNDebugCommandEvent(con, n));
                 }else if (PATTERN_VALIDATE.matcher(message).matches()) {
-                    //acknowledge the command
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'm going to validate the data in our connection. This may take a while.");
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                    //start validation behaviour
-                    ValidateConnectionCommandEvent command = new ValidateConnectionCommandEvent(con.getNeedURI(), con.getConnectionURI());
-                    ValidateConnectionDataBehaviour validateConnectionDataBehaviour = new ValidateConnectionDataBehaviour(ctx,command, Duration.ofSeconds(60));
-                    validateConnectionDataBehaviour.onResult(new BaseEventBotAction(ctx) {
-                        @Override
-                        protected void doRun(Event event, EventListener executingListener) throws Exception {
-                            if (event instanceof ValidateConnectionCommandSuccessEvent) {
-                                ValidateConnectionCommandSuccessEvent successEvent = (ValidateConnectionCommandSuccessEvent) event;
-                                Model messageModel = WonRdfUtils.MessageUtils
-                                        .textMessage(successEvent.getMessage());
-                                bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                                if (!successEvent.isValid()) {
-                                    String message = successEvent.getMessage();
-                                    if (message == null || message.trim().length() == 0) {
-                                        message = "[no message available]";
-                                    }
-                                    messageModel = WonRdfUtils.MessageUtils
-                                            .textMessage("Problem report: " + message);
-                                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                                }
-                            } else if (event instanceof ValidateConnectionCommandFailureEvent){
-                                String message = ((ValidateConnectionCommandFailureEvent)event).getMessage();
-                                if (message == null || message.trim().length() == 0) {
-                                    message = "[no message available]";
-                                }
-                                Model messageModel = WonRdfUtils.MessageUtils
-                                        .textMessage("Could not validate connection data. Problem: " + message);
-                                bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                            }
-                        }
-                    });
-                    validateConnectionDataBehaviour.activate();
+                   validate(ctx,bus,con);
                 } else if (PATTERN_RETRACT.matcher(message).matches()) {
                     retractLatestMessage(ctx, bus, con);
                 } else if (PATTERN_RETRACT_MINE.matcher(message).matches()) {
@@ -321,9 +289,40 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		return new DecimalFormat("###.##").format( queryDuration.toMillis() / 1000d);
 	}
 	
+	private void validate(EventListenerContext ctx, EventBus bus, Connection con) {
+		Model messageModel = WonRdfUtils.MessageUtils
+		        .textMessage("ok, I'll validate the connection - but I'll need to crawl the connection data first, please be patient.");
+		bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+		// initiate crawl behaviour
+		CrawlConnectionCommandEvent command = new CrawlConnectionCommandEvent(con.getNeedURI(), con.getConnectionURI());
+		CrawlConnectionDataBehaviour crawlConnectionDataBehaviour = new CrawlConnectionDataBehaviour(ctx, command, Duration.ofSeconds(60));
+		final StopWatch crawlStopWatch = new StopWatch();
+		crawlStopWatch.start("crawl");
+		crawlConnectionDataBehaviour.onResult(new SendMessageReportingCrawlResultAction(ctx, con, crawlStopWatch));
+		crawlConnectionDataBehaviour.onResult(new SendMessageOnCrawlResultAction(ctx, con) {
+			@Override
+			protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
+				 try {
+			            logger.debug("validating data of connection {}", command.getConnectionURI());
+			            //TODO: use one validator for all invocations
+			            WonConnectionValidator validator = new WonConnectionValidator();
+			            StringBuilder message = new StringBuilder();
+			            boolean valid = validator.validate(successEvent.getCrawledData(), message);
+			            String successMessage =
+			            "Connection " + command.getConnectionURI() + " is valid: " + valid + " " + message.toString();
+			            return WonRdfUtils.MessageUtils
+                                .textMessage(successMessage);
+			        } catch (Exception e) {
+			            return WonRdfUtils.MessageUtils.textMessage("Caught exception during validation: " + e);
+			        }		
+			}
+		});
+		crawlConnectionDataBehaviour.activate();
+	}
+	
 	private void retractLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll retract your latest message (which should not have any effect) - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll retract your latest message (which should not have any effect) - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),2)), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
@@ -339,7 +338,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void proposeLatestMessage(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll propose my latest message - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getNeedURI(),2)), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
@@ -355,7 +354,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void proposeLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll propose your latest message - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll propose your latest message - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),2)), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
@@ -371,7 +370,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void acceptLatestProposal(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll accept your latest proposal - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
@@ -387,7 +386,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void acceptLatestProposalToCancel(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll accept your latest proposal to cancel - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll accept your latest proposal to cancel - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesToCancelMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
@@ -403,7 +402,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void proposeToCancelLatestAccept(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestAcceptsMessage(conversationDataset)), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
