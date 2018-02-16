@@ -360,7 +360,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
-						return "Sorry, I cannot propose one of your messages - I id not find any";
+						return "Sorry, I cannot propose one of your messages - I did not find any";
 					}
 					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
 					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
@@ -376,7 +376,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
-						return "Sorry, I cannot accept any proposal - I id not find any 'agr:proposes' messages";
+						return "Sorry, I cannot accept any proposal - I did not find any 'agr:proposes' messages";
 					}
 					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
 					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
@@ -392,7 +392,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
-						return "Sorry, I cannot accept a proposal to cancel - I id not find any 'agr:proposesToCancel' messages";
+						return "Sorry, I cannot accept a proposal to cancel - I did not find any 'agr:proposesToCancel' messages";
 					}
 					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
 					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
@@ -408,7 +408,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
-						return "Sorry, I cannot propose to cancel - I id not find any 'agr:accept' messages";
+						return "Sorry, I cannot propose to cancel - I did not find any 'agr:accept' messages";
 					}
 					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
 					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
