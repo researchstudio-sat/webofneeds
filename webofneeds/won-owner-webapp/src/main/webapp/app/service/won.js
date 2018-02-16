@@ -628,10 +628,10 @@ import jsonld from 'jsonld';
         "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
     }
     won.minimalTurtlePrefixes = 
-        "@prefix msg: <http://purl.org/webofneeds/message#>." +
-        "@prefix won: <http://purl.org/webofneeds/model#>." +
-        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>." +
-        "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.";
+        "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
+        "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
+        "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
 
     won.defaultContext = {
             "webID": "http://www.example.com/webids/",
@@ -651,17 +651,17 @@ import jsonld from 'jsonld';
             }
     }
     won.defaultTurtlePrefixes = 
-            "@prefix webID: <http://www.example.com/webids/>." +
-            "@prefix msg: <http://purl.org/webofneeds/message#>." +
-            "@prefix dc: <http://purl.org/dc/elements/1.1/>." +
-            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>." +
-            "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>." +
-            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>." +
-            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>." +
-            "@prefix won: <http://purl.org/webofneeds/model#>." +
-            "@prefix gr: <http://purl.org/goodrelations/v1#>." +
-            "@prefix ldp: <http://www.w3.org/ns/ldp#>." +
-            "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.";
+            "@prefix webID: <http://www.example.com/webids/>.\n" +
+            "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
+            "@prefix dc: <http://purl.org/dc/elements/1.1/>.\n" +
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n" +
+            "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.\n" +
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n" +
+            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
+            "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+            "@prefix gr: <http://purl.org/goodrelations/v1#>.\n" +
+            "@prefix ldp: <http://www.w3.org/ns/ldp#>.\n" +
+            "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
 
 
 
