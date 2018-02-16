@@ -355,7 +355,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void proposeLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll propose your latest message (which should not have any effect) - but 'll need to crawl the connection data first, please be patient.", 
+				"ok, I'll propose your latest message - but 'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
