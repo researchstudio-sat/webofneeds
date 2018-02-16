@@ -1639,6 +1639,13 @@ import jsonld from 'jsonld';
         getContentGraphNode: function(){
             return this.getContentGraph()["@graph"][0];
         },
+        /** 
+         * takes a lists of json-ld-objects and merges them into the content-graph
+         */
+        mergeIntoContentGraph: function(jsonldPayload) {
+            var contentGraph = this.getContentGraph();
+            contentGraph["@graph"] = contentGraph["@graph"].concat(jsonldPayload);
+        },
         addContentGraphData: function(predicate, object){
             this.getContentGraphNode()[predicate] = object;
             return this;

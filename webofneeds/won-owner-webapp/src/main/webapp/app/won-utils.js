@@ -265,16 +265,34 @@ export async function ttlToJsonLd(ttl) {
     .then((triples, prefixes) => {
         triples.forEach(triple => console.log(triple.subject, triple.predicate, triple.object, '.', triple));
 
-        console.log('TODO useme:', prefixes); //TODO
+        const graphUri = 'ignoredgraphuri:placeholder';
 
-        const graphUri = 'graphuri:placeholderTODO'; // TODO
-
-        const nquads = triples.map(t => `<${t.subject}> <${t.predicate}> <${t.object}> <${graphUri}>.` ).join('\n');
+        /* 
+         * the parsing doesn't give us information if a
+         * thing was an uri, a blind-node-id or a literal
+         * so we need to find that by ourselves before 
+         * generating the quads.
+         */
+        const wrap = frag => {
+            if( frag.startsWith("_:") || // id of blind node 
+                frag.match(/^".*"$/)  // string-literal
+            ) {
+                return frag; 
+            } else { // uri
+                return `<${frag}>`;
+            }
+        }
+        const nquads = triples.map(t => 
+            wrap(t.subject) + " " +
+            wrap(t.predicate) + " " +
+            wrap(t.object) + " " +
+            wrap(graphUri) + "." // even if it's ignored it's necessary as jsonld can only parse quads, not tripples
+        ).join('\n');
 
         return jsonld.promises.fromRDF(nquads, {format: 'application/nquads'});
     })
     .then(jsonld => {
-        console.log('parsed jsonld: ', jsonld);
+        console.log('jsonld parsed from input turtle: ', jsonld);
         return jsonld;
     })
     .catch(e => {

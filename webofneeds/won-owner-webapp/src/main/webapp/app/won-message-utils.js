@@ -163,9 +163,14 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
     let jsonldGraphPayloadP = isTTL?
         ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
         Promise.resolve();
-    const messageP =
-        won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
-        .then(envelopeData => {
+
+    const envelopeDataP = won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
+
+    const messageP = Promise.all([
+            envelopeDataP,
+            jsonldGraphPayloadP,
+        ])
+        .then(([envelopeData, graphPayload]) => {
             const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
 
             /*
@@ -173,7 +178,6 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
              * and then send to the won-node.
              */
             const wonMessageBuilder = new won.MessageBuilder(won.WONMSG.connectionMessage)
-                .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .hasOwnerDirection()
                 .hasSentTimestamp(new Date().getTime().toString());
@@ -197,10 +201,21 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
                 }
               }
             }   
+            if(graphPayload) {
+                wonMessageBuilder.mergeIntoContentGraph(graphPayload);
+            } else if (chatMessage) {
+                //add the chatMessage as normal text message 
+                wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
+            } else {
+                throw new Exception(
+                    "No textmessage or valid graph as payload of chat message:" + 
+                    JSON.stringify(chatMessage) + " " +
+                    JSON.stringify(graphPayload)
+                );
+            }
             
-            //add the chatMessage as normal text message (even if it's a triple too).
-            wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
-                
+            wonMessageBuilder.eventURI(eventUri); // replace placeholders with proper event-uri
+
             const message = wonMessageBuilder.build();
 
             return {
