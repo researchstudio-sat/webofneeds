@@ -24,7 +24,7 @@ public class HighlevelFunctionFactory {
 	private static DatasetToModelBySparqlFunction acceptedRetracts;
 	private static DatasetSelectionBySparqlFunction modifiedSelection;
 	// variable for getAgreements Function that gets all accepts messages
-	private static DatasetToModelBySparqlFunction allaccepts;
+	private static DatasetToModelBySparqlFunction allAcceptsFunction;
 	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
@@ -61,6 +61,17 @@ public class HighlevelFunctionFactory {
 		}
 		return acceptedProposesToCancelFunction;
 	}
+	
+	// function to get all accept messages, regardless whether they are part of a valid agreement..
+	
+	public static DatasetToModelBySparqlFunction getAllAcceptsFunction() {
+		if (allAcceptsFunction == null) {
+			allAcceptsFunction = new DatasetToModelBySparqlFunction("/allaccepts/query.rq");
+		}
+		return allAcceptsFunction;
+	}
+	
+	
 	
 	public static DatasetToModelBySparqlFunction getAcceptsProposesToCancelFunction() {
 		if (acceptsProposesToCancelFunction == null) {
@@ -128,15 +139,6 @@ public class HighlevelFunctionFactory {
 			agreementFunction = new DatasetToDatasetBySparqlGSPOSelectFunction("/agreement/query.rq");
 		}
 		return agreementFunction;
-	}
-	
-	// Add functionality to get all accept messages 
-	public static DatasetToModelBySparqlFunction getAllAccepts() {
-		if (allaccepts == null) {
-			allaccepts = new DatasetToModelBySparqlFunction("/allaccepts/query.rq");
-		}
-		return allaccepts;
-		
 	}
 	
 }

@@ -82,7 +82,7 @@ public class HighlevelProtocols {
 		// only valid accepts, too
 		// okay ... right now this a dumb implementation....
 	
-         Model actual = HighlevelFunctionFactory.getAllAccepts().apply(conversationDataset);
+         Model actual = HighlevelFunctionFactory.getAllAcceptsFunction().apply(conversationDataset);
 		  
 		  RDFList list = actual.createList(actual.listSubjects());
 		  

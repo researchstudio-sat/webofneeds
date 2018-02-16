@@ -3,25 +3,23 @@ package won.utils.allaccepts;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
 
+import org.apache.camel.main.Main;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.util.FileManager;
-import org.apache.jena.util.iterator.ExtendedIterator;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import junit.framework.TestCase;
 import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
+import won.utils.proposaltocancel.ProposalToCancelTest;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.apache.jena.riot.Lang;
@@ -31,7 +29,7 @@ import org.apache.jena.riot.RDFFormat;
 public class AllAcceptsTest {
 	
     private static final String inputFolder = "/won/utils/allaccepts/input/";
-    private static final String expectedOutputFolder = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources/won/utils/allaccepts/expected/";
+    private static final String expectedOutputFolder = "/won/utils/allaccepts/expected/";
     
     @BeforeClass
     public static void setLogLevel() {
@@ -40,53 +38,24 @@ public class AllAcceptsTest {
     }
 
 	@Test
-	public void oneAccept() throws IOException {
-	    Dataset input = loadDataset( inputFolder + "one-agreement.trig");
-	    // commented out because this does not work
-//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
-
-	  FileManager.get().addLocatorClassLoader(AllAcceptsTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel( expectedOutputFolder + "one-agreement.ttl");
+	public void oneValidProposalToCancelOneAgreement () throws IOException {
+	    Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-one-cancellation.ttl");
         test(input,expected);		
 	}
 	
 	@Test
-	public void twoAccepts() throws IOException {
+	public void oneProposalTwoAccepts () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "oneproposal-twoaccepts.trig");
-	    // commented out because this does not work
-//	   Model expected2 = customloadModel( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.ttl");	 
-
-	  FileManager.get().addLocatorClassLoader(AllAcceptsTest.class.getClassLoader());
-      Model expected = FileManager.get().loadModel( expectedOutputFolder + "oneproposal-twoaccepts.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "oneproposal-twoaccepts.ttl");
         test(input,expected);		
 	}
+	
 	
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
-		  Model actual = HighlevelFunctionFactory.getAllAccepts().apply(input);
-		  
-		  RDFList list = actual.createList(actual.listSubjects());
-		  
-		//  Iterator listiterator = list.iterator();
-		  
-		  ExtendedIterator<RDFNode> listiterator = list.iterator();
-		  
-		  while(listiterator.hasNext()) {
-			    Object object = listiterator.next();
-			    System.out.println(object.toString());
-		  }
-		  
-		//  System.out.println(list.size());
-		
-		  /*
-		 
-		  NodeIterator listobjects = actual.listObjects();
-		  while(listobjects.hasNext()) {
-			  Object object = listobjects.next();
-			  System.out.print(object.toString());
-		  }
-		  */
+		  Model actual = HighlevelFunctionFactory.getAllAcceptsFunction().apply(input);
 		  		  
 	      RdfUtils.Pair<Model> diff = RdfUtils.diff(expectedOutput, actual); 
 
@@ -101,24 +70,15 @@ public class AllAcceptsTest {
 	       Assert.assertTrue(RdfUtils.areModelsIsomorphic(expectedOutput, actual)); 
 
 }
-
 	
-    private static Model customloadModel(String path) throws IOException {
+	private static Model customLoadModel(String path) throws IOException {
 
-        InputStream is = null;
-        Model model = null;
-        try {
-            is = AllAcceptsTest.class.getResourceAsStream(path);
-            model = ModelFactory.createDefaultModel();
-            RDFDataMgr.read(model, is, RDFFormat.TTL.getLang());      	
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-        }
-
-        return model;
-    }
+		String prefix = "file:///C:/DATA/DEV/workspace/webofneeds/webofneeds/won-utils/won-utils-conversation/src/test/resources";
+        FileManager.get().addLocatorClassLoader(AllAcceptsTest.class.getClassLoader());
+        Model model = FileManager.get().loadModel(prefix + path);
+          
+       return model;
+   }
     
 	
     private static Dataset loadDataset(String path) throws IOException {
