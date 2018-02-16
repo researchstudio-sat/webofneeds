@@ -267,7 +267,7 @@ export async function ttlToJsonLd(ttl) {
 
         console.log('TODO useme:', prefixes); //TODO
 
-        const graphUri = 'http://TODO.org'; // TODO
+        const graphUri = 'graphuri:placeholderTODO'; // TODO
 
         const nquads = triples.map(t => `<${t.subject}> <${t.predicate}> <${t.object}> <${graphUri}>.` ).join('\n');
 

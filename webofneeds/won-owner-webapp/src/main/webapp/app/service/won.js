@@ -323,7 +323,7 @@ import jsonld from 'jsonld';
     };
 
     //UTILS
-    var UNSET_URI= "no:uri";
+    var MSG_URI_PLACEHOLDER= "msguri:placeholder";
 
 
     /**
@@ -777,17 +777,17 @@ import jsonld from 'jsonld';
      */
     won.addMessageGraph = function (builder, graphURIs, messageType) {
         let graphs = builder.data['@graph'];
-        let unsetMessageGraphUri = UNSET_URI+"#data";
+        let unsetMessageGraphUri = MSG_URI_PLACEHOLDER+"#data";
         //create the message graph, containing the message type
         var messageGraph = {
             "@graph": [
                 {
-                    "@id":UNSET_URI,
+                    "@id":MSG_URI_PLACEHOLDER,
                     "msg:hasMessageType": {'@id':messageType}
                 },
                 {   "@id": unsetMessageGraphUri,
                     "@type": "msg:EnvelopeGraph",
-                    "rdfg:subGraphOf" : {"@id":UNSET_URI}
+                    "rdfg:subGraphOf" : {"@id":MSG_URI_PLACEHOLDER}
                 }
             ],
             "@id": unsetMessageGraphUri
@@ -808,7 +808,7 @@ import jsonld from 'jsonld';
         hashFragement = hashFragement || 'graph1';
         return {"@graph": [
                     {
-                        "@id": UNSET_URI + "#" + hashFragement,
+                        "@id": MSG_URI_PLACEHOLDER + "#" + hashFragement,
                         "@graph": []
                     }
                 ]
@@ -1491,7 +1491,7 @@ import jsonld from 'jsonld';
             }
         }
         this.messageGraph = null;
-        this.eventUriValue = UNSET_URI;
+        this.eventUriValue = MSG_URI_PLACEHOLDER;
         won.addMessageGraph(this, graphNames , messageType);
     };
 
