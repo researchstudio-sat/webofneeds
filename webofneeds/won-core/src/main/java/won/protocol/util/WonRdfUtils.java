@@ -259,43 +259,63 @@ public class WonRdfUtils
     }
     
     
-    public static Model retractsMessage(URI toRetract) {
+    public static Model retractsMessage(URI... toRetract) {
         return addRetracts(createModelWithBaseResource(), toRetract);
     }
     
-    public static Model proposesMessage(URI toPropose) {
+    public static Model proposesMessage(URI... toPropose) {
         return addProposes(createModelWithBaseResource(), toPropose);
     }
     
-    public static Model acceptsMessage(URI toAccept) {
+    public static Model acceptsMessage(URI... toAccept) {
         return addAccepts(createModelWithBaseResource(), toAccept);
     }
  
-    public static Model proposesToCancelMessage(URI toProposeToCancel) {
+    public static Model proposesToCancelMessage(URI... toProposeToCancel) {
         return addProposesToCancel(createModelWithBaseResource(), toProposeToCancel);
     }
     
-    public static Model addRetracts(Model messageModel, URI toRetract) {
+    public static Model addRetracts(Model messageModel, URI... toRetract) {
     	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-    	baseRes.addProperty(WONMOD.RETRACTS, baseRes.getModel().getResource(toRetract.toString()));
+    	if (toRetract == null) return messageModel;
+    	for(URI uri: toRetract) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONMOD.RETRACTS, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
     	return messageModel;
     }
     
-    public static Model addProposes(Model messageModel, URI toPropose) {
+    public static Model addProposes(Model messageModel, URI... toPropose) {
     	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-    	baseRes.addProperty(WONAGR.PROPOSES, baseRes.getModel().getResource(toPropose.toString()));
+    	if (toPropose == null) return messageModel;
+    	for(URI uri: toPropose) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONAGR.PROPOSES, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
     	return messageModel;
     }
     
-    public static Model addAccepts(Model messageModel, URI toAccept) {
+    public static Model addAccepts(Model messageModel, URI... toAccept) {
     	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-    	baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(toAccept.toString()));
+    	if (toAccept == null) return messageModel;
+    	for(URI uri: toAccept) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
     	return messageModel;
     }
     
-    public static Model addProposesToCancel(Model messageModel, URI toProposeToCancel) {
+    public static Model addProposesToCancel(Model messageModel, URI... toProposeToCancel) {
     	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-    	baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(toProposeToCancel.toString()));
+    	if (toProposeToCancel == null) return messageModel;
+    	for(URI uri: toProposeToCancel) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
     	return messageModel;
     }
         
