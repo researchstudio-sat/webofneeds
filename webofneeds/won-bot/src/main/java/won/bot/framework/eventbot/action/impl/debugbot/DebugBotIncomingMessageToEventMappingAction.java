@@ -16,10 +16,24 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.springframework.util.StopWatch;
+
+import com.google.common.collect.Lists;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.behaviour.CrawlConnectionDataBehaviour;
 import won.bot.framework.eventbot.behaviour.ValidateConnectionDataBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
@@ -29,19 +43,23 @@ import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.*;
+import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandEvent;
+import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.validate.ValidateConnectionCommandEvent;
 import won.bot.framework.eventbot.event.impl.validate.ValidateConnectionCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.validate.ValidateConnectionCommandSuccessEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
+import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 
-import java.net.URI;
-import java.time.Duration;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Listener that reacts to incoming messages, creating internal bot events for them
@@ -200,40 +218,19 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                     });
                     validateConnectionDataBehaviour.activate();
                 } else if (PATTERN_RETRACT.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby retracting my last message (not yet implemented)");
-                    messageModel = WonRdfUtils.MessageUtils.addRetracts(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                    retractLatestMessage(ctx, bus, con);
                 } else if (PATTERN_RETRACT_MINE.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby retracting your last message (not yet implemented)");
-                    messageModel = WonRdfUtils.MessageUtils.addRetracts(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                	retractLatestMessageOfCounterpart(ctx, bus, con);
                 } else if (PATTERN_PROPOSE.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby proposing my last message for an agreement (not yet implemented)");
-                    messageModel = WonRdfUtils.MessageUtils.addProposes(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                	proposeLatestMessage(ctx, bus, con);
                 } else if (PATTERN_PROPOSE_MINE.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                	Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby proposing your last message for an agreement (not yet implemented)");
-                	messageModel = WonRdfUtils.MessageUtils.addProposes(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                	proposeLatestMessageOfCounterpart(ctx, bus, con);
                 } else if (PATTERN_ACCEPT.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby accepting the newest open proposal I find (not yet implemented)");
-                    messageModel = WonRdfUtils.MessageUtils.addAccepts(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                	acceptLatestProposal(ctx, bus, con);
                 } else if (PATTERN_ACCEPT_PROPOSAL_TO_CANCEL.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby accepting the lates proposal to cancel I find (not yet implemented)");
-                    messageModel = WonRdfUtils.MessageUtils.addAccepts(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                	acceptLatestProposalToCancel(ctx, bus, con);
                 } else if (PATTERN_PROPOSE_TO_CANCEL.matcher(message).matches()) {
-                	URI targetUri = URI.create("https://example.com/to/be/implemented");
-                    Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I am hereby proposing to cancel the latest agreement I find (not yet implemented)");
-                    messageModel = WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, targetUri);
-                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                	proposeToCancelLatestAccept(ctx, bus, con);
                 } else {
                     //default: answer with eliza.
                     bus.publish(new MessageToElizaEvent(con, message));
@@ -251,4 +248,178 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
         String message = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         return StringUtils.trim(message);
     }
+    
+    /***********************************************************************************
+     * Mini framework for allowing the bot to refer to earlier messages
+     * while trying to avoid code duplication
+     ***********************************************************************************/
+    
+    private interface MessageFinder{
+    	List<URI> findMessages(Dataset conversation);
+    }
+    
+    private interface MessageReferrer {
+    	Model referToMessages(Model messageModel, URI... targetUris);
+    }
+    
+    private interface TextMessageMaker{
+    	String makeTextMessage(Duration queryDuration, Dataset conversation, URI...uris);
+    }
+   
+
+	private void referToEarlierMessages(EventListenerContext ctx, EventBus bus, Connection con, String crawlAnnouncement, MessageFinder messageFinder, MessageReferrer messageReferrer, TextMessageMaker textMessageMaker) {
+		Model messageModel = WonRdfUtils.MessageUtils
+		        .textMessage(crawlAnnouncement);
+		bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+		// initiate crawl behaviour
+		CrawlConnectionCommandEvent command = new CrawlConnectionCommandEvent(con.getNeedURI(), con.getConnectionURI());
+		CrawlConnectionDataBehaviour crawlConnectionDataBehaviour = new CrawlConnectionDataBehaviour(ctx, command, Duration.ofSeconds(60));
+		final StopWatch crawlStopWatch = new StopWatch();
+		crawlStopWatch.start("crawl");
+		crawlConnectionDataBehaviour.onResult(new SendMessageReportingCrawlResultAction(ctx, con, crawlStopWatch));
+		crawlConnectionDataBehaviour.onResult(new SendMessageOnCrawlResultAction(ctx, con) {
+			@Override
+			protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
+				return makeReferringMessage(successEvent.getCrawledData(), messageFinder, messageReferrer, textMessageMaker);	
+			}
+		});
+		crawlConnectionDataBehaviour.activate();
+	}
+    
+    private Model makeReferringMessage(Dataset conversation, MessageFinder messageFinder, MessageReferrer messageReferrer, TextMessageMaker textMessageMaker) {
+		int origPrio = Thread.currentThread().getPriority();
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		StopWatch queryStopWatch = new StopWatch();
+		queryStopWatch.start("query");
+		List<URI> targetUris = messageFinder.findMessages(conversation); 
+		URI[] targetUriArray = targetUris.toArray(new URI[targetUris.size()]);
+		queryStopWatch.stop();
+		Thread.currentThread().setPriority(origPrio);
+		Duration queryDuration = Duration.ofMillis(queryStopWatch.getLastTaskTimeMillis());
+        Model messageModel = WonRdfUtils.MessageUtils.textMessage(textMessageMaker.makeTextMessage(queryDuration, conversation, targetUriArray));
+        return messageReferrer.referToMessages(messageModel, targetUriArray);
+	}
+    
+    
+	private void retractLatestMessage(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll retract my latest message - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestMessageOfNeed(conversationDataset, con.getNeedURI())), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot retract any of my messages - I did not find any.";
+					}
+					String retractedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					retractedString = (retractedString == null)? ", which had no text message" : ", which read, '"+retractedString+"'";
+			        return "Ok, I am hereby retracting my last message"+retractedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+
+	private String getDurationString(Duration queryDuration) {
+		return new DecimalFormat("###.##").format( queryDuration.toMillis() / 1000d);
+	}
+	
+	private void retractLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll retract your latest message (which should not have any effect) - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot retract any of your messages - I did not find any.";
+					}
+					String retractedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					retractedString = (retractedString == null)? ", which had no text message" : ", which read, '"+retractedString+"'";
+			        return "Ok, I am hereby retracting your last message"+retractedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+	
+	private void proposeLatestMessage(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll propose my latest message - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestMessageOfNeed(conversationDataset, con.getNeedURI())), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot propose any of my messages - I did not find any.";
+					}
+					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+			        return "Ok, I am hereby proposing my last message"+proposeedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+	
+	private void proposeLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll propose your latest message (which should not have any effect) - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot propose one of your messages - I id not find any";
+					}
+					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+			        return "Ok, I am hereby proposing your last message"+proposeedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+	
+	private void acceptLatestProposal(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll accept your latest proposal - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot accept any proposal - I id not find any 'agr:proposes' messages";
+					}
+					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+			        return "Ok, I am hereby accepting your last proposal"+proposeedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+	
+	private void acceptLatestProposalToCancel(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll accept your latest proposal to cancel - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesToCancelMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot accept a proposal to cancel - I id not find any 'agr:proposesToCancel' messages";
+					}
+					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+			        return "Ok, I am hereby accepting your last proposal to cancel"+proposeedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+	
+	private void proposeToCancelLatestAccept(EventListenerContext ctx, EventBus bus, Connection con) {
+		referToEarlierMessages(ctx, bus, con, 
+				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but 'll need to crawl the connection data first, please be patient.", 
+				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestAcceptsMessage(conversationDataset)), 
+				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
+				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+					if (uris == null || uris.length == 0 || uris[0] == null) {
+						return "Sorry, I cannot propose to cancel - I id not find any 'agr:accept' messages";
+					}
+					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+			        return "Ok, I am hereby proposing to cancel our latest agreement (if it is one)"+proposeedString+" (uri: " + uris[0]+")."
+			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+				});
+	}
+
+   
+    
+   
+    
+    
 }
