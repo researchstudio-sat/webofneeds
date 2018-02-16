@@ -112,7 +112,7 @@ function genComponentConf() {
                 ng-show="self.shouldShowRdf" 
                 won-textarea-autogrow 
                 style="resize: none; height: auto;   flex-grow: 1;"
-                placeholder="any valid turtle syntax. all usages of \`msguri:placeholder\` will be string-replaced by the proper message uri."
+                placeholder="any valid turtle syntax. all usages of \`msguri:placeholder\` will be string-replaced by the proper message uri. see \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
             ></textarea>
             <button 
                 class="rdfMsgBtnTmpDeletme" 

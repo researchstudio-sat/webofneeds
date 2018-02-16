@@ -18,6 +18,10 @@ import {
 } from './utils.js';
 
 import {
+    ttlToJsonLd,
+} from './won-utils.js';
+
+import {
     actionTypes,
 } from './actions/actions.js';
 
@@ -155,6 +159,10 @@ export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, thei
 }
 
 export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
+
+    let jsonldGraphPayloadP = isTTL?
+        ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
+        Promise.resolve();
     const messageP =
         won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {

@@ -628,6 +628,11 @@ import jsonld from 'jsonld';
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
     }
+    won.minimalTurtlePrefixes = 
+        "@prefix msg: <http://purl.org/webofneeds/message#>." +
+        "@prefix won: <http://purl.org/webofneeds/model#>." +
+        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>." +
+        "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.";
 
     won.defaultContext = {
             "webID": "http://www.example.com/webids/",
@@ -645,9 +650,20 @@ import jsonld from 'jsonld';
                 "@id":"http://purl.org/webofneeds/message#hasMessageType",
                 "@type":"@id"
             }
-
-
     }
+    won.defaultTurtlePrefixes = 
+            "@prefix webID: <http://www.example.com/webids/>." +
+            "@prefix msg: <http://purl.org/webofneeds/message#>." +
+            "@prefix dc: <http://purl.org/dc/elements/1.1/>." +
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>." +
+            "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>." +
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>." +
+            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>." +
+            "@prefix won: <http://purl.org/webofneeds/model#>." +
+            "@prefix gr: <http://purl.org/goodrelations/v1#>." +
+            "@prefix ldp: <http://www.w3.org/ns/ldp#>." +
+            "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.";
+
 
 
     won.JsonLdHelper = {
