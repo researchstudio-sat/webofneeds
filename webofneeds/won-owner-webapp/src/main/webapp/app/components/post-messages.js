@@ -1,6 +1,7 @@
 ;
 
 import angular from 'angular';
+import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
@@ -59,7 +60,7 @@ function genComponentConf() {
                         ng-show="!message.get('outgoingMessage')">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text">
+                        <div class="pm__content__message__content__text" title="{{ self.showRdfIcon ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
                             {{ message.get('text') }}
                         </div>
                         <div
@@ -180,7 +181,13 @@ function genComponentConf() {
                     this.updateScrollposition()
                 )
             )
+            
+           
 
+        }
+        
+        rdfToString(jsonld){
+        	return JSON.stringify(jsonld);
         }
 
         ensureMessagesAreLoaded() {
