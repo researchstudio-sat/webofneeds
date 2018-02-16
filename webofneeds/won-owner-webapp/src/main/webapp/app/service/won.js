@@ -323,8 +323,7 @@ import jsonld from 'jsonld';
     };
 
     //UTILS
-    var MSG_URI_PLACEHOLDER= "msguri:placeholder";
-
+    won.WONMSG.msguriPlaceholder= "msguri:placeholder";
 
     /**
      * Returns the "compacted" alternative of the value (e.g.
@@ -793,17 +792,17 @@ import jsonld from 'jsonld';
      */
     won.addMessageGraph = function (builder, graphURIs, messageType) {
         let graphs = builder.data['@graph'];
-        let unsetMessageGraphUri = MSG_URI_PLACEHOLDER+"#data";
+        let unsetMessageGraphUri = won.WONMSG.msguriPlaceholder+"#data";
         //create the message graph, containing the message type
         var messageGraph = {
             "@graph": [
                 {
-                    "@id":MSG_URI_PLACEHOLDER,
+                    "@id":won.WONMSG.msguriPlaceholder,
                     "msg:hasMessageType": {'@id':messageType}
                 },
                 {   "@id": unsetMessageGraphUri,
                     "@type": "msg:EnvelopeGraph",
-                    "rdfg:subGraphOf" : {"@id":MSG_URI_PLACEHOLDER}
+                    "rdfg:subGraphOf" : {"@id":won.WONMSG.msguriPlaceholder}
                 }
             ],
             "@id": unsetMessageGraphUri
@@ -824,7 +823,7 @@ import jsonld from 'jsonld';
         hashFragement = hashFragement || 'graph1';
         return {"@graph": [
                     {
-                        "@id": MSG_URI_PLACEHOLDER + "#" + hashFragement,
+                        "@id": won.WONMSG.msguriPlaceholder + "#" + hashFragement,
                         "@graph": []
                     }
                 ]
@@ -1507,7 +1506,7 @@ import jsonld from 'jsonld';
             }
         }
         this.messageGraph = null;
-        this.eventUriValue = MSG_URI_PLACEHOLDER;
+        this.eventUriValue = won.WONMSG.msguriPlaceholder;
         won.addMessageGraph(this, graphNames , messageType);
     };
 
