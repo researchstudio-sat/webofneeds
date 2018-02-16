@@ -77,6 +77,16 @@ export function connectionsChatMessage(chatMessage, connectionUri, isTTL=false) 
                    optimisticEvent,
                 }
             });
+       })
+       .catch(e => {
+           console.error('Error while processing chat message: ', e);
+           dispatch({
+               type: actionTypes.connections.sendChatMessageFailed,
+               payload: {
+                   error: e,
+                   message: e.message,
+                }
+            });
        });
    }
 }

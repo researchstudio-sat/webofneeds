@@ -296,7 +296,7 @@ export async function ttlToJsonLd(ttl) {
         return jsonld;
     })
     .catch(e => {
-        console.error('error while parsing turtle: ', e)
+        e.message = "error while parsing the following turtle:\n\n" + ttl + "\n\n----\n\n" + e.message;
         throw e;
     })
 }

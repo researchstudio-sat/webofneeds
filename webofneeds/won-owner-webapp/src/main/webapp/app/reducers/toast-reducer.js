@@ -22,6 +22,14 @@ export default function(allToasts = initialState, action = {}) {
         case actionTypes.logout:
             return initialState;
 
+        case actionTypes.connections.sendChatMessageFailed:
+            var msg = getIn(action, ['payload', 'message'])
+            return pushNewToast(
+                allToasts,
+                'Error while processing chat message: \n\n' + msg,
+                won.WON.errorToast, {}
+            )
+
         case actionTypes.registerFailed:
             var privateId = getIn(action, ['payload', 'privateId']);
             if(privateId) {
