@@ -4,7 +4,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
-CONSTRUCT { ?acc agr:accepts ?prop . }
+CONSTRUCT { ?g1 rdfs:comment "Accept Message" . }
 WHERE { 
 
     GRAPH ?g1 {

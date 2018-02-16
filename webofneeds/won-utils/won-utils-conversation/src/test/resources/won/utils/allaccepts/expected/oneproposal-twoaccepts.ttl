@@ -19,5 +19,9 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix sioc:  <http://rdfs.org/sioc/ns#> .
 
-event:ow321nn1va6clfidc4s0 agr:accepts event:557600936467257340 .
-event:mt1f8i41bogt7kc91fi6 agr:accepts event:557600936467257340 .
+
+<https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90>
+        rdfs:comment  "Accept Message" .
+
+<https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#content-lqq1>
+        rdfs:comment  "Accept Message" .
