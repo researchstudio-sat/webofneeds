@@ -154,7 +154,7 @@ export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, thei
     return {eventUri:eventUri,message:message};  
 }
 
-export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri}) {
+export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
     const messageP =
         won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
         .then(envelopeData => {

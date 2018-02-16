@@ -47,7 +47,7 @@ import {
     buildAdHocConnectMessage,
 } from '../won-message-utils.js';
 
-export function connectionsChatMessage(chatMessage, connectionUri) {
+export function connectionsChatMessage(chatMessage, connectionUri, isTTL=false) {
    return (dispatch, getState) => {
 
        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
@@ -63,6 +63,7 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
             ownNodeUri: ownNeed.get("nodeUri"), 
             theirNodeUri: theirNeed.get("nodeUri"), 
             theirConnectionUri,
+            isTTL,
         })
        .then(msgData =>
             Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
