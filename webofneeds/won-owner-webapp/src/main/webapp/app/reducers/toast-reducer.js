@@ -62,7 +62,8 @@ export default function(allToasts = initialState, action = {}) {
             }
 
         case actionTypes.geoLocationDenied:
-            return pushNewToast(allToasts,
+            return pushNewToast(
+                allToasts,
                 'Sorry, we were unable to create your "What\'s Around"-Post, ' +
                 'because you have denied us accesss to your current location. ' +
                 'To enable it, reload the page and click on "allow access". If' +
