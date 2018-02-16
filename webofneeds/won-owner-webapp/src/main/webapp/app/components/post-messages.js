@@ -22,6 +22,7 @@ import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
 } from '../selectors.js';
+import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -92,17 +93,16 @@ function genComponentConf() {
                     </div>
             </div>
         </div>
-        <div>
-            <chat-textfield
-                class="pm__footer"
-                placeholder="::'Your Message'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.send()"
-                submit-button-label="::'Send'"
-                >
-            </chat-textfield>
-        </div>
+        <chat-textfield
+            class="pm__footer"
+            placeholder="::'Your Message'"
+            on-input="::self.input(value)"
+            on-paste="::self.input(value)"
+            on-submit="::self.send()"
+            submit-button-label="::'Send'"
+            >
+        </chat-textfield>
+        <textarea won-textarea-autogrow style="resize: none; height: auto;"></textarea>
         <div>
             <a class="rdflink withlabel clickable"
                ng-click="self.toggleRdfDisplay()">
@@ -272,6 +272,7 @@ function genComponentConf() {
 export default angular.module('won.owner.components.postMessages', [
     squareImageModule,
     chatTextFieldModule,
+    autoresizingTextareaModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
