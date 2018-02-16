@@ -44,6 +44,13 @@ public class WonLinkedDataUtils
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
 	}
   
+  public static URI getNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+	    assert linkedDataSource != null : "linkedDataSource must not be null";
+	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Path propertyPath = PathParser.parse("<" + WON.BELONGS_TO_NEED + ">", PrefixMapping.Standard);
+	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
+	  }
+  
   public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
