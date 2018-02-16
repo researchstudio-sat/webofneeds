@@ -281,6 +281,10 @@ function genComponentConf() {
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
             if(rdftxtEl) {
                 console.log('found rdftxtel: ', rdftxtEl.value);
+                const trimmedMsg = rdftxtEl.value.trim();
+                if(trimmedMsg) {
+                    this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'), isTTL=true);
+                }
             }
 
         }
