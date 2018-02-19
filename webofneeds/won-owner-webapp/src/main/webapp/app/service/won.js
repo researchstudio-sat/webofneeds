@@ -323,7 +323,7 @@ import jsonld from 'jsonld';
     };
 
     //UTILS
-    won.WONMSG.msguriPlaceholder= "msguri:placeholder";
+    won.WONMSG.msguriPlaceholder= "this:messageuri";
 
     /**
      * Returns the "compacted" alternative of the value (e.g.
