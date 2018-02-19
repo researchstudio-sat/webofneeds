@@ -105,6 +105,7 @@ const actionHierarchy = {
         closeRemote: cnct.connectionsCloseRemote,
         rate: cnct.connectionsRate,
         sendChatMessage: cnct.connectionsChatMessage,
+        sendChatMessageFailed: INJ_DEFAULT,
         showLatestMessages: cnct.showLatestMessages,
         showMoreMessages: cnct.showMoreMessages,
     },
@@ -226,6 +227,8 @@ const actionHierarchy = {
     lostConnection: INJ_DEFAULT,
     reconnect: INJ_DEFAULT,
     reconnectSuccess: INJ_DEFAULT,
+
+    toggleRdfDisplay: INJ_DEFAULT,
 
     toasts: {
         delete: INJ_DEFAULT,
