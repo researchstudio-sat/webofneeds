@@ -125,7 +125,7 @@ function genComponentConf() {
                 ng-show="self.shouldShowRdf" 
                 won-textarea-autogrow 
                 style="resize: none; height: auto;   flex-grow: 1;"
-                placeholder="any valid turtle syntax. all usages of \`msguri:placeholder\` will be string-replaced by the proper message uri. see \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
+                placeholder="Expects valid turtle. <{{self.msguriPlaceholder}}> will be the uri generated for this message. See \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
             ></textarea>
             <button 
                 class="rdfMsgBtnTmpDeletme" 
@@ -152,10 +152,11 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.relativeTime = relativeTime;
             window.pm4dbg = this;
-
+            
             const self = this;
 
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
+            this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
 
             //this.postmsg = this;
             const selectFromState = state => {

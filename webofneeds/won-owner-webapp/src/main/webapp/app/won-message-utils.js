@@ -184,8 +184,9 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
             
 
  
-            if(graphPayload) {
-                wonMessageBuilder.mergeIntoContentGraph(graphPayload);
+            const graphPayload_ = getIn(graphPayload, [0, '@graph']);
+            if(graphPayload_) {
+                wonMessageBuilder.mergeIntoContentGraph(graphPayload_);
             } else if (chatMessage) {
                 //add the chatMessage as normal text message 
                 wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
