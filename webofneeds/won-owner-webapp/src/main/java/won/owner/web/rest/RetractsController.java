@@ -24,10 +24,10 @@ import java.util.List;
 public class RetractsController {
 
     @Autowired
-    private LinkedDataSource linkedDataSource;
+    private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
-        this.linkedDataSource = linkedDataSource;
+        this.linkedDataSourceOnBehalfOfNeed = linkedDataSource;
     }
 
     @RequestMapping(value = "/getRetracts", method = RequestMethod.GET)
@@ -48,7 +48,7 @@ public class RetractsController {
         pmap.setNsPrefix("msg", WONMSG.getURI());
         propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
         propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-        return linkedDataSource.getDataForResourceWithPropertyPath(
+        return linkedDataSourceOnBehalfOfNeed.getDataForResourceWithPropertyPath(
                 URI.create(connectionUri), propertyPaths, maxRequests, depth, false);
     }
 }

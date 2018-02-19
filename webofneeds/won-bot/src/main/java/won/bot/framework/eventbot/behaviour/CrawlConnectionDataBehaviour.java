@@ -16,6 +16,13 @@
 
 package won.bot.framework.eventbot.behaviour;
 
+import java.net.URI;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.shared.PrefixMapping;
@@ -24,6 +31,7 @@ import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
@@ -33,9 +41,9 @@ import won.bot.framework.eventbot.event.impl.cmd.CommandResultEvent;
 import won.bot.framework.eventbot.event.impl.crawl.CrawlCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawl.CrawlCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.crawl.CrawlCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.validate.ValidateConnectionCommandEvent;
-import won.bot.framework.eventbot.event.impl.validate.ValidateConnectionCommandFailureEvent;
-import won.bot.framework.eventbot.event.impl.validate.ValidateConnectionCommandSuccessEvent;
+import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandEvent;
+import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandFailureEvent;
+import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
 import won.bot.framework.eventbot.filter.impl.CommandResultFilter;
 import won.bot.framework.eventbot.filter.impl.OrFilter;
 import won.bot.framework.eventbot.filter.impl.SameEventFilter;
@@ -43,33 +51,28 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.util.RdfUtils;
-import won.protocol.validation.WonConnectionValidator;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
-import java.net.URI;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Crawls the complete connection data and checks if it is valid.
+ * Crawls the complete connection data.
  * This behaviour is transient, it is only active once for a specific activity and then deactivates itself.
  */
-public class ValidateConnectionDataBehaviour extends BotBehaviour {
+public class CrawlConnectionDataBehaviour extends BotBehaviour {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private ValidateConnectionCommandEvent command;
+    private CrawlConnectionCommandEvent command;
     private Duration abortTimeout;
 
-    public ValidateConnectionDataBehaviour(EventListenerContext context, ValidateConnectionCommandEvent command, Duration abortTimeout) {
+    public CrawlConnectionDataBehaviour(EventListenerContext context, CrawlConnectionCommandEvent command, Duration abortTimeout) {
         super(context);
         this.command = command;
         this.abortTimeout = abortTimeout;
     }
 
-    public ValidateConnectionDataBehaviour(EventListenerContext context, String name, ValidateConnectionCommandEvent command, Duration abortTimeout) {
+    public CrawlConnectionDataBehaviour(EventListenerContext context, String name, CrawlConnectionCommandEvent command, Duration abortTimeout) {
         super(context, name);
         this.command = command;
         this.abortTimeout = abortTimeout;
@@ -77,8 +80,18 @@ public class ValidateConnectionDataBehaviour extends BotBehaviour {
 
     @Override
     protected void onActivate(Optional<Object> message) {
-        logger.debug("activating validation for connection {}", command.getConnectionURI());
+        logger.debug("activating crawling connection data for connection {}", command.getConnectionURI());
         logger.debug("will deactivate autmatically after " + abortTimeout );
+        LinkedDataSource linkedDataSource = context.getLinkedDataSource();
+        if (linkedDataSource instanceof CachingLinkedDataSource) {
+        	URI toInvalidate = WonLinkedDataUtils.getEventContainerURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
+        	((CachingLinkedDataSource)linkedDataSource).invalidate(toInvalidate);
+        	((CachingLinkedDataSource)linkedDataSource).invalidate(toInvalidate, command.getNeedURI());
+        	URI remoteConnectionUri = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(command.getConnectionURI(), linkedDataSource);
+        	toInvalidate = WonLinkedDataUtils.getEventContainerURIforConnectionURI(remoteConnectionUri, linkedDataSource);
+        	((CachingLinkedDataSource)linkedDataSource).invalidate(toInvalidate);
+        	((CachingLinkedDataSource)linkedDataSource).invalidate(toInvalidate, command.getNeedURI());
+        }
         context.getTaskScheduler().schedule(
                 new Runnable() {
                     @Override
@@ -88,6 +101,7 @@ public class ValidateConnectionDataBehaviour extends BotBehaviour {
                 }, new Date(System.currentTimeMillis() + abortTimeout.toMillis()));
         ;
 
+        
         List<URI> seedUris = new ArrayList();
         seedUris.add(command.getNeedURI());
         List<Path> propertyPaths = new ArrayList<>();
@@ -148,9 +162,8 @@ public class ValidateConnectionDataBehaviour extends BotBehaviour {
                         logger.debug("finished crawling need data for connection {}", command.getConnectionURI());
                         Dataset dataset = ((CrawlCommandSuccessEvent) event).getCrawledData();
                         RdfUtils.addDatasetToDataset(crawledData, dataset);
-
-                        validateConnectionData(crawledData);
-                        //deactivate();
+                        context.getEventBus().publish(new CrawlConnectionCommandSuccessEvent(command, crawledData));
+                        deactivate();
                     }
                 }
                 ));
@@ -167,31 +180,14 @@ public class ValidateConnectionDataBehaviour extends BotBehaviour {
                             protected void doRun(Event event, EventListener executingListener) throws Exception {
                                 CrawlCommandFailureEvent failureEvent = (CrawlCommandFailureEvent) event;
                                 logger.debug("crawling failed for connection {}, message: {}", command.getConnectionURI(), failureEvent.getMessage());
-                                context.getEventBus().publish(new ValidateConnectionCommandFailureEvent(failureEvent.getMessage(), command));
+                                context.getEventBus().publish(new CrawlConnectionCommandFailureEvent(failureEvent.getMessage(), command));
+                                deactivate();
                             }
                         })
         );
         //start crawling the need  - connection will be crawled when need crawling is done
         context.getEventBus().publish(crawlNeedCommandEvent);
     }
-
-    private void validateConnectionData(Dataset dataset) {
-        try {
-            logger.debug("validating data of connection {}", command.getConnectionURI());
-            //TODO: use one validator for all invocations
-            WonConnectionValidator validator = new WonConnectionValidator();
-            StringBuilder message = new StringBuilder();
-            boolean valid = validator.validate(dataset, message);
-            String messageBegin =
-            "Connection " + command.getConnectionURI() + " is valid: " + valid + " (downloaded " + dataset.asDatasetGraph().size() + " rdf graphs) ";
-            logger.debug(messageBegin);
-            context.getEventBus().publish(new ValidateConnectionCommandSuccessEvent(command, valid, messageBegin + " " + message.toString()));
-        } catch (Exception e) {
-            context.getEventBus().publish(new ValidateConnectionCommandFailureEvent("Caught exception during validation: " + e, command));
-        }
-        deactivate();
-    }
-
 
     public void onResult(EventBotAction task) {
         subscribeWithAutoCleanup(CommandResultEvent.class,

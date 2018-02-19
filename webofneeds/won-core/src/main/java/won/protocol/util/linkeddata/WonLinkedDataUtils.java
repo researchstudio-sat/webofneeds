@@ -44,6 +44,13 @@ public class WonLinkedDataUtils
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
 	}
   
+  public static URI getNeedURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+	    assert linkedDataSource != null : "linkedDataSource must not be null";
+	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Path propertyPath = PathParser.parse("<" + WON.BELONGS_TO_NEED + ">", PrefixMapping.Standard);
+	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
+	  }
+  
   public static URI getRemoteConnectionURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
     Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
@@ -57,6 +64,20 @@ public class WonLinkedDataUtils
     Path propertyPath = PathParser.parse("<" + WON.HAS_REMOTE_NEED + ">", PrefixMapping.Standard);
     return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
   }
+  
+  public static URI getEventContainerURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+	    assert linkedDataSource != null : "linkedDataSource must not be null";
+	    Dataset dataset = getDatalForResource(connectionURI, linkedDataSource);
+	    Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER+ ">", PrefixMapping.Standard);
+	    return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
+  }
+  
+  public static URI getEventContainerURIforNeedURI(URI needURI, LinkedDataSource linkedDataSource) {
+	    assert linkedDataSource != null : "linkedDataSource must not be null";
+	    Dataset dataset = getDatalForResource(needURI, linkedDataSource);
+	    Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER+ ">", PrefixMapping.Standard);
+	    return RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
+}
 
   public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
