@@ -44,11 +44,11 @@ function genComponentConf() {
     			<div ng-show="self.isPart">
     				<won-post-is-info is-part="::self.isPart"></won-post-is-info>
                 </div>
+                </br>
                 <!-- SEEKS Part -->
                 <div ng-show="self.seeksPart"> 
 	                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
     			</div>
-                
                 </br>
                 <hr>
                 <p class="post-info__details">
