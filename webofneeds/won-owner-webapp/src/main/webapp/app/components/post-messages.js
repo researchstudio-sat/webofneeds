@@ -134,9 +134,6 @@ function genComponentConf() {
                     Send RDF
             </button>
         </div>
-
-
-
         <div>
             <a class="rdflink withlabel clickable"
                ng-click="self.toggleRdfDisplay()">
@@ -300,6 +297,7 @@ function genComponentConf() {
                     this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'), isTTL=true);
                 }
             }
+
         }
     }
     Controller.$inject = serviceDependencies;

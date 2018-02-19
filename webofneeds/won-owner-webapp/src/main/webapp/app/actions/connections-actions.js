@@ -47,7 +47,7 @@ import {
     buildAdHocConnectMessage,
 } from '../won-message-utils.js';
 
-export function connectionsChatMessage(chatMessage, connectionUri) {
+export function connectionsChatMessage(chatMessage, connectionUri, isTTL=false) {
    return (dispatch, getState) => {
 
        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
@@ -55,7 +55,16 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
        const theirNeed = getState().getIn(["needs", theirNeedUri]);
        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-       buildChatMessage(chatMessage, connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
+       buildChatMessage({
+            chatMessage: chatMessage, 
+            connectionUri,
+            ownNeedUri: ownNeed.get("uri"), 
+            theirNeedUri: theirNeedUri,
+            ownNodeUri: ownNeed.get("nodeUri"), 
+            theirNodeUri: theirNeed.get("nodeUri"), 
+            theirConnectionUri,
+            isTTL,
+        })
        .then(msgData =>
             Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
        .then(([optimisticEvent, jsonldMessage]) => {
@@ -66,6 +75,16 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
                    eventUri: optimisticEvent.getMessageUri(),
                    message: jsonldMessage,
                    optimisticEvent,
+                }
+            });
+       })
+       .catch(e => {
+           console.error('Error while processing chat message: ', e);
+           dispatch({
+               type: actionTypes.connections.sendChatMessageFailed,
+               payload: {
+                   error: e,
+                   message: e.message,
                 }
             });
        });
@@ -124,7 +143,13 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-    const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
+    const cnctMsg = buildConnectMessage({
+        ownNeedUri: needUri,
+        theirNeedUri: theirNeedUri,
+        ownNodeUri: nodeUri,
+        theirNodeUri: theirNeed.get("nodeUri"),
+        textMessage: textMessage,
+    });
     
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
     
