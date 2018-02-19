@@ -48,7 +48,21 @@ public class WonMessageIntoCamelProcessor implements Processor
     //if the wonMessage header is there, don't change it - that way we can re-route internal messages
     WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
     if (wonMessage == null) {
-      wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
+    	try {
+    		wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
+    	} catch (Exception e) {
+    		// stop the exchange in this case - maybe at some point we can return a failure response but
+    		// currently, we would have to look into the message for doing that, and looking into
+    		// the message is not possible if we cannot decode it.
+    		logger.info("could not decode message as TriG, ignoring it (the offending message is logged at loglevel 'DEBUG')", e);
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("offending message: {}", exchange.getIn().getBody().toString());
+    		}
+    		
+    		exchange.setProperty(Exchange.ROUTE_STOP, Boolean.TRUE);
+    		
+    		throw new WonMessageProcessingException("Could not decode message", e);
+    	}
     }
     if (wonMessage == null) {
       throw new WonMessageProcessingException("No WonMessage found in header '" +

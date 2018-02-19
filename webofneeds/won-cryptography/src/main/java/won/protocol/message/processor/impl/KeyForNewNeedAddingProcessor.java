@@ -37,7 +37,6 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
   private static final Logger logger = LoggerFactory.getLogger(KeyForNewNeedAddingProcessor.class);
 
   private CryptographyService cryptographyService;
-  ThreadLocal<StopWatch> stopWatchThreadLocal = new ThreadLocal<>();
 
   private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 
@@ -50,24 +49,17 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
 
   @Override
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
-    StopWatch stopWatch = getStopWatch();
     try {
       if (message.getMessageType() == WonMessageType.CREATE_NEED) {
         String needUri = message.getSenderNeedURI().toString();
         Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(message);
         // generate and add need's public key to the need content
 
-        if (logger.isDebugEnabled()){
-          stopWatch.start();
-        }
         String alias = keyPairAliasDerivationStrategy.getAliasForNeedUri(needUri);
         if (cryptographyService.getPrivateKey(alias) == null) {
           cryptographyService.createNewKeyPair(alias, alias);
         }
 
-        if (logger.isDebugEnabled()) {
-          stopWatchStopAndLog(stopWatch);
-        }
         PublicKey pubKey = cryptographyService.getPublicKey(alias);
         WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
         String contentName = message.getContentGraphURIs().get(0);
@@ -86,22 +78,4 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
     this.keyPairAliasDerivationStrategy = keyPairAliasDerivationStrategy;
   }
 
-  private void stopWatchStopAndLog(StopWatch stopWatch) {
-    stopWatch.stop();
-    if (stopWatch.getTaskCount() % 10 == 0) {
-      logger
-              .debug("creating keypair takes {} millis on average", String.format("%.2f", ((double) stopWatch
-                      .getTotalTimeMillis() / stopWatch
-                      .getTaskCount())));
-    }
-  }
-
-  private StopWatch getStopWatch() {
-    StopWatch stopWatch = stopWatchThreadLocal.get();
-    if (stopWatch == null) {
-      stopWatch = new StopWatch();
-      stopWatchThreadLocal.set(stopWatch);
-    }
-    return stopWatch;
-  }
 }

@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.Model;
 public abstract class SparqlFunction<T,R> implements Function<T,R> {
 
 	protected final String sparql;
+	protected final String sparqlFile;
 
 	public SparqlFunction(String sparqlFile) {
 		super();
@@ -25,6 +26,7 @@ public abstract class SparqlFunction<T,R> implements Function<T,R> {
 			throw new IllegalStateException("Could not read sparql from file", e);
 		}
 		this.sparql = writer.toString();
+		this.sparqlFile = sparqlFile;
 	}
 
 	public String getSparql() {
