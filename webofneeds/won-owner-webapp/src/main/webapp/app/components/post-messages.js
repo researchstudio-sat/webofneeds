@@ -5,6 +5,7 @@ import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
+import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import {
     relativeTime,
 } from '../won-label-utils.js'
@@ -102,6 +103,18 @@ function genComponentConf() {
             submit-button-label="::'Send'"
             >
         </chat-textfield>
+        <!--
+        <chat-textfield-simple
+            class="pm__footer"
+            placeholder="::'Your Message'"
+            on-input="::self.input(value)"
+            on-paste="::self.input(value)"
+            on-submit="::self.send()"
+            submit-button-label="::'Send'"
+            >
+        </chat-textfield-simple>
+        -->
+
         <!-- 
         quick'n'dirty textfield and button so flo can use it for his branch. 
         TODO implement and style chat-textfield-simple and use that instead.
@@ -121,8 +134,6 @@ function genComponentConf() {
                     Send RDF
             </button>
         </div>
-
-
         <div>
             <a class="rdflink withlabel clickable"
                ng-click="self.toggleRdfDisplay()">
@@ -305,6 +316,7 @@ export default angular.module('won.owner.components.postMessages', [
     squareImageModule,
     chatTextFieldModule,
     autoresizingTextareaModule,
+    chatTextFieldSimpleModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;

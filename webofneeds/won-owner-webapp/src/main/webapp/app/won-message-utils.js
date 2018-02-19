@@ -183,28 +183,7 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
                 .hasSentTimestamp(new Date().getTime().toString());
             
 
-            if (chatMessage.startsWith("::msg::")) {
-              let candidateTripleString = chatMessage.replace(/&lt;/g,"<").replace(/&gt;/g,">")
-              // triple syntax: parse chat message. if it has exactly three elements, 
-              // separated by white space, interpret as triples:
-              const tripleCandidate = candidateTripleString.split(/\s+/);
-              if (tripleCandidate.length == 3){
-                const predicate = tripleCandidate[1];
-                let predicateUri = getUri(predicate);
-                if (!predicateUri){
-                  predicateUri = expandPrefix(predicate);  
-                }
-                const object = tripleCandidate[2];
-                const objectUri = getUri(object);
-                if (objectUri){ 
-                  //object is an uri, add JSON-LD URI
-                  wonMessageBuilder.addContentGraphData(predicateUri, {'@id':objectUri});
-                } else {
-                  //object is interpreted as string
-                  wonMessageBuilder.addContentGraphData(predicateUri, object);
-                }
-              }
-            }   
+ 
             if(graphPayload) {
                 wonMessageBuilder.mergeIntoContentGraph(graphPayload);
             } else if (chatMessage) {
@@ -219,7 +198,6 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
             }
             
             wonMessageBuilder.eventURI(eventUri); // replace placeholders with proper event-uri
-
             const message = wonMessageBuilder.build();
 
             return {
@@ -231,24 +209,6 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
 
 }
 
-/*
- * If the specified candidate is a string enclosed in '<' and '>', return the enclosed string.
- * Returns null in any other case. 
- */
-function getUri(candidate){
-  const matched = candidate.match(/^<([^<>]+)>$/)
-  if (matched == null) return null;
-  if (matched.length != 2) return null;
-  return matched[1];
-}
-
-function expandPrefix(candidate){
-  return candidate
-    .replace(/^won:/,'http://purl.org/webofneeds/model#')
-    .replace(/^msg:/,'http://purl.org/webofneeds/message#')
-    .replace(/^agr:/,'http://purl.org/webofneeds/agreement#')
-    .replace(/^mod:/,'http://purl.org/webofneeds/modification#');
-}
 
 export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {
     const messageP = won

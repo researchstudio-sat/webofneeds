@@ -3,11 +3,11 @@ package won.protocol.util;
 import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+
 
 public class WonConversationUtils {
 	
@@ -177,6 +177,5 @@ public class WonConversationUtils {
 				WonMessageQueryBuilder.getBuilder(x -> x.get("text").asLiteral().toString())
 				.messageUri(messageUri).build());
 	}
-	
 	
 }

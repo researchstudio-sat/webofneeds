@@ -258,7 +258,6 @@ public class WonRdfUtils
         return messageModel;
     }
     
-    
     public static Model retractsMessage(URI... toRetract) {
         return addRetracts(createModelWithBaseResource(), toRetract);
     }

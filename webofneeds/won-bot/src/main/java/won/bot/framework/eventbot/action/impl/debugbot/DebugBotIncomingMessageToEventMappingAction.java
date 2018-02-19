@@ -193,6 +193,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                 	acceptLatestProposalToCancel(ctx, bus, con);
                 } else if (PATTERN_PROPOSE_TO_CANCEL.matcher(message).matches()) {
                 	proposeToCancelLatestAccept(ctx, bus, con);
+
                 } else {
                     //default: answer with eliza.
                     bus.publish(new MessageToElizaEvent(con, message));
