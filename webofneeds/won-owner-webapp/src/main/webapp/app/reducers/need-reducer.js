@@ -648,38 +648,29 @@ function parseNeed(jsonldNeed, ownNeed) {
         //TODO: Type concept?
         if(isPresent){
             type = seeksPresent ? won.WON.BasicNeedTypeCombinedCompacted : won.WON.BasicNeedTypeSupplyCompacted;
-            let description = is.get("dc:description");
-            let tags = is.get("won:hasTag");
-            let location = parseLocation(is.get("won:hasLocation"));
+            let tags = is.get("won:hasTag")? is.get("won:hasTag") : undefined;
             isPart = {
             		title: is.get("dc:title"),
             		type: type, 
-            		description: description ? description : undefined, 
-            		tags: (tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
-            		location: location	
+            		description: (is.get("dc:description")? is.get("dc:description") : undefined), 
+            		tags: (tags? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
+            		location: (is.get("won:hasLocation")? parseLocation(is.get("won:hasLocation")) : undefined),
             };
         }
         if(seeksPresent){
         	type = isPresent? type : won.WON.BasicNeedTypeDemandCompacted;
-            let description = seeks.get("dc:description");
-            let tags = seeks.get("won:hasTag");
-            let location = parseLocation(seeks.get("won:hasLocation"));
+        	let tags = seeks.get("won:hasTag")? seeks.get("won:hasTag") : undefined;
             seeksPart = {
             		title: seeks.get("dc:title"),
             		type: type, 
-            		description: description ? description : undefined, 
-            		tags: (tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
-            		location: location	
+            		description: (seeks.get("dc:description")? seeks.get("dc:description") : undefined), 
+            		tags: (tags? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
+            		location: (seeks.get("won:hasLocation")? parseLocation(seeks.get("won:hasLocation")) : undefined),	
             };
         }
 
         parsedNeed.is = isPart;
         parsedNeed.seeks = seeksPart;
-        
-        //parsedNeed.tags = tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined;
-        //parsedNeed.description = description ? description : undefined;
-        //parsedNeed.location = location;
-        
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
         parsedNeed.isWhatsAround = !!isWhatsAround;
         parsedNeed.matchingContexts =  wonHasMatchingContexts ? ( Immutable.List.isList(wonHasMatchingContexts) ? wonHasMatchingContexts : Immutable.List.of(wonHasMatchingContexts) ) : undefined;

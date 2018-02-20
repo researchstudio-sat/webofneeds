@@ -1,5 +1,6 @@
 @import 'won-config';
 @import 'sizing-utils';
+@import 'animate';
 
 .post__sendrequest {
   position: absolute;
@@ -57,9 +58,18 @@ won-post-info {
     }
   }
 
+  .post-info__carret {
+    @include fixed-square(1rem);
+
+    // visually center icon on line
+    position: relative;
+    top: 0.1em;
+  }
+
   won-need-map{
     display: block;
-
+    @include slideWithOpacityAnimation(.5s, linear, 20rem);
+    
     .need-map__mapmount {
       width: 100%;
       height: 31rem;
