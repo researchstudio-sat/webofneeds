@@ -6,6 +6,7 @@ import org.apache.jena.rdf.model.Model;
 import won.protocol.util.DatasetSelectionBySparqlFunction;
 import won.protocol.util.DatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.DatasetToModelBySparqlFunction;
+import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
 
 public class HighlevelFunctionFactory {
 	
@@ -25,6 +26,8 @@ public class HighlevelFunctionFactory {
 	private static DatasetSelectionBySparqlFunction modifiedSelection;
 	// variable for getAgreements Function that gets all accepts messages
 	private static DatasetToModelBySparqlFunction allAcceptsFunction;
+	//// get a dynamic dataset
+	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutOffFunction;
 	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
@@ -141,5 +144,11 @@ public class HighlevelFunctionFactory {
 		return agreementFunction;
 	}
 	
+	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap intialBinding) {
+		if (cutOffFunction == null) {
+			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutofffunction/query.rq",intialBinding);
+		}
+		return cutOffFunction;
+	}
 }
 

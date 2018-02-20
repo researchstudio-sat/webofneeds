@@ -16,10 +16,14 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
+import won.protocol.util.DatasetToModelBySparqlFunction;
+import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.RdfUtils;
 
 
 public class HighlevelProtocols {
+	
+	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutAfterMessageFunction;
 	/**
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
@@ -79,6 +83,8 @@ public class HighlevelProtocols {
 		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
 		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
 		initialBinding.add("terminatinggraph", name);
+		// use this initial binding in: DynamicDatasetToDatasetBySparqlGSPOSelectFunction
+	 //	cutAfterMessageFunction.apply(dataset);
 		
 		return null;
 	}
