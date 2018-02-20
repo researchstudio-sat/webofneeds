@@ -64,8 +64,28 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
   private Ehcache cache;
   private CrawlerCallback crawlerCallback = null;
 
+  //are we acting as a shared cache? if so, we MUST not cache 
+  //resources that have CacheControl: private, even if we've cached them.
+  private boolean sharedCache = true;
+
   //In-memory dataset for caching linked data.
 
+  /**
+   * Set if this linkedDataSource is/uses a shared cache. 
+   * @param sharedCache
+   */
+  public void setSharedCache(boolean sharedCache) {
+	this.sharedCache = sharedCache;
+  }
+  
+  /**
+   * Is this linkedDataSource using a shared cache?
+   * @return
+   */
+  public boolean isSharedCache() {
+	return sharedCache;
+  }
+  
   /**
    * Removes the element associated with the
    * specified URI from the cache
@@ -151,11 +171,11 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         logger.debug("cache item {} expired, fetching again.", resource);
         return fetchOnlyOnce(resource, requesterWebID, linkedDataCacheEntry, headers);
       }
-      if (linkedDataCacheEntry.getCacheControlFlags().contains(CacheControlFlag.PRIVATE)){
+      if (linkedDataCacheEntry.getCacheControlFlags().contains(CacheControlFlag.PRIVATE) && isSharedCache()){
         // in this case we assume that the response is not publicly visible, so it depends on the specified
         // requesterWebID. The check is performed by the server. We cannot return a cached response
         // immediately, but further down the line the ETAG based system can do that.
-        logger.debug("cache item {} is Cache-Control:private, will return cached copy only after server checks ETAG, " +
+        logger.debug("cache item {} is Cache-Control:private and we are a shared cache. Will return cached copy only after server checks ETAG (and client cert), " +
                        "therefore sending request to server.", resource);
         return fetchOnlyOnce(resource, requesterWebID, linkedDataCacheEntry, headers);
       }
@@ -242,8 +262,12 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     Date expires = parseCacheControlMaxAgeValue(resource, responseData);
     if (expires == null) {
       expires = parseExpiresHeader(resource, responseData);
+      if (expires != null && expires.getTime() == 0) {
+    	  //the expires header was invalid (e.g. '0'), which means: already expired. Don't cache.
+    	  return responseData;
+      }
     }
-
+    
     EnumSet<CacheControlFlag> cacheControlFlags = parseCacheControlHeaderFlags(resource, responseData);
     if (cacheControlFlags.contains(CacheControlFlag.NO_STORE) || cacheControlFlags.contains(CacheControlFlag.NO_CACHE)){
       //we are not allowed to cache the result
@@ -375,13 +399,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     try {
       expires = format.parse(expiresHeader);
     } catch (ParseException e) {
-      //cannot parse expires header - use a default
-      expires = addNSecondsToNow(DEFAULT_EXPIRY_PERIOD);
-      //TODO: there seems to be a problem with the Expires header from the LinkedDataService
+      //invalid dates mean 'already expired.' don't cache
       logger.debug("could not parse 'Expires' header ' "
-       + expiresHeader +"' obtained for '" + resource + "', using default expiry period of " + DEFAULT_EXPIRY_PERIOD
-                    +" " +
-                    "seconds");
+       + expiresHeader +"' obtained for '" + resource + "', marking as already expired");
+      return new Date(0);
     }
     return expires;
   }

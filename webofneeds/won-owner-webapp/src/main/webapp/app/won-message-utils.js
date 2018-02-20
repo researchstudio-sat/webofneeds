@@ -178,14 +178,18 @@ export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNe
               const tripleCandidate = candidateTripleString.split(/\s+/);
               if (tripleCandidate.length == 3){
                 const predicate = tripleCandidate[1];
+                let predicateUri = getUri(predicate);
+                if (!predicateUri){
+                  predicateUri = expandPrefix(predicate);  
+                }
                 const object = tripleCandidate[2];
                 const objectUri = getUri(object);
                 if (objectUri){ 
                   //object is an uri, add JSON-LD URI
-                  wonMessageBuilder.addContentGraphData(predicate, {'@id':objectUri});
+                  wonMessageBuilder.addContentGraphData(predicateUri, {'@id':objectUri});
                 } else {
                   //object is interpreted as string
-                  wonMessageBuilder.addContentGraphData(predicate, object);
+                  wonMessageBuilder.addContentGraphData(predicateUri, object);
                 }
               }
             }   
@@ -213,6 +217,14 @@ function getUri(candidate){
   if (matched == null) return null;
   if (matched.length != 2) return null;
   return matched[1];
+}
+
+function expandPrefix(candidate){
+  return candidate
+    .replace(/^won:/,'http://purl.org/webofneeds/model#')
+    .replace(/^msg:/,'http://purl.org/webofneeds/message#')
+    .replace(/^agr:/,'http://purl.org/webofneeds/agreement#')
+    .replace(/^mod:/,'http://purl.org/webofneeds/modification#');
 }
 
 export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {
