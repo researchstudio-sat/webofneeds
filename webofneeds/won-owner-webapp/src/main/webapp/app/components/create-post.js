@@ -3,7 +3,7 @@
  */
 ;
 
-import angular from 'angular'
+import angular from 'angular';
 import ngAnimate from 'angular-animate';
 
 import 'ng-redux';
@@ -13,6 +13,10 @@ import labelledHrModule from './labelled-hr.js';
 import needTextfieldModule from './need-textfield.js';
 import imageDropzoneModule from './image-dropzone.js';
 import locationPickerModule from './location-picker.js';
+import createIsseeksModule from './create-isseeks.js';
+import {
+	postTitleCharacterLimit,
+} from '../config.js';
 import {
 	getIn,
     attach,
@@ -74,214 +78,14 @@ function genComponentConf() {
            <div class="cp__title">Post</div>
             <div class="cp__addDetail">
 
-	            <!-- IS PART -->
-                <div class="cp__header addDetail clickable" 
-                    ng-click="self.toggleDropDown(self.is)" 
-                    ng-class="{'closedDetail': !self.checkDropDown(self.is)}">
-
-                    <svg class="cp__circleicon" ng-show="!self.checkDropDown(self.is)">
-                        <use href="#ico36_plus_circle"></use>
-                    </svg>
-                    <svg class="cp__circleicon" ng-show="self.checkDropDown(self.is)">
-                        <use href="#ico36_close_circle"></use>
-                    </svg>
-                    <span ng-show="!self.checkDropDown(self.is)">
-                        Add 
-                    </span>
-                    <span class="hover" ng-show="self.checkDropDown(self.is)">
-                        Remove
-                    </span>
-                    Description
-                    <span class="opt">(allows others to find your post)</span>
-    			</div>
-	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.is)" >
-		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.is)">
-				        <won-image-dropzone on-image-picked="::self.pickImage(image, self.is)">
-				        </won-image-dropzone>
-						<need-textfield on-draft-change="::self.setDraft(draft, self.is)"></need-textfield>
-					</div>
-					<div class="cp__textfield_instruction" ng-if="self.checkDropDown(self.is)">
-						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-					</div>
-					
-					<!-- DETAILS -->
-					<div class="cp__details" ng-repeat="detail in self.details[self.is] track by $index" ng-if="self.isValid(self.is)">
-						<!-- LOCATION ng-if="self.isDetailPresent('location', self.is)"-->
-						<div class="cp__location"  ng-if="detail === 'location'">
-	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.is)">
-                                <svg class="cp__circleicon">
-                                    <use href="#ico36_location_circle"></use>
-                                </svg>
-		                        <span class="nonHover">Location</span>
-		                        <span class="hover">Remove Location</span>
-	    					</div>
-	                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.is)" location-is-saved="::self.locationIsSaved(self.is)"></won-location-picker>
-	                	</div>
-	                	<!-- TAGS -->
-	                	 <div class="cp__tags" ng-if="detail === 'tags'">
-		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.is)">
-                                <svg class="cp__circleicon">
-                                    <use href="#ico36_tags_circle"></use>
-                                </svg>
-		                        <span class="nonHover">Tags</span>
-		                        <span class="hover">Remove Tags</span>
-		                    </div>
-		                    <div class="cp__taglist">
-		                        <span class="cp__taglist__tag" ng-repeat="tag in self.draftObject[self.is].tags">{{tag}}</span>
-		                    </div>
-		                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.is]" ng-keyup="::self.addTags(self.is)"/>
-		                </div>
-		            </div>
-                	<!-- /DETAILS -->
-    				<!-- DETAILS Picker -->
-	    			<div class="cp__addDetail" ng-if="self.isValid(self.is)">
-                        <div class="cp__header detailPicker clickable" 
-                            ng-click="self.toggleDetail(self.is)" 
-                            ng-class="{'closedDetailPicker': !self.showDetail[self.is]}">
-                                <span class="nonHover">Add more detail</span>
-                                <span class="hover" ng-if="!self.showDetail[self.is]">Open more detail</span>
-                                <span class="hover" ng-if="self.showDetail[self.is]">Close more detail</span>
-                                <svg class="cp__carret" ng-show="!self.showDetail[self.is]">
-                                    <use href="#ico16_arrow_down"></use>
-                                </svg>
-                                <svg class="cp__carret" ng-show="self.showDetail[self.is]">
-                                    <use href="#ico16_arrow_up"></use>
-                                </svg>
-		                </div>
-			            <div class="cp__detail__items" ng-if="self.showDetail[self.is]" >
-		                    <div class="cp__detail__items__item location" 
-		                        ng-click="!self.isDetailPresent('location', self.is) && self.addDetail('location', self.is)"
-                                ng-class="{'picked' : self.isDetailPresent('location', self.is)}">
-                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('location', self.is)">
-                                        <use href="#ico36_location_circle"></use>
-                                    </svg>
-                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('location', self.is)">
-                                        <use href="#ico36_added_circle"></use>
-                                    </svg>
-                                    Address or Location
-                                </div>   
-		                    <div class="cp__detail__items__item tags"
-		                        ng-click="!self.isDetailPresent('tags', self.is) && self.addDetail('tags', self.is)"
-                                ng-class="{'picked' : self.isDetailPresent('tags', self.is)}">
-                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('tags', self.is)">
-                                        <use href="#ico36_tags_circle"></use>
-                                    </svg>
-                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('tags', self.is)">
-                                        <use href="#ico36_added_circle"></use>
-                                    </svg>
-                                    Tags
-                            </div>
-		                </div>
-		            </div>
-		            <!-- /DETAIL Picker/ -->
-                </div>
-                <!-- /IS PART/ -->
-                    
-                <won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="(self.checkDropDown(self.seeks) || self.checkDropDown(self.is))"></won-labelled-hr> 
-                
-                <!-- SEEKS PART -->   	
-                <div class="cp__header addDetail clickable" 
-                    ng-click="self.toggleDropDown(self.seeks)" 
-                    ng-class="{'closedDetail': !self.checkDropDown(self.seeks)}">
-
-                    <svg class="cp__circleicon" ng-show="!self.checkDropDown(self.seeks)">
-                        <use href="#ico36_plus_circle"></use>
-                    </svg>
-                    <svg class="cp__circleicon" ng-show="self.checkDropDown(self.seeks)">
-                        <use href="#ico36_close_circle"></use>
-                    </svg>
-                    <span ng-show="!self.checkDropDown(self.seeks)">
-                        Add 
-                    </span>
-                    <span class="hover" ng-show="self.checkDropDown(self.seeks)">
-                        Remove
-                    </span>
-                    Search
-                    <span class="opt">(search in other posts)</span>
-    			</div>
-	            <div class="cp__detail__items" ng-if="self.checkDropDown(self.seeks)" >
-		            <div class="cp__mandatory-rest ng-if="self.checkDropDown(self.seeks)">
-				        <won-image-dropzone on-image-picked="::self.pickImage(image, self.seeks)">
-				        </won-image-dropzone>
-						<need-textfield on-draft-change="::self.setDraft(draft, self.seeks)"></need-textfield>
-					</div>
-					<div class="cp__textfield_instruction" ng-if="self.checkDropDown(self.seeks)">
-						<span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-					</div>
-					
-					<!-- DETAILS -->
-					<div class="cp__details" ng-repeat="detail in self.details[self.seeks] track by $index" ng-if="self.isValid(self.seeks)">
-						<!-- LOCATION ng-if="self.isDetailPresent('location', self.seeks)"-->
-						<div class="cp__location"  ng-if="detail === 'location'">
-	                    	<div class="cp__header location" ng-click="self.removeDetail('location', self.seeks)">
-                                <svg class="cp__circleicon">
-                                    <use href="#ico36_location_circle"></use>
-                                </svg>
-		                        <span class="nonHover">Location</span>
-		                        <span class="hover">Remove Location</span>
-	    					</div>
-	                    	<won-location-picker id="seeksPicker" on-draft-change="::self.setDraft(draft, self.seeks)" location-is-saved="::self.locationIsSaved(self.seeks)"></won-location-picker>
-	                	</div>
-	                	<!-- TAGS -->
-	                	 <div class="cp__tags" ng-if="detail === 'tags'">
-		                    <div class="cp__header tags" ng-click="self.removeDetail('tags', self.seeks)">
-                                <svg class="cp__circleicon">
-                                    <use href="#ico36_tags_circle"></use>
-                                </svg>
-		                        <span class="nonHover">Tags</span>
-		                        <span class="hover">Remove Tags</span>
-		                    </div>
-		                    <div class="cp__taglist">
-		                        <span class="cp__taglist__tag" ng-repeat="tag in self.draftObject[self.seeks].tags">{{tag}}</span>
-		                    </div>
-		                    <input class="cp__tags__input" placeholder="e.g. #couch #free" type="text" ng-model="self.tagsString[self.seeks]" ng-keyup="::self.addTags(self.seeks)"/>
-		                </div>
-		            </div>
-                	<!-- /DETAILS -->
-    				<!-- DETAILS Picker -->
-	    			<div class="cp__addDetail" ng-if="self.isValid(self.seeks)">
-                        <div class="cp__header detailPicker clickable" 
-                            ng-click="self.toggleDetail(self.seeks)" 
-                            ng-class="{'closedDetailPicker': !self.showDetail[self.seeks]}">
-                                <span class="nonHover">Add more detail</span>
-                                <span class="hover" ng-if="!self.showDetail[self.seeks]">Open more detail</span>
-                                <span class="hover" ng-if="self.showDetail[self.seeks]">Close more detail</span>
-                                <svg class="cp__carret" ng-show="!self.showDetail[self.seeks]">
-                                    <use href="#ico16_arrow_down"></use>
-                                </svg>
-                                <svg class="cp__carret" ng-show="self.showDetail[self.seeks]">
-                                    <use href="#ico16_arrow_up"></use>
-                                </svg>
-		                </div>
-			            <div class="cp__detail__items" ng-if="self.showDetail[self.seeks]" >
-		                    <div class="cp__detail__items__item location" 
-		                        ng-click="!self.isDetailPresent('location', self.seeks) && self.addDetail('location', self.seeks)"
-                                ng-class="{'picked' : self.isDetailPresent('location', self.seeks)}">
-                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('location', self.seeks)">
-                                        <use href="#ico36_location_circle"></use>
-                                    </svg>
-                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('location', self.seeks)">
-                                        <use href="#ico36_added_circle"></use>
-                                    </svg>
-                                    Address or Location
-                                </div>   
-		                    <div class="cp__detail__items__item tags"
-		                        ng-click="!self.isDetailPresent('tags', self.seeks) && self.addDetail('tags', self.seeks)"
-                                ng-class="{'picked' : self.isDetailPresent('tags', self.seeks)}">
-                                    <svg class="cp__circleicon" ng-show="!self.isDetailPresent('tags', self.seeks)">
-                                        <use href="#ico36_tags_circle"></use>
-                                    </svg>
-                                    <svg class="cp__circleicon" ng-show="self.isDetailPresent('tags', self.seeks)">
-                                        <use href="#ico36_added_circle"></use>
-                                    </svg>
-                                    Tags
-                            </div>
-		                </div>
-		            </div>
-		            <!-- /DETAIL Picker/ -->
-                </div>
-	            <!-- /SEEKS PART/ -->
-	       	</div>
+    			<won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
+    			
+    			<won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr> 
+    			
+    			<won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
+    			
+    		</div>
+    		
 	       	<won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
 	       	
 	       	<div class="cp__detail" ng-if="self.isValid()">
@@ -320,24 +124,17 @@ function genComponentConf() {
             window.cnc = this;
            
             this.postTypeTexts = postTypeTexts;
-            this.characterLimit = 140; //TODO move to conf
+            this.characterLimit = postTitleCharacterLimit;
             this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
             this.draftSeeks = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
+            
             this.draftObject = {is: this.draftIs, seeks: this.draftSeeks};
             
-            this.isOpen = {is: false, seeks: false};
             this.is = 'is'
             this.seeks = 'seeks';
            
-            this.select = ['isPart', 'seeksPart'];
-            
             this.pendingPublishing = false;
-
-            this.showDetail = {is: false, seeks: false};
             this.details = {is: [], seeks: []};
-            this.tagsString = {is: "", seeks: ""};
-            this.tempTags = {is: [], seeks: []};
-            
             this.isNew = true;
             
             this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
@@ -355,78 +152,14 @@ function genComponentConf() {
             // Using actionCreators like this means that every action defined there is available in the template.
             connect2Redux(selectFromState, actionCreators, [], this);
         }
-        isValid(isSeeks){
-        	if(isSeeks){
-        		return (this.draftObject[isSeeks]) 
-		        		&& (this.draftObject[isSeeks].title)
-		        		&& (this.draftObject[isSeeks].title.length < this.characterLimit);
-        	}
-        	
+        
+        isValid(){
             return (this.draftObject[this.is] || this.draftObject[this.seeks]) 
             		&& (this.draftObject[this.is].title || this.draftObject[this.seeks].title)
             		&& ((this.draftObject[this.is].title.length < this.characterLimit) || (this.draftObject[this.seeks].title.length < this.characterLimit));
         }
-        checkDropDown(isSeeks){
-        	return this.isOpen[isSeeks];
-        }       
-        toggleDropDown(isSeeks){
-        	if(this.isOpen[isSeeks]){
-        		this.draftObject[isSeeks] = this.resetObject(isSeeks);
-         	}
-        	this.isOpen[isSeeks] = !this.isOpen[isSeeks];
-        	
-        }
-        resetObject(isSeeks){
-        	this.showDetail[isSeeks] = false;
-        	this.details[isSeeks] = [];
-        	this.tagsString[isSeeks] = "";
-            this.tempTags[isSeeks] = [];
-        	return {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
-        }
-        
-        titlePicZoneNg() {
-            return angular.element(this.titlePicZone())
-        }
-        titlePicZone() {
-            if(!this._titlePicZone) {
-                this._titlePicZone = this.$element[0].querySelector('#titlePic');
-            }
-            return this._titlePicZone;
-        }
-        publish() {
-        	// Post both needs
-            if (!this.pendingPublishing) {
-                this.pendingPublishing = true;
-
-                var tmpList = [this.is, this.seeks];
-                var newObject = {is: this.draftObject.is, seeks: this.draftObject.seeks}; 
-                
-                for(i = 0; i < 2; i ++){
-                	var tmp = tmpList[i];
-                	if(!this.isDetailPresent("tags", tmp)){
-                		newObject[tmp].tags = undefined;
-                    }
-                    if(!this.isDetailPresent("location", tmp)){
-                    	newObject[tmp].location = undefined;
-                    }
-                    
-                    if(this.tempMatchingContext.length > 0){
-                    	newObject[tmp].matchingContext = this.tempMatchingContext;
-                    }
-                    
-                    if(newObject[tmp].title === "") {
-                    	delete newObject[tmp];
-                    }
-                }
-                
-               this.needs__create(
-                    newObject,
-                		this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
-                );
-            }
-        }
-
-        setDraft(updatedDraft, isSeeks) {
+       
+        updateDraft(updatedDraft, isSeeks) {
         	if(this.isNew){
         		this.isNew = false;
         		if(!this.defaultContext) {
@@ -435,25 +168,8 @@ function genComponentConf() {
 	                this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
         		}
         	}
-            if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.isDetailPresent("tags", isSeeks)){
-                this.addDetail("tags", isSeeks);
-            }
-            this.tempTags[isSeeks] = updatedDraft.tags;
-            updatedDraft.tags = this.mergeTags();
-            Object.assign(this.draftObject[isSeeks], updatedDraft);
-        }
-
-        mergeTags(isSeeks) {
-            let detailTags = Immutable.Set(this.tagsString[isSeeks]? this.tagsString[isSeeks].match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
-
-            let combinedTags = this.tempTags[isSeeks]? detailTags.concat(this.tempTags[isSeeks]) : detailTags;
-
-            const immutableTagSet = Immutable.Set(combinedTags);
-            return immutableTagSet.toJS();
-        }
-
-        addTags(isSeeks) {
-            this.draftObject[isSeeks].tags = this.mergeTags(isSeeks);
+        	
+        	this.draftObject[isSeeks] = updatedDraft;
         }
         
         mergeMatchingContext() {
@@ -470,33 +186,32 @@ function genComponentConf() {
             this.tempMatchingContext = this.mergeMatchingContext();
         }
 
-        locationIsSaved(isSeeks) {
-            return this.isDetailPresent("location", isSeeks) && this.draftObject[isSeeks].location && this.draftObject[isSeeks].location.name;
-        }
+        
+        publish() {
+        	// Post both needs
+            if (!this.pendingPublishing) {
+                this.pendingPublishing = true;
 
-        pickImage(image, isSeeks) {
-            this.draftObject[isSeeks].thumbnail = image;
-        }
-
-        toggleDetail(isSeeks){
-        	//TODO decide if clear detail list or not
-        	this.showDetail[isSeeks] = !this.showDetail[isSeeks];
-        }
-
-        addDetail(detail, isSeeks) {
-            this.details[isSeeks].push(detail);
-        }
-
-        removeDetail(detail, isSeeks) {
-        	 var tempDetails = [];
-             for(var i=0; i < this.details[isSeeks].length; i++){
-                 if(this.details[isSeeks][i] != detail) tempDetails.push(this.details[isSeeks][i]);
-             }
-             this.details[isSeeks] = tempDetails;
-        }
-
-        isDetailPresent(detail, isSeeks) {
-            return this.details[isSeeks].indexOf(detail) > -1;
+                var tmpList = [this.is, this.seeks];
+                var newObject = {is: this.draftObject.is, seeks: this.draftObject.seeks}; 
+                
+                for(i = 0; i < 2; i ++){
+                	var tmp = tmpList[i];
+                	                   
+                    if(this.tempMatchingContext.length > 0){
+                    	newObject[tmp].matchingContext = this.tempMatchingContext;
+                    }
+                    
+                    if(newObject[tmp].title === "") {
+                    	delete newObject[tmp];
+                    }
+                }
+                
+               this.needs__create(
+                    newObject,
+                		this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
+                );
+            }
         }
       
         createWhatsAround(){
@@ -576,6 +291,7 @@ export default angular.module('won.owner.components.createPost', [
         imageDropzoneModule,
         needTextfieldModule,
         locationPickerModule,
+        createIsseeksModule,
         ngAnimate,
     ])
     .directive('wonCreatePost', genComponentConf)
