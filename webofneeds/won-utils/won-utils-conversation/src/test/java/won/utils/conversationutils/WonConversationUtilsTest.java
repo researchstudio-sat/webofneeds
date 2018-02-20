@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
+import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonConversationQueryBuilder;
 import won.protocol.util.WonConversationUtils;
@@ -172,14 +173,32 @@ public class WonConversationUtilsTest {
 	}
 	
 	public static void main (String... args) throws Exception {
+		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		root.setLevel(Level.INFO);
 		//Dataset input = loadDataset("/won/utils/agreement/input/one-agreement-one-cancellation.trig");
-		Dataset input = loadDataset("/won/utils/conversationutils/input/allmessageuris.trig");
+		Dataset input = loadDataset("/won/utils/conversationutils/input/long-conversation.trig");
+		Dataset output = HighlevelFunctionFactory.getAcknowledgedSelection().apply(input);
+		
+		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(input, output);
+		if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
+			System.out.println("diff - only in input:");
+			RDFDataMgr.write(System.out, diff.getFirst(), Lang.TRIG);
+			System.out.println("diff - only in output:");
+			RDFDataMgr.write(System.out, diff.getSecond(), Lang.TRIG);
+		} else {
+			System.out.println("input and output are equal");
+		}
+		
+		//Dataset output = HighlevelProtocols.getProposals(input);
+		System.out.println("result:");
+		//RDFDataMgr.write(System.out, output, Lang.TRIG);
+		
 		//initialBinding.add("senderNeed", new ResourceImpl("https://localhost:8443/won/resource/need/7820503869697675000"));
 		//initialBinding.add("senderConnection", new ResourceImpl("https://localhost:8443/won/resource/connection/4t9deo4t6bqx83jxk5ex"));
 		
-		URI uri = WonConversationUtils.getLatestMessageOfNeed(input, URI.create("https://localhost:8443/won/resource/need/7820503869697675000"));
+		//URI uri = WonConversationUtils.getLatestMessageOfNeed(input, URI.create("https://localhost:8443/won/resource/need/7820503869697675000"));
 		//URI uri = WonConversationUtils.getLatestMessageOfNeed(input, URI.create("https://192.168.124.49:8443/won/resource/need/z35td13ftmn5k1hzella"));
-		System.out.println("uri: " + uri);
+		//System.out.println("uri: " + uri);
 		/*
 		List<QuerySolution> actual = WonConversationQueryBuilder.getBuilder((x -> x))
 				//.senderNeed(URI.create("https://localhost:8443/won/resource/need/7820503869697675000"))
@@ -196,3 +215,4 @@ public class WonConversationUtilsTest {
 		System.out.println("uri: " + uri);*/
 	}
 }
+

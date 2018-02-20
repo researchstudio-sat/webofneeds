@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
@@ -24,8 +26,8 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 @Controller
-@RequestMapping("/rest/agreement")
-public class AgreementController {
+@RequestMapping("/rest/highlevel")
+public class HighlevelProtocolsController {
 
 	@Autowired
 	private LinkedDataSource linkedDataSourceOnBehalfOfNeed;
@@ -33,6 +35,12 @@ public class AgreementController {
 	public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
 		this.linkedDataSourceOnBehalfOfNeed = linkedDataSource;
 	}
+	
+	@RequestMapping(value = "/getRetracts", method = RequestMethod.GET)
+    public Model getRetracts(String connectionUri) {
+        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        return HighlevelProtocols.getAcceptedRetracts(conversationDataset);
+    }
 
 	@RequestMapping(value = "/getAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getAgreements(String connectionUri) {
@@ -44,9 +52,14 @@ public class AgreementController {
 
 	@RequestMapping(value = "/getProposals", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getProposals(String connectionUri) {
-
+		
 		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-		return new ResponseEntity<>(HighlevelProtocols.getProposals(conversationDataset), HttpStatus.OK);
+		System.out.println("conversation:");
+		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
+		Dataset proposals =  HighlevelProtocols.getProposals(conversationDataset);
+		System.out.println("proposals");
+		RDFDataMgr.write(System.err, proposals, Lang.TRIG);		
+		return new ResponseEntity<>(proposals, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getAgreementsProposedToBeCancelled", method = RequestMethod.GET)
@@ -58,9 +71,13 @@ public class AgreementController {
 
 	@RequestMapping(value = "/getPendingProposals", method = RequestMethod.GET)
 	public ResponseEntity<Model> getOpenProposes(String connectionUri) {
-
 		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-		return new ResponseEntity<>(HighlevelProtocols.getPendingProposes(conversationDataset), HttpStatus.OK);
+		System.out.println("conversation:");
+		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
+		Model model = HighlevelProtocols.getPendingProposes(conversationDataset);
+		System.out.println("pendingProposes");
+		RDFDataMgr.write(System.err, model, Lang.TRIG);
+		return new ResponseEntity<>(model, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getPendingProposalsToCancelAgreements", method = RequestMethod.GET)
@@ -72,9 +89,13 @@ public class AgreementController {
 
 	@RequestMapping(value = "/getAcceptedProposals", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedProposes(String connectionUri) {
-
 		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
-		return new ResponseEntity<>(HighlevelProtocols.getAcceptedProposes(conversationDataset), HttpStatus.OK);
+		System.out.println("conversation:");
+		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
+		Model model = HighlevelProtocols.getAcceptedProposes(conversationDataset);
+		System.out.println("pendingProposes");
+		RDFDataMgr.write(System.err, model, Lang.TRIG);
+		return new ResponseEntity<>(model, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getAcceptsOfProposals", method = RequestMethod.GET)
@@ -115,7 +136,7 @@ public class AgreementController {
 	}
 
 	private Dataset retrieveConversationDataset(String connectionUri) {
-		int depth = 3; // depth 3 from connection gives us the messages in the conversation
+		int depth = 5; // depth 3 from connection gives us the messages in the conversation
 		int maxRequests = 1000;
 		List<Path> propertyPaths = new ArrayList<>();
 		PrefixMapping pmap = new PrefixMappingImpl();
@@ -124,15 +145,19 @@ public class AgreementController {
 		pmap.setNsPrefix("msg", WONMSG.getURI());
 		propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
 		propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
+		propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
 		propertyPaths.add(PathParser.parse("won:belongsToNeed", pmap));
 		propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer", pmap));
 		propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
+		propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
 		propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
 		propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
-        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+		propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
+		propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));		
+		propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
+		propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
+		propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+		propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
 		URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(URI.create(connectionUri),
 				linkedDataSourceOnBehalfOfNeed);
 		return linkedDataSourceOnBehalfOfNeed.getDataForResourceWithPropertyPath(URI.create(connectionUri),
