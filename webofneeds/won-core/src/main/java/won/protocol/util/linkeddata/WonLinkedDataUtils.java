@@ -20,15 +20,20 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.awt.image.ImageWatched;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utilitiy functions for common linked data lookups.
@@ -71,6 +76,24 @@ public class WonLinkedDataUtils
 	    Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER+ ">", PrefixMapping.Standard);
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
 }
+
+  public static Dataset getConversationDataset(String connectionURI, LinkedDataSource linkedDataSource) {
+      return getConversationDataset(URI.create(connectionURI), linkedDataSource);
+  }
+
+  public static Dataset getConversationDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
+      assert linkedDataSource != null : "linkedDataSource must not be null";
+      int depth = 3;  // depth 3 from connection gives us the messages in the conversation
+      int maxRequests = 1000;
+      List<Path> propertyPaths = new ArrayList<>();
+      PrefixMapping pmap = new PrefixMappingImpl();
+      pmap.withDefaultMappings(PrefixMapping.Standard);
+      pmap.setNsPrefix("won", WON.getURI());
+      pmap.setNsPrefix("msg", WONMSG.getURI());
+      propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
+      return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, propertyPaths, maxRequests, depth, false);
+  }
 
   public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
