@@ -1,12 +1,7 @@
 package won.protocol.highlevel;
 
-import java.util.function.Function;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-
-import won.protocol.util.DatasetSelectionBySparqlFunction;
-
 
 public class HighlevelProtocols {
 	/**
