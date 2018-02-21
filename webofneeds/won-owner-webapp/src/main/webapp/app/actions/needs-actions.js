@@ -39,7 +39,14 @@ export function needsConnect(ownNeedUri, ownConnectionUri, theirNeedUri, textMes
         } else {
         	theirNodeUri = await won.getNode(theirNeedUri).hasWonNode;
         } 
-        const cnctMsg = await buildConnectMessage(ownNeedUri, theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), textMessage, ownConnectionUri);
+        const cnctMsg = await buildConnectMessage({
+            ownNeedUri: ownNeedUri,
+            theirNeedUri: theirNeedUri,
+            ownNodeUri: ownNeed.get("nodeUri"),
+            theirNodeUri: theirNeed.get("nodeUri"),
+            textMessage: textMessage,
+            optionalOwnConnectionUri: ownConnectionUri
+        });
         const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
         dispatch({
             type: actionTypes.needs.connect,

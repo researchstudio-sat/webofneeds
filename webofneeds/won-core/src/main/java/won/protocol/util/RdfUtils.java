@@ -748,7 +748,7 @@ public class RdfUtils
      */
     public static Iterator<RDFNode> getNodesForPropertyPathByQuery(final Dataset dataset, final URI resourceURI, Path propertyPath)
     {
-        String queryString = "select ?obj where { ?resource " + propertyPath.toString() +" ?obj}";
+        String queryString = "select ?obj where { GRAPH <urn:x-arq:UnionGraph> { ?resource " + propertyPath.toString() +" ?obj } }";
         Query query = QueryFactory.create(queryString);
         QuerySolutionMap initialBinding = new QuerySolutionMap();
         initialBinding.add("?resource",dataset.getDefaultModel().createResource(resourceURI.toString()));

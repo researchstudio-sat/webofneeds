@@ -8,8 +8,7 @@ PREFIX won: <http://purl.org/webofneeds/model#>
    
    filter (?prop != ?clause) .
    filter (?prop != ?acc) .
- #  filter (?openprop != ?something) .
- 
+  
    GRAPH ?openg1 {   
         ?openprop agr:proposesToCancel ?acc .
     }     
