@@ -25,6 +25,7 @@ import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
@@ -32,6 +33,8 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 /**
  * Action executing a MessageCommandEvent and publishing MessageCommandSuccess and MessageCommandFailure
@@ -62,8 +65,8 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
      */
     @Override
     public final void doRun(Event event, EventListener executingListener) {
+        T messageCommandEvent = (T) event;
         try {
-            T messageCommandEvent = (T) event;
             //create the message
             WonMessage message = createWonMessage(messageCommandEvent);
 
@@ -128,6 +131,7 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
             
         } catch (Exception e) {
             logger.warn("error executing messageCommandEvent: ", e);
+            getEventListenerContext().getEventBus().publish(createMessageNotSentEvent(messageCommandEvent, e.getMessage()));
         }
     }
 
@@ -150,6 +154,11 @@ public abstract class ExecuteSendMessageCommandAction<T extends MessageCommandEv
      * Implementations can choose to return null here if they do not want an event published.
      */
     protected abstract MessageCommandSuccessEvent createLocalNodeSuccessEvent(T originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent);
+
+    /**
+     * Implementations can choose to return null here if they do not want an event published.
+     */
+    protected abstract MessageCommandNotSentEvent createMessageNotSentEvent(T originalCommand, String message);
 
     /**
      * Implementations must return a valid WoNMessage here or perform adequate logging and publish an MessageCommandFailureEvent and return null.

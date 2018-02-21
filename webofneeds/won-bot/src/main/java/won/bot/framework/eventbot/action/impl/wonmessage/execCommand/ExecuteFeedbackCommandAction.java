@@ -19,7 +19,9 @@ package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
+import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.feedback.FeedbackCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.feedback.FeedbackCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.feedback.FeedbackCommandSuccessEvent;
@@ -62,6 +64,11 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
     @Override
     protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return new FeedbackCommandSuccessEvent(originalCommand, originalCommand.getCon());
+    }
+
+    @Override
+    protected MessageCommandNotSentEvent createMessageNotSentEvent(FeedbackCommandEvent originalCommand, String message) {
+        return new MessageCommandNotSentEvent<FeedbackCommandEvent>(message, originalCommand);
     }
 
     protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent)
