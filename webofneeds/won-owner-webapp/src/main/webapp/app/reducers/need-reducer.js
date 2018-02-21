@@ -355,14 +355,9 @@ function addConnectionFull(state, connection, newConnection) {
 
     // console.log("Adding Full Connection");
     if(newConnection === undefined) {
-      newConnection = !!selectNeedByConnectionUri(state, connection.uri || connection.get('uri')); // do
-																									// we
-																									// already
-																									// have
-																									// a
-																									// connection
-																									// like
-																									// that?
+        newConnection = !!selectNeedByConnectionUri(
+            state, connection.uri || connection.get('uri')
+        ); //do we already have a connection like that?
     }
     let parsedConnection = parseConnection(connection, newConnection);
 
