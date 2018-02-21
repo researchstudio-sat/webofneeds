@@ -22,10 +22,19 @@ export default function(allToasts = initialState, action = {}) {
         case actionTypes.logout:
             return initialState;
 
+        case actionTypes.connections.sendChatMessageFailed:
+            var msg = getIn(action, ['payload', 'message'])
+            return pushNewToast(
+                allToasts,
+                'Error while processing chat message: \n\n' + msg,
+                won.WON.errorToast, {}
+            )
+
         case actionTypes.registerFailed:
             var privateId = getIn(action, ['payload', 'privateId']);
             if(privateId) {
                 return pushNewToast(
+                    allToasts,
                     'Sorry, something failed when posting/generating a new private-ID (the one in ' +
                     'your url-bar). Copy the text you\'ve written somewhere safe, then log out / remove ' +
                     'the ID, then refresh the page and try posting again.',
@@ -54,7 +63,8 @@ export default function(allToasts = initialState, action = {}) {
             }
 
         case actionTypes.geoLocationDenied:
-            return pushNewToast(allToasts,
+            return pushNewToast(
+                allToasts,
                 'Sorry, we were unable to create your "What\'s Around"-Post, ' +
                 'because you have denied us accesss to your current location. ' +
                 'To enable it, reload the page and click on "allow access". If' +
