@@ -1,8 +1,7 @@
 @import 'sizing-utils';
-@import 'square-image';
-@import 'speech-bubble';
 @import 'chattextfield';
 @import 'won-config';
+@import 'connection-message';
 
 
 @media (max-width: $responsivenessBreakPoint) {
@@ -101,46 +100,6 @@
       border: $thinGrayBorder;
       overflow: auto;
       flex-grow: 1;
-
-      &__message {
-        margin: 0.5rem 0;
-        @include square-image($postIconSize, 0, 0.5rem, 0, 0);
-        display: flex;
-
-        won-square-image {
-          cursor: pointer; /* the image links to their post info */
-        }
-
-        &.left{
-          justify-content: flex-start;
-
-          & .pm__content__message__content__text {
-            @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
-          }
-        }
-        &.right{
-          justify-content: flex-end;
-
-          & .pm__content__message__content__text {
-            @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
-          }
-        }
-
-        &__content {
-          margin: 0 0.5rem;
-          font-size: $smallFontSize;
-
-          &__text{
-            padding: 0.5rem;
-            border: $thinGrayBorder;
-            background: $won-light-gray;
-          }
-
-          &__time {
-            color: $won-line-gray;
-          }
-        }
-      }
     }
 
     .rdflink.withlabel {
