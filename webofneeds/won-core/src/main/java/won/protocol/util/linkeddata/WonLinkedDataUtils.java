@@ -90,7 +90,7 @@ public class WonLinkedDataUtils
 
   public static Dataset getConversationDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
       assert linkedDataSource != null : "linkedDataSource must not be null";
-      int depth = 3;  // depth 3 from connection gives us the messages in the conversation
+      int depth = 5; // depth 3 from connection gives us the messages in the conversation
       int maxRequests = 1000;
       List<Path> propertyPaths = new ArrayList<>();
       PrefixMapping pmap = new PrefixMappingImpl();
@@ -99,7 +99,22 @@ public class WonLinkedDataUtils
       pmap.setNsPrefix("msg", WONMSG.getURI());
       propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
       propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-      return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, propertyPaths, maxRequests, depth, false);
+      propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
+
+      return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth, false);
   }
 
   public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {

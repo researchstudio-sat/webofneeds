@@ -38,14 +38,14 @@ public class HighlevelProtocolsController {
 	
 	@RequestMapping(value = "/getRetracts", method = RequestMethod.GET)
     public Model getRetracts(String connectionUri) {
-        Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+        Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
         return HighlevelProtocols.getAcceptedRetracts(conversationDataset);
     }
 
 	@RequestMapping(value = "/getAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getAgreements(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		Dataset agreements = HighlevelProtocols.getAgreements(conversationDataset);
 		return new ResponseEntity<>(agreements, HttpStatus.OK);
 	}
@@ -53,7 +53,7 @@ public class HighlevelProtocolsController {
 	@RequestMapping(value = "/getProposals", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getProposals(String connectionUri) {
 		
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		System.out.println("conversation:");
 		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
 		Dataset proposals =  HighlevelProtocols.getProposals(conversationDataset);
@@ -65,13 +65,13 @@ public class HighlevelProtocolsController {
 	@RequestMapping(value = "/getAgreementsProposedToBeCancelled", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getProposalsToCancel(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getProposalsToCancel(conversationDataset), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getPendingProposals", method = RequestMethod.GET)
 	public ResponseEntity<Model> getOpenProposes(String connectionUri) {
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		System.out.println("conversation:");
 		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
 		Model model = HighlevelProtocols.getPendingProposes(conversationDataset);
@@ -83,13 +83,13 @@ public class HighlevelProtocolsController {
 	@RequestMapping(value = "/getPendingProposalsToCancelAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Model> getOpenProposesToCancel(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getPendingProposesToCancel(conversationDataset), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getAcceptedProposals", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedProposes(String connectionUri) {
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		System.out.println("conversation:");
 		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
 		Model model = HighlevelProtocols.getAcceptedProposes(conversationDataset);
@@ -101,28 +101,28 @@ public class HighlevelProtocolsController {
 	@RequestMapping(value = "/getAcceptsOfProposals", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedAcceptsProposes(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getAcceptsProposes(conversationDataset), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getAcceptedPropsalsToCancel", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedProposesToCancel(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getAcceptedProposesToCancel(conversationDataset), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getAcceptsOfPropsalsToCancel", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedAcceptsProposesToCancel(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getAcceptsProposesToCancel(conversationDataset), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getProposalsInCancelledAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedProposesInCancelledAgreement(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getProposesInCancelledAgreement(conversationDataset),
 				HttpStatus.OK);
 	}
@@ -130,37 +130,8 @@ public class HighlevelProtocolsController {
 	@RequestMapping(value = "/getAcceptsInCancelledAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Model> getClosedAcceptsInCancelledAgreement(String connectionUri) {
 
-		Dataset conversationDataset = retrieveConversationDataset(connectionUri);
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getAcceptsInCancelledAgreement(conversationDataset),
 				HttpStatus.OK);
-	}
-
-	private Dataset retrieveConversationDataset(String connectionUri) {
-		int depth = 5; // depth 3 from connection gives us the messages in the conversation
-		int maxRequests = 1000;
-		List<Path> propertyPaths = new ArrayList<>();
-		PrefixMapping pmap = new PrefixMappingImpl();
-		pmap.withDefaultMappings(PrefixMapping.Standard);
-		pmap.setNsPrefix("won", WON.getURI());
-		pmap.setNsPrefix("msg", WONMSG.getURI());
-		propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
-		propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
-		propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
-		propertyPaths.add(PathParser.parse("won:belongsToNeed", pmap));
-		propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer", pmap));
-		propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
-		propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));		
-		propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
-		propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
-		URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(URI.create(connectionUri),
-				linkedDataSourceOnBehalfOfNeed);
-		return linkedDataSourceOnBehalfOfNeed.getDataForResourceWithPropertyPath(URI.create(connectionUri),
-				requesterWebId, propertyPaths, maxRequests, depth, false);
 	}
 }
