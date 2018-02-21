@@ -5,6 +5,7 @@ import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
+import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import {
     relativeTime,
 } from '../won-label-utils.js'
@@ -22,6 +23,7 @@ import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
 } from '../selectors.js';
+import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -60,7 +62,7 @@ function genComponentConf() {
                         ng-show="!message.get('outgoingMessage')">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text" title="{{ self.showRdfIcon ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
+                        <div class="pm__content__message__content__text" title="{{ self.shouldShowRdf ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
                             {{ message.get('text') }}
                         </div>
                         <div
@@ -74,7 +76,7 @@ function genComponentConf() {
                                 {{ self.relativeTime(self.lastUpdateTime, message.get('date')) }}
                         </div>
                         <a
-                          ng-show="self.showRdfIcon && message.get('outgoingMessage')"
+                          ng-show="self.shouldShowRdf && message.get('outgoingMessage')"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
                             <svg class="rdflink__small clickable">
@@ -82,7 +84,7 @@ function genComponentConf() {
                             </svg>
                         </a>
                          <a
-                          ng-show="self.showRdfIcon && !message.get('outgoingMessage')"
+                          ng-show="self.shouldShowRdf && !message.get('outgoingMessage')"
                           target="_blank"
                           href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
                             <svg class="rdflink__small clickable">
@@ -92,24 +94,53 @@ function genComponentConf() {
                     </div>
             </div>
         </div>
-        <div>
-            <chat-textfield
-                class="pm__footer"
-                placeholder="::'Your Message'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.send()"
-                submit-button-label="::'Send'"
-                >
-            </chat-textfield>
+        <chat-textfield
+            class="pm__footer"
+            placeholder="::'Your Message'"
+            on-input="::self.input(value)"
+            on-paste="::self.input(value)"
+            on-submit="::self.send()"
+            submit-button-label="::'Send'"
+            >
+        </chat-textfield>
+        <!--
+        <chat-textfield-simple
+            class="pm__footer"
+            placeholder="::'Your Message'"
+            on-input="::self.input(value)"
+            on-paste="::self.input(value)"
+            on-submit="::self.send()"
+            submit-button-label="::'Send'"
+            >
+        </chat-textfield-simple>
+        -->
+
+        <!-- 
+        quick'n'dirty textfield and button so flo can use it for his branch. 
+        TODO implement and style chat-textfield-simple and use that instead.
+        -->
+        <div style="display: flex;">
+            <textarea 
+                class="rdfTxtTmpDeletme" 
+                ng-show="self.shouldShowRdf" 
+                won-textarea-autogrow 
+                style="resize: none; height: auto;   flex-grow: 1;"
+                placeholder="Expects valid turtle. <{{self.msguriPlaceholder}}> will be the uri generated for this message. See \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
+            ></textarea>
+            <button 
+                class="rdfMsgBtnTmpDeletme" 
+                ng-show="self.shouldShowRdf" 
+                ng-click="self.sendRdfTmpDeletme()">
+                    Send RDF
+            </button>
         </div>
         <div>
             <a class="rdflink withlabel clickable"
-               ng-click="self.showRdf()">
+               ng-click="self.toggleRdfDisplay()">
                    <svg class="rdflink__small">
                        <use href="#rdf_logo_1"></use>
                    </svg>
-                  <span class="rdflink__text">[{{self.showhide}}]</span> 
+                  <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span> 
             </a>
         </div>
     `;
@@ -121,16 +152,11 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.relativeTime = relativeTime;
             window.pm4dbg = this;
-
+            
             const self = this;
-            this.showhide = "SHOW";
-            this.showRdfIcon = won.showRdf;
-
-            if(won.showRdf){
-                this.showhide = "HIDE";
-            }
 
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
+            this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
 
             //this.postmsg = this;
             const selectFromState = state => {
@@ -159,6 +185,7 @@ function genComponentConf() {
                     lastUpdateTime: state.get('lastUpdateTime'),
                     chatMessages: sortedMessages,
                     debugmode: won.debugmode,
+                    shouldShowRdf: state.get('showRdf'),
 
                     // if the connect-message is here, everything else should be as well
                     allLoaded,
@@ -262,21 +289,16 @@ function genComponentConf() {
             }
         }
 
-        showRdf() {
-            if(won.showRdf) {
-                won.showRdf = false;
-                this.showRdfIcon = false;
-                this.showhide = "SHOW";
-            } else {
-                won.showRdf = true;
-                this.showRdfIcon = true;
-                this.showhide = "HIDE";
+        sendRdfTmpDeletme() {
+            const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
+            if(rdftxtEl) {
+                console.log('found rdftxtel: ', rdftxtEl.value);
+                const trimmedMsg = rdftxtEl.value.trim();
+                if(trimmedMsg) {
+                    this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'), isTTL=true);
+                }
             }
-            try {
-                this.connections__showMoreMessages(this.connectionUri);
-            } catch(Exception) {
-                //this.connections__showMoreMessages();
-            }
+
         }
     }
     Controller.$inject = serviceDependencies;
@@ -294,6 +316,8 @@ function genComponentConf() {
 export default angular.module('won.owner.components.postMessages', [
     squareImageModule,
     chatTextFieldModule,
+    autoresizingTextareaModule,
+    chatTextFieldSimpleModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;

@@ -323,8 +323,7 @@ import jsonld from 'jsonld';
     };
 
     //UTILS
-    var UNSET_URI= "no:uri";
-
+    won.WONMSG.msguriPlaceholder= "this:messageuri";
 
     /**
      * Returns the "compacted" alternative of the value (e.g.
@@ -628,6 +627,11 @@ import jsonld from 'jsonld';
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
     }
+    won.minimalTurtlePrefixes = 
+        "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
+        "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
+        "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
 
     won.defaultContext = {
             "webID": "http://www.example.com/webids/",
@@ -645,9 +649,20 @@ import jsonld from 'jsonld';
                 "@id":"http://purl.org/webofneeds/message#hasMessageType",
                 "@type":"@id"
             }
-
-
     }
+    won.defaultTurtlePrefixes = 
+            "@prefix webID: <http://www.example.com/webids/>.\n" +
+            "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
+            "@prefix dc: <http://purl.org/dc/elements/1.1/>.\n" +
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n" +
+            "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.\n" +
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n" +
+            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
+            "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+            "@prefix gr: <http://purl.org/goodrelations/v1#>.\n" +
+            "@prefix ldp: <http://www.w3.org/ns/ldp#>.\n" +
+            "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
+
 
 
     won.JsonLdHelper = {
@@ -777,17 +792,17 @@ import jsonld from 'jsonld';
      */
     won.addMessageGraph = function (builder, graphURIs, messageType) {
         let graphs = builder.data['@graph'];
-        let unsetMessageGraphUri = UNSET_URI+"#data";
+        let unsetMessageGraphUri = won.WONMSG.msguriPlaceholder+"#data";
         //create the message graph, containing the message type
         var messageGraph = {
             "@graph": [
                 {
-                    "@id":UNSET_URI,
+                    "@id":won.WONMSG.msguriPlaceholder,
                     "msg:hasMessageType": {'@id':messageType}
                 },
                 {   "@id": unsetMessageGraphUri,
                     "@type": "msg:EnvelopeGraph",
-                    "rdfg:subGraphOf" : {"@id":UNSET_URI}
+                    "rdfg:subGraphOf" : {"@id":won.WONMSG.msguriPlaceholder}
                 }
             ],
             "@id": unsetMessageGraphUri
@@ -808,7 +823,7 @@ import jsonld from 'jsonld';
         hashFragement = hashFragement || 'graph1';
         return {"@graph": [
                     {
-                        "@id": UNSET_URI + "#" + hashFragement,
+                        "@id": won.WONMSG.msguriPlaceholder + "#" + hashFragement,
                         "@graph": []
                     }
                 ]
@@ -1491,7 +1506,7 @@ import jsonld from 'jsonld';
             }
         }
         this.messageGraph = null;
-        this.eventUriValue = UNSET_URI;
+        this.eventUriValue = won.WONMSG.msguriPlaceholder;
         won.addMessageGraph(this, graphNames , messageType);
     };
 
@@ -1623,6 +1638,13 @@ import jsonld from 'jsonld';
         },
         getContentGraphNode: function(){
             return this.getContentGraph()["@graph"][0];
+        },
+        /** 
+         * takes a lists of json-ld-objects and merges them into the content-graph
+         */
+        mergeIntoContentGraph: function(jsonldPayload) {
+            var contentGraph = this.getContentGraph();
+            contentGraph["@graph"] = contentGraph["@graph"].concat(jsonldPayload);
         },
         addContentGraphData: function(predicate, object){
             this.getContentGraphNode()[predicate] = object;

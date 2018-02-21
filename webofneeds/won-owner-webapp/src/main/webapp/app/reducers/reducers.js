@@ -99,6 +99,16 @@ const reducers = {
         }
     },
 
+    showRdf: (isShowingRdf = false, action = {}) => {
+        switch(action.type) {
+            case actionTypes.toggleRdfDisplay:
+                return !isShowingRdf;
+            default:
+                return isShowingRdf;
+        }
+    },
+
+
 
     //config: createReducer(
     config: (config = Immutable.fromJS({theme: {name: 'current'}}), action = {}) => {

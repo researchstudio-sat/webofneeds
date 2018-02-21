@@ -18,6 +18,10 @@ import {
 } from './utils.js';
 
 import {
+    ttlToJsonLd,
+} from './won-utils.js';
+
+import {
     actionTypes,
 } from './actions/actions.js';
 
@@ -134,7 +138,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri){
+export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri }){
     const envelopeData = won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri);
     if (optionalOwnConnectionUri){
        envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
@@ -154,10 +158,19 @@ export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirN
     return {eventUri:eventUri,message:message};  
 }
 
-export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {
-    const messageP =
-        won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
-        .then(envelopeData => {
+export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
+
+    let jsonldGraphPayloadP = isTTL?
+        ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
+        Promise.resolve();
+
+    const envelopeDataP = won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
+
+    const messageP = Promise.all([
+            envelopeDataP,
+            jsonldGraphPayloadP,
+        ])
+        .then(([envelopeData, graphPayload]) => {
             const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
 
             /*
@@ -165,38 +178,27 @@ export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNe
              * and then send to the won-node.
              */
             const wonMessageBuilder = new won.MessageBuilder(won.WONMSG.connectionMessage)
-                .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .hasOwnerDirection()
                 .hasSentTimestamp(new Date().getTime().toString());
             
 
-            if (chatMessage.startsWith("::msg::")) {
-              let candidateTripleString = chatMessage.replace(/&lt;/g,"<").replace(/&gt;/g,">")
-              // triple syntax: parse chat message. if it has exactly three elements, 
-              // separated by white space, interpret as triples:
-              const tripleCandidate = candidateTripleString.split(/\s+/);
-              if (tripleCandidate.length == 3){
-                const predicate = tripleCandidate[1];
-                let predicateUri = getUri(predicate);
-                if (!predicateUri){
-                  predicateUri = expandPrefix(predicate);  
-                }
-                const object = tripleCandidate[2];
-                const objectUri = getUri(object);
-                if (objectUri){ 
-                  //object is an uri, add JSON-LD URI
-                  wonMessageBuilder.addContentGraphData(predicateUri, {'@id':objectUri});
-                } else {
-                  //object is interpreted as string
-                  wonMessageBuilder.addContentGraphData(predicateUri, object);
-                }
-              }
-            }   
+ 
+            const graphPayload_ = getIn(graphPayload, [0, '@graph']);
+            if(graphPayload_) {
+                wonMessageBuilder.mergeIntoContentGraph(graphPayload_);
+            } else if (chatMessage) {
+                //add the chatMessage as normal text message 
+                wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
+            } else {
+                throw new Exception(
+                    "No textmessage or valid graph as payload of chat message:" + 
+                    JSON.stringify(chatMessage) + " " +
+                    JSON.stringify(graphPayload)
+                );
+            }
             
-            //add the chatMessage as normal text message (even if it's a triple too).
-            wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
-                
+            wonMessageBuilder.eventURI(eventUri); // replace placeholders with proper event-uri
             const message = wonMessageBuilder.build();
 
             return {
@@ -208,24 +210,6 @@ export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNe
 
 }
 
-/*
- * If the specified candidate is a string enclosed in '<' and '>', return the enclosed string.
- * Returns null in any other case. 
- */
-function getUri(candidate){
-  const matched = candidate.match(/^<([^<>]+)>$/)
-  if (matched == null) return null;
-  if (matched.length != 2) return null;
-  return matched[1];
-}
-
-function expandPrefix(candidate){
-  return candidate
-    .replace(/^won:/,'http://purl.org/webofneeds/model#')
-    .replace(/^msg:/,'http://purl.org/webofneeds/message#')
-    .replace(/^agr:/,'http://purl.org/webofneeds/agreement#')
-    .replace(/^mod:/,'http://purl.org/webofneeds/modification#');
-}
 
 export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {
     const messageP = won
