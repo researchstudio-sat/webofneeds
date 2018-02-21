@@ -289,7 +289,7 @@ function genComponentConf() {
             }
         }
 
-        sendRdfTmpDeletme() {
+        sendRdfTmpDeletme() { //TODO move to own component
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
             if(rdftxtEl) {
                 console.log('found rdftxtel: ', rdftxtEl.value);
