@@ -28,6 +28,36 @@ import {
 import rdfstore from 'rdfstore-js';
 import jld from 'jsonld';
 import won from './won.js';
+
+/**
+ * Thin wrapper around `rdfstore.load(...)` that returns 
+ * a promise instead of requiring a callback.
+ * @param {RdfStore} store 
+ * @param {String} mediaType 
+ * @param {Jsonld} jsonldData 
+ * @param {String} graphUri 
+ */
+export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
+
+    return new Promise((resolve, reject) => {
+        const callback = (success, results) => {
+            if (success) {
+                //console.log('linkeddata-serice-won.js: finished storing triples ', data);
+                resolve();
+            } else {
+                console.error('Failed to store json-ld data for ' + uri);
+                reject('Failed to store json-ld data for ' + uri);
+            }
+        }
+
+        if(graphUri) {
+            store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
+        } else {
+            store.load("application/ld+json", jsonldData, callback); // add to default graph
+        }
+    });
+}
+
 (function(){
 
     /**
@@ -708,7 +738,7 @@ import won from './won.js';
                 }
             })
             .then(() =>
-                won.addJsonLdData(uri, dataset)
+                won.addJsonLdData(dataset)
             )
             .then(() => dataset)
         )
@@ -720,21 +750,21 @@ import won from './won.js';
     };
 
     /**
-     * Adds the specified JSON-LD dataset to the store.
+     * Adds the specified JSON-LD dataset to the store, once to the default graph and once to 
+     * the individual graphs contained in the data set.
      */
-    won.addJsonLdData = function(uri, data) {
-        return new Promise((resolve, reject) =>
-            privateData.store.load("application/ld+json", data, function (success, results) {
-                if (success) {
-                    //console.log('linkeddata-serice-won.js: finished storing triples ', data);
-                    resolve(uri);
-                } else {
-                    console.error('Failed to store json-ld data for ' + uri);
-                    reject('Failed to store json-ld data for ' + uri);
-                }
+    won.addJsonLdData = function(data) {
+        if(!window.jsonLdFiles4dbg) { window.jsonLdFiles4dbg = [] } window.jsonLdFiles4dbg.push(data); //TODO deleteme
 
-            })
-        );
+        const context = data['@context'];
+
+        const graphsAddedSeperatelyP = Promise.resolve();
+
+        const triplesAddedToDefaultGraphP = rdfStoreLoadPromise(privateData.store, 'application/ld+json', data);
+
+        return Promise
+            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP])
+            .then(() => undefined); // no return value beyond success
     };
 
     /**
