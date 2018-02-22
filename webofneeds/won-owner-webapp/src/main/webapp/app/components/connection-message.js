@@ -50,6 +50,20 @@ function genComponentConf() {
                 class="won-cm__content__text" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
                     {{ self.message.get('text') }}
+                <div class="won-cm__content__button" 
+                	ng-if="self.message.get('isProposeMessage') 
+                		&& !self.message.get('outgoingMessage')
+                		&& !self.message.get('isAcceptMessage')
+                		&& !self.message.isAccepted
+    					&& !self.clicked">
+                	<button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
+                </div>
+                <div class="won-cm__content__button" 
+                	ng-if="self.message.get('outgoingMessage')
+                		&& !self.message.get('isProposeMessage') 
+                		&& !self.message.get('isAcceptMessage')">
+                	<button class="won-button--filled thin black" ng-click="self.sendProposal()">Propose</button>
+                </div>
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
@@ -86,6 +100,7 @@ function genComponentConf() {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
             this.relativeTime = relativeTime;
+            this.clicked = false;
             window.cmsg4dbg = this;
             
             const self = this;
@@ -117,6 +132,26 @@ function genComponentConf() {
                 () => this.message.get('outgoingMessage'),
                 (newVal, oldVal) => this.updateAlignment(newVal)
             )
+        }
+        
+        sendProposal(){
+        	this.clicked = true;
+        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        }
+        
+        acceptProposal() {
+        	this.clicked = true;
+        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "accepts", this.message.get("text"));
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	//TODO: isAccepted = true;
+        }
+        
+        buildProposalMessage(uri, type, text) {
+        	const msgP = won.WONMSG.msguriPlaceholder;
+        	const sc = "http://purl.org/webofneeds/agreement#"+type;
+        	const whM = ";won:hasTextMessage";
+        	return "<"+msgP+"><"+sc+"><"+uri+">"+whM+" '"+text+"'.";
         }
 
         updateAlignment(isOutgoingMessage) {

@@ -35,6 +35,10 @@ won-connection-message {
             border: $thinGrayBorder;
             background: $won-light-gray;
         }
+    
+        &__button{
+            padding: 0.5rem;
+        }
 
         &__time {
             color: $won-line-gray;

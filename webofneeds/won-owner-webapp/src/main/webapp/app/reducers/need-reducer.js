@@ -539,6 +539,9 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
             outgoingMessage: outgoingMessage,
             newMessage: !!newMessage,
             connectMessage: wonMessage.isConnectMessage(),
+            isProposeMessage: wonMessage.isProposeMessage(),
+            isAcceptMessage: wonMessage.isAcceptMessage(),
+            isAccepted: false,
         }
     };
 
