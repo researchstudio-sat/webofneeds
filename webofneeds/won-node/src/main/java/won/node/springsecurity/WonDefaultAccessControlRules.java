@@ -55,7 +55,10 @@ public class WonDefaultAccessControlRules implements AccessControlRules
     	return connectionEventContainerRepository.isReadPermittedForWebID(uriService.getConnectionURIofConnectionEventsURI(resourceUri), webId);
     } else if (uriService.isNeedEventsURI(resourceUri)) {
     	return this.needEventContainerRepository.isReadPermittedForWebID(uriService.getNeedURIofNeedEventsURI(resourceUri), webId);
-    }
+    } else if (uriService.isNeedUnreadURI(resourceUri)) {
+    	//only the need itself can get unread events
+    	return webId.equals(uriService.getNeedURIofNeedUnreadURI(resourceUri));
+  }
     return false;
   }
 
