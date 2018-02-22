@@ -33,6 +33,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
@@ -58,9 +59,9 @@ public class AnalyzeAction extends BaseEventBotAction {
             WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
             Dataset needDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getNeedURI());
             Dataset remoteNeedDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getRemoteNeedURI());
-            Dataset connectionDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getConnectionURI());
+            Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
 
-            GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, connectionDataset, "http://example.org/","http://example.org/blended/");
+            GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/","http://example.org/blended/");
             Collection<GoalInstantiationResult> results = goalInstantiationProducer.createGoalInstantiationResultsForNeed1();
             Connection con = ((WonMessageReceivedOnConnectionEvent) event).getCon();
 

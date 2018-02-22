@@ -8,53 +8,53 @@ DELETE {
   GRAPH ?contentGraph { ?s ?p ?o }.
 }
 WHERE
- {
-	GRAPH ?gm2 {
-    	?m a ?messageDirection .
-        filter (?messageDirection != msg:FromExternal)
-    }
-	GRAPH ?gm3 {
-    	?m msg:hasMessageType ?mtype .
-        filter (?mtype != msg:SuccessResponse && ?mtype != msg:FailureResponse)
-    }
-    GRAPH ?gm4 {
-        	?m msg:hasContent ?contentGraph .
-    }
-    optional {
-      	GRAPH ?gr11 {
-          ?r1 msg:isResponseTo ?m .
-        }
-        GRAPH ?gr12 {
-          ?r1 msg:hasMessageType ?r1type .
-        }
-    }
-   	optional {
-    	GRAPH ?gm1 {
-    		?m msg:hasCorrespondingRemoteMessage ?rm .
-        }
-        optional {
-            GRAPH ?gr21 {
-                ?r2 msg:isResponseTo ?rm .
-            }
-            GRAPH ?gr22 {
-                ?r2 msg:hasMessageType ?r2type .
-            }
-
-            optional {
-                GRAPH ?gr31 {
-                    ?r3 msg:hasCorrespondingRemoteMessage ?r2 .
-                }
-                filter (bound(?r2))
-            }
+{
+  {
+    # remove all messages that have remote messages (except responses)
+    GRAPH <urn:x-arq:UnionGraph> {
+      ?m msg:hasContent ?contentGraph;
+         msg:hasMessageType ?mtype;
+         msg:hasCorrespondingRemoteMessage ?rm .
+         filter (?mtype in (msg:ConnectMessage, msg:OpenMessage, msg:CloseMessage, msg:ConnectionMessage))
+         # unless there are the required SuccessResponses
+        FILTER NOT EXISTS {
+          ?sm msg:isResponseTo ?m.
+          ?sm msg:hasPreviousMessage+ ?m.
+          ?sm msg:hasMessageType msg:SuccessResponse.
+          ?rsm msg:isRemoteResponseTo ?m.
+          ?rsm msg:isResponseTo ?rm.
+          ?rsm msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?m.
+          ?rsm msg:hasMessageType msg:SuccessResponse.
+          ?rsm msg:hasCorrespondingRemoteMessage ?lsm.
+          ?lsm msg:hasPreviousMessage+ ?m.
         }
     }
-	filter (
-      	!bound(?r1) || ?r1type = msg:FailureResponse
-        || ( ?mtype in ( msg:ConnectionMessage, msg:ConnectMessage, msg:OpenMessage, msg:CloseMessage ) && ! bound(?rm))
-        || (bound(?rm) && (!bound(?r2) || ?r2type = msg:FailureResponse || !bound(?r3)))
-	)
-
-	GRAPH ?contentGraph {
-    	?s ?p ?o .
+  } union {
+    # remove all messages that do not require remote messages
+    GRAPH <urn:x-arq:UnionGraph> {
+      ?m msg:hasContent ?contentGraph;
+         msg:hasMessageType ?mtype.
+      filter (?mtype  in (msg:CreateMessage, msg:ActivateMessage, msg:DeactivateMessage, msg:HintFeedbackMessage))
+      # unless there is the required SuccessResponse
+      FILTER NOT EXISTS {
+        ?sm msg:isResponseTo ?m.
+        ?sm msg:hasPreviousMessage+ ?m.
+        ?sm msg:hasMessageType msg:SuccessResponse.
+      }
     }
- }
+  } union {
+    # remove all messages that require remote but don't have any (except responses)
+    GRAPH <urn:x-arq:UnionGraph> {
+      ?m msg:hasContent ?contentGraph;
+         msg:hasMessageType ?mtype;
+         filter (?mtype  in (msg:ConnectMessage, msg:OpenMessage, msg:CloseMessage, msg:ConnectionMessage))
+         optional {
+           ?m msg:hasCorrespondingRemoteMessage ?rm .
+         }
+         filter (!bound(?rm))
+    }
+  }
+  GRAPH ?contentGraph {
+      ?s ?p ?o .
+  }
+}
