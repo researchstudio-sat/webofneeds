@@ -46,10 +46,12 @@ function genComponentConf() {
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__content">
-            <div 
-                class="won-cm__content__text" 
-                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
-                    {{ self.message.get('text') }}
+            <div class="won-cm__content__text"
+            	title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
+            	ng-class="{'propose' : self.message.get('isProposeMessage')}">
+                <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
+                <span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>	
+                {{ self.message.get('text') }}
                 <div class="won-cm__content__button" 
                 	ng-if="self.message.get('isProposeMessage') 
                 		&& !self.message.get('outgoingMessage')
