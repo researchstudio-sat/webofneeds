@@ -29,35 +29,6 @@ import rdfstore from 'rdfstore-js';
 import jld from 'jsonld';
 import won from './won.js';
 
-/**
- * Thin wrapper around `rdfstore.load(...)` that returns 
- * a promise instead of requiring a callback.
- * @param {RdfStore} store 
- * @param {String} mediaType 
- * @param {Jsonld} jsonldData 
- * @param {String} graphUri 
- */
-export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
-
-    return new Promise((resolve, reject) => {
-        const callback = (success, results) => {
-            if (success) {
-                //console.log('linkeddata-serice-won.js: finished storing triples ', data);
-                resolve();
-            } else {
-                console.error('Failed to store json-ld data for ' + uri);
-                reject('Failed to store json-ld data for ' + uri);
-            }
-        }
-
-        if(graphUri) {
-            store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
-        } else {
-            store.load("application/ld+json", jsonldData, callback); // add to default graph
-        }
-    });
-}
-
 (function(){
 
     /**
@@ -1840,3 +1811,32 @@ export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
         },
     }
 })();
+
+/**
+ * Thin wrapper around `rdfstore.load(...)` that returns 
+ * a promise instead of requiring a callback.
+ * @param {RdfStore} store 
+ * @param {String} mediaType 
+ * @param {Jsonld} jsonldData 
+ * @param {String} graphUri 
+ */
+export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
+
+    return new Promise((resolve, reject) => {
+        const callback = (success, results) => {
+            if (success) {
+                //console.log('linkeddata-serice-won.js: finished storing triples ', data);
+                resolve();
+            } else {
+                console.error('Failed to store json-ld data for ' + uri);
+                reject('Failed to store json-ld data for ' + uri);
+            }
+        }
+
+        if(graphUri) {
+            store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
+        } else {
+            store.load("application/ld+json", jsonldData, callback); // add to default graph
+        }
+    });
+}
