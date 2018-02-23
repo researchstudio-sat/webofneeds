@@ -960,9 +960,10 @@ import won from './won.js';
             timePerNeedStr = format.format(time / rep);
             console.log("executed custom code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
         }*/
-        const needJsonLdP = new Promise((resolve, reject) => {
-
-                const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
+        const needJsonLdP = 
+            loadStarshapedGraph(store, needUri, propertyTree)
+            .then(resultGraph => new Promise((resolve, reject) => {
+                //const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
                 const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
                     /* frame */
                     "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
@@ -985,7 +986,7 @@ import won from './won.js';
                 });
                 resolve(needJsonLdP);
             }
-        ).then(needJsonLd => {
+        )).then(needJsonLd => {
             // usually the need-data will be in a single object in the '@graph' array.
             // We can flatten this and still have valid json-ld
             const simplified = needJsonLd['@graph'][0];
@@ -1034,7 +1035,7 @@ import won from './won.js';
     // loads all triples starting from start uri, using each array in 'paths' like a
     // property path, collecting all reachable triples
     // returns a JS RDF Interfaces Graph object
-    function loadStarshapedGraph(store, startUri, tree) {
+    async function loadStarshapedGraph(store, startUri, tree) {
         let prefixes = tree.prefixes;
         if (prefixes != null) {
             for (let key in prefixes) {
@@ -1045,9 +1046,12 @@ import won from './won.js';
         }
         try {
             let startNode = store.rdf.createNamedNode(startUri);
-            let tmpResult  = { res : null };
-            store.graph( (success, result) => tmpResult.res = result);
-            let dataGraph = dropUnnecessaryTriples(store, tmpResult.res, tree.roots);
+            const tmpResult = await new Promise((resolve, reject) => 
+                store.graph((success, result) => success? 
+                    resolve(result) : 
+                    reject('Couldn\'t get graph '))
+            );
+            let dataGraph = dropUnnecessaryTriples(store, tmpResult, tree.roots);
             let resultGraph = new store.rdf.api.Graph();
             for (let i = 0; i < tree.roots.length; i++) {
                 let subResult = loadStarshapedGraph_internal(store, dataGraph, startNode, tree.roots[i]);
