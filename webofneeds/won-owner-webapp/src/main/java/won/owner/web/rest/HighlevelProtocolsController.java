@@ -34,23 +34,35 @@ public class HighlevelProtocolsController {
 
 	@RequestMapping(value = "/getAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getAgreements(String connectionUri) {
-
 		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		Dataset agreements = HighlevelProtocols.getAgreements(conversationDataset);
+
 		return new ResponseEntity<>(agreements, HttpStatus.OK);
 	}
 
+    @RequestMapping(value = "/getAgreement", method = RequestMethod.GET)
+    public ResponseEntity<Model> getAgreement(String connectionUri, String agreementUri) {
+        Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+        Model agreement = HighlevelProtocols.getAgreement(conversationDataset, agreementUri);
+
+        return new ResponseEntity<>(agreement, HttpStatus.OK);
+    }
+
 	@RequestMapping(value = "/getProposals", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getProposals(String connectionUri) {
-		
 		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
-		System.out.println("conversation:");
-		RDFDataMgr.write(System.err, conversationDataset, Lang.TRIG);
 		Dataset proposals =  HighlevelProtocols.getProposals(conversationDataset);
-		System.out.println("proposals");
-		RDFDataMgr.write(System.err, proposals, Lang.TRIG);		
+
 		return new ResponseEntity<>(proposals, HttpStatus.OK);
 	}
+
+    @RequestMapping(value = "/getProposal", method = RequestMethod.GET)
+    public ResponseEntity<Model> getProposal(String connectionUri, String proposalUri) {
+        Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+        Model proposal =  HighlevelProtocols.getProposal(conversationDataset, proposalUri);
+
+        return new ResponseEntity<>(proposal, HttpStatus.OK);
+    }
 
 	@RequestMapping(value = "/getAgreementsProposedToBeCancelled", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getProposalsToCancel(String connectionUri) {
