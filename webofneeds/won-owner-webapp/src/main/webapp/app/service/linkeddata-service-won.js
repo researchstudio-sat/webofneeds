@@ -23,6 +23,7 @@ import {
     is,
     clone,
     contains,
+    deepFreeze,
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
@@ -725,11 +726,41 @@ import won from './won.js';
      * the individual graphs contained in the data set.
      */
     won.addJsonLdData = function(data) {
+        //data = deepFreeze(clone(data)); // defensive copy
         if(!window.jsonLdFiles4dbg) { window.jsonLdFiles4dbg = [] } window.jsonLdFiles4dbg.push(data); //TODO deleteme
 
         const context = data['@context'];
 
-        const graphsAddedSeperatelyP = Promise.resolve();
+        // TODO deleteme
+        const byGraphP = jld.promises.flatten(data) // flattening groups by graph as a side-effect
+        .then(r => {console.log('flattening success for ', r, data); return r})
+        .catch(e => {console.error('flattening failed for ', e, data); throw e}); 
+
+        const prepAndAddGraph = graph => {
+            const graphWithContext = { '@graph': graph['@graph'], '@id': graph['@id'], '@context': context};
+
+            if(graphWithContext['@id'] && graphWithContext['@graph'] && graphWithContext['@context']) {
+                if(!window.graphsWithCtxt4dbg) window.graphsWithCtxt4dbg = []; window.graphsWithCtxt4dbg.push(graphWithContext); // TODO deleteme
+
+                //return Promise.resolve(); // TODO deleteme
+                return rdfStoreLoadPromise(privateData.store, 'application/ld+json', graphWithContext, graphWithContext['@id']);
+            } else {
+                const msg = 'Couldn\'t add the graph ' + graphUri + 
+                    ' with jsonld of ' + graphWithContext + 
+                    ' to the rdf-store.';
+                console.error(msg);
+                Promise.reject(msg);
+            }
+        }
+
+        const graphsAddedSeperatelyP = byGraphP
+        .then(flattenedData => {
+            window.flattenedData4dbg = flattenedData; //TODO deleteme
+            return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
+        })
+        /*
+       const graphsAddedSeperatelyP = Promise.resolve();
+        */
 
         const triplesAddedToDefaultGraphP = rdfStoreLoadPromise(privateData.store, 'application/ld+json', data);
 
@@ -1044,23 +1075,40 @@ import won from './won.js';
                 }
             }
         }
-        try {
-            let startNode = store.rdf.createNamedNode(startUri);
-            const tmpResult = await new Promise((resolve, reject) => 
-                store.graph((success, result) => success? 
-                    resolve(result) : 
-                    reject('Couldn\'t get graph '))
-            );
-            let dataGraph = dropUnnecessaryTriples(store, tmpResult, tree.roots);
-            let resultGraph = new store.rdf.api.Graph();
-            for (let i = 0; i < tree.roots.length; i++) {
-                let subResult = loadStarshapedGraph_internal(store, dataGraph, startNode, tree.roots[i]);
-                resultGraph.addAll(subResult);
+
+        let startNode = store.rdf.createNamedNode(startUri);
+        const tmpResultP = new Promise((resolve, reject) => 
+            store.graph((success, result) => success? 
+                resolve(result) : 
+                reject('Couldn\'t get graph '))
+        );
+        const resultGraphP = tmpResultP.then(tmpResult => {
+            try {
+                let dataGraph = dropUnnecessaryTriples(store, tmpResult, tree.roots);
+                let resultGraph = new store.rdf.api.Graph();
+                for (let i = 0; i < tree.roots.length; i++) {
+                    let subResult = loadStarshapedGraph_internal(store, dataGraph, startNode, tree.roots[i]);
+                    resultGraph.addAll(subResult);
+                }
+                if(!resultGraph) {
+                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
+                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
+                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
+                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
+                    throw new Error(
+                        "Failed to construct valid graph:" + resultGraph + 
+                        ". For start Uri " + startUri + 
+                        " and tree " + JSON.stringify(tree)
+                    );
+                }
+                return resultGraph;
+            } catch (e){
+                console.error("error executing custom select function: " + e);
+                throw e;
             }
-            return resultGraph;
-        } catch (e){
-            console.error("error executing custom select function: " + e);
-        }
+        });
+
+        return resultGraphP;
     }
 
     function dropUnnecessaryTriples(store, graph, roots){
@@ -1825,15 +1873,21 @@ import won from './won.js';
  * @param {String} graphUri 
  */
 export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
-
     return new Promise((resolve, reject) => {
         const callback = (success, results) => {
+            if(graphUri) {
+                console.log('load with graphUri finished ', mediaType, graphUri, jsonldData); //TODO deleteme
+                console.log('');
+                console.log('');
+                console.log('');
+                console.log('');
+            }
             if (success) {
                 //console.log('linkeddata-serice-won.js: finished storing triples ', data);
                 resolve();
             } else {
-                console.error('Failed to store json-ld data for ' + uri);
-                reject('Failed to store json-ld data for ' + uri);
+                console.error('Failed to store json-ld data for ' + uri + '\n' + results);
+                reject('Failed to store json-ld data for ' + uri + '\n' + results);
             }
         }
 
