@@ -1049,6 +1049,10 @@ import jsonld from 'jsonld';
             return this.__getMessageUri(this.messageStructure);
         },
 
+        getRemoteMessageUri: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage");
+        },
+
         __getMessageUri: function (messageStructure) {
             if (messageStructure.messageUri) {
                 return messageStructure.messageUri;

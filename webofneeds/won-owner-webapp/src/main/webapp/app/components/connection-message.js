@@ -144,7 +144,7 @@ function genComponentConf() {
         
         acceptProposal() {
         	this.clicked = true;
-        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "accepts", this.message.get("text"));
+        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
         }

@@ -533,6 +533,7 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         belongsToUri: undefined,
         data: {
             uri: wonMessage.getMessageUri(),
+            remoteUri: !outgoingMessage? wonMessage.getRemoteMessageUri() : undefined,
             text: wonMessage.getTextMessage(),
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
