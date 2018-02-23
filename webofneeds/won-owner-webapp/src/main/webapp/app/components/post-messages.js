@@ -3,11 +3,10 @@
 import angular from 'angular';
 import jld from 'jsonld';
 import Immutable from 'immutable';
-import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
+import connectionMessageModule from './connection-message.js';
 import {
-    relativeTime,
 } from '../won-label-utils.js'
 import {
     connect2Redux,
@@ -45,54 +44,17 @@ function genComponentConf() {
                 alt="Loading&hellip;"
                 ng-show="self.connection.get('loadingEvents')"
                 class="hspinner"/>
-                <a ng-show="self.eventsLoaded && !self.connection.get('loadingEvents') && !self.allLoaded"
-                    ng-click="self.connections__showMoreMessages(self.connection.get('uri'), 5)"
-                    href="">
-                        show more
-                </a>
-            <div
-                class="pm__content__message"
-                ng-repeat="message in self.chatMessages"
-                ng-class="message.get('outgoingMessage') ? 'right' : 'left'">
-                    <won-square-image
-                        title="self.theirNeed.get('title')"
-                        src="self.theirNeed.get('TODOtitleImgSrc')"
-                        uri="self.theirNeed.get('uri')"
-                        ng-click="self.router__stateGoAbs('post', {postUri: self.theirNeed.get('uri')})"
-                        ng-show="!message.get('outgoingMessage')">
-                    </won-square-image>
-                    <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text" title="{{ self.shouldShowRdf ? self.rdfToString(message.get('contentGraphs')) : undefined }}">
-                            {{ message.get('text') }}
-                        </div>
-                        <div
-                            ng-show="message.get('unconfirmed')"
-                            class="pm__content__message__content__time">
-                                Pending&nbsp;&hellip;
-                        </div>
-                        <div
-                            ng-hide="message.get('unconfirmed')"
-                            class="pm__content__message__content__time">
-                                {{ self.relativeTime(self.lastUpdateTime, message.get('date')) }}
-                        </div>
-                        <a
-                          ng-show="self.shouldShowRdf && message.get('outgoingMessage')"
-                          target="_blank"
-                          href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
-                            <svg class="rdflink__small clickable">
-                                    <use href="#rdf_logo_2"></use>
-                            </svg>
-                        </a>
-                         <a
-                          ng-show="self.shouldShowRdf && !message.get('outgoingMessage')"
-                          target="_blank"
-                          href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(message.get('uri'))}}">
-                            <svg class="rdflink__small clickable">
-                                <use href="#rdf_logo_2"></use>
-                            </svg>
-                        </a>
-                    </div>
-            </div>
+            <a ng-show="self.eventsLoaded && !self.connection.get('loadingEvents') && !self.allLoaded"
+                ng-click="self.connections__showMoreMessages(self.connection.get('uri'), 5)"
+                href="">
+                    show more
+            </a>
+            <won-connection-message
+                ng-repeat="msg in self.chatMessages"
+                connection-uri="self.connectionUri"
+                message-uri="msg.get('uri')"
+                message="msg">
+            </won-connection-message>
         </div>
         <chat-textfield
             class="pm__footer"
@@ -150,7 +112,6 @@ function genComponentConf() {
     class Controller {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
-            this.relativeTime = relativeTime;
             window.pm4dbg = this;
             
             const self = this;
@@ -174,15 +135,13 @@ function genComponentConf() {
                         return a.get("date").getTime() - b.get("date").getTime();
                     });
                 }
-                //TODO: SET RELATIVE TIMESTAMPS
-
 
                 return {
                     ownNeed,
                     theirNeed,
+                    connectionUri,
                     connection,
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
-                    lastUpdateTime: state.get('lastUpdateTime'),
                     chatMessages: sortedMessages,
                     debugmode: won.debugmode,
                     shouldShowRdf: state.get('showRdf'),
@@ -209,14 +168,8 @@ function genComponentConf() {
                 )
             )
             
-           
-
         }
         
-        rdfToString(jsonld){
-        	return JSON.stringify(jsonld);
-        }
-
         ensureMessagesAreLoaded() {
             delay(0).then(() => {
                 // make sure latest messages are loaded
@@ -228,13 +181,6 @@ function genComponentConf() {
                     this.connections__showLatestMessages(this.connection.get('uri'), 4);
                 }
             })
-        }
-
-        encodeParam(param) {
-            var encoded = encodeURIComponent(param);
-            // console.log("encoding: ",param);
-            // console.log("encoded: ",encoded)
-            return encoded;
         }
 
         snapToBottom() {
@@ -289,7 +235,7 @@ function genComponentConf() {
             }
         }
 
-        sendRdfTmpDeletme() {
+        sendRdfTmpDeletme() { //TODO move to own component
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
             if(rdftxtEl) {
                 console.log('found rdftxtel: ', rdftxtEl.value);
@@ -314,10 +260,10 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.postMessages', [
-    squareImageModule,
     chatTextFieldModule,
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
+    connectionMessageModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
