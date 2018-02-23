@@ -427,6 +427,43 @@ public class WonRdfUtils
           return null;
       }
 
+      public static URI getAcceptedEvent(final WonMessage wonMessage) {
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:accepts ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+                  if (rs.hasNext()) {
+                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
+                      throw new IllegalArgumentException("wonMessage has more than one accepts eventUri");
+                  }
+
+                  return eventUri != null? URI.create(eventUri) : null;
+              }
+          }
+          return null;
+      }
+
+      /**
+       * Returns true if the message is an accept message
+       *
+       * @param wonMessage
+       * @return true if the wonMessage is an accept message of an agreement, false if it is not
+       */
+      public static boolean isAccepts(final WonMessage wonMessage) {
+          return getAcceptedEvent(wonMessage) != null;
+      }
       private static String rdfNodeToString(RDFNode node) {
           if (node.isLiteral()) {
               return node.asLiteral().getString();
