@@ -70,7 +70,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                 //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
                 //Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, acceptedEventUri.toString());
-                Model agreementPayload = HighlevelProtocols.getProposal(fullConversationDataset, acceptedEventUri.toString()); //TODO: RETRIEVE AGREEMENT, for whatever reason there is no agreement at this point only a proposal idk why
+                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, acceptedEventUri.toString()); //TODO: RETRIEVE AGREEMENT, for whatever reason there is no agreement at this point only a proposal idk why
                 bus.publish(new AgreementAcceptedEvent(con, agreementPayload));
             }else {
                 //TODO: DETERMINE WHAT MESSAGE THIS ACTUALLY IS
@@ -87,10 +87,10 @@ public class AnalyzeAction extends BaseEventBotAction {
                 Collection<GoalInstantiationResult> results = goalInstantiationProducer.createGoalInstantiationResultsForNeed1();
 
 
-                Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
+                /*Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
                 Dataset agreements = HighlevelProtocols.getAgreements(fullConversationDataset);
                 RDFDataMgr.write(System.out, agreements, Lang.TRIG);
-                Dataset proposals = HighlevelProtocols.getProposals(fullConversationDataset);
+                Dataset proposals = HighlevelProtocols.getProposals(fullConversationDataset);*/
 
                 for (GoalInstantiationResult result : results) {
                     if (result.getShaclReportWrapper().isConform()) {
