@@ -83,10 +83,8 @@ public class HighlevelProtocols {
 		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
 		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
 		initialBinding.add("terminatinggraph", name);
-		// use this initial binding in: DynamicDatasetToDatasetBySparqlGSPOSelectFunction
-	 //	cutAfterMessageFunction.apply(dataset);
-		
-		return null;
+		Dataset cutOff = HighlevelFunctionFactory.getCutOffFunction(initialBinding).apply(conversationDataset);
+		return cutOff;
 	}
 
 	private static List<URI> getAcceptMessages(Dataset conversationDataset) {

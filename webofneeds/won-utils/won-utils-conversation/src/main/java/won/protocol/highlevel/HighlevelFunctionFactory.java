@@ -1,6 +1,7 @@
 package won.protocol.highlevel;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Model;
 
 import won.protocol.util.DatasetSelectionBySparqlFunction;
@@ -144,9 +145,9 @@ public class HighlevelFunctionFactory {
 		return agreementFunction;
 	}
 	
-	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap intialBinding) {
+	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap initialBinding) {
 		if (cutOffFunction == null) {
-			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutofffunction/query.rq",intialBinding);
+			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutofffunction/query.rq",initialBinding);
 		}
 		return cutOffFunction;
 	}
