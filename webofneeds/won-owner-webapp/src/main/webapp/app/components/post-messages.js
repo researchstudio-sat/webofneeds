@@ -1,5 +1,6 @@
 ;
 
+import won from '../won-es6.js';
 import angular from 'angular';
 import jld from 'jsonld';
 import Immutable from 'immutable';
@@ -14,6 +15,7 @@ import {
 import {
     attach,
     delay,
+    checkHttpStatus,
 } from '../utils.js'
 import {
     actionCreators
@@ -23,6 +25,7 @@ import {
     selectNeedByConnectionUri,
 } from '../selectors.js';
 import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
+//import won.owner.web.rest.highlevel.HighlevelProtocolsController;
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -65,6 +68,20 @@ function genComponentConf() {
             submit-button-label="::'Send'"
             >
         </chat-textfield>
+        <!-- quick and dirty button to get agreements -->
+        <div  ng-show="self.shouldShowRdf">
+        	<button 
+                class="rdfMsgBtnTmpDeletme" 
+                ng-click="self.getProposals()">
+                    Load P.
+            </button>
+            <button 
+                class="rdfMsgBtnTmpDeletme" 
+                ng-click="self.getAgreements()">
+                    Load A.
+            </button>
+        </div>
+       
         <!--
         <chat-textfield-simple
             class="pm__footer"
@@ -116,6 +133,9 @@ function genComponentConf() {
             
             const self = this;
 
+            const proposals = undefined;
+            const agreements = undefined;
+            
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
 
@@ -233,6 +253,38 @@ function genComponentConf() {
             if(trimmedMsg) {
                this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
             }
+        }
+        
+        getAgreements() {
+        	console.log("Load Agreements");
+        	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
+        	const tmpAgreements = this.callFetch(url);
+        	if(!!tmpAgreements){
+        		this.agreements = tmpAgreements;
+        	}
+        }
+        
+        getProposals() {
+        	console.log("Load Proposals");
+        	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
+        	const tmpProposals = this.callFetch(url);
+        	if(!!tmpProposals){
+        		this.proposals = tmpProposals;
+        	}
+        }
+
+        callFetch(url) {
+        	return fetch(url, {
+        		method: 'get',
+        		credentials: "same-origin",
+        		headers : { 
+        	        'Accept': 'application/ld+json'
+        	       },
+           	})         
+            .then(checkHttpStatus)
+            .then(response =>
+            	response.json()
+            )
         }
 
         sendRdfTmpDeletme() { //TODO move to own component

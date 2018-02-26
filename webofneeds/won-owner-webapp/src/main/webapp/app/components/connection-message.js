@@ -120,6 +120,7 @@ function genComponentConf() {
                     Immutable.Map();
 
                 return {
+                	ownNeed,
                     theirNeed,
                     connection,
                     message,

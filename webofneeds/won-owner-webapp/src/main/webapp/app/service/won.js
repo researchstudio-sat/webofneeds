@@ -1202,6 +1202,16 @@ import jsonld from 'jsonld';
         isAcceptMessage: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#accepts");
         },
+        isProposeToCancelMessage: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel");
+        },
+        isProposal: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#Proposal");
+        },
+        isAgreement: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#Agreement");
+        },
+        
         isFromSystem: function () {
             let direction = this.getMessageDirection();
             return  direction === "http://purl.org/webofneeds/message#FromSystem" ;
