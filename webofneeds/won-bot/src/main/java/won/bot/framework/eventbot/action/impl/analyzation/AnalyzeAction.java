@@ -69,7 +69,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                 logger.debug("ACCEPT MESSAGE FOUND "+acceptedEventUri);
                 //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
-                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI().toString()); //TODO: RETRIEVE AGREEMENT, for whatever reason there is no agreement at this point only a proposal idk why
+                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI().toString());
                 bus.publish(new AgreementAcceptedEvent(con, agreementPayload));
             }else {
                 //TODO: DETERMINE WHAT MESSAGE THIS ACTUALLY IS
