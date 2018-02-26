@@ -1,12 +1,7 @@
 package won.protocol.highlevel;
 
-import java.util.function.Function;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-
-import won.protocol.util.DatasetSelectionBySparqlFunction;
-
 
 public class HighlevelProtocols {
 	/**
@@ -19,6 +14,14 @@ public class HighlevelProtocols {
 				.andThen(HighlevelFunctionFactory.getAgreementFunction())
 				.apply(conversationDataset);
 	}
+
+    public static Model getAgreement(Dataset conversationDataset, String agreementUri) {
+        return HighlevelFunctionFactory.getAcknowledgedSelection()
+                .andThen(HighlevelFunctionFactory.getModifiedSelection())
+                .andThen(HighlevelFunctionFactory.getAgreementFunction())
+                .apply(conversationDataset)
+                .getNamedModel(agreementUri);
+    }
 	
 	/**
 	 * Calculates all open proposals present in the specified conversation dataset.
@@ -33,6 +36,14 @@ public class HighlevelProtocols {
 					.andThen(HighlevelFunctionFactory.getProposalFunction())
 					.apply(conversationDataset);
 	}
+
+    public static Model getProposal(Dataset conversationDataset, String proposalUri) {
+        return HighlevelFunctionFactory.getAcknowledgedSelection()
+                .andThen(HighlevelFunctionFactory.getModifiedSelection())
+                .andThen(HighlevelFunctionFactory.getAgreementFunction())
+                .apply(conversationDataset)
+                .getNamedModel(proposalUri);
+    }
 	
 	/** reveiw and rewrite the JavaDoc descriptions below **/
 	

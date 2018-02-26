@@ -625,11 +625,13 @@ import jsonld from 'jsonld';
         "msg": "http://purl.org/webofneeds/message#",
         "won": "http://purl.org/webofneeds/model#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "agr": "http://purl.org/webofneeds/agreement#",
         "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
     }
     won.minimalTurtlePrefixes = 
         "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
         "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+        "@prefix agr: <http://purl.org/webofneeds/agreement#>.\n" +
         "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
         "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
 
@@ -642,6 +644,7 @@ import jsonld from 'jsonld';
             "xsd": "http://www.w3.org/2001/XMLSchema#",
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "won": "http://purl.org/webofneeds/model#",
+            "agr": "http://purl.org/webofneeds/agreement#",
             "gr": "http://purl.org/goodrelations/v1#",
             "ldp": "http://www.w3.org/ns/ldp#",
             "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
@@ -654,6 +657,7 @@ import jsonld from 'jsonld';
             "@prefix webID: <http://www.example.com/webids/>.\n" +
             "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
             "@prefix dc: <http://purl.org/dc/elements/1.1/>.\n" +
+            "@prefix agr: <http://purl.org/webofneeds/agreement#>.\n" +
             "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n" +
             "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.\n" +
             "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n" +
