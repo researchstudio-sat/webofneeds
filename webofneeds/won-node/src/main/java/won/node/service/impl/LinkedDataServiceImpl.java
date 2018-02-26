@@ -16,12 +16,21 @@
 
 package won.node.service.impl;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -34,27 +43,34 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.*;
+import won.protocol.model.Connection;
+import won.protocol.model.ConnectionModelMapper;
+import won.protocol.model.ConnectionState;
+import won.protocol.model.DataWithEtag;
+import won.protocol.model.DatasetHolder;
+import won.protocol.model.DatasetHolderAggregator;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.Need;
+import won.protocol.model.NeedModelMapper;
+import won.protocol.model.NeedState;
+import won.protocol.model.unread.UnreadMessageInfo;
+import won.protocol.model.unread.UnreadMessageInfoForNeed;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.model.ConnectionModelMapper;
+import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.model.NeedModelMapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
 
 /**
  * Creates rdf models from the relational database.
@@ -94,6 +110,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   @Autowired
   private CryptographyService cryptographyService;
+  
+  @Autowired 
+  private UnreadInformationService unreadInformationService;
+  
 
   private String needProtocolEndpoint;
   private String matcherProtocolEndpoint;
@@ -267,6 +287,38 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     return dataset;
   }
+
+  @Override
+@Transactional
+  public Model getUnreadInformationForNeed(URI needURI, Collection<URI> lastSeenMessageURIs) {
+		UnreadMessageInfoForNeed unreadInfo = this.unreadInformationService.getUnreadInformation(needURI, lastSeenMessageURIs);
+		Model ret = ModelFactory.createDefaultModel();
+		Resource needRes = ret.createResource(needURI.toString());
+		addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_SUGGESTED, unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.SUGGESTED));
+		addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_CONNECTED, unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.CONNECTED));
+		addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_REQUEST_SENT, unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.REQUEST_SENT));
+		addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_REQUEST_RECEIVED, unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.REQUEST_RECEIVED));
+		addUnreadInfoWithProperty(ret, needRes, WON.HAS_UNREAD_CLOSED, unreadInfo.getUnreadInfoByConnectionState().get(ConnectionState.CLOSED));
+		unreadInfo.getUnreadMessageInfoForConnections().forEach(info -> {
+			Resource connRes = ret.createResource(info.getConnectionURI().toString());
+			addUnreadInfoWithProperty(ret, connRes, null, info.getUnreadInformation());
+		});
+		return ret;
+  }
+
+	private void addUnreadInfoWithProperty(Model ret, Resource subject, Property property, UnreadMessageInfo info) {
+		if (info != null) {
+			if (property != null) {
+				//if we are given a property, make a blank node and connect it to the subject using the property
+				Resource node = ret.createResource();
+				subject.addProperty(property, node);
+				subject = node;
+			} 
+			subject.addLiteral(WON.HAS_UNREAD_COUNT, info.getCount());
+			subject.addLiteral(WON.HAS_UNREAD_OLDEST_TIMESTAMP, info.getOldestTimestamp().getTime());
+			subject.addLiteral(WON.HAS_UNREAD_NEWEST_TIMESTAMP, info.getNewestTimestamp().getTime());
+		}
+	}
 
   @Transactional
   public Dataset getNodeDataset()

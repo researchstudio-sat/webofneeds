@@ -52,6 +52,7 @@ public class URIService implements InitializingBean
   private Pattern connectionEventsPattern;
   private Pattern connectionUriPattern;
   private Pattern needEventsPattern;
+  private Pattern needUnreadPattern;
   private Pattern needUriPattern;
   
   @Override
@@ -59,6 +60,7 @@ public class URIService implements InitializingBean
 	  this.connectionEventsPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+/events");
 	  this.connectionUriPattern = Pattern.compile(connectionResourceURIPrefix + "/[a-zA-Z0-9]+");
 	  this.needEventsPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+/events");
+	  this.needUnreadPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+/unread");
 	  this.needUriPattern = Pattern.compile(needResourceURIPrefix + "/[a-zA-Z0-9]+");
 	}
   
@@ -85,6 +87,12 @@ public class URIService implements InitializingBean
 	  Matcher m = needEventsPattern.matcher(toCheck.toString());
 	  return m.lookingAt();
   }
+  
+  public boolean isNeedUnreadURI(URI toCheck) {
+	  if (toCheck == null) return false;
+	  Matcher m = needUnreadPattern.matcher(toCheck.toString());
+	  return m.lookingAt();
+  }
    
   public boolean isConnectionEventsURI(URI toCheck) {
 	  if (toCheck == null) return false;
@@ -102,6 +110,13 @@ public class URIService implements InitializingBean
   public URI getNeedURIofNeedEventsURI(URI needEventsURI) {
 	  if (needEventsURI == null) return null;
 	  Matcher m = needUriPattern.matcher(needEventsURI.toString());
+	  m.find();
+	  return URI.create(m.group());
+  }
+  
+  public URI getNeedURIofNeedUnreadURI(URI needUnreadURI) {
+	  if (needUnreadURI == null) return null;
+	  Matcher m = needUriPattern.matcher(needUnreadURI.toString());
 	  m.find();
 	  return URI.create(m.group());
   }

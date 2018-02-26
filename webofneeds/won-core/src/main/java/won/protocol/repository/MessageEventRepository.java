@@ -1,17 +1,21 @@
 package won.protocol.repository;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.LockModeType;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import won.protocol.message.WonMessageType;
 import won.protocol.model.MessageEventPlaceholder;
-
-import javax.persistence.LockModeType;
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
+import won.protocol.model.unread.UnreadMessageInfoForConnection;
 
 public interface MessageEventRepository extends WonRepository<MessageEventPlaceholder> {
 
@@ -52,7 +56,51 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
             "   or msg.senderNodeURI = :webId " +
             ")")
     public boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
-
+    
+    /*@Query(
+    		"select " + 
+    		"	new won.protocol.model.unread.UnreadMessageInfoForConnection(c.connectionuri, c.state, new won.protocol.model.unread.UnreadMessageInfo(count(*), max(m.creationdate), min(m.creationdate)) " + 
+    		"    from MessageEventPlaceholder m join MessageEventPlaceholder last on ( " + 
+    		"        m.parenturi = last.parenturi n" + 
+    		"    	and m.messagetype not in ('SUCCESS_RESPONSE', 'FAILURE_RESPONSE') " + 
+    		"    	and m.creationdate > last.creationdate " + 
+    		"    ) " + 
+    		"    join EventContainer e on ( " + 
+    		"    	last.parenturi = e.parent_uri " + 
+    		"    ) " + 
+    		"    join Connection c on ( " + 
+    		"    	c.connectionuri = last.parenturi " + 
+    		"    ) " + 
+    		"    and e.parent_type = 'Connection' " + 
+    		"    where  " + 
+    		"    	last.messageuri in :lastSeenMessageUris " + 
+    		"        and c.needuri = :needUri " + 
+    		"    group by (c.connectionuri, c.state) "
+    	  )*/
+    
+    @Query(
+    		"select \n" + 
+    		"	new won.protocol.model.unread.UnreadMessageInfoForConnection(\n"
+    		+ "		c.connectionURI, \n"
+    		+ "		c.state, \n"
+    		+ "		count(*), \n"
+    		+ "		max(m.creationDate), \n"
+    		+ "		min(m.creationDate) \n"
+    		+ "  ) \n" + 
+    		"    from Connection c join MessageEventPlaceholder m on \n" + 
+    		"    	c.connectionURI = m.parentURI\n" + 
+    		"    left join MessageEventPlaceholder last on \n" + 
+    		"        m.parentURI = last.parentURI\n" + 
+    		"        and last.messageURI in :lastSeenMessageUris \n" + 
+    		"    where \n" + 
+    		"        c.needURI = :needUri \n" + 
+    		"		and m.messageType not in ('SUCCESS_RESPONSE', 'FAILURE_RESPONSE') \n" + 
+    		"        and (last is null or m.creationDate > last.creationDate) \n" +
+    		"    group by c.connectionURI, c.state \n"
+    		)
+    
+    public List<UnreadMessageInfoForConnection> getUnreadInfoForNeed(@Param("needUri") URI needURI, @Param("lastSeenMessageUris") Collection<URI> lastSeenMessageURIs); 
+    
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select n,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Need n on c.parentUri = n.needURI where msg.messageURI = :messageUri")
     public void lockNeedAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
