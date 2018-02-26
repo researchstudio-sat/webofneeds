@@ -78,7 +78,7 @@ public class HighlevelProtocols {
 		return null;
 	}
 
-	private static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {
+   public static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {
 		// TODO Auto-generated method stub
 		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
 		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
