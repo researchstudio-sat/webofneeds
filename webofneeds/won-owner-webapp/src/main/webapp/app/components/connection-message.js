@@ -60,14 +60,12 @@ function genComponentConf() {
     					&& !self.clicked">
                 	<button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
                 </div>
-                <!--
                 <div class="won-cm__content__button" 
                 	ng-if="self.message.get('outgoingMessage')
                 		&& !self.message.get('isProposeMessage') 
                 		&& !self.message.get('isAcceptMessage')">
                 	<button class="won-button--filled thin black" ng-click="self.sendProposal()">Propose</button>
                 </div>
-                -->
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"

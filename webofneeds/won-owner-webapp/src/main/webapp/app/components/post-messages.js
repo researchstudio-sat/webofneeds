@@ -69,7 +69,6 @@ function genComponentConf() {
             >
         </chat-textfield>
         <!-- quick and dirty button to get agreements -->
-        <!--
         <div  ng-show="self.shouldShowRdf">
         	<button 
                 class="rdfMsgBtnTmpDeletme" 
@@ -82,7 +81,6 @@ function genComponentConf() {
                     Load A.
             </button>
         </div>
-    	-->
         <!--
         <chat-textfield-simple
             class="pm__footer"
@@ -273,7 +271,7 @@ function genComponentConf() {
         		this.proposals = tmpProposals;
         	}*/
         	//this.proposals = Promise.resolve(this.callFetch(url));
-        	this.callFetch(url);
+        	this.proposals = this.callFetch(url);
         }
 
         callFetch(url) {
