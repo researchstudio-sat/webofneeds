@@ -3,8 +3,13 @@ package won.protocol.highlevel;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -47,11 +52,13 @@ public class HighlevelProtocols {
 			cutOff = cutOffAfterMessage(cutOff, acceptsMessageURI);
 			Dataset modifiedCutOff = HighlevelFunctionFactory.getModifiedSelection().apply(cutOff);
 			
+			// Add agreements, regardless of whether they are cancelled later...
 			Model agreement = getAgreement(modifiedCutOff, acceptsMessageURI);
 			if (agreement != null && agreement.size() > 0) {
 				result.addNamedModel(acceptsMessageURI.toString(), agreement);
 			}
 			
+			// Remove agreements that are cancelled...
 			List<URI> retractedAgreementUris = getRetractedAgreements(modifiedCutOff, acceptsMessageURI);
 			for (URI retractedAgreement: retractedAgreementUris) {
 				result.removeNamedModel(retractedAgreement.toString());
@@ -75,7 +82,11 @@ public class HighlevelProtocols {
 
 	private static Model getAgreement(Dataset conversationDataset, URI acceptsMessageURI) {
 		// TODO Auto-generated method stub
-		return null;
+		// If A is accepting proposals, add a new agreement A to the result
+		// getAgreementFunction
+		// This gets all agreements, but we want to cherry pick for a particular accepts message... (hence .... conversationDataset and acceptsMessageURI)
+		Dataset agreed = HighlevelFunctionFactory.getAgreementFunction().apply(conversationDataset);
+		return agreed;
 	}
 
    public static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {
@@ -87,7 +98,7 @@ public class HighlevelProtocols {
 		return cutOff;
 	}
 
-	private static List<URI> getAcceptMessages(Dataset conversationDataset) {
+	public static List<URI> getAcceptMessages(Dataset conversationDataset) {
 		// only the first accepts message for each proposal
 		// only valid accepts, too
 		// okay ... right now this a dumb implementation....
@@ -104,18 +115,42 @@ public class HighlevelProtocols {
 			    Object object = listiterator.next();
 			    try {
 					URI newuri = new URI(object.toString());
-					urilist.add(newuri);
+					   urilist.add(newuri);
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
 					// should I catch the error here... or throw it for a higher level function to catch??
 					e.printStackTrace();
 				}
-			    System.out.println(object.toString());
+			  //   System.out.println(object.toString());
 		  }
-		  return urilist;
+		  
+		  List<URI> urilistnoduplicates = removeTheDuplicates(urilist);
+		  return urilistnoduplicates;
 		  // what do I return here if the query fails??
 	}
+	
+	
+	// https://stackoverflow.com/questions/2849450/how-to-remove-duplicates-from-a-list
+	// June 24, 2015 by Bade
+	
+		private static List<URI> removeTheDuplicates(List<URI> myList) {
+		    
+//			for(ListIterator<URI>iterator = myList.listIterator(); iterator.hasNext();) {
+//		        URI nextURI  = iterator.next();
+//		        if(Collections.frequency(myList, nextURI) > 1) {
+//		            iterator.remove();
+//		        }
+//		    }
+//		    return myList;
 
+			Set<URI> newSet = new HashSet<>();
+			newSet.addAll(myList);
+			List<URI> newList = new LinkedList<>();
+			newList.addAll(newSet);
+			return newList;
+
+		}
+	
 	/**
 	 * Calculates all open proposals present in the specified conversation dataset.
 	 * Returns the envelope graph of the proposal with the contents of the proposed

@@ -4,7 +4,8 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
 
-CONSTRUCT { ?g1 rdfs:comment "Accept Message" . }
+# Select ?acc (the accept message subject), or the ?g1, accept message graph...the test on the CutOFF suggests ?acc
+CONSTRUCT { ?acc rdfs:comment "Accept Message" . }
 WHERE { 
 
     GRAPH ?g1 {
