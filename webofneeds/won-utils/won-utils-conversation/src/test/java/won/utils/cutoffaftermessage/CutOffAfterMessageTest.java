@@ -68,48 +68,12 @@ public class CutOffAfterMessageTest {
 		}
     }
     
-
-    // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
-    @Test
-    public void oneOpenProposal () throws IOException {
-        Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-accepted.trig");
-        try {
-			test(input,expectedOutput);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    
-    // This is the case where there are two open proposals ...(each exist in their own envelope)
-    @Test
-    public void twoOpenProposals () throws IOException {
-        Dataset input = loadDataset( inputFolder + "2proposal-noaccepted.trig");
-        Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-noaccepted.trig");
-        try {
-			test(input,expectedOutput);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    
-       
-/*    private static boolean passesTest(Dataset input, Dataset expectedOutput) {
-    	ProposalFunction proposalFunction = new ProposalFunction();
-        Dataset actual = proposalFunction.applyProposalFunction(input);
-        return RdfUtils.isIsomorphicWith(expectedOutput, actual);
-    }
-    
-  */
-    
     public void test(Dataset input, Dataset expectedOutput) throws URISyntaxException {
 
         // check that the computed dataset is the expected one
     	// replace example.com with accepts message URI
-    	URI acceptsMessageURI = new URI("http://example.com");
-        Dataset actual =  HighlevelProtocols.cutOffAfterMessage(input, acceptsMessageURI);
+    	URI acceptsMessageURI = new URI("https://localhost:8443/won/resource/event/6671551888677331000");
+        Dataset actual = HighlevelProtocols.cutOffAfterMessage(input, acceptsMessageURI);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

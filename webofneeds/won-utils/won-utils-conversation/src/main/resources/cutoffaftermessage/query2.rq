@@ -6,14 +6,12 @@ SELECT ?g ?s ?p ?o WHERE {
      GRAPH ?g {
          ?msg ?p ?o .
      }
-
-    GRAPH <urn:x-arq:UnionGraph> { 
+        
+     GRAPH <urn:x-arq:UnionGraph> { 
         ?terminatinggraph  msg:hasPreviousMessage* ?msg .
-         ?msg msg:hasPreviousMessage* ?mid .
-         ?mid msg:hasPreviousMessage+ ?first .
      }  
 
-     FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}  
+       
 
      BIND(?msg as ?s)
 

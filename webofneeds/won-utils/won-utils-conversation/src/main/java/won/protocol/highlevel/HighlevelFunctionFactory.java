@@ -147,7 +147,7 @@ public class HighlevelFunctionFactory {
 	
 	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap initialBinding) {
 		if (cutOffFunction == null) {
-			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutofffunction/query.rq",initialBinding);
+			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutoffaftermessage/query.rq",initialBinding);
 		}
 		return cutOffFunction;
 	}
