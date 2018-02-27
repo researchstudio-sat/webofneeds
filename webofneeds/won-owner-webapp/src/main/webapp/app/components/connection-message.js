@@ -60,12 +60,14 @@ function genComponentConf() {
     					&& !self.clicked">
                 	<button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
                 </div>
+                <!--
                 <div class="won-cm__content__button" 
                 	ng-if="self.message.get('outgoingMessage')
                 		&& !self.message.get('isProposeMessage') 
                 		&& !self.message.get('isAcceptMessage')">
                 	<button class="won-button--filled thin black" ng-click="self.sendProposal()">Propose</button>
                 </div>
+                -->
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
@@ -145,7 +147,9 @@ function genComponentConf() {
         
         acceptProposal() {
         	this.clicked = true;
-        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
+        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
         }
@@ -153,8 +157,8 @@ function genComponentConf() {
         buildProposalMessage(uri, type, text) {
         	const msgP = won.WONMSG.msguriPlaceholder;
         	const sc = "http://purl.org/webofneeds/agreement#"+type;
-        	const whM = ";won:hasTextMessage";
-        	return "<"+msgP+"><"+sc+"><"+uri+">"+whM+" '"+text+"'.";
+        	const whM = "\n won:hasTextMessage ";
+        	return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
         }
 
         updateAlignment(isOutgoingMessage) {

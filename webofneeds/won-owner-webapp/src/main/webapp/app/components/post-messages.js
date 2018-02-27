@@ -69,6 +69,7 @@ function genComponentConf() {
             >
         </chat-textfield>
         <!-- quick and dirty button to get agreements -->
+        <!--
         <div  ng-show="self.shouldShowRdf">
         	<button 
                 class="rdfMsgBtnTmpDeletme" 
@@ -81,7 +82,7 @@ function genComponentConf() {
                     Load A.
             </button>
         </div>
-       
+    	-->
         <!--
         <chat-textfield-simple
             class="pm__footer"
@@ -267,16 +268,18 @@ function genComponentConf() {
         getProposals() {
         	console.log("Load Proposals");
         	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
-        	const tmpProposals = this.callFetch(url);
+        	/*const tmpProposals = this.callFetch(url);
         	if(!!tmpProposals){
         		this.proposals = tmpProposals;
-        	}
+        	}*/
+        	//this.proposals = Promise.resolve(this.callFetch(url));
+        	this.callFetch(url);
         }
 
         callFetch(url) {
-        	return fetch(url, {
+    		fetch(url, {
         		method: 'get',
-        		credentials: "same-origin",
+        		credentials: 'same-origin',
         		headers : { 
         	        'Accept': 'application/ld+json'
         	       },
@@ -285,6 +288,15 @@ function genComponentConf() {
             .then(response =>
             	response.json()
             )
+            .then(resp => {
+            	console.log(Array.from(resp['@graph']));
+            	return Array.from(resp['@graph']);
+            	//return Array.from(resp['@graph']);
+            }).then(res =>
+            	console.log(res)
+            	//Object.assign(this.proposals, res)
+            )
+	        
         }
 
         sendRdfTmpDeletme() { //TODO move to own component
