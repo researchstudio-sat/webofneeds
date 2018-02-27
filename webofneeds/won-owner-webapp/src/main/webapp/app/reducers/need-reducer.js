@@ -355,14 +355,9 @@ function addConnectionFull(state, connection, newConnection) {
 
     // console.log("Adding Full Connection");
     if(newConnection === undefined) {
-      newConnection = !!selectNeedByConnectionUri(state, connection.uri || connection.get('uri')); // do
-																									// we
-																									// already
-																									// have
-																									// a
-																									// connection
-																									// like
-																									// that?
+        newConnection = !!selectNeedByConnectionUri(
+            state, connection.uri || connection.get('uri')
+        ); //do we already have a connection like that?
     }
     let parsedConnection = parseConnection(connection, newConnection);
 
@@ -538,12 +533,16 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         belongsToUri: undefined,
         data: {
             uri: wonMessage.getMessageUri(),
+            remoteUri: !outgoingMessage? wonMessage.getRemoteMessageUri() : undefined,
             text: wonMessage.getTextMessage(),
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: outgoingMessage,
             newMessage: !!newMessage,
             connectMessage: wonMessage.isConnectMessage(),
+            isProposeMessage: wonMessage.isProposeMessage(),
+            isAcceptMessage: wonMessage.isAcceptMessage(),
+            isAccepted: false,
         }
     };
 
