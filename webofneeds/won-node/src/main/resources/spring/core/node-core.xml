@@ -51,6 +51,8 @@
         <constructor-arg value="MINUTES" index="3"/> <!-- time unit -->
         <constructor-arg ref="workqueue" index="4"/> <!-- worker queue-->
     </bean>
+    
+    <bean id="unreadInformationService" class="won.protocol.service.impl.UnreadInformationService" />
 
     <bean id="linkedDataService" class="won.node.service.impl.LinkedDataServiceImpl">
         <property name="needInformationService" ref="needInformationService" />
