@@ -727,33 +727,46 @@ import won from './won.js';
      */
     won.addJsonLdData = function(data) {
         //data = deepFreeze(clone(data)); // defensive copy
-        if(!window.jsonLdFiles4dbg) { window.jsonLdFiles4dbg = [] } window.jsonLdFiles4dbg.push(data); //TODO deleteme
+        //if(!window.jsonLdFiles4dbg) { window.jsonLdFiles4dbg = [] } window.jsonLdFiles4dbg.push(data); //TODO deleteme
 
         const context = data['@context'];
 
-        // TODO deleteme
-        const byGraphP = jld.promises.flatten(data) // flattening groups by graph as a side-effect
-        .then(r => {console.log('flattening success for ', r, data); return r})
-        .catch(e => {console.error('flattening failed for ', e, data); throw e}); 
-
         const prepAndAddGraph = graph => {
-            const graphWithContext = { '@graph': graph['@graph'], '@id': graph['@id'], '@context': context};
+            const graphUri = graph['@id'];
+            const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
 
-            if(graphWithContext['@id'] && graphWithContext['@graph'] && graphWithContext['@context']) {
-                if(!window.graphsWithCtxt4dbg) window.graphsWithCtxt4dbg = []; window.graphsWithCtxt4dbg.push(graphWithContext); // TODO deleteme
-
-                //return Promise.resolve(); // TODO deleteme
-                return rdfStoreLoadPromise(privateData.store, 'application/ld+json', graphWithContext, graphWithContext['@id']);
-            } else {
+            if(!graph['@graph'] || !graphUri || !context) {
                 const msg = 'Couldn\'t add the graph ' + graphUri + 
                     ' with jsonld of ' + graphWithContext + 
                     ' to the rdf-store.';
                 console.error(msg);
-                Promise.reject(msg);
+                return Promise.reject(msg);
+            } else {
+                /*
+                * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into 
+                * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
+                * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
+                * these from occuring.
+                */
+                return jsonld.promises
+                .compact(graphWithContext, graphWithContext['@context']) 
+                .then(compactedGraph => {
+
+                    compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
+
+                    // if(!window.graphsWithCtxt4dbg) window.graphsWithCtxt4dbg = []; window.graphsWithCtxt4dbg.push(compactedGraph); // TODO deleteme
+                    // return Promise.resolve(); // TODO deleteme
+
+                    return rdfStoreLoadPromise(privateData.store, 'application/ld+json', compactedGraph, compactedGraph['@id']);
+                })
             }
         }
 
-        const graphsAddedSeperatelyP = byGraphP
+        const graphsAddedSeperatelyP = jld.promises
+        .flatten(data) // flattening groups by graph as a side-effect
+        // TODO deleteme
+        //.then(r => {console.log('flattening success for ', r, data); return r})
+        //.catch(e => {console.error('flattening failed for ', e, data); throw e}); 
         .then(flattenedData => {
             window.flattenedData4dbg = flattenedData; //TODO deleteme
             return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
@@ -1875,13 +1888,15 @@ import won from './won.js';
 export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
     return new Promise((resolve, reject) => {
         const callback = (success, results) => {
+            /*
             if(graphUri) {
-                console.log('load with graphUri finished ', mediaType, graphUri, jsonldData); //TODO deleteme
+                console.log('load with graphUri finished ', success, mediaType, graphUri, jsonldData); //TODO deleteme
                 console.log('');
                 console.log('');
                 console.log('');
                 console.log('');
             }
+            */
             if (success) {
                 //console.log('linkeddata-serice-won.js: finished storing triples ', data);
                 resolve();
