@@ -1501,9 +1501,9 @@ import won from './won.js';
                  * container, getNode will not return an array, so we
                  * need to make sure it's one from here on out.
                  */
-                connection.hasEvents = is('String', eventContainer.member) ?
-                    [eventContainer.member] :
-                    eventContainer.member;
+                connection.hasEvents = is('Array', eventContainer.member) ?
+                    eventContainer.member :
+                    [eventContainer.member];
                 return connection;
             })
     };
