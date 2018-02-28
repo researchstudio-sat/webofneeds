@@ -1509,42 +1509,40 @@ import won from './won.js';
     };
 
     //aliases (formerly functions that were just pass-throughs)
-    won.getEvent = (uri, fetchParams) => won.getNode(uri, fetchParams)
-            .then(event => {
-                // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
-                if(is('Array', event.hasReceivedTimestamp)) {
-                    const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(y) - new Date(x));
-                    event.hasReceivedTimestamp = new Date(latestFirst[0]);
-                } else {
-                    event.hasReceivedTimestamp = new Date(event.hasReceivedTimestamp);
-                }
+    won.getEvent = async (eventUri, fetchParams) => {
+        const event = await won.getNode(eventUri, fetchParams);
+
+        // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
+        if(is('Array', event.hasReceivedTimestamp)) {
+            const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(y) - new Date(x));
+            event.hasReceivedTimestamp = new Date(latestFirst[0]);
+        } else {
+            event.hasReceivedTimestamp = new Date(event.hasReceivedTimestamp);
+        }
 
 
-                if(!event.hasCorrespondingRemoteMessage) {
-                    return event;
-                } else {
-                    if (event.isRemoteResponseTo) {
-                        //we can't access the remote message of a remote response. just use the event
-                        return event;
-                    }
-                    /*
-                    * there's some messages (e.g. incoming connect) where there's
-                    * vital information in the correspondingRemoteMessage. So
-                    * we fetch it here.
-                    */
-                    fetchParams.doNotFetch = true;
-                    return won
-                        .getNode(event.hasCorrespondingRemoteMessage, fetchParams)
-                        .then(correspondingEvent => {
-                            if (correspondingEvent.type) {
-                                //if we have at least a type attribute, we add the remote event to the
-                                //local event. if not, it is just an URI.
-                                event.hasCorrespondingRemoteMessage = correspondingEvent;
-                            }
-                            return event;
-                        })
-                }
-            });
+        if(!event.hasCorrespondingRemoteMessage) {
+            return event;
+        } else {
+            if (event.isRemoteResponseTo) {
+                //we can't access the remote message of a remote response. just use the event
+                return event;
+            }
+            /*
+            * there's some messages (e.g. incoming connect) where there's
+            * vital information in the correspondingRemoteMessage. So
+            * we fetch it here.
+            */
+            fetchParams.doNotFetch = true;
+            const correspondingEvent = await won.getNode(event.hasCorrespondingRemoteMessage, fetchParams);
+            if (correspondingEvent.type) {
+                //if we have at least a type attribute, we add the remote event to the
+                //local event. if not, it is just an URI.
+                event.hasCorrespondingRemoteMessage = correspondingEvent;
+            }
+            return event;
+        }
+    }
 
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
