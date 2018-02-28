@@ -88,7 +88,6 @@ import won from './won.js';
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
         window.store4dbg = privateData.store; //TODO deletme
-        window.ldspriv4dbg = privateData; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
@@ -726,9 +725,6 @@ import won from './won.js';
      * the individual graphs contained in the data set.
      */
     won.addJsonLdData = function(data) {
-        //data = deepFreeze(clone(data)); // defensive copy
-        //if(!window.jsonLdFiles4dbg) { window.jsonLdFiles4dbg = [] } window.jsonLdFiles4dbg.push(data); //TODO deleteme
-
         const context = data['@context'];
 
         const prepAndAddGraph = graph => {
@@ -754,9 +750,6 @@ import won from './won.js';
 
                     compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
 
-                    // if(!window.graphsWithCtxt4dbg) window.graphsWithCtxt4dbg = []; window.graphsWithCtxt4dbg.push(compactedGraph); // TODO deleteme
-                    // return Promise.resolve(); // TODO deleteme
-
                     return rdfStoreLoadPromise(privateData.store, 'application/ld+json', compactedGraph, compactedGraph['@id']);
                 })
             }
@@ -764,11 +757,7 @@ import won from './won.js';
 
         const graphsAddedSeperatelyP = jld.promises
         .flatten(data) // flattening groups by graph as a side-effect
-        // TODO deleteme
-        //.then(r => {console.log('flattening success for ', r, data); return r})
-        //.catch(e => {console.error('flattening failed for ', e, data); throw e}); 
         .then(flattenedData => {
-            window.flattenedData4dbg = flattenedData; //TODO deleteme
             return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
         })
         /*
@@ -1104,10 +1093,6 @@ import won from './won.js';
                     resultGraph.addAll(subResult);
                 }
                 if(!resultGraph) {
-                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
-                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
-                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
-                    console.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"); // TODO deleteme
                     throw new Error(
                         "Failed to construct valid graph:" + resultGraph + 
                         ". For start Uri " + startUri + 
@@ -1888,17 +1873,7 @@ import won from './won.js';
 export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
     return new Promise((resolve, reject) => {
         const callback = (success, results) => {
-            /*
-            if(graphUri) {
-                console.log('load with graphUri finished ', success, mediaType, graphUri, jsonldData); //TODO deleteme
-                console.log('');
-                console.log('');
-                console.log('');
-                console.log('');
-            }
-            */
             if (success) {
-                //console.log('linkeddata-serice-won.js: finished storing triples ', data);
                 resolve();
             } else {
                 console.error('Failed to store json-ld data for ' + uri + '\n' + results);
