@@ -1511,6 +1511,8 @@ import won from './won.js';
     //aliases (formerly functions that were just pass-throughs)
     won.getEvent = async (eventUri, fetchParams) => {
         const event = await won.getNode(eventUri, fetchParams);
+        const contentGraph = await won.getGraph(eventUri + "#content", eventUri, fetchParams); 
+        console.log("getEvent - contentGraph: ", eventUri, contentGraph);
 
         // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
         if(is('Array', event.hasReceivedTimestamp)) {
@@ -1659,6 +1661,29 @@ import won from './won.js';
             });
         });
     };
+
+    /**
+     * @param {*} graphUri the uri of the graph to be retrieved
+     * @param {*} documentUri the uri to the document that contains the graph (to make sure it's already cached)
+     * @param {*} fetchParams params necessary for fetching that document
+     */
+    won.getGraph = async function(graphUri, documentUri, fetchParams) {
+        return won
+        .ensureLoaded(documentUri, fetchParams)
+        .then(() => 
+            new Promise((resolve, reject) => {
+                privateData.store.graph(graphUri, (success, graph) => {
+                    if(success) {
+                        resolve(graph)
+                    } else {
+                        const msg = "Failed to retrieve graph with uri " + graphUri + ". Got: " + JSON.stringify(graph);
+                        console.error(msg);
+                        reject(msg);
+                    }
+                })
+            })
+        )
+    }
 
     won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
         return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
