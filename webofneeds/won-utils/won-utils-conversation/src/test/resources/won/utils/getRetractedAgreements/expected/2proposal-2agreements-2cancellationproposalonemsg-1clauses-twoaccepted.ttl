@@ -18,5 +18,5 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix agr: <http://purl.org/webofneeds/agreement#> .
 
-event:152dum7y56zn95qyernf agr:accepts  event:1107469913331435500 .
-event:4846251213444807000  agr:accepts  event:cbcccoqqqbec6bxkl3y3 .
+event:1107469913331435500 agr:proposes  event:6149800720990867000 .
+event:cbcccoqqqbec6bxkl3y3 agr:proposes event:gv6zk2yqk6o8bl574n36 . 
