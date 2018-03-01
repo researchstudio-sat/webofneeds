@@ -132,8 +132,7 @@ function genComponentConf() {
             
             const self = this;
 
-            const proposals = undefined;
-            const agreements = undefined;
+            this.proposalAgreements = {proposals: undefined, agreements: undefined};
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
@@ -164,7 +163,6 @@ function genComponentConf() {
                     chatMessages: sortedMessages,
                     debugmode: won.debugmode,
                     shouldShowRdf: state.get('showRdf'),
-
                     // if the connect-message is here, everything else should be as well
                     allLoaded,
                 }
@@ -257,24 +255,16 @@ function genComponentConf() {
         getAgreements() {
         	console.log("Load Agreements");
         	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
-        	const tmpAgreements = this.callFetch(url);
-        	if(!!tmpAgreements){
-        		this.agreements = tmpAgreements;
-        	}
+        	this.callFetch(url, 'agreements');
         }
         
         getProposals() {
         	console.log("Load Proposals");
         	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
-        	/*const tmpProposals = this.callFetch(url);
-        	if(!!tmpProposals){
-        		this.proposals = tmpProposals;
-        	}*/
-        	//this.proposals = Promise.resolve(this.callFetch(url));
-        	this.proposals = this.callFetch(url);
+        	this.callFetch(url, 'proposals');
         }
 
-        callFetch(url) {
+        callFetch(url, value) {
     		fetch(url, {
         		method: 'get',
         		credentials: 'same-origin',
@@ -286,16 +276,17 @@ function genComponentConf() {
             .then(response =>
             	response.json()
             )
-            .then(resp => {
-            	console.log(Array.from(resp['@graph']));
-            	return Array.from(resp['@graph']);
-            	//return Array.from(resp['@graph']);
-            }).then(res =>
-            	console.log(res)
-            	//Object.assign(this.proposals, res)
-            )
-	        
-        }
+            .catch(error => console.error('Error:', error))
+            .then(response => 
+            	Array.from(response['@graph'])
+            ).catch(error => console.error('Error:', error))
+            .then(response => 
+            	this.proposalAgreements[value] = response
+            ).catch(error => console.error('Error:', error))
+            .then(response =>
+            	console.log(response)
+            )  
+	     }
 
         sendRdfTmpDeletme() { //TODO move to own component
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
