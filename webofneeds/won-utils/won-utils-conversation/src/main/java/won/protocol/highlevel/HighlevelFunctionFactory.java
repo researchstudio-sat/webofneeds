@@ -29,6 +29,7 @@ public class HighlevelFunctionFactory {
 	private static DatasetToModelBySparqlFunction allAcceptsFunction;
 	//// get a dynamic dataset
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutOffFunction;
+	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction singleAgreementFunction;
 	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
@@ -145,11 +146,19 @@ public class HighlevelFunctionFactory {
 		return agreementFunction;
 	}
 	
+	
 	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap initialBinding) {
 		if (cutOffFunction == null) {
 			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutoffaftermessage/query.rq",initialBinding);
 		}
 		return cutOffFunction;
+	}
+	
+	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getSingleAgreementFunction(QuerySolutionMap initialBinding) {
+		if (singleAgreementFunction == null) {
+			singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreementfunction/query.rq",initialBinding);
+		}
+		return singleAgreementFunction;
 	}
 }
 

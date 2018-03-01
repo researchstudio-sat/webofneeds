@@ -52,13 +52,13 @@ public class HighlevelProtocols {
 			cutOff = cutOffAfterMessage(cutOff, acceptsMessageURI);
 			Dataset modifiedCutOff = HighlevelFunctionFactory.getModifiedSelection().apply(cutOff);
 			
-			// Add agreements, regardless of whether they are cancelled later...
+			// Add agreements, regardless of whether they are cancelled later... (comment added by Brent)
 			Model agreement = getAgreement(modifiedCutOff, acceptsMessageURI);
 			if (agreement != null && agreement.size() > 0) {
 				result.addNamedModel(acceptsMessageURI.toString(), agreement);
 			}
 			
-			// Remove agreements that are cancelled...
+			// Remove agreements that are cancelled... (comment added by Brent)
 			List<URI> retractedAgreementUris = getRetractedAgreements(modifiedCutOff, acceptsMessageURI);
 			for (URI retractedAgreement: retractedAgreementUris) {
 				result.removeNamedModel(retractedAgreement.toString());
@@ -75,9 +75,28 @@ public class HighlevelProtocols {
 	 */			
 	}
 	
-	private static List<URI> getRetractedAgreements(Dataset conversationDataset, URI acceptsMessageURI) {
+	public static List<URI> getRetractedAgreements(Dataset conversationDataset, URI acceptsMessageURI) {
 		// TODO Auto-generated method stub
-		return null;
+		Model  acceptscancelledagreement = HighlevelFunctionFactory.getAcceptsInCancelledAgreementFunction().apply(conversationDataset);
+		RDFList list = acceptscancelledagreement.createList(acceptscancelledagreement.listSubjects());
+		ExtendedIterator<RDFNode> listiterator = list.iterator();
+		List<URI> urilist = new ArrayList<URI>();
+		
+		while(listiterator.hasNext()) {
+		    Object object = listiterator.next();
+		    try {
+				URI newuri = new URI(object.toString());
+				   urilist.add(newuri);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				// should I catch the error here... or throw it for a higher level function to catch??
+				e.printStackTrace();
+			}
+		  //   System.out.println(object.toString());
+	  }
+
+		  List<URI> urilistnoduplicates = removeTheDuplicates(urilist);
+		  return urilistnoduplicates;
 	}
 
 	private static Model getAgreement(Dataset conversationDataset, URI acceptsMessageURI) {
@@ -85,8 +104,12 @@ public class HighlevelProtocols {
 		// If A is accepting proposals, add a new agreement A to the result
 		// getAgreementFunction
 		// This gets all agreements, but we want to cherry pick for a particular accepts message... (hence .... conversationDataset and acceptsMessageURI)
-		Dataset agreed = HighlevelFunctionFactory.getAgreementFunction().apply(conversationDataset);
-		return agreed;
+		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
+		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
+		initialBinding.add("targetedacceptsmessage", name);
+		Dataset agreement = HighlevelFunctionFactory.getSingleAgreementFunction(initialBinding).apply(conversationDataset);
+		// insert code here to grab model from Dataset agreed
+		return agreement.getNamedModel(acceptsMessageURI.toString());
 	}
 
    public static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {

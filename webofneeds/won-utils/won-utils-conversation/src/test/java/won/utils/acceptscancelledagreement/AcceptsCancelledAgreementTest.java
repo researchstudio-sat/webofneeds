@@ -41,6 +41,13 @@ public class AcceptsCancelledAgreementTest {
         test(input,expected);		
 	}
 	
+	@Test
+	public void toAcceptedCancellationProposals() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-twoaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-twoaccepted.ttl");
+        test(input,expected);		
+	}
+	
 	public void test(Dataset input, Model expectedOutput) {
 
 		  // perform a sparql query to convert input into actual...
