@@ -77,7 +77,10 @@ public class HighlevelProtocols {
 	
 	public static List<URI> getRetractedAgreements(Dataset conversationDataset, URI acceptsMessageURI) {
 		// TODO Auto-generated method stub
-		Model  acceptscancelledagreement = HighlevelFunctionFactory.getAcceptsInCancelledAgreementFunction().apply(conversationDataset);
+		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
+		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
+		initialBinding.add("acceptsMessageURIforProposesToCancel", name);
+		Model acceptscancelledagreement = HighlevelFunctionFactory.getRetractedAgreementsFunction(initialBinding).apply(conversationDataset);
 		RDFList list = acceptscancelledagreement.createList(acceptscancelledagreement.listSubjects());
 		ExtendedIterator<RDFNode> listiterator = list.iterator();
 		List<URI> urilist = new ArrayList<URI>();

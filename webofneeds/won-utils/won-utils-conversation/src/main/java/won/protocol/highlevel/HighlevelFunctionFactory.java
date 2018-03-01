@@ -8,6 +8,7 @@ import won.protocol.util.DatasetSelectionBySparqlFunction;
 import won.protocol.util.DatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.DatasetToModelBySparqlFunction;
 import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
+import won.protocol.util.DynamicDatasetToModelBySparqlFunction;
 
 public class HighlevelFunctionFactory {
 	
@@ -30,6 +31,7 @@ public class HighlevelFunctionFactory {
 	//// get a dynamic dataset
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutOffFunction;
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction singleAgreementFunction;
+	private static DynamicDatasetToModelBySparqlFunction retractedAgreementsFunction;
 	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
@@ -159,6 +161,13 @@ public class HighlevelFunctionFactory {
 			singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreementfunction/query.rq",initialBinding);
 		}
 		return singleAgreementFunction;
+	}
+	
+	public static DynamicDatasetToModelBySparqlFunction getRetractedAgreementsFunction(QuerySolutionMap initialBinding) {
+		if (retractedAgreementsFunction == null) {
+			retractedAgreementsFunction = new DynamicDatasetToModelBySparqlFunction("/getRetractedAgreements/query.rq",initialBinding);
+		}
+		return retractedAgreementsFunction;
 	}
 }
 
