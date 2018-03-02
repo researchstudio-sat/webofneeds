@@ -50,6 +50,12 @@ function genComponentConf() {
                 class="won-cm__content__text" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
                     {{ self.message.get('text') }}
+
+                    <br ng-show="self.shouldShowRdf && self.contentGraphs.size > 0"/>
+                    <hr ng-show="self.shouldShowRdf && self.contentGraphs.size > 0"/>
+                    <code ng-show="self.shouldShowRdf && self.contentGraphs.size > 0">
+                        {{ self.contentGraphs.toJS() }}
+                    </code>
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
@@ -61,21 +67,19 @@ function genComponentConf() {
                 class="won-cm__content__time">
                     {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
             </div>
-            <a
-                ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
+            <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
                 target="_blank"
                 href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
-                <svg class="rdflink__small clickable">
-                        <use href="#rdf_logo_2"></use>
-                </svg>
+                    <svg class="rdflink__small clickable">
+                            <use href="#rdf_logo_2"></use>
+                    </svg>
             </a>
-                <a
-                ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
+            <a ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
                 target="_blank"
                 href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
-                <svg class="rdflink__small clickable">
-                    <use href="#rdf_logo_2"></use>
-                </svg>
+                    <svg class="rdflink__small clickable">
+                        <use href="#rdf_logo_2"></use>
+                    </svg>
             </a>
         </div>
     `;
@@ -107,6 +111,7 @@ function genComponentConf() {
                     theirNeed,
                     connection,
                     message,
+                    contentGraphs: getIn(message, ['contentGraphs', 0, '@graph']) || Immutable.List(),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }
