@@ -1430,7 +1430,7 @@ import jsonld from 'jsonld';
                 .map(resource => resource["http://purl.org/webofneeds/message#hasContent"])
                 .filter(x => x);
             if (contentUrisArray.length > 0){
-                return contentUrisArray[0].map(x => x["@id"])
+                return contentUrisArray[0].map(x => x["@id"] || x["@value"])
             } else {
                 return [];
             }
