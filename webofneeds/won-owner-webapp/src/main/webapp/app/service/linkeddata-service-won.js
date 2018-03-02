@@ -724,52 +724,20 @@ import won from './won.js';
      * Adds the specified JSON-LD dataset to the store, once to the default graph and once to 
      * the individual graphs contained in the data set.
      */
-    won.addJsonLdData = function(data) {
-        const context = data['@context'];
-
-        const prepAndAddGraph = graph => {
-            const graphUri = graph['@id'];
-            const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
-
-            if(!graph['@graph'] || !graphUri || !context) {
-                const msg = 'Couldn\'t add the graph ' + graphUri + 
-                    ' with jsonld of ' + graphWithContext + 
-                    ' to the rdf-store.';
-                console.error(msg);
-                return Promise.reject(msg);
-            } else {
-                /*
-                * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into 
-                * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
-                * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
-                * these from occuring.
-                */
-                return jsonld.promises
-                .compact(graphWithContext, graphWithContext['@context']) 
-                .then(compactedGraph => {
-
-                    compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
-
-                    return rdfStoreLoadPromise(privateData.store, 'application/ld+json', compactedGraph, compactedGraph['@id']);
-                })
+    won.addJsonLdData = async function(data) {
+        return new Promise((resolve, reject) => {
+            const callback = (success, results) => {
+                if (success) {
+                    resolve();
+                } else {
+                    console.error('Failed to store json-ld data for ' + uri + '\n' + results);
+                    reject('Failed to store json-ld data for ' + uri + '\n' + results);
+                }
             }
-        }
 
-        /*
-        const graphsAddedSeperatelyP = jld.promises
-        .flatten(data) // flattening groups by graph as a side-effect
-        .then(flattenedData => {
-            return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
-        })
-        */
-        const graphsAddedSeperatelyP = Promise.resolve();
-
-        const triplesAddedToDefaultGraphP = rdfStoreLoadPromise(privateData.store, 'application/ld+json', data);
-
-        return Promise
-            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP])
-            .then(() => undefined); // no return value beyond success
-    };
+            privateData.store.load("application/ld+json", data, callback); // add to default graph
+        });
+    }
 
     /**
      * Loads the need-data without following up
@@ -1888,30 +1856,3 @@ import won from './won.js';
         },
     }
 })();
-
-/**
- * Thin wrapper around `rdfstore.load(...)` that returns 
- * a promise instead of requiring a callback.
- * @param {RdfStore} store 
- * @param {String} mediaType 
- * @param {Jsonld} jsonldData 
- * @param {String} graphUri 
- */
-export function rdfStoreLoadPromise(store, mediaType, jsonldData, graphUri) {
-    return new Promise((resolve, reject) => {
-        const callback = (success, results) => {
-            if (success) {
-                resolve();
-            } else {
-                console.error('Failed to store json-ld data for ' + uri + '\n' + results);
-                reject('Failed to store json-ld data for ' + uri + '\n' + results);
-            }
-        }
-
-        if(graphUri) {
-            store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
-        } else {
-            store.load("application/ld+json", jsonldData, callback); // add to default graph
-        }
-    });
-}
