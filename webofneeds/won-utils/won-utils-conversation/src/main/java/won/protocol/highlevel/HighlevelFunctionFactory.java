@@ -158,7 +158,7 @@ public class HighlevelFunctionFactory {
 	
 	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getSingleAgreementFunction(QuerySolutionMap initialBinding) {
 		if (singleAgreementFunction == null) {
-			singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreementfunction/query.rq",initialBinding);
+			singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreement/query.rq",initialBinding);
 		}
 		return singleAgreementFunction;
 	}
