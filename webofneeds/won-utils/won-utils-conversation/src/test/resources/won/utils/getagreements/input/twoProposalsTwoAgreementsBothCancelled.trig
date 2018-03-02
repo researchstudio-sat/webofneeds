@@ -9994,7 +9994,8 @@
 
 <https://localhost:8443/won/resource/event/8863100035920837000#content> {
     event:8863100035920837000
-            won:hasTextMessage  "validate" .
+            won:hasTextMessage  "validate" ;
+            agr:accepts event:eczqg8lp7xbukpzikd41 .
 }
 
 <https://localhost:8443/won/resource/event/xkeovy4cf48spd5euwj1#envelope-0x2u-sig> {
@@ -10180,7 +10181,8 @@
 
 <https://localhost:8443/won/resource/event/eczqg8lp7xbukpzikd41#content-xg7t> {
     event:eczqg8lp7xbukpzikd41
-            won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" .
+            won:hasTextMessage  "    'deactivate':  deactivate remote need of the current connection" ;
+            agr:proposesToCancel event:4846251213444807000 .
 }
 
 <https://localhost:8443/won/resource/event/2uf9sj4itmz9fpas7suo#envelope-sc0y> {
