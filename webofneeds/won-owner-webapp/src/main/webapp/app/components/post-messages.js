@@ -75,15 +75,10 @@ function genComponentConf() {
         <div  ng-show="self.shouldShowRdf">
         	<button 
                 class="rdfMsgBtnTmpDeletme" 
-                ng-click="self.getProposals()">
-                    Load P.
+                ng-click="self.getAgreementsData()">
+                    Load Agreements Data
             </button>
-            <button 
-                class="rdfMsgBtnTmpDeletme" 
-                ng-click="self.getAgreements()">
-                    Load A.
-            </button>
-        </div>
+         </div>
         <!--
         <chat-textfield-simple
             class="pm__footer"
@@ -135,7 +130,12 @@ function genComponentConf() {
             
             const self = this;
 
-            this.proposalAgreements = {proposals: undefined, agreements: undefined};
+            this.proposalAgreements = {
+            		proposals: undefined, 
+            		agreements: undefined, 
+            		proposeToCancel: undefined,
+            		acceptedProposalsToCancel: undefined,
+            };
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
@@ -255,6 +255,13 @@ function genComponentConf() {
             }
         }
         
+        getAgreementsData() {
+        	this.getAgreements();
+        	this.getProposals();
+        	this.getAgreementsProposedToBeCancelled();
+        	this.getAcceptedPropsalsToCancel();
+        }
+        
         getAgreements() {
         	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
@@ -270,7 +277,23 @@ function genComponentConf() {
     			if(response["@graph"]) {this.proposalAgreements.proposals = Array.from(response['@graph']);}
     		}).catch(error => console.error('Error:', error))
         }
-
+        
+        getAgreementsProposedToBeCancelled() {
+        	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled/?connectionUri='+this.connection.get('uri');
+        	callAgreementsFetch(url)
+    		.then(response => {
+    			if(response["@graph"]) {this.proposalAgreements.proposeToCancel = Array.from(response['@graph']);}
+    		}).catch(error => console.error('Error:', error))
+        }
+        
+        getAcceptedPropsalsToCancel() {
+        	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel/?connectionUri='+this.connection.get('uri');
+        	callAgreementsFetch(url)
+    		.then(response => {
+    			if(response["@graph"]) {this.proposalAgreements.acceptedProposalsToCancel = Array.from(response['@graph']);}
+    		}).catch(error => console.error('Error:', error))
+        }
+        
         sendRdfTmpDeletme() { //TODO move to own component
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
             if(rdftxtEl) {
