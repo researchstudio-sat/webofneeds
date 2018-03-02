@@ -9,10 +9,14 @@ import {
     checkHttpStatus,
     generateIdString,
     getIn,
+    is,
 } from './utils.js';
 
 import N3 from '../scripts/N3/n3-browserify.js';
+window.N34dbg = N3;
+
 import jsonld from 'jsonld';
+window.jsonld4dbg = jsonld;
 
 export function initLeaflet(mapMount) {
     if(!L) {
@@ -242,9 +246,55 @@ export function parseCredentials(credentials) {
         credentials;
 }
 
+export async function jsonLdToTrig(jsonldData) {
+    if(
+        !jsonldData || !(
+            (is('Array', jsonldData) && jsonldData.length > 0) ||
+            (is('Object', jsonldData) && jsonldData['@graph'])
+        )
+    ) {
+        const msg = "Couldn't parse the following json-ld to trig: " + JSON.stringify(jsonldData);
+        console.error(msg);
+        return Promise.reject(msg);
+    }
+    const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
+    const quads = await n3Parse(quadString, {format: 'application/n-quads'});
+    const trig = await n3Write(quads, { format: 'application/trig' });
+    return trig;
+}
+window.jsonLdToTrig4dbg = jsonLdToTrig;
 
-export async function n3Parse(rdf) {
-    const parser = N3.Parser();
+/**
+ * An wrapper for N3's writer that returns a promise
+ * @param {*} triples list of triples, each with "subject", "predicate", 
+ *   "object" and optionally "graph"
+ * @param {*} writerArgs the arguments for intializing the writer. 
+ *   e.g. `{format: 'application/trig'}`. See the writer-documentation 
+ *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
+ */
+export async function n3Write(triples, writerArgs) {
+    const writer = N3.Writer(writerArgs);
+    return new Promise((resolve, reject) => {
+        triples.forEach(t => writer.addTriple(t))
+        writer.end((error, result) => {
+            if(error) reject(error);
+            else resolve(result)
+        })
+    });
+}
+
+/**
+ * A wrapper for N3's parse that returns a promise
+ * @param {*} rdf a rdf-string to be parsed
+ * @param {*} parserArgs arguments for initializing the parser, 
+ *   e.g. `{format: 'application/n-quads'}` if you want to make
+ *   parser stricter about what it accepts. See the parser-documentation
+ *   (https://github.com/RubenVerborgh/N3.js#parsing) for more details.
+ */
+export async function n3Parse(rdf, parserArgs) {
+    const parser = parserArgs? 
+        N3.Parser(parserArgs) : 
+        N3.Parser();
     return new Promise((resolve, reject) => {
         let triples = [];
         parser.parse( rdf, (error, triple, prefixes) => {
