@@ -18,6 +18,9 @@ import {
     checkHttpStatus,
 } from '../utils.js'
 import {
+	callAgreementsFetch,
+} from '../won-message-utils.js';
+import {
     actionCreators
 }  from '../actions/actions.js';
 import {
@@ -253,40 +256,20 @@ function genComponentConf() {
         }
         
         getAgreements() {
-        	console.log("Load Agreements");
         	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
-        	this.callFetch(url, 'agreements');
+        	callAgreementsFetch(url)
+        		.then(response => {
+                	if(response["@graph"]) {this.proposalAgreements.agreements = Array.from(response['@graph']);}
+                }).catch(error => console.error('Error:', error))
         }
         
         getProposals() {
-        	console.log("Load Proposals");
         	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
-        	this.callFetch(url, 'proposals');
+        	callAgreementsFetch(url)
+    		.then(response => {
+    			if(response["@graph"]) {this.proposalAgreements.proposals = Array.from(response['@graph']);}
+    		}).catch(error => console.error('Error:', error))
         }
-
-        callFetch(url, value) {
-    		fetch(url, {
-        		method: 'get',
-        		credentials: 'same-origin',
-        		headers : { 
-        	        'Accept': 'application/ld+json'
-        	       },
-           	})         
-            .then(checkHttpStatus)
-            .then(response =>
-            	response.json()
-            )
-            .catch(error => console.error('Error:', error))
-            .then(response => 
-            	Array.from(response['@graph'])
-            ).catch(error => console.error('Error:', error))
-            .then(response => 
-            	this.proposalAgreements[value] = response
-            ).catch(error => console.error('Error:', error))
-            .then(response =>
-            	console.log(response)
-            )  
-	     }
 
         sendRdfTmpDeletme() { //TODO move to own component
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');

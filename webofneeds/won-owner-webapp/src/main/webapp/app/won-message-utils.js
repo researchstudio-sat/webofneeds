@@ -352,6 +352,21 @@ function fetchOwnedNeedUris() {
         )
 }
 
+// API call to get agreements data for a connection
+export function callAgreementsFetch(url) {
+    return fetch(url, {
+            method: 'get',
+            headers : { 
+                'Accept': 'application/ld+json'
+               },
+            credentials: 'same-origin'
+        })         
+        .then(checkHttpStatus)
+        .then(response =>
+            response.json()
+        )
+}
+
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => undefined) {
