@@ -755,14 +755,14 @@ import won from './won.js';
             }
         }
 
+        /*
         const graphsAddedSeperatelyP = jld.promises
         .flatten(data) // flattening groups by graph as a side-effect
         .then(flattenedData => {
             return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
         })
-        /*
-       const graphsAddedSeperatelyP = Promise.resolve();
         */
+        const graphsAddedSeperatelyP = Promise.resolve();
 
         const triplesAddedToDefaultGraphP = rdfStoreLoadPromise(privateData.store, 'application/ld+json', data);
 
@@ -1511,8 +1511,12 @@ import won from './won.js';
     //aliases (formerly functions that were just pass-throughs)
     won.getEvent = async (eventUri, fetchParams) => {
         const event = await won.getNode(eventUri, fetchParams);
+
+        /*
         const contentGraph = await won.getGraph(eventUri + "#content", eventUri, fetchParams); 
+        event.contentGraphNT = contentGraph? contentGraph.toNT() : "";
         console.log("getEvent - contentGraph: ", eventUri, contentGraph);
+        */
 
         // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
         if(is('Array', event.hasReceivedTimestamp)) {
