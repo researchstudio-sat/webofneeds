@@ -10,6 +10,7 @@ import {
     generateIdString,
     getIn,
     is,
+    clone,
 } from './utils.js';
 
 import N3 from '../scripts/N3/n3-browserify.js';
@@ -310,42 +311,25 @@ export async function n3Parse(rdf, parserArgs) {
 }
 
 export async function ttlToJsonLd(ttl) {
-    return n3Parse(ttl)
-    .then((triples, prefixes) => {
+    const tryConversion = async () => {
+
+        const triples = await n3Parse(ttl);
         const graphUri = 'ignoredgraphuri:placeholder';
 
-        /* 
-         * the parsing doesn't give us information if a
-         * thing was an uri, a blind-node-id or a literal
-         * so we need to find that by ourselves before 
-         * generating the quads.
-         */
-        const wrap = frag => {
-            if( frag.startsWith("_:") || // id of blind node 
-                frag.match(/^".*"$/)  // string-literal
-            ) {
-                return frag; 
-            } else { // uri
-                return `<${frag}>`;
-            }
-        }
-        const nquads = triples.map(t => 
-            wrap(t.subject) + " " +
-            wrap(t.predicate) + " " +
-            wrap(t.object) + " " +
-            wrap(graphUri) + "." // even if it's ignored it's necessary as jsonld can only parse quads, not tripples
-        ).join('\n');
+        const quadObjs = clone(triples); 
+        quadObjs.forEach(t => { t.graph = graphUri }); // add graph-uri to make the triples into quads
 
-        return jsonld.promises.fromRDF(nquads, {format: 'application/nquads'});
-    })
-    .then(jsonld => {
-        console.log('jsonld parsed from input turtle: ', jsonld);
-        return jsonld;
-    })
-    .catch(e => {
-        e.message = "error while parsing the following turtle:\n\n" + ttl + "\n\n----\n\n" + e.message;
-        throw e;
-    })
+        const quadString = await n3Write(quadObjs, { format: 'application/n-quads' });
+
+        const parsedJsonld = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'});
+
+        return parsedJsonld;
+    }
+    return tryConversion()
+        .catch(e => {
+            e.message = "error while parsing the following turtle:\n\n" + ttl + "\n\n----\n\n" + e.message;
+            throw e;
+        })
 }
 
 window.ttlToJsonLd4dbg = ttlToJsonLd;
