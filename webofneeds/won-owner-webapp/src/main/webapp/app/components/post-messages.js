@@ -7,6 +7,7 @@ import Immutable from 'immutable';
 import chatTextFieldModule from './chat-textfield.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
+import connectionAgreementModule from './connection-agreement.js';
 import {
 } from '../won-label-utils.js'
 import {
@@ -61,6 +62,10 @@ function genComponentConf() {
                 message-uri="msg.get('uri')"
                 message="msg">
             </won-connection-message>
+            <won-connection-agreement
+            	ng-repeat="prop in self.proposalList"
+                agreement-object="prop">
+            </won-connection-agreement>
         </div>
         <chat-textfield
             class="pm__footer"
@@ -73,12 +78,13 @@ function genComponentConf() {
         </chat-textfield>
         <!-- quick and dirty button to get agreements -->
         <div  ng-show="self.shouldShowRdf">
-        	<button 
-                class="rdfMsgBtnTmpDeletme" 
-                ng-click="self.getAgreementsData()">
-                    Load Agreements Data
-            </button>
+	        	<button 
+	                class="rdfMsgBtnTmpDeletme" 
+	                ng-click="self.getAgreementsData()">
+	                    Load Agreements Data
+	            </button>
          </div>
+         <br>
         <!--
         <chat-textfield-simple
             class="pm__footer"
@@ -129,12 +135,14 @@ function genComponentConf() {
             window.pm4dbg = this;
             
             const self = this;
-
-            this.proposalAgreements = {
-            		proposals: undefined, 
-            		agreements: undefined, 
-            		proposeToCancel: undefined,
-            		acceptedProposalsToCancel: undefined,
+            
+            this.proposalList = [];
+            
+            this.agreementData = {
+            		proposals: [], 
+            		agreements: [], 
+            		proposeToCancel: [],
+            		acceptedProposalsToCancel: [],
             };
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
@@ -181,7 +189,7 @@ function genComponentConf() {
             );
 
             this.$scope.$watch(
-                () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
+                () => this.chatMessages && this.chatMessages.length && this.proposalList, // trigger if there's messages added (or removed)
                 () => delay(0).then(() =>
                     // scroll to bottom directly after rendering, if snapped
                     this.updateScrollposition()
@@ -256,17 +264,19 @@ function genComponentConf() {
         }
         
         getAgreementsData() {
-        	this.getAgreements();
+        	//this.getAgreements();
         	this.getProposals();
-        	this.getAgreementsProposedToBeCancelled();
-        	this.getAcceptedPropsalsToCancel();
+        	//this.getAgreementsProposedToBeCancelled();
+        	//this.getAcceptedPropsalsToCancel();
+        	
+        	//this.sendAgreementsOverviewMsg();
         }
         
         getAgreements() {
         	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
         		.then(response => {
-                	if(response["@graph"]) {this.proposalAgreements.agreements = Array.from(response['@graph']);}
+                	if(response["@graph"]) {this.agreementData.agreements = parseAgreementsData(Array.from(response['@graph']));}
                 }).catch(error => console.error('Error:', error))
         }
         
@@ -274,7 +284,8 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.proposalAgreements.proposals = Array.from(response['@graph']);}
+    			//if(response["@graph"]) {this.agreementData.proposals = this.parseAgreementsData(Array.from(response['@graph']));}
+    			if(response["@graph"]) {this.proposalList = this.parseAgreementsData(Array.from(response['@graph']));}
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -282,7 +293,7 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.proposalAgreements.proposeToCancel = Array.from(response['@graph']);}
+    			if(response["@graph"]) {this.agreementData.proposeToCancel = Array.from(response['@graph']);}
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -290,8 +301,45 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.proposalAgreements.acceptedProposalsToCancel = Array.from(response['@graph']);}
+    			if(response["@graph"]) {this.agreementData.acceptedProposalsToCancel = Array.from(response['@graph']);}
     		}).catch(error => console.error('Error:', error))
+        }
+        
+        parseAgreementsData(obj) {
+        	var list = [];
+        	const getText = "http://purl.org/webofneeds/model#hasTextMessage";
+        	
+        	if(obj.length < 2) {
+        		list.push({id: obj[0]["@id"], text: obj[0][getText]});
+        	}else {
+	        	for(i = 0; i < obj.length; i++){
+		        	list.push({id: obj[i]["@graph"][0]["@id"], text: obj[i]["@graph"][0][getText]});
+		        }
+        	}
+        	return list;
+        }
+        
+        sendAgreementsOverviewMsg(){
+        	const obj = this.agreementData;
+        	const getText = "http://purl.org/webofneeds/model#hasTextMessage";
+        	
+        	var msg = "Agreements: '";
+        	if(obj.agreements){
+	        	for(i = 0; i < obj.agreements.length; i++){
+	        		msg += (i+1) + ": " + obj.agreements[i]["@graph"][0][getText] + " - ";
+	        	}
+        	}
+        	msg += "  |  "
+        	msg += "Proposals: ";
+        	if(obj.proposals){
+	        	for(i = 0; i < obj.proposals.length; i++){
+	        		msg += (i+1) + ": " + obj.proposals[i]["@graph"][0][getText] + " - ";
+	        	}
+        	}
+        	
+        	//const message = {text: msg, outgoingMessage: false};
+        	//this.chatMessages.push(message);
+        	this.connections__sendChatMessage(msg, this.connection.get('uri'));
         }
         
         sendRdfTmpDeletme() { //TODO move to own component
@@ -323,6 +371,7 @@ export default angular.module('won.owner.components.postMessages', [
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
     connectionMessageModule,
+    connectionAgreementModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
