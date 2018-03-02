@@ -53,11 +53,7 @@ function genComponentConf() {
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
                     {{ self.message.get('text') }}
 
-                    <br ng-show="self.shouldShowRdf && self.contentGraphs.size > 0"/>
-                    <hr ng-show="self.shouldShowRdf && self.contentGraphs.size > 0"/>
-                    <code ng-show="self.shouldShowRdf && self.contentGraphs.size > 0">
-                        {{ self.contentGraphs.toJS() }}
-                    </code>
+                    <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
                     <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
                         {{ self.contentGraphsTrig }}
