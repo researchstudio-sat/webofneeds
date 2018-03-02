@@ -455,15 +455,67 @@ public class WonRdfUtils
           return null;
       }
 
-      /**
-       * Returns true if the message is an accept message
-       *
-       * @param wonMessage
-       * @return true if the wonMessage is an accept message of an agreement, false if it is not
-       */
-      public static boolean isAccepts(final WonMessage wonMessage) {
-          return getAcceptedEvent(wonMessage) != null;
+      public static List<URI> getAcceptedEvents(final WonMessage wonMessage) {
+          return getAcceptedEvents(wonMessage.getCompleteDataset());
       }
+
+      public static List<URI> getAcceptedEvents(final Dataset messageDataset) {
+          List<URI> acceptedEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:accepts ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      acceptedEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return acceptedEvents;
+      }
+
+      public static List<URI> getProposeToCancelEvents(final WonMessage wonMessage) {
+          return getProposeToCancelEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getProposeToCancelEvents(final Dataset messageDataset) {
+          List<URI> proposeToCancelEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:proposeToCancel ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      proposeToCancelEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return proposeToCancelEvents;
+      }
+
       private static String rdfNodeToString(RDFNode node) {
           if (node.isLiteral()) {
               return node.asLiteral().getString();
