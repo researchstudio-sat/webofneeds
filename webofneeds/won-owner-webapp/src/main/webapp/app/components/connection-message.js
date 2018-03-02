@@ -12,10 +12,12 @@ import {
 } from '../won-label-utils.js'
 import {
     connect2Redux,
+    jsonLdToTrig,
 } from '../won-utils.js';
 import {
     attach,
     delay,
+    get,
     getIn,
     deepFreeze,
 } from '../utils.js'
@@ -55,6 +57,10 @@ function genComponentConf() {
                     <hr ng-show="self.shouldShowRdf && self.contentGraphs.size > 0"/>
                     <code ng-show="self.shouldShowRdf && self.contentGraphs.size > 0">
                         {{ self.contentGraphs.toJS() }}
+                    </code>
+                    <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
+                    <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
+                        {{ self.contentGraphsTrig }}
                     </code>
             </div>
             <div
@@ -111,7 +117,7 @@ function genComponentConf() {
                     theirNeed,
                     connection,
                     message,
-                    contentGraphs: getIn(message, ['contentGraphs', 0, '@graph']) || Immutable.List(),
+                    contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }
@@ -122,6 +128,21 @@ function genComponentConf() {
             this.$scope.$watch(
                 () => this.message.get('outgoingMessage'),
                 (newVal, oldVal) => this.updateAlignment(newVal)
+            )
+
+            // gotta do this via a $watch, as the whole message parsing before 
+            // this point happens synchronously but jsonLdToTrig needs to be async.
+            this.$scope.$watch(
+                () => this.contentGraphs,
+                (newVal, oldVal) => {
+                    jsonLdToTrig(newVal.toJS())
+                    .then(trig => {
+                        this.contentGraphsTrig = trig;
+                    })
+                    .catch(e => {
+                        this.contentGraphsTrig = JSON.stringify(e);
+                    })
+                }
             )
         }
 
