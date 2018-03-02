@@ -1426,7 +1426,7 @@ import jsonld from 'jsonld';
             let graphUri = graph["@id"];
             let graphData = graph["@graph"];
             const contentUrisArray = graphData
-                .filter(resource => resource["@id"] == messageUri)
+                .filter(resource => resource["@id"] === messageUri)
                 .map(resource => resource["http://purl.org/webofneeds/message#hasContent"])
                 .filter(x => x);
             if (contentUrisArray.length > 0){
