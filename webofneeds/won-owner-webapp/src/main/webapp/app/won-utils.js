@@ -254,7 +254,6 @@ export async function jsonLdToTrig(jsonldData) {
         )
     ) {
         const msg = "Couldn't parse the following json-ld to trig: " + JSON.stringify(jsonldData);
-        console.error(msg);
         return Promise.reject(msg);
     }
     const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
