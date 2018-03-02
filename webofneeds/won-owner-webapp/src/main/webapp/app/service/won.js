@@ -970,7 +970,7 @@ import jsonld from 'jsonld';
         let contentGraph = undefined;
         if (contentResource) {
             contentGraph = {
-                "@id": contentResource.uri + "@content",
+                "@id": contentResource.uri + "#content",
                 "@graph": [
                     {
                         "@id": contentResource.uri,
