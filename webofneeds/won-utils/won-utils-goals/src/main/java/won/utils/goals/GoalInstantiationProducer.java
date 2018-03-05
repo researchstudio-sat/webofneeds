@@ -184,6 +184,33 @@ public class GoalInstantiationProducer {
     }
 
     /**
+     * Create a goal instantiation result from the attempt to instantiate one goal with data given in the dataset
+     * The data is extracted and validated against the shacl shape of the goal.
+     *
+     * @param need Dataset of the need to retrieve the goalShapesModel from
+     * @param goal resource referencing goal from need1 or need2
+     * @param model Model that should be checked for goal validity
+     * @return a goal instantiation result whose input model can either conform to its shacl shapes or not
+     */
+    public static GoalInstantiationResult findInstantiationForGoalInDataset(Dataset need, Resource goal, Model model) {
+        NeedModelWrapper needWrapper = new NeedModelWrapper(need);
+        Model goalShapesModel;
+
+        if (needWrapper.getGoals().contains(goal)) {
+            goalShapesModel = needWrapper.getShapesGraph(goal);
+        } else {
+            throw new IllegalArgumentException("problem to identify goal resource in the need model");
+        }
+
+        if (goalShapesModel == null) {
+            throw new IllegalArgumentException("shapes model for goal not found");
+        }
+
+        Model extractedModel = GoalUtils.extractGoalData(model, goalShapesModel);
+        return new GoalInstantiationResult(extractedModel, goalShapesModel);
+    }
+
+    /**
      * create all possible goal instantiations between two needs.
      * That means trying to combine each two goals of the two needs.
      *
