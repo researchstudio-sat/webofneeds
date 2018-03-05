@@ -427,6 +427,95 @@ public class WonRdfUtils
           return null;
       }
 
+      public static URI getAcceptedEvent(final WonMessage wonMessage) {
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:accepts ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+                  if (rs.hasNext()) {
+                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
+                      throw new IllegalArgumentException("wonMessage has more than one accepts eventUri");
+                  }
+
+                  return eventUri != null? URI.create(eventUri) : null;
+              }
+          }
+          return null;
+      }
+
+      public static List<URI> getAcceptedEvents(final WonMessage wonMessage) {
+          return getAcceptedEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getAcceptedEvents(final Dataset messageDataset) {
+          List<URI> acceptedEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:accepts ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      acceptedEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return acceptedEvents;
+      }
+
+      public static List<URI> getProposeToCancelEvents(final WonMessage wonMessage) {
+          return getProposeToCancelEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getProposeToCancelEvents(final Dataset messageDataset) {
+          List<URI> proposeToCancelEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:proposeToCancel ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      proposeToCancelEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return proposeToCancelEvents;
+      }
+
       private static String rdfNodeToString(RDFNode node) {
           if (node.isLiteral()) {
               return node.asLiteral().getString();

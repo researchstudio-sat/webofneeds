@@ -533,12 +533,16 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         belongsToUri: undefined,
         data: {
             uri: wonMessage.getMessageUri(),
+            remoteUri: !outgoingMessage? wonMessage.getRemoteMessageUri() : undefined,
             text: wonMessage.getTextMessage(),
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: outgoingMessage,
             newMessage: !!newMessage,
             connectMessage: wonMessage.isConnectMessage(),
+            isProposeMessage: wonMessage.isProposeMessage(),
+            isAcceptMessage: wonMessage.isAcceptMessage(),
+            isAccepted: false,
         }
     };
 

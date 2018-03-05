@@ -4,7 +4,9 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
+import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandSuccessEvent;
@@ -34,7 +36,7 @@ public class ExecuteConnectionMessageCommandAction extends ExecuteSendMessageCom
 
     @Override
     protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(ConnectionMessageCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
-        return new ConnectionMessageCommandSuccessEvent(originalCommand);
+        return new ConnectionMessageCommandSuccessEvent(originalCommand, messageSent);
     }
 
     @Override
@@ -45,6 +47,11 @@ public class ExecuteConnectionMessageCommandAction extends ExecuteSendMessageCom
     @Override
     protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(ConnectionMessageCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return null;
+    }
+
+    @Override
+    protected MessageCommandNotSentEvent createMessageNotSentEvent(ConnectionMessageCommandEvent originalCommand, String message) {
+        return new MessageCommandNotSentEvent<ConnectionMessageCommandEvent>(message, originalCommand);
     }
 
     @Override

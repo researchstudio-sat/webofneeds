@@ -267,6 +267,20 @@
                             <arguments>run clean</arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <!-- 
+                          Configuration that starts the watch task. This causes a build when resources change.  
+                          Not run during any phase, must be started explicitly using 'mvn frontend:npm@watch' 
+                        -->
+                        <id>watch</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>none</phase>
+                        <configuration>
+                            <arguments>run watch</arguments>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

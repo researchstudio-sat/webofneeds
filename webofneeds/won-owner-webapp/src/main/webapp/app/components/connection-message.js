@@ -48,16 +48,33 @@ function genComponentConf() {
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__content">
-            <div 
-                class="won-cm__content__text" 
-                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
-                    {{ self.message.get('text') }}
+            <div class="won-cm__content__text"
+            	title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
+            	ng-class="{'propose' : self.message.get('isProposeMessage')}">
+                <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
+                <span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>	
+                {{ self.message.get('text') }}
 
-                    <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
+                <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
                     <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
                         {{ self.contentGraphsTrig }}
                     </code>
+
+                <div class="won-cm__content__button" 
+                	ng-if="self.message.get('isProposeMessage') 
+                		&& !self.message.get('outgoingMessage')
+                		&& !self.message.get('isAcceptMessage')
+                		&& !self.message.isAccepted
+    					&& !self.clicked">
+                	<button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
+                </div>
+                <div class="won-cm__content__button" 
+                	ng-if="self.message.get('outgoingMessage')
+                		&& !self.message.get('isProposeMessage') 
+                		&& !self.message.get('isAcceptMessage')">
+                	<button class="won-button--filled thin black" ng-click="self.sendProposal()">Propose</button>
+                </div>
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
@@ -92,6 +109,7 @@ function genComponentConf() {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
             this.relativeTime = relativeTime;
+            this.clicked = false;
             window.cmsg4dbg = this;
             
             const self = this;
@@ -140,6 +158,28 @@ function genComponentConf() {
                     })
                 }
             )
+        }
+        
+        sendProposal(){
+        	this.clicked = true;
+        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        }
+        
+        acceptProposal() {
+        	this.clicked = true;
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
+        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	//TODO: isAccepted = true;
+        }
+        
+        buildProposalMessage(uri, type, text) {
+        	const msgP = won.WONMSG.msguriPlaceholder;
+        	const sc = "http://purl.org/webofneeds/agreement#"+type;
+        	const whM = "\n won:hasTextMessage ";
+        	return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
         }
 
         updateAlignment(isOutgoingMessage) {

@@ -17,6 +17,8 @@
 package won.bot.framework.eventbot.action.impl.analyzation;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -24,19 +26,23 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCanceledEvent;
-import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementErrorEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.model.Connection;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Checks if the received hint is for a factoryURI
@@ -48,54 +54,73 @@ public class AnalyzeAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        //TODO: Implement the analyzation accordingly, currently we will push the events by sending the event givien as a textmessage (for debug purposes)
+        if(!(event instanceof WonMessageReceivedOnConnectionEvent)){
+            logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent, was an event of class: " + event.getClass());
+            return;
+        }
+
         EventListenerContext ctx = getEventListenerContext();
-        BotContextWrapper botContextWrapper = ctx.getBotContextWrapper();
         EventBus bus = ctx.getEventBus();
         LinkedDataSource linkedDataSource = ctx.getLinkedDataSource();
 
-        if(event instanceof WonMessageReceivedOnConnectionEvent){
-            WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
+        WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
+        Connection con = receivedOnConnectionEvent.getCon();
+
+        List<URI> acceptedEvents = WonRdfUtils.MessageUtils.getAcceptedEvents(receivedOnConnectionEvent.getWonMessage());
+
+        if(!acceptedEvents.isEmpty()) {
+            publishAnalyzingMessage(con);
+            //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
+            Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
+            URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI();
+            Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri.toString());
+
+            if(!agreementPayload.isEmpty()){
+                bus.publish(new AgreementAcceptedEvent(con, agreementUri, agreementPayload));
+            }else{
+                for (URI acceptedEvent : acceptedEvents) {
+                    Dataset acceptedEventData = linkedDataSource.getDataForResource(acceptedEvent);
+
+                    List<URI> proposeToCancelEvents = WonRdfUtils.MessageUtils.getProposeToCancelEvents(acceptedEventData);
+
+                    for(URI proposeToCancelEvent : proposeToCancelEvents) {
+                        Model agreementToCancel = HighlevelProtocols.getAgreement(fullConversationDataset, proposeToCancelEvent.toString());
+                        bus.publish(new AgreementCanceledEvent(con, proposeToCancelEvent, agreementToCancel));
+                    }
+                }
+            }
+        } else {
             Dataset needDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getNeedURI());
+            NeedModelWrapper needWrapper = new NeedModelWrapper(needDataset);
+
+            Collection<Resource> goalsInNeed = needWrapper.getGoals();
+
+            Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
+
+            if(goalsInNeed.isEmpty() || !HighlevelProtocols.getAgreements(fullConversationDataset).isEmpty() || !HighlevelProtocols.getProposals(fullConversationDataset).isEmpty()) { //TODO: do not do this like that but for every goal individually
+                return; //If there are no goals present we do not have to do anything (also we do not have to do anything if there are already proposals or agreements present
+            }
+            publishAnalyzingMessage(con);
+
             Dataset remoteNeedDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getRemoteNeedURI());
-            Dataset connectionDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getConnectionURI());
+            Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
 
-            GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, connectionDataset, "http://example.org/","http://example.org/blended/");
-            Collection<GoalInstantiationResult> results = goalInstantiationProducer.createGoalInstantiationResultsForNeed1();
-            Connection con = ((WonMessageReceivedOnConnectionEvent) event).getCon();
+            GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
 
-            for(GoalInstantiationResult result : results) {
-                if(result.getShaclReportWrapper().isConform()){
+            for(Resource goal : goalsInNeed){
+                GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
+
+                if (result.getShaclReportWrapper().isConform()) {
                     bus.publish(new PreconditionMetEvent(con, result));
-                }else{
+                } else {
                     bus.publish(new PreconditionUnmetEvent(con, result));
                 }
             }
-            //TODO: THIS IS SOLELY FOR DEBUG PURPOSES NOW
-            if(event instanceof MessageFromOtherNeedEvent) {
-                logger.info("Analyzing MessageFromOtherNeedEvent");
-                MessageFromOtherNeedEvent messageFromOtherNeedEvent = (MessageFromOtherNeedEvent) event;
-
-                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(messageFromOtherNeedEvent.getWonMessage());
-
-                if("PreconditionMetEvent".equals(textMessage)){
-                    bus.publish(new PreconditionMetEvent(con, null));
-                }else if("PrecondtionUnmetEvent".equals(textMessage)){
-                    bus.publish(new PreconditionUnmetEvent(con, null));
-                } else if("AgreementCanceledEvent".equals(textMessage)){
-                    bus.publish(new AgreementCanceledEvent(con, new Object()));
-                }else if("AgreementAcceptedEvent".equals(textMessage)){
-                    bus.publish(new AgreementAcceptedEvent(con, new Object()));
-                }else if("AgreementErrorEvent".equals(textMessage)){
-                    bus.publish(new AgreementErrorEvent(con, new Object()));
-                }
-            } else {
-                logger.error("AnalyzeAction can only handle MessageFromOtherNeedEvent and OpenFromOtherNeedEvent");
-                return;
-            }
-        } else {
-            logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent");
-            return;
         }
+    }
+
+    private void publishAnalyzingMessage(Connection connection) {
+        Model messageModel = WonRdfUtils.MessageUtils.textMessage("Checking Taxi availability...");
+        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel)); //TODO: REMOVE THIS OR CHANGE IT TO A SORT-OF PROCESSING MESSAGE TYPE
     }
 }

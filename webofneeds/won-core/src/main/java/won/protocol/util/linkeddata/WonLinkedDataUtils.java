@@ -20,15 +20,19 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utilitiy functions for common linked data lookups.
@@ -78,6 +82,62 @@ public class WonLinkedDataUtils
 	    Path propertyPath = PathParser.parse("<" + WON.HAS_EVENT_CONTAINER+ ">", PrefixMapping.Standard);
 	    return RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
 }
+
+  public static Dataset getConversationAndNeedsDataset(String connectionURI, LinkedDataSource linkedDataSource) {
+      return getConversationAndNeedsDataset(URI.create(connectionURI), linkedDataSource);
+  }
+
+  public static Dataset getConversationAndNeedsDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
+      assert linkedDataSource != null : "linkedDataSource must not be null";
+      int depth = 5; // depth 3 from connection gives us the messages in the conversation
+      int maxRequests = 1000;
+      List<Path> propertyPaths = new ArrayList<>();
+      PrefixMapping pmap = new PrefixMappingImpl();
+      pmap.withDefaultMappings(PrefixMapping.Standard);
+      pmap.setNsPrefix("won", WON.getURI());
+      pmap.setNsPrefix("msg", WONMSG.getURI());
+      propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:belongsToNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+      propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
+      URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
+
+      return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth, false);
+  }
+
+    public static Dataset getConversationDataset(String connectionURI, LinkedDataSource linkedDataSource) {
+        return getConversationDataset(URI.create(connectionURI), linkedDataSource);
+    }
+
+    public static Dataset getConversationDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
+        assert linkedDataSource != null : "linkedDataSource must not be null";
+        int depth = 5; // depth 3 from connection gives us the messages in the conversation
+        int maxRequests = 1000;
+        List<Path> propertyPaths = new ArrayList<>();
+        PrefixMapping pmap = new PrefixMappingImpl();
+        pmap.withDefaultMappings(PrefixMapping.Standard);
+        pmap.setNsPrefix("won", WON.getURI());
+        pmap.setNsPrefix("msg", WONMSG.getURI());
+        propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
+        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
+        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+        URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
+
+        return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth, false);
+    }
 
   public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
     assert linkedDataSource != null : "linkedDataSource must not be null";
