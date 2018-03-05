@@ -788,6 +788,7 @@ export function getIn(obj, path) {
         }
     }
 }
+window.getIn4dbg = getIn;
 
 export function contains(arr, el) {
     return arr.indexOf(el) > 0;
