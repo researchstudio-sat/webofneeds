@@ -50,7 +50,7 @@
 }
 ```
 
-**present output**:
+**expected output**:
 
 ```
 <https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n> {
@@ -96,7 +96,7 @@
 }
 ```
 
-**output**:
+**expected output**:
 
 ```
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0> {
@@ -138,7 +138,7 @@
 }
 ```
 
-**output**:
+**expected output**:
 
 ```
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0> {
@@ -182,7 +182,7 @@
 
 ```
 
-**output**: NOTHING
+**expected output**: NOTHING
 
 ### retractProposalTocancelAfterAgreement
 **input**: one-agreement-proposaltocancel-retracted.trig
@@ -228,7 +228,7 @@
 }
 ```
 
-**output**:  NOTHING
+**expected output**:  NOTHING
 
 **present output**:
 
@@ -244,8 +244,6 @@
 }
 
 ```
-
-**output**: NOTHING
 
 ### retractProposalTocancelBeforeAccept
 **input**: one-agreement-proposaltocancel-retracted-b4-accept.trig
@@ -293,7 +291,7 @@
 
 ```
 
-**output**:  
+**expected output**:  
 
 ```
 <https://localhost:8443/won/resource/event/cbcccoqqqbec6bxkl3y3> {
