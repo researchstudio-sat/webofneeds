@@ -382,10 +382,9 @@ function addConnectionFull(state, connection, newConnection) {
 }
 
 function addMessage(state, wonMessage, outgoingMessage, newMessage) {
-    if (wonMessage.getTextMessage()) {
+    if (wonMessage.getContentGraphs().length > 0) {
         // we only want to add messages to the state that actually contain text
-		// content.
-        // (no empty connect messages, for example)
+		// content. (no empty connect messages, for example)
         let parsedMessage = parseMessage(wonMessage, outgoingMessage, newMessage);
 
         if (parsedMessage) {
@@ -551,7 +550,6 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
     if(
         !parsedMessage.data.uri ||
         !parsedMessage.belongsToUri ||
-        !parsedMessage.data.text ||
         !parsedMessage.data.date
     ) {
         console.error('Cant parse chat-message, data is an invalid message-object: ', wonMessage);
