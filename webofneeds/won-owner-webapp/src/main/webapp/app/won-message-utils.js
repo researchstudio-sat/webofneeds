@@ -410,7 +410,6 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     const allDataRawPromise = Promise.all([
             allOwnNeedsPromise,
             allConnectionsPromise,
-            //allEventsPromise, // STARTING with selective loading
             allTheirNeedsPromise
         ]);
 

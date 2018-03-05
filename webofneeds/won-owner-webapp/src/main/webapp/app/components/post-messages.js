@@ -106,7 +106,7 @@ function genComponentConf() {
                 class="rdfTxtTmpDeletme" 
                 ng-show="self.shouldShowRdf" 
                 won-textarea-autogrow 
-                style="resize: none; height: auto;   flex-grow: 1;"
+                style="resize: none; height: auto;   flex-grow: 1;   font-family: monospace;"
                 placeholder="Expects valid turtle. <{{self.msguriPlaceholder}}> will be the uri generated for this message. See \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
             ></textarea>
             <button 
