@@ -50,8 +50,6 @@
 }
 ```
 
-**output**:  NOTHING
-
 **present output**:
 
 ```

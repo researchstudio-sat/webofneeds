@@ -150,24 +150,15 @@ public class HighlevelFunctionFactory {
 	
 	
 	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap initialBinding) {
-		if (cutOffFunction == null) {
-			cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutoffaftermessage/query.rq",initialBinding);
-		}
-		return cutOffFunction;
+		return	cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutoffaftermessage/query.rq",initialBinding);
 	}
 	
 	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getSingleAgreementFunction(QuerySolutionMap initialBinding) {
-		if (singleAgreementFunction == null) {
-			singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreement/query.rq",initialBinding);
-		}
-		return singleAgreementFunction;
+		return singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreement/query.rq",initialBinding);
 	}
 	
 	public static DynamicDatasetToModelBySparqlFunction getRetractedAgreementsFunction(QuerySolutionMap initialBinding) {
-		if (retractedAgreementsFunction == null) {
-			retractedAgreementsFunction = new DynamicDatasetToModelBySparqlFunction("/getRetractedAgreements/query.rq",initialBinding);
-		}
-		return retractedAgreementsFunction;
+		return retractedAgreementsFunction = new DynamicDatasetToModelBySparqlFunction("/getRetractedAgreements/query.rq",initialBinding);
 	}
 }
 

@@ -18,6 +18,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
@@ -51,18 +53,29 @@ public class HighlevelProtocols {
 			Dataset cutOff = RdfUtils.cloneDataset(ack);
 			cutOff = cutOffAfterMessage(cutOff, acceptsMessageURI);
 			Dataset modifiedCutOff = HighlevelFunctionFactory.getModifiedSelection().apply(cutOff);
-			
+
+			// System.out.println("modified cutoff:");
+			//RDFDataMgr.write(System.out, modifiedCutOff, Lang.TRIG);
+		
 			// Add agreements, regardless of whether they are cancelled later... (comment added by Brent)
 			Model agreement = getAgreement(modifiedCutOff, acceptsMessageURI);
 			if (agreement != null && agreement.size() > 0) {
 				result.addNamedModel(acceptsMessageURI.toString(), agreement);
 			}
 			
+			// System.out.println("result:");
+			//RDFDataMgr.write(System.out, result, Lang.TRIG);
+
+			
 			// Remove agreements that are cancelled... (comment added by Brent)
 			List<URI> retractedAgreementUris = getRetractedAgreements(modifiedCutOff, acceptsMessageURI);
 			for (URI retractedAgreement: retractedAgreementUris) {
 				result.removeNamedModel(retractedAgreement.toString());
 			}
+		   //	System.out.println("result after deletion:");
+			//RDFDataMgr.write(System.out, result, Lang.TRIG);
+
+	
 		}
 		return result;
 	
@@ -111,6 +124,23 @@ public class HighlevelProtocols {
 		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
 		initialBinding.add("targetedacceptsmessage", name);
 		Dataset agreement = HighlevelFunctionFactory.getSingleAgreementFunction(initialBinding).apply(conversationDataset);
+	
+		/*
+		System.out.println("party duck:");
+		RDFDataMgr.write(System.out, agreement, Lang.TRIG);
+		System.out.println("end of the party duck:");
+		
+		
+		System.out.println("accepts message URI:");
+		System.out.println('<'+acceptsMessageURI.toString()+'>');
+		System.out.println("end of the accepts message URI:");
+		*/
+	/*	
+		Model testagreement = agreement.getNamedModel('<'+acceptsMessageURI.toString()+'>');
+		System.out.println("model party duck:");
+		RDFDataMgr.write(System.out, testagreement, Lang.TRIG);
+	*/
+		
 		// insert code here to grab model from Dataset agreed
 		return agreement.getNamedModel(acceptsMessageURI.toString());
 	}
