@@ -49,8 +49,9 @@
             agr:accepts  event:8863100035920837000 .
 }
 ```
+**expected output**: NOTHING
 
-**expected output**:
+**actual output**:
 
 ```
 <https://localhost:8443/won/resource/event/cgqt5h004iql2003me2n> {
