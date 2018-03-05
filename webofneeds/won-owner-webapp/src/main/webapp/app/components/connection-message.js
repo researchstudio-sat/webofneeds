@@ -47,12 +47,13 @@ function genComponentConf() {
             ng-click="self.router__stateGoAbs('post', {postUri: self.theirNeed.get('uri')})"
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
-        <div class="won-cm__content">
+        <div class="won-cm__center" ng-class="{'won-cm__center--nondisplayable': !self.text}">
             <div 
-                class="won-cm__content__text" 
+                class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
-                    {{ self.message.get('text') }}
-
+                    <span class="won-cm__center__bubble__text">
+                        {{ self.text? self.text : self.noTextPlaceholder }}
+                    </span>
                     <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
                     <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
@@ -61,12 +62,12 @@ function genComponentConf() {
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
-                class="won-cm__content__time">
+                class="won-cm__center__time">
                     Pending&nbsp;&hellip;
             </div>
             <div
                 ng-hide="self.message.get('unconfirmed')"
-                class="won-cm__content__time">
+                class="won-cm__center__time">
                     {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
             </div>
             <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
@@ -96,6 +97,11 @@ function genComponentConf() {
             
             const self = this;
 
+            self.noTextPlaceholder = 
+                        '«This message couldn\'t be displayed as it didn\'t contain text! ' +
+                        'Click on the \"RDF\"-logo at ' + 
+                        'the bottom of screen to see the \"raw\" message-data.»'
+
             const selectFromState = state => {
                 /*
                 const connectionUri = selectOpenConnectionUri(state);
@@ -113,6 +119,7 @@ function genComponentConf() {
                     theirNeed,
                     connection,
                     message,
+                    text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
