@@ -3,31 +3,29 @@
 @import 'square-image';
 
 won-connection-agreement {
-    margin: 0.5rem 0;
+    //margin: 0.5rem 0;
+    padding-top: 0.5rem;
+    padding-left: 0.5rem;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: flex;
+    
+    
 
     won-square-image {
         cursor: pointer; /* the image links to their post info */
     }
 
-
     .won-ca__content {
+        /*@include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         margin: 0 0.5rem;
         font-size: $smallFontSize;
+        border: $thinRedBorder;
+        background: $won-light-gray;*/
 
         &__text{
             padding: 0.5rem;
-            border: $thinGrayBorder;
-            background: $won-light-gray;
             justify-content: flex-end;
-            @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
-            
-            &.proposal{
-                padding: 0.5rem;
-                border: $thinGrayBorder;
-                background: $won-dark-gray;
-            }
+            border-top: $thinBorderWidth solid $won-line-gray;
         }
     
         &__button{
@@ -36,6 +34,14 @@ won-connection-agreement {
 
         &__time {
             color: $won-line-gray;
+        }
+
+        &__carret {
+            @include fixed-square(1rem);
+        
+            // visually center icon on line
+            position: relative;
+            top: 0.1em;
         }
     }
 }

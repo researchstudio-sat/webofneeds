@@ -16,6 +16,8 @@ import {
 import {
     attach,
     delay,
+    deepFreeze,
+    clone,
     checkHttpStatus,
 } from '../utils.js'
 import {
@@ -33,6 +35,12 @@ import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
+const declarations = deepFreeze({
+	proposal: "proposal",
+	agreement: "agreement",
+	proposeToCancel: "proposeToCancel",
+	
+});
 function genComponentConf() {
     let template = `
         <div class="pm__header">
@@ -62,10 +70,38 @@ function genComponentConf() {
                 message-uri="msg.get('uri')"
                 message="msg">
             </won-connection-message>
-            <won-connection-agreement
-            	ng-repeat="prop in self.proposalList"
-                agreement-object="prop">
-            </won-connection-agreement>
+            <div class="pm__content__agreement" ng-show="self.showAgreementData && self.agreementDataIsValid()">           	
+	            <img class="pm__content__agreement__icon clickable"
+            		src="generated/icon-sprite.svg#ico36_close"
+            		ng-click="self.showAgreementData = !self.showAgreementData"/>
+            	<!-- Agreements-->
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreements.length"> 
+            		Agreements
+            	</div>
+	            <won-connection-agreement
+	            	ng-repeat="agree in self.agreementData.agreements track by $index"
+	                agreement-object="agree"
+	                agreement-number="$index"
+	                agreement-declaration="self.declarations.agreement">
+	            </won-connection-agreement>
+	            <!-- /Agreements -->
+            	<!-- PROPOSALS -->
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposals.length">
+            		<br ng-show="self.agreementData.agreements.length" />
+            		<hr ng-show="self.agreementData.agreements.length" />
+            		Proposals
+            	</div>
+	            <won-connection-agreement
+	            	ng-repeat="prop in self.agreementData.proposals track by $index"
+	                agreement-object="prop"
+	                agreement-number="$index"
+	                agreement-declaration="self.declarations.proposal">
+	            </won-connection-agreement>
+	            <!-- /PROPOSALS -->
+            </div>
+            <div ng-show="self.showAgreementData && self.loading">
+            	Loading the Agreement Data. Please be patient, because patience is a talent :)
+            </div>
         </div>
         <chat-textfield
             class="pm__footer"
@@ -77,13 +113,20 @@ function genComponentConf() {
             >
         </chat-textfield>
         <!-- quick and dirty button to get agreements -->
-        <div  ng-show="self.shouldShowRdf">
-	        	<button 
-	                class="rdfMsgBtnTmpDeletme" 
-	                ng-click="self.getAgreementsData()">
-	                    Load Agreements Data
-	            </button>
+        <div ng-show="self.shouldShowRdf">
+	        <button 
+	            class="rdfMsgBtnTmpDeletme" 
+	            ng-click="self.getAgreementData()">
+	                 Load Agreement Data
+	        </button>
          </div>
+         <br>
+         <button 
+	            class="rdfMsgBtnTmpDeletme" 
+	            ng-click="self.showAgreementDataField()"
+	            ng-show="!self.showAgreementData">
+	                Show Agreement Data
+	     </button>
          <br>
         <!--
         <chat-textfield-simple
@@ -134,16 +177,18 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             
+            this.reload = true;
+            this.loading = false;
             const self = this;
-            
-            this.proposalList = [];
-            
+                     
+            this.declarations = clone(declarations);
             this.agreementData = {
             		proposals: [], 
             		agreements: [], 
             		proposeToCancel: [],
             		acceptedProposalsToCancel: [],
             };
+            this.showAgreementData = false;
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
@@ -157,7 +202,7 @@ function genComponentConf() {
                 const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
                 const chatMessages = connection && connection.get("messages");
                 const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
-
+                
                 let sortedMessages = chatMessages && chatMessages.toArray();
                 if(sortedMessages){
                     sortedMessages.sort(function(a,b) {
@@ -165,6 +210,11 @@ function genComponentConf() {
                     });
                 }
 
+                if(this.reload && connection) {
+                	this.getAgreementData(connection)
+                	this.reload = false;
+                }
+                
                 return {
                     ownNeed,
                     theirNeed,
@@ -189,7 +239,7 @@ function genComponentConf() {
             );
 
             this.$scope.$watch(
-                () => this.chatMessages && this.chatMessages.length && this.proposalList, // trigger if there's messages added (or removed)
+                () => (this.chatMessages && this.chatMessages.length) || this.agreementData, // trigger if there's messages added (or removed)
                 () => delay(0).then(() =>
                     // scroll to bottom directly after rendering, if snapped
                     this.updateScrollposition()
@@ -257,17 +307,37 @@ function genComponentConf() {
         }
 
         send() {
+        	this.showAgreementData = false;
             const trimmedMsg = this.chatMessage.trim();
             if(trimmedMsg) {
                this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
             }
         }
+       
+        showAgreementDataField() {
+        	this.loading = true;
+        	this.showAgreementData = true;
+        	//TODO activate Component?
+        }
         
-        getAgreementsData() {
-        	//this.getAgreements();
+        agreementDataIsValid() {
+        	var aD = this.agreementData;
+        	if(aD.proposals.length ||aD.agreements.length ||aD.proposeToCancel.length || aD.acceptedProposalsToCancel.length){
+        		return true;
+        	}
+        	return false;
+        }
+        
+        getAgreementData(connection) {
+        	if(connection) {
+        		this.connection = connection;
+        	}
+        	console.log("Load Agreement Data");
+        	this.getAgreements();
         	this.getProposals();
         	//this.getAgreementsProposedToBeCancelled();
         	//this.getAcceptedPropsalsToCancel();
+        	
         	
         	//this.sendAgreementsOverviewMsg();
         }
@@ -276,7 +346,7 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
         		.then(response => {
-                	if(response["@graph"]) {this.agreementData.agreements = parseAgreementsData(Array.from(response['@graph']));}
+                	if(response["@graph"]) {this.agreementData.agreements = this.parseAgreementsData(Array.from(response['@graph']));}
                 }).catch(error => console.error('Error:', error))
         }
         
@@ -284,8 +354,7 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			//if(response["@graph"]) {this.agreementData.proposals = this.parseAgreementsData(Array.from(response['@graph']));}
-    			if(response["@graph"]) {this.proposalList = this.parseAgreementsData(Array.from(response['@graph']));}
+    				if(response["@graph"]) {this.agreementData.proposals = this.parseAgreementsData(Array.from(response['@graph']));}
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -293,7 +362,7 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.agreementData.proposeToCancel = Array.from(response['@graph']);}
+    			if(response["@graph"]) {this.agreementData.proposeToCancel = this.parseAgreementsData(Array.from(response['@graph']));}
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -301,7 +370,7 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel/?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.agreementData.acceptedProposalsToCancel = Array.from(response['@graph']);}
+    			if(response["@graph"]) {this.agreementData.acceptedProposalsToCancel = this.parseAgreementsData(Array.from(response['@graph']));}
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -316,6 +385,8 @@ function genComponentConf() {
 		        	list.push({id: obj[i]["@graph"][0]["@id"], text: obj[i]["@graph"][0][getText]});
 		        }
         	}
+        	
+        	this.loading = false;
         	return list;
         }
         
@@ -336,13 +407,11 @@ function genComponentConf() {
 	        		msg += (i+1) + ": " + obj.proposals[i]["@graph"][0][getText] + " - ";
 	        	}
         	}
-        	
-        	//const message = {text: msg, outgoingMessage: false};
-        	//this.chatMessages.push(message);
         	this.connections__sendChatMessage(msg, this.connection.get('uri'));
         }
         
         sendRdfTmpDeletme() { //TODO move to own component
+        	this.showAgreementData = false;
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
             if(rdftxtEl) {
                 console.log('found rdftxtel: ', rdftxtEl.value);

@@ -50,16 +50,16 @@ function genComponentConf() {
         <div class="won-cm__content">
             <div class="won-cm__content__text"
             	title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-            	ng-class="{'propose' : self.message.get('isProposeMessage')}">
+            	ng-class="{'proposal' : self.message.get('isProposeMessage')}">
                 <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
                 <span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>	
                 {{ self.message.get('text') }}
 
                 <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
-                    <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
-                    <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
-                        {{ self.contentGraphsTrig }}
-                    </code>
+                <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
+                <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
+                    {{ self.contentGraphsTrig }}
+                </code>
 
                 <div class="won-cm__content__button" 
                 	ng-if="self.message.get('isProposeMessage') 
@@ -73,7 +73,17 @@ function genComponentConf() {
                 	ng-if="self.message.get('outgoingMessage')
                 		&& !self.message.get('isProposeMessage') 
                 		&& !self.message.get('isAcceptMessage')">
-                	<button class="won-button--filled thin black" ng-click="self.sendProposal()">Propose</button>
+                	 <svg class="won-cm__content__carret clickable"
+                	 		ng-click="self.showDetail = !self.showDetail"
+                	 		ng-show="!self.showDetail">
+	                    <use href="#ico16_arrow_down"></use>
+	                </svg>
+	                <svg class="won-cm__content__carret clickable"
+    						ng-click="self.showDetail = !self.showDetail"
+    						ng-show="self.showDetail">
+	                    <use href="#ico16_arrow_up"></use>
+	                </svg>
+                	<button class="won-button--filled thin black" ng-click="self.sendProposal()" ng-show="self.showDetail">Propose</button>
                 </div>
             </div>
             <div
@@ -110,6 +120,8 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.relativeTime = relativeTime;
             this.clicked = false;
+            this.showDetail = false;
+            
             window.cmsg4dbg = this;
             
             const self = this;

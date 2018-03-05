@@ -35,10 +35,10 @@ won-connection-message {
             border: $thinGrayBorder;
             background: $won-light-gray;
             
-            &.proposal{
+            &.proposal {
                 padding: 0.5rem;
-                border: $thinGrayBorder;
-                background: $won-dark-gray;
+                border:  $thinDarkBorder;
+                background: $won-light-gray;
             }
         }
     
@@ -48,6 +48,14 @@ won-connection-message {
 
         &__time {
             color: $won-line-gray;
+        }
+    
+        &__carret {
+            @include fixed-square(1rem);
+        
+            // visually center icon on line
+            position: relative;
+            top: 0.1em;
         }
     }
 }
