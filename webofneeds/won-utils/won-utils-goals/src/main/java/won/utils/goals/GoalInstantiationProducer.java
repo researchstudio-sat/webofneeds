@@ -55,8 +55,8 @@ public class GoalInstantiationProducer {
         Dataset combinedDataset = DatasetFactory.create();
         combinedDataset.addNamedModel("need1", strippedNeed1);
         combinedDataset.addNamedModel("need2", strippedNeed2);
-        if(conversation != null){
-            RdfUtils.addDatasetToDataset(combinedDataset, conversation, false);
+        if(this.conversation != null){
+            RdfUtils.addDatasetToDataset(combinedDataset, this.conversation, false);
         }
         combinedModelWithoutGoals = RdfUtils.mergeAllDataToSingleModel(combinedDataset);
     }
