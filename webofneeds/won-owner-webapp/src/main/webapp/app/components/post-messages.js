@@ -22,6 +22,7 @@ import {
 } from '../utils.js'
 import {
 	callAgreementsFetch,
+	callAgreementEventFetch,
 } from '../won-message-utils.js';
 import {
     actionCreators
@@ -68,39 +69,61 @@ function genComponentConf() {
                 ng-repeat="msg in self.chatMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
-                message="msg">
+                message="msg"
+                on-update="::self.showAgreementData = false">
             </won-connection-message>
-            <div class="pm__content__agreement" ng-show="self.showAgreementData && self.agreementDataIsValid()">           	
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
 	            <img class="pm__content__agreement__icon clickable"
             		src="generated/icon-sprite.svg#ico36_close"
             		ng-click="self.showAgreementData = !self.showAgreementData"/>
             	<!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreements.length"> 
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreements.size"> 
             		Agreements
+            		<span ng-show="self.loading.agreements"> (loading...)</span>
+            		<span ng-show="!self.loading.agreements"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="agree in self.agreementData.agreements track by $index"
-	                agreement-object="agree"
+	            	ng-repeat="agree in self.getArrayFromSet(self.agreementData.agreements) track by $index"
+	                event-uri="agree"
 	                agreement-number="$index"
-	                agreement-declaration="self.declarations.agreement">
+	                agreement-declaration="self.declarations.agreement"
+	                connection-uri="self.connectionUri">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
             	<!-- PROPOSALS -->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposals.length">
-            		<br ng-show="self.agreementData.agreements.length" />
-            		<hr ng-show="self.agreementData.agreements.length" />
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposals.size">
+            		<br ng-show="self.agreementData.agreements.size" />
+            		<hr ng-show="self.agreementData.agreements.size" />
             		Proposals
+    				<span ng-show="self.loading.proposals"> (loading...)</span>
+            		<span ng-show="!self.loading.proposals"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="prop in self.agreementData.proposals track by $index"
-	                agreement-object="prop"
+	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.proposals) track by $index"
+	                event-uri="prop"
 	                agreement-number="$index"
-	                agreement-declaration="self.declarations.proposal">
+	                agreement-declaration="self.declarations.proposal"
+	                connection-uri="self.connectionUri">
 	            </won-connection-agreement>
 	            <!-- /PROPOSALS -->
             </div>
-            <div ng-show="self.showAgreementData && self.loading">
-            	Loading the Agreement Data. Please be patient, because patience is a talent :)
+            <!-- Show if no Agrrement Data exists -->
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.agreementDataIsValid() && !self.showLoadingInfo">
+	            <img class="pm__content__agreement__icon clickable"
+	            		src="generated/icon-sprite.svg#ico36_close"
+	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
+	            <div class="pm__content__agreement__title"> 
+	            		No Agreement Data found
+            	</div>
+            </div>
+            <!-- Loading Text -->
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.isStillLoading && self.showLoadingInfo && !self.agreementDataIsValid()">
+	            <img class="pm__content__agreement__icon clickable"
+	            		src="generated/icon-sprite.svg#ico36_close"
+	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
+	            <div class="pm__content__agreement__title"> 
+	            		Loading the Agreement Data. Please be patient, because patience is a talent :)
+            	</div>
             </div>
         </div>
         <chat-textfield
@@ -112,22 +135,6 @@ function genComponentConf() {
             submit-button-label="::'Send'"
             >
         </chat-textfield>
-        <!-- quick and dirty button to get agreements -->
-        <div ng-show="self.shouldShowRdf">
-	        <button 
-	            class="rdfMsgBtnTmpDeletme" 
-	            ng-click="self.getAgreementData()">
-	                 Load Agreement Data
-	        </button>
-         </div>
-         <br>
-         <button 
-	            class="rdfMsgBtnTmpDeletme" 
-	            ng-click="self.showAgreementDataField()"
-	            ng-show="!self.showAgreementData">
-	                Show Agreement Data
-	     </button>
-         <br>
         <!--
         <chat-textfield-simple
             class="pm__footer"
@@ -167,6 +174,12 @@ function genComponentConf() {
                    </svg>
                   <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span> 
             </a>
+            <!-- quick and dirty button to get agreements -->
+	        <button class="won-button--filled thin black"
+	            ng-click="self.showAgreementDataField()"
+	            ng-show="!self.showAgreementData">
+	                Show Agreement Data
+		     </button>
         </div>
     `;
 
@@ -177,17 +190,27 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             
+            
             this.reload = true;
-            this.loading = false;
+            
+            this.showLoadingInfo = false;
+            
             const self = this;
                      
             this.declarations = clone(declarations);
             this.agreementData = {
-            		proposals: [], 
-            		agreements: [], 
-            		proposeToCancel: [],
-            		acceptedProposalsToCancel: [],
+            		proposals: new Set(), 
+            		agreements: new Set(), 
+            		proposeToCancel: new Set(),
+            		acceptedProposalsToCancel: new Set(),
             };
+            this.loading = {
+            		proposals: false, 
+            		agreements: false, 
+            		proposeToCancel: false,
+            		acceptedProposalsToCancel: false,
+            };
+            
             this.showAgreementData = false;
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
@@ -315,14 +338,15 @@ function genComponentConf() {
         }
        
         showAgreementDataField() {
-        	this.loading = true;
+        	this.getAgreementData();
+        	this.showLoadingInfo = true;
         	this.showAgreementData = true;
         	//TODO activate Component?
         }
         
         agreementDataIsValid() {
         	var aD = this.agreementData;
-        	if(aD.proposals.length ||aD.agreements.length ||aD.proposeToCancel.length || aD.acceptedProposalsToCancel.length){
+        	if(aD.proposals.size ||aD.agreements.size ||aD.proposeToCancel.size || aD.acceptedProposalsToCancel.size){
         		return true;
         	}
         	return false;
@@ -333,6 +357,7 @@ function genComponentConf() {
         		this.connection = connection;
         	}
         	console.log("Load Agreement Data");
+        	this.startLoading();
         	this.getAgreements();
         	this.getProposals();
         	//this.getAgreementsProposedToBeCancelled();
@@ -342,36 +367,114 @@ function genComponentConf() {
         	//this.sendAgreementsOverviewMsg();
         }
         
-        getAgreements() {
-        	var url = '/owner/rest/highlevel/getAgreements/?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-        		.then(response => {
-                	if(response["@graph"]) {this.agreementData.agreements = this.parseAgreementsData(Array.from(response['@graph']));}
-                }).catch(error => console.error('Error:', error))
+        startLoading() {
+        	this.loading = {
+        		proposals: true, 
+        		agreements: true, 
+        		proposeToCancel: true,
+        		acceptedProposalsToCancel: true,
+            };
         }
         
-        getProposals() {
-        	var url = '/owner/rest/highlevel/getProposals/?connectionUri='+this.connection.get('uri');
+        isStillLoading(){
+        	var ld = this.loading
+        	if(!ld.proposals && !ld.agreements && !ld.proposeToCancel && !ld.acceptedProposalsToCancel) {
+        		return true;
+        	}
+        	return false;
+        }
+        
+        getAgreements() {
+        	var url = '/owner/rest/highlevel/getAgreements?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    				if(response["@graph"]) {this.agreementData.proposals = this.parseAgreementsData(Array.from(response['@graph']));}
+    			if(response["@id"]) {
+    				var uri = response["@id"];
+    				if(!this.agreementData.agreements.has(uri)) {
+	    				this.parseResponseGraph(uri);
+	    				this.agreementData.agreements.add(uri);
+	    				this.loading.agreements = false;
+    				}
+				}
+    			else if(response["@graph"]) {
+    				var graph = response["@graph"];
+    				for(i = 0; i<graph.length; i++) {
+    					var uri = graph[i]["@id"];
+    					if(!this.agreementData.agreements.has(uri)) {
+	    					this.parseResponseGraph(graph[i]["@id"]);
+	    					this.agreementData.agreements.add(graph[i]["@id"]);
+    					}
+    				}
+    				this.loading.agreements = false;
+				}
+    			this.loading.agreements = false;
     		}).catch(error => console.error('Error:', error))
         }
         
-        getAgreementsProposedToBeCancelled() {
-        	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled/?connectionUri='+this.connection.get('uri');
+        getProposals() {
+        	var url = '/owner/rest/highlevel/getProposals?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.agreementData.proposeToCancel = this.parseAgreementsData(Array.from(response['@graph']));}
+    			if(response["@id"]) {
+    				var uri = response["@id"];
+    				if(!this.agreementData.proposals.has(uri)) {
+	    				this.parseResponseGraph(uri);
+	    				this.agreementData.proposals.add(uri);
+	    				this.loading.proposals = false;
+    				}
+				}
+    			else if(response["@graph"]) {
+    				var graph = response["@graph"];
+    				for(i = 0; i<graph.length; i++) {
+    					var uri = graph[i]["@id"];
+    					if(!this.agreementData.proposals.has(uri)) {
+	    					this.parseResponseGraph(graph[i]["@id"]);
+	    					this.agreementData.proposals.add(graph[i]["@id"]);
+    					}
+    				}
+    				this.loading.proposals = false;
+				}
+    			this.loading.proposals = false;
+    		}).catch(error => console.error('Error:', error))
+        }
+        
+        /*
+        getAgreementsProposedToBeCancelled() {
+        	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled?connectionUri='+this.connection.get('uri');
+        	callAgreementsFetch(url)
+    		.then(response => {
+    			if(response["@graph"]) {
+    				this.agreementData.proposeToCancel = this.parseAgreementsData(Array.from(response['@graph']));
+    				this.loading.proposeToCancel = false;
+    			}
     		}).catch(error => console.error('Error:', error))
         }
         
         getAcceptedPropsalsToCancel() {
-        	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel/?connectionUri='+this.connection.get('uri');
+        	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {this.agreementData.acceptedProposalsToCancel = this.parseAgreementsData(Array.from(response['@graph']));}
+    			if(response["@graph"]) {
+    				this.agreementData.acceptedProposalsToCancel = this.parseAgreementsData(Array.from(response['@graph']));
+    				this.loading.acceptedProposalsToCancel = false;
+    			}
     		}).catch(error => console.error('Error:', error))
+        }
+        */
+        
+        //Create WonMEssage and add to State
+        parseResponseGraph(eventUri) {
+        	callAgreementEventFetch(this.ownNeed.get("uri"), eventUri)
+			.then(response => {
+				won.wonMessageFromJsonLd(response)
+				.then(msg =>
+					this.messages__connectionMessageReceived(msg)
+				)
+			})
+        }
+        
+        getArrayFromSet(set) {
+        	return Array.from(set);
         }
         
         parseAgreementsData(obj) {
@@ -379,14 +482,13 @@ function genComponentConf() {
         	const getText = "http://purl.org/webofneeds/model#hasTextMessage";
         	
         	if(obj.length < 2) {
-        		list.push({id: obj[0]["@id"], text: obj[0][getText]});
+        		list.push({id: obj["@id"], text: obj["graph"][0][getText]});
         	}else {
 	        	for(i = 0; i < obj.length; i++){
-		        	list.push({id: obj[i]["@graph"][0]["@id"], text: obj[i]["@graph"][0][getText]});
+		        	//list.push({id: obj[i]["@graph"][0]["@id"], text: obj[i]["@graph"][0][getText]});
+	        		list.push({id: obj[i]["@id"], text: obj[i]["@graph"][0][getText]});
 		        }
         	}
-        	
-        	this.loading = false;
         	return list;
         }
         

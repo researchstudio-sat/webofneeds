@@ -176,6 +176,7 @@ function genComponentConf() {
         	this.clicked = true;
         	const trimmedMsg = this.buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	this.onUpdate();
         }
         
         acceptProposal() {
@@ -185,6 +186,7 @@ function genComponentConf() {
         	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
+        	this.onUpdate();
         }
         
         buildProposalMessage(uri, type, text) {
@@ -229,6 +231,11 @@ function genComponentConf() {
             message: '=',
             messageUri: '=',
             connectionUri: '=',
+            /*
+             * Usage:
+             *  on-update="::myCallback(draft)"
+             */
+            onUpdate: '&',
         },
         template: template,
     }

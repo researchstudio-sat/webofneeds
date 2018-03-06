@@ -357,10 +357,26 @@ export function callAgreementsFetch(url) {
     return fetch(url, {
             method: 'get',
             headers : { 
-                'Accept': 'application/ld+json'
+                'Accept': 'application/ld+json',
+                'Content-Type': 'application/ld+json'
                },
-            credentials: 'same-origin'
+            credentials: 'include'
         })         
+        .then(checkHttpStatus)
+        .then(response =>
+            response.json()
+        )
+}
+
+export function callAgreementEventFetch(needUri, eventUri) {
+    return fetch("https://localhost:8443/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
+            method: 'get',
+            headers : { 
+                'Accept': 'application/ld+json',
+                'Content-Type': 'application/ld+json'
+               },
+            credentials: 'include'
+        })
         .then(checkHttpStatus)
         .then(response =>
             response.json()
