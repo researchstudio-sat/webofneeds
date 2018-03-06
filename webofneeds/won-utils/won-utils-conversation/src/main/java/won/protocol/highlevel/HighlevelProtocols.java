@@ -49,17 +49,19 @@ public class HighlevelProtocols {
 		Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
 		List<URI> accepts = getAcceptMessages(ack);
 		Dataset result = DatasetFactory.createGeneral();
+		List<URI> acceptedMessages = new ArrayList<>();
 		for(URI acceptsMessageURI: accepts) {
 			Dataset cutOff = RdfUtils.cloneDataset(ack);
 			cutOff = cutOffAfterMessage(cutOff, acceptsMessageURI);
 			Dataset modifiedCutOff = HighlevelFunctionFactory.getModifiedSelection().apply(cutOff);
-
+				
 			// System.out.println("modified cutoff:");
 			//RDFDataMgr.write(System.out, modifiedCutOff, Lang.TRIG);
 		
 			// Add agreements, regardless of whether they are cancelled later... (comment added by Brent)
 			Model agreement = getAgreement(modifiedCutOff, acceptsMessageURI);
 			if (agreement != null && agreement.size() > 0) {
+				System.out.println("adding agreement: " + acceptsMessageURI);
 				result.addNamedModel(acceptsMessageURI.toString(), agreement);
 			}
 			
@@ -70,6 +72,7 @@ public class HighlevelProtocols {
 			// Remove agreements that are cancelled... (comment added by Brent)
 			List<URI> retractedAgreementUris = getRetractedAgreements(modifiedCutOff, acceptsMessageURI);
 			for (URI retractedAgreement: retractedAgreementUris) {
+				System.out.println("removing agreement: " + retractedAgreement);
 				result.removeNamedModel(retractedAgreement.toString());
 			}
 		   //	System.out.println("result after deletion:");
@@ -144,6 +147,31 @@ public class HighlevelProtocols {
 		// insert code here to grab model from Dataset agreed
 		return agreement.getNamedModel(acceptsMessageURI.toString());
 	}
+	
+	// this needs to be tested...
+	public static List<URI> getProposalSingleAgreement(Dataset conversationDataset, URI acceptsMessageURI) {
+		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
+		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
+		initialBinding.add("targetedacceptsmessage", name);
+		Model proposalsingleagreement = HighlevelFunctionFactory.getProposalSingleAgreementFunction(initialBinding).apply(conversationDataset);
+		RDFList list = proposalsingleagreement.createList(proposalsingleagreement.listSubjects());
+		ExtendedIterator<RDFNode> listiterator = list.iterator();
+		List<URI> urilist = new ArrayList<URI>();
+		
+		while(listiterator.hasNext()) {
+		    Object object = listiterator.next();
+		    try {
+				URI newuri = new URI(object.toString());
+				   urilist.add(newuri);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				// should I catch the error here... or throw it for a higher level function to catch??
+				e.printStackTrace();
+			}
+		  //   System.out.println(object.toString());
+	  }
+		return urilist;
+	}
 
    public static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {
 		// TODO Auto-generated method stub
@@ -185,6 +213,34 @@ public class HighlevelProtocols {
 		  // what do I return here if the query fails??
 	}
 	
+	public static List<URI> getProposalMessages(Dataset conversationDataset) {
+		// only the first accepts message for each proposal
+		// only valid accepts, too
+		// okay ... right now this a dumb implementation....
+	
+         Model actual = HighlevelFunctionFactory.getAllProposalsFunction().apply(conversationDataset);
+		  
+		  RDFList list = actual.createList(actual.listSubjects());
+		  
+		  ExtendedIterator<RDFNode> listiterator = list.iterator();
+		  
+		  List<URI> urilist = new ArrayList<URI>();
+		  
+		  while(listiterator.hasNext()) {
+			    Object object = listiterator.next();
+			    try {
+					URI newuri = new URI(object.toString());
+					   urilist.add(newuri);
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					// should I catch the error here... or throw it for a higher level function to catch??
+					e.printStackTrace();
+				}
+			  //   System.out.println(object.toString());
+		  }
+		return urilist;
+		  
+	}
 	
 	// https://stackoverflow.com/questions/2849450/how-to-remove-duplicates-from-a-list
 	// June 24, 2015 by Bade

@@ -28,10 +28,12 @@ public class HighlevelFunctionFactory {
 	private static DatasetSelectionBySparqlFunction modifiedSelection;
 	// variable for getAgreements Function that gets all accepts messages
 	private static DatasetToModelBySparqlFunction allAcceptsFunction;
+	private static DatasetToModelBySparqlFunction allProposalsFunction;
 	//// get a dynamic dataset
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutOffFunction;
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction singleAgreementFunction;
 	private static DynamicDatasetToModelBySparqlFunction retractedAgreementsFunction;
+	private static DynamicDatasetToModelBySparqlFunction proposalsingleagreementFunction;
 	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
@@ -78,7 +80,14 @@ public class HighlevelFunctionFactory {
 		return allAcceptsFunction;
 	}
 	
+	// function to get all proposes messages, regardless of whether they are part of a valid agreement...
 	
+	public static DatasetToModelBySparqlFunction getAllProposalsFunction() {
+		if (allProposalsFunction == null) {
+			allProposalsFunction = new DatasetToModelBySparqlFunction("/allproposals/query.rq");
+		}
+		return allProposalsFunction;
+	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptsProposesToCancelFunction() {
 		if (acceptsProposesToCancelFunction == null) {
@@ -160,5 +169,9 @@ public class HighlevelFunctionFactory {
 	public static DynamicDatasetToModelBySparqlFunction getRetractedAgreementsFunction(QuerySolutionMap initialBinding) {
 		return retractedAgreementsFunction = new DynamicDatasetToModelBySparqlFunction("/getRetractedAgreements/query.rq",initialBinding);
 	}
+	
+	public static DynamicDatasetToModelBySparqlFunction getProposalSingleAgreementFunction(QuerySolutionMap initialBinding) {
+		return proposalsingleagreementFunction = new DynamicDatasetToModelBySparqlFunction("/getproposalsingleagreement/query.rq",initialBinding);
+    }
 }
 
