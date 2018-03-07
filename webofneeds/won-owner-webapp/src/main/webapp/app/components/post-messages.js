@@ -469,7 +469,7 @@ function genComponentConf() {
 			.then(response => {
 				won.wonMessageFromJsonLd(response)
 				.then(msg => {
-                    if(msg.getReceiverNeed() === ownNeedUri){
+                    if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
                         /*if we find out that the receiverneed of the crawled event is actually our
                         need we will call the method again but this time with the correct eventUri
                         */
