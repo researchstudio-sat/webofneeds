@@ -471,7 +471,7 @@ function genComponentConf() {
                     if(msg.getSenderNeed() === this.ownNeed.get("uri")){
 					    this.messages__connectionMessageReceived(msg);
                     }else{
-                        parseResponseGraph(msg.getRemoteMessageUri());
+                        this.parseResponseGraph(msg.getRemoteMessageUri());
                     }
                 })
 			})
