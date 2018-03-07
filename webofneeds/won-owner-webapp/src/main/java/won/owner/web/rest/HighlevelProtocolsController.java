@@ -1,5 +1,7 @@
 package won.owner.web.rest;
 
+import java.net.URI;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -43,7 +45,7 @@ public class HighlevelProtocolsController {
     @RequestMapping(value = "/getAgreement", method = RequestMethod.GET)
     public ResponseEntity<Model> getAgreement(String connectionUri, String agreementUri) {
         Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
-        Model agreement = HighlevelProtocols.getAgreement(conversationDataset, agreementUri);
+        Model agreement = HighlevelProtocols.getAgreement(conversationDataset, URI.create(agreementUri));
 
         return new ResponseEntity<>(agreement, HttpStatus.OK);
     }

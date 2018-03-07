@@ -4,8 +4,19 @@ PREFIX won: <http://purl.org/webofneeds/model#>
 PREFIX agr: <http://purl.org/webofneeds/agreement#>
 PREFIX mod: <http://purl.org/webofneeds/modification#> 
 
-SELECT distinct (?msg as ?uri) ?timestamp ?msgType ?text ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel WHERE {
- 
+SELECT distinct ?msg ?timestamp $distance ?msgType ?text ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel WHERE {
+ {
+ {
+   SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
+    GRAPH <urn:x-arq:UnionGraph> {
+     ?msg msg:hasCorrespondingRemoteMessage?/msg:hasPreviousMessage* ?mid .
+     ?mid msg:hasPreviousMessage* ?first .
+     ?first msg:hasSenderNeed ?senderOfFirstMessage .
+     FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}
+     }            
+   }
+   GROUP BY ?msg ?first 
+ }
  GRAPH <urn:x-arq:UnionGraph> {
    ?msg msg:hasSenderNeed ?senderNeed.
    ?msg msg:hasMessageType ?msgType.
@@ -25,5 +36,6 @@ SELECT distinct (?msg as ?uri) ?timestamp ?msgType ?text ?senderNeed ?retracts ?
    OPTIONAL {
     ?msg mod:retracts ?retracts.
    }
+ }
  }  
 } 
