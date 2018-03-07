@@ -464,14 +464,18 @@ function genComponentConf() {
         
         //Create WonMEssage and add to State
         parseResponseGraph(eventUri) {
-        	callAgreementEventFetch(this.ownNeed.get("uri"), eventUri)
+            const ownNeedUri = this.ownNeed.get("uri");
+            callAgreementEventFetch(ownNeedUri, eventUri)
 			.then(response => {
 				won.wonMessageFromJsonLd(response)
 				.then(msg => {
-                    if(msg.getSenderNeed() === this.ownNeed.get("uri")){
-					    this.messages__connectionMessageReceived(msg);
-                    }else{
+                    if(msg.getReceiverNeed() === ownNeedUri){
+                        /*if we find out that the receiverneed of the crawled event is actually our
+                        need we will call the method again but this time with the correct eventUri
+                        */
                         this.parseResponseGraph(msg.getRemoteMessageUri());
+                    }else{
+                        this.messages__connectionMessageReceived(msg);
                     }
                 })
 			})
