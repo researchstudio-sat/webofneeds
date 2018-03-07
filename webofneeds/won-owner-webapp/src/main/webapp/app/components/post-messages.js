@@ -393,7 +393,6 @@ function genComponentConf() {
     				if(!this.agreementData.agreements.has(uri)) {
 	    				this.parseResponseGraph(uri);
 	    				this.agreementData.agreements.add(uri);
-	    				this.loading.agreements = false;
     				}
 				}
     			else if(response["@graph"]) {
@@ -405,7 +404,6 @@ function genComponentConf() {
 	    					this.agreementData.agreements.add(uri);
     					}
     				}
-    				this.loading.agreements = false;
 				}
     			this.loading.agreements = false;
     		}).catch(error => console.error('Error:', error))
@@ -420,7 +418,6 @@ function genComponentConf() {
     				if(!this.agreementData.proposals.has(uri)) {
 	    				this.parseResponseGraph(uri);
 	    				this.agreementData.proposals.add(uri);
-	    				this.loading.proposals = false;
     				}
 				}
     			else if(response["@graph"]) {
@@ -432,7 +429,6 @@ function genComponentConf() {
 	    					this.agreementData.proposals.add(uri);
     					}
     				}
-    				this.loading.proposals = false;
 				}
     			this.loading.proposals = false;
     		}).catch(error => console.error('Error:', error))
