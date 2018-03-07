@@ -47,7 +47,7 @@ import {
     buildAdHocConnectMessage,
 } from '../won-message-utils.js';
 
-export function connectionsChatMessage(chatMessage, connectionUri) {
+export function connectionsChatMessage(chatMessage, connectionUri, isTTL=false) {
    return (dispatch, getState) => {
 
        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
@@ -55,7 +55,16 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
        const theirNeed = getState().getIn(["needs", theirNeedUri]);
        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-       buildChatMessage(chatMessage, connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
+       buildChatMessage({
+            chatMessage: chatMessage, 
+            connectionUri,
+            ownNeedUri: ownNeed.get("uri"), 
+            theirNeedUri: theirNeedUri,
+            ownNodeUri: ownNeed.get("nodeUri"), 
+            theirNodeUri: theirNeed.get("nodeUri"), 
+            theirConnectionUri,
+            isTTL,
+        })
        .then(msgData =>
             Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
        .then(([optimisticEvent, jsonldMessage]) => {
@@ -66,6 +75,16 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
                    eventUri: optimisticEvent.getMessageUri(),
                    message: jsonldMessage,
                    optimisticEvent,
+                }
+            });
+       })
+       .catch(e => {
+           console.error('Error while processing chat message: ', e);
+           dispatch({
+               type: actionTypes.connections.sendChatMessageFailed,
+               payload: {
+                   error: e,
+                   message: e.message,
                 }
             });
        });
@@ -124,7 +143,13 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const adHocDraft = generateResponseNeedTo(theirNeed);
     const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
     const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-    const cnctMsg = buildConnectMessage(needUri, theirNeedUri, nodeUri, theirNeed.get("nodeUri"), textMessage);
+    const cnctMsg = buildConnectMessage({
+        ownNeedUri: needUri,
+        theirNeedUri: theirNeedUri,
+        ownNodeUri: nodeUri,
+        theirNodeUri: theirNeed.get("nodeUri"),
+        textMessage: textMessage,
+    });
     
     const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
     
@@ -179,35 +204,24 @@ async function messageGraphToEvent(eventUri, messageGraph) {
 
 
 function generateResponseNeedTo(theirNeed) {
-    let reNeedType, descriptionPhrase;
-    const theirNeedType = get(theirNeed, 'type');
-    if(theirNeedType === won.WON.BasicNeedTypeDemandCompacted) {
-        reNeedType = won.WON.BasicNeedTypeSupply;
-    } else if(theirNeedType === won.WON.BasicNeedTypeSupplyCompacted) {
-        reNeedType = won.WON.BasicNeedTypeDemand;
-    } else if(theirNeedType === won.WON.BasicNeedTypeDotogetherCompacted) {
-        reNeedType = won.WON.BasicNeedTypeDotogether;
-    } else {
-        console.error(
-            'The need responded to (' + get(theirNeed, 'uri') + ') doesn\'t ' +
-            'have a need type recognized by ad-hoc-connect method. Type: ',
-            theirNeedType
-        );
-        reNeedType = undefined;
-    }
-    descriptionPhrase = 'Direct response to : ';
+    const theirSeeks = get(theirNeed, 'seeks');
+    const theirIs = get(theirNeed, 'is');
+    return {
+        is: theirSeeks? generateResponseContentNodeTo(theirSeeks) : undefined,
+        seeks: theirIs? generateResponseContentNodeTo(theirIs) : undefined,
+    };
+}
 
-    let theirTitle = get(theirNeed, 'title');
-
+function generateResponseContentNodeTo(contentNode) {
+    const theirTitle = get(contentNode, 'title');
     return {
         title: 'Re: ' + theirTitle,
-        description: descriptionPhrase + theirTitle,
-        type: reNeedType,
-        tags: cloneAsMutable(get(theirNeed, 'tags')),
-        location: cloneAsMutable(get(theirNeed, 'location')),
+        description: 'Direct response to : ' + theirTitle,
+        //type: reNeedType,
+        tags: cloneAsMutable(get(contentNode, 'tags')),
+        location: cloneAsMutable(get(contentNode, 'location')),
         noHints: true,
     };
-
 }
 
 export function connectionsClose(connectionUri) {

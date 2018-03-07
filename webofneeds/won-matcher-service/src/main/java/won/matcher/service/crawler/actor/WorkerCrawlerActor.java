@@ -218,7 +218,7 @@ public class WorkerCrawlerActor extends UntypedActor {
                 sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
         String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues()) : "<None>";
         String responseETags = etags != null ? String.join(", ", etags) : "<None>";
-        log.info("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})", uriDoneMsg.getUri(), responseETags, ifNoneMatch);
+        log.debug("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})", uriDoneMsg.getUri(), responseETags, ifNoneMatch);
         getSender().tell(uriDoneMsg, getSelf());
     }
 

@@ -192,6 +192,18 @@ public class WON {
     public static final String GROUP_FACET_STRING = BASE_URI + "GroupFacet";
     public static final String OWNER_FACET_STRING = BASE_URI + "OwnerFacet";
 
+    //unread information
+	public static final Property HAS_UNREAD_SUGGESTED = m.createProperty(BASE_URI + "hasUnreadSuggested");
+	public static final Property HAS_UNREAD_REQUEST_SENT = m.createProperty(BASE_URI + "hasUnreadRequestSent");
+	public static final Property HAS_UNREAD_REQUEST_RECEIVED = m.createProperty(BASE_URI + "hasUnreadRequestReceived");
+	public static final Property HAS_UNREAD_CONNECTED = m.createProperty(BASE_URI + "hasUnreadConnected");
+	public static final Property HAS_UNREAD_CLOSED = m.createProperty(BASE_URI + "hasUnreadClosed");
+	public static final Property HAS_UNREAD_OLDEST_TIMESTAMP = m.createProperty(BASE_URI + "hasUnreadOldestTimestamp");
+	public static final Property HAS_UNREAD_NEWEST_TIMESTAMP = m.createProperty(BASE_URI + "hasUnreadNewestTimestamp");
+	public static final Property HAS_UNREAD_COUNT = m.createProperty(BASE_URI + "hasUnreadCount");
+	
+	
+
     /**
      * Returns the base URI for this schema.
      *

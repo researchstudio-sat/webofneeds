@@ -18,6 +18,10 @@ import {
 } from './utils.js';
 
 import {
+    ttlToJsonLd,
+} from './won-utils.js';
+
+import {
     actionTypes,
 } from './actions/actions.js';
 
@@ -134,7 +138,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
  * @param textMessage
  * @returns {{eventUri, message}|*}
  */
-export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri){
+export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, textMessage, optionalOwnConnectionUri }){
     const envelopeData = won.getEnvelopeDataforNewConnection(ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri);
     if (optionalOwnConnectionUri){
        envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
@@ -154,23 +158,48 @@ export function buildConnectMessage(ownNeedUri, theirNeedUri, ownNodeUri, theirN
     return {eventUri:eventUri,message:message};  
 }
 
-export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri) {
-    const messageP =
-        won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
-        .then(envelopeData => {
+export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
+
+    let jsonldGraphPayloadP = isTTL?
+        ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
+        Promise.resolve();
+
+    const envelopeDataP = won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
+
+    const messageP = Promise.all([
+            envelopeDataP,
+            jsonldGraphPayloadP,
+        ])
+        .then(([envelopeData, graphPayload]) => {
             const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
 
             /*
              * Build the json-ld message that's signed on the owner-server
              * and then send to the won-node.
              */
-            const message = new won.MessageBuilder(won.WONMSG.connectionMessage)
-                .eventURI(eventUri)
+            const wonMessageBuilder = new won.MessageBuilder(won.WONMSG.connectionMessage)
                 .forEnvelopeData(envelopeData)
-                .addContentGraphData(won.WON.hasTextMessage, chatMessage)
                 .hasOwnerDirection()
-                .hasSentTimestamp(new Date().getTime().toString())
-                .build();
+                .hasSentTimestamp(new Date().getTime().toString());
+            
+
+ 
+            const graphPayload_ = getIn(graphPayload, [0, '@graph']);
+            if(graphPayload_) {
+                wonMessageBuilder.mergeIntoContentGraph(graphPayload_);
+            } else if (chatMessage) {
+                //add the chatMessage as normal text message 
+                wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
+            } else {
+                throw new Exception(
+                    "No textmessage or valid graph as payload of chat message:" + 
+                    JSON.stringify(chatMessage) + " " +
+                    JSON.stringify(graphPayload)
+                );
+            }
+            
+            wonMessageBuilder.eventURI(eventUri); // replace placeholders with proper event-uri
+            const message = wonMessageBuilder.build();
 
             return {
                 eventUri,
@@ -180,6 +209,7 @@ export function buildChatMessage(chatMessage, connectionUri, ownNeedUri, theirNe
     return messageP;
 
 }
+
 
 export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, chatMessage) {
     const messageP = won

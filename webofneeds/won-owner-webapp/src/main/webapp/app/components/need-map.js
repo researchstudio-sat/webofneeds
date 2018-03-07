@@ -44,10 +44,12 @@ function genComponentConf() {
             );
 
             const selectFromState = (state) => {
-                const post = this.uri && state.getIn(["needs", this.uri]);
-                const location = post && post.get('location');
+               	const post = this.uri && state.getIn(["needs", this.uri]);
+            	const isSeeksPart = post && post.get(this.isSeeks);
+            	                               
+                const location = isSeeksPart && isSeeksPart.get('location');
+                
                 return {
-                    post: post,
                     location: location,
                 }
             };
@@ -102,6 +104,7 @@ function genComponentConf() {
         template: template,
         scope: {
             uri: "=",
+            isSeeks: "=",
         }
     }
 }

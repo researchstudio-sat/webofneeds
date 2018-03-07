@@ -19,6 +19,7 @@ package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandFailureEvent;
@@ -61,6 +62,11 @@ public class ExecuteCloseCommandAction extends ExecuteSendMessageCommandAction<C
     @Override
     protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(CloseCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
         return null;
+    }
+
+    @Override
+    protected MessageCommandNotSentEvent createMessageNotSentEvent(CloseCommandEvent originalCommand, String message) {
+        return new MessageCommandNotSentEvent<CloseCommandEvent>(message, originalCommand);
     }
 
     protected WonMessage createWonMessage(CloseCommandEvent connectCommandEvent) throws WonMessageBuilderException {

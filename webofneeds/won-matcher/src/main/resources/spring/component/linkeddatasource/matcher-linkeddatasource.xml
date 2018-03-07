@@ -48,6 +48,7 @@
 
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
         <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+        <property name="sharedCache" value="false"/>
     </bean>
 
 </beans>

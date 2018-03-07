@@ -355,14 +355,9 @@ function addConnectionFull(state, connection, newConnection) {
 
     // console.log("Adding Full Connection");
     if(newConnection === undefined) {
-      newConnection = !!selectNeedByConnectionUri(state, connection.uri || connection.get('uri')); // do
-																									// we
-																									// already
-																									// have
-																									// a
-																									// connection
-																									// like
-																									// that?
+        newConnection = !!selectNeedByConnectionUri(
+            state, connection.uri || connection.get('uri')
+        ); //do we already have a connection like that?
     }
     let parsedConnection = parseConnection(connection, newConnection);
 
@@ -538,11 +533,16 @@ function parseMessage(wonMessage, outgoingMessage, newMessage) {
         belongsToUri: undefined,
         data: {
             uri: wonMessage.getMessageUri(),
+            remoteUri: !outgoingMessage? wonMessage.getRemoteMessageUri() : undefined,
             text: wonMessage.getTextMessage(),
+            contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: outgoingMessage,
             newMessage: !!newMessage,
             connectMessage: wonMessage.isConnectMessage(),
+            isProposeMessage: wonMessage.isProposeMessage(),
+            isAcceptMessage: wonMessage.isAcceptMessage(),
+            isAccepted: false,
         }
     };
 
@@ -635,30 +635,43 @@ function parseNeed(jsonldNeed, ownNeed) {
             parsedNeed.state = won.WON.InactiveCompacted;
         }
 
+        let isPart = undefined;
+        let seeksPart = undefined;
         let type = undefined;
+        
+        /*
         let description = undefined;
         let tags = undefined;
         let location = undefined;
-
+		*/
         //TODO: Type concept?
         if(isPresent){
-            //type = seeksPresent ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
-        	type = seeksPresent ? won.WON.BasicNeedTypeCombinedCompacted : won.WON.BasicNeedTypeSupplyCompacted;
-            description = is.get("dc:description");
-            tags = is.get("won:hasTag");
-            location = parseLocation(is.get("won:hasLocation"));
-        }else if(seeksPresent){
-            type = won.WON.BasicNeedTypeDemandCompacted;
-            description = seeks.get("dc:description");
-            tags = seeks.get("won:hasTag");
-            location = parseLocation(seeks.get("won:hasLocation"));
+            type = seeksPresent ? won.WON.BasicNeedTypeCombinedCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+            let tags = is.get("won:hasTag")? is.get("won:hasTag") : undefined;
+            isPart = {
+            		title: is.get("dc:title"),
+            		type: type, 
+            		description: (is.get("dc:description")? is.get("dc:description") : undefined), 
+            		tags: (tags? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
+            		location: (is.get("won:hasLocation")? parseLocation(is.get("won:hasLocation")) : undefined),
+            };
+        }
+        if(seeksPresent){
+        	type = isPresent? type : won.WON.BasicNeedTypeDemandCompacted;
+        	let tags = seeks.get("won:hasTag")? seeks.get("won:hasTag") : undefined;
+            seeksPart = {
+            		title: seeks.get("dc:title"),
+            		type: type, 
+            		description: (seeks.get("dc:description")? seeks.get("dc:description") : undefined), 
+            		tags: (tags? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined), 
+            		location: (seeks.get("won:hasLocation")? parseLocation(seeks.get("won:hasLocation")) : undefined),	
+            };
         }
 
-        parsedNeed.tags = tags ? (Immutable.List.isList(tags)? tags : Immutable.List.of(tags)) : undefined;
-        parsedNeed.description = description ? description : undefined;
-        parsedNeed.isWhatsAround = !!isWhatsAround;
+        parsedNeed.is = isPart;
+        parsedNeed.seeks = seeksPart;
         parsedNeed.type = isWhatsAround? won.WON.BasicNeedTypeWhatsAroundCompacted : type;
-        parsedNeed.location = location;
+        parsedNeed.isWhatsAround = !!isWhatsAround;
         parsedNeed.matchingContexts =  wonHasMatchingContexts ? ( Immutable.List.isList(wonHasMatchingContexts) ? wonHasMatchingContexts : Immutable.List.of(wonHasMatchingContexts) ) : undefined;
         parsedNeed.nodeUri = nodeUri;
     }else{

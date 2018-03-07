@@ -908,7 +908,7 @@
         <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
         <camel.version>2.12.1</camel.version>
         <qpid.version>0.24</qpid.version>
-        <activemq.version>5.8.0</activemq.version>
+        <activemq.version>5.10.2</activemq.version>
         <activemq.conf>classpath:</activemq.conf>
         <jms.version>1.1</jms.version>
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->

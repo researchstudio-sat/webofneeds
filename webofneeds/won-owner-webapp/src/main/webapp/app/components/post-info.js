@@ -6,7 +6,8 @@
 ;
 
 import angular from 'angular';
-import needMapModule from './need-map.js';
+import postSeeksInfoModule from './post-seeks-info.js';
+import postIsInfoModule from './post-is-info.js';
 
 import { attach, } from '../utils.js';
 import won from '../won-es6.js';
@@ -32,44 +33,24 @@ function genComponentConf() {
             </won-gallery>
 
             <div class="post-info__inner__right">
+            	<!-- GENERAL Part -->
                 <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
                     Created
                 </h2>
                 <p class="post-info__details" ng-show="self.friendlyTimestamp">
                     {{ self.friendlyTimestamp }}
                 </p>
-
-                <h2 class="post-info__heading"
-                    ng-show="self.post.get('description')">
-                    Description
-                </h2>
-                <p class="post-info__details"
-                    ng-show="self.post.get('description')">
-                    {{ self.post.get('description')}}
-                </p>
-
-                <h2 class="post-info__heading"
-                    ng-show="self.post.get('tags')">
-                    Tags
-                </h2>
-                <div class="post-info__details post-info__tags"
-                    ng-show="self.post.get('tags')">
-                        <span class="post-info__tags__tag" ng-repeat="tag in self.post.get('tags').toJS()">{{tag}}</span>
+                <!-- IS Part -->
+    			<div ng-show="self.isPart">
+    				<won-post-is-info is-part="::self.isPart"></won-post-is-info>
                 </div>
-
-                <h2 class="post-info__heading"
-                    ng-show="self.location">
-                    Location
-                </h2>
-                <p class="post-info__details"
-                    ng-show="self.address">
-                    {{ self.address }}
-                </p>                
-                <won-need-map 
-                    uri="self.post.get('uri')"
-                    ng-show="self.location">
-                </won-need-map>
-                <br/>
+                </br>
+                <!-- SEEKS Part -->
+                <div ng-show="self.seeksPart"> 
+	                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
+    			</div>
+                </br>
+                <hr>
                 <p class="post-info__details">
                  <a href="{{self.post.get('uri')}}"
                     target="_blank">
@@ -93,16 +74,34 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
 
             window.pi4dbg = this;
-
+            
+            this.is = 'is';
+            this.seeks = 'seeks';
+           
             const selectFromState = (state) => {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
-                const location = post && post.get('location');
-
+                const is = post? post.get('is') : undefined;
+                
+                //TODO it will be possible to have more than one seeks
+                const seeks = post? post.get('seeks') : undefined;
+                
                 return {
+                	isPart: is? {
+                		postUri: postUri,
+                		is: is,
+                		isString: 'is',
+                		location: is && is.get('location'),
+                		address: is.get('location') && is.get('location').get('address'),
+                	}: undefined,
+                	seeksPart: seeks? {
+                		postUri: postUri,
+                		seeks: seeks,
+                		seeksString: 'seeks',
+                		location: seeks && seeks.get('location'),
+                		address: seeks.get('location') && seeks.get('location').get('address'),
+                	}: undefined,
                     post,
-                    location: location,
-                    address: location && location.get('address'),
                     showRequestButton: post && !post.get('ownNeed') && !post.get('isWhatsAround'),
                     friendlyTimestamp: post && relativeTime(
                         selectLastUpdateTime(state),
@@ -113,6 +112,7 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, [], this);
         }
 }
+    
 Controller.$inject = serviceDependencies;
 return {
     restrict: 'E',
@@ -124,6 +124,9 @@ return {
 }
 }
 
-export default angular.module('won.owner.components.postInfo', [ needMapModule ])
+export default angular.module('won.owner.components.postInfo', [ 
+		postIsInfoModule,
+		postSeeksInfoModule,
+	])
     .directive('wonPostInfo', genComponentConf)
     .name;

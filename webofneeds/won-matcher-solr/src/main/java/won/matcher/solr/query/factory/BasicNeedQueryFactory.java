@@ -17,9 +17,6 @@ import java.util.Map;
  */
 public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
-    private static final String NEED_TYPE_DUMMY_FIELD = "_graph._type";
-    private static final String NEED_TYPE_DUMMY_FIELD_CONTENT = "http\\://purl.org/webofneeds/model#Need";
-
     public static final Map<NeedContentPropertyType, String> titleFieldMap;
     static
     {
@@ -39,9 +36,9 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
         descriptionFieldMap.put(NeedContentPropertyType.IS,
                 "_graph.http___purl.org_webofneeds_model_is.http___purl.org_dc_elements_1.1_description");
         descriptionFieldMap.put(NeedContentPropertyType.SEEKS,
-                "_graph.http___purl.org_webofneeds_model_seeks.is.http___purl.org_dc_elements_1.1_description");
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_description");
         descriptionFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
-                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.is.http___purl.org_dc_elements_1.1_description");
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_description");
     }
 
     public static final Map<NeedContentPropertyType, String> tagFieldMap;
@@ -141,6 +138,11 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     @Override
     protected String makeQueryString() {
 
+        // return null if there is no content to search for
+        if (contentFactories.size() == 0) {
+            return null;
+        }
+
         // boost the query with a location distance factor
         // add up all the reverse query boost components and add 1 so that the multiplicative boost factor is at least 1
         String boostQueryString = "";
@@ -154,11 +156,6 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
             MultiplicativeBoostQueryFactory boostQueryFactory = new MultiplicativeBoostQueryFactory(sb.toString());
             boostQueryString = boostQueryFactory.makeQueryString();
         }
-
-        // create a dummy query, this is the minimal part of a query that has no search term content
-        // so that we at least create some valid query, in this case we just search for "all other needs"
-        MatchFieldQueryFactory dummyQuery = new MatchFieldQueryFactory(NEED_TYPE_DUMMY_FIELD, NEED_TYPE_DUMMY_FIELD_CONTENT);
-        contentFactories.add(dummyQuery);
 
         // combine all content term query parts with boolean OR operator
         SolrQueryFactory[] contentArray = new SolrQueryFactory[contentFactories.size()];

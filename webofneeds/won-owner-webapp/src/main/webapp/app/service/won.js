@@ -323,8 +323,7 @@ import jsonld from 'jsonld';
     };
 
     //UTILS
-    var UNSET_URI= "no:uri";
-
+    won.WONMSG.msguriPlaceholder= "this:messageuri";
 
     /**
      * Returns the "compacted" alternative of the value (e.g.
@@ -336,6 +335,9 @@ import jsonld from 'jsonld';
      * @param longValue
      */
     won.toCompacted = function(longValue) {
+        if(!longValue) {
+            return undefined;
+        }
         var propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
         propertyPath[propertyPath.length - 1] += 'Compacted';
         //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
@@ -623,8 +625,15 @@ import jsonld from 'jsonld';
         "msg": "http://purl.org/webofneeds/message#",
         "won": "http://purl.org/webofneeds/model#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "agr": "http://purl.org/webofneeds/agreement#",
         "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
     }
+    won.minimalTurtlePrefixes = 
+        "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
+        "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+        "@prefix agr: <http://purl.org/webofneeds/agreement#>.\n" +
+        "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
+        "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
 
     won.defaultContext = {
             "webID": "http://www.example.com/webids/",
@@ -635,6 +644,7 @@ import jsonld from 'jsonld';
             "xsd": "http://www.w3.org/2001/XMLSchema#",
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "won": "http://purl.org/webofneeds/model#",
+            "agr": "http://purl.org/webofneeds/agreement#",
             "gr": "http://purl.org/goodrelations/v1#",
             "ldp": "http://www.w3.org/ns/ldp#",
             "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
@@ -642,9 +652,21 @@ import jsonld from 'jsonld';
                 "@id":"http://purl.org/webofneeds/message#hasMessageType",
                 "@type":"@id"
             }
-
-
     }
+    won.defaultTurtlePrefixes = 
+            "@prefix webID: <http://www.example.com/webids/>.\n" +
+            "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
+            "@prefix dc: <http://purl.org/dc/elements/1.1/>.\n" +
+            "@prefix agr: <http://purl.org/webofneeds/agreement#>.\n" +
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n" +
+            "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.\n" +
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n" +
+            "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
+            "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
+            "@prefix gr: <http://purl.org/goodrelations/v1#>.\n" +
+            "@prefix ldp: <http://www.w3.org/ns/ldp#>.\n" +
+            "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
+
 
 
     won.JsonLdHelper = {
@@ -774,17 +796,17 @@ import jsonld from 'jsonld';
      */
     won.addMessageGraph = function (builder, graphURIs, messageType) {
         let graphs = builder.data['@graph'];
-        let unsetMessageGraphUri = UNSET_URI+"#data";
+        let unsetMessageGraphUri = won.WONMSG.msguriPlaceholder+"#data";
         //create the message graph, containing the message type
         var messageGraph = {
             "@graph": [
                 {
-                    "@id":UNSET_URI,
+                    "@id":won.WONMSG.msguriPlaceholder,
                     "msg:hasMessageType": {'@id':messageType}
                 },
                 {   "@id": unsetMessageGraphUri,
                     "@type": "msg:EnvelopeGraph",
-                    "rdfg:subGraphOf" : {"@id":UNSET_URI}
+                    "rdfg:subGraphOf" : {"@id":won.WONMSG.msguriPlaceholder}
                 }
             ],
             "@id": unsetMessageGraphUri
@@ -805,7 +827,7 @@ import jsonld from 'jsonld';
         hashFragement = hashFragement || 'graph1';
         return {"@graph": [
                     {
-                        "@id": UNSET_URI + "#" + hashFragement,
+                        "@id": won.WONMSG.msguriPlaceholder + "#" + hashFragement,
                         "@graph": []
                     }
                 ]
@@ -1031,6 +1053,10 @@ import jsonld from 'jsonld';
             return this.__getMessageUri(this.messageStructure);
         },
 
+        getRemoteMessageUri: function () {
+            return this.getProperty("http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage");
+        },
+
         __getMessageUri: function (messageStructure) {
             if (messageStructure.messageUri) {
                 return messageStructure.messageUri;
@@ -1105,7 +1131,14 @@ import jsonld from 'jsonld';
             }
             return won.getSafeJsonLdValue(val);
         },
-
+        getContentGraphs: function(){
+        	// walk over graphs, copy all graphs to result that are content graphs 
+        	// we identify content graphs by finding their URI in messageStructure.containedContent
+        	return this.graphs.filter(graph => this.contentGraphUris.indexOf(graph['@id']) > -1 );
+        },
+        getContentGraphsAsJsonLD: function(){
+        	return JSON.stringify(this.getContentGraphs());
+        },
         getMessageType: function () {
             return this.getProperty("http://purl.org/webofneeds/message#hasMessageType");
         },
@@ -1166,6 +1199,22 @@ import jsonld from 'jsonld';
             return this.getProperty("http://purl.org/webofneeds/message#hasReceiver");
         },
         
+        
+        isProposeMessage: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#proposes");
+        },
+        isAcceptMessage: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#accepts");
+        },
+        isProposeToCancelMessage: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel");
+        },
+        isProposal: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#Proposal");
+        },
+        isAgreement: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#Agreement");
+        },
         
         isFromSystem: function () {
             let direction = this.getMessageDirection();
@@ -1245,6 +1294,7 @@ import jsonld from 'jsonld';
         isResponseToDeactivateMessage: function () {
             return this.getIsResponseToMessageType() === "http://purl.org/webofneeds/message#DeactivateMessage";
         },
+        
 
         __getMessageDirection: function (messageStructure) {
             if (messageStructure.messageDirection) {
@@ -1275,7 +1325,7 @@ import jsonld from 'jsonld';
             const nodes = {};
             let unreferencedEnvelopes = [];
             const innermostEnvelopes = [];
-            const contentGraphs = [];
+            const contentGraphUris =[];
             //first pass: create one node per envelope/content graph
             this.graphs.forEach(graph => {
                 let graphUri = graph["@id"];
@@ -1323,7 +1373,7 @@ import jsonld from 'jsonld';
                         if (containedContent.length > 0) {
                             node.containedContent = containedContent.map(uri => nodes[uri]);
                             //remember the content graphs
-                            containedContent.forEach(uri => contentGraphs.push(uri));
+                            containedContent.forEach(uri => contentGraphUris.push(uri));
                         }
                     }
                 }
@@ -1364,7 +1414,7 @@ import jsonld from 'jsonld';
                 this.parseErrors.push("more than one unreferenced (i.e. outermost) envelope found");
             }
             this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
-
+            this.contentGraphUris = contentGraphUris;
         },
 
         __isEnvelopeGraph: graph => {
@@ -1480,7 +1530,7 @@ import jsonld from 'jsonld';
             }
         }
         this.messageGraph = null;
-        this.eventUriValue = UNSET_URI;
+        this.eventUriValue = won.WONMSG.msguriPlaceholder;
         won.addMessageGraph(this, graphNames , messageType);
     };
 
@@ -1612,6 +1662,13 @@ import jsonld from 'jsonld';
         },
         getContentGraphNode: function(){
             return this.getContentGraph()["@graph"][0];
+        },
+        /** 
+         * takes a lists of json-ld-objects and merges them into the content-graph
+         */
+        mergeIntoContentGraph: function(jsonldPayload) {
+            var contentGraph = this.getContentGraph();
+            contentGraph["@graph"] = contentGraph["@graph"].concat(jsonldPayload);
         },
         addContentGraphData: function(predicate, object){
             this.getContentGraphNode()[predicate] = object;

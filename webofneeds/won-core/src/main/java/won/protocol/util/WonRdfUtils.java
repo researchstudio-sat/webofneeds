@@ -10,6 +10,7 @@ import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
+import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -22,6 +23,8 @@ import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONAGR;
+import won.protocol.vocabulary.WONMOD;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -248,6 +251,73 @@ public class WonRdfUtils
       baseRes.addProperty(predicate, object);
       return messageModel;
     }
+    
+    public static Model addToMessage(Model messageModel, Property predicate, Resource object) {
+        Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+        baseRes.addProperty(predicate, object);
+        return messageModel;
+    }
+    
+    public static Model retractsMessage(URI... toRetract) {
+        return addRetracts(createModelWithBaseResource(), toRetract);
+    }
+    
+    public static Model proposesMessage(URI... toPropose) {
+        return addProposes(createModelWithBaseResource(), toPropose);
+    }
+    
+    public static Model acceptsMessage(URI... toAccept) {
+        return addAccepts(createModelWithBaseResource(), toAccept);
+    }
+ 
+    public static Model proposesToCancelMessage(URI... toProposeToCancel) {
+        return addProposesToCancel(createModelWithBaseResource(), toProposeToCancel);
+    }
+    
+    public static Model addRetracts(Model messageModel, URI... toRetract) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	if (toRetract == null) return messageModel;
+    	for(URI uri: toRetract) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONMOD.RETRACTS, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
+    	return messageModel;
+    }
+    
+    public static Model addProposes(Model messageModel, URI... toPropose) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	if (toPropose == null) return messageModel;
+    	for(URI uri: toPropose) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONAGR.PROPOSES, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
+    	return messageModel;
+    }
+    
+    public static Model addAccepts(Model messageModel, URI... toAccept) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	if (toAccept == null) return messageModel;
+    	for(URI uri: toAccept) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
+    	return messageModel;
+    }
+    
+    public static Model addProposesToCancel(Model messageModel, URI... toProposeToCancel) {
+    	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+    	if (toProposeToCancel == null) return messageModel;
+    	for(URI uri: toProposeToCancel) {
+    		if (uri != null) {
+    			baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(uri.toString()));
+    		}
+    	}
+    	return messageModel;
+    }
+        
 
     /**
      * Creates an RDF model containing a feedback message referring to the specified resource
@@ -357,6 +427,43 @@ public class WonRdfUtils
           return null;
       }
 
+      public static URI getAcceptedEvent(final WonMessage wonMessage) {
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:accepts ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+                  if (rs.hasNext()) {
+                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
+                      throw new IllegalArgumentException("wonMessage has more than one accepts eventUri");
+                  }
+
+                  return eventUri != null? URI.create(eventUri) : null;
+              }
+          }
+          return null;
+      }
+
+      /**
+       * Returns true if the message is an accept message
+       *
+       * @param wonMessage
+       * @return true if the wonMessage is an accept message of an agreement, false if it is not
+       */
+      public static boolean isAccepts(final WonMessage wonMessage) {
+          return getAcceptedEvent(wonMessage) != null;
+      }
       private static String rdfNodeToString(RDFNode node) {
           if (node.isLiteral()) {
               return node.asLiteral().getString();
@@ -587,6 +694,19 @@ public class WonRdfUtils
       return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
+    
+    public static URI getLastMessageSentByLocalNeed(Dataset dataset, final URI connectionURI) {
+    	throw new NotYetImplementedException();
+    }
+    
+    public static URI getLastMessageSentByRemoteNeed(Dataset dataset, final URI connectionURI) {
+    	throw new NotYetImplementedException();
+    }
+    
+    public static List<URI> getMessageURIs(){
+    	throw new NotYetImplementedException();
+    }
+    
   }
 
   private static Model createModelWithBaseResource() {

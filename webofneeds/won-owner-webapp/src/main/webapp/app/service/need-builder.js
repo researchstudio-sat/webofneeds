@@ -89,11 +89,8 @@ import won from './won.js';
      */
     won.buildNeedRdf = function(args){
 
-
-        if(hasAttachmentUrls(args)) {
-            var attachmentUrisTyped = args.attachmentUris.map(function (uri) {
-                return {'@id': uri}
-            });
+        if(!args.is && !args.seeks) {
+            throw new Exception("Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " + args);
         }
 
         /*
@@ -141,7 +138,7 @@ import won from './won.js';
             'dc:title': isOrSeeksData.title,
             'dc:description': isOrSeeksData.description,
             'won:hasTag': isOrSeeksData.tags,
-            'won:hasAttachment': (hasAttachmentUrls(isOrSeeksData) ? attachmentUrisTyped : undefined),
+            'won:hasAttachment': (hasAttachmentUrls(isOrSeeksData) ? isOrSeeksData.attachmentUris.map(uri => ({'@id': uri})) : undefined),
             'won:hasLocation': (!hasLocation(isOrSeeksData)? undefined : {
                 '@type': 's:Place',
                 's:geo' : {

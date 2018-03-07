@@ -43,6 +43,20 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.1.xsd">
 		<property name="prefix" value="/WEB-INF/jsp/"/>
 		<property name="suffix" value=".jsp"/>
 	</bean>
+	
+	    <!-- it seems the following config element plus dependencies is required
+         to get produces/consumes working in spring 3.1
+    -->
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters>
+            <bean class="won.protocol.rest.RdfModelConverter"/>
+            <bean class="won.protocol.rest.RdfDatasetConverter"/>
+            <bean class="won.protocol.rest.RdfDatasetAttachmentConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+	
+	
     <!--
     we move to annotation config in WebSocketConfig.java
     websocket:handlers>

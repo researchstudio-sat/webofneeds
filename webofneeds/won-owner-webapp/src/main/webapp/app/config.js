@@ -5,3 +5,5 @@ import {
 export default deepFreeze({
     piwik : { baseUrl : '' },
 });
+
+export const postTitleCharacterLimit = 140;
