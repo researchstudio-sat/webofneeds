@@ -401,8 +401,8 @@ function genComponentConf() {
     				for(i = 0; i<graph.length; i++) {
     					var uri = graph[i]["@id"];
     					if(!this.agreementData.agreements.has(uri)) {
-	    					this.parseResponseGraph(graph[i]["@id"]);
-	    					this.agreementData.agreements.add(graph[i]["@id"]);
+	    					this.parseResponseGraph(uri);
+	    					this.agreementData.agreements.add(uri);
     					}
     				}
     				this.loading.agreements = false;
@@ -428,8 +428,8 @@ function genComponentConf() {
     				for(i = 0; i<graph.length; i++) {
     					var uri = graph[i]["@id"];
     					if(!this.agreementData.proposals.has(uri)) {
-	    					this.parseResponseGraph(graph[i]["@id"]);
-	    					this.agreementData.proposals.add(graph[i]["@id"]);
+	    					this.parseResponseGraph(uri);
+	    					this.agreementData.proposals.add(uri);
     					}
     				}
     				this.loading.proposals = false;
@@ -467,9 +467,13 @@ function genComponentConf() {
         	callAgreementEventFetch(this.ownNeed.get("uri"), eventUri)
 			.then(response => {
 				won.wonMessageFromJsonLd(response)
-				.then(msg =>
-					this.messages__connectionMessageReceived(msg)
-				)
+				.then(msg => {
+                    if(msg.getSenderNeed() === this.ownNeed.get("uri")){
+					    this.messages__connectionMessageReceived(msg);
+                    }else{
+                        parseResponseGraph(msg.getRemoteMessageUri());
+                    }
+                })
 			})
         }
         
