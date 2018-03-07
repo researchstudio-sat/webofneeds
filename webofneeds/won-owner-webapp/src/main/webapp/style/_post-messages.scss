@@ -2,6 +2,7 @@
 @import 'chattextfield';
 @import 'won-config';
 @import 'connection-message';
+@import 'connection-agreement';
 
 
 @media (max-width: $responsivenessBreakPoint) {
@@ -100,6 +101,27 @@
       border: $thinGrayBorder;
       overflow: auto;
       flex-grow: 1;
+      
+      &__agreement {
+        @include speech-bubble-bottom($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
+        margin: 0 0.5rem;
+        padding-bottom: 0.5rem;
+        font-size: $smallFontSize;
+        border: $thinDarkBorder;
+        background: $won-light-gray;
+        
+        &__title {
+          font-size: 0.85rem;
+          font-weight: 550;
+          padding-left: 0.5rem;
+        }
+    
+        &__icon {
+          position: relative;
+          flex-grow:1;
+          @include fixed-square(1.5rem);
+        }
+      }
     }
 
     .rdflink.withlabel {

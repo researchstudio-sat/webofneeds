@@ -275,7 +275,7 @@ export function runMessagingAgent(redux) {
         const data = JSON.parse(receivedMsg.data);
 
         won.wonMessageFromJsonLd(data).then(message => {
-            won.addJsonLdData(message.getMessageUri(), data);
+            won.addJsonLdData(data);
 
             var messageProcessed = false;
     
