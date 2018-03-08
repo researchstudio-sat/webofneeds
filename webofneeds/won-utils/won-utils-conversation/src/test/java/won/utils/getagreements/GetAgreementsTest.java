@@ -372,7 +372,9 @@ public class GetAgreementsTest {
     
         
     public void test(Dataset input, Dataset expectedOutput) {
-
+    	input = RdfUtils.cloneDataset(input);
+    	expectedOutput = RdfUtils.cloneDataset(expectedOutput);
+    	
         // check that the computed dataset is the expected one
         Dataset actual =  HighlevelProtocols.getAgreements(input);
         //TODO: remove before checking in
@@ -399,7 +401,7 @@ public class GetAgreementsTest {
         Dataset dataset = null;
         try {
             is = GetAgreementsTest.class.getResourceAsStream(path);
-            dataset = DatasetFactory.create();
+            dataset = DatasetFactory.createTxnMem();
         	RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
             if (is != null) {
@@ -416,7 +418,7 @@ public class GetAgreementsTest {
         Dataset dataset = null;
         try {
             is = new FileInputStream(new File(path));
-            dataset = DatasetFactory.create();
+            dataset = DatasetFactory.createTxnMem();
             RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
         } finally {
             if (is != null) {

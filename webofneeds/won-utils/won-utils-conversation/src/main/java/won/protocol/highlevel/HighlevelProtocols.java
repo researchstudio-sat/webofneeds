@@ -22,19 +22,29 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
+import won.protocol.vocabulary.WONAGR;
 
 
 public class HighlevelProtocols {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutAfterMessageFunction;
 	
@@ -43,7 +53,7 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		
+		System.out.println("---------------- begin -------------------------");
 		//Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
@@ -103,8 +113,8 @@ public class HighlevelProtocols {
 		});
 		
 		 
-		System.out.println("messages:");
-		messages.forEach(m -> System.out.println(m));
+		
+
 		//apply acknowledgment protocol to whole conversation first:
 		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
 		
@@ -112,61 +122,93 @@ public class HighlevelProtocols {
 		
 		Dataset proposals = DatasetFactory.createGeneral();
 		Dataset agreements = DatasetFactory.createGeneral();
-		Collection<ConversationMessage> currentMessages = new HashSet<>();
 		
-		currentMessages.addAll(roots);
-		PriorityQueue<ConversationMessage> unprocessedMessages = 
+		
+		PriorityQueue<ConversationMessage> currentMessages = 
 				new PriorityQueue<ConversationMessage>(
 						new Comparator<ConversationMessage>() {
 							@Override
 							public int compare(ConversationMessage o1, ConversationMessage o2) {
-								//TODO continue here
-								return 0;
+								if (o1.isAfter(o2)) {
+									return 1;
+								} else {
+									return -1;
+								}
 							}
 						});
-		
+		currentMessages.addAll(roots);
 		
 		//TODO: we need to use a priority queue for the messages, which is 
 		//sorted by temporal ordering. Each time we process a message, we 
 		//add the subsequent ones to the queue, the retrieve the 
 		//oldest from the queue for the next iteration.
 
-		do {
-			final Set<ConversationMessage> nextMessages = new HashSet<>();
-			currentMessages.forEach(msg -> {
-				if (msg.isRetractsMessage()) {
-					System.out.println("retracting message:" + msg.getMessageURI());
-					removeContentGraphs(conversation, msg);
-					msg.getRetractsRefs()
-						.stream()
-						.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
-						.forEach(toRetract -> removeContentGraphs(conversation, toRetract));
-				}
-				if (msg.isProposesMessage()) {
-					Model proposalContent = ModelFactory.createDefaultModel();
-					msg.getProposesRefs().forEach(clause -> {
-						proposalContent.add(aggregateGraphs(conversation, clause.getContentGraphs()));
+		Set<ConversationMessage> processed = new HashSet<>();
+		while(!currentMessages.isEmpty()) {
+
+			ConversationMessage msg = currentMessages.poll();
+			if (processed.contains(msg)) {
+				continue;
+			}
+			processed.add(msg);
+			System.out.println("current:" + msg);
+			if (!currentMessages.isEmpty()) {
+				System.out.println("next is after current: " + currentMessages.peek().isAfter(msg) + " - next: " +currentMessages.peek().getMessageURI());
+			}
+
+			if (msg.isRetractsMessage()) {
+				System.out.println("retracting message:" + msg.getMessageURI());
+				removeContentGraphs(conversation, msg);
+				msg.getRetractsRefs()
+					.stream()
+					.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.forEach(toRetract -> {
+						removeContentGraphs(conversation, toRetract);
+						if (toRetract.isProposesMessage()) {
+							removeProposal(toRetract.getMessageURI(), proposals);
+						}
 					});
-					System.out.println("proposal: "+ msg.getMessageURI() );
-					proposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
-				}
-				if (msg.isAcceptsMessage()) {
-					msg.getAcceptsRefs()
-						.stream()
-						.filter(accepted -> ! accepted.getSenderNeedURI().equals(msg.getSenderNeedURI()))
-						.forEach(accepted -> {
-							if (accepted.isProposesMessage()) {
-								acceptProposal(accepted.getMessageURI(),msg.getMessageURI(), proposals, agreements);
-							}
-							accepted.getProposesToCancel().forEach(toCancel -> {
-								cancelAgreement(toCancel, agreements);
-							});
+			}
+			if (msg.isProposesMessage()) {
+				Model proposalContent = ModelFactory.createDefaultModel();
+				msg.getProposesRefs().forEach(clause -> {
+					proposalContent.add(aggregateGraphs(conversation, clause.getContentGraphs()));
+				});
+				System.out.println("proposal: "+ msg.getMessageURI() + ":");
+				RDFDataMgr.write(System.out, proposalContent, Lang.TURTLE);
+				proposals.begin(ReadWrite.WRITE);
+				proposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
+				proposals.commit();
+				RDFDataMgr.write(System.out, proposals, Lang.TRIG);
+			}
+			if (msg.isAcceptsMessage()) {
+				msg.getAcceptsRefs()
+					.stream()
+					.filter(accepted -> ! accepted.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.forEach(accepted -> {
+						acceptProposal(accepted.getMessageURI(),msg.getMessageURI(), proposals, agreements);
 					});
-				}
-				nextMessages.addAll(msg.getPreviousInverseRefs());
-			});
-			currentMessages = nextMessages;
-		} while (!currentMessages.isEmpty());
+			}
+			if (msg.isProposesToCancelMessage()) {
+				proposals.begin(ReadWrite.WRITE);
+				final Model cancellationProposals = proposals.getDefaultModel();
+				msg.getProposesToCancelRefs().forEach(proposedToCancel -> {
+					System.out.println("proposing to cancel: " + proposedToCancel.getMessageURI() + " in proposal: " + msg.getMessageURI());
+					cancellationProposals.add(new StatementImpl(
+							cancellationProposals.getResource(msg.getMessageURI().toString()),
+							WONAGR.PROPOSES_TO_CANCEL,
+							cancellationProposals.getResource(proposedToCancel.getMessageURI().toString())));
+					proposals.setDefaultModel(cancellationProposals);
+				});
+				proposals.commit();
+				
+			}
+			currentMessages.addAll(msg.getPreviousInverseRefs());
+			
+			RDFDataMgr.write(System.out, proposals.getDefaultModel(), Lang.TURTLE);
+		}
+
+		System.out.println("---------------- done -------------------------");
 		return agreements;
 	}
 	
@@ -216,13 +258,14 @@ public class HighlevelProtocols {
 	}
 	
 	private static void removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
-		System.out.println("retracting content from : " + message.getMessageURI());
 		conversationDataset.begin(ReadWrite.WRITE);
+		System.out.println("retracting content from : " + message.getMessageURI());
 		message.getContentGraphs().stream().forEach(uri -> conversationDataset.removeNamedModel(uri.toString()));
 		conversationDataset.commit();
 	}
 	
 	private static Model aggregateGraphs(Dataset conversationDataset, Collection<URI> graphURIs) {
+		conversationDataset.begin(ReadWrite.READ);
 		Model result = ModelFactory.createDefaultModel();
 		graphURIs.forEach(uri -> {
 			Model graph = conversationDataset.getNamedModel(uri.toString());
@@ -230,13 +273,15 @@ public class HighlevelProtocols {
 				result.add(RdfUtils.cloneModel(graph));
 			}
 		});
+		conversationDataset.end();
 		return result;
 	}
 	
 	private static void acceptProposal(URI proposalUri, URI agreementUri, Dataset proposals, Dataset agreements) {
-		System.out.println("accepting: " + proposalUri + " as " + agreementUri);
 		proposals.begin(ReadWrite.WRITE);
 		agreements.begin(ReadWrite.WRITE);
+		System.out.println("accepting: " + proposalUri + " as " + agreementUri);
+		RDFDataMgr.write(System.out, proposals.getDefaultModel(), Lang.TURTLE);
 		Model proposal = proposals.getNamedModel(proposalUri.toString());
 		proposals.removeNamedModel(proposalUri.toString());
 		if (agreements.containsNamedModel(agreementUri.toString())) {
@@ -248,10 +293,35 @@ public class HighlevelProtocols {
 		}
 		proposals.commit();
 		agreements.commit();
+		proposals.begin(ReadWrite.WRITE);
+		agreements.begin(ReadWrite.WRITE);
+		//now process proposeToCancel triples
+		Model cancellationProposals = proposals.getDefaultModel();
+		
+		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
+		System.out.println("seeing what there is to cancel for proposal " + proposalUri + ", default model:");
+		RDFDataMgr.write(System.out, cancellationProposals, Lang.TURTLE);
+		while (nIt.hasNext()){
+			RDFNode agreementToCancelUri = nIt.next();
+			System.out.println("cancelling agreement: " + agreementToCancelUri.asResource().getURI());
+			agreements.removeNamedModel(agreementToCancelUri.asResource().getURI());
+		}
+		cancellationProposals.remove(cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null));
+		proposals.commit();
+		agreements.commit();
+	}
+	
+	private static void removeProposal(URI proposalUri, Dataset proposals) {
+		System.out.println("removing proposal: " + proposalUri);
+		proposals.begin(ReadWrite.WRITE);
+		proposals.removeNamedModel(proposalUri.toString());
+		proposals.commit();
 	}
 	
 	private static void cancelAgreement(URI toCancel, Dataset agreements) {
+		agreements.begin(ReadWrite.WRITE);
 		agreements.removeNamedModel(toCancel.toString());
+		agreements.commit();
 	}
 	
 	private static class ConversationResultMapper implements Function<QuerySolution, ConversationMessage>{
@@ -269,7 +339,6 @@ public class HighlevelProtocols {
 		@Override
 		public ConversationMessage apply(QuerySolution solution) {
 			URI messageUri = getUriVar(solution, "msg");
-			System.out.println(solution);
 			ConversationMessage ret = knownMessages.get(messageUri);
 			if (ret == null) {
 				ret = new ConversationMessage(messageUri);
@@ -403,6 +472,85 @@ public class HighlevelProtocols {
 			boolean hrsr = correspondingRemoteMessageRef.hasSuccessResponse();
 			//boolean hrr = correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
 			return hsr && hcrm && hrsr;
+		}
+		
+		public boolean isCorrespondingRemoteMessageOf(ConversationMessage other) {
+			return getCorrespondingRemoteMessageRef() == other;
+		}
+		
+		public boolean isResponseTo(ConversationMessage other) {
+			return getIsRemoteResponseToRef() == other;
+		}
+		
+		public boolean hasResponse(ConversationMessage other) {
+			return other.getIsResponseToRef() == this;
+		}
+		
+		public boolean isRemoteResponseTo(ConversationMessage other) {
+			return getIsRemoteResponseToRef() == other;
+		}
+		
+		public boolean hasRemoteResponse(ConversationMessage other) {
+			return other.getIsRemoteResponseToRef() == this;
+		}
+		
+		public boolean partOfSameExchange(ConversationMessage other) {
+			return isCorrespondingRemoteMessageOf(other) 
+					|| isResponseTo(other) 
+					|| hasResponse(other)
+					|| isRemoteResponseTo(other)
+					|| hasRemoteResponse(other)
+					|| (hasCorrespondingRemoteMessage() 
+							&& (getCorrespondingRemoteMessageRef().isResponseTo(other) 
+								|| getCorrespondingRemoteMessageRef().hasResponse(other)
+								|| getCorrespondingRemoteMessageRef().hasRemoteResponse(other)
+								|| getCorrespondingRemoteMessageRef().isRemoteResponseTo(other))
+							);
+		}
+		
+		public boolean isAfter(ConversationMessage other, ConversationMessage... boundary) {
+			if (this == other) return false;
+			Set<ConversationMessage> boundarySet = Sets.newHashSet(boundary);
+			if (this.isResponseTo(other)) return true;
+			if (this.isRemoteResponseTo(other)) return true;
+			if (this.isFromOwner() && this.isCorrespondingRemoteMessageOf(other)) return false;
+			final Set<ConversationMessage> checked = new HashSet<>();
+			Set<ConversationMessage> checkNow = new HashSet<>();
+			checkNow.add(this);
+			while (!checkNow.isEmpty()) {
+				final Set<ConversationMessage> checkNext = new HashSet<>();
+				long foundCount = checkNow.stream().filter(checkMsg -> {
+					if (checked.contains(checkMsg)) return false;
+					checked.add(checkMsg);
+					if (checkMsg == other) return true;
+					if (boundarySet.contains(checkMsg)) {
+						return false;
+					}
+					checkNext.addAll(checkMsg.getPreviousRefs());
+					if (checkMsg.hasCorrespondingRemoteMessage()) {
+						checkNext.addAll(checkMsg.getCorrespondingRemoteMessageRef().getPreviousRefs());	
+					}
+					return false;
+				}).count();
+				if (foundCount > 0) {
+					return true;
+				}
+				checkNow = checkNext;
+			}
+			return false;
+		}
+		
+		public boolean isFromOwner() {
+			return this.direction == WonMessageDirection.FROM_OWNER;
+		}
+		
+		public boolean isFromExternal() {
+			return this.direction == WonMessageDirection.FROM_EXTERNAL;
+		}
+		
+		public boolean isFromSystem() {
+			return this.direction == WonMessageDirection.FROM_SYSTEM;
+					
 		}
 		
 		public boolean isAcknowledgedLocally() {
@@ -607,8 +755,11 @@ public class HighlevelProtocols {
 
 		@Override
 		public String toString() {
-			return "ConversationMessage [messageURI=" + messageURI + ", senderNeedURI=" + senderNeedURI
+			return "ConversationMessage [messageURI=" + messageURI 
 					+ ", direction=" + direction
+					+ ", messageType=" + messageType
+					+ ", senderNeedURI=" + senderNeedURI
+					
 					+ ", proposes="
 					+ proposes + ", proposesRefs:" + proposesRefs.size() + ", previous=" + previous + ", previousRefs:"
 					+ previousRefs.size() + ", accepts=" + accepts + ", acceptsRefs:" + acceptsRefs.size() + ", retracts=" + retracts
