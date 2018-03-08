@@ -393,7 +393,6 @@ function genComponentConf() {
     				if(!this.agreementData.agreements.has(uri)) {
 	    				this.parseResponseGraph(uri);
 	    				this.agreementData.agreements.add(uri);
-	    				this.loading.agreements = false;
     				}
 				}
     			else if(response["@graph"]) {
@@ -401,11 +400,10 @@ function genComponentConf() {
     				for(i = 0; i<graph.length; i++) {
     					var uri = graph[i]["@id"];
     					if(!this.agreementData.agreements.has(uri)) {
-	    					this.parseResponseGraph(graph[i]["@id"]);
-	    					this.agreementData.agreements.add(graph[i]["@id"]);
+	    					this.parseResponseGraph(uri);
+	    					this.agreementData.agreements.add(uri);
     					}
     				}
-    				this.loading.agreements = false;
 				}
     			this.loading.agreements = false;
     		}).catch(error => console.error('Error:', error))
@@ -420,7 +418,6 @@ function genComponentConf() {
     				if(!this.agreementData.proposals.has(uri)) {
 	    				this.parseResponseGraph(uri);
 	    				this.agreementData.proposals.add(uri);
-	    				this.loading.proposals = false;
     				}
 				}
     			else if(response["@graph"]) {
@@ -428,11 +425,10 @@ function genComponentConf() {
     				for(i = 0; i<graph.length; i++) {
     					var uri = graph[i]["@id"];
     					if(!this.agreementData.proposals.has(uri)) {
-	    					this.parseResponseGraph(graph[i]["@id"]);
-	    					this.agreementData.proposals.add(graph[i]["@id"]);
+	    					this.parseResponseGraph(uri);
+	    					this.agreementData.proposals.add(uri);
     					}
     				}
-    				this.loading.proposals = false;
 				}
     			this.loading.proposals = false;
     		}).catch(error => console.error('Error:', error))
@@ -464,12 +460,20 @@ function genComponentConf() {
         
         //Create WonMEssage and add to State
         parseResponseGraph(eventUri) {
-        	callAgreementEventFetch(this.ownNeed.get("uri"), eventUri)
+            const ownNeedUri = this.ownNeed.get("uri");
+            callAgreementEventFetch(ownNeedUri, eventUri)
 			.then(response => {
 				won.wonMessageFromJsonLd(response)
-				.then(msg =>
-					this.messages__connectionMessageReceived(msg)
-				)
+				.then(msg => {
+                    if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
+                        /*if we find out that the receiverneed of the crawled event is actually our
+                        need we will call the method again but this time with the correct eventUri
+                        */
+                        this.parseResponseGraph(msg.getRemoteMessageUri());
+                    }else{
+                        this.messages__connectionMessageReceived(msg);
+                    }
+                })
 			})
         }
         

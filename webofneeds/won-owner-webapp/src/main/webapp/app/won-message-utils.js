@@ -369,7 +369,7 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
-    return fetch("https://localhost:8443/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
+    return fetch("/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
             method: 'get',
             headers : { 
                 'Accept': 'application/ld+json',

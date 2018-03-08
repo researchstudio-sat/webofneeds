@@ -6,6 +6,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     private String factoryListName = getBotName() + ":factoryList";
     private String factoryInternalIdName = getBotName() + ":factoryInternalId";
     private String factoryOfferToFactoryNeedMapName = getBotName() + ":factoryOfferToFactoryNeedMap";
+    private String factoryGoalPreconditionStateMapName = getBotName() + ":factoryGoalPreconditionStateMap";
 
     public FactoryBotContextWrapper(BotContext botContext, String botName) {
         super(botContext, botName);
@@ -34,5 +35,14 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
 
     public void addFactoryNeedURIOfferRelation(URI offerURI, URI factoryNeedURI){
         getBotContext().saveToObjectMap(factoryInternalIdName, offerURI.toString(), factoryNeedURI);
+    }
+
+    public Boolean getGoalPreconditionState(String goalURI) {
+        return (Boolean) getBotContext().loadFromObjectMap(factoryGoalPreconditionStateMapName, goalURI);
+    }
+
+    public void addGoalPreconditionState(String goalURI, boolean state) {
+        //WE SHOULD KEEP A MAP CONNURI TO LIST OF GOALURIs AS WELL (TO MAKE IT EASIER TO REMOVE ALL THE DATA IF NECESSARY)
+        getBotContext().saveToObjectMap(factoryGoalPreconditionStateMapName, goalURI, state);
     }
 }
