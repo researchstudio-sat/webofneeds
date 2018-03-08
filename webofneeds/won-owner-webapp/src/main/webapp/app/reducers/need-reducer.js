@@ -99,7 +99,7 @@ export default function(allNeedsInState = initialState, action = {}) {
             }
 
             if(action.payload.message){
-            	changedState  = addMessage(changedState , action.payload.message, false, true);
+            	changedState  = addMessage(changedState , action.payload.message, true);
             }
             changedState  = changeConnectionStateByFun(
             		changedState  , 
@@ -131,7 +131,7 @@ export default function(allNeedsInState = initialState, action = {}) {
             if (action.payload.ownConnectionUri) {
             	stateUpdated = changeConnectionState(allNeedsInState, action.payload.ownConnectionUri, won.WON.RequestSent);
             	//because we have a connection uri, we can add the message
-            	return addMessage(stateUpdated, action.payload.optimisticEvent, true, false);
+            	return addMessage(stateUpdated, action.payload.optimisticEvent, false);
             } else {
 	            var tmpConnectionUri = 'connectionFrom:' + eventUri; // need to
 																		// wait for
@@ -167,7 +167,7 @@ export default function(allNeedsInState = initialState, action = {}) {
             			if (state == won.WON.Suggested) return won.WON.RequestSent;
             			if (state == won.WON.Closed) return won.WON.RequestSent;
             		});
-            return addMessage(cnctStateUpdated, action.payload.optimisticEvent, true, false);
+            return addMessage(cnctStateUpdated, action.payload.optimisticEvent, false);
 
         case actionTypes.messages.open.failure:
             return changeConnectionState(allNeedsInState,  action.payload.events['msg:FromSystem'].hasReceiver, won.WON.RequestReceived);
@@ -224,7 +224,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         case actionTypes.messages.connectionMessageReceived:
             // ADD RECEIVED CHAT MESSAGES
             // payload; { events }
-            return addMessage(allNeedsInState, action.payload, false, true);
+            return addMessage(allNeedsInState, action.payload, true);
 
         case actionTypes.connections.sendChatMessage:
             // ADD SENT TEXT MESSAGE
@@ -232,7 +232,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 			 * payload: { eventUri: optimisticEvent.uri, message,
 			 * optimisticEvent, }
 			 */
-            return addMessage(allNeedsInState, action.payload.optimisticEvent, true, true);
+            return addMessage(allNeedsInState, action.payload.optimisticEvent, true);
 
         // update timestamp on success response
         case actionTypes.messages.connect.successOwn:
@@ -381,16 +381,16 @@ function addConnectionFull(state, connection, newConnection) {
     return state;
 }
 
-function addMessage(state, wonMessage, outgoingMessage, newMessage) {
+function addMessage(state, wonMessage, newMessage) {
     if (wonMessage.getContentGraphs().length > 0) {
         // we only want to add messages to the state that actually contain text
 		// content. (no empty connect messages, for example)
-        let parsedMessage = parseMessage(wonMessage, outgoingMessage, newMessage);
+        let parsedMessage = parseMessage(wonMessage, newMessage);
 
         if (parsedMessage) {
             const connectionUri = parsedMessage.get("belongsToUri");
             let needUri = null;
-            if (outgoingMessage) {
+            if (parsedMessage.getIn(["data", "outgoingMessage"])) {
                 // needUri is the message's hasSenderNeed
                 needUri = wonMessage.getSenderNeed();
             } else {
@@ -412,7 +412,7 @@ function addMessages(state, wonMessages) {
     if(wonMessages && wonMessages.size > 0){
         wonMessages.map(wonMessage => {
             const outgoingMessage = wonMessage.isFromOwner();
-            state = addMessage(state, wonMessage, outgoingMessage, true);
+            state = addMessage(state, wonMessage, true);
         });
     }else{
         console.log("no messages to add");
@@ -526,22 +526,26 @@ function parseConnection(jsonldConnection, newConnection) {
     }
 }
 
-function parseMessage(wonMessage, outgoingMessage, newMessage) {
+function parseMessage(wonMessage, newMessage) {
 
     let parsedMessage = {
         belongsToUri: undefined,
         data: {
             uri: wonMessage.getMessageUri(),
+            remoteUri: !wonMessage.isFromOwner()? wonMessage.getRemoteMessageUri() : undefined,
             text: wonMessage.getTextMessage(),
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
-            outgoingMessage: outgoingMessage,
+            outgoingMessage: wonMessage.isFromOwner(),
             newMessage: !!newMessage,
             connectMessage: wonMessage.isConnectMessage(),
+            isProposeMessage: wonMessage.isProposeMessage(),
+            isAcceptMessage: wonMessage.isAcceptMessage(),
+            isAccepted: false,
         }
     };
 
-    if(outgoingMessage){
+    if(wonMessage.isFromOwner()){
         parsedMessage.belongsToUri = wonMessage.getSender();  
     } else {
         parsedMessage.belongsToUri = wonMessage.getReceiver();

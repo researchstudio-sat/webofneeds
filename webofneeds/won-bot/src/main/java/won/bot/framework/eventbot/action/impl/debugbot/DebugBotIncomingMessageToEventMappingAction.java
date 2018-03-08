@@ -138,7 +138,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             String message = extractTextMessageFromWonMessage(msg);
 
             try {
-                if (PATTERN_USAGE.matcher(message).matches()) {
+            	if (message == null) {
+            		Model messageModel = WonRdfUtils.MessageUtils.textMessage("Whatever you sent me there, it was not a normal text message. I'm expecting a <message> won:hasTextMessage \"Some text\" triple in that message.");
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+            	} else if (PATTERN_USAGE.matcher(message).matches()) {
                     bus.publish(new UsageDebugCommandEvent(con));
                 } else if (PATTERN_HINT.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll create a new need and make it send a hint to you.");

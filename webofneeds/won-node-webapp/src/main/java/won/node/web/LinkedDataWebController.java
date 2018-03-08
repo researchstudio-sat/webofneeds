@@ -17,6 +17,7 @@
 package won.node.web;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.slf4j.Logger;
@@ -49,9 +50,11 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.NeedState;
+import won.protocol.model.unread.UnreadMessageInfoForNeed;
 import won.protocol.rest.WonEtagHelper;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
+import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.HTTP;
@@ -133,6 +136,8 @@ LinkedDataWebController {
 
     @Autowired
     private RegistrationServer registrationServer;
+    
+    
 
     //date format for Expires header (rfc 1123)
     private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
@@ -797,6 +802,45 @@ LinkedDataWebController {
         });
     }
 
+    @RequestMapping(
+            value = "${uri.path.data.need}/{identifier}/unread",
+            method = RequestMethod.POST,
+            produces = {"application/ld+json",
+                    "application/trig",
+                    "application/n-quads"})
+    public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationPost(
+    		@PathVariable(value = "identifier") String identifier,
+    		@RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
+    	/* information we want:
+    	 * need-level: unread count, date of first unread, date of last unread
+    	 * per connection: 
+    	 * 	connection uri, unread count, date of first unread, date of last unread 
+    	 */
+    	URI needURI = URI.create(needResourceURIPrefix + "/" + identifier);
+    	org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService.getUnreadInformationForNeed(needURI, lastSeenMessageUris);
+    	return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
+    	
+    }
+    
+    @RequestMapping(
+            value = "${uri.path.data.need}/{identifier}/unread",
+            method = RequestMethod.GET,
+            produces = {"application/ld+json",
+                    "application/trig",
+                    "application/n-quads"})
+    public ResponseEntity<org.apache.jena.rdf.model.Model> readUnreadInformationGet(
+    		@PathVariable(value = "identifier") String identifier,
+    		@RequestParam(value = "lastSeenMessageUris", required = false) List<URI> lastSeenMessageUris) {
+    	/* information we want:
+    	 * need-level: unread count, date of first unread, date of last unread
+    	 * per connection: 
+    	 * 	connection uri, unread count, date of first unread, date of last unread 
+    	 */
+    	URI needURI = URI.create(needResourceURIPrefix + "/" + identifier);
+    	org.apache.jena.rdf.model.Model unreadInfo = this.linkedDataService.getUnreadInformationForNeed(needURI, lastSeenMessageUris);
+    	return new ResponseEntity<>(unreadInfo, HttpStatus.OK);
+    	
+    }
 
     /**
      * This request URL should be protected by WebID filter because the result contains events data - which is data with

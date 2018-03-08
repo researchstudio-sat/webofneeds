@@ -34,6 +34,12 @@ won-connection-message {
             padding: 0.5rem;
             border: $thinGrayBorder;
             //background: $won-light-gray;
+
+            // &.proposal {
+            //     padding: 0.5rem;
+            //     border:  $thinDarkBorder;
+            //     background: $won-light-gray;
+            // }
         }
 
         &.won-cm__center--nondisplayable {
@@ -46,6 +52,7 @@ won-connection-message {
                 color: #8f8f8f;
             }
         }
+
         &:not(.won-cm__center--nondisplayable) {
             .won-cm__center__bubble {
                 background-color: $won-light-gray; // like the error toast-notifications
@@ -53,9 +60,21 @@ won-connection-message {
             }
         }
 
+        &__button{
+            padding: 0.5rem;
+        }
+
 
         &__time {
             color: $won-line-gray;
+        }
+    
+        &__carret {
+            @include fixed-square(1rem);
+        
+            // visually center icon on line
+            position: relative;
+            top: 0.1em;
         }
     }
 }

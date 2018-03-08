@@ -48,9 +48,11 @@ function genComponentConf() {
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__center" ng-class="{'won-cm__center--nondisplayable': !self.text}">
+
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
+
                     <span class="won-cm__center__bubble__text">
                         {{ self.text? self.text : self.noTextPlaceholder }}
                     </span>
@@ -59,6 +61,30 @@ function genComponentConf() {
                     <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
                         {{ self.contentGraphsTrig }}
                     </code>
+                    <div class="won-cm__center__button" 
+                        ng-if="self.message.get('isProposeMessage') 
+                            && !self.message.get('outgoingMessage')
+                            && !self.message.get('isAcceptMessage')
+                            && !self.message.isAccepted
+                            && !self.clicked">
+                        <button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
+                    </div>
+                    <div class="won-cm__center__button" 
+                        ng-if="self.message.get('outgoingMessage')
+                            && !self.message.get('isProposeMessage') 
+                            && !self.message.get('isAcceptMessage')">
+                        <svg class="won-cm__center__carret clickable"
+                                ng-click="self.showDetail = !self.showDetail"
+                                ng-show="!self.showDetail">
+                            <use href="#ico16_arrow_down"></use>
+                        </svg>
+                        <svg class="won-cm__center__carret clickable"
+                                ng-click="self.showDetail = !self.showDetail"
+                                ng-show="self.showDetail">
+                            <use href="#ico16_arrow_up"></use>
+                        </svg>
+                        <button class="won-button--filled thin black" ng-click="self.sendProposal()" ng-show="self.showDetail">Propose</button>
+                    </div>
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
@@ -93,6 +119,9 @@ function genComponentConf() {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
             this.relativeTime = relativeTime;
+            this.clicked = false;
+            this.showDetail = false;
+            
             window.cmsg4dbg = this;
             
             const self = this;
@@ -148,6 +177,30 @@ function genComponentConf() {
                 }
             )
         }
+        
+        sendProposal(){
+        	this.clicked = true;
+        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	this.onUpdate();
+        }
+        
+        acceptProposal() {
+        	this.clicked = true;
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
+        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	//TODO: isAccepted = true;
+        	this.onUpdate();
+        }
+        
+        buildProposalMessage(uri, type, text) {
+        	const msgP = won.WONMSG.msguriPlaceholder;
+        	const sc = "http://purl.org/webofneeds/agreement#"+type;
+        	const whM = "\n won:hasTextMessage ";
+        	return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
+        }
 
         updateAlignment(isOutgoingMessage) {
             const classes = this.$element[0].classList;
@@ -184,6 +237,11 @@ function genComponentConf() {
             message: '=',
             messageUri: '=',
             connectionUri: '=',
+            /*
+             * Usage:
+             *  on-update="::myCallback(draft)"
+             */
+            onUpdate: '&',
         },
         template: template,
     }

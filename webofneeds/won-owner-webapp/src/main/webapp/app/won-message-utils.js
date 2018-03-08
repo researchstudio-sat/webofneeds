@@ -352,6 +352,37 @@ function fetchOwnedNeedUris() {
         )
 }
 
+// API call to get agreements data for a connection
+export function callAgreementsFetch(url) {
+    return fetch(url, {
+            method: 'get',
+            headers : { 
+                'Accept': 'application/ld+json',
+                'Content-Type': 'application/ld+json'
+               },
+            credentials: 'include'
+        })         
+        .then(checkHttpStatus)
+        .then(response =>
+            response.json()
+        )
+}
+
+export function callAgreementEventFetch(needUri, eventUri) {
+    return fetch("https://localhost:8443/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
+            method: 'get',
+            headers : { 
+                'Accept': 'application/ld+json',
+                'Content-Type': 'application/ld+json'
+               },
+            credentials: 'include'
+        })
+        .then(checkHttpStatus)
+        .then(response =>
+            response.json()
+        )
+}
+
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => undefined) {

@@ -58,7 +58,7 @@
     verification step is not needed, and we can be more open about caching.
      -->
     <sec:http request-matcher="regex"
-              pattern="/(resource|data|page)/((event/.+)|(need/[a-zA-Z0-9]+/((deep.*)|(events/.+)))|(connection/[a-zA-Z0-9]+/events.*))"
+              pattern="/(resource|data|page)/((event/.+)|(need/[a-zA-Z0-9]+/((deep.*)|(events/.+)|unread))|(connection/[a-zA-Z0-9]+/events.*))"
               entry-point-ref="authorizationEntryPoint"
               authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
               access-decision-manager-ref="webIdBasedAccessDecisionManager">

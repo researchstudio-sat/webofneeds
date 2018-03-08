@@ -102,8 +102,6 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         ;
 
         
-        List<URI> seedUris = new ArrayList();
-        seedUris.add(command.getNeedURI());
         List<Path> propertyPaths = new ArrayList<>();
         PrefixMapping pmap = new PrefixMappingImpl();
         pmap.withDefaultMappings(PrefixMapping.Standard);
