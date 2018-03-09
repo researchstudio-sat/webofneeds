@@ -26,7 +26,7 @@ One of the major design choices of the reputation systems architecture is who sh
 
 ### Public Rating Data Approach
 
-One idea is to make rating data public to everyone in the network. For every transaction the interacting Need owners would decide and agree on what rating data about the transaction they would like to make public after the transaction has been completed and the ratings submitted. This information could be the data that is created by a trusted service mentioned earlier to certify transactions. So there would not only be different rating formats but also be different amount of rating data available for all the connections/transactions in the network.
+One idea is to make rating data public to everyone in the network. For every transaction the interacting Need owners would decide and agree on what rating data about the transaction they would like to make public after the transaction has been completed and the ratings submitted. Note that if they would decide on making no rating data public they could probably also not trust in the correct behavior of their counterpart for the current transaction since the incentive (fear of bad rating) for correct behavior is missing. This information could be the data that is created by a trusted service mentioned earlier to certify transactions. So there would not only be different rating formats but also be different amount of rating data available for all the connections/transactions in the network.
 
 Benefits:
 
