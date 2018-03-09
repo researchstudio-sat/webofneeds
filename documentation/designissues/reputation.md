@@ -24,7 +24,7 @@ We intend to have reputation profiles in our system that are independet of the N
 
 One of the major design choices of the reputation systems architecture is who should be able to access transaction data which is the basis for calculating a rating or reputation. We see two alternatives: either making rating data public and accessable for everybody or making rating data private and only accessible for the owner and other partners and services which are trusted. 
 
-### Public Rating Data
+### Public Rating Data Approach
 
 One idea is to make rating data public to everyone in the network. For every transaction the interacting Need owners would decide and agree on what rating data about the transaction they would like to make public after the transaction has been completed and the ratings submitted. This information could be the data that is created by a trusted service mentioned earlier to certify transactions. So there would not only be different rating formats but also be different amount of rating data available for all the connections/transactions in the network.
 
@@ -40,6 +40,8 @@ Drawbacks/Risks:
 
 => Therefore in a system where anonymity is important we discard this approach
 
-### Private Rating Data 
+### Simple Private Rating Data Approach
+
+### Advanced Private Rating Data Approach
 
 ## Counter-Measures for Attacks and Manipulation
