@@ -12,12 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
@@ -33,10 +31,7 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
-
 import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
 import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
@@ -112,6 +107,8 @@ public class HighlevelProtocols {
 			}
 		});
 		
+		//link messages to deliveryChains
+		messages.forEach(m -> m.getDeliveryChain());
 		 
 		
 
@@ -125,17 +122,7 @@ public class HighlevelProtocols {
 		
 		
 		PriorityQueue<ConversationMessage> currentMessages = 
-				new PriorityQueue<ConversationMessage>(
-						new Comparator<ConversationMessage>() {
-							@Override
-							public int compare(ConversationMessage o1, ConversationMessage o2) {
-								if (o1.isAfter(o2)) {
-									return 1;
-								} else {
-									return -1;
-								}
-							}
-						});
+				new PriorityQueue<ConversationMessage>();
 		currentMessages.addAll(roots);
 		
 		//TODO: we need to use a priority queue for the messages, which is 
@@ -144,6 +131,7 @@ public class HighlevelProtocols {
 		//oldest from the queue for the next iteration.
 
 		Set<ConversationMessage> processed = new HashSet<>();
+		ConversationMessage last = null;
 		while(!currentMessages.isEmpty()) {
 
 			ConversationMessage msg = currentMessages.poll();
@@ -152,9 +140,15 @@ public class HighlevelProtocols {
 			}
 			processed.add(msg);
 			System.out.println("current:" + msg);
-			if (!currentMessages.isEmpty()) {
-				System.out.println("next is after current: " + currentMessages.peek().isAfter(msg) + " - next: " +currentMessages.peek().getMessageURI());
+			System.out.println("deliveryChain of current:" + msg.getDeliveryChain().getRootURI());
+			System.out.println("deliveryChain size:" + msg.getDeliveryChain().getMessages().size());
+			if (last != null) {
+				System.out.println("previous compared to current:" + compare4Dbg(last, msg));
+				System.out.println("deliveryChain of last:" + last.getDeliveryChain().getRootURI());
+				System.out.println("deliveryChains are interleaved:" + msg.getDeliveryChain().isInterleavedDeliveryChain(last.getDeliveryChain()));
 			}
+			
+			last = msg;
 
 			if (msg.isRetractsMessage()) {
 				System.out.println("retracting message:" + msg.getMessageURI());
@@ -210,6 +204,22 @@ public class HighlevelProtocols {
 
 		System.out.println("---------------- done -------------------------");
 		return agreements;
+	}
+	
+	private static int compare4Dbg(ConversationMessage o1, ConversationMessage o2) {
+		int o1dist = o1.distanceToRoot(); 
+		int o2dist = o2.distanceToRoot();
+		System.out.println("o1dist:" + o1dist + ", o2dist:" + o2dist);
+		if (o1dist != o2dist) {
+			return o1dist - o2dist;
+		}
+		if (o1.isAfter(o2)) {
+			return 1;
+		}
+		if (o2.isAfter(o1)) {
+			return -1;
+		}
+		return 0;
 	}
 	
 	private static Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages ) {
@@ -324,462 +334,11 @@ public class HighlevelProtocols {
 		agreements.commit();
 	}
 	
-	private static class ConversationResultMapper implements Function<QuerySolution, ConversationMessage>{
-		
-		private Map<URI, ConversationMessage> knownMessages = null;
-		
-		public ConversationResultMapper(Map messages) {
-			this.knownMessages = messages;
-		}
-		
-		public Map<URI, ConversationMessage> getKnownMessages(){
-			return this.knownMessages;
-		}
-		
-		@Override
-		public ConversationMessage apply(QuerySolution solution) {
-			URI messageUri = getUriVar(solution, "msg");
-			ConversationMessage ret = knownMessages.get(messageUri);
-			if (ret == null) {
-				ret = new ConversationMessage(messageUri);
-			}
-			URI senderNeedUri = getUriVar(solution, "senderNeed");
-			if (senderNeedUri != null) {
-				ret.setSenderNeedURI(senderNeedUri);
-			}
-			URI previous = getUriVar(solution, "previous");
-			if (previous != null) {
-				ret.addPrevious(previous);
-			}
-			URI retracts = getUriVar(solution, "retracts");
-			if (retracts != null) {
-				ret.addRetracts(retracts);
-			}
-			URI proposes = getUriVar(solution, "proposes");
-			if (proposes != null) {
-				ret.addProposes(proposes);
-			}
-			URI proposesToCancel = getUriVar(solution, "proposesToCancel");
-			if (proposesToCancel != null) {
-				ret.addProposesToCancel(proposesToCancel);
-			}
-			URI accepts = getUriVar(solution, "accepts");
-			if (accepts != null){
-				ret.addAccepts(accepts);
-			}
-			URI correspondingRemoteMessage = getUriVar(solution, "correspondingRemoteMessage");
-			if (correspondingRemoteMessage != null) {
-				ret.setCorrespondingRemoteMessageURI(correspondingRemoteMessage);
-			}
-			URI isResponseTo = getUriVar(solution, "isResponseTo");
-			if (isResponseTo != null) {
-				ret.setIsResponseTo(isResponseTo);
-			}
-			URI isRemoteResponseTo = getUriVar(solution, "isRemoteResponseTo");
-			if (isRemoteResponseTo != null) {
-				ret.setIsRemoteResponseTo(isRemoteResponseTo);
-			}			
-			URI type = getUriVar(solution, "msgType");
-			if (type != null) {
-				ret.setMessageType(WonMessageType.getWonMessageType(type));
-			}
-			URI direction = getUriVar(solution, "direction");
-			if (direction != null) {
-				ret.setDirection(WonMessageDirection.getWonMessageDirection(direction));
-			}
-			URI contentGraph = getUriVar(solution, "contentGraph");
-			if (contentGraph != null) {
-				ret.addContentGraph(contentGraph);
-			}
-			this.knownMessages.put(messageUri, ret);
-			return ret;
-		}
-		
-		private URI getUriVar(QuerySolution solution, String name) {
-			 RDFNode node = solution.get(name);
-			 if (node == null) {
-				 return null;
-			 }
-			 return URI.create(node.asResource().getURI());
-		}
-	}
 	
-	/**
-	 * @author bshamb
-	 *
-	 */
-	private static class ConversationMessage {
-		URI messageURI;
-		URI senderNeedURI;
-		Set<URI> proposes = new HashSet<>();
-		Set<ConversationMessage> proposesRefs = new HashSet<ConversationMessage>();
-		Set<ConversationMessage> proposesInverseRefs = new HashSet<ConversationMessage>();
-		Set<URI> previous = new HashSet<>();
-		Set<ConversationMessage> previousRefs = new HashSet<ConversationMessage>();
-		Set<ConversationMessage> previousInverseRefs = new HashSet<ConversationMessage>();
-		Set<URI> accepts = new HashSet<>();
-		Set<ConversationMessage> acceptsRefs = new HashSet<ConversationMessage>();
-		Set<ConversationMessage> acceptsInverseRefs = new HashSet<ConversationMessage>();
-		Set<URI> retracts = new HashSet<>();
-		Set<ConversationMessage> retractsRefs = new HashSet<ConversationMessage>();
-		Set<ConversationMessage> retractsInverseRefs = new HashSet<ConversationMessage>();
-		Set<URI> proposesToCancel = new HashSet<>();
-		Set<ConversationMessage> proposesToCancelRefs = new HashSet<ConversationMessage>();
-		Set<ConversationMessage> proposesToCancelInverseRefs = new HashSet<ConversationMessage>();
-		Set<URI> contentGraphs = new HashSet<>();
-		
-		URI correspondingRemoteMessageURI;
-		ConversationMessage correspondingRemoteMessageRef;
-		
-		URI isResponseTo;
-		ConversationMessage isResponseToRef;
-		ConversationMessage isResponseToInverseRef;
-		
-		URI isRemoteResponseTo;
-		ConversationMessage isRemoteResponseToRef;
-		ConversationMessage isRemoteResponseToInverseRef;
-		
-		WonMessageType messageType ;
-		WonMessageDirection direction;
-		
-		public ConversationMessage(URI messageURI) {
-			this.messageURI = messageURI;
-		}
-		
-		public boolean isResponse() {
-			return this.messageType == WonMessageType.SUCCESS_RESPONSE || this.messageType == WonMessageType.FAILURE_RESPONSE;
-		}
-		
-		public boolean hasResponse() {
-			return this.isResponseToInverseRef != null;
-		}
-		
-		public boolean hasRemoteResponse() {
-			return this.isRemoteResponseToInverseRef != null;
-		}
-		
-		public boolean hasSuccessResponse() {
-			return hasResponse() && this.isResponseToInverseRef.getMessageType() == WonMessageType.SUCCESS_RESPONSE;
-		}
-		
-		public boolean hasRemoteSuccessResponse() {
-			return hasRemoteResponse() && this.isRemoteResponseToInverseRef.getMessageType() == WonMessageType.SUCCESS_RESPONSE;
-		}
-		
-		public boolean isAcknowledgedRemotely() {
-			boolean hsr = hasSuccessResponse();
-			boolean hcrm = hasCorrespondingRemoteMessage();
-			boolean hrsr = correspondingRemoteMessageRef.hasSuccessResponse();
-			//boolean hrr = correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
-			return hsr && hcrm && hrsr;
-		}
-		
-		public boolean isCorrespondingRemoteMessageOf(ConversationMessage other) {
-			return getCorrespondingRemoteMessageRef() == other;
-		}
-		
-		public boolean isResponseTo(ConversationMessage other) {
-			return getIsRemoteResponseToRef() == other;
-		}
-		
-		public boolean hasResponse(ConversationMessage other) {
-			return other.getIsResponseToRef() == this;
-		}
-		
-		public boolean isRemoteResponseTo(ConversationMessage other) {
-			return getIsRemoteResponseToRef() == other;
-		}
-		
-		public boolean hasRemoteResponse(ConversationMessage other) {
-			return other.getIsRemoteResponseToRef() == this;
-		}
-		
-		public boolean partOfSameExchange(ConversationMessage other) {
-			return isCorrespondingRemoteMessageOf(other) 
-					|| isResponseTo(other) 
-					|| hasResponse(other)
-					|| isRemoteResponseTo(other)
-					|| hasRemoteResponse(other)
-					|| (hasCorrespondingRemoteMessage() 
-							&& (getCorrespondingRemoteMessageRef().isResponseTo(other) 
-								|| getCorrespondingRemoteMessageRef().hasResponse(other)
-								|| getCorrespondingRemoteMessageRef().hasRemoteResponse(other)
-								|| getCorrespondingRemoteMessageRef().isRemoteResponseTo(other))
-							);
-		}
-		
-		public boolean isAfter(ConversationMessage other, ConversationMessage... boundary) {
-			if (this == other) return false;
-			Set<ConversationMessage> boundarySet = Sets.newHashSet(boundary);
-			if (this.isResponseTo(other)) return true;
-			if (this.isRemoteResponseTo(other)) return true;
-			if (this.isFromOwner() && this.isCorrespondingRemoteMessageOf(other)) return false;
-			final Set<ConversationMessage> checked = new HashSet<>();
-			Set<ConversationMessage> checkNow = new HashSet<>();
-			checkNow.add(this);
-			while (!checkNow.isEmpty()) {
-				final Set<ConversationMessage> checkNext = new HashSet<>();
-				long foundCount = checkNow.stream().filter(checkMsg -> {
-					if (checked.contains(checkMsg)) return false;
-					checked.add(checkMsg);
-					if (checkMsg == other) return true;
-					if (boundarySet.contains(checkMsg)) {
-						return false;
-					}
-					checkNext.addAll(checkMsg.getPreviousRefs());
-					if (checkMsg.hasCorrespondingRemoteMessage()) {
-						checkNext.addAll(checkMsg.getCorrespondingRemoteMessageRef().getPreviousRefs());	
-					}
-					return false;
-				}).count();
-				if (foundCount > 0) {
-					return true;
-				}
-				checkNow = checkNext;
-			}
-			return false;
-		}
-		
-		public boolean isFromOwner() {
-			return this.direction == WonMessageDirection.FROM_OWNER;
-		}
-		
-		public boolean isFromExternal() {
-			return this.direction == WonMessageDirection.FROM_EXTERNAL;
-		}
-		
-		public boolean isFromSystem() {
-			return this.direction == WonMessageDirection.FROM_SYSTEM;
-					
-		}
-		
-		public boolean isAcknowledgedLocally() {
-			return hasSuccessResponse();
-		}
-		
-		public boolean isRetractsMessage() {
-			return !this.retractsRefs.isEmpty();
-		}
-		
-		public boolean isAcceptsMessage() {
-			return !this.acceptsRefs.isEmpty();
-		}
-		
-		public boolean isProposesMessage() {
-			return !this.proposesRefs.isEmpty();
-		}
-		
-		public boolean isProposesToCancelMessage() {
-			return !this.proposesToCancelRefs.isEmpty();
-		}
-		
-		public URI getMessageURI() {
-			return messageURI;
-		}
-		public URI getSenderNeedURI() {
-			return senderNeedURI;
-		}
-		public void setSenderNeedURI(URI senderNeedURI) {
-			this.senderNeedURI = senderNeedURI;
-		}
-		public Set<URI> getProposes() {
-			return proposes;
-		}
-		public Set<ConversationMessage> getProposesRefs(){
-			return proposesRefs;
-		}
-		public void addProposes(URI proposes) {
-			this.proposes.add(proposes);
-		}
-		public void addProposesRef(ConversationMessage ref) {
-			this.proposesRefs.add(ref);
-		}
-		
-		public Set<URI> getPrevious() {
-			return previous;
-		}
-		public Set<ConversationMessage> getPreviousRefs(){
-			return previousRefs;
-		}
-		public void addPrevious(URI previous) {
-			this.previous.add(previous);
-		}
-		public void addPreviousRef(ConversationMessage ref) {
-			this.previousRefs.add(ref);
-		}
-		
-		public Set<URI> getAccepts() {
-			return accepts;
-		}
-		public Set<ConversationMessage> getAcceptsRefs(){
-			return this.acceptsRefs;
-		}
-		public void addAcceptsRef(ConversationMessage ref) {
-			this.acceptsRefs.add(ref);
-		}
-		public void addAccepts(URI accepts) {
-			this.accepts.add(accepts);
-		}
-		public Set<URI> getRetracts() {
-			return retracts;
-		}
-		public Set<ConversationMessage> getRetractsRefs(){
-			return this.retractsRefs;
-		}
-		public void addRetractsRef(ConversationMessage ref) {
-			this.retractsRefs.add(ref);
-		}
-		public void addRetracts(URI retracts) {
-			this.retracts.add(retracts);
-		}
-		public Set<URI> getProposesToCancel() {
-			return proposesToCancel;
-		}
-		public Set<ConversationMessage> getProposesToCancelRefs(){
-			return this.proposesToCancelRefs;
-		}
-		public void addProposesToCancelRef(ConversationMessage ref) {
-			this.proposesToCancelRefs.add(ref);
-		}
-		public void addProposesToCancel(URI proposesToCancel) {
-			this.proposesToCancel.add(proposesToCancel);
-		}
-		public URI getCorrespondingRemoteMessageURI() {
-			return correspondingRemoteMessageURI;
-		}
-		public ConversationMessage getCorrespondingRemoteMessageRef() {
-			return this.correspondingRemoteMessageRef;
-		}
-		public boolean hasCorrespondingRemoteMessage() {
-			return this.correspondingRemoteMessageRef != null;
-		}
-		public void setCorrespondingRemoteMessageURI(URI correspondingRemoteMessageURI) {
-			this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
-		}
-		public void setCorrespondingRemoteMessageRef(ConversationMessage ref) {
-			this.correspondingRemoteMessageRef = ref;
-		}
-		
-		
-		public URI getIsResponseTo() {
-			return isResponseTo;
-		}
-		public void setIsResponseTo(URI isResponseTo) {
-			this.isResponseTo = isResponseTo;
-		}
-		public ConversationMessage getIsResponseToRef() {
-			return isResponseToRef;
-		}
-		public void setIsResponseToRef(ConversationMessage ref) {
-			this.isResponseToRef = ref;
-		}
-		public URI getIsRemoteResponseTo() {
-			return isRemoteResponseTo;
-		}
-		public void setIsRemoteResponseTo(URI isRemoteResponseTo) {
-			this.isRemoteResponseTo = isRemoteResponseTo;
-		}
-		public ConversationMessage getIsRemoteResponseToRef() {
-			return isRemoteResponseToRef;
-		}
-		public void setIsRemoteResponseToRef(ConversationMessage ref) {
-			this.isRemoteResponseToRef = ref;
-		}
-		
-		
-		public Set<ConversationMessage> getProposesInverseRefs() {
-			return proposesInverseRefs;
-		}
-		public void addProposesInverseRef(ConversationMessage ref) {
-			this.proposesInverseRefs.add(ref);
-		}
-		public Set<ConversationMessage> getPreviousInverseRefs() {
-			return previousInverseRefs;
-		}
-		public void addPreviousInverseRef(ConversationMessage ref) {
-			this.previousInverseRefs.add(ref);
-		}
-		public Set<ConversationMessage> getAcceptsInverseRefs() {
-			return acceptsInverseRefs;
-		}
-		public void addAcceptsInverseRef(ConversationMessage ref) {
-			this.acceptsInverseRefs.add(ref);
-		}
-		public Set<ConversationMessage> getRetractsInverseRefs() {
-			return retractsInverseRefs;
-		}
-		public void addRetractsInverseRef(ConversationMessage ref) {
-			this.retractsInverseRefs.add(ref);
-		}
-		public ConversationMessage getIsResponseToInverseRef() {
-			return isResponseToInverseRef;
-		}
-		public void setIsResponseToInverseRef(ConversationMessage ref) {
-			this.isResponseToInverseRef = ref;
-		}
-		public ConversationMessage getIsRemoteResponseToInverseRef() {
-			return isRemoteResponseToInverseRef;
-		}
-		public void setIsRemoteResponseToInverseRef(ConversationMessage ref) {
-			this.isRemoteResponseToInverseRef = ref;
-		}
-		
-		public Set<ConversationMessage> getProposesToCancelInverseRefs() {
-			return proposesToCancelInverseRefs;
-		}
-		public void addProposesToCancelInverseRef(ConversationMessage ref) {
-			this.proposesToCancelInverseRefs.add(ref);
-		}
-		public Set<URI> getContentGraphs() {
-			return contentGraphs;
-		}
-		public void addContentGraph(URI contentGraph) {
-			this.contentGraphs.add(contentGraph);
-		}
-
-		public WonMessageType getMessageType() {
-			return messageType;
-		}
-		public void setMessageType(WonMessageType messageType) {
-			this.messageType = messageType;
-		}
-		
-		
-		public WonMessageDirection getDirection() {
-			return direction;
-		}
-
-		public void setDirection(WonMessageDirection direction) {
-			this.direction = direction;
-		}
-
-		@Override
-		public String toString() {
-			return "ConversationMessage [messageURI=" + messageURI 
-					+ ", direction=" + direction
-					+ ", messageType=" + messageType
-					+ ", senderNeedURI=" + senderNeedURI
-					
-					+ ", proposes="
-					+ proposes + ", proposesRefs:" + proposesRefs.size() + ", previous=" + previous + ", previousRefs:"
-					+ previousRefs.size() + ", accepts=" + accepts + ", acceptsRefs:" + acceptsRefs.size() + ", retracts=" + retracts
-					+ ", retractsRefs:" + retractsRefs.size() + ", proposesToCancel=" + proposesToCancel
-					+ ", proposesToCancelRefs:" + proposesToCancelRefs.size() + ", correspondingRemoteMessageURI="
-					+ correspondingRemoteMessageURI + ", correspondingRemoteMessageRef=" + messageUriOrNullString(correspondingRemoteMessageRef)
-					+ ", isResponseTo= " +isResponseTo + ", isRemoteResponseTo=" + isRemoteResponseTo 
-					+ ", isResponseToRef: " + messageUriOrNullString(isResponseToRef) 
-					+ ", isRemoteResponseToRef:" + messageUriOrNullString(isRemoteResponseToRef)
-					+ ", isResponseToInverse: " + messageUriOrNullString(isResponseToInverseRef)
-					+ ", isRemoteResponseToInverse: " + messageUriOrNullString(isRemoteResponseToInverseRef)
-					+ "]";
-		}
-
-		private Object messageUriOrNullString(ConversationMessage message) {
-			return message != null? message.getMessageURI():"null";
-		}
-		
-		
-	}
+	
+	
+	
+	
 	
 	/**
 	 * Calculates all agreements present in the specified conversation dataset.
