@@ -2,7 +2,7 @@
 
 ## Transactions 
 
-Needs can have an interaction with each other and at some point engage in a transaction. For instance this could be initiated by an agreement between the Needs. Ratings could be applied to these transactions if the Need owners agree on that. 
+Needs can have an interaction with each other and at some point engage in a transaction. For instance this could be initiated by an agreement between the Needs. Ratings could be applied to these transactions if the Need owners agree on that. So after the transaction completed and a rating process was agreed on before, the ratings by the participants can be submitted. The system has to make sure that the submited ratings are counted for all participants even though the rating turns out to be bad for one or both sides. 
 
 ## Certify Transactions
 
@@ -26,7 +26,19 @@ One of the major design choices of the reputation systems architecture is who sh
 
 ### Public Rating Data
 
-One idea is to make rating data public to everyone in the network. 
+One idea is to make rating data public to everyone in the network. For every transaction the interacting Need owners would decide and agree on what rating data about the transaction they would like to make public after the transaction has been completed and the ratings submitted. This information could be the data that is created by a trusted service mentioned earlier to certify transactions. So there would not only be different rating formats but also be different amount of rating data available for all the connections/transactions in the network.
+
+Benefits:
+
+* Reputation of a potential transaction partner can be computed by everybody and verified by everybody
+* This means rating or reputation services would have only reduced power compared to a system where only selected services can do this calculation
+* Reputation can be computed by arbitrary and possibly competing algorithms (including algorithms that take the whole transaction/rating graph into account, e.g. PageRank)
+
+Drawbacks/Risks:
+
+* Anonymity: reputation profiles would accumulate transaction/rating information over time and therefore get traceable and more linkable to the real users behind it. To reduce this danger either the amount of publicly available transaction/rating data would have to be reduced or the reputation profiles would have to be dumped at some time when they accomulated too much information. Both options however would reduce the trust or confidence in reputation profiles and self-defeating its purpose in a way.
+
+=> Therefore in a system where anonymity is important we discard this approach
 
 ### Private Rating Data 
 
