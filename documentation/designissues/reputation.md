@@ -26,12 +26,15 @@ One of the major design choices of the reputation systems architecture is who sh
 
 ### Public Rating Data Approach
 
-One idea is to make rating data public to everyone in the network. For every transaction the interacting Need owners would decide and agree on what rating data about the transaction they would like to make public after the transaction has been completed and the ratings submitted. Note that if they would decide on making no rating data public they could probably also not trust in the correct behavior of their counterpart for the current transaction since the incentive (fear of bad rating) for correct behavior is missing. This information could be the data that is created by a trusted service mentioned earlier to certify transactions. So there would not only be different rating formats but also be different amount of rating data available for all the connections/transactions in the network.
+One idea is to make rating data public to everyone in the network. For every transaction the interacting Need owners would decide and agree on what rating data about the transaction they would like to make public after the transaction has been completed and the ratings submitted. The public rating data of a transaction could be created by a trusted service mentioned earlier to certify transactions. There would not only be different rating formats but also be different amounts of rating data available for all the connections/transactions in the network. 
+
+Note that if the participants of a transaction would decide on making no rating data public they could probably also not trust the counterpart for the current transaction since the incentive (fear of bad rating) for correct behavior is missing. This means the amount of agreed rating data to make public for this transaction determines the trust in the transaction partners.
 
 Benefits:
 
 * Reputation of a potential transaction partner can be computed by everybody and verified by everybody
 * This means rating or reputation services would have only reduced power compared to a system where only selected services can do this calculation
+* Simple system architecture: there is basically no protocol for rating service interaction since rating data can just be crawled by everyone
 * Reputation can be computed by arbitrary and possibly competing algorithms (including algorithms that take the whole transaction/rating graph into account, e.g. PageRank)
 
 Drawbacks/Risks:
