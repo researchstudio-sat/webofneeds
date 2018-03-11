@@ -1,6 +1,7 @@
 package won.protocol.highlevel;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -114,6 +115,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		return hsr && hcrm && hrsr;
 	}
 	
+	public boolean hasPreviousMessage() {
+		return ! this.getPreviousRefs().isEmpty();
+	}
+	
 	public boolean isCorrespondingRemoteMessageOf(ConversationMessage other) {
 		return getCorrespondingRemoteMessageRef() == other;
 	}
@@ -139,7 +144,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	/**
-	 * Compares messages for sorting them temporally.
+	 * Compares messages for sorting them temporally, using the URI as tie breaker so as to ensure a stable ordering.
 	 * @param other
 	 * @return
 	 */
@@ -148,12 +153,17 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		int o1dist = this.distanceToRoot(); 
 		int o2dist = other.distanceToRoot();
 		if (o1dist != o2dist) {
+			int diff = o1dist - o2dist;
+			System.out.println("can find earlier from later: " + (diff < 0 ? other.isMessageOnPathToRoot(this) : this.isMessageOnPathToRoot(other)));
 			return o1dist - o2dist;
 		}
 		if (this.isResponseTo(other)) return -1;
 		if (this.isRemoteResponseTo(other)) return -1;
 		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return -1;
-		return 0;
+		//if we get to here, we should check if one of the delivery chains is earlier
+		
+		System.out.println("using uri as tie breaker");
+		return this.getMessageURI().compareTo(other.getMessageURI());
 	}
 	
 	public boolean isAfter(ConversationMessage other) {
@@ -175,16 +185,45 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	
 	public int distanceToRoot(Set<ConversationMessage> visited) {
 		if (distanceToRoot != null) return distanceToRoot;
-		visited.add(this);
-		Set<ConversationMessage> checkNow = new HashSet<>();
-		checkNow.addAll(this.getPreviousRefs());
-		if (this.hasCorrespondingRemoteMessage()) {
-			checkNow.add(this.getCorrespondingRemoteMessageRef());
+		if (!this.hasPreviousMessage()) {
+			this.distanceToRoot = 0;
+			return 0;
 		}
-		checkNow.removeAll(visited);
-		OptionalInt dist = checkNow.stream().map(msg -> msg.distanceToRoot(visited)).mapToInt(i->i).min();
+		visited.add(this);
+		HashSet visitedSoFar = new HashSet<>();
+		visitedSoFar.addAll(visited);
+		OptionalInt dist = getPreviousRefs()
+				.stream()
+				.filter(msg -> !visitedSoFar.contains(msg))
+				.map(msg -> msg.distanceToRoot(visitedSoFar)).mapToInt(i->i).max();
+		if (this.hasCorrespondingRemoteMessage() && ! visited.contains(this.getCorrespondingRemoteMessageRef())) {
+			int distThroughRemote = this.getCorrespondingRemoteMessageRef().distanceToRoot(visitedSoFar);
+			dist = OptionalInt.of(dist.isPresent() ? Math.max(dist.getAsInt(), distThroughRemote) : distThroughRemote);  
+		}
 		this.distanceToRoot = dist.isPresent() ? dist.getAsInt() + 1 : 0;
 		return this.distanceToRoot;
+	}
+	
+	
+	public boolean isMessageOnPathToRoot(ConversationMessage other) {
+		if (this == other) return false;
+		return isMessageOnPathToRoot(other, new HashSet<>());
+	}
+	
+	private boolean isMessageOnPathToRoot(ConversationMessage other, Set<ConversationMessage> visited) {
+		if (this == other) return true;
+		visited.add(this);
+		if (!this.hasPreviousMessage()) {
+			return false;
+		}
+		Boolean foundIt = getPreviousRefs().stream()
+				.filter(msg -> !visited.contains(msg))
+				.anyMatch(msg -> msg.isMessageOnPathToRoot(other, visited));
+		if (foundIt) return true;
+		if (this.hasCorrespondingRemoteMessage() && !visited.contains(this.getCorrespondingRemoteMessageRef())) {
+			return this.getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(other, visited);
+		}
+		return false;
 	}
 	
 	public boolean isFromOwner() {

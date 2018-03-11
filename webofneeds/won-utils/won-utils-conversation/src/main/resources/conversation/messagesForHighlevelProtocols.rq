@@ -41,4 +41,4 @@ SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?propose
         ?msg msg:hasContent ?contentGraph.
        }
     }  
-} 
+}

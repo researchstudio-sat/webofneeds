@@ -37,12 +37,9 @@ public class DeliveryChain {
 	}
 	
 	public boolean isAfter(DeliveryChain other) {
-		return messages.stream()
-				.allMatch(m -> 
-					other.getMessages().stream()
-						.allMatch(
-								o ->  m.isAfter(o) || ! o.isAfter(m) 
-						));
+		return other.getMessages().stream()
+				.anyMatch(
+						msg -> this.getRoot().isMessageOnPathToRoot(msg));
 	}
 
 	/**
@@ -53,7 +50,7 @@ public class DeliveryChain {
 	 */
 	public boolean isInterleavedDeliveryChain(DeliveryChain other) {
 		if (this == other) return false;
-		return this.isBefore(other.getRoot()) && other.isBefore(this.root);
+		return ! this.isAfter(other) || other.isAfter(this); 
 	}
 	
 	/**

@@ -52,13 +52,15 @@ public class HighlevelProtocols {
 		//Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
+		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
 		SparqlSelectFunction<ConversationMessage> selectfunction = 
-				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", new ConversationResultMapper(messagesByURI))
+				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", resultMapper )
 				.addOrderBy("msg", Query.ORDER_ASCENDING);
 		selectfunction.apply(conversationDataset);
 		
 		Set<ConversationMessage> roots = new HashSet();
 		Collection<ConversationMessage> messages = messagesByURI.values();
+		System.out.println("processed " + resultMapper.getCount() + " sparql solutions");
 		
 		//iterate over messages and interconnect them
 		messages.stream().forEach(message -> {
@@ -155,7 +157,9 @@ public class HighlevelProtocols {
 				removeContentGraphs(conversation, msg);
 				msg.getRetractsRefs()
 					.stream()
+					.filter(other -> msg != other)
 					.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(toRetract -> {
 						removeContentGraphs(conversation, toRetract);
 						if (toRetract.isProposesMessage()) {
@@ -165,7 +169,11 @@ public class HighlevelProtocols {
 			}
 			if (msg.isProposesMessage()) {
 				Model proposalContent = ModelFactory.createDefaultModel();
-				msg.getProposesRefs().forEach(clause -> {
+				msg.getProposesRefs().stream()
+				.filter(other -> msg != other)
+				.filter(other -> msg.isMessageOnPathToRoot(other))
+				.forEach(clause -> {
+					System.out.println("proposing: " + clause.getMessageURI() + " in proposal: " + msg.getMessageURI());
 					proposalContent.add(aggregateGraphs(conversation, clause.getContentGraphs()));
 				});
 				System.out.println("proposal: "+ msg.getMessageURI() + ":");
@@ -173,12 +181,13 @@ public class HighlevelProtocols {
 				proposals.begin(ReadWrite.WRITE);
 				proposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
 				proposals.commit();
-				RDFDataMgr.write(System.out, proposals, Lang.TRIG);
 			}
 			if (msg.isAcceptsMessage()) {
 				msg.getAcceptsRefs()
 					.stream()
-					.filter(accepted -> ! accepted.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.filter(other -> msg != other)
+					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(accepted -> {
 						acceptProposal(accepted.getMessageURI(),msg.getMessageURI(), proposals, agreements);
 					});
@@ -186,7 +195,11 @@ public class HighlevelProtocols {
 			if (msg.isProposesToCancelMessage()) {
 				proposals.begin(ReadWrite.WRITE);
 				final Model cancellationProposals = proposals.getDefaultModel();
-				msg.getProposesToCancelRefs().forEach(proposedToCancel -> {
+				msg.getProposesToCancelRefs()
+					.stream()
+					.filter(other -> msg != other)
+					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
+					.forEach(proposedToCancel -> {
 					System.out.println("proposing to cancel: " + proposedToCancel.getMessageURI() + " in proposal: " + msg.getMessageURI());
 					cancellationProposals.add(new StatementImpl(
 							cancellationProposals.getResource(msg.getMessageURI().toString()),
@@ -290,22 +303,9 @@ public class HighlevelProtocols {
 	private static void acceptProposal(URI proposalUri, URI agreementUri, Dataset proposals, Dataset agreements) {
 		proposals.begin(ReadWrite.WRITE);
 		agreements.begin(ReadWrite.WRITE);
-		System.out.println("accepting: " + proposalUri + " as " + agreementUri);
-		RDFDataMgr.write(System.out, proposals.getDefaultModel(), Lang.TURTLE);
-		Model proposal = proposals.getNamedModel(proposalUri.toString());
-		proposals.removeNamedModel(proposalUri.toString());
-		if (agreements.containsNamedModel(agreementUri.toString())) {
-			Model m = agreements.getNamedModel(agreementUri.toString());
-			m.add(proposal);
-			agreements.addNamedModel(agreementUri.toString(),	m);
-		} else {
-			agreements.addNamedModel(agreementUri.toString(), proposal);
-		}
-		proposals.commit();
-		agreements.commit();
-		proposals.begin(ReadWrite.WRITE);
-		agreements.begin(ReadWrite.WRITE);
-		//now process proposeToCancel triples
+		// first process proposeToCancel triples - this avoids that a message can 
+		// successfully propose to cancel itself, as agreements are only made after the
+		// cancellations are processed.		
 		Model cancellationProposals = proposals.getDefaultModel();
 		
 		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
@@ -317,6 +317,22 @@ public class HighlevelProtocols {
 			agreements.removeNamedModel(agreementToCancelUri.asResource().getURI());
 		}
 		cancellationProposals.remove(cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null));
+		proposals.commit();
+		agreements.commit();
+
+		proposals.begin(ReadWrite.WRITE);
+		agreements.begin(ReadWrite.WRITE);
+		System.out.println("accepting: " + proposalUri + " as " + agreementUri);
+		RDFDataMgr.write(System.out, proposals.getDefaultModel(), Lang.TURTLE);
+		Model proposal = RdfUtils.cloneModel(proposals.getNamedModel(proposalUri.toString()));
+		proposals.removeNamedModel(proposalUri.toString());
+		if (agreements.containsNamedModel(agreementUri.toString())) {
+			Model m = agreements.getNamedModel(agreementUri.toString());
+			m.add(proposal);
+			agreements.addNamedModel(agreementUri.toString(),	m);
+		} else {
+			agreements.addNamedModel(agreementUri.toString(), proposal);
+		}
 		proposals.commit();
 		agreements.commit();
 	}
