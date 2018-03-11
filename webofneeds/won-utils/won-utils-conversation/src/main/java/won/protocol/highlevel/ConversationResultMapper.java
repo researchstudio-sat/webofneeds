@@ -13,7 +13,6 @@ import won.protocol.message.WonMessageType;
 public class ConversationResultMapper implements Function<QuerySolution, ConversationMessage>{
 	
 	private Map<URI, ConversationMessage> knownMessages = null;
-	private int count = 0;
 	
 	public ConversationResultMapper(Map messages) {
 		this.knownMessages = messages;
@@ -23,14 +22,8 @@ public class ConversationResultMapper implements Function<QuerySolution, Convers
 		return this.knownMessages; 
 	}
 	
-	public int getCount() {
-		return count;
-	}
-	
 	@Override
 	public ConversationMessage apply(QuerySolution solution) {
-		count++;
-		System.out.println(solution);
 		URI messageUri = getUriVar(solution, "msg");
 		ConversationMessage ret = knownMessages.get(messageUri);
 		if (ret == null) {

@@ -48,7 +48,7 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		System.out.println("---------------- begin -------------------------");
+		
 		//Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
@@ -60,7 +60,7 @@ public class HighlevelProtocols {
 		
 		Set<ConversationMessage> roots = new HashSet();
 		Collection<ConversationMessage> messages = messagesByURI.values();
-		System.out.println("processed " + resultMapper.getCount() + " sparql solutions");
+		
 		
 		//iterate over messages and interconnect them
 		messages.stream().forEach(message -> {
@@ -141,19 +141,12 @@ public class HighlevelProtocols {
 				continue;
 			}
 			processed.add(msg);
-			System.out.println("current:" + msg);
-			System.out.println("deliveryChain of current:" + msg.getDeliveryChain().getRootURI());
-			System.out.println("deliveryChain size:" + msg.getDeliveryChain().getMessages().size());
-			if (last != null) {
-				System.out.println("previous compared to current:" + compare4Dbg(last, msg));
-				System.out.println("deliveryChain of last:" + last.getDeliveryChain().getRootURI());
-				System.out.println("deliveryChains are interleaved:" + msg.getDeliveryChain().isInterleavedDeliveryChain(last.getDeliveryChain()));
-			}
+			
 			
 			last = msg;
 
 			if (msg.isRetractsMessage()) {
-				System.out.println("retracting message:" + msg.getMessageURI());
+				
 				removeContentGraphs(conversation, msg);
 				msg.getRetractsRefs()
 					.stream()
@@ -173,11 +166,11 @@ public class HighlevelProtocols {
 				.filter(other -> msg != other)
 				.filter(other -> msg.isMessageOnPathToRoot(other))
 				.forEach(clause -> {
-					System.out.println("proposing: " + clause.getMessageURI() + " in proposal: " + msg.getMessageURI());
+					
 					proposalContent.add(aggregateGraphs(conversation, clause.getContentGraphs()));
 				});
-				System.out.println("proposal: "+ msg.getMessageURI() + ":");
-				RDFDataMgr.write(System.out, proposalContent, Lang.TURTLE);
+				
+
 				proposals.begin(ReadWrite.WRITE);
 				proposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
 				proposals.commit();
@@ -200,7 +193,7 @@ public class HighlevelProtocols {
 					.filter(other -> msg != other)
 					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
 					.forEach(proposedToCancel -> {
-					System.out.println("proposing to cancel: " + proposedToCancel.getMessageURI() + " in proposal: " + msg.getMessageURI());
+					
 					cancellationProposals.add(new StatementImpl(
 							cancellationProposals.getResource(msg.getMessageURI().toString()),
 							WONAGR.PROPOSES_TO_CANCEL,
@@ -212,17 +205,14 @@ public class HighlevelProtocols {
 			}
 			currentMessages.addAll(msg.getPreviousInverseRefs());
 			
-			RDFDataMgr.write(System.out, proposals.getDefaultModel(), Lang.TURTLE);
-		}
 
-		System.out.println("---------------- done -------------------------");
+		}
 		return agreements;
 	}
 	
 	private static int compare4Dbg(ConversationMessage o1, ConversationMessage o2) {
 		int o1dist = o1.distanceToRoot(); 
 		int o2dist = o2.distanceToRoot();
-		System.out.println("o1dist:" + o1dist + ", o2dist:" + o2dist);
 		if (o1dist != o2dist) {
 			return o1dist - o2dist;
 		}
@@ -246,7 +236,6 @@ public class HighlevelProtocols {
 			}
 			if (message.getDirection() == WonMessageDirection.FROM_SYSTEM && ! message.isResponse()) {
 				if (!message.isAcknowledgedLocally()) {
-					System.out.println("not acknowledged locally " + message);
 					removeContentGraphs(copy, message);
 				}
 				return;
@@ -261,7 +250,6 @@ public class HighlevelProtocols {
 				case ACTIVATE:
 				case HINT_MESSAGE:
 					if (!message.isAcknowledgedLocally()) {
-						System.out.println("not acknowledged locally " + message);
 						removeContentGraphs(copy, message);
 					}
 					break;
@@ -270,7 +258,6 @@ public class HighlevelProtocols {
 				case CONNECTION_MESSAGE :
 				case CLOSE:
 					if (!message.isAcknowledgedRemotely()) {
-						System.out.println("not acknowledged remotely " + message);
 						removeContentGraphs(copy, message);
 					}
 				default:
@@ -282,7 +269,6 @@ public class HighlevelProtocols {
 	
 	private static void removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
 		conversationDataset.begin(ReadWrite.WRITE);
-		System.out.println("retracting content from : " + message.getMessageURI());
 		message.getContentGraphs().stream().forEach(uri -> conversationDataset.removeNamedModel(uri.toString()));
 		conversationDataset.commit();
 	}
@@ -309,11 +295,9 @@ public class HighlevelProtocols {
 		Model cancellationProposals = proposals.getDefaultModel();
 		
 		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
-		System.out.println("seeing what there is to cancel for proposal " + proposalUri + ", default model:");
-		RDFDataMgr.write(System.out, cancellationProposals, Lang.TURTLE);
+
 		while (nIt.hasNext()){
 			RDFNode agreementToCancelUri = nIt.next();
-			System.out.println("cancelling agreement: " + agreementToCancelUri.asResource().getURI());
 			agreements.removeNamedModel(agreementToCancelUri.asResource().getURI());
 		}
 		cancellationProposals.remove(cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null));
@@ -322,23 +306,22 @@ public class HighlevelProtocols {
 
 		proposals.begin(ReadWrite.WRITE);
 		agreements.begin(ReadWrite.WRITE);
-		System.out.println("accepting: " + proposalUri + " as " + agreementUri);
-		RDFDataMgr.write(System.out, proposals.getDefaultModel(), Lang.TURTLE);
 		Model proposal = RdfUtils.cloneModel(proposals.getNamedModel(proposalUri.toString()));
 		proposals.removeNamedModel(proposalUri.toString());
-		if (agreements.containsNamedModel(agreementUri.toString())) {
-			Model m = agreements.getNamedModel(agreementUri.toString());
-			m.add(proposal);
-			agreements.addNamedModel(agreementUri.toString(),	m);
-		} else {
-			agreements.addNamedModel(agreementUri.toString(), proposal);
+		if (proposal != null && proposal.size() > 0 ) {
+			if (agreements.containsNamedModel(agreementUri.toString())) {
+				Model m = agreements.getNamedModel(agreementUri.toString());
+				m.add(proposal);
+				agreements.addNamedModel(agreementUri.toString(),	m);
+			} else {
+				agreements.addNamedModel(agreementUri.toString(), proposal);
+			}
 		}
 		proposals.commit();
 		agreements.commit();
 	}
 	
 	private static void removeProposal(URI proposalUri, Dataset proposals) {
-		System.out.println("removing proposal: " + proposalUri);
 		proposals.begin(ReadWrite.WRITE);
 		proposals.removeNamedModel(proposalUri.toString());
 		proposals.commit();

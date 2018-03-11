@@ -153,8 +153,6 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		int o1dist = this.distanceToRoot(); 
 		int o2dist = other.distanceToRoot();
 		if (o1dist != o2dist) {
-			int diff = o1dist - o2dist;
-			System.out.println("can find earlier from later: " + (diff < 0 ? other.isMessageOnPathToRoot(this) : this.isMessageOnPathToRoot(other)));
 			return o1dist - o2dist;
 		}
 		if (this.isResponseTo(other)) return -1;
@@ -162,7 +160,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return -1;
 		//if we get to here, we should check if one of the delivery chains is earlier
 		
-		System.out.println("using uri as tie breaker");
+		
 		return this.getMessageURI().compareTo(other.getMessageURI());
 	}
 	
