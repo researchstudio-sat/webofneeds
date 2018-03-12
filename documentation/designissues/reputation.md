@@ -6,7 +6,18 @@ Needs can have an interaction with each other and at some point engage in a tran
 
 ## Certify Transactions
 
-To avoid fake transactions in order to avoid fake ratings there should be ways of validating a transaction. This could be done by trusted third party services that could have a look into (some data of) the connection between the Needs and check if the transaction is a valid one. For instance it could verify that there was a real transfer of money between the two partners. The trusted service could then create a certificate about the validity of the transaction, e.g. stating the amount, the date, domain of the transaction. The trusted party could be paid for its service. 
+To avoid fake transactions in order to avoid fake ratings there should be ways of validating a transaction. This could be done by trusted third party services that could have a look into (some data of) the connection between the Needs and check if the transaction is a valid one. For instance it could verify that there was a real transfer of money between the two partners. The trusted service could then create a certificate about the validity of the transaction. The trusted party could be paid for its service. 
+
+Possible certifiable parameters of transactions:
+* Date
+* Amount of money exchanged
+* Domain
+* Certification authority
+* Certification fee
+
+In addition to the transaction certification parameters for the ratings additional parameters are added:
+* Rating
+* Reputation profiles/pseudonyms of participants
 
 ## Rating Format
 
