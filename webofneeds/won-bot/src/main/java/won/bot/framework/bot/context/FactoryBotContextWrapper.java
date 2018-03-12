@@ -7,6 +7,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     private String factoryInternalIdName = getBotName() + ":factoryInternalId";
     private String factoryOfferToFactoryNeedMapName = getBotName() + ":factoryOfferToFactoryNeedMap";
     private String factoryGoalPreconditionStateMapName = getBotName() + ":factoryGoalPreconditionStateMap";
+    //TODO: ONCE THE PROPOSAL AND THE AGREEMENT WILL HAVE THE SAME URI WE NEED TO ADD PROPOSAL/AGREEMENTURI <-> PRECONDITION RELATION
 
     public FactoryBotContextWrapper(BotContext botContext, String botName) {
         super(botContext, botName);
