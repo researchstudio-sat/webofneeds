@@ -18,6 +18,7 @@ Possible certifiable parameters of transactions:
 * Domain
 * Certification authority
 * Certification fee
+* Other certificates (payment, postal, insurance, etc.)
 
 In addition to the transaction certification parameters for the ratings additional parameters are added:
 * Rating
