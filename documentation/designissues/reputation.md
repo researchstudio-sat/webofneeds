@@ -43,22 +43,30 @@ Drawbacks/Risks:
 
 => Therefore in a system where anonymity is important we discard this approach
 
-### Simple Rating Service Approach
+### Simple Reputation Service Approach
 
-Another approach is that rating service providers store the reputation based on transaction data for the users. Every participant could use its own reputation provider. Before transaction it has to be checked that participants accept the reputation provider of their counterpart. If that is the case they can query the reputation (if its not already included in the need description) of their counterpart. If the reputation is sufficient they can start a transaction and afterwards provide ratings to the reputation provider of their counterpart to update their counterparts rating profile.
+Another approach is that reputation service providers store the reputation based on transaction data/ratings for the users. Every participant could use its own reputation provider. Before transaction it has to be checked that participants accept the reputation provider of their counterpart. If that is the case they can query the reputation (if its not already included in the need description) of their counterpart. If the reputation is sufficient they can start a transaction and afterwards provide ratings to the reputation provider of their counterpart to update their counterparts rating profile.
 
 Benefits:
 
 * Simple solution 
-* Rating provider shows just enough reputation data to other users that is needed for a certain transaction
-* Rating service providers (and transactions counterpart provider) can be choosen by participants
+* Reputation provider shows just enough reputation data to other users that is needed for a certain transaction
+* Reputation service providers (and transactions counterpart provider) can be choosen by participants
+* Control of profiles can be applied (e.g. can demand an ID of a users before creating a reputation profile)
 
 Drawbacks/Risks:
 
 * Reputation providers can become powerful since they provide central services
+* Reputation provider collects all of an users reputation pseudonyms transaction data
 * Reputation providers have to be trusted to handle reputation data correctly (not pass/sell user data without agreement of users, count all ratings according to a transparent algorithm, not drop some ratings cause they might be bad for a user, etc.)
 * In case of change of reputation provider all transaction data has to be transfered (trustful cooperation between providers)
 * Incompatibility of which reputation providers are accepted by participants of a potential transaction
 
-### Privacy-enhanced Rating Service Approach
+### Privacy-enhanced Reputation Service Approach
+
+The problem with the previous approach is mostly that reputation service providers collect too much private user data and therefore have too much power. They must be trusted but cannot transparently be controlled from paying and interacting users. 
+
+
+
+
 
