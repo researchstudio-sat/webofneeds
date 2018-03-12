@@ -1,5 +1,9 @@
 # Reputation System Design
 
+## Reputation Profiles
+
+We intend to have reputation profiles in our system that are independet of the Needs (public keys) or the Need Owners (public keys). The user should be able to use different reputation profile pseudonyms with different owners or for different purposes. 
+
 ## Transactions 
 
 Needs can have an interaction with each other and at some point engage in a transaction. For instance this could be initiated by an agreement between the Needs. Ratings could be applied to these transactions if the Need owners agree on that. So after the transaction completed and a rating process was agreed on before, the ratings by the participants can be submitted. The system has to make sure that the submited ratings are counted for all participants even though the rating turns out to be bad for one or both sides. 
@@ -25,11 +29,6 @@ Since we want to support interactions between Needs from arbitrary domains we do
 For instance there could be ratings with single dimension or multiple dimensions, discrete or floating number scales or also including text descriptions depending on use case. Rating scheme and ontology should be negotiable between the partners of a transaction. This means that there will exists (and dynamically change) a vast amount of different rating formats in the Web of Needs Network that have to be handled in different ways. 
 
 Examples for rating ontologies that can be used:
-
-## Reputation Profiles
-
-We intend to have reputation profiles in our system that are independet of the Needs (public keys) or the Need Owners (public keys). The user should be able to use different reputation profile pseudonyms with different owners or for different purposes. 
-=> TODO: WHY?
 
 ## Architecture Options
 
