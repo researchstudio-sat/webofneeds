@@ -10,7 +10,7 @@ import java.net.URI;
  * Created by fsuda on 27.11.2017.
  */
 public class AgreementErrorEvent extends AgreementEvent {
-    public AgreementErrorEvent(Connection con, URI agreementUri, Model payload) {
-        super(con, agreementUri, payload);
+    public AgreementErrorEvent(Connection con, URI agreementUri) {
+        super(con, agreementUri);
     }
 }

@@ -10,7 +10,7 @@ import java.net.URI;
  * Created by fsuda on 27.11.2017.
  */
 public class AgreementCanceledEvent extends AgreementEvent {
-    public AgreementCanceledEvent(Connection con, URI agreementUri, Model payload) {
-        super(con, agreementUri, payload);
+    public AgreementCanceledEvent(Connection con, URI agreementUri) {
+        super(con, agreementUri);
     }
 }

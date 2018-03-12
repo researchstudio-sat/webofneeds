@@ -11,17 +11,11 @@ import java.net.URI;
  * Created by fsuda on 27.11.2017.
  */
 public abstract class AgreementEvent extends BaseNeedAndConnectionSpecificEvent {
-    private final Model payload;
     private final URI agreementUri;
 
-    public AgreementEvent(Connection con, URI agreementUri, Model payload) {
+    public AgreementEvent(Connection con, URI agreementUri) {
         super(con);
         this.agreementUri = agreementUri;
-        this.payload = payload;
-    }
-
-    public Model getPayload() {
-        return payload;
     }
 
     public URI getAgreementUri() {
