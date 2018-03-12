@@ -74,7 +74,7 @@ Drawbacks/Risks:
 
 ### Privacy-enhanced Reputation Service Approach
 
-The problem with the previous approach is mostly that reputation service providers collect too much private user data and therefore have too much power. They must be trusted but cannot transparently be controlled from paying and interacting users. 
+The problem with the previous approach is mostly that reputation service providers collect too much private user data and therefore have too much power. They must be trusted but cannot be effectively controlled from paying and interacting users. 
 
 
 
