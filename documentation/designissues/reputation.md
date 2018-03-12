@@ -43,8 +43,22 @@ Drawbacks/Risks:
 
 => Therefore in a system where anonymity is important we discard this approach
 
-### Simple Private Rating Data Approach
+### Simple Rating Service Approach
 
-### Advanced Private Rating Data Approach
+Another approach is that rating service providers store the reputation based on transaction data for the users. Every participant could use its own reputation provider. Before transaction it has to be checked that participants accept the reputation provider of their counterpart. If that is the case they can query the reputation (if its not already included in the need description) of their counterpart. If the reputation is sufficient they can start a transaction and afterwards provide ratings to the reputation provider of their counterpart to update their counterparts rating profile.
 
-## Counter-Measures for Attacks and Manipulation
+Benefits:
+
+* Simple solution 
+* Rating provider shows just enough reputation data to other users that is needed for a certain transaction
+* Rating service providers (and transactions counterpart provider) can be choosen by participants
+
+Drawbacks/Risks:
+
+* Reputation providers can become powerful since they provide central services
+* Reputation providers have to be trusted to handle reputation data correctly (not pass/sell user data without agreement of users, count all ratings according to a transparent algorithm, not drop some ratings cause they might be bad for a user, etc.)
+* In case of change of reputation provider all transaction data has to be transfered (trustful cooperation between providers)
+* Incompatibility of which reputation providers are accepted by participants of a potential transaction
+
+### Privacy-enhanced Rating Service Approach
+
