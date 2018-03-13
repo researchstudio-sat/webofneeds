@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -25,12 +26,11 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.RdfUtils;
@@ -39,7 +39,7 @@ import won.protocol.vocabulary.WONAGR;
 
 
 public class HighlevelProtocols {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger logger = LoggerFactory.getLogger(HighlevelProtocols.class);
 	
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutAfterMessageFunction;
 	
@@ -48,7 +48,9 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		
+		if (logger.isDebugEnabled()) {
+			logger.debug("starting conversation analysis for high-level protocols");
+		}
 		//Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
@@ -64,42 +66,47 @@ public class HighlevelProtocols {
 		
 		//iterate over messages and interconnect them
 		messages.stream().forEach(message -> {
-			if (message.getCorrespondingRemoteMessageURI() != null) {
+			if (message.getCorrespondingRemoteMessageURI() != null && ! message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
 				message.setCorrespondingRemoteMessageRef(other);
 				other.setCorrespondingRemoteMessageRef(message);
 			}
-			message.getPrevious().stream().forEach(uri -> {
+			message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
 				message.addPreviousRef(other);
 				other.addPreviousInverseRef(message);
 			});
-			message.getAccepts().stream().forEach(uri -> {
+			message.getAccepts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
 				message.addAcceptsRef(other); 
 				other.addAcceptsInverseRef(message);
 			});
-			message.getProposes().stream().forEach(uri -> {
+			message.getProposes().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
 				message.addProposesRef(other);
 				other.addProposesInverseRef(message);
 				});
-			message.getProposesToCancel().stream().forEach(uri -> {
+			message.getProposesToCancel().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
 				message.addProposesToCancelRef(other);
 				other.addProposesToCancelInverseRef(message);
 				});
-			message.getRetracts().stream().forEach(uri -> {
+			message.getRetracts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
 				message.addRetractsRef(other);
 				other.addRetractsInverseRef(message);
 				});
-			if (message.getIsResponseTo() != null) {
+			if (message.getIsResponseTo() != null && ! message.getIsResponseTo().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
 				message.setIsResponseToRef(other);
 				other.setIsResponseToInverseRef(message);
 			}
-			if (message.getIsRemoteResponseTo() != null) {
+			if (message.getIsRemoteResponseTo() != null && ! message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
 				message.setIsRemoteResponseToRef(other);
 				other.setIsRemoteResponseToInverseRef(message);
@@ -108,11 +115,15 @@ public class HighlevelProtocols {
 				roots.add(message);
 			}
 		});
-		
+
 		//link messages to deliveryChains
-		messages.forEach(m -> m.getDeliveryChain());
-		 
+		Set<DeliveryChain> deliveryChains = 
+				messages.stream().map(m -> m.getDeliveryChain())
+				.collect(Collectors.toSet());
 		
+		//find interleaved delivery chains
+		deliveryChains.stream().forEach(dc -> deliveryChains.stream().forEach(dc2 -> dc.rememberIfInterleavedWith(dc)));			
+				
 
 		//apply acknowledgment protocol to whole conversation first:
 		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
@@ -125,7 +136,7 @@ public class HighlevelProtocols {
 		
 		PriorityQueue<ConversationMessage> currentMessages = 
 				new PriorityQueue<ConversationMessage>();
-		currentMessages.addAll(roots);
+		currentMessages.addAll(messages);
 		
 		//TODO: we need to use a priority queue for the messages, which is 
 		//sorted by temporal ordering. Each time we process a message, we 
@@ -133,6 +144,10 @@ public class HighlevelProtocols {
 		//oldest from the queue for the next iteration.
 
 		Set<ConversationMessage> processed = new HashSet<>();
+		List<ConversationMessage> processedInOrder = null;
+		if (logger.isDebugEnabled()) {
+			processedInOrder = new ArrayList<>();
+		}
 		ConversationMessage last = null;
 		while(!currentMessages.isEmpty()) {
 
@@ -141,33 +156,61 @@ public class HighlevelProtocols {
 				continue;
 			}
 			processed.add(msg);
+			if (logger.isDebugEnabled() && processedInOrder != null) {
+				processedInOrder.add(msg);
+			}
 			
 			
 			last = msg;
-
+			if (!msg.isRootOfDeliveryChain() ) {
+				continue;
+			}
+			if (!msg.isHighlevelProtocolMessage()) {
+				continue;
+			}
+			if (msg.getDeliveryChain().getInterleavedDeliveryChains().stream().anyMatch(s -> s.getRoot().isHighlevelProtocolMessage())) {
+				// if highlevel protocol messages are interleaved, their relative ordering is undecided
+				// for calculating their effects one would have to choose which one is first
+				// the only fair solution is that neither of these messages have any effect
+				continue;
+			}
 			if (msg.isRetractsMessage()) {
-				
 				removeContentGraphs(conversation, msg);
+				if (logger.isDebugEnabled()) {
+					msg.getRetractsRefs().forEach(other -> {
+						logger.debug("{} retracts {}", msg.getMessageURI(), other.getMessageURI());
+					});
+				}
 				msg.getRetractsRefs()
 					.stream()
 					.filter(other -> msg != other)
 					.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
-					.forEach(toRetract -> {
-						removeContentGraphs(conversation, toRetract);
-						if (toRetract.isProposesMessage()) {
-							removeProposal(toRetract.getMessageURI(), proposals);
+					.forEach(other -> {
+						if (logger.isDebugEnabled()) {
+							logger.debug("{} retracts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+						}
+						removeContentGraphs(conversation, other);
+						if (other.isProposesMessage()) {
+							removeProposal(other.getMessageURI(), proposals);
 						}
 					});
 			}
 			if (msg.isProposesMessage()) {
+				if (logger.isDebugEnabled()) {
+					msg.getProposesRefs().forEach(other -> {
+						logger.debug("{} proposes {}", msg.getMessageURI(), other.getMessageURI());
+					});
+				}
 				Model proposalContent = ModelFactory.createDefaultModel();
 				msg.getProposesRefs().stream()
 				.filter(other -> msg != other)
 				.filter(other -> msg.isMessageOnPathToRoot(other))
-				.forEach(clause -> {
-					
-					proposalContent.add(aggregateGraphs(conversation, clause.getContentGraphs()));
+				.forEach(other -> {
+					if (logger.isDebugEnabled()) {
+						logger.debug("{} proposes {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+					}
+					proposalContent.add(aggregateGraphs(conversation, other.getContentGraphs()));
 				});
 				
 
@@ -176,28 +219,43 @@ public class HighlevelProtocols {
 				proposals.commit();
 			}
 			if (msg.isAcceptsMessage()) {
+				if (logger.isDebugEnabled()) {
+					msg.getAcceptsRefs().forEach(other -> {
+						logger.debug("{} accepts {}", msg.getMessageURI(), other.getMessageURI());
+					});
+				}
 				msg.getAcceptsRefs()
 					.stream()
 					.filter(other -> msg != other)
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
-					.forEach(accepted -> {
-						acceptProposal(accepted.getMessageURI(),msg.getMessageURI(), proposals, agreements);
+					.forEach(other -> {
+						if (logger.isDebugEnabled()) {
+							logger.debug("{} accepts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+						}
+						acceptProposal(other.getMessageURI(),msg.getMessageURI(), proposals, agreements);
 					});
 			}
 			if (msg.isProposesToCancelMessage()) {
+				if (logger.isDebugEnabled()) {
+					msg.getProposesToCancelRefs().forEach(other -> {
+						logger.debug("{} proposesToCancel {}", msg.getMessageURI(), other.getMessageURI());
+					});
+				}
 				proposals.begin(ReadWrite.WRITE);
 				final Model cancellationProposals = proposals.getDefaultModel();
 				msg.getProposesToCancelRefs()
 					.stream()
 					.filter(other -> msg != other)
 					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
-					.forEach(proposedToCancel -> {
-					
+					.forEach(other -> {
+						if (logger.isDebugEnabled()) {
+							logger.debug("{} proposesToCancel {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+						}
 					cancellationProposals.add(new StatementImpl(
 							cancellationProposals.getResource(msg.getMessageURI().toString()),
 							WONAGR.PROPOSES_TO_CANCEL,
-							cancellationProposals.getResource(proposedToCancel.getMessageURI().toString())));
+							cancellationProposals.getResource(other.getMessageURI().toString())));
 					proposals.setDefaultModel(cancellationProposals);
 				});
 				proposals.commit();
@@ -207,12 +265,19 @@ public class HighlevelProtocols {
 			
 
 		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("messages in the order they were processed:");
+			if (processedInOrder != null) {
+				processedInOrder.stream().forEach(x -> logger.debug(x.toString()));
+			}
+			logger.debug("finished conversation analysis for high-level protocols");
+		}
 		return agreements;
 	}
 	
 	private static int compare4Dbg(ConversationMessage o1, ConversationMessage o2) {
-		int o1dist = o1.distanceToRoot(); 
-		int o2dist = o2.distanceToRoot();
+		int o1dist = o1.distanceToFurthestRoot(); 
+		int o2dist = o2.distanceToFurthestRoot();
 		if (o1dist != o2dist) {
 			return o1dist - o2dist;
 		}

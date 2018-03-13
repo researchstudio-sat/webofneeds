@@ -1,10 +1,15 @@
 package won.protocol.highlevel;
 
 import java.net.URI;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
@@ -49,7 +54,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	WonMessageDirection direction;
 	DeliveryChain deliveryChain;
 	
-	private Integer distanceToRoot;
+	private OptionalInt distanceToOwnRoot = OptionalInt.empty();
 	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
@@ -150,24 +155,23 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	 */
 	public int compareTo(ConversationMessage other) {
 		if (this == other) return 0;
-		int o1dist = this.distanceToRoot(); 
-		int o2dist = other.distanceToRoot();
+		int o1dist = this.distanceToFurthestRoot(); 
+		int o2dist = other.distanceToFurthestRoot();
 		if (o1dist != o2dist) {
 			return o1dist - o2dist;
 		}
-		if (this.isResponseTo(other)) return -1;
-		if (this.isRemoteResponseTo(other)) return -1;
-		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return -1;
+		if (this.isResponseTo(other)) return 1;
+		if (this.isRemoteResponseTo(other)) return 1;
+		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return 1;
 		//if we get to here, we should check if one of the delivery chains is earlier
-		
-		
 		return this.getMessageURI().compareTo(other.getMessageURI());
+
 	}
 	
 	public boolean isAfter(ConversationMessage other) {
 		if (this == other) return false;
-		int o1dist = this.distanceToRoot(); 
-		int o2dist = other.distanceToRoot();
+		int o1dist = this.distanceToFurthestRoot(); 
+		int o2dist = other.distanceToFurthestRoot();
 		if (o1dist != o2dist) {
 			return o1dist > o2dist;
 		}
@@ -177,29 +181,27 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		return false;
 	}
 	
-	public int distanceToRoot() {
-		return distanceToRoot(new HashSet());
+	public int distanceToFurthestRoot() {
+		int dist = distanceToOwnRoot();
+		if (this.hasCorrespondingRemoteMessage()) {
+			return Math.max(dist, getCorrespondingRemoteMessageRef().distanceToOwnRoot());
+		}
+		return dist;
 	}
 	
-	public int distanceToRoot(Set<ConversationMessage> visited) {
-		if (distanceToRoot != null) return distanceToRoot;
+	public int distanceToOwnRoot() {
+		//if we have 
+		if (this.distanceToOwnRoot.isPresent()) {
+			return this.distanceToOwnRoot.getAsInt();
+		}
 		if (!this.hasPreviousMessage()) {
-			this.distanceToRoot = 0;
+			this.distanceToOwnRoot = OptionalInt.of(0);
 			return 0;
 		}
-		visited.add(this);
-		HashSet visitedSoFar = new HashSet<>();
-		visitedSoFar.addAll(visited);
-		OptionalInt dist = getPreviousRefs()
+		this.distanceToOwnRoot = getPreviousRefs()
 				.stream()
-				.filter(msg -> !visitedSoFar.contains(msg))
-				.map(msg -> msg.distanceToRoot(visitedSoFar)).mapToInt(i->i).max();
-		if (this.hasCorrespondingRemoteMessage() && ! visited.contains(this.getCorrespondingRemoteMessageRef())) {
-			int distThroughRemote = this.getCorrespondingRemoteMessageRef().distanceToRoot(visitedSoFar);
-			dist = OptionalInt.of(dist.isPresent() ? Math.max(dist.getAsInt(), distThroughRemote) : distThroughRemote);  
-		}
-		this.distanceToRoot = dist.isPresent() ? dist.getAsInt() + 1 : 0;
-		return this.distanceToRoot;
+				.mapToInt(msg -> msg.distanceToOwnRoot() + 1).min();
+		return distanceToOwnRoot.getAsInt();
 	}
 	
 	
@@ -222,6 +224,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 			return this.getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(other, visited);
 		}
 		return false;
+	}
+	
+	public boolean isHighlevelProtocolMessage() {
+		return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this.isAcceptsMessage(); 
 	}
 	
 	public boolean isFromOwner() {
@@ -439,10 +445,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 
 	@Override
 	public String toString() {
-		return "ConversationMessage [messageURI=" + messageURI 
+		return "ConversationMessage [messageURI=" + messageURI
+				+ ", distanceToOwnRoot=" + distanceToFurthestRoot()				
 				+ ", direction=" + direction
 				+ ", messageType=" + messageType
-				+ ", distanceToRoot=" + distanceToRoot()
 				+ ", senderNeedURI=" + senderNeedURI
 				
 				+ ", proposes="

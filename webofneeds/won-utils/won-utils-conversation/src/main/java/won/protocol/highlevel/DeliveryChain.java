@@ -11,6 +11,7 @@ import java.util.Set;
  */
 public class DeliveryChain {
 	private Set<ConversationMessage> messages = new HashSet<>();
+	private Set<DeliveryChain> interleavedDeliveryChains = new HashSet<>();
 	private ConversationMessage root; 
 	public DeliveryChain() {}
 	
@@ -39,7 +40,12 @@ public class DeliveryChain {
 	public boolean isAfter(DeliveryChain other) {
 		return other.getMessages().stream()
 				.anyMatch(
-						msg -> this.getRoot().isMessageOnPathToRoot(msg));
+						msg -> 
+						//is the root before msg?
+						this.getRoot().isMessageOnPathToRoot(msg)
+						//is the remote message of root before msg?
+						|| (this.getRoot().hasCorrespondingRemoteMessage() 
+								&& this.getRoot().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg)));
 	}
 
 	/**
@@ -48,26 +54,28 @@ public class DeliveryChain {
 	 * @param other
 	 * @return
 	 */
-	public boolean isInterleavedDeliveryChain(DeliveryChain other) {
+	private boolean _isInterleavedWith(DeliveryChain other) {
 		if (this == other) return false;
 		return ! this.isAfter(other) || other.isAfter(this); 
 	}
-	
-	/**
-	 * This chain is before the specified other message if there is a path
-	 * from other to any of the messages in the chain.
-	 * @param other
-	 * @return
-	 */
-	public boolean isBefore(ConversationMessage other) {
-		return this.messages.stream().anyMatch(m -> other.isAfter(m));
+
+	public void rememberIfInterleavedWith(DeliveryChain other) {
+		if (this.interleavedDeliveryChains.contains(other)) {
+			//checked that earlier
+			return;
+		}
+		if (_isInterleavedWith(other)) {
+			this.interleavedDeliveryChains.add(other);
+			other.interleavedDeliveryChains.add(this);
+		}
 	}
 	
+	public boolean isInterleavedWith(DeliveryChain other) {
+		return this.interleavedDeliveryChains.contains(other);
+	}
 	
 	public Set<DeliveryChain> getInterleavedDeliveryChains() {
-		Set ret = new HashSet<>();
-		//start at the root - only messages after the root can be interleaved
-		return ret;
+		return this.interleavedDeliveryChains;
 	}
 	
 }
