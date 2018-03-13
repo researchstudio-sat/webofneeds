@@ -25,6 +25,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	Set<URI> proposes = new HashSet<>();
 	Set<ConversationMessage> proposesRefs = new HashSet<ConversationMessage>();
 	Set<ConversationMessage> proposesInverseRefs = new HashSet<ConversationMessage>();
+	Set<URI> rejects = new HashSet<>();
+	Set<ConversationMessage> rejectsRefs = new HashSet<ConversationMessage>();
+	Set<ConversationMessage> rejectsInverseRefs = new HashSet<ConversationMessage>();
 	Set<URI> previous = new HashSet<>();
 	Set<ConversationMessage> previousRefs = new HashSet<ConversationMessage>();
 	Set<ConversationMessage> previousInverseRefs = new HashSet<ConversationMessage>();
@@ -168,18 +171,6 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 
 	}
 	
-	public boolean isAfter(ConversationMessage other) {
-		if (this == other) return false;
-		int o1dist = this.distanceToFurthestRoot(); 
-		int o2dist = other.distanceToFurthestRoot();
-		if (o1dist != o2dist) {
-			return o1dist > o2dist;
-		}
-		if (this.isResponseTo(other)) return true;
-		if (this.isRemoteResponseTo(other)) return true;
-		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return true;
-		return false;
-	}
 	
 	public int distanceToFurthestRoot() {
 		int dist = distanceToOwnRoot();
@@ -227,7 +218,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 	
 	public boolean isHighlevelProtocolMessage() {
-		return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this.isAcceptsMessage(); 
+		return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this.isAcceptsMessage() || this.isRejectsMessage(); 
 	}
 	
 	public boolean isFromOwner() {
@@ -259,6 +250,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		return !this.proposesRefs.isEmpty();
 	}
 	
+	public boolean isRejectsMessage() {
+		return !this.rejectsRefs.isEmpty();
+	}
+	
 	public boolean isProposesToCancelMessage() {
 		return !this.proposesToCancelRefs.isEmpty();
 	}
@@ -275,6 +270,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public Set<URI> getProposes() {
 		return proposes;
 	}
+	public Set<URI> getRejects() {
+		return rejects;
+	}
 	public Set<ConversationMessage> getProposesRefs(){
 		return proposesRefs;
 	}
@@ -284,7 +282,15 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public void addProposesRef(ConversationMessage ref) {
 		this.proposesRefs.add(ref);
 	}
-	
+	public Set<ConversationMessage> getRejectsRefs(){
+		return rejectsRefs;
+	}
+	public void addRejects(URI rejects) {
+		this.rejects.add(rejects);
+	}
+	public void addRejectsRef(ConversationMessage ref) {
+		this.rejectsRefs.add(ref);
+	}	
 	public Set<URI> getPrevious() {
 		return previous;
 	}
@@ -383,6 +389,12 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public void addProposesInverseRef(ConversationMessage ref) {
 		this.proposesInverseRefs.add(ref);
 	}
+	public Set<ConversationMessage> getRejectsInverseRefs() {
+		return rejectsInverseRefs;
+	}
+	public void addRejectsInverseRef(ConversationMessage ref) {
+		this.rejectsInverseRefs.add(ref);
+	}
 	public Set<ConversationMessage> getPreviousInverseRefs() {
 		return previousInverseRefs;
 	}
@@ -450,9 +462,9 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 				+ ", direction=" + direction
 				+ ", messageType=" + messageType
 				+ ", senderNeedURI=" + senderNeedURI
-				
-				+ ", proposes="
-				+ proposes + ", proposesRefs:" + proposesRefs.size() + ", previous=" + previous + ", previousRefs:"
+				+ ", proposes=" + proposes + ", proposesRefs:" + proposesRefs.size()
+				+ ", rejects=" + rejects + ", rejectsRefs:" + rejectsRefs.size()
+				+ ", previous=" + previous + ", previousRefs:"
 				+ previousRefs.size() + ", accepts=" + accepts + ", acceptsRefs:" + acceptsRefs.size() + ", retracts=" + retracts
 				+ ", retractsRefs:" + retractsRefs.size() + ", proposesToCancel=" + proposesToCancel
 				+ ", proposesToCancelRefs:" + proposesToCancelRefs.size() + ", correspondingRemoteMessageURI="

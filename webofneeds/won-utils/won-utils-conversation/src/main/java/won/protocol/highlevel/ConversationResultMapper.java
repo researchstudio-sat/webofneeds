@@ -45,6 +45,10 @@ public class ConversationResultMapper implements Function<QuerySolution, Convers
 		if (proposes != null) {
 			ret.addProposes(proposes);
 		}
+		URI rejects = getUriVar(solution, "rejects");
+		if (rejects != null) {
+			ret.addRejects(rejects);
+		}
 		URI proposesToCancel = getUriVar(solution, "proposesToCancel");
 		if (proposesToCancel != null) {
 			ret.addProposesToCancel(proposesToCancel);

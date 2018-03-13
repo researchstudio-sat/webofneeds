@@ -51,7 +51,6 @@ public class HighlevelProtocols {
 		if (logger.isDebugEnabled()) {
 			logger.debug("starting conversation analysis for high-level protocols");
 		}
-		//Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
 		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
@@ -88,6 +87,12 @@ public class HighlevelProtocols {
 				ConversationMessage other = messagesByURI.get(uri);
 				message.addProposesRef(other);
 				other.addProposesInverseRef(message);
+				});
+			message.getRejects().stream().filter(uri -> !uri.equals(message.getMessageURI()))
+				.forEach(uri -> {
+				ConversationMessage other = messagesByURI.get(uri);
+				message.addRejectsRef(other);
+				other.addRejectsInverseRef(message);
 				});
 			message.getProposesToCancel().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
@@ -172,6 +177,9 @@ public class HighlevelProtocols {
 				// if highlevel protocol messages are interleaved, their relative ordering is undecided
 				// for calculating their effects one would have to choose which one is first
 				// the only fair solution is that neither of these messages have any effect
+				if (logger.isDebugEnabled()) {
+					logger.debug("ignoring interleaved message: {}", msg.getMessageURI());
+				}
 				continue;
 			}
 			if (msg.isRetractsMessage()) {
@@ -195,6 +203,26 @@ public class HighlevelProtocols {
 							removeProposal(other.getMessageURI(), proposals);
 						}
 					});
+			}
+			if (msg.isRejectsMessage()) {
+				removeContentGraphs(conversation, msg);
+				if (logger.isDebugEnabled()) {
+					msg.getRejectsRefs().forEach(other -> {
+						logger.debug("{} rejects {}", msg.getMessageURI(), other.getMessageURI());
+					});
+				}
+				msg.getRejectsRefs()
+					.stream()
+					.filter(other -> msg != other)
+					.filter(other -> other.isProposesMessage())
+					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.filter(other -> msg.isMessageOnPathToRoot(other))
+					.forEach(other -> {
+						if (logger.isDebugEnabled()) {
+							logger.debug("{} rejects {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+						}
+						removeProposal(other.getMessageURI(), proposals);
+				});
 			}
 			if (msg.isProposesMessage()) {
 				if (logger.isDebugEnabled()) {
@@ -275,20 +303,7 @@ public class HighlevelProtocols {
 		return agreements;
 	}
 	
-	private static int compare4Dbg(ConversationMessage o1, ConversationMessage o2) {
-		int o1dist = o1.distanceToFurthestRoot(); 
-		int o2dist = o2.distanceToFurthestRoot();
-		if (o1dist != o2dist) {
-			return o1dist - o2dist;
-		}
-		if (o1.isAfter(o2)) {
-			return 1;
-		}
-		if (o2.isAfter(o1)) {
-			return -1;
-		}
-		return 0;
-	}
+
 	
 	private static Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages ) {
 		Dataset copy = RdfUtils.cloneDataset(conversationDataset);

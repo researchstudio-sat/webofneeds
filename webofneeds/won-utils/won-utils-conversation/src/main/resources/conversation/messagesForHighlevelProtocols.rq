@@ -4,7 +4,7 @@ PREFIX won: <http://purl.org/webofneeds/model#>
 PREFIX agr: <http://purl.org/webofneeds/agreement#>
 PREFIX mod: <http://purl.org/webofneeds/modification#> 
 
-SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel ?previous ?correspondingRemoteMessage ?isResponseTo ?isRemoteResponseTo ?contentGraph WHERE 
+SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel ?rejects ?previous ?correspondingRemoteMessage ?isResponseTo ?isRemoteResponseTo ?contentGraph WHERE 
 {
     GRAPH <urn:x-arq:UnionGraph> 
     {
@@ -27,6 +27,8 @@ SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?propose
         ?msg msg:hasCorrespondingRemoteMessage ?correspondingRemoteMessage.
        } OPTIONAL {
         ?msg agr:proposes ?proposes.
+       } OPTIONAL {
+        ?msg agr:rejects ?rejects.
        } OPTIONAL {
         ?msg agr:proposesToCancel ?proposesToCancel.
        } OPTIONAL {

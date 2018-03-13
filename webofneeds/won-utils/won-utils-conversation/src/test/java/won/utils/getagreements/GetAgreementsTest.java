@@ -408,6 +408,14 @@ public class GetAgreementsTest {
 		test(input, expectedOutput);
 	}
 
+	@Test
+	public void oneProposalRejectedBeforeAccept() throws IOException {
+		Dataset input = loadDataset(inputFolder + "one-proposal-rejected-before-accept.trig");
+		Dataset expectedOutput = loadDataset(
+				expectedOutputFolder + "one-proposal-rejected-before-accept.trig");
+		test(input, expectedOutput);
+	}
+	
 	private static boolean passesTest(Dataset input, Dataset expectedOutput) {
 		Dataset actual = HighlevelFunctionFactory.getAgreementFunction().apply(input);
 		return RdfUtils.isIsomorphicWith(expectedOutput, actual);
