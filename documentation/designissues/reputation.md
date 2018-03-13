@@ -37,7 +37,8 @@ There are different ways of calculating an aggregated reputation "score" out of 
 
 ## Architecture Options
 
-One of the major design choices of the reputation systems architecture is who should be able to access transaction data which is the basis for calculating a rating or reputation. We see two alternatives: either making rating data public and accessable for everybody or making rating data private and only accessible for the owner and other partners and services which are trusted. 
+Main design choices of the reputation systems architecture is who should be able to access transaction data which is the basis for calculating a rating or reputation. Furthermore the system could be centralized or decentralized. 
+We will start describing an approach making rating data public and accessable for everybody. In the following we descibe different approaches with more or less privacy for rating data (centralized and dezentralized). 
 
 ### Public Rating Data Approach
 
@@ -58,7 +59,26 @@ Drawbacks/Risks:
 
 => Therefore in a system where anonymity is important we discard this approach
 
-### Simple Reputation Service Approach
+### Centralized Reputation Service Approach
+
+Instead of detailed public rating and transaction data there could be one centralized reputation service which manages the ratings and reputations for everyone. This service has the rating data of the whole transaction graph of the whole network avaiable. Users can query the service for an aggregated reputation score of their potential counterpart in a transaction. If the reputation is sufficient they can start a transaction and afterwards provide ratings to the reputation service to update their counterparts rating profile. 
+
+Benefits:
+
+* Simple solution 
+* Reputation provider shows just enough reputation data to other users that is needed for a certain transaction
+* Control of profiles can be applied (e.g. can demand an ID of a users before creating a reputation profile)
+
+Drawbacks/Risks:
+
+* Centralized service defeats purpose of decentralized WoN system architecture 
+* Reputation service is extremly powerful
+* Reputation service collects all breputation pseudonyms transaction data
+* Reputation service have to be trusted by everyone to handle reputation data correctly (not pass/sell user data without agreement of users, count all ratings according to a transparent algorithm, not drop some ratings cause they might be bad for a user, etc.)
+
+=> Centralized Reputation Service Approach (in general) not useful for decentralized infrastructure
+
+### Simple Decentralized Reputation Service Approach
 
 Another approach is that reputation service providers store the reputation based on transaction data/ratings for the users. Every participant could use its own reputation provider. Before transaction it has to be checked that participants accept the reputation provider of their counterpart. If that is the case they can query the reputation (if its not already included in the need description) of their counterpart. If the reputation is sufficient they can start a transaction and afterwards provide ratings to the reputation provider of their counterpart to update their counterparts rating profile.
 
@@ -77,7 +97,7 @@ Drawbacks/Risks:
 * In case of change of reputation provider all transaction data has to be transfered (trustful cooperation between providers)
 * Incompatibility of which reputation providers are accepted by participants of a potential transaction
 
-### Privacy-enhanced Reputation Service Approach
+### Privacy-enhanced Decentralized Reputation Service Approach
 
 The problem with the previous approach is mostly that reputation service providers collect too much private user data and therefore have too much power. They must be trusted but cannot be effectively controlled from paying and interacting users. 
 
