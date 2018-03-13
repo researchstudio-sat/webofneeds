@@ -1331,7 +1331,7 @@
 <https://localhost:8443/won/resource/event/ow321nn1va6clfidc4s0#content-1o90> {
     event:ow321nn1va6clfidc4s0
             won:hasTextMessage  "Please go on." ;
-            agr:proposesToCancel event:5669098069340991000 .
+            agr:proposesToCancel event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/fbsnd9ilwhqg8f4l2tjg#envelope-jfhm> {
@@ -2556,7 +2556,7 @@
 <https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc#content-tbn3> {
     event:00d5wzbbf8hzzt2eewcc
             won:hasTextMessage  "I'm not sure I understand you fully." ;
-            agr:proposesToCancel event:5669098069340991000 .
+            agr:proposesToCancel event:usi9yhill1lo2xi70sjx .
             
 }
 

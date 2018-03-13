@@ -233,7 +233,7 @@ public class HighlevelProtocols {
 						if (logger.isDebugEnabled()) {
 							logger.debug("{} accepts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
 						}
-						acceptProposal(other.getMessageURI(),msg.getMessageURI(), proposals, agreements);
+						acceptProposal(other.getMessageURI(),other.getMessageURI(), proposals, agreements);
 					});
 			}
 			if (msg.isProposesToCancelMessage()) {
