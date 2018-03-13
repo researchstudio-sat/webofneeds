@@ -77,7 +77,14 @@ Drawbacks/Risks:
 
 The problem with the previous approach is mostly that reputation service providers collect too much private user data and therefore have too much power. They must be trusted but cannot be effectively controlled from paying and interacting users. 
 
+A rather advanced option to the privacy problem would be to let every user store and manage their own reputation profiles. The detailed transaction and rating history ideally would not be revealed to anybody (not even the reputation services), just the aggregated rating computed based on it. 
 
+The rating services would be used to update and sign a transaction/rating history when a new transaction with a rating is available. The user would proof (zero knowledge proof) to the rating service that he has a valid signed transaction history and the service should blind sign (blind signature) the old history including the new transaction rating. The user could then use the newly signed rating history to compute his updated agreegated rating and publish it. A user who computes his aggregated rating would have to proof to other users that he used his signed and up-to-date transaction rating history for that purpose without revealing the details of this history to other users (zkSNARKS).
 
+Benefits:
+* privacy and trust of reputation profiles (towards other users and reputation services, basically invalidate all drawback arguments from the Simple Reputation Service Approach)
 
+Drawbacks/Risks:
+* Advanced complex concepts that have not been adopted widely yet
+* Not yet clear how exactly this would be implemented
 
