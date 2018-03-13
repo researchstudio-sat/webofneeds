@@ -364,13 +364,30 @@ public class GetAgreementsTest {
 
 	}
 
-	// This includes a Proposal that is retracted
+	// proposal is first accepted, then retracted
 	@Test
-	public void oneAgreementProposalRetracted() throws IOException {
+	public void oneAgreementProposalRetractedTooLate() throws IOException {
 		Dataset input = loadDataset(getAGinputFolder + "one-agreement-proposes-retracted.trig");
 		Dataset expectedOutput = loadDataset(getAGexpectedOutputFolder + "one-agreement-proposes-retracted.trig");
 		test(input, expectedOutput);
 	}
+	
+	// proposal not accepted as accept chain is interleaved with retracts chain
+	@Test
+	public void oneAgreementProposalRetractedInterleaved() throws IOException {
+		Dataset input = loadDataset(inputFolder + "one-agreement-proposes-retracted-interleaved.trig");
+		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposes-retracted-interleaved.trig");
+		test(input, expectedOutput);
+	}
+	
+	// proposal not accepted as accept chain is interleaved with retracts chain
+	@Test
+	public void oneAgreementAcceptContainsRetract() throws IOException {
+		Dataset input = loadDataset(inputFolder + "one-agreement-proposes-accept-contains-retract.trig");
+		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposes-accept-contains-retract.trig");
+		test(input, expectedOutput);
+	}
+
 
 	// This includes a Proposal that is retracted
 	@Test

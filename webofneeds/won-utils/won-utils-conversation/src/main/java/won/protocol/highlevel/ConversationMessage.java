@@ -11,6 +11,8 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.thrift.Option;
+
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 
@@ -41,6 +43,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	Set<ConversationMessage> proposesToCancelRefs = new HashSet<ConversationMessage>();
 	Set<ConversationMessage> proposesToCancelInverseRefs = new HashSet<ConversationMessage>();
 	Set<URI> contentGraphs = new HashSet<>();
+	Option<ConversationMessage> conversationRoot = Option.none();
 	
 	URI correspondingRemoteMessageURI;
 	ConversationMessage correspondingRemoteMessageRef;
@@ -57,23 +60,94 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	WonMessageDirection direction;
 	DeliveryChain deliveryChain;
 	
-	private OptionalInt distanceToOwnRoot = OptionalInt.empty();
+	private OptionalInt minDistanceToOwnRoot = OptionalInt.empty();
+	private OptionalInt maxDistanceToOwnRoot = OptionalInt.empty();
+	private OptionalInt order = OptionalInt.empty();
 	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
 	}
 	
-	public ConversationMessage getRootOfDeliveryChain() {
-		return getDeliveryChain().getRoot();
+	/**
+	 * Removes all proposes, rejects, accepts, proposesToCancel, contentGraphs
+	 */
+	public void removeHighlevelProtocolProperties() {
+		removeProposes();
+		removeAccepts();
+		removeProposesToCancel();
+		removeRejects();
+		removeRetracts();
 	}
 	
-	public boolean isRootOfDeliveryChain() {
+	private void removeProposes() {
+		this.proposes = new HashSet<>();
+		this.proposesRefs.forEach(other -> other.removeProposesInverseRef(this));
+		this.proposesRefs = new HashSet<>();
+	}
+	
+	private void removeProposesInverseRef(ConversationMessage other) {
+		this.proposesInverseRefs.remove(other);
+	}
+	
+	private void removeProposesToCancel() {
+		this.proposesToCancel = new HashSet<>();
+		this.proposesToCancelRefs.forEach(other -> other.removeProposesToCancelInverseRef(this));
+		this.proposesToCancelRefs = new HashSet<>();
+	}
+	
+	private void removeProposesToCancelInverseRef(ConversationMessage other) {
+		this.proposesInverseRefs.remove(other);
+	}
+	
+	private void removeAccepts() {
+		this.accepts = new HashSet<>();
+		this.acceptsRefs.forEach(other -> other.removeAcceptsInverseRef(this));
+		this.acceptsRefs = new HashSet<>();
+	}
+	
+	private void removeAcceptsInverseRef(ConversationMessage other) {
+		this.proposesInverseRefs.remove(other);
+	}
+	
+	private void removeRejects() {
+		this.rejects = new HashSet<>();
+		this.rejectsRefs.forEach(other -> other.removeRejectsInverseRef(this));
+		this.rejectsRefs = new HashSet<>();
+	}
+	
+	private void removeRejectsInverseRef(ConversationMessage other) {
+		this.proposesInverseRefs.remove(other);
+	}
+	
+	private void removeRetracts() {
+		this.retracts = new HashSet<>();
+		this.retractsRefs.forEach(other -> other.removeRetractsInverseRef(this));
+		this.retractsRefs = new HashSet<>();
+	}
+	
+	private void removeRetractsInverseRef(ConversationMessage other) {
+		this.proposesInverseRefs.remove(other);
+	}
+	
+	public ConversationMessage getRootOfDeliveryChain() {
+		return getDeliveryChain().getHead();
+	}
+	
+	public boolean isHeadOfDeliveryChain() {
 		return isFromOwner() || (isFromSystem() && !isResponse()) || (!hasCorrespondingRemoteMessage() && ! isResponse());
+	}
+	
+	public boolean isEndOfDeliveryChain() {
+		return this == getDeliveryChain().getEnd();
+	}
+	
+	public boolean isInSameDeliveryChain(ConversationMessage other) {
+		return this.getDeliveryChain() == other.getDeliveryChain();
 	}
 	
 	public DeliveryChain getDeliveryChain() {
 		if (this.deliveryChain != null) return deliveryChain;
-		if (this.isRootOfDeliveryChain()) {
+		if (this.isHeadOfDeliveryChain()) {
 			this.deliveryChain = new DeliveryChain();
 			this.deliveryChain.addMessage(this);
 			return this.deliveryChain;
@@ -119,12 +193,16 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		boolean hsr = hasSuccessResponse();
 		boolean hcrm = hasCorrespondingRemoteMessage();
 		boolean hrsr = correspondingRemoteMessageRef.hasSuccessResponse();
-		//boolean hrr = correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
-		return hsr && hcrm && hrsr;
+		boolean hrr = correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
+		return hsr && hcrm && hrsr && hrr;
 	}
 	
 	public boolean hasPreviousMessage() {
 		return ! this.getPreviousRefs().isEmpty();
+	}
+	
+	public boolean hasSubsequentMessage() {
+		return !this.getPreviousInverseRefs().isEmpty();
 	}
 	
 	public boolean isCorrespondingRemoteMessageOf(ConversationMessage other) {
@@ -158,43 +236,86 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	 */
 	public int compareTo(ConversationMessage other) {
 		if (this == other) return 0;
-		int o1dist = this.distanceToFurthestRoot(); 
-		int o2dist = other.distanceToFurthestRoot();
+		int o1dist = this.getOrder(); 
+		int o2dist = other.getOrder();
 		if (o1dist != o2dist) {
 			return o1dist - o2dist;
 		}
 		if (this.isResponseTo(other)) return 1;
 		if (this.isRemoteResponseTo(other)) return 1;
-		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return 1;
+		if (this.isFromExternal() && this.isCorrespondingRemoteMessageOf(other)) return 1;		
+		if (this.isInSameDeliveryChain(other)) {
+			if (this.isHeadOfDeliveryChain() || other.isEndOfDeliveryChain()) {
+				return -1;
+			}
+			if (this.isEndOfDeliveryChain() ||  other.isHeadOfDeliveryChain()) {
+				return 1;
+			}
+		}
+
 		//if we get to here, we should check if one of the delivery chains is earlier
 		return this.getMessageURI().compareTo(other.getMessageURI());
 
 	}
 	
-	
-	public int distanceToFurthestRoot() {
-		int dist = distanceToOwnRoot();
-		if (this.hasCorrespondingRemoteMessage()) {
-			return Math.max(dist, getCorrespondingRemoteMessageRef().distanceToOwnRoot());
-		}
-		return dist;
+	public int getOrder() {
+		//defend against endless recursion attack by remembering which nodes we've visited.
+		return getOrder(new HashSet());
 	}
 	
-	public int distanceToOwnRoot() {
-		//if we have 
-		if (this.distanceToOwnRoot.isPresent()) {
-			return this.distanceToOwnRoot.getAsInt();
+	public int getOrder(Set<ConversationMessage> visited) {
+		if (this.order.isPresent()) {
+			return this.order.getAsInt();
 		}
-		if (!this.hasPreviousMessage()) {
-			this.distanceToOwnRoot = OptionalInt.of(0);
-			return 0;
-		}
-		this.distanceToOwnRoot = getPreviousRefs()
+		visited.add(this);
+		OptionalInt mindist = getPreviousRefs()
 				.stream()
-				.mapToInt(msg -> msg.distanceToOwnRoot() + 1).min();
-		return distanceToOwnRoot.getAsInt();
+				.filter(msg -> !visited.contains(msg))
+				.mapToInt(msg -> msg.getOrder(visited) + 1).min();
+		if (this.hasCorrespondingRemoteMessage() && this.isFromExternal()) {
+			this.order =  OptionalInt.of(Math.max(mindist.orElse(0), getCorrespondingRemoteMessageRef().getOrder(visited) +1));
+		} else {
+			this.order = OptionalInt.of(mindist.orElse(0));
+		}
+		return this.order.getAsInt();
 	}
 	
+	public Option<ConversationMessage> getOwnConversationRoot() {
+		if (this.conversationRoot.isDefined()) {
+			return this.conversationRoot;
+		}
+		for (ConversationMessage prev: this.getPreviousRefs()) {
+			Option<ConversationMessage> root = prev.getOwnConversationRoot();
+			if (root.isDefined()) {
+				this.conversationRoot = Option.some(root.get());
+				return root;
+			}
+		}
+		this.conversationRoot = Option.some(this);
+		return this.conversationRoot;
+	}
+	
+	public Set<ConversationMessage> getReachableConversationRoots(){
+		Set<ConversationMessage> roots = new HashSet<>();
+		Option<ConversationMessage> ownRoot = getOwnConversationRoot();
+		if (ownRoot.isDefined()) {
+			roots.add(ownRoot.get());
+		}
+		if (this.hasCorrespondingRemoteMessage()) {
+			Option<ConversationMessage> remoteRoot = getCorrespondingRemoteMessageRef().getOwnConversationRoot();
+			if (remoteRoot.isDefined()) {
+				roots.add(remoteRoot.get());
+			}
+		}
+		return roots;
+	}
+	
+	public boolean sharesReachableRootsWith(ConversationMessage other) {
+		Set<ConversationMessage> myRoots = getReachableConversationRoots();
+		return other.getReachableConversationRoots()
+				.stream()
+				.anyMatch(root -> myRoots.contains(root));
+	}
 	
 	public boolean isMessageOnPathToRoot(ConversationMessage other) {
 		if (this == other) return false;
@@ -458,10 +579,12 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	@Override
 	public String toString() {
 		return "ConversationMessage [messageURI=" + messageURI
-				+ ", distanceToOwnRoot=" + distanceToFurthestRoot()				
+				+ ", order=" + getOrder()
 				+ ", direction=" + direction
 				+ ", messageType=" + messageType
-				+ ", senderNeedURI=" + senderNeedURI
+				+ ", deliveryChainPosition:" + (this == getDeliveryChain().getHead() ? "head" : this == getDeliveryChain().getEnd() ? "end" : "middle") 
+				+ ", deliveryChainHead:" + getDeliveryChain().getHeadURI()
+				+ ", senderNeedURI=" + senderNeedURI				
 				+ ", proposes=" + proposes + ", proposesRefs:" + proposesRefs.size()
 				+ ", rejects=" + rejects + ", rejectsRefs:" + rejectsRefs.size()
 				+ ", previous=" + previous + ", previousRefs:"

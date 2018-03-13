@@ -123,11 +123,18 @@ public class HighlevelProtocols {
 
 		//link messages to deliveryChains
 		Set<DeliveryChain> deliveryChains = 
-				messages.stream().map(m -> m.getDeliveryChain())
+				messages.stream().map(m -> {
+					if (logger.isDebugEnabled()) {
+						logger.debug("deliveryChain for message {}: {}", m.getMessageURI(), m.getDeliveryChain());
+					}
+					return m.getDeliveryChain();
+				})
 				.collect(Collectors.toSet());
 		
 		//find interleaved delivery chains
-		deliveryChains.stream().forEach(dc -> deliveryChains.stream().forEach(dc2 -> dc.rememberIfInterleavedWith(dc)));			
+		deliveryChains.stream().forEach(dc -> deliveryChains.stream().forEach(dc2 -> {
+			dc.rememberIfInterleavedWith(dc2);	
+		}));			
 				
 
 		//apply acknowledgment protocol to whole conversation first:
@@ -167,19 +174,10 @@ public class HighlevelProtocols {
 			
 			
 			last = msg;
-			if (!msg.isRootOfDeliveryChain() ) {
+			if (!msg.isHeadOfDeliveryChain() ) {
 				continue;
 			}
 			if (!msg.isHighlevelProtocolMessage()) {
-				continue;
-			}
-			if (msg.getDeliveryChain().getInterleavedDeliveryChains().stream().anyMatch(s -> s.getRoot().isHighlevelProtocolMessage())) {
-				// if highlevel protocol messages are interleaved, their relative ordering is undecided
-				// for calculating their effects one would have to choose which one is first
-				// the only fair solution is that neither of these messages have any effect
-				if (logger.isDebugEnabled()) {
-					logger.debug("ignoring interleaved message: {}", msg.getMessageURI());
-				}
 				continue;
 			}
 			if (msg.isRetractsMessage()) {
@@ -193,6 +191,7 @@ public class HighlevelProtocols {
 					.stream()
 					.filter(other -> msg != other)
 					.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
+					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
@@ -215,6 +214,7 @@ public class HighlevelProtocols {
 					.stream()
 					.filter(other -> msg != other)
 					.filter(other -> other.isProposesMessage())
+					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(other -> {
@@ -233,6 +233,7 @@ public class HighlevelProtocols {
 				Model proposalContent = ModelFactory.createDefaultModel();
 				msg.getProposesRefs().stream()
 				.filter(other -> msg != other)
+				.filter(other -> other.isHeadOfDeliveryChain())
 				.filter(other -> msg.isMessageOnPathToRoot(other))
 				.forEach(other -> {
 					if (logger.isDebugEnabled()) {
@@ -255,6 +256,7 @@ public class HighlevelProtocols {
 				msg.getAcceptsRefs()
 					.stream()
 					.filter(other -> msg != other)
+					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(other -> {
@@ -275,6 +277,7 @@ public class HighlevelProtocols {
 				msg.getProposesToCancelRefs()
 					.stream()
 					.filter(other -> msg != other)
+					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
@@ -289,7 +292,6 @@ public class HighlevelProtocols {
 				proposals.commit();
 				
 			}
-			currentMessages.addAll(msg.getPreviousInverseRefs());
 			
 
 		}
@@ -316,8 +318,13 @@ public class HighlevelProtocols {
 			}
 			if (message.getDirection() == WonMessageDirection.FROM_SYSTEM && ! message.isResponse()) {
 				if (!message.isAcknowledgedLocally()) {
-					removeContentGraphs(copy, message);
+					notAcknowledged(copy, message);
 				}
+				return;
+			}
+			if (!message.isHeadOfDeliveryChain()) {
+				// here, we are only concerned with removing content graphs of the 'main' message in a delivery chain.
+				// any other message does not concern us here.
 				return;
 			}
 			switch (message.getMessageType()) {
@@ -330,7 +337,7 @@ public class HighlevelProtocols {
 				case ACTIVATE:
 				case HINT_MESSAGE:
 					if (!message.isAcknowledgedLocally()) {
-						removeContentGraphs(copy, message);
+						notAcknowledged(copy, message);
 					}
 					break;
 				case CONNECT:
@@ -338,13 +345,55 @@ public class HighlevelProtocols {
 				case CONNECTION_MESSAGE :
 				case CLOSE:
 					if (!message.isAcknowledgedRemotely()) {
-						removeContentGraphs(copy, message);
+						notAcknowledged(copy, message);
 					}
 				default:
 					break;
 			}
+			// delivery chain checking:
+			// 1. if delivery chains are interleaved, and one contains the other (first msg before, last msg after the other),
+			// 	  the containing chain is disregarded (content graph of root message removed
+			// 2. if two delivery chains are interleaved, and none contains the other, both are disregarded.
+
+			DeliveryChain msgChain = message.getDeliveryChain();
+			msgChain.getInterleavedDeliveryChains().stream()
+				.filter(otherChain -> otherChain.isTerminated())
+				.forEach(otherChain -> {
+					// does the other contain this one? In this case, it is not possible to determine if the other
+					// one has been delayed maliciously. Removing it is the only safe option. Downside: It allows the recipient of the
+					// message to delay it such that it is removed by this rule, but that at least has immediate effects: the 
+					// message never seems acknowledged and then later, when some other chain terminates, is found not to. 
+					// Rather, as soon as the chain of such a maliciously delayed message terminates, it is dropped.
+					if (otherChain.contains(msgChain)) {
+						//remove the other
+						if (logger.isDebugEnabled()) {
+							logger.debug("ignoring delivery chain {} as it conatins {}", otherChain.getHead().getMessageURI(), message.getMessageURI());
+						}
+						notAcknowledged(copy, otherChain.getHead());
+					} else {
+						//the other does not contain this one: 
+						// * either this one contains the other -> drop this one
+						// * or both are same-time: drop both  (in which case the other one is removed when that message's chain is checked)
+						if (logger.isDebugEnabled()) {
+							logger.debug("ignoring delivery chain {} as it is interleaved with {}",  message.getMessageURI(), otherChain.getHead().getMessageURI());
+						}
+						notAcknowledged(copy, message);
+					}
+				});
+		
+		{
+				
+			}
+
 		});
 		return copy;
+	}
+
+
+
+	private static void notAcknowledged(Dataset copy, ConversationMessage message) {
+		message.removeHighlevelProtocolProperties();
+		removeContentGraphs(copy, message);
 	}
 	
 	private static void removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
