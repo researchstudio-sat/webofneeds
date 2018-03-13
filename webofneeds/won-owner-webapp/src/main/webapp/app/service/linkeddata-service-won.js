@@ -23,11 +23,13 @@ import {
     is,
     clone,
     contains,
+    deepFreeze,
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
 import jld from 'jsonld';
 import won from './won.js';
+
 (function(){
 
     /**
@@ -86,7 +88,6 @@ import won from './won.js';
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
         window.store4dbg = privateData.store; //TODO deletme
-        window.ldspriv4dbg = privateData; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
@@ -708,7 +709,7 @@ import won from './won.js';
                 }
             })
             .then(() =>
-                won.addJsonLdData(uri, dataset)
+                won.addJsonLdData(dataset)
             )
             .then(() => dataset)
         )
@@ -720,22 +721,23 @@ import won from './won.js';
     };
 
     /**
-     * Adds the specified JSON-LD dataset to the store.
+     * Adds the specified JSON-LD dataset to the store, once to the default graph and once to 
+     * the individual graphs contained in the data set.
      */
-    won.addJsonLdData = function(uri, data) {
-        return new Promise((resolve, reject) =>
-            privateData.store.load("application/ld+json", data, function (success, results) {
+    won.addJsonLdData = async function(data) {
+        return new Promise((resolve, reject) => {
+            const callback = (success, results) => {
                 if (success) {
-                    //console.log('linkeddata-serice-won.js: finished storing triples ', data);
-                    resolve(uri);
+                    resolve();
                 } else {
-                    console.error('Failed to store json-ld data for ' + uri);
-                    reject('Failed to store json-ld data for ' + uri);
+                    console.error('Failed to store json-ld data for ' + uri + '\n' + results);
+                    reject('Failed to store json-ld data for ' + uri + '\n' + results);
                 }
+            }
 
-            })
-        );
-    };
+            privateData.store.load("application/ld+json", data, callback); // add to default graph
+        });
+    }
 
     /**
      * Loads the need-data without following up
@@ -959,9 +961,10 @@ import won from './won.js';
             timePerNeedStr = format.format(time / rep);
             console.log("executed custom code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
         }*/
-        const needJsonLdP = new Promise((resolve, reject) => {
-
-                const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
+        const needJsonLdP = 
+            loadStarshapedGraph(store, needUri, propertyTree)
+            .then(resultGraph => new Promise((resolve, reject) => {
+                //const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
                 const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
                     /* frame */
                     "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
@@ -984,7 +987,7 @@ import won from './won.js';
                 });
                 resolve(needJsonLdP);
             }
-        ).then(needJsonLd => {
+        )).then(needJsonLd => {
             // usually the need-data will be in a single object in the '@graph' array.
             // We can flatten this and still have valid json-ld
             const simplified = needJsonLd['@graph'][0];
@@ -1033,7 +1036,7 @@ import won from './won.js';
     // loads all triples starting from start uri, using each array in 'paths' like a
     // property path, collecting all reachable triples
     // returns a JS RDF Interfaces Graph object
-    function loadStarshapedGraph(store, startUri, tree) {
+    async function loadStarshapedGraph(store, startUri, tree) {
         let prefixes = tree.prefixes;
         if (prefixes != null) {
             for (let key in prefixes) {
@@ -1042,20 +1045,36 @@ import won from './won.js';
                 }
             }
         }
-        try {
-            let startNode = store.rdf.createNamedNode(startUri);
-            let tmpResult  = { res : null };
-            store.graph( (success, result) => tmpResult.res = result);
-            let dataGraph = dropUnnecessaryTriples(store, tmpResult.res, tree.roots);
-            let resultGraph = new store.rdf.api.Graph();
-            for (let i = 0; i < tree.roots.length; i++) {
-                let subResult = loadStarshapedGraph_internal(store, dataGraph, startNode, tree.roots[i]);
-                resultGraph.addAll(subResult);
+
+        let startNode = store.rdf.createNamedNode(startUri);
+        const tmpResultP = new Promise((resolve, reject) => 
+            store.graph((success, result) => success? 
+                resolve(result) : 
+                reject('Couldn\'t get graph '))
+        );
+        const resultGraphP = tmpResultP.then(tmpResult => {
+            try {
+                let dataGraph = dropUnnecessaryTriples(store, tmpResult, tree.roots);
+                let resultGraph = new store.rdf.api.Graph();
+                for (let i = 0; i < tree.roots.length; i++) {
+                    let subResult = loadStarshapedGraph_internal(store, dataGraph, startNode, tree.roots[i]);
+                    resultGraph.addAll(subResult);
+                }
+                if(!resultGraph) {
+                    throw new Error(
+                        "Failed to construct valid graph:" + resultGraph + 
+                        ". For start Uri " + startUri + 
+                        " and tree " + JSON.stringify(tree)
+                    );
+                }
+                return resultGraph;
+            } catch (e){
+                console.error("error executing custom select function: " + e);
+                throw e;
             }
-            return resultGraph;
-        } catch (e){
-            console.error("error executing custom select function: " + e);
-        }
+        });
+
+        return resultGraphP;
     }
 
     function dropUnnecessaryTriples(store, graph, roots){
@@ -1450,50 +1469,54 @@ import won from './won.js';
                  * container, getNode will not return an array, so we
                  * need to make sure it's one from here on out.
                  */
-                connection.hasEvents = is('String', eventContainer.member) ?
-                    [eventContainer.member] :
-                    eventContainer.member;
+                connection.hasEvents = is('Array', eventContainer.member) ?
+                    eventContainer.member :
+                    [eventContainer.member];
                 return connection;
             })
     };
 
     //aliases (formerly functions that were just pass-throughs)
-    won.getEvent = (uri, fetchParams) => won.getNode(uri, fetchParams)
-            .then(event => {
-                // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
-                if(is('Array', event.hasReceivedTimestamp)) {
-                    const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(y) - new Date(x));
-                    event.hasReceivedTimestamp = new Date(latestFirst[0]);
-                } else {
-                    event.hasReceivedTimestamp = new Date(event.hasReceivedTimestamp);
-                }
+    won.getEvent = async (eventUri, fetchParams) => {
+        const event = await won.getNode(eventUri, fetchParams);
+
+        /*
+        const contentGraph = await won.getGraph(eventUri + "#content", eventUri, fetchParams); 
+        event.contentGraphNT = contentGraph? contentGraph.toNT() : "";
+        console.log("getEvent - contentGraph: ", eventUri, contentGraph);
+        */
+
+        // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
+        if(is('Array', event.hasReceivedTimestamp)) {
+            const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(y) - new Date(x));
+            event.hasReceivedTimestamp = new Date(latestFirst[0]);
+        } else {
+            event.hasReceivedTimestamp = new Date(event.hasReceivedTimestamp);
+        }
 
 
-                if(!event.hasCorrespondingRemoteMessage) {
-                    return event;
-                } else {
-                    if (event.isRemoteResponseTo) {
-                        //we can't access the remote message of a remote response. just use the event
-                        return event;
-                    }
-                    /*
-                    * there's some messages (e.g. incoming connect) where there's
-                    * vital information in the correspondingRemoteMessage. So
-                    * we fetch it here.
-                    */
-                    fetchParams.doNotFetch = true;
-                    return won
-                        .getNode(event.hasCorrespondingRemoteMessage, fetchParams)
-                        .then(correspondingEvent => {
-                            if (correspondingEvent.type) {
-                                //if we have at least a type attribute, we add the remote event to the
-                                //local event. if not, it is just an URI.
-                                event.hasCorrespondingRemoteMessage = correspondingEvent;
-                            }
-                            return event;
-                        })
-                }
-            });
+        if(!event.hasCorrespondingRemoteMessage) {
+            return event;
+        } else {
+            if (event.isRemoteResponseTo) {
+                //we can't access the remote message of a remote response. just use the event
+                return event;
+            }
+            /*
+            * there's some messages (e.g. incoming connect) where there's
+            * vital information in the correspondingRemoteMessage. So
+            * we fetch it here.
+            */
+            fetchParams.doNotFetch = true;
+            const correspondingEvent = await won.getNode(event.hasCorrespondingRemoteMessage, fetchParams);
+            if (correspondingEvent.type) {
+                //if we have at least a type attribute, we add the remote event to the
+                //local event. if not, it is just an URI.
+                event.hasCorrespondingRemoteMessage = correspondingEvent;
+            }
+            return event;
+        }
+    }
 
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
@@ -1610,6 +1633,29 @@ import won from './won.js';
             });
         });
     };
+
+    /**
+     * @param {*} graphUri the uri of the graph to be retrieved
+     * @param {*} documentUri the uri to the document that contains the graph (to make sure it's already cached)
+     * @param {*} fetchParams params necessary for fetching that document
+     */
+    won.getGraph = async function(graphUri, documentUri, fetchParams) {
+        return won
+        .ensureLoaded(documentUri, fetchParams)
+        .then(() => 
+            new Promise((resolve, reject) => {
+                privateData.store.graph(graphUri, (success, graph) => {
+                    if(success) {
+                        resolve(graph)
+                    } else {
+                        const msg = "Failed to retrieve graph with uri " + graphUri + ". Got: " + JSON.stringify(graph);
+                        console.error(msg);
+                        reject(msg);
+                    }
+                })
+            })
+        )
+    }
 
     won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
         return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
