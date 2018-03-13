@@ -88,7 +88,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                 //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
                 URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI();
-                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri.toString());
+                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri);
 
                 if(!agreementPayload.isEmpty()){
                     bus.publish(new AgreementAcceptedEvent(con, agreementUri, agreementPayload));
