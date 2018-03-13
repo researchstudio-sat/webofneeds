@@ -31,6 +31,10 @@ For instance there could be ratings with single dimension or multiple dimensions
 
 Examples for rating ontologies that can be used:
 
+## Reputation Computation
+
+There are different ways of calculating an aggregated reputation "score" out of all relevant transaction ratings of a certain profile. Many of them are described in ["A survey of trust and reputation systems for online service provision"] (http://eprints.qut.edu.au/7280/1/7280.pdf) for instance. For this architecture document the actual computation of the reputation is not a primary focus since we image that in this decentralized system different reputation providers will develop different calculation methods that can be choosen from. However the architecture does have some influence on what can be computed and what cannot (e.g. if all rating data is public the whole graph of ratings of all profiles can be used, in case the rating data is not public and there is not only one centralised reputation provider only a local view on single profiles can be used for the calculation). 
+
 ## Architecture Options
 
 One of the major design choices of the reputation systems architecture is who should be able to access transaction data which is the basis for calculating a rating or reputation. We see two alternatives: either making rating data public and accessable for everybody or making rating data private and only accessible for the owner and other partners and services which are trusted. 
@@ -79,7 +83,7 @@ The problem with the previous approach is mostly that reputation service provide
 
 A rather advanced option to the privacy problem would be to let every user store and manage their own reputation profiles. The detailed transaction and rating history ideally would not be revealed to anybody (not even the reputation services), just the aggregated rating computed based on it. 
 
-The rating services would be used to update and sign a transaction/rating history when a new transaction with a rating is available. The user would proof (zero knowledge proof) to the rating service that he has a valid signed transaction history and the service should blind sign (blind signature) the old history including the new transaction rating. The user could then use the newly signed rating history to compute his updated agreegated rating and publish it. A user who computes his aggregated rating would have to proof to other users that he used his signed and up-to-date transaction rating history for that purpose without revealing the details of this history to other users (zkSNARKS).
+The rating services would be used to update and sign a transaction/rating history when a new transaction with a rating is available. The user would proof (zero knowledge proof) to the rating service that he has a valid signed transaction history and the service should blind sign (blind signature) the old history including the new transaction rating. The user could then use the newly signed rating history to compute his updated agreegated rating and publish it. A user who computes his aggregated rating would have to proof to other users that he used his signed and up-to-date transaction rating history and a certain rating aggregation algorithm for that purpose without revealing the details of this history to other users (zkSNARKS).
 
 Benefits:
 * privacy and trust of reputation profiles (towards other users and reputation services, basically invalidate all drawback arguments from the Simple Reputation Service Approach)
