@@ -35,7 +35,11 @@ Examples for rating/reputation ontologies that could be used:
 
 ## Reputation Computation
 
-There are different ways of calculating an aggregated reputation "score" out of all relevant transaction ratings of a certain profile. Many of them (e.g. summation, average, weighted models, ect.) are described in ["A survey of trust and reputation systems for online service provision"](http://eprints.qut.edu.au/7280/1/7280.pdf) for instance. For this architecture document the actual computation of the reputation is not a primary focus since we image that in this decentralized system different reputation providers will develop different calculation methods that can be choosen from. However the architecture does have some influence on what can be computed and what cannot (e.g. if all rating data is public the whole graph of ratings of all profiles can be used, in case the rating data is not public and there is not only one centralised reputation provider only a local view on single profiles can be used for the calculation). 
+There are different ways of calculating an aggregated reputation "score" out of all relevant transaction ratings of a certain profile. Many of them (e.g. summation, average, weighted models, ect.) are described in:
+* [Jøsang, A., Ismail, R., & Boyd, C. (2007). A survey of trust and reputation systems for online service provision. Decision support systems, 43(2), 618-644.](http://eprints.qut.edu.au/7280/1/7280.pdf) 
+
+
+For this architecture document the actual computation of the reputation is not a primary focus since we image that in this decentralized system different reputation providers will develop different calculation methods that can be choosen from. However the architecture does have some influence on what can be computed and what cannot (e.g. if all rating data is public the whole graph of ratings of all profiles can be used, in case the rating data is not public and there is not only one centralised reputation provider only a local view on single profiles can be used for the calculation). 
 
 ## Architecture Options
 
