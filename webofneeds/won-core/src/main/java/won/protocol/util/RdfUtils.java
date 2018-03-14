@@ -156,7 +156,7 @@ public class RdfUtils
 
   public static Dataset cloneDataset(Dataset dataset) {
     if (dataset == null) return null;
-    Dataset clonedDataset = DatasetFactory.createTxnMem();
+    Dataset clonedDataset = DatasetFactory.createGeneral();
     Model model = dataset.getDefaultModel();
     if (model != null) {
       clonedDataset.setDefaultModel(cloneModel(model));
