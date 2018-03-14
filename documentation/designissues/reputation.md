@@ -24,12 +24,14 @@ In addition to the transaction certification parameters for the ratings addition
 * Rating
 * Reputation profiles/pseudonyms of participants
 
-## Rating Format
+## Rating Format and Reputation Representation 
 
 Since we want to support interactions between Needs from arbitrary domains we do not want to restrict the rating format upfront. 
 For instance there could be ratings with single dimension or multiple dimensions, discrete or floating number scales or also including text descriptions depending on use case. Rating scheme and ontology should be negotiable between the partners of a transaction. This means that there will exists (and dynamically change) a vast amount of different rating formats in the Web of Needs Network that have to be handled in different ways. 
 
-Examples for rating ontologies that can be used:
+Examples for rating/reputation ontologies that could be used:
+
+* [Alnemr, R., Paschke, A., & Meinel, C. (2010, September). Enabling reputation interoperability through semantic technologies. In Proceedings of the 6th International Conference on Semantic Systems (p. 13). ACM.](https://hpi.de/fileadmin/user_upload/fachgebiete/meinel/papers/Trust_and_Security_Engineering/2010_Alnemr_iSemantics.pdf)
 
 ## Reputation Computation
 
