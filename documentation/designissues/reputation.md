@@ -105,6 +105,8 @@ Drawbacks/Risks:
 * In case of change of reputation provider all transaction data has to be transfered (trustful cooperation between providers)
 * Incompatibility of which reputation providers are accepted by participants of a potential transaction
 
+=> Simple Decentralized Reputation Service Approach could be a starting point of implementing a first reputation concept but would also need some rework if its later changed to more advanced concepts like a privacy-enhancement (see next). 
+
 ### Privacy-enhanced Decentralized Reputation Service Approach
 
 The problem with the previous approach is mostly that reputation service providers collect too much private user data and therefore have too much power. They must be trusted but cannot be effectively controlled from paying and interacting users. 
@@ -119,6 +121,7 @@ Benefits:
 * privacy and trust of reputation profiles (towards other users and reputation services, basically invalidate all drawback arguments from the Simple Reputation Service Approach)
 
 Drawbacks/Risks:
-* Advanced complex concepts that have not been adopted widely yet (e.g. zkSNARKS)
-* Not yet clear how exactly this would be implemented
+* Advanced complex concepts that have not been adopted widely yet (Option 2: e.g. zkSNARKS)
+* Not yet clear how exactly this would be implemented (Option 2)
 
+=> Option 1 could be implemented if some more privacy is required than in the "Simple Decentralized Reputation Service Approach" but is not a general purpose solution. Option 2 is quite advanced and unclear to implement currently
