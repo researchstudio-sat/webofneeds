@@ -1,0 +1,18 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+SELECT ?g ?s ?p ?o WHERE {
+
+     GRAPH ?g {
+         ?msg ?p ?o .
+     }
+        
+     GRAPH <urn:x-arq:UnionGraph> { 
+        ?terminatinggraph  msg:hasPreviousMessage* ?msg .
+     }  
+
+       
+
+     BIND(?msg as ?s)
+
+} 

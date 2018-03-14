@@ -1,0 +1,34 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+SELECT distinct ?g ?s ?p ?o WHERE {
+
+     GRAPH ?g {
+         ?msg ?p ?o .
+       BIND(?msg as ?s)
+     }
+     
+     optional {
+       GRAPH ?e1 {
+            ?msg msg:hasContent ?g
+       }
+       GRAPH ?g {
+            ?s ?p ?o
+       }
+     }
+     
+     optional {
+       GRAPH ?e1 {
+            ?msg msg:containsEnvelope ?g
+       }
+       GRAPH ?g {
+            ?s ?p ?o
+       }
+     }
+        
+        
+     GRAPH <urn:x-arq:UnionGraph> { 
+         ?terminatinggraph   msg:hasPreviousMessage*/msg:hasCorrespondingRemoteMessage?/^(msg:isResponseTo|msg:isRemoteResponseTo)? ?msg .    
+     }  
+
+} order by ?g

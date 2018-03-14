@@ -35,9 +35,9 @@ CONSTRUCT { ?prop agr:proposes ?clause  . }
     # only accept the main solution if acc is lexicographically smaller than the other one
     filter not exists {
         #find another accept message
+           filter(?acc2 != ?acc) . #different from acc
         GRAPH ?gf1 {
-            ?acc2 agr:accepts ?prop .
-            filter(?acc2 != ?acc) . #different from acc
+            ?acc2 agr:accepts ?prop .         
         }   
          GRAPH <urn:x-arq:UnionGraph> {
             # also after prop
@@ -57,10 +57,10 @@ CONSTRUCT { ?prop agr:proposes ?clause  . }
     # and if there is an accept message that is at the same point in the conversation 
     # only accept the main solution if acc is lexicographically smaller than the other one
     filter not exists {
+        filter(?acc2 != ?acc) . #different from acc
         #find another accept message
         GRAPH ?gf1 {
-            ?acc2 agr:accepts ?prop .
-            filter(?acc2 != ?acc) . #different from acc
+            ?acc2 agr:accepts ?prop .         
         }   
           GRAPH <urn:x-arq:UnionGraph> {
             # also after prop

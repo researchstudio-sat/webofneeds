@@ -62,11 +62,12 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
 		return this;
 	}
 
-	public void addInitialBinding(String varName, RDFNode value) {
+	public SparqlSelectFunction<T> addInitialBinding(String varName, RDFNode value) {
 		if (this.initialBinding == null) {
 			this.initialBinding = new QuerySolutionMap();
 		}
 		this.initialBinding.add(varName, value);
+		return this;
 	}
 	
 	public SparqlSelectFunction<T> addInitialBindings(QuerySolution moreInitialBindings) {

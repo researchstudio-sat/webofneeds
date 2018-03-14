@@ -2,6 +2,7 @@ PREFIX mod: <http://purl.org/webofneeds/modification#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX msg: <http://purl.org/webofneeds/message#>
 PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX agr: <http://purl.org/webofneeds/agreement#>
 
 DELETE
  {
@@ -35,6 +36,7 @@ WHERE
     GRAPH ?retractedMessageContent {
         ?s ?p ?o
     }
+     
  }
 
 

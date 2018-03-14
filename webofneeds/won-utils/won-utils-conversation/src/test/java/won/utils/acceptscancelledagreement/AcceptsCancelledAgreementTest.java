@@ -1,8 +1,9 @@
 package won.utils.acceptscancelledagreement;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -12,13 +13,14 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class AcceptsCancelledAgreementTest {
 	  
@@ -32,9 +34,18 @@ public class AcceptsCancelledAgreementTest {
     }
 
 	@Test
+	@Ignore
 	public void oneValidProposalToCancel() throws IOException {
 	    Dataset input = loadDataset( inputFolder + "one-agreement-one-cancellation.trig");
 	    Model expected = customLoadModel( expectedOutputFolder + "one-agreement-one-cancellation.ttl");
+        test(input,expected);		
+	}
+	
+	@Test
+	@Ignore
+	public void toAcceptedCancellationProposals() throws IOException {
+	    Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-twoaccepted.trig");
+	    Model expected = customLoadModel( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-twoaccepted.ttl");
         test(input,expected);		
 	}
 	
