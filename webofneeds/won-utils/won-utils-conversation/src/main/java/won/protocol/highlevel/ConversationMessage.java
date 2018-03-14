@@ -258,22 +258,16 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 
 	}
 	
-	public int getOrder() {
-		//defend against endless recursion attack by remembering which nodes we've visited.
-		return getOrder(new HashSet());
-	}
 	
-	public int getOrder(Set<ConversationMessage> visited) {
+	public int getOrder() {
 		if (this.order.isPresent()) {
 			return this.order.getAsInt();
 		}
-		visited.add(this);
 		OptionalInt mindist = getPreviousRefs()
 				.stream()
-				.filter(msg -> !visited.contains(msg))
-				.mapToInt(msg -> msg.getOrder(visited) + 1).min();
+				.mapToInt(msg -> msg.getOrder() + 1).min();
 		if (this.hasCorrespondingRemoteMessage() && this.isFromExternal()) {
-			this.order =  OptionalInt.of(Math.max(mindist.orElse(0), getCorrespondingRemoteMessageRef().getOrder(visited) +1));
+			this.order =  OptionalInt.of(Math.max(mindist.orElse(0), getCorrespondingRemoteMessageRef().getOrder() +1));
 		} else {
 			this.order = OptionalInt.of(mindist.orElse(0));
 		}

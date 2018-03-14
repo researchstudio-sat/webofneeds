@@ -1,44 +1,21 @@
 package won.utils.getproposals;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.util.RdfUtils;
 
@@ -54,7 +31,7 @@ public class GetProposalsTest {
     }
  
     // This is the case where there is no open proposal...(each exist in their own envelope, both are accepted in an agreement)
-    @Test
+    @Test @Ignore
     public void noOpenProposal () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-bothaccepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-bothaccepted.trig");
@@ -63,7 +40,7 @@ public class GetProposalsTest {
     
 
     // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
-    @Test
+    @Test @Ignore
     public void oneOpenProposal () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-one-accepted.trig");
@@ -71,7 +48,7 @@ public class GetProposalsTest {
     }
     
     // This is the case where there are two open proposals ...(each exist in their own envelope)
-    @Test
+    @Test @Ignore
     public void twoOpenProposals () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-noaccepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-noaccepted.trig");

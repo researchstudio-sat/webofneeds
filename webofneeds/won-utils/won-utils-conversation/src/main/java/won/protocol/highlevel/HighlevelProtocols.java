@@ -48,657 +48,12 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("starting conversation analysis for high-level protocols");
-		}
-		
-		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
-		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
-		SparqlSelectFunction<ConversationMessage> selectfunction = 
-				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", resultMapper )
-				.addOrderBy("msg", Query.ORDER_ASCENDING);
-		selectfunction.apply(conversationDataset);
-		
-		Set<ConversationMessage> roots = new HashSet();
-		Collection<ConversationMessage> messages = messagesByURI.values();
-		
-		
-		//iterate over messages and interconnect them
-		messages.stream().forEach(message -> {
-			if (message.getCorrespondingRemoteMessageURI() != null && ! message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
-				ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
-				message.setCorrespondingRemoteMessageRef(other);
-				other.setCorrespondingRemoteMessageRef(message);
-			}
-			message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI()))
-				.forEach(uri -> {
-				ConversationMessage other = messagesByURI.get(uri);
-				message.addPreviousRef(other);
-				other.addPreviousInverseRef(message);
-			});
-			message.getAccepts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
-				.forEach(uri -> {
-				ConversationMessage other = messagesByURI.get(uri);
-				message.addAcceptsRef(other); 
-				other.addAcceptsInverseRef(message);
-			});
-			message.getProposes().stream().filter(uri -> !uri.equals(message.getMessageURI()))
-				.forEach(uri -> {
-				ConversationMessage other = messagesByURI.get(uri);
-				message.addProposesRef(other);
-				other.addProposesInverseRef(message);
-				});
-			message.getRejects().stream().filter(uri -> !uri.equals(message.getMessageURI()))
-				.forEach(uri -> {
-				ConversationMessage other = messagesByURI.get(uri);
-				message.addRejectsRef(other);
-				other.addRejectsInverseRef(message);
-				});
-			message.getProposesToCancel().stream().filter(uri -> !uri.equals(message.getMessageURI()))
-				.forEach(uri -> {
-				ConversationMessage other = messagesByURI.get(uri);
-				message.addProposesToCancelRef(other);
-				other.addProposesToCancelInverseRef(message);
-				});
-			message.getRetracts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
-				.forEach(uri -> {
-				ConversationMessage other = messagesByURI.get(uri);
-				message.addRetractsRef(other);
-				other.addRetractsInverseRef(message);
-				});
-			if (message.getIsResponseTo() != null && ! message.getIsResponseTo().equals(message.getMessageURI())) {
-				ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
-				message.setIsResponseToRef(other);
-				other.setIsResponseToInverseRef(message);
-			}
-			if (message.getIsRemoteResponseTo() != null && ! message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
-				ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
-				message.setIsRemoteResponseToRef(other);
-				other.setIsRemoteResponseToInverseRef(message);
-			}
-			if (message.getPrevious().isEmpty()) {
-				roots.add(message);
-			}
-		});
-
-		//link messages to deliveryChains
-		Set<DeliveryChain> deliveryChains = 
-				messages.stream().map(m -> {
-					if (logger.isDebugEnabled()) {
-						logger.debug("deliveryChain for message {}: {}", m.getMessageURI(), m.getDeliveryChain());
-					}
-					return m.getDeliveryChain();
-				})
-				.collect(Collectors.toSet());
-		
-		//find interleaved delivery chains
-		deliveryChains.stream().forEach(dc -> deliveryChains.stream().forEach(dc2 -> {
-			dc.rememberIfInterleavedWith(dc2);	
-		}));			
-				
-
-		//apply acknowledgment protocol to whole conversation first:
-		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
-		
-		//on top of this, apply modification and agreement protocol on a per-message basis, starting with the root(s)
-		
-		Dataset proposals = DatasetFactory.createGeneral();
-		Dataset agreements = DatasetFactory.createGeneral();
-		
-		
-		PriorityQueue<ConversationMessage> currentMessages = 
-				new PriorityQueue<ConversationMessage>();
-		currentMessages.addAll(messages);
-		
-		//TODO: we need to use a priority queue for the messages, which is 
-		//sorted by temporal ordering. Each time we process a message, we 
-		//add the subsequent ones to the queue, the retrieve the 
-		//oldest from the queue for the next iteration.
-
-		Set<ConversationMessage> processed = new HashSet<>();
-		List<ConversationMessage> processedInOrder = null;
-		if (logger.isDebugEnabled()) {
-			processedInOrder = new ArrayList<>();
-		}
-		ConversationMessage last = null;
-		while(!currentMessages.isEmpty()) {
-
-			ConversationMessage msg = currentMessages.poll();
-			if (processed.contains(msg)) {
-				continue;
-			}
-			processed.add(msg);
-			if (logger.isDebugEnabled() && processedInOrder != null) {
-				processedInOrder.add(msg);
-			}
-			
-			
-			last = msg;
-			if (!msg.isHeadOfDeliveryChain() ) {
-				continue;
-			}
-			if (!msg.isHighlevelProtocolMessage()) {
-				continue;
-			}
-			if (msg.isRetractsMessage()) {
-				removeContentGraphs(conversation, msg);
-				if (logger.isDebugEnabled()) {
-					msg.getRetractsRefs().forEach(other -> {
-						logger.debug("{} retracts {}", msg.getMessageURI(), other.getMessageURI());
-					});
-				}
-				msg.getRetractsRefs()
-					.stream()
-					.filter(other -> msg != other)
-					.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
-					.filter(other -> other.isHeadOfDeliveryChain())
-					.filter(other -> msg.isMessageOnPathToRoot(other))
-					.forEach(other -> {
-						if (logger.isDebugEnabled()) {
-							logger.debug("{} retracts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
-						}
-						removeContentGraphs(conversation, other);
-						if (other.isProposesMessage()) {
-							removeProposal(other.getMessageURI(), proposals);
-						}
-					});
-			}
-			if (msg.isRejectsMessage()) {
-				removeContentGraphs(conversation, msg);
-				if (logger.isDebugEnabled()) {
-					msg.getRejectsRefs().forEach(other -> {
-						logger.debug("{} rejects {}", msg.getMessageURI(), other.getMessageURI());
-					});
-				}
-				msg.getRejectsRefs()
-					.stream()
-					.filter(other -> msg != other)
-					.filter(other -> other.isProposesMessage())
-					.filter(other -> other.isHeadOfDeliveryChain())
-					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
-					.filter(other -> msg.isMessageOnPathToRoot(other))
-					.forEach(other -> {
-						if (logger.isDebugEnabled()) {
-							logger.debug("{} rejects {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
-						}
-						removeProposal(other.getMessageURI(), proposals);
-				});
-			}
-			if (msg.isProposesMessage()) {
-				if (logger.isDebugEnabled()) {
-					msg.getProposesRefs().forEach(other -> {
-						logger.debug("{} proposes {}", msg.getMessageURI(), other.getMessageURI());
-					});
-				}
-				Model proposalContent = ModelFactory.createDefaultModel();
-				msg.getProposesRefs().stream()
-				.filter(other -> msg != other)
-				.filter(other -> other.isHeadOfDeliveryChain())
-				.filter(other -> msg.isMessageOnPathToRoot(other))
-				.forEach(other -> {
-					if (logger.isDebugEnabled()) {
-						logger.debug("{} proposes {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
-					}
-					proposalContent.add(aggregateGraphs(conversation, other.getContentGraphs()));
-				});
-				
-
-				proposals.begin(ReadWrite.WRITE);
-				proposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
-				proposals.commit();
-			}
-			if (msg.isAcceptsMessage()) {
-				if (logger.isDebugEnabled()) {
-					msg.getAcceptsRefs().forEach(other -> {
-						logger.debug("{} accepts {}", msg.getMessageURI(), other.getMessageURI());
-					});
-				}
-				msg.getAcceptsRefs()
-					.stream()
-					.filter(other -> msg != other)
-					.filter(other -> other.isHeadOfDeliveryChain())
-					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
-					.filter(other -> msg.isMessageOnPathToRoot(other))
-					.forEach(other -> {
-						if (logger.isDebugEnabled()) {
-							logger.debug("{} accepts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
-						}
-						acceptProposal(other.getMessageURI(),other.getMessageURI(), proposals, agreements);
-					});
-			}
-			if (msg.isProposesToCancelMessage()) {
-				if (logger.isDebugEnabled()) {
-					msg.getProposesToCancelRefs().forEach(other -> {
-						logger.debug("{} proposesToCancel {}", msg.getMessageURI(), other.getMessageURI());
-					});
-				}
-				proposals.begin(ReadWrite.WRITE);
-				final Model cancellationProposals = proposals.getDefaultModel();
-				msg.getProposesToCancelRefs()
-					.stream()
-					.filter(other -> msg != other)
-					.filter(other -> other.isHeadOfDeliveryChain())
-					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
-					.forEach(other -> {
-						if (logger.isDebugEnabled()) {
-							logger.debug("{} proposesToCancel {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
-						}
-					cancellationProposals.add(new StatementImpl(
-							cancellationProposals.getResource(msg.getMessageURI().toString()),
-							WONAGR.PROPOSES_TO_CANCEL,
-							cancellationProposals.getResource(other.getMessageURI().toString())));
-					proposals.setDefaultModel(cancellationProposals);
-				});
-				proposals.commit();
-				
-			}
-			
-
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("messages in the order they were processed:");
-			if (processedInOrder != null) {
-				processedInOrder.stream().forEach(x -> logger.debug(x.toString()));
-			}
-			logger.debug("finished conversation analysis for high-level protocols");
-		}
-		return agreements;
+		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements();
 	}
 	
-
-	
-	private static Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages ) {
-		Dataset copy = RdfUtils.cloneDataset(conversationDataset);
-		messages.stream().forEach(message -> {
-			if (message.getMessageType() == null) {
-				return;
-			}
-			if (message.getDirection() == WonMessageDirection.FROM_EXTERNAL) {
-				return;
-			}
-			if (message.getDirection() == WonMessageDirection.FROM_SYSTEM && ! message.isResponse()) {
-				if (!message.isAcknowledgedLocally()) {
-					notAcknowledged(copy, message);
-				}
-				return;
-			}
-			if (!message.isHeadOfDeliveryChain()) {
-				// here, we are only concerned with removing content graphs of the 'main' message in a delivery chain.
-				// any other message does not concern us here.
-				return;
-			}
-			switch (message.getMessageType()) {
-				case SUCCESS_RESPONSE:
-				case FAILURE_RESPONSE:
-					break;
-				case CREATE_NEED:
-				case HINT_FEEDBACK_MESSAGE:
-				case DEACTIVATE:
-				case ACTIVATE:
-				case HINT_MESSAGE:
-					if (!message.isAcknowledgedLocally()) {
-						notAcknowledged(copy, message);
-					}
-					break;
-				case CONNECT:
-				case OPEN:
-				case CONNECTION_MESSAGE :
-				case CLOSE:
-					if (!message.isAcknowledgedRemotely()) {
-						notAcknowledged(copy, message);
-					}
-				default:
-					break;
-			}
-			// delivery chain checking:
-			// 1. if delivery chains are interleaved, and one contains the other (first msg before, last msg after the other),
-			// 	  the containing chain is disregarded (content graph of root message removed
-			// 2. if two delivery chains are interleaved, and none contains the other, both are disregarded.
-
-			DeliveryChain msgChain = message.getDeliveryChain();
-			msgChain.getInterleavedDeliveryChains().stream()
-				.filter(otherChain -> otherChain.isTerminated())
-				.forEach(otherChain -> {
-					// does the other contain this one? In this case, it is not possible to determine if the other
-					// one has been delayed maliciously. Removing it is the only safe option. Downside: It allows the recipient of the
-					// message to delay it such that it is removed by this rule, but that at least has immediate effects: the 
-					// message never seems acknowledged and then later, when some other chain terminates, is found not to. 
-					// Rather, as soon as the chain of such a maliciously delayed message terminates, it is dropped.
-					if (otherChain.contains(msgChain)) {
-						//remove the other
-						if (logger.isDebugEnabled()) {
-							logger.debug("ignoring delivery chain {} as it conatins {}", otherChain.getHead().getMessageURI(), message.getMessageURI());
-						}
-						notAcknowledged(copy, otherChain.getHead());
-					} else {
-						//the other does not contain this one: 
-						// * either this one contains the other -> drop this one
-						// * or both are same-time: drop both  (in which case the other one is removed when that message's chain is checked)
-						if (logger.isDebugEnabled()) {
-							logger.debug("ignoring delivery chain {} as it is interleaved with {}",  message.getMessageURI(), otherChain.getHead().getMessageURI());
-						}
-						notAcknowledged(copy, message);
-					}
-				});
-		
-		{
-				
-			}
-
-		});
-		return copy;
+	public static Model getAgreement(Dataset conversationDataset, URI agreementURI) {
+		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements().getNamedModel(agreementURI.toString());
 	}
-
-
-
-	private static void notAcknowledged(Dataset copy, ConversationMessage message) {
-		message.removeHighlevelProtocolProperties();
-		removeContentGraphs(copy, message);
-	}
-	
-	private static void removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
-		conversationDataset.begin(ReadWrite.WRITE);
-		message.getContentGraphs().stream().forEach(uri -> conversationDataset.removeNamedModel(uri.toString()));
-		conversationDataset.commit();
-	}
-	
-	private static Model aggregateGraphs(Dataset conversationDataset, Collection<URI> graphURIs) {
-		conversationDataset.begin(ReadWrite.READ);
-		Model result = ModelFactory.createDefaultModel();
-		graphURIs.forEach(uri -> {
-			Model graph = conversationDataset.getNamedModel(uri.toString());
-			if (graph != null) {
-				result.add(RdfUtils.cloneModel(graph));
-			}
-		});
-		conversationDataset.end();
-		return result;
-	}
-	
-	private static void acceptProposal(URI proposalUri, URI agreementUri, Dataset proposals, Dataset agreements) {
-		proposals.begin(ReadWrite.WRITE);
-		agreements.begin(ReadWrite.WRITE);
-		// first process proposeToCancel triples - this avoids that a message can 
-		// successfully propose to cancel itself, as agreements are only made after the
-		// cancellations are processed.		
-		Model cancellationProposals = proposals.getDefaultModel();
-		
-		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
-
-		while (nIt.hasNext()){
-			RDFNode agreementToCancelUri = nIt.next();
-			agreements.removeNamedModel(agreementToCancelUri.asResource().getURI());
-		}
-		cancellationProposals.remove(cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null));
-		proposals.commit();
-		agreements.commit();
-
-		proposals.begin(ReadWrite.WRITE);
-		agreements.begin(ReadWrite.WRITE);
-		Model proposal = RdfUtils.cloneModel(proposals.getNamedModel(proposalUri.toString()));
-		proposals.removeNamedModel(proposalUri.toString());
-		if (proposal != null && proposal.size() > 0 ) {
-			if (agreements.containsNamedModel(agreementUri.toString())) {
-				Model m = agreements.getNamedModel(agreementUri.toString());
-				m.add(proposal);
-				agreements.addNamedModel(agreementUri.toString(),	m);
-			} else {
-				agreements.addNamedModel(agreementUri.toString(), proposal);
-			}
-		}
-		proposals.commit();
-		agreements.commit();
-	}
-	
-	private static void removeProposal(URI proposalUri, Dataset proposals) {
-		proposals.begin(ReadWrite.WRITE);
-		proposals.removeNamedModel(proposalUri.toString());
-		proposals.commit();
-	}
-	
-	private static void cancelAgreement(URI toCancel, Dataset agreements) {
-		agreements.begin(ReadWrite.WRITE);
-		agreements.removeNamedModel(toCancel.toString());
-		agreements.commit();
-	}
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * Calculates all agreements present in the specified conversation dataset.
-	 */
-	public static Dataset getAgreements2(Dataset conversationDataset) {
-
-		// 1: calculate acknowledged selection 
-		// 2: find all accept message uris (only the first one for each proposal) 
-		// 3: for each accept message a:
-		// 3.1	copy the conversation and cut it off after the accept message
-		//      in the cut-off copy:
-		// 3.2  feed through modification protocol
-		// 3.3  analyze what is being accepted by a: (both cases are possible for one accept message)
-		// 3.4 if a is accepting proposalsToCancel, remove the respective agreements from the result
-		// 3.5 if a is accepting proposals, add a new agreement a to the result
-
-		Dataset ack = HighlevelFunctionFactory.getAcknowledgedSelection().apply(conversationDataset);
-		List<URI> accepts = getAcceptMessages(ack);
-		Dataset result = DatasetFactory.createGeneral();
-		List<URI> acceptedMessages = new ArrayList<>();
-		for(URI acceptsMessageURI: accepts) {
-			Dataset cutOff = RdfUtils.cloneDataset(ack);
-			cutOff = cutOffAfterMessage(cutOff, acceptsMessageURI);
-			Dataset modifiedCutOff = HighlevelFunctionFactory.getModifiedSelection().apply(cutOff);
-				
-			// System.out.println("modified cutoff:");
-			//RDFDataMgr.write(System.out, modifiedCutOff, Lang.TRIG);
-		
-			// Add agreements, regardless of whether they are cancelled later... (comment added by Brent)
-			Model agreement = getAgreement(modifiedCutOff, acceptsMessageURI);
-			if (agreement != null && agreement.size() > 0) {
-				System.out.println("adding agreement: " + acceptsMessageURI);
-				result.addNamedModel(acceptsMessageURI.toString(), agreement);
-			}
-			
-			// System.out.println("result:");
-			//RDFDataMgr.write(System.out, result, Lang.TRIG);
-
-			
-			// Remove agreements that are cancelled... (comment added by Brent)
-			List<URI> retractedAgreementUris = getRetractedAgreements(modifiedCutOff, acceptsMessageURI);
-			for (URI retractedAgreement: retractedAgreementUris) {
-				System.out.println("removing agreement: " + retractedAgreement);
-				result.removeNamedModel(retractedAgreement.toString());
-			}
-		   //	System.out.println("result after deletion:");
-			//RDFDataMgr.write(System.out, result, Lang.TRIG);
-
-	
-		}
-		return result;
-	
-		
-	/*	
-		return HighlevelFunctionFactory.getAcknowledgedSelection()
-				.andThen(HighlevelFunctionFactory.getModifiedSelection())
-				.andThen(HighlevelFunctionFactory.getAgreementFunction())
-				.apply(conversationDataset);
-	 */			
-	}
-	
-	public static List<URI> getRetractedAgreements(Dataset conversationDataset, URI acceptsMessageURI) {
-		// TODO Auto-generated method stub
-		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
-		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
-		initialBinding.add("acceptsMessageURIforProposesToCancel", name);
-		Model acceptscancelledagreement = HighlevelFunctionFactory.getRetractedAgreementsFunction(initialBinding).apply(conversationDataset);
-		RDFList list = acceptscancelledagreement.createList(acceptscancelledagreement.listSubjects());
-		ExtendedIterator<RDFNode> listiterator = list.iterator();
-		List<URI> urilist = new ArrayList<URI>();
-		
-		while(listiterator.hasNext()) {
-		    Object object = listiterator.next();
-		    try {
-				URI newuri = new URI(object.toString());
-				   urilist.add(newuri);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				// should I catch the error here... or throw it for a higher level function to catch??
-				e.printStackTrace();
-			}
-		  //   System.out.println(object.toString());
-	  }
-
-		  List<URI> urilistnoduplicates = removeTheDuplicates(urilist);
-		  return urilistnoduplicates;
-	}
-
-	public static Model getAgreement(Dataset conversationDataset, URI acceptsMessageURI) {
-		// TODO Auto-generated method stub
-		// If A is accepting proposals, add a new agreement A to the result
-		// getAgreementFunction
-		// This gets all agreements, but we want to cherry pick for a particular accepts message... (hence .... conversationDataset and acceptsMessageURI)
-		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
-		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
-		initialBinding.add("targetedacceptsmessage", name);
-		Dataset agreement = HighlevelFunctionFactory.getSingleAgreementFunction(initialBinding).apply(conversationDataset);
-	
-		/*
-		System.out.println("party duck:");
-		RDFDataMgr.write(System.out, agreement, Lang.TRIG);
-		System.out.println("end of the party duck:");
-		
-		
-		System.out.println("accepts message URI:");
-		System.out.println('<'+acceptsMessageURI.toString()+'>');
-		System.out.println("end of the accepts message URI:");
-		*/
-	/*	
-		Model testagreement = agreement.getNamedModel('<'+acceptsMessageURI.toString()+'>');
-		System.out.println("model party duck:");
-		RDFDataMgr.write(System.out, testagreement, Lang.TRIG);
-	*/
-		
-		// insert code here to grab model from Dataset agreed
-		return agreement.getNamedModel(acceptsMessageURI.toString());
-	}
-	
-	// this needs to be tested...
-	public static List<URI> getProposalSingleAgreement(Dataset conversationDataset, URI acceptsMessageURI) {
-		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
-		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
-		initialBinding.add("targetedacceptsmessage", name);
-		Model proposalsingleagreement = HighlevelFunctionFactory.getProposalSingleAgreementFunction(initialBinding).apply(conversationDataset);
-		RDFList list = proposalsingleagreement.createList(proposalsingleagreement.listSubjects());
-		ExtendedIterator<RDFNode> listiterator = list.iterator();
-		List<URI> urilist = new ArrayList<URI>();
-		
-		while(listiterator.hasNext()) {
-		    Object object = listiterator.next();
-		    try {
-				URI newuri = new URI(object.toString());
-				   urilist.add(newuri);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				// should I catch the error here... or throw it for a higher level function to catch??
-				e.printStackTrace();
-			}
-		  //   System.out.println(object.toString());
-	  }
-		return urilist;
-	}
-
-   public static Dataset cutOffAfterMessage(Dataset conversationDataset, URI acceptsMessageURI) {
-		// TODO Auto-generated method stub
-		RDFNode name = new ResourceImpl(acceptsMessageURI.toString()); 
-		QuerySolutionMap initialBinding = new QuerySolutionMap(); 
-		initialBinding.add("terminatinggraph", name);
-		Dataset cutOff = HighlevelFunctionFactory.getCutOffFunction(initialBinding).apply(conversationDataset);
-		return cutOff;
-	}
-
-	public static List<URI> getAcceptMessages(Dataset conversationDataset) {
-		// only the first accepts message for each proposal
-		// only valid accepts, too
-		// okay ... right now this a dumb implementation....
-	
-         Model actual = HighlevelFunctionFactory.getAllAcceptsFunction().apply(conversationDataset);
-		  
-		  RDFList list = actual.createList(actual.listSubjects());
-		  
-		  ExtendedIterator<RDFNode> listiterator = list.iterator();
-		  
-		  List<URI> urilist = new ArrayList<URI>();
-		  
-		  while(listiterator.hasNext()) {
-			    Object object = listiterator.next();
-			    try {
-					URI newuri = new URI(object.toString());
-					   urilist.add(newuri);
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					// should I catch the error here... or throw it for a higher level function to catch??
-					e.printStackTrace();
-				}
-			  //   System.out.println(object.toString());
-		  }
-		  
-		  List<URI> urilistnoduplicates = removeTheDuplicates(urilist);
-		  return urilistnoduplicates;
-		  // what do I return here if the query fails??
-	}
-	
-	public static List<URI> getProposalMessages(Dataset conversationDataset) {
-		// only the first accepts message for each proposal
-		// only valid accepts, too
-		// okay ... right now this a dumb implementation....
-	
-         Model actual = HighlevelFunctionFactory.getAllProposalsFunction().apply(conversationDataset);
-		  
-		  RDFList list = actual.createList(actual.listSubjects());
-		  
-		  ExtendedIterator<RDFNode> listiterator = list.iterator();
-		  
-		  List<URI> urilist = new ArrayList<URI>();
-		  
-		  while(listiterator.hasNext()) {
-			    Object object = listiterator.next();
-			    try {
-					URI newuri = new URI(object.toString());
-					   urilist.add(newuri);
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					// should I catch the error here... or throw it for a higher level function to catch??
-					e.printStackTrace();
-				}
-			  //   System.out.println(object.toString());
-		  }
-		return urilist;
-		  
-	}
-	
-	// https://stackoverflow.com/questions/2849450/how-to-remove-duplicates-from-a-list
-	// June 24, 2015 by Bade
-	
-		private static List<URI> removeTheDuplicates(List<URI> myList) {
-		    
-//			for(ListIterator<URI>iterator = myList.listIterator(); iterator.hasNext();) {
-//		        URI nextURI  = iterator.next();
-//		        if(Collections.frequency(myList, nextURI) > 1) {
-//		            iterator.remove();
-//		        }
-//		    }
-//		    return myList;
-
-			Set<URI> newSet = new HashSet<>();
-			newSet.addAll(myList);
-			List<URI> newList = new LinkedList<>();
-			newList.addAll(newSet);
-			return newList;
-
-		}
 	
 	/**
 	 * Calculates all open proposals present in the specified conversation dataset.
@@ -708,18 +63,12 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
-		return HighlevelFunctionFactory.getAcknowledgedSelection()
-					.andThen(HighlevelFunctionFactory.getModifiedSelection())
-					.andThen(HighlevelFunctionFactory.getProposalFunction())
-					.apply(conversationDataset);
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals();
 	}
 	
+	// TODO refactor to use URI instead of String
 	public static Model getProposal(Dataset conversationDataset, String proposalUri) {
-        return HighlevelFunctionFactory.getAcknowledgedSelection()
-                .andThen(HighlevelFunctionFactory.getModifiedSelection())
-                .andThen(HighlevelFunctionFactory.getAgreementFunction())
-                .apply(conversationDataset)
-                .getNamedModel(proposalUri);
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
 	}	
 	
 	/** reveiw and rewrite the JavaDoc descriptions below **/
@@ -732,11 +81,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
-		
-		return HighlevelFunctionFactory.getAcknowledgedSelection()
-				.andThen(HighlevelFunctionFactory.getModifiedSelection())
-				.andThen(HighlevelFunctionFactory.getProposalToCancelFunction())
-				.apply(conversationDataset);
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -747,8 +92,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getPendingProposes(Dataset conversationDataset) {
-		Model pendingproposes  = HighlevelFunctionFactory.getPendingProposesFunction().apply(conversationDataset);
-		return pendingproposes;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	
@@ -760,8 +104,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getPendingProposesToCancel(Dataset conversationDataset) {
-		Model pendingproposestocancel  = HighlevelFunctionFactory.getPendingProposesToCancelFunction().apply(conversationDataset);
-		return pendingproposestocancel;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -772,8 +115,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposes(Dataset conversationDataset) {
-		Model acceptedproposes = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(conversationDataset);
-		return acceptedproposes;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -784,8 +126,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsProposes(Dataset conversationDataset) {
-		Model acceptsproposes = HighlevelFunctionFactory.getAcceptsProposesFunction().apply(conversationDataset);
-		return acceptsproposes;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -796,8 +137,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposesToCancel(Dataset conversationDataset) {
-		Model acceptedproposestocancel = HighlevelFunctionFactory.getAcceptedProposesToCancelFunction().apply(conversationDataset);
-		return acceptedproposestocancel;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -808,8 +148,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsProposesToCancel(Dataset conversationDataset) {
-		Model acceptsproposestocancel = HighlevelFunctionFactory.getAcceptsProposesToCancelFunction().apply(conversationDataset);
-		return acceptsproposestocancel;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -820,8 +159,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getProposesInCancelledAgreement(Dataset conversationDataset) {
-		Model  proposesincancelledagreement = HighlevelFunctionFactory.getProposesInCancelledAgreementFunction().apply(conversationDataset);
-		return proposesincancelledagreement;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	
@@ -833,8 +171,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsInCancelledAgreement(Dataset conversationDataset) {
-		Model  acceptscancelledagreement = HighlevelFunctionFactory.getAcceptsInCancelledAgreementFunction().apply(conversationDataset);
-		return acceptscancelledagreement;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -845,8 +182,23 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedRetracts(Dataset conversationDataset) {
-		Model  acceptedretracts = HighlevelFunctionFactory.getAcceptedRetractsFunction().apply(conversationDataset);
-		return acceptedretracts;
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static List<URI> getRetractedAgreements(Dataset input, URI acceptsMessageURI) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static Dataset cutOffAfterMessage(Dataset input, URI acceptsMessageURI) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static List<URI> getAcceptMessages(Dataset input) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static List<URI> getProposalSingleAgreement(Dataset actual, URI acceptsMessageURI) {
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 }

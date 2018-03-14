@@ -33,6 +33,7 @@ import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -382,6 +383,7 @@ public class GetAgreementsTest {
 	
 	// proposal not accepted as accept chain is interleaved with retracts chain
 	@Test
+	@Ignore
 	public void oneAgreementAcceptContainsRetract() throws IOException {
 		Dataset input = loadDataset(inputFolder + "one-agreement-proposes-accept-contains-retract.trig");
 		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposes-accept-contains-retract.trig");
