@@ -27,7 +27,7 @@ In addition to the transaction certification parameters for the ratings addition
 ## Rating Format and Reputation Representation 
 
 Since we want to support interactions between Needs from arbitrary domains we do not want to restrict the rating format upfront. 
-For instance there could be ratings with single dimension or multiple dimensions, discrete or floating number scales or also including text descriptions depending on use case. Rating scheme and ontology should be negotiable between the partners of a transaction. This means that there will exists (and dynamically change) a vast amount of different rating formats in the Web of Needs Network that have to be handled in different ways. 
+For instance there could be ratings with single dimension or multiple dimensions, discrete or floating number scales or also including text descriptions depending on use case. Rating scheme and ontology should be negotiable between the partners of a transaction. Alternatively or in combination with that we could use general purpose context-aware reputation ontologies. This means that there will exists (and dynamically change) a vast amount of different rating formats in the Web of Needs Network that have to be handled in different ways. 
 
 Examples for rating/reputation ontologies that could be used:
 
