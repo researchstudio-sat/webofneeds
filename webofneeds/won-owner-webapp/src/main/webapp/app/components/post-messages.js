@@ -80,14 +80,15 @@ function genComponentConf() {
             	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreements.size"> 
             		Agreements
             		<span ng-show="self.loading.agreements"> (loading...)</span>
-            		<span ng-show="!self.loading.agreements"> (up-to-date)</span>
+            		<span ng-if="!self.loading.agreements"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="agree in self.getArrayFromSet(self.agreementData.agreements) track by $index"
 	                event-uri="agree"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
-	                connection-uri="self.connectionUri">
+	                connection-uri="self.connectionUri"
+	                on-update="::self.showAgreementData = false">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
             	<!-- PROPOSALS -->
@@ -96,33 +97,34 @@ function genComponentConf() {
             		<hr ng-show="self.agreementData.agreements.size" />
             		Proposals
     				<span ng-show="self.loading.proposals"> (loading...)</span>
-            		<span ng-show="!self.loading.proposals"> (up-to-date)</span>
+            		<span ng-if="!self.loading.proposals"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.proposals) track by $index"
 	                event-uri="prop"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.proposal"
-	                connection-uri="self.connectionUri">
+	                connection-uri="self.connectionUri"
+	                on-update="(self.showAgreementData = false) && (self.updateAgreementData(draft))">
 	            </won-connection-agreement>
 	            <!-- /PROPOSALS -->
             </div>
-            <!-- Show if no Agrrement Data exists -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.agreementDataIsValid() && !self.showLoadingInfo">
-	            <img class="pm__content__agreement__icon clickable"
-	            		src="generated/icon-sprite.svg#ico36_close"
-	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
-	            <div class="pm__content__agreement__title"> 
-	            		No Agreement Data found
-            	</div>
-            </div>
             <!-- Loading Text -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.isStillLoading && self.showLoadingInfo && !self.agreementDataIsValid()">
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.isStillLoading() && self.showLoadingInfo && !self.agreementDataIsValid()">
 	            <img class="pm__content__agreement__icon clickable"
 	            		src="generated/icon-sprite.svg#ico36_close"
 	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
 	            <div class="pm__content__agreement__title"> 
 	            		Loading the Agreement Data. Please be patient, because patience is a talent :)
+            	</div>
+            </div>
+    		<!-- Show if no Agrrement Data exists -->
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.isStillLoading() && self.showLoadingInfo && !self.agreementDataIsValid()">
+	            <img class="pm__content__agreement__icon clickable"
+	            		src="generated/icon-sprite.svg#ico36_close"
+	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
+	            <div class="pm__content__agreement__title"> 
+	            		No Agreement Data found
             	</div>
             </div>
         </div>
@@ -198,6 +200,7 @@ function genComponentConf() {
             const self = this;
                      
             this.declarations = clone(declarations);
+            
             this.agreementData = {
             		proposals: new Set(), 
             		agreements: new Set(), 
@@ -363,25 +366,31 @@ function genComponentConf() {
         	//this.getAgreementsProposedToBeCancelled();
         	//this.getAcceptedPropsalsToCancel();
         	
+        	//TODO: Filter ProposalList and drop accepted proposals
         	
-        	//this.sendAgreementsOverviewMsg();
+        }
+        
+        updateAgreementData(uri) {
+        	console.log("Is Accepted: " + uri);
         }
         
         startLoading() {
+        	this.loading.proposals = true;
+        	this.loading.agreements = true;
+        	/*
         	this.loading = {
         		proposals: true, 
         		agreements: true, 
         		proposeToCancel: true,
         		acceptedProposalsToCancel: true,
-            };
+            };*/
         }
         
         isStillLoading(){
-        	var ld = this.loading
-        	if(!ld.proposals && !ld.agreements && !ld.proposeToCancel && !ld.acceptedProposalsToCancel) {
-        		return true;
+        	if(!this.loading.proposals && !this.loading.agreements && !this.loading.proposeToCancel && !this.loading.acceptedProposalsToCancel) {
+        		return false;
         	}
-        	return false;
+        	return true;
         }
         
         getAgreements() {
@@ -391,8 +400,7 @@ function genComponentConf() {
     			if(response["@id"]) {
     				var uri = response["@id"];
     				if(!this.agreementData.agreements.has(uri)) {
-	    				this.parseResponseGraph(uri);
-	    				this.agreementData.agreements.add(uri);
+    					this.parseResponseGraph(uri, "agreements");
     				}
 				}
     			else if(response["@graph"]) {
@@ -400,8 +408,7 @@ function genComponentConf() {
     				for(i = 0; i<graph.length; i++) {
     					var uri = graph[i]["@id"];
     					if(!this.agreementData.agreements.has(uri)) {
-	    					this.parseResponseGraph(uri);
-	    					this.agreementData.agreements.add(uri);
+    						this.parseResponseGraph(uri, "agreements");
     					}
     				}
 				}
@@ -416,8 +423,7 @@ function genComponentConf() {
     			if(response["@id"]) {
     				var uri = response["@id"];
     				if(!this.agreementData.proposals.has(uri)) {
-	    				this.parseResponseGraph(uri);
-	    				this.agreementData.proposals.add(uri);
+    					this.parseResponseGraph(uri, "proposals");
     				}
 				}
     			else if(response["@graph"]) {
@@ -425,8 +431,7 @@ function genComponentConf() {
     				for(i = 0; i<graph.length; i++) {
     					var uri = graph[i]["@id"];
     					if(!this.agreementData.proposals.has(uri)) {
-	    					this.parseResponseGraph(uri);
-	    					this.agreementData.proposals.add(uri);
+    						this.parseResponseGraph(uri, "proposals");
     					}
     				}
 				}
@@ -459,7 +464,7 @@ function genComponentConf() {
         */
         
         //Create WonMEssage and add to State
-        parseResponseGraph(eventUri) {
+        parseResponseGraph(eventUri, type) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
 			.then(response => {
@@ -469,9 +474,10 @@ function genComponentConf() {
                         /*if we find out that the receiverneed of the crawled event is actually our
                         need we will call the method again but this time with the correct eventUri
                         */
-                        this.parseResponseGraph(msg.getRemoteMessageUri());
+                        this.parseResponseGraph(msg.getRemoteMessageUri(), type);
                     }else{
                         this.messages__connectionMessageReceived(msg);
+                        this.agreementData[type].add(eventUri);
                     }
                 })
 			})
@@ -495,27 +501,7 @@ function genComponentConf() {
         	}
         	return list;
         }
-        
-        sendAgreementsOverviewMsg(){
-        	const obj = this.agreementData;
-        	const getText = "http://purl.org/webofneeds/model#hasTextMessage";
-        	
-        	var msg = "Agreements: '";
-        	if(obj.agreements){
-	        	for(i = 0; i < obj.agreements.length; i++){
-	        		msg += (i+1) + ": " + obj.agreements[i]["@graph"][0][getText] + " - ";
-	        	}
-        	}
-        	msg += "  |  "
-        	msg += "Proposals: ";
-        	if(obj.proposals){
-	        	for(i = 0; i < obj.proposals.length; i++){
-	        		msg += (i+1) + ": " + obj.proposals[i]["@graph"][0][getText] + " - ";
-	        	}
-        	}
-        	this.connections__sendChatMessage(msg, this.connection.get('uri'));
-        }
-        
+      
         sendRdfTmpDeletme() { //TODO move to own component
         	this.showAgreementData = false;
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');

@@ -312,6 +312,15 @@ export function buildCreateMessage(needData, wonNodeUri) {
     };
 }
 
+
+export function buildProposalMessage(uri, type, text) {
+    const msgP = won.WONMSG.msguriPlaceholder;
+    const sc = "http://purl.org/webofneeds/agreement#"+type;
+    const whM = "\n won:hasTextMessage ";
+    return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
+}
+
+
 export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }

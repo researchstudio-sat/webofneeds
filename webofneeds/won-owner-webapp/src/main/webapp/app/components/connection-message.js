@@ -22,6 +22,9 @@ import {
     deepFreeze,
 } from '../utils.js'
 import {
+	buildProposalMessage,
+} from '../won-message-utils.js';
+import {
     actionCreators
 }  from '../actions/actions.js';
 import {
@@ -174,7 +177,7 @@ function genComponentConf() {
         
         sendProposal(){
         	this.clicked = true;
-        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	const trimmedMsg = buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate();
         }
@@ -183,17 +186,10 @@ function genComponentConf() {
         	this.clicked = true;
         	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
-        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
         	this.onUpdate();
-        }
-        
-        buildProposalMessage(uri, type, text) {
-        	const msgP = won.WONMSG.msguriPlaceholder;
-        	const sc = "http://purl.org/webofneeds/agreement#"+type;
-        	const whM = "\n won:hasTextMessage ";
-        	return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
         }
 
         updateAlignment(isOutgoingMessage) {
