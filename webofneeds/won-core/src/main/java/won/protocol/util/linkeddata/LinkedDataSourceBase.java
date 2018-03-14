@@ -323,6 +323,6 @@ public class LinkedDataSourceBase implements LinkedDataSource
   public static Dataset makeDataset() {
     DatasetGraph dsg = TDBFactory.createDatasetGraph();
     dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
-    return DatasetFactory.create(dsg);
+    return DatasetFactory.wrap(dsg);
   }
 }
