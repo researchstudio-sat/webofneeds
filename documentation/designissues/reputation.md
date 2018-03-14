@@ -31,7 +31,7 @@ For instance there could be ratings with single dimension or multiple dimensions
 
 Examples for rating/reputation ontologies that could be used:
 
-* [Alnemr, R., Paschke, A., & Meinel, C. (2010, September). Enabling reputation interoperability through semantic technologies. In Proceedings of the 6th International Conference on Semantic Systems (p. 13). ACM.](https://hpi.de/fileadmin/user_upload/fachgebiete/meinel/papers/Trust_and_Security_Engineering/2010_Alnemr_iSemantics.pdf)
+* [Alnemr, R., Schnjakin, M., & Meinel, C. (2011, November). Towards context-aware service-oriented semantic reputation framework. In Trust, Security and Privacy in Computing and Communications (TrustCom), 2011 IEEE 10th International Conference on (pp. 362-372). IEEE.](https://www.researchgate.net/profile/Rehab_Alnemr/publication/254017612_Towards_Context-Aware_Service-Oriented_Semantic_Reputation_Framework/links/54bd10330cf218da9390ec02.pdf)
 
 ## Reputation Computation
 
