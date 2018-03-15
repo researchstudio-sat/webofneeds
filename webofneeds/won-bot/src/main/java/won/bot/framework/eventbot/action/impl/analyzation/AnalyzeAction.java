@@ -67,6 +67,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
         if(event instanceof WonMessageSentOnConnectionEvent) {
             logger.debug("AnalyzeAction was called for a WonMessageSentOnConnectionEvent, this handling is not implemented yet");
+            //TODO: handle Proposals that are sent because we need to add the status of all the other preconditions to the proposed content -> but do we really do that?
         }else if(event instanceof WonMessageReceivedOnConnectionEvent){
             LinkedDataSource linkedDataSource = ctx.getLinkedDataSource();
 
@@ -87,10 +88,10 @@ public class AnalyzeAction extends BaseEventBotAction {
             if(!acceptedEvents.isEmpty()) {
                 //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
-                URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI();
+                URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI(); //TODO: REFACTOR SINCE THIS COULD BE MANY MANY ACCEPTED PROPOSALS NOW
                 Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri.toString());
 
-                if(!agreementPayload.isEmpty()){
+                if(!agreementPayload.isEmpty()){ //If there is no agreement for this particular accept then the accept is concerning a proposeToCancel message
                     bus.publish(new AgreementAcceptedEvent(con, agreementUri, agreementPayload));
                 }else{
                     for (URI acceptedEvent : acceptedEvents) {
@@ -194,7 +195,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
         for (Resource goal : goalsInNeed) {
             GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
-            Boolean oldGoalState = botContextWrapper.getGoalPreconditionState(getUniqueGoalId(goal, needDataset, receivedOnConnectionEvent.getCon()));
+            Boolean oldGoalState = botContextWrapper.getPreconditionState(getUniqueGoalId(goal, needDataset, receivedOnConnectionEvent.getCon()));
             boolean newGoalState = result.getShaclReportWrapper().isConform();
 
             if(oldGoalState == null || newGoalState != oldGoalState) {
@@ -203,7 +204,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                 }else{
                     ctx.getEventBus().publish(new PreconditionUnmetEvent(receivedOnConnectionEvent.getCon(), result));
                 }
-                botContextWrapper.addGoalPreconditionState(getUniqueGoalId(goal, needDataset, receivedOnConnectionEvent.getCon()), newGoalState);
+                botContextWrapper.addPreconditionState(getUniqueGoalId(goal, needDataset, receivedOnConnectionEvent.getCon()), newGoalState);
             }
         }
     }
