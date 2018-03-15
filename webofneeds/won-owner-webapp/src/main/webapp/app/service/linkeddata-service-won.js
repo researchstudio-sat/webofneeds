@@ -785,7 +785,10 @@ import won from './won.js';
                 .compact(graphWithContext, graphWithContext['@context']) 
                 .then(compactedGraph => {
                     compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
-                    return loadIntoRdfStore(privateData.store, 'application/ld+json', compactedGraph, compactedGraph['@id']);
+                    return loadIntoRdfStore(
+                        privateData.store, 'application/ld+json', 
+                        compactedGraph, compactedGraph['@id']
+                    );
                 })
             }
         }
@@ -797,8 +800,10 @@ import won from './won.js';
         })
         // const graphsAddedSeperatelyP = Promise.resolve();
 
-        const triplesAddedToDefaultGraphP = loadIntoRdfStore(privateData.store, 'application/ld+json', data);
 
+        const triplesAddedToDefaultGraphP = loadIntoRdfStore(
+            privateData.store, 'application/ld+json', data
+        );
         return Promise
             .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP])
             .then(() => undefined); // no return value beyond success or failure of promise
