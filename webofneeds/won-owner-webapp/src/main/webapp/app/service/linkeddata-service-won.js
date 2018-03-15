@@ -732,7 +732,7 @@ import won from './won.js';
                 }
             })
             .then(() =>
-                won.addJsonLdData(dataset)
+                won.addJsonLdData(dataset, uri)
             )
             .then(() => dataset)
         )
@@ -762,7 +762,6 @@ import won from './won.js';
         });
     }
 
-    won.addJsonLdData = async function(data) {
     /**
      * Stores the json-ld passed as `data` in the rdf-store.
      * It saves everything into the default graph, for running sparql-queries 
@@ -775,6 +774,7 @@ import won from './won.js';
      * @param {*} data 
      * @param {*} documentUri 
      */
+    won.addJsonLdData = async function(data, documentUri) {
         const context = data['@context'];
 
         const prepAndAddGraph = graph => {
@@ -814,11 +814,17 @@ import won from './won.js';
         // const graphsAddedSeperatelyP = Promise.resolve();
 
 
+        const triplesAddedToDocumentGraphP = loadIntoRdfStore(
+            privateData.store, 'application/ld+json', data, documentUri
+        );
         const triplesAddedToDefaultGraphP = loadIntoRdfStore(
             privateData.store, 'application/ld+json', data
         );
+
+        // const triplesAddedToDefaultGraphP = Promise.resolve();
+
         return Promise
-            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP])
+            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP, triplesAddedToDocumentGraphP])
             .then(() => undefined); // no return value beyond success or failure of promise
     }
 
