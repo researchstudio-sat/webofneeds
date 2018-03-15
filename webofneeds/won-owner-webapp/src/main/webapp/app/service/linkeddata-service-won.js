@@ -252,6 +252,12 @@ import won from './won.js';
 
     var cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(uri){
         var entry = privateData.cacheStatus[uri];
+        return entry && (
+            entry.state === CACHE_ITEM_STATE.OK ||
+            entry.state === CACHE_ITEM_STATE.UNRESOLVABLE ||
+            entry.state === CACHE_ITEM_STATE.FETCHING
+        );
+        /*
         var ret = false;
         if (typeof entry === 'undefined') {
             ret = false
@@ -264,6 +270,23 @@ import won from './won.js';
         var retStr = (ret + "     ").substr(0,5);
         //console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
         return ret;
+        */
+    };
+    var cacheItemIsFetching = function cacheItemIsFetching(uri){
+        return entry && entry.state === CACHE_ITEM_STATE.FETCHING;
+
+        /*
+        var entry = privateData.cacheStatus[uri];
+        var ret = false;
+        if (typeof entry === 'undefined') {
+            ret = false
+        } else {
+            ret = (entry.state === CACHE_ITEM_STATE.FETCHING);
+        }
+        var retStr = (ret + "     ").substr(0,5);
+        //console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
+        return ret;
+        */
     };
 
 
@@ -528,7 +551,7 @@ import won from './won.js';
 
 
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, fetchParams )
+        return won.fetch(uri, fetchParams, true)
             .then(
                 (dataset) => {
                     if( !(fetchParams && fetchParams.deep) ) {
@@ -566,14 +589,14 @@ import won from './won.js';
      * @param params: see `loadFromOwnServerIntoCache`
      * @returns {*}
      */
-    won.fetch = function(uri, params) {
+    won.fetch = function(uri, params, removeCacheItem=false) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
         //console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-                () => loadFromOwnServerIntoCache(uri, params)
+                () => loadFromOwnServerIntoCache(uri, params, removeCacheItem)
             ).then(dataset => {
                 lock.releaseUpdateLock();
                 return dataset;
@@ -666,7 +689,7 @@ import won from './won.js';
      *            it will return the second page of size N)
      * @return {Promise}
      */
-    function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
+    function loadFromOwnServerIntoCache(uri, params, removeCacheItem=false) { 
         let requestUri = queryString(uri, params);
 
         //console.log("linkeddata-service-won.js: fetching:        " + requestUri);
@@ -705,7 +728,7 @@ import won from './won.js';
                      * loaded triples below. So we skip removing
                      * the previously loaded data. For everything
                      * remove any remaining stale data: */
-                    won.deleteNode(uri)
+                    won.deleteNode(uri, removeCacheItem) 
                 }
             })
             .then(() =>
@@ -724,7 +747,7 @@ import won from './won.js';
      * Adds the specified JSON-LD dataset to the store, once to the default graph and once to 
      * the individual graphs contained in the data set.
      */
-    won.addJsonLdData = async function(data) {
+    won.addJsonLdData2 = async function(data) {
         return new Promise((resolve, reject) => {
             const callback = (success, results) => {
                 if (success) {
@@ -737,6 +760,48 @@ import won from './won.js';
 
             privateData.store.load("application/ld+json", data, callback); // add to default graph
         });
+    }
+    won.addJsonLdData = async function(data) {
+        const context = data['@context'];
+
+        const prepAndAddGraph = graph => {
+            const graphUri = graph['@id'];
+            const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
+
+            if(!graph['@graph'] || !graphUri || !context) {
+                const msg = 'Couldn\'t add the graph ' + graphUri + 
+                    ' with the following jsonld to the rdf-store: \n' + 
+                    JSON.stringify(graphWithContext);
+                console.error(msg);
+                return Promise.reject(msg);
+            } else {
+                /*
+                * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into 
+                * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
+                * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
+                * these from occuring.
+                */
+                return jsonld.promises
+                .compact(graphWithContext, graphWithContext['@context']) 
+                .then(compactedGraph => {
+                    compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
+                    return loadIntoRdfStore(privateData.store, 'application/ld+json', compactedGraph, compactedGraph['@id']);
+                })
+            }
+        }
+
+        const graphsAddedSeperatelyP = jld.promises
+        .flatten(data) // flattening groups by graph as a side-effect
+        .then(flattenedData => {
+            return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
+        })
+        // const graphsAddedSeperatelyP = Promise.resolve();
+
+        const triplesAddedToDefaultGraphP = loadIntoRdfStore(privateData.store, 'application/ld+json', data);
+
+        return Promise
+            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP])
+            .then(() => undefined); // no return value beyond success or failure of promise
     }
 
     /**
@@ -1476,15 +1541,11 @@ import won from './won.js';
             })
     };
 
+
     //aliases (formerly functions that were just pass-throughs)
     won.getEvent = async (eventUri, fetchParams) => {
         const event = await won.getNode(eventUri, fetchParams);
-
-        /*
-        const contentGraph = await won.getGraph(eventUri + "#content", eventUri, fetchParams); 
-        event.contentGraphNT = contentGraph? contentGraph.toNT() : "";
-        console.log("getEvent - contentGraph: ", eventUri, contentGraph);
-        */
+        await addContentGraphTrig(event, fetchParams);
 
         // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
         if(is('Array', event.hasReceivedTimestamp)) {
@@ -1509,6 +1570,7 @@ import won from './won.js';
             */
             fetchParams.doNotFetch = true;
             const correspondingEvent = await won.getNode(event.hasCorrespondingRemoteMessage, fetchParams);
+            await addContentGraphTrig(event, fetchParams);
             if (correspondingEvent.type) {
                 //if we have at least a type attribute, we add the remote event to the
                 //local event. if not, it is just an URI.
@@ -1516,6 +1578,99 @@ import won from './won.js';
             }
             return event;
         }
+    }
+
+    /**
+     * Retrieves the contentgraph for an event from the store. That contentgraph
+     * should be stored as seperate graphs for all events loaded via the store 
+     * (see won.addJsonLdData).
+     * @param {*} event 
+     * @param {*} fetchParams see won.getGraph/won.ensureLoaded/won.fetch 
+     */
+    /*async*/ function addContentGraphTrig(event, fetchParams) {
+        if(!event.hasContent) {
+            return Promise.resolve();
+        }
+        const contentGraphUri = event.hasContent;
+
+        const graphP = won.getGraph(
+            contentGraphUri, event.uri, fetchParams
+        );
+
+        const trigP = graphP.then(contentGraph => {
+            if(!contentGraph) {
+                throw new Error(
+                    "Couldn't find the following content-graph in the store: " + 
+                    contentGraphUri + "\n\n" + 
+                    contentGraph
+                );
+            }
+            const quads = contentGraph.triples.map(t => ({
+                subject: t.subject.nominalValue,
+                predicate: t.predicate.nominalValue,
+                object: t.object.nominalValue,
+                graph: contentGraphUri,
+            }));
+            console.log(
+                "\ngetEvent - contentGraph - quads:\n\n", quads, "\n\n", event
+            );
+            return won.n3Write(quads, { format: 'application/trig' });
+        });
+
+        const trigAddedP = trigP.then(trig => {
+            event.contentGraphTrig = trig;
+            console.log(
+                "\ngetEvent - contentGraph - trig: \n\n", event.contentGraphTrig, '\n\n', event, 
+            );
+
+        });
+
+        return trigAddedP
+            .catch(e => {
+                event.contentGraphTrigError = JSON.stringify(e);
+            }); 
+
+
+        /*
+
+
+
+        const tryRetrieveAndSerialize = async () => {
+            if(event.hasContent) {
+                const contentGraphUri = event.hasContent;
+                const contentGraph = await won.getGraph(contentGraphUri, eventUri, fetchParams); 
+                console.log(contentGraph);
+                if(!contentGraph) {
+                    throw new Error(
+                        "Couldn't find the following content-graph in the store: " + 
+                        contentGraphUri + "\n\n" + 
+                        contentGraph
+                    );
+                }
+                const quads = contentGraph.triples.map(t => ({
+                    subject: t.subject.nominalValue,
+                    predicate: t.predicate.nominalValue,
+                    object: t.object.nominalValue,
+                    graph: contentGraphUri,
+                }));
+
+                const trig = await won.n3Write(quads, { format: 'application/trig' });
+                // event.contentGraphNT = contentGraph? contentGraph.toNT() : "";
+                event.contentGraphTrig = trig;
+                console.log(
+                    "\n\n\ngetEvent - contentGraph: ", event, 
+                    '\n\n\n', event.contentGraphNT, 
+                    '\n\n\n', event.contentGraphTrig,
+                    '\n\n\n', quads,
+                );
+            }
+
+        }
+        return tryRetrieveAndSerialize()
+            .catch(e => {
+                event.contentGraphTrigError = JSON.stringify(e);
+            })
+            */
     }
 
     /**
@@ -1609,7 +1764,7 @@ import won from './won.js';
      * Deletes all triples where the specified uri is the subect. May have side effects on concurrent
      * reads on the rdf store if called without a read lock.
      */
-    won.deleteNode = function(uri){
+    won.deleteNode = function(uri, removeCacheItem=true){
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "deleteNode: uri must not be null"};
         }
@@ -1627,7 +1782,9 @@ import won from './won.js';
                 if (rejMsg) {
                     reject(rejMsg);
                 } else {
-                    cacheItemRemove(uri);
+                    if(removeCacheItem) { // e.g. `ensureLoaded` needs to clear the store but not the cache-status, that it handles itself
+                        cacheItemRemove(uri);
+                    }
                     resolve();
                 }
             });
@@ -1856,3 +2013,30 @@ import won from './won.js';
         },
     }
 })();
+
+/**
+ * Thin wrapper around `rdfstore.load(...)` that returns 
+ * a promise instead of requiring a callback.
+ * @param {RdfStore} store 
+ * @param {String} mediaType 
+ * @param {Jsonld} jsonldData 
+ * @param {String} graphUri 
+ */
+export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
+    return new Promise((resolve, reject) => {
+        const callback = (success, results) => {
+            if (success) {
+                resolve();
+            } else {
+                console.error('Failed to store json-ld data for ' + uri + '\n' + results);
+                reject('Failed to store json-ld data for ' + uri + '\n' + results);
+            }
+        }
+
+        if(graphUri) {
+            store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
+        } else {
+            store.load("application/ld+json", jsonldData, callback); // add to default graph
+        }
+    });
+}

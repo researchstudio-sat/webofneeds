@@ -1024,7 +1024,14 @@ window.N34dbg = N3;
         if (envelopeGraphs && envelopeGraphs.length > 0) {
             envelopeGraphs.forEach( envelopeGraph => jsonld["@graph"].push(envelopeGraph));
         }
-        return won.wonMessageFromJsonLd(jsonld);
+        return won.wonMessageFromJsonLd(jsonld)
+        .then(wonMsg => {
+             wonMsg.contentGraphTrig = 
+                get(wonMsg, 'contentGraphTrig') || 
+                get(message, 'contentGraphTrig') || 
+                getIn(message, ['hasCorrespondingRemoteMessage', 'contentGraphTrig']);
+            return wonMsg;
+        });;
     }
 
 
@@ -1038,7 +1045,21 @@ window.N34dbg = N3;
             .then(wonMessage =>
                 wonMessage.frameInPromise()
                     .then(framed => wonMessage)
-            );
+            )
+            .then(wonMessage => {
+                const contentGraphs = wonMessage.getContentGraphs(); 
+                if(contentGraphs && contentGraphs.length > 0) {
+                    won.jsonLdToTrig(contentGraphs)
+                    .then(trig => {
+                        wonMessage.contentGraphTrig = trig;
+                    })
+                    .catch(e => {
+                        wonMessage.contentGraphTrigError = JSON.stringify(e);
+                    })
+                }
+                return wonMessage;
+            });
+    }
 
     won.jsonLdToTrig = async function (jsonldData) {
         if(

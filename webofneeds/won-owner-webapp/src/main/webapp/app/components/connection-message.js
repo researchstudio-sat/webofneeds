@@ -2,6 +2,7 @@
 ;
 
 import angular from 'angular';
+import won from '../won-es6.js';
 import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
@@ -12,7 +13,6 @@ import {
 } from '../won-label-utils.js'
 import {
     connect2Redux,
-    jsonLdToTrig,
 } from '../won-utils.js';
 import {
     attach,
@@ -150,6 +150,7 @@ function genComponentConf() {
                     message,
                     text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
+                    contentGraphsTrig: get(message, 'contentGraphsTrig') || "",
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }
@@ -164,10 +165,11 @@ function genComponentConf() {
 
             // gotta do this via a $watch, as the whole message parsing before 
             // this point happens synchronously but jsonLdToTrig needs to be async.
+            /*
             this.$scope.$watch(
                 () => this.contentGraphs,
                 (newVal, oldVal) => {
-                    jsonLdToTrig(newVal.toJS())
+                    won.jsonLdToTrig(newVal.toJS())
                     .then(trig => {
                         this.contentGraphsTrig = trig;
                     })
@@ -176,6 +178,7 @@ function genComponentConf() {
                     })
                 }
             )
+            */
         }
         
         sendProposal(){
