@@ -707,7 +707,7 @@
 <https://localhost:8443/won/resource/event/1435888415723958200#content> {
     event:1435888415723958200
             won:hasTextMessage  "validate" ;
-            agr:proposesToCancel event:557600936467257340 .
+            agr:proposesToCancel event:usi9yhill1lo2xi70sjx .
 }
 
 <https://localhost:8443/won/resource/event/ej27d16ryg5cg6hos72l#envelope-xm9b-sig> {

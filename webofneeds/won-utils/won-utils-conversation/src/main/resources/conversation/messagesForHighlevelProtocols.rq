@@ -1,0 +1,46 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX mod: <http://purl.org/webofneeds/modification#> 
+
+SELECT distinct ?msg ?direction ?msgType ?senderNeed ?retracts ?accepts ?proposes ?proposesToCancel ?rejects ?previous ?correspondingRemoteMessage ?isResponseTo ?isRemoteResponseTo ?contentGraph WHERE 
+{
+    GRAPH <urn:x-arq:UnionGraph> 
+    {
+       {
+        ?msg a msg:FromExternal.
+        bind(msg:FromExternal as ?direction)
+       } union {
+        ?msg a msg:FromOwner.
+        bind(msg:FromOwner as ?direction)
+       } union {
+        ?msg a msg:FromSystem.
+        bind(msg:FromSystem as ?direction)
+       } OPTIONAL {
+        ?msg msg:hasPreviousMessage ?previous.
+       } OPTIONAL {
+        ?msg msg:isResponseTo ?isResponseTo.
+       } OPTIONAL {
+        ?msg msg:isRemoteResponseTo ?isRemoteResponseTo.
+       } OPTIONAL {
+        ?msg msg:hasCorrespondingRemoteMessage ?correspondingRemoteMessage.
+       } OPTIONAL {
+        ?msg agr:proposes ?proposes.
+       } OPTIONAL {
+        ?msg agr:rejects ?rejects.
+       } OPTIONAL {
+        ?msg agr:proposesToCancel ?proposesToCancel.
+       } OPTIONAL {
+        ?msg agr:accepts ?accepts.
+       } OPTIONAL {
+        ?msg mod:retracts ?retracts.
+       } OPTIONAL {
+        ?msg msg:hasSenderNeed ?senderNeed.
+       } OPTIONAL {
+        ?msg msg:hasMessageType ?msgType.
+       } OPTIONAL {
+        ?msg msg:hasContent ?contentGraph.
+       }
+    }  
+}

@@ -1,11 +1,14 @@
 package won.protocol.highlevel;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Model;
 
 import won.protocol.util.DatasetSelectionBySparqlFunction;
 import won.protocol.util.DatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.DatasetToModelBySparqlFunction;
+import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
+import won.protocol.util.DynamicDatasetToModelBySparqlFunction;
 
 public class HighlevelFunctionFactory {
 	
@@ -23,6 +26,15 @@ public class HighlevelFunctionFactory {
 	private static DatasetToModelBySparqlFunction acceptsCancelledAgreement;
 	private static DatasetToModelBySparqlFunction acceptedRetracts;
 	private static DatasetSelectionBySparqlFunction modifiedSelection;
+	// variable for getAgreements Function that gets all accepts messages
+	private static DatasetToModelBySparqlFunction allAcceptsFunction;
+	private static DatasetToModelBySparqlFunction allProposalsFunction;
+	//// get a dynamic dataset
+	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutOffFunction;
+	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction singleAgreementFunction;
+	private static DynamicDatasetToModelBySparqlFunction retractedAgreementsFunction;
+	private static DynamicDatasetToModelBySparqlFunction proposalsingleagreementFunction;
+	
 	
 	public static DatasetToModelBySparqlFunction getAcceptedProposesFunction() {
 		if (acceptedProposesFunction == null) {
@@ -57,6 +69,24 @@ public class HighlevelFunctionFactory {
 			acceptedProposesToCancelFunction = new DatasetToModelBySparqlFunction("/acceptedproposestocancel/query.rq");
 		}
 		return acceptedProposesToCancelFunction;
+	}
+	
+	// function to get all accept messages, regardless whether they are part of a valid agreement..
+	
+	public static DatasetToModelBySparqlFunction getAllAcceptsFunction() {
+		if (allAcceptsFunction == null) {
+			allAcceptsFunction = new DatasetToModelBySparqlFunction("/allaccepts/query.rq");
+		}
+		return allAcceptsFunction;
+	}
+	
+	// function to get all proposes messages, regardless of whether they are part of a valid agreement...
+	
+	public static DatasetToModelBySparqlFunction getAllProposalsFunction() {
+		if (allProposalsFunction == null) {
+			allProposalsFunction = new DatasetToModelBySparqlFunction("/allproposals/query.rq");
+		}
+		return allProposalsFunction;
 	}
 	
 	public static DatasetToModelBySparqlFunction getAcceptsProposesToCancelFunction() {
@@ -126,4 +156,22 @@ public class HighlevelFunctionFactory {
 		}
 		return agreementFunction;
 	}
+	
+	
+	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getCutOffFunction(QuerySolutionMap initialBinding) {
+		return	cutOffFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/cutoffaftermessage/query.rq",initialBinding);
+	}
+	
+	public static DynamicDatasetToDatasetBySparqlGSPOSelectFunction getSingleAgreementFunction(QuerySolutionMap initialBinding) {
+		return singleAgreementFunction = new DynamicDatasetToDatasetBySparqlGSPOSelectFunction("/getsingleagreement/query.rq",initialBinding);
+	}
+	
+	public static DynamicDatasetToModelBySparqlFunction getRetractedAgreementsFunction(QuerySolutionMap initialBinding) {
+		return retractedAgreementsFunction = new DynamicDatasetToModelBySparqlFunction("/getRetractedAgreements/query.rq",initialBinding);
+	}
+	
+	public static DynamicDatasetToModelBySparqlFunction getProposalSingleAgreementFunction(QuerySolutionMap initialBinding) {
+		return proposalsingleagreementFunction = new DynamicDatasetToModelBySparqlFunction("/getproposalsingleagreement/query.rq",initialBinding);
+    }
 }
+

@@ -974,7 +974,7 @@ import jsonld from 'jsonld';
         let contentGraph = undefined;
         if (contentResource) {
             contentGraph = {
-                "@id": contentResource.uri + "@content",
+                "@id": contentResource.uri + "#content",
                 "@graph": [
                     {
                         "@id": contentResource.uri,
@@ -1450,11 +1450,11 @@ import jsonld from 'jsonld';
             let graphUri = graph["@id"];
             let graphData = graph["@graph"];
             const contentUrisArray = graphData
-                .filter(resource => resource["@id"] == messageUri)
+                .filter(resource => resource["@id"] === messageUri)
                 .map(resource => resource["http://purl.org/webofneeds/message#hasContent"])
                 .filter(x => x);
             if (contentUrisArray.length > 0){
-                return contentUrisArray[0].map(x => x["@id"])
+                return contentUrisArray[0].map(x => x["@id"] || x["@value"])
             } else {
                 return [];
             }

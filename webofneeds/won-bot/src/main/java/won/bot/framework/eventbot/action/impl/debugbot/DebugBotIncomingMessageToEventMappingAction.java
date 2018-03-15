@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.util.StopWatch;
 
 import com.google.common.collect.Lists;
@@ -247,6 +249,16 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 			@Override
 			protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
 				return makeReferringMessage(successEvent.getCrawledData(), messageFinder, messageReferrer, textMessageMaker);	
+			}
+		});
+		crawlConnectionDataBehaviour.onResult(new BaseEventBotAction(ctx) {
+			
+			@Override
+			protected void doRun(Event event, EventListener executingListener) throws Exception {
+				System.out.println("------- beginning of conversation dataset ------");
+				RDFDataMgr.write(System.out, ((CrawlConnectionCommandSuccessEvent)event).getCrawledData(), Lang.TRIG);
+				System.out.println("------- end of conversation dataset ------");
+				
 			}
 		});
 		crawlConnectionDataBehaviour.activate();

@@ -319,7 +319,7 @@ export function showLatestMessages(connectionUri, numberOfEvents){
             payload: Immutable.fromJS({connectionUri, pending: true}),
         });
 
-        getEvents(
+        won.getEventsOfConnection(
             connectionUri,
             {
                 requesterWebId: needUri,
@@ -360,6 +360,7 @@ export function showLatestMessages(connectionUri, numberOfEvents){
  * @param params
  * @return {*}
  */
+/*
 function getEvents(connectionUri, params) {
     const eventP = won
         .getNode(connectionUri, params)
@@ -379,8 +380,10 @@ function getEvents(connectionUri, params) {
         ));
 
     return eventP;
-
 }
+*/
+
+
 /**
  * @param connectionUri
  * @param numberOfEvents
@@ -409,7 +412,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
             payload: Immutable.fromJS({connectionUri, pending: true}),
         });
 
-        getEvents(
+        won.getEventsOfConnection(
             connectionUri,
             {
                 requesterWebId: needUri,

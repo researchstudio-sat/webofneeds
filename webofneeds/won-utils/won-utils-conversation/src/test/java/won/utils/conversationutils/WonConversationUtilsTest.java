@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
@@ -20,15 +22,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonConversationQueryBuilder;
+import won.protocol.util.SparqlSelectFunction;
 import won.protocol.util.WonConversationUtils;
-import won.protocol.util.WonMessageQueryBuilder;
 
 public class WonConversationUtilsTest {
 
@@ -176,9 +178,22 @@ public class WonConversationUtilsTest {
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
 		//Dataset input = loadDataset("/won/utils/agreement/input/one-agreement-one-cancellation.trig");
-		Dataset input = loadDataset("/won/utils/conversationutils/input/long-conversation.trig");
-		Dataset output = HighlevelFunctionFactory.getAcknowledgedSelection().apply(input);
+		Dataset input = loadDataset("/won/utils/conversationutils/input/longer-conversation.trig");
+		SparqlSelectFunction<QuerySolution> selectfunction = 
+				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", x -> x)
+				.addOrderBy("distance", Query.ORDER_ASCENDING)
+				.addInitialBinding("senderOfFirstMessage", new ResourceImpl("https://localhost:8443/won/resource/need/4517796920802783000"));
+		StopWatch sw = new StopWatch();
+		sw.start();
+		selectfunction.apply(input).forEach(x -> System.out.println("solution:" + x.toString()));
+		sw.stop();
+		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
 		
+		sw.start();
+		HighlevelProtocols.getAgreements(input);
+		sw.stop();
+		System.out.println("getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		/*
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(input, output);
 		if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
 			System.out.println("diff - only in input:");
@@ -188,9 +203,8 @@ public class WonConversationUtilsTest {
 		} else {
 			System.out.println("input and output are equal");
 		}
-		
+		*/
 		//Dataset output = HighlevelProtocols.getProposals(input);
-		System.out.println("result:");
 		//RDFDataMgr.write(System.out, output, Lang.TRIG);
 		
 		//initialBinding.add("senderNeed", new ResourceImpl("https://localhost:8443/won/resource/need/7820503869697675000"));

@@ -65,9 +65,9 @@ FILTER NOT EXISTS {
     # only accept the main solution if acc is lexicographically smaller than the other one
     filter not exists {
         #find another accept message
+           filter(?acc2 != ?acc) . #different from acc
         GRAPH ?gf1 {
             ?acc2 agr:accepts ?prop .
-            filter(?acc2 != ?acc) . #different from acc
         }   
           GRAPH <urn:x-arq:UnionGraph> { 
             # also after prop
@@ -88,9 +88,9 @@ FILTER NOT EXISTS {
     # only accept the main solution if acc is lexicographically smaller than the other one
     filter not exists {
         #find another accept message
+         filter(?acc2 != ?acc) . #different from acc
         GRAPH ?gf1 {
             ?acc2 agr:accepts ?prop .
-            filter(?acc2 != ?acc) . #different from acc
         }   
           GRAPH <urn:x-arq:UnionGraph> {
             # also after prop
