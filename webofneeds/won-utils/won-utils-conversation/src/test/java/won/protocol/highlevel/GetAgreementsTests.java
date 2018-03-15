@@ -1,4 +1,4 @@
-package won.utils.getagreements;
+package won.protocol.highlevel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +43,7 @@ import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.util.RdfUtils;
 
-public class GetAgreementsTest {
+public class GetAgreementsTests {
 
 	// for agreement protocol::
 	private static final String inputFolder = "/won/utils/agreement/input/";
@@ -468,7 +468,7 @@ public class GetAgreementsTest {
 		InputStream is = null;
 		Dataset dataset = null;
 		try {
-			is = GetAgreementsTest.class.getResourceAsStream(path);
+			is = GetAgreementsTests.class.getResourceAsStream(path);
 			dataset = DatasetFactory.createGeneral();
 			RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
 		} finally {
@@ -518,7 +518,7 @@ public class GetAgreementsTest {
 	}
 
 	private static List<String> getClasspathEntriesByPath(String path) throws IOException {
-		InputStream is = GetAgreementsTest.class.getClassLoader().getResourceAsStream(path);
+		InputStream is = GetAgreementsTests.class.getClassLoader().getResourceAsStream(path);
 
 		StringBuilder sb = new StringBuilder();
 		while (is.available() > 0) {
