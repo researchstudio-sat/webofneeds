@@ -65,7 +65,7 @@ Drawbacks/Risks:
 
 * Anonymity: reputation profiles would accumulate transaction/rating information over time and therefore get traceable and more linkable to the real users behind it. To reduce this danger either the amount of publicly available transaction/rating data would have to be reduced or the reputation profiles would have to be dumped at some time when they accomulated too much information. Both options however would reduce the trust or confidence in reputation profiles and self-defeating its purpose in a way.
 
-=> Therefore in a system where anonymity is important we discard this approach
+=> If transaction history is not privacy sensitive in a certain domain this approach can be powerful and relatively easy to implement (especially since crawling of data has already be implemented for matching). However in a system/domain where anonymity of transaction history is important we discard this approach since profiles would become easily trackable
 
 ### Centralized Reputation Service Approach
 
