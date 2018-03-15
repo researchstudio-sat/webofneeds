@@ -304,6 +304,7 @@ public class HighlevelProtocolAnalyzer {
 			}
 			logger.debug("finished conversation analysis for high-level protocols");
 		}
+		conversationDataset.end();
 	}
 	
 	public Dataset getAgreements() {
