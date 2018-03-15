@@ -11930,10 +11930,12 @@ SparqlParser.parser = (function(){
         if (result0 !== null) {
           result0 = (function(offset, g, ts) {
               var quads = []
-              for(var i=0; i<ts.triplesContext.length; i++) {
-                  var triple = ts.triplesContext[i]
-                  triple.graph = g;
-                  quads.push(triple)
+              if(ts.triplesContext) {
+                for(var i=0; i<ts.triplesContext.length; i++) {
+                    var triple = ts.triplesContext[i]
+                    triple.graph = g;
+                    quads.push(triple)
+                }
               }
         
               return {token:'quadsnottriples',

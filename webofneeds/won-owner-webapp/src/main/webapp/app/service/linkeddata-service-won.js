@@ -96,6 +96,7 @@ import won from './won.js';
 
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
         privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
+        privateData.documentToGraph = {} // document-uri -> Set<uris of contained graphs>
     };
     /**
      * OK: fully fetched
@@ -728,7 +729,8 @@ import won from './won.js';
                      * loaded triples below. So we skip removing
                      * the previously loaded data. For everything
                      * remove any remaining stale data: */
-                    won.deleteNode(uri, removeCacheItem) 
+                    // won.deleteNode(uri, removeCacheItem) 
+                    won.removeDocumentFromStore(uri, removeCacheItem)
                 }
             })
             .then(() =>
@@ -777,41 +779,27 @@ import won from './won.js';
     won.addJsonLdData = async function(data, documentUri) {
         const context = data['@context'];
 
-        const prepAndAddGraph = graph => {
-            const graphUri = graph['@id'];
-            const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
-
-            if(!graph['@graph'] || !graphUri || !context) {
-                const msg = 'Couldn\'t add the graph ' + graphUri + 
-                    ' with the following jsonld to the rdf-store: \n' + 
-                    JSON.stringify(graphWithContext);
-                console.error(msg);
-                return Promise.reject(msg);
-            } else {
-                /*
-                * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into 
-                * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
-                * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
-                * these from occuring.
-                */
-                return jsonld.promises
-                .compact(graphWithContext, graphWithContext['@context']) 
-                .then(compactedGraph => {
-                    compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
-                    return loadIntoRdfStore(
-                        privateData.store, 'application/ld+json', 
-                        compactedGraph, compactedGraph['@id']
-                    );
-                })
-            }
-        }
-
-        const graphsAddedSeperatelyP = jld.promises
-        .flatten(data) // flattening groups by graph as a side-effect
-        .then(flattenedData => {
-            return Promise.all(flattenedData.map(graph => prepAndAddGraph(graph)))
-        })
         // const graphsAddedSeperatelyP = Promise.resolve();
+        const graphsAddedSeperatelyP = groupByGraphs(data)
+        .then(grouped => {
+
+            // Save mapping from documentUri to graphUris, e.g. for future deletion operations
+            const graphUris = grouped.map(g => g['@id']);
+            const prevGraphUris = privateData.documentToGraph[documentUri];
+            if(!prevGraphUris) {
+                privateData.documentToGraph[documentUri] = new Set(graphUris);
+            } else {
+                graphUris.forEach(u => prevGraphUris.add(u));
+            }
+
+            // save all the graphs into the rdf store
+            return grouped.map(g => 
+                loadIntoRdfStore(
+                    privateData.store, 'application/ld+json', 
+                    g, g['@id']
+                )
+            )
+        });
 
 
         const triplesAddedToDocumentGraphP = loadIntoRdfStore(
@@ -827,6 +815,7 @@ import won from './won.js';
             .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP, triplesAddedToDocumentGraphP])
             .then(() => undefined); // no return value beyond success or failure of promise
     }
+
 
     /**
      * Loads the need-data without following up
@@ -1785,7 +1774,91 @@ import won from './won.js';
     };
 
     /**
-     * Deletes all triples where the specified uri is the subect. May have side effects on concurrent
+     * Deletes all triples belonging to that particular document (e.g. need, event, etc)
+     * from all graphs.
+     */
+    won.removeDocumentFromStore = function(documentUri, removeCacheItem=true) {
+        return won.getCachedGraph(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
+        .catch(e => {
+            const msg = 'Failed to retrieve triples for the document ' + documentUri + '.';
+            console.error(msg);
+            e.message += msg;
+            throw e;
+        })
+        .then(result => {
+            console.log('about to delete the following from all graphs: ', result);
+
+            console.log('adflk;ajsflkajsdflk - 1 ', privateData);
+            //remove entry from documentToGraph
+            delete privateData.documentToGraph[documentUri];
+            console.log('adflk;ajsflkajsdflk - 2 ', privateData);
+
+            const urisOfContainedGraphs = (privateData.documentToGraph[documentUri] || new Set());
+
+            return Promise.all([
+                won.deleteTriples(result.triples), // deletion from default graph
+                won.deleteTriples(result.triples, documentUri), // deletion from document-graph
+
+                //deletion from subgraphs
+                ...Array.from(urisOfContainedGraphs).map(graphUri => 
+                    won.deleteTriples(result.triples, graphUri, 
+                        (success) => success? 
+                            Promise.resolve() : 
+                            Promise.reject(
+                                "Failed to delete the following triples from" +
+                                " the graph " + graphUri + 
+                                " contained in document " + documentUri + ": " + 
+                                JSON.stringify(result.triples)
+                            )
+                    )
+                )
+            ]);
+        })
+        .catch(e => {
+            const msg = 'Failed to delete the triples for the document ' + documentUri +
+                ' from the default graph.'
+            console.error(msg);
+            e.message += msg;
+            throw e;
+        })
+        .then(() => {
+            if(removeCacheItem) { 
+                // e.g. `ensureLoaded` needs to clear the store but 
+                // not the cache-status, as it handles that itself
+                cacheItemRemove(documentUri);
+            }
+        })
+    }
+
+    /**
+     * @param {*} triples in rdfjs interface format
+     * @param {string} graphUri if omitted, will remove from default graph
+     */
+    won.deleteTriples = function(triples, graphUri) {
+        return new Promise((resolve, reject) => {
+            const callback = (success) => {
+                if(!success) {
+                    const msg = 'Failed to delete the following triples: ' + 
+                        JSON.stringify(triples);
+                    console.error(msg);
+                    reject(msg);
+                } else {
+                    resolve();
+                }
+            }
+            if(graphUri) {
+                privateData.store.delete(triples, graphUri, callback);
+            } else {
+                privateData.store.delete(triples, callback);
+            }
+        })
+
+    }
+
+    /**
+     * @deprecated only deletes from default graph and not sub- and documentgraphs.
+     * Deletes all triples where the specified uri is the subect. 
+     * May have side effects on concurrent
      * reads on the rdf store if called without a read lock.
      */
     won.deleteNode = function(uri, removeCacheItem=true){
@@ -1815,6 +1888,20 @@ import won from './won.js';
         });
     };
 
+    won.getCachedGraph = function(graphUri) {
+        return new Promise((resolve, reject) => {
+            privateData.store.graph(graphUri, (success, graph) => {
+                if(success) {
+                    resolve(graph)
+                } else {
+                    const msg = "Failed to retrieve graph with uri " + graphUri + ". Got: " + JSON.stringify(graph);
+                    console.error(msg);
+                    reject(msg);
+                }
+            })
+        })
+    }
+
     /**
      * @param {*} graphUri the uri of the graph to be retrieved
      * @param {*} documentUri the uri to the document that contains the graph (to make sure it's already cached)
@@ -1824,17 +1911,7 @@ import won from './won.js';
         return won
         .ensureLoaded(documentUri, fetchParams)
         .then(() => 
-            new Promise((resolve, reject) => {
-                privateData.store.graph(graphUri, (success, graph) => {
-                    if(success) {
-                        resolve(graph)
-                    } else {
-                        const msg = "Failed to retrieve graph with uri " + graphUri + ". Got: " + JSON.stringify(graph);
-                        console.error(msg);
-                        reject(msg);
-                    }
-                })
-            })
+            won.getCachedGraph(graphUri)
         )
     }
 
@@ -2063,4 +2140,45 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
             store.load("application/ld+json", jsonldData, callback); // add to default graph
         }
     });
+}
+
+window.groupByGraphs = groupByGraphs;
+function groupByGraphs(jsonldData) {
+
+    const context = jsonldData['@context'];
+
+    const cleanUpGraph = graph => {
+        const graphUri = graph['@id'];
+        const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
+
+        if(!graph['@graph'] || !graphUri || !context) {
+            const msg = 'Grouping-by-graph failed for the graph' +
+                graphUri + ' and context ' + JSON.stringify(graphUri) + 
+                ' with the following jsonld: \n' + 
+                JSON.stringify(graphWithContext);
+            console.error(msg);
+            return Promise.reject(msg);
+        } else {
+            /*
+            * the previous flattening would generate `{ "@id": "foo", "ex:bar": "someval"}` into 
+            * `{ "@id": "foo", "ex:bar": { "@value": "someval"}}`. however, the rdfstore can't handle
+            * nodes with `@value` but without `@type`, so we need to compact here first, to prevent
+            * these from occuring.
+            */
+            return jsonld.promises
+            .compact(graphWithContext, graphWithContext['@context']) 
+            .then(compactedGraph => {
+                compactedGraph['@id'] = graphUri; // we want the long graph-uri, not the compacted one
+                return compactedGraph;
+            });
+        }
+    }
+
+    const seperatedGraphsP = jld.promises
+    .flatten(jsonldData) // flattening groups by graph as a side-effect
+    .then(flattenedData => {
+        return Promise.all(flattenedData.map(graph => cleanUpGraph(graph)))
+    })
+
+    return seperatedGraphsP;
 }
