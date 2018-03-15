@@ -369,7 +369,7 @@ export function callAgreementsFetch(url) {
                 'Accept': 'application/ld+json',
                 'Content-Type': 'application/ld+json'
                },
-            credentials: 'include'
+            credentials: 'same-origin'
         })         
         .then(checkHttpStatus)
         .then(response =>
@@ -378,7 +378,7 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
-    return fetch("/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
+        return fetch("/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
             method: 'get',
             headers : { 
                 'Accept': 'application/ld+json',

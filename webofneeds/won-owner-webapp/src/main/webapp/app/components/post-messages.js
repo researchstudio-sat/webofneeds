@@ -32,7 +32,6 @@ import {
     selectNeedByConnectionUri,
 } from '../selectors.js';
 import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
-//import won.owner.web.rest.highlevel.HighlevelProtocolsController;
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -40,6 +39,7 @@ const declarations = deepFreeze({
 	proposal: "proposal",
 	agreement: "agreement",
 	proposeToCancel: "proposeToCancel",
+	acceptedProposalToCancel: "acceptedProposalToCancel",
 	
 });
 function genComponentConf() {
@@ -92,15 +92,15 @@ function genComponentConf() {
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
             	<!-- PROPOSALS -->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposals.size">
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposal.size">
             		<br ng-show="self.agreementData.agreements.size" />
             		<hr ng-show="self.agreementData.agreements.size" />
             		Proposals
-    				<span ng-show="self.loading.proposals"> (loading...)</span>
-            		<span ng-if="!self.loading.proposals"> (up-to-date)</span>
+    				<span ng-show="self.loading.proposal"> (loading...)</span>
+            		<span ng-if="!self.loading.proposal"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.proposals) track by $index"
+	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.proposal) track by $index"
 	                event-uri="prop"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.proposal"
@@ -202,16 +202,16 @@ function genComponentConf() {
             this.declarations = clone(declarations);
             
             this.agreementData = {
-            		proposals: new Set(), 
-            		agreements: new Set(), 
+            		proposal: new Set(), 
+            		agreement: new Set(), 
             		proposeToCancel: new Set(),
-            		acceptedProposalsToCancel: new Set(),
+            		acceptedProposalToCancel: new Set(),
             };
             this.loading = {
-            		proposals: false, 
-            		agreements: false, 
+            		proposal: false, 
+            		agreement: false, 
             		proposeToCancel: false,
-            		acceptedProposalsToCancel: false,
+            		acceptedProposalToCancel: false,
             };
             
             this.showAgreementData = false;
@@ -349,7 +349,7 @@ function genComponentConf() {
         
         agreementDataIsValid() {
         	var aD = this.agreementData;
-        	if(aD.proposals.size ||aD.agreements.size ||aD.proposeToCancel.size || aD.acceptedProposalsToCancel.size){
+        	if(aD.proposal.size ||aD.agreemens.size ||aD.proposeToCancel.size || aD.acceptedProposalToCancel.size){
         		return true;
         	}
         	return false;
@@ -363,56 +363,56 @@ function genComponentConf() {
         	this.startLoading();
         	this.getAgreements();
         	this.getProposals();
-        	//this.getAgreementsProposedToBeCancelled();
-        	//this.getAcceptedPropsalsToCancel();
+        	this.getAgreementsProposedToBeCancelled();
+        	this.getAcceptedPropsalsToCancel();
         	
-        	//TODO: Filter ProposalList and drop accepted proposals
-        	
+        	this.filterAgreementDataList();
         }
         
         updateAgreementData(uri) {
         	console.log("Is Accepted: " + uri);
+        	
+        	//TODO: Reaload AgreementData, refresh uri list
         }
         
         startLoading() {
-        	this.loading.proposals = true;
-        	this.loading.agreements = true;
-        	/*
         	this.loading = {
-        		proposals: true, 
-        		agreements: true, 
+        		proposal: true, 
+        		agreement: true, 
         		proposeToCancel: true,
-        		acceptedProposalsToCancel: true,
-            };*/
+        		acceptedProposalToCancel: true,
+            }
         }
         
         isStillLoading(){
-        	if(!this.loading.proposals && !this.loading.agreements && !this.loading.proposeToCancel && !this.loading.acceptedProposalsToCancel) {
+        	if(!this.loading.proposal && !this.loading.agreement && !this.loading.proposeToCancel && !this.loading.acceptedProposalToCancel) {
         		return false;
         	}
         	return true;
+        }
+        
+        //Filter and update the agreementData object
+        filterAgreementDataList() {
+        	for(agreement of this.agreementData.agreement) {
+        		if(this.agreementData.proposals.has(agreement)) {
+        			this.agreementData.proposal.delete(agreement)
+        		}
+        		if(this.agreementData.proposeToCancel.has(agreement)) {
+        			this.agreementData.agreement.delete(agreement)
+        		}
+        	}
+        	for(agreement of this.agreementData.acceptedProposalToCancel) {
+        		if(this.agreementData.proposeToCancel.has(agreement)) {
+        			this.agreementData.proposeToCancel.delete(agreement)
+        		}
+        	}
         }
         
         getAgreements() {
         	var url = '/owner/rest/highlevel/getAgreements?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@id"]) {
-    				var uri = response["@id"];
-    				if(!this.agreementData.agreements.has(uri)) {
-    					this.parseResponseGraph(uri, "agreements");
-    				}
-				}
-    			else if(response["@graph"]) {
-    				var graph = response["@graph"];
-    				for(i = 0; i<graph.length; i++) {
-    					var uri = graph[i]["@id"];
-    					if(!this.agreementData.agreements.has(uri)) {
-    						this.parseResponseGraph(uri, "agreements");
-    					}
-    				}
-				}
-    			this.loading.agreements = false;
+    			this.handleApiResponse(response, this.declarations.agreement);
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -420,34 +420,15 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getProposals?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@id"]) {
-    				var uri = response["@id"];
-    				if(!this.agreementData.proposals.has(uri)) {
-    					this.parseResponseGraph(uri, "proposals");
-    				}
-				}
-    			else if(response["@graph"]) {
-    				var graph = response["@graph"];
-    				for(i = 0; i<graph.length; i++) {
-    					var uri = graph[i]["@id"];
-    					if(!this.agreementData.proposals.has(uri)) {
-    						this.parseResponseGraph(uri, "proposals");
-    					}
-    				}
-				}
-    			this.loading.proposals = false;
+    			this.handleApiResponse(response, this.declarations.proposal);
     		}).catch(error => console.error('Error:', error))
         }
         
-        /*
         getAgreementsProposedToBeCancelled() {
         	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {
-    				this.agreementData.proposeToCancel = this.parseAgreementsData(Array.from(response['@graph']));
-    				this.loading.proposeToCancel = false;
-    			}
+    			this.handleApiResponse(response, this.declarations.proposeToCancel);
     		}).catch(error => console.error('Error:', error))
         }
         
@@ -455,15 +436,30 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			if(response["@graph"]) {
-    				this.agreementData.acceptedProposalsToCancel = this.parseAgreementsData(Array.from(response['@graph']));
-    				this.loading.acceptedProposalsToCancel = false;
-    			}
+    			this.handleApiResponse(response, this.declarations.acceptedPropsalToCancel);
     		}).catch(error => console.error('Error:', error))
         }
-        */
         
-        //Create WonMEssage and add to State
+        handleApiResponse(response, type){
+        	if(response["@id"]) {
+				var eventUri = response["@id"];
+				if(!this.agreementData.proposals.has(eventUri)) {
+					this.parseResponseGraph(uri, type);
+				}
+			}
+			else if(response["@graph"]) {
+				var graph = response["@graph"];
+				for(i = 0; i<graph.length; i++) {
+					var uri = graph[i]["@id"];
+					if(!this.agreementData[type].has(eventUri)) {
+						this.parseResponseGraph(eventUri, type);
+					}
+				}
+			}
+			this.loading[type] = false;
+        }
+        
+        //Create WonMessage and add to State
         parseResponseGraph(eventUri, type) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
@@ -486,22 +482,7 @@ function genComponentConf() {
         getArrayFromSet(set) {
         	return Array.from(set);
         }
-        
-        parseAgreementsData(obj) {
-        	var list = [];
-        	const getText = "http://purl.org/webofneeds/model#hasTextMessage";
-        	
-        	if(obj.length < 2) {
-        		list.push({id: obj["@id"], text: obj["graph"][0][getText]});
-        	}else {
-	        	for(i = 0; i < obj.length; i++){
-		        	//list.push({id: obj[i]["@graph"][0]["@id"], text: obj[i]["@graph"][0][getText]});
-	        		list.push({id: obj[i]["@id"], text: obj[i]["@graph"][0][getText]});
-		        }
-        	}
-        	return list;
-        }
-      
+             
         sendRdfTmpDeletme() { //TODO move to own component
         	this.showAgreementData = false;
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
