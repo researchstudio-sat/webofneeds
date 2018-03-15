@@ -28,6 +28,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -156,7 +157,9 @@ public class RdfUtils
 
   public static Dataset cloneDataset(Dataset dataset) {
     if (dataset == null) return null;
+    dataset.begin(ReadWrite.READ);
     Dataset clonedDataset = DatasetFactory.createGeneral();
+    clonedDataset.begin(ReadWrite.WRITE);
     Model model = dataset.getDefaultModel();
     if (model != null) {
       clonedDataset.setDefaultModel(cloneModel(model));
@@ -165,6 +168,8 @@ public class RdfUtils
       String modelName = modelNames.next();
       clonedDataset.addNamedModel(modelName, cloneModel(dataset.getNamedModel(modelName)));
     }
+    clonedDataset.commit();
+    dataset.end();
     return clonedDataset;
   }
 
