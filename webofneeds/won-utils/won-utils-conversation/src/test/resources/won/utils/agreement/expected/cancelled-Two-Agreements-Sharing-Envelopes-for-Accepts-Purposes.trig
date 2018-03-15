@@ -18,7 +18,7 @@
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix agr: <http://purl.org/webofneeds/agreement#> .
 
-<https://localhost:8443/won/resource/event/557600936467257340> {
+<https://localhost:8443/won/resource/event/00d5wzbbf8hzzt2eewcc> {
     <https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx>
             <http://purl.org/webofneeds/model#hasTextMessage>
                     "Greetings! \nI am the DebugBot. I can simulate multiple other users so you can test things. I understand a few commands. \nTo see which ones, type \n\n'usage'\n\n (without the quotes)." .

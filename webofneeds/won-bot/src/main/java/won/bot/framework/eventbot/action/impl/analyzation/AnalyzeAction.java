@@ -88,8 +88,8 @@ public class AnalyzeAction extends BaseEventBotAction {
             if(!acceptedEvents.isEmpty()) {
                 //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
-                URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI(); //TODO: REFACTOR SINCE THIS COULD BE MANY MANY ACCEPTED PROPOSALS NOW
-                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri.toString());
+                URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI();
+                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri);
 
                 if(!agreementPayload.isEmpty()){ //If there is no agreement for this particular accept then the accept is concerning a proposeToCancel message
                     bus.publish(new AgreementAcceptedEvent(con, agreementUri, agreementPayload));

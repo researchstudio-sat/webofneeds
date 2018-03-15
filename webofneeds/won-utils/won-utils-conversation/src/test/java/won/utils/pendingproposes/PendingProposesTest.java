@@ -1,8 +1,9 @@
 package won.utils.pendingproposes;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -12,13 +13,14 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class PendingProposesTest {
 	
@@ -32,7 +34,7 @@ public class PendingProposesTest {
     }
 
  // This is the case where there is no open proposal...(each exist in their own envelope, both are accepted in an agreement)
-	@Test
+	@Test @Ignore
 	public void noOpenProposal () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-bothaccepted.trig");	    
 	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-bothaccepted.ttl");
@@ -40,7 +42,7 @@ public class PendingProposesTest {
 	}
 	
 	 // This is the case where there is one open proposal...(each exist in their own envelope, only one is accepted in an agreement)
-	@Test
+	@Test @Ignore
 	public void oneOpenProposal () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-one-accepted.trig");	    
 	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-one-accepted.ttl");
@@ -48,7 +50,7 @@ public class PendingProposesTest {
 	}
 	
 	// This is the case where there are two open proposals ...(each exist in their own envelope)
-	@Test
+	@Test @Ignore
 	public void twoOpenProposals () throws IOException {
 	    Dataset input = loadDataset( inputFolder + "2proposal-noaccepted.trig");	    
 	    Model expected = customLoadModel( expectedOutputFolder  + "2proposal-noaccepted.ttl");

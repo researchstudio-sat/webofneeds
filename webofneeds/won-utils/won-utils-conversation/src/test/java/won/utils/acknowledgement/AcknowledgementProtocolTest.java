@@ -84,6 +84,20 @@ public class AcknowledgementProtocolTest {
         test(input,expectedOutput);
     }
     
+    @Test
+    public void twoProposalsTwoAgreementsBothCancelled () throws IOException {
+        Dataset input = loadDataset( inputFolder + "twoProposalsTwoAgreementsBothCancelled.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "twoProposalsTwoAgreementsBothCancelled.trig");
+        test(input,expectedOutput);
+    }
+    
+    @Test
+    public void twoProposalsTwoAgreementsOneCancelled () throws IOException {
+        Dataset input = loadDataset( inputFolder + "twoProposalsTwoAgreementsOneCancelled.trig");
+        Dataset expectedOutput = loadDataset( expectedOutputFolder + "twoProposalsTwoAgreementsOneCancelled.trig");
+        test(input,expectedOutput);
+    }
+    
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one

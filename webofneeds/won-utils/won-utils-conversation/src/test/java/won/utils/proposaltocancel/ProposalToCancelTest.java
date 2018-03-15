@@ -1,38 +1,16 @@
 package won.utils.proposaltocancel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +32,7 @@ public class ProposalToCancelTest {
  
     // This is the case where there is one open proposal to cancel an agreement and no acceptance..
     // This should show the content of the agreement... rather than the agreement envelope...(2 degrees of indirection...)
-    @Test
+    @Test @Ignore
     public void oneOpenCancellationPropsoal () throws IOException {
         Dataset input = loadDataset( inputFolder + "one-agreement-one-unacceptedcancellation.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "one-agreement-one-unacceptedcancellation.trig");
@@ -65,7 +43,7 @@ public class ProposalToCancelTest {
     // valid agreement. Another is a proposaltocancel of an invalid agreement. The proposaltocancel content graph is accepted.
     // This makes one valid proposaltocancel agreement, and one attempted agreement that results in an error. There are
     // no open proposaltocancel since all valid agreements that have been proposedtocancel have been accepted.
-    @Test
+    @Test @Ignore
     public void oneClosedCancellationOneCancellationErrorSameProposal () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-onefail.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-onefail.trig");
@@ -75,7 +53,7 @@ public class ProposalToCancelTest {
     // This is the case where there is a proposal content graph with two proposaltocancel. Both are a proposaltocancel of 
     // valid agreement. There are no open proposaltocancel since all valid agreements that have been proposedtocancel 
     /// have been accepted.
-    @Test
+    @Test @Ignore
     public void twoClosedCancellationOneCancellationSameProposal () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-bothsucceed.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-bothsucceed.trig");
@@ -86,7 +64,7 @@ public class ProposalToCancelTest {
     // This is the case where there is a proposal content graph with two proposaltocancel. Both are a proposaltocancel of 
     // valid agreement. There are two open proposaltocancel since all valid agreements that have been proposedtocancel 
     /// have not been accepted.
-    @Test
+    @Test @Ignore
     public void twoOpenCancellationOneCancellationSameProposal () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-1cancellationproposal-2clauses-noneaccepted.trig");
@@ -96,7 +74,7 @@ public class ProposalToCancelTest {
     // This is the case where there are two proposal content graph each with one proposaltocancel. Both are a proposaltocancel of 
     // valid agreement. There are no open proposaltocancel since all valid agreements that have been proposedtocancel 
     /// have been accepted.
-    @Test
+    @Test @Ignore
     public void twoProposaltwoAgreementstwoCancellationProposalClausesBothAccepted () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-bothaccepted.trig");
@@ -106,7 +84,7 @@ public class ProposalToCancelTest {
     // This is the case where there are two proposal content graph each with one proposaltocancel. Both are a proposaltocancel of 
     // valid agreement. There is one open proposaltocancel since one of the valid agreements that have been proposedtocancel 
     /// has been accepted .
-    @Test
+    @Test @Ignore
     public void twoProposaltwoAgreementstwoCancellationProposalClausesOneAccepted () throws IOException {
         Dataset input = loadDataset( inputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.trig");
         Dataset expectedOutput = loadDataset( expectedOutputFolder + "2proposal-2agreements-2cancellationproposal-1clauses-oneaccepted.trig");
