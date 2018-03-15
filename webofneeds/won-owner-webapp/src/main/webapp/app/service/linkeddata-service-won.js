@@ -761,7 +761,20 @@ import won from './won.js';
             privateData.store.load("application/ld+json", data, callback); // add to default graph
         });
     }
+
     won.addJsonLdData = async function(data) {
+    /**
+     * Stores the json-ld passed as `data` in the rdf-store.
+     * It saves everything into the default graph, for running sparql-queries 
+     * (our rdf-store.js can't do cross-graph queries), saves it into it's seperate
+     * graphs for later retrieval on a graph-level (e.g. when retrieving the 
+     * content-graph of a message), and saves it once into a graph with the documentUri
+     * to be able to retrieve all triples belonging to a document (e.g. when it needs to
+     * update the cache for a document).
+     * 
+     * @param {*} data 
+     * @param {*} documentUri 
+     */
         const context = data['@context'];
 
         const prepAndAddGraph = graph => {
