@@ -37,7 +37,7 @@ Examples for rating/reputation ontologies that could be used:
 
 ## Reputation Computation
 
-There are different ways of calculating an aggregated reputation "score" out of all relevant transaction ratings of a certain profile. Many of them (e.g. summation, average, weighted models, ect.) are described in:
+There are different ways of calculating an aggregated reputation "score" out of all relevant transaction ratings of a certain profile. Many of them (e.g. summation, average, weighted models, decay of ratings over time, ect.) are described in:
 * [Jøsang, A., Ismail, R., & Boyd, C. (2007). A survey of trust and reputation systems for online service provision. Decision support systems, 43(2), 618-644.](http://eprints.qut.edu.au/7280/1/7280.pdf) 
 
 
