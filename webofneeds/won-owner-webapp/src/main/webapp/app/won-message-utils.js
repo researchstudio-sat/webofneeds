@@ -369,7 +369,7 @@ export function callAgreementsFetch(url) {
                 'Accept': 'application/ld+json',
                 'Content-Type': 'application/ld+json'
                },
-            credentials: 'same-origin'
+            credentials: 'include'
         })         
         .then(checkHttpStatus)
         .then(response =>

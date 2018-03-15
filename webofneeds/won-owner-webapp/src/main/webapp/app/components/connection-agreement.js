@@ -50,7 +50,8 @@ function genComponentConf() {
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: {{ self.message.get('text') }}<br />
-            	{{ self.eventUri }}
+            	EventUri: {{ self.eventUri }}<br />
+            	RealUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
             </div>
             <div class="won-ca__content__button">
             	<svg class="won-ca__content__carret clickable"
@@ -127,11 +128,16 @@ function genComponentConf() {
         acceptProposal() {
         	this.clicked = true;
         	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
-        	//this.message.setIn(["isAccepted"], true);
+        	/*	
+        	this.message = this.message.set("isAccepted", true);
+        	this.connections__sendChatMessage(this.message, this.connectionUri);
+        	*/
         	this.onUpdate({draft: this.eventUri});
         	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }

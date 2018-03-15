@@ -77,13 +77,13 @@ function genComponentConf() {
             		src="generated/icon-sprite.svg#ico36_close"
             		ng-click="self.showAgreementData = !self.showAgreementData"/>
             	<!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreements.size"> 
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreement.size"> 
             		Agreements
-            		<span ng-show="self.loading.agreements"> (loading...)</span>
-            		<span ng-if="!self.loading.agreements"> (up-to-date)</span>
+            		<span ng-show="self.loading.agreement"> (loading...)</span>
+            		<span ng-if="!self.loading.agreement"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="agree in self.getArrayFromSet(self.agreementData.agreements) track by $index"
+	            	ng-repeat="agree in self.getArrayFromSet(self.agreementData.agreement) track by $index"
 	                event-uri="agree"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
@@ -93,8 +93,8 @@ function genComponentConf() {
 	            <!-- /Agreements -->
             	<!-- PROPOSALS -->
             	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposal.size">
-            		<br ng-show="self.agreementData.agreements.size" />
-            		<hr ng-show="self.agreementData.agreements.size" />
+            		<br ng-show="self.agreementData.agreement.size" />
+            		<hr ng-show="self.agreementData.agreement.size" />
             		Proposals
     				<span ng-show="self.loading.proposal"> (loading...)</span>
             		<span ng-if="!self.loading.proposal"> (up-to-date)</span>
@@ -229,12 +229,48 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
                 
+                //Filter already accepted proposals
                 let sortedMessages = chatMessages && chatMessages.toArray();
+                if(sortedMessages) {
+                	var msgSet = new Set(sortedMessages);
+                	for(msg of msgSet) {
+                		if(msg.get("isProposeMessage")){
+	                		if(this.agreementData.agreement.has(msg.get("uri")) || this.agreementData.agreement.has(msg.get("remoteUri"))) {
+	                			msgSet.delete(msg);
+	                		} else {
+	                			//TODO: add messages from state to agreementDate with right uri
+	                			msg.get("remoteUri")? this.agreementData.proposal.add(msg.get("remoteUri")) : this.agreementData.proposal.add(msg.get("uri"));
+	                		}
+                		}
+                	}
+                	sortedMessages = Array.from(msgSet);
+	            	sortedMessages.sort(function(a,b) {
+	                    return a.get("date").getTime() - b.get("date").getTime();
+	                });
+	            	
+	            	this.filterAgreementDataList();
+                }
+                //Load AgreementData from State -> faster than Api call
+                /*
+                if(chatMessages) {
+                	for(msg of chatMessages.toArray()){                    	
+		              	if(msg.get("isProposeMessage")) {
+		              		this.agreementData.proposal.add(msg.get("uri"));
+		              	}
+		              	else if(msg.get("isAcceptMessage")) {
+		              		this.agreementData.agreement.add(msg.get("uri"));
+		              		chatMessages.filter(e => e !== msg);
+		              	}
+                	}
+                	this.filterAgreementDataList();
+                }*/
+                
+                /*
                 if(sortedMessages){
                     sortedMessages.sort(function(a,b) {
                         return a.get("date").getTime() - b.get("date").getTime();
                     });
-                }
+                }*/
 
                 if(this.reload && connection) {
                 	this.getAgreementData(connection)
@@ -349,7 +385,7 @@ function genComponentConf() {
         
         agreementDataIsValid() {
         	var aD = this.agreementData;
-        	if(aD.proposal.size ||aD.agreemens.size ||aD.proposeToCancel.size || aD.acceptedProposalToCancel.size){
+        	if(aD.proposal.size ||aD.agreement.size ||aD.proposeToCancel.size || aD.acceptedProposalToCancel.size){
         		return true;
         	}
         	return false;
@@ -363,8 +399,8 @@ function genComponentConf() {
         	this.startLoading();
         	this.getAgreements();
         	this.getProposals();
-        	this.getAgreementsProposedToBeCancelled();
-        	this.getAcceptedPropsalsToCancel();
+        	//this.getAgreementsProposedToBeCancelled();
+        	//this.getAcceptedPropsalsToCancel();
         	
         	this.filterAgreementDataList();
         }
@@ -376,12 +412,15 @@ function genComponentConf() {
         }
         
         startLoading() {
+        	this.loading.proposal = true;
+        	this.loading.agreement = true;
+        	/*
         	this.loading = {
         		proposal: true, 
         		agreement: true, 
         		proposeToCancel: true,
         		acceptedProposalToCancel: true,
-            }
+            }*/
         }
         
         isStillLoading(){
@@ -394,7 +433,7 @@ function genComponentConf() {
         //Filter and update the agreementData object
         filterAgreementDataList() {
         	for(agreement of this.agreementData.agreement) {
-        		if(this.agreementData.proposals.has(agreement)) {
+        		if(this.agreementData.proposal.has(agreement)) {
         			this.agreementData.proposal.delete(agreement)
         		}
         		if(this.agreementData.proposeToCancel.has(agreement)) {
@@ -413,7 +452,10 @@ function genComponentConf() {
         	callAgreementsFetch(url)
     		.then(response => {
     			this.handleApiResponse(response, this.declarations.agreement);
-    		}).catch(error => console.error('Error:', error))
+    		}).catch(error => {
+    				console.error('Error:', error);
+    				this.loading.agreement = false;
+    		})
         }
         
         getProposals() {
@@ -421,7 +463,10 @@ function genComponentConf() {
         	callAgreementsFetch(url)
     		.then(response => {
     			this.handleApiResponse(response, this.declarations.proposal);
-    		}).catch(error => console.error('Error:', error))
+    		}).catch(error => {
+				console.error('Error:', error);
+				this.loading.proposal = false;
+			})
         }
         
         getAgreementsProposedToBeCancelled() {
@@ -429,7 +474,10 @@ function genComponentConf() {
         	callAgreementsFetch(url)
     		.then(response => {
     			this.handleApiResponse(response, this.declarations.proposeToCancel);
-    		}).catch(error => console.error('Error:', error))
+    		}).catch(error => {
+				console.error('Error:', error);
+				this.loading.proposeToCancel = false;
+			})
         }
         
         getAcceptedPropsalsToCancel() {
@@ -437,20 +485,23 @@ function genComponentConf() {
         	callAgreementsFetch(url)
     		.then(response => {
     			this.handleApiResponse(response, this.declarations.acceptedPropsalToCancel);
-    		}).catch(error => console.error('Error:', error))
+    		}).catch(error => {
+				console.error('Error:', error);
+				this.loading.acceptedPropsalToCancel = false;
+			})
         }
         
         handleApiResponse(response, type){
         	if(response["@id"]) {
 				var eventUri = response["@id"];
-				if(!this.agreementData.proposals.has(eventUri)) {
-					this.parseResponseGraph(uri, type);
+				if(!this.agreementData[type].has(eventUri)) {
+					this.parseResponseGraph(eventUri, type);
 				}
 			}
 			else if(response["@graph"]) {
 				var graph = response["@graph"];
 				for(i = 0; i<graph.length; i++) {
-					var uri = graph[i]["@id"];
+					var eventUri = graph[i]["@id"];
 					if(!this.agreementData[type].has(eventUri)) {
 						this.parseResponseGraph(eventUri, type);
 					}

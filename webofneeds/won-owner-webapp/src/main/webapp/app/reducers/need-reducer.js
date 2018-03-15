@@ -542,7 +542,7 @@ function parseMessage(wonMessage, newMessage) {
             connectMessage: wonMessage.isConnectMessage(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
-            isAccepted: false,
+            //isAccepted: wonMessage.isAccepted(),
         }
     };
 

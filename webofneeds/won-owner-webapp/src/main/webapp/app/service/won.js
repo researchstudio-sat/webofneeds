@@ -1215,6 +1215,10 @@ import jsonld from 'jsonld';
         isAgreement: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#Agreement");
         },
+        /*
+        isAccepted: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/message#isAccepted");
+        },*/
         
         isFromSystem: function () {
             let direction = this.getMessageDirection();
