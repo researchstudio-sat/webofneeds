@@ -1071,6 +1071,8 @@ export function inlineSVGSpritesheet(path, id) {
  * @param {*} prependedMsg 
  */
 export function rethrow(e, prependedMsg="") {
+    prependedMsg = prependedMsg? prependedMsg + "\n" : "";
+
     if(is('String', e)) {
         throw new Error(prependedMsg + e);
     } else if(e.stack && e.message) { // a class defined
