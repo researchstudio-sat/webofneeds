@@ -66,10 +66,28 @@ public class HighlevelProtocols {
 		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals();
 	}
 	
-	// TODO refactor to use URI instead of String
 	public static Model getProposal(Dataset conversationDataset, String proposalUri) {
 		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
 	}	
+	
+	public static Set<URI> getAgreementUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreementUris();
+	}
+	
+	public static Set<URI> getCancelledAgreementUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getCancelledAreementUris();
+	}
+	
+	public static Set<URI> getAgreementsProposedToBeCancelledUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposedToBeCancelledAgreementUris();
+	}
+	
+	public static Set<URI> getRejectedProposalUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getRejectedProposalUris();
+	}
+
+
+
 	
 	/** reveiw and rewrite the JavaDoc descriptions below **/
 	
@@ -81,6 +99,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
+		//TODO
 		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
@@ -187,6 +206,10 @@ public class HighlevelProtocols {
 
 	public static List<URI> getRetractedAgreements(Dataset input, URI acceptsMessageURI) {
 		throw new UnsupportedOperationException("not yet implemented");
+	}
+	
+	public static Set<URI> getRetractedUris(Dataset input){
+		return new HighlevelProtocolAnalyzer(input).getRetractedUris();
 	}
 
 	public static Dataset cutOffAfterMessage(Dataset input, URI acceptsMessageURI) {

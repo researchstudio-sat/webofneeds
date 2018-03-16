@@ -136,7 +136,10 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
 
 	@Override
 	public List<T> apply(Dataset dataset) {
-		dataset.begin(ReadWrite.READ);
+		boolean existingTransaction = dataset.isInTransaction();
+		if (! existingTransaction) {
+			dataset.begin(ReadWrite.READ);
+		}
 		Dataset result = DatasetFactory.createGeneral();
 		result.begin(ReadWrite.WRITE);
 		try {
@@ -170,7 +173,9 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
 		}
 		return ret;
 		} finally {
-			dataset.end();
+			if (!existingTransaction) {
+				dataset.end();
+			}
 			result.commit();
 		}
 	}

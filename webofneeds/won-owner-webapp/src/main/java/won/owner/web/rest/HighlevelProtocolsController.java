@@ -1,6 +1,7 @@
 package won.owner.web.rest;
 
 import java.net.URI;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -33,6 +34,13 @@ public class HighlevelProtocolsController {
         Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
         return HighlevelProtocols.getAcceptedRetracts(conversationDataset);
     }
+	
+	@RequestMapping(value = "/getRetractedUris", method = RequestMethod.GET)
+	public ResponseEntity<Set<URI>> getRetractedUris(String connectionUri) {
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+		Set<URI> uris = HighlevelProtocols.getRetractedUris(conversationDataset);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/getAgreements", method = RequestMethod.GET)
 	public ResponseEntity<Dataset> getAgreements(String connectionUri) {
@@ -40,6 +48,13 @@ public class HighlevelProtocolsController {
 		Dataset agreements = HighlevelProtocols.getAgreements(conversationDataset);
 
 		return new ResponseEntity<>(agreements, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getAgreementUris", method = RequestMethod.GET)
+	public ResponseEntity<Set<URI>> getAgreementUris(String connectionUri) {
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+		Set<URI> uris = HighlevelProtocols.getAgreementUris(conversationDataset);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
 	}
 
     @RequestMapping(value = "/getAgreement", method = RequestMethod.GET)
@@ -57,6 +72,13 @@ public class HighlevelProtocolsController {
 
 		return new ResponseEntity<>(proposals, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/getProposalUris", method = RequestMethod.GET)
+	public ResponseEntity<Set<URI>> getProposalUris(String connectionUri) {
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+		Set<URI> uris = HighlevelProtocols.getRejectedProposalUris(conversationDataset);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
+	}
 
     @RequestMapping(value = "/getProposal", method = RequestMethod.GET)
     public ResponseEntity<Model> getProposal(String connectionUri, String proposalUri) {
@@ -71,6 +93,27 @@ public class HighlevelProtocolsController {
 
 		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		return new ResponseEntity<>(HighlevelProtocols.getProposalsToCancel(conversationDataset), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getAgreementsProposedToBeCancelledUris", method = RequestMethod.GET)
+	public ResponseEntity<Set<URI>> getAgreementsProposedToBeCancelledUris(String connectionUri) {
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+		Set<URI> uris = HighlevelProtocols.getAgreementsProposedToBeCancelledUris(conversationDataset);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getCancelledAgreementUris", method = RequestMethod.GET)
+	public ResponseEntity<Set<URI>> getCancelledAgreementUris(String connectionUri) {
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+		Set<URI> uris = HighlevelProtocols.getCancelledAgreementUris(conversationDataset);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getRejectedProposalUris", method = RequestMethod.GET)
+	public ResponseEntity<Set<URI>> getRejectedProposalUris(String connectionUri) {
+		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+		Set<URI> uris = HighlevelProtocols.getRejectedProposalUris(conversationDataset);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getPendingProposals", method = RequestMethod.GET)
