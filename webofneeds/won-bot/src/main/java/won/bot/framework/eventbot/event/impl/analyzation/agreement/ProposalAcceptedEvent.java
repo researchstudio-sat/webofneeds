@@ -9,11 +9,11 @@ import java.net.URI;
 /**
  * Created by fsuda on 27.11.2017.
  */
-public class AgreementAcceptedEvent extends AgreementEvent {
+public class ProposalAcceptedEvent extends AgreementEvent {
     private final Model payload;
 
-    public AgreementAcceptedEvent(Connection con, URI agreementUri, Model payload) {
-        super(con, agreementUri);
+    public ProposalAcceptedEvent(Connection con, URI proposalUri, Model payload) {
+        super(con, proposalUri);
         this.payload = payload;
     }
 
