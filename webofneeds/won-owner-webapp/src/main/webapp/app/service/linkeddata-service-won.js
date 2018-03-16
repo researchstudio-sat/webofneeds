@@ -755,12 +755,17 @@ import won from './won.js';
                 if (success) {
                     resolve();
                 } else {
-                    console.error('Failed to store json-ld data for ' + uri + '\n' + results);
-                    reject('Failed to store json-ld data for ' + uri + '\n' + results);
+                    throw new Exception('' + results);
                 }
             }
 
-            privateData.store.load("application/ld+json", data, callback); // add to default graph
+            try {
+                privateData.store.load("application/ld+json", data, callback); // add to default graph
+            } catch (e) {
+                e.message += 'Failed to store json-ld data for ' + uri + '\n';
+                console.error(e);
+                reject(e);
+            }
         });
     }
 
@@ -1835,18 +1840,23 @@ import won from './won.js';
         return new Promise((resolve, reject) => {
             const callback = (success) => {
                 if(!success) {
-                    const msg = 'Failed to delete the following triples: ' + 
-                        JSON.stringify(triples);
-                    console.error(msg);
-                    reject(msg);
+                    throw new Exception();
                 } else {
                     resolve();
                 }
             }
-            if(graphUri) {
-                privateData.store.delete(triples, graphUri, callback);
-            } else {
-                privateData.store.delete(triples, callback);
+            try {
+                if(graphUri) {
+                    privateData.store.delete(triples, graphUri, callback);
+                } else {
+                    privateData.store.delete(triples, callback);
+                }
+            } catch (e) {
+                e.message += 'Failed to delete the following triples: ' + 
+                    JSON.stringify(triples);
+                console.error(e);
+                reject(e);
+
             }
         })
 
@@ -1887,15 +1897,24 @@ import won from './won.js';
 
     won.getCachedGraph = function(graphUri) {
         return new Promise((resolve, reject) => {
-            privateData.store.graph(graphUri, (success, graph) => {
+            const callback = (success, graph) => {
                 if(success) {
                     resolve(graph)
                 } else {
-                    const msg = "Failed to retrieve graph with uri " + graphUri + ". Got: " + JSON.stringify(graph);
-                    console.error(msg);
-                    reject(msg);
+                    throw new Exception("Got: " + JSON.stringify(graph));
                 }
-            })
+            }
+            try {
+                if(graphUri) {
+                    privateData.store.graph(graphUri, callback);
+                } else {
+                    privateData.store.graph(callback);
+                }
+            } catch (e) {
+                e.message += "Failed to retrieve graph with uri " + graphUri + ".";
+                console.error(e);
+                reject(e);
+            }
         })
     }
 
@@ -2126,15 +2145,20 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
             if (success) {
                 resolve();
             } else {
-                console.error('Failed to store json-ld data for ' + uri + '\n' + results);
-                reject('Failed to store json-ld data for ' + uri + '\n' + results);
+                throw new Exception('' + results);
             }
         }
 
-        if(graphUri) {
-            store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
-        } else {
-            store.load("application/ld+json", jsonldData, callback); // add to default graph
+        try {
+            if(graphUri) {
+                store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
+            } else {
+                store.load("application/ld+json", jsonldData, callback); // add to default graph
+            }
+        } catch (e) {
+            e.message += 'Failed to store json-ld data for ' + uri;
+            console.error(e);
+            reject(e);
         }
     });
 }
