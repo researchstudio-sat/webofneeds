@@ -1786,12 +1786,9 @@ import won from './won.js';
             throw e;
         })
         .then(result => {
-            console.log('about to delete the following from all graphs: ', result);
 
-            console.log('adflk;ajsflkajsdflk - 1 ', privateData);
             //remove entry from documentToGraph
             delete privateData.documentToGraph[documentUri];
-            console.log('adflk;ajsflkajsdflk - 2 ', privateData);
 
             const urisOfContainedGraphs = (privateData.documentToGraph[documentUri] || new Set());
 
