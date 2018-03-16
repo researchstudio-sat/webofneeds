@@ -1060,3 +1060,25 @@ export function inlineSVGSpritesheet(path, id) {
         //window.foo4dbg = document.body.appendChild(svgNode);
     })
 }
+
+
+/**
+ * Optionally prepends a string, and then throws
+ * whatever it gets as proper javascript error.
+ * Note, that throwing an exception will also 
+ * reject in a `Promise`-constructor-callback.
+ * @param {*} e 
+ * @param {*} prependedMsg 
+ */
+export function rethrow(e, prependedMsg="") {
+    if(is('String', e)) {
+        throw new Error(prependedMsg + e);
+    } else if(e.stack && e.message) { // a class defined
+        var g = new Error(prependedMsg + e.message);
+        g.stack = e.stack;
+        throw g;
+    } else {
+        throw new Error(prependedMsg + JSON.stringify(e));
+    }
+}
+

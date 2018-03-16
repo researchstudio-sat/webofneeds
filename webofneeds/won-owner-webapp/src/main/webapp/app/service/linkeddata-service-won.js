@@ -24,6 +24,7 @@ import {
     clone,
     contains,
     deepFreeze,
+    rethrow,
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
@@ -709,7 +710,7 @@ import won from './won.js';
             if (response.status === 200)
                 return response;
             else
-                throw new Exception(`${response.status} - ${response.statusText}`);
+                throw new Error(`${response.status} - ${response.statusText}`);
         })
         .then(dataset =>
             dataset.json())
@@ -739,7 +740,7 @@ import won from './won.js';
             .then(() => dataset)
         )
         .catch(e =>
-            Promise.reject(`failed to load ${uri} due to reason: "${e}"`)
+            rethrow(e, `failed to load ${uri} due to reason: `)
         );
 
         return datasetP;
@@ -755,16 +756,14 @@ import won from './won.js';
                 if (success) {
                     resolve();
                 } else {
-                    throw new Exception('' + results);
+                    throw new Error(JSON.stringify(results));
                 }
             }
 
             try {
                 privateData.store.load("application/ld+json", data, callback); // add to default graph
             } catch (e) {
-                e.message += 'Failed to store json-ld data for ' + uri + '\n';
-                console.error(e);
-                reject(e);
+                rethrow(e, 'Failed to store json-ld data for ' + uri + '\n');
             }
         });
     }
@@ -1348,7 +1347,7 @@ import won from './won.js';
                 result.type = "blank node";
                 break;
             default:
-                throw new Exception("Encountered triple with object of unknown type: "
+                throw new Error("Encountered triple with object of unknown type: "
                     + t.object.interfaceName + "\n" +
                     t.subject.nominalValue + " " +
                     t.predicate.nominalValue + " " +
@@ -1771,8 +1770,7 @@ import won from './won.js';
             })
             .catch(e => {
                 releaseLock();
-                throw new Exception("Couldn't get node " +
-                    uri + " with params " + fetchParams, e);
+                rethrow(e, "Couldn't get node " + uri + " with params " + fetchParams + "\n");
             });
 
         return nodePromise;
@@ -1840,7 +1838,7 @@ import won from './won.js';
         return new Promise((resolve, reject) => {
             const callback = (success) => {
                 if(!success) {
-                    throw new Exception();
+                    throw new Error();
                 } else {
                     resolve();
                 }
@@ -1852,11 +1850,10 @@ import won from './won.js';
                     privateData.store.delete(triples, callback);
                 }
             } catch (e) {
-                e.message += 'Failed to delete the following triples: ' + 
-                    JSON.stringify(triples);
-                console.error(e);
-                reject(e);
-
+                rethrow(
+                    'Failed to delete the following triples: ' + 
+                    JSON.stringify(triples)
+                );
             }
         })
 
@@ -1901,7 +1898,7 @@ import won from './won.js';
                 if(success) {
                     resolve(graph)
                 } else {
-                    throw new Exception("Got: " + JSON.stringify(graph));
+                    throw new Error("Got: " + JSON.stringify(graph));
                 }
             }
             try {
@@ -1911,9 +1908,7 @@ import won from './won.js';
                     privateData.store.graph(callback);
                 }
             } catch (e) {
-                e.message += "Failed to retrieve graph with uri " + graphUri + ".";
-                console.error(e);
-                reject(e);
+                rethrow(e, "Failed to retrieve graph with uri " + graphUri + ".");
             }
         })
     }
@@ -2145,7 +2140,7 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
             if (success) {
                 resolve();
             } else {
-                throw new Exception('' + results);
+                throw new Error(JSON.stringify(results));
             }
         }
 
@@ -2156,9 +2151,7 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
                 store.load("application/ld+json", jsonldData, callback); // add to default graph
             }
         } catch (e) {
-            e.message += 'Failed to store json-ld data for ' + uri;
-            console.error(e);
-            reject(e);
+            rethrow(e, 'Failed to store json-ld data for ' + uri);
         }
     });
 }
