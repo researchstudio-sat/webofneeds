@@ -1821,20 +1821,20 @@ Lexicon.Lexicon.prototype.retrieve = function(oid) {
           }
         }
     } catch(e) {
-        console.log("error in lexicon retrieving OID:");
-        console.log(oid);
+        console.error("error in lexicon retrieving OID:");
+        console.error(oid);
         if(e.message || e.stack) {
             if(e.message) {
-                console.log(e.message); 
+                console.error(e.message); 
             }
             if(e.stack) {
-                console.log(e.stack);
+                console.error(e.stack);
             }
         } else {
-            console.log(e);
+            console.error(e);
         }
-        throw new Error("Unknown retrieving OID in lexicon:"+oid);
-
+        e.message = "Unknown retrieving OID in lexicon:" + oid + "\n" + e.message;
+        throw e;
     }
 };
 
