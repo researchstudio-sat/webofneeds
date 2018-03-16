@@ -381,11 +381,11 @@ function addConnectionFull(state, connection, newConnection) {
     return state;
 }
 
-function addMessage(state, wonMessage, newMessage) {
+function addMessage(state, wonMessage, isNewMessage) {
     if (wonMessage.getContentGraphs().length > 0) {
         // we only want to add messages to the state that actually contain text
 		// content. (no empty connect messages, for example)
-        let parsedMessage = parseMessage(wonMessage, newMessage);
+        let parsedMessage = parseMessage(wonMessage, isNewMessage);
 
         if (parsedMessage) {
             const connectionUri = parsedMessage.get("belongsToUri");
@@ -526,7 +526,7 @@ function parseConnection(jsonldConnection, newConnection) {
     }
 }
 
-function parseMessage(wonMessage, newMessage) {
+function parseMessage(wonMessage, isNewMessage) {
 
     let parsedMessage = {
         belongsToUri: undefined,
@@ -537,7 +537,7 @@ function parseMessage(wonMessage, newMessage) {
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: wonMessage.isFromOwner(),
-            newMessage: !!newMessage,
+            newMessage: !!isNewMessage,
             connectMessage: wonMessage.isConnectMessage(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
