@@ -56,10 +56,10 @@ function genComponentConf() {
                     <span class="won-cm__center__bubble__text">
                         {{ self.text? self.text : self.noTextPlaceholder }}
                     </span>
-                    <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
-                    <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
-                    <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
-                        {{ self.contentGraphsTrig }}
+                    <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
+                    <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
+                    <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
+                        {{ self.contentGraphTrig }}
                     </code>
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage') 
@@ -150,7 +150,7 @@ function genComponentConf() {
                     message,
                     text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
-                    contentGraphsTrig: get(message, 'contentGraphsTrig') || "",
+                    contentGraphTrig: get(message, 'contentGraphTrig') || "",
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }
@@ -171,10 +171,10 @@ function genComponentConf() {
                 (newVal, oldVal) => {
                     won.jsonLdToTrig(newVal.toJS())
                     .then(trig => {
-                        this.contentGraphsTrig = trig;
+                        this.contentGraphTrig = trig;
                     })
                     .catch(e => {
-                        this.contentGraphsTrig = JSON.stringify(e);
+                        this.contentGraphTrig = JSON.stringify(e);
                     })
                 }
             )

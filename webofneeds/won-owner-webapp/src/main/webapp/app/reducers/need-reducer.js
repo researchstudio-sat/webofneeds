@@ -542,6 +542,7 @@ function parseMessage(wonMessage, isNewMessage) {
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
             isAccepted: false,
+            contentGraphTrig: wonMessage.contentGraphTrig,
         }
     };
 
