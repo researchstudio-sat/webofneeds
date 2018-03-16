@@ -37,6 +37,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConn
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
@@ -74,6 +75,7 @@ public class AnalyzeAction extends BaseEventBotAction {
         URI remoteNeedUri;
         URI connectionUri;
         Connection connection;
+        WonMessage wonMessage;
         boolean publishAnalyzeMessages = false;
 
         try {
@@ -81,6 +83,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             remoteNeedUri = ((RemoteNeedSpecificEvent) event).getRemoteNeedURI();
             connectionUri = ((ConnectionSpecificEvent) event).getConnectionURI();
             connection = makeConnection(needUri, remoteNeedUri, connectionUri);
+            wonMessage = ((MessageEvent) event).getWonMessage();
         }catch(ClassCastException e){
             logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent, was an event of class: " + event.getClass());
             return;
@@ -93,15 +96,13 @@ public class AnalyzeAction extends BaseEventBotAction {
         Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSource);
 
         if(event instanceof WonMessageSentOnConnectionEvent) {
-            WonMessageSentOnConnectionEvent sentOnConnectionEvent = (WonMessageSentOnConnectionEvent) event;
-
-            List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(sentOnConnectionEvent.getWonMessage());
+            List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(wonMessage);
 
             if(!proposesEvents.isEmpty()){
                 addPreconditionProposalRelations(connectionUri,
                         needDataset,
                         fullConversationDataset,
-                        new Proposal(sentOnConnectionEvent.getWonMessage().getMessageURI(), ProposalState.SUGGESTED),
+                        new Proposal(wonMessage.getMessageURI(), ProposalState.SUGGESTED),
                         goalsInNeed,
                         botContextWrapper);
             }
@@ -110,21 +111,21 @@ public class AnalyzeAction extends BaseEventBotAction {
             publishAnalyzeMessages = true;
             WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
 
-            List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(receivedOnConnectionEvent.getWonMessage());
-            List<URI> proposesToCancelEvents = WonRdfUtils.MessageUtils.getProposesToCancelEvents(receivedOnConnectionEvent.getWonMessage());
+            List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(wonMessage);
+            List<URI> proposesToCancelEvents = WonRdfUtils.MessageUtils.getProposesToCancelEvents(wonMessage);
 
             if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()){
                 //If the message contains proposes or proposesToCancel the event itself is a proposal
                 addPreconditionProposalRelations(connectionUri,
                         needDataset,
                         fullConversationDataset,
-                        new Proposal(receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI(), ProposalState.SUGGESTED),
+                        new Proposal(wonMessage.getCorrespondingRemoteMessageURI(), ProposalState.SUGGESTED),
                         goalsInNeed,
                         botContextWrapper);
                 bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
             }
 
-            List<URI> acceptedEventUris = WonRdfUtils.MessageUtils.getAcceptedEvents(receivedOnConnectionEvent.getWonMessage());
+            List<URI> acceptedEventUris = WonRdfUtils.MessageUtils.getAcceptedEvents(wonMessage);
 
             if(!acceptedEventUris.isEmpty()) {
                 for(URI acceptedEventURI : acceptedEventUris) {
@@ -148,7 +149,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             return;
         }
 
-        List<URI> rejectEventUris = WonRdfUtils.MessageUtils.getRejectEvents(((MessageEvent) event).getWonMessage());
+        List<URI> rejectEventUris = WonRdfUtils.MessageUtils.getRejectEvents(wonMessage);
 
         if(!rejectEventUris.isEmpty()) {
             Set<URI> agreementUris = HighlevelProtocols.getAgreementUris(fullConversationDataset);
