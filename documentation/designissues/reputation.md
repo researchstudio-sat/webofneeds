@@ -60,6 +60,7 @@ Benefits:
 * This means rating or reputation services would have only reduced power compared to a system where only selected services can do this calculation
 * Simple system architecture: there is basically no protocol for rating service interaction since rating data can just be crawled by everyone
 * Reputation can be computed by arbitrary and possibly competing algorithms (including algorithms that take the whole transaction/rating graph into account, e.g. PageRank)
+* Having a global view on the rating graph means that there are more advanced approches available to detect and react to attacks on the reputation system (e.g. fake ratings, discrimination, unfair ratings)
 
 Drawbacks/Risks:
 
