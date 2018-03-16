@@ -12,6 +12,10 @@ public class Proposal implements Serializable {
     private URI uri;
     private ProposalState state;
 
+    public Proposal(String uri, ProposalState state) {
+        this(URI.create(uri), state);
+    }
+
     public Proposal(URI uri, ProposalState state) {
         this.uri = uri;
         this.state = state;
@@ -29,10 +33,6 @@ public class Proposal implements Serializable {
         return state;
     }
 
-    public void setState(ProposalState state) {
-        this.state = state;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -40,9 +40,7 @@ public class Proposal implements Serializable {
 
         Proposal proposal = (Proposal) o;
 
-        if (!uri.equals(proposal.uri)) return false;
-
-        return true;
+        return uri.equals(proposal.uri);
     }
 
     @Override
