@@ -66,13 +66,13 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     /**
      * Adds one or more preconditions to the given connection Uri ListMap
      * @param connectionURI a single connectionUri to store as the key of the ListMap
-     * @param preconditionURI one or more preconditionUris that should be linked with the connection
+     * @param precondition one or more preconditions that should be linked with the connection
      */
-    public void addConnectionPrecondition(URI connectionURI, String... preconditionURI) {
-        getBotContext().addToListMap(connectionToPreconditionListMapName, connectionURI.toString(), preconditionURI);
+    public void addConnectionPrecondition(URI connectionURI, Precondition... precondition) {
+        getBotContext().addToListMap(connectionToPreconditionListMapName, connectionURI.toString(), precondition);
 
-        for(String preconUri : preconditionURI) {
-            getBotContext().saveToObjectMap(preconditionToConnectionMapName, preconUri, connectionURI);
+        for(Precondition precon : precondition) {
+            getBotContext().saveToObjectMap(preconditionToConnectionMapName, precon.getUri(), connectionURI);
         }
     }
 
@@ -108,7 +108,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     }
 
     public boolean hasPreconditionProposalRelation(String preconditionURI, String proposalURI) {
-        return getPreconditionsForProposalUri(proposalURI).contains(preconditionURI);
+        return getPreconditionsForProposalUri(proposalURI).contains(new Precondition(preconditionURI, false)); //Status of the Precondition is irrelevant (equals works on uri alone)
     }
 
     public List<Proposal> getProposalsForPreconditionUri(String preconditionURI){
@@ -121,11 +121,47 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
 
     /**
      * Returns a List of All saved Precondition URIS for the proposal
-     * @param proposalURI uri of the proposal to retrieve the preconditionList of
+     * @param proposalURI string of the proposaluri to retrieve the preconditionList of
      * @return List of all URI-Strings of preconditions save for the given connectionURI
      */
-    public List<String> getPreconditionsForProposalUri(String proposalURI) {
-        return (List<String>)(List<?>) getBotContext().loadFromListMap(connectionToPreconditionListMapName, proposalURI.toString());
+    public List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
+        return (List<Precondition>)(List<?>) getBotContext().loadFromListMap(connectionToPreconditionListMapName, proposalURI.toString());
+    }
+
+    /**
+     * @param proposalURI uri of the proposal to retrieve the preconditionList of
+     * @return true if there is at least one Met Precondition for this proposal
+     */
+    public boolean hasMetPrecondition(URI proposalURI) {
+        return hasMetPrecondition(proposalURI.toString());
+    }
+
+    /**
+     * @param preconditionURI string of the uri of the precondition
+     * @return true if the given precondition is met by at least one proposal
+     */
+    public boolean isPreconditionMetInProposals(String preconditionURI) {
+        List<Proposal> proposals = getProposalsForPreconditionUri(preconditionURI);
+        for(Proposal p : proposals) {
+            List<Precondition> preconditions = getPreconditionsForProposalUri(p.getUri().toString());
+            for(Precondition condition : preconditions) {
+                if(condition.isMet()) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param proposalURI string of the proposaluri to retrieve the preconditionList of
+     * @return true if there is at least one Met Precondition for this proposal
+     */
+    public boolean hasMetPrecondition(String proposalURI) {
+        List<Precondition> preconditions = getPreconditionsForProposalUri(proposalURI);
+
+        for(Precondition p : preconditions) {
+            if(p.isMet()) return true;
+        }
+        return false;
     }
 
     /**
@@ -140,7 +176,6 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
         getBotContext().removeFromListMap(connectionToPreconditionListMapName, connectionURI);
         getBotContext().removeFromListMap(connectionToProposalListMapName, connectionURI);
     }
-
 
     /**
      * Removes All the stored entries in all Maps Lists or MapList for the given Proposal
@@ -171,9 +206,9 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
 
     public void removePreconditionReferences(String preconditionURI) {
         getBotContext().removeFromObjectMap(preconditionConversationStateMapName, preconditionURI);
-        getBotContext().removeLeavesFromListMap(connectionToPreconditionListMapName, preconditionURI);
+        getBotContext().removeLeavesFromListMap(connectionToPreconditionListMapName, new Precondition(preconditionURI, false)); //Status of the Precondition is irrelevant (equals works on uri alone)
         getBotContext().removeFromObjectMap(preconditionToConnectionMapName, preconditionURI);
         getBotContext().removeFromObjectMap(preconditionToProposalListMapName, preconditionURI);
-        getBotContext().removeLeavesFromListMap(proposalToPreconditionListMapName, preconditionURI);
+        getBotContext().removeLeavesFromListMap(proposalToPreconditionListMapName, new Precondition(preconditionURI, false)); //Status of the Precondition is irrelevant (equals works on uri alone)
     }
 }
