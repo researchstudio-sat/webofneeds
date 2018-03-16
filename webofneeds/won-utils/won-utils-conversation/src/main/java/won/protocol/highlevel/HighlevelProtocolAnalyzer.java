@@ -1,13 +1,12 @@
 package won.protocol.highlevel;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -17,22 +16,16 @@ import java.util.stream.Collectors;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.Level;
 import won.protocol.message.WonMessageDirection;
-import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
 import won.protocol.vocabulary.WONAGR;
@@ -43,9 +36,63 @@ public class HighlevelProtocolAnalyzer {
 	
 	private final Dataset proposals = DatasetFactory.createGeneral();
 	private final Dataset agreements = DatasetFactory.createGeneral();
+	private final Dataset cancelled = DatasetFactory.createGeneral();
+	private final Dataset rejected = DatasetFactory.createGeneral();
+	private final Set<URI> retractedUris = new HashSet<URI>();
 	
 	public HighlevelProtocolAnalyzer(Dataset conversation) {
 		recalculate(conversation);
+	}
+	
+	public Dataset getAgreements() {
+		return agreements;
+	}
+	
+	public Dataset getProposals() {
+		return proposals;
+	}
+	
+	public Dataset getCancelledAgreements() {
+		return cancelled;
+	}
+	
+	public Model getPendingCancellations() {
+		return proposals.getDefaultModel();
+	}
+	
+	
+	public Set<URI> getAgreementUris(){
+		return RdfUtils.getGraphUris(agreements);		
+	}
+	
+	public Set<URI> getProposalUris(){
+		return RdfUtils.getGraphUris(proposals);		
+	}	
+	
+	public Set<URI> getCancelledAreementUris(){
+		return RdfUtils.getGraphUris(cancelled);		
+	}
+	
+	public Set<URI> getRetractedUris() {
+		return retractedUris;
+	}
+	
+	public Set<URI> getProposedToBeCancelledAgreementUris(){
+		Model cancellations = proposals.getDefaultModel();
+		if (cancellations == null) {
+			return Collections.EMPTY_SET;
+		}
+		Set ret = new HashSet<URI>();
+		NodeIterator it = cancellations.listObjectsOfProperty(WONAGR.PROPOSES_TO_CANCEL);
+		while(it.hasNext()) {
+			String uri = it.next().asResource().getURI();
+			ret.add(URI.create(uri));
+		}
+		return ret;
+	}
+	
+	public Set<URI> getRejectedProposalUris(){
+		return RdfUtils.getGraphUris(rejected);		
 	}
 	
 	/**
@@ -55,6 +102,11 @@ public class HighlevelProtocolAnalyzer {
 		if (logger.isDebugEnabled()) {
 			logger.debug("starting conversation analysis for high-level protocols");
 		}
+		proposals.begin(ReadWrite.WRITE);
+		agreements.begin(ReadWrite.WRITE);
+		cancelled.begin(ReadWrite.WRITE);
+		rejected.begin(ReadWrite.WRITE);
+		conversationDataset.begin(ReadWrite.READ);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
 		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
@@ -143,6 +195,7 @@ public class HighlevelProtocolAnalyzer {
 
 		//apply acknowledgment protocol to whole conversation first:
 		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
+		conversationDataset.end();
 		
 		//on top of this, apply modification and agreement protocol on a per-message basis, starting with the root(s)
 		
@@ -197,11 +250,12 @@ public class HighlevelProtocolAnalyzer {
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} retracts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} retracts {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
 						removeContentGraphs(conversation, other);
+						retractedUris.add(other.getMessageURI());
 						if (other.isProposesMessage()) {
-							removeProposal(other.getMessageURI(), proposals);
+							retractProposal(other.getMessageURI());
 						}
 					});
 			}
@@ -221,9 +275,9 @@ public class HighlevelProtocolAnalyzer {
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} rejects {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} rejects {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
-						removeProposal(other.getMessageURI(), proposals);
+						rejectProposal(other.getMessageURI());
 				});
 			}
 			if (msg.isProposesMessage()) {
@@ -239,15 +293,13 @@ public class HighlevelProtocolAnalyzer {
 				.filter(other -> msg.isMessageOnPathToRoot(other))
 				.forEach(other -> {
 					if (logger.isDebugEnabled()) {
-						logger.debug("{} proposes {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+						logger.debug("{} proposes {}: valid", msg.getMessageURI(), other.getMessageURI());
 					}
 					proposalContent.add(aggregateGraphs(conversation, other.getContentGraphs()));
 				});
 				
 
-				proposals.begin(ReadWrite.WRITE);
 				proposals.addNamedModel(msg.getMessageURI().toString(), proposalContent);
-				proposals.commit();
 			}
 			if (msg.isAcceptsMessage()) {
 				if (logger.isDebugEnabled()) {
@@ -263,9 +315,9 @@ public class HighlevelProtocolAnalyzer {
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} accepts {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} accepts {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
-						acceptProposal(other.getMessageURI(),other.getMessageURI(), proposals, agreements);
+						acceptProposal(other.getMessageURI());
 					});
 			}
 			if (msg.isProposesToCancelMessage()) {
@@ -274,7 +326,6 @@ public class HighlevelProtocolAnalyzer {
 						logger.debug("{} proposesToCancel {}", msg.getMessageURI(), other.getMessageURI());
 					});
 				}
-				proposals.begin(ReadWrite.WRITE);
 				final Model cancellationProposals = proposals.getDefaultModel();
 				msg.getProposesToCancelRefs()
 					.stream()
@@ -283,7 +334,7 @@ public class HighlevelProtocolAnalyzer {
 					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} proposesToCancel {}: passes all tests", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} proposesToCancel {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
 					cancellationProposals.add(new StatementImpl(
 							cancellationProposals.getResource(msg.getMessageURI().toString()),
@@ -291,11 +342,7 @@ public class HighlevelProtocolAnalyzer {
 							cancellationProposals.getResource(other.getMessageURI().toString())));
 					proposals.setDefaultModel(cancellationProposals);
 				});
-				proposals.commit();
-				
 			}
-			
-
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("messages in the order they were processed:");
@@ -304,16 +351,14 @@ public class HighlevelProtocolAnalyzer {
 			}
 			logger.debug("finished conversation analysis for high-level protocols");
 		}
-		conversationDataset.end();
+		
+		proposals.commit();
+		agreements.commit();
+		cancelled.commit();
+		rejected.commit();
 	}
 	
-	public Dataset getAgreements() {
-		return agreements;
-	}
 	
-	public Dataset getProposals() {
-		return proposals;
-	}
 	
 	private  Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages ) {
 		Dataset copy = RdfUtils.cloneDataset(conversationDataset);
@@ -405,13 +450,10 @@ public class HighlevelProtocolAnalyzer {
 	}
 	
 	private  void removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
-		conversationDataset.begin(ReadWrite.WRITE);
 		message.getContentGraphs().stream().forEach(uri -> conversationDataset.removeNamedModel(uri.toString()));
-		conversationDataset.commit();
 	}
 	
 	private  Model aggregateGraphs(Dataset conversationDataset, Collection<URI> graphURIs) {
-		conversationDataset.begin(ReadWrite.READ);
 		Model result = ModelFactory.createDefaultModel();
 		graphURIs.forEach(uri -> {
 			Model graph = conversationDataset.getNamedModel(uri.toString());
@@ -419,56 +461,61 @@ public class HighlevelProtocolAnalyzer {
 				result.add(RdfUtils.cloneModel(graph));
 			}
 		});
-		conversationDataset.end();
 		return result;
 	}
 	
-	private  void acceptProposal(URI proposalUri, URI agreementUri, Dataset proposals, Dataset agreements) {
-		proposals.begin(ReadWrite.WRITE);
-		agreements.begin(ReadWrite.WRITE);
+	private void acceptProposal(URI proposalUri) {
 		// first process proposeToCancel triples - this avoids that a message can 
 		// successfully propose to cancel itself, as agreements are only made after the
 		// cancellations are processed.		
 		Model cancellationProposals = proposals.getDefaultModel();
-		
 		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
-
+		while (nIt.hasNext()){
+			RDFNode agreementToCancelUri = nIt.next();
+			cancelAgreement(URI.create(agreementToCancelUri.asResource().getURI()));
+		}
+		removeCancellationProposal(proposalUri);
+		
+		// move proposal to agreements
+		moveNamedGraph(proposalUri, proposals, agreements);
+		
+	}
+	
+	private void retractProposal(URI proposalUri) {
+		// we don't track retracted proposals (nobody cares about retracted proposals)
+		// so just remove them
+		proposals.removeNamedModel(proposalUri.toString());
+		removeCancellationProposal(proposalUri);
+	}
+	
+	private void rejectProposal(URI proposalUri) {
+		moveNamedGraph(proposalUri, proposals, rejected);
+		removeCancellationProposal(proposalUri);
+	}
+	
+	private void cancelAgreement(URI toCancel) {
+		moveNamedGraph(toCancel, agreements, cancelled);
+	}
+	
+	private void removeCancellationProposal(URI proposalUri) {
+		Model cancellationProposals = proposals.getDefaultModel();
+		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
 		while (nIt.hasNext()){
 			RDFNode agreementToCancelUri = nIt.next();
 			agreements.removeNamedModel(agreementToCancelUri.asResource().getURI());
 		}
 		cancellationProposals.remove(cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null));
-		proposals.commit();
-		agreements.commit();
-
-		proposals.begin(ReadWrite.WRITE);
-		agreements.begin(ReadWrite.WRITE);
-		Model proposal = RdfUtils.cloneModel(proposals.getNamedModel(proposalUri.toString()));
-		proposals.removeNamedModel(proposalUri.toString());
-		if (proposal != null && proposal.size() > 0 ) {
-			if (agreements.containsNamedModel(agreementUri.toString())) {
-				Model m = agreements.getNamedModel(agreementUri.toString());
-				m.add(proposal);
-				agreements.addNamedModel(agreementUri.toString(),	m);
-			} else {
-				agreements.addNamedModel(agreementUri.toString(), proposal);
-			}
+	}
+	
+	private  void moveNamedGraph(URI graphUri, Dataset fromDataset, Dataset toDataset) {
+		Model model = fromDataset.getNamedModel(graphUri.toString());
+		fromDataset.removeNamedModel(graphUri.toString());
+		if (model != null && model.size() > 0) {
+			toDataset.addNamedModel(graphUri.toString(), model);
 		}
-		proposals.commit();
-		agreements.commit();
 	}
+
 	
-	private  void removeProposal(URI proposalUri, Dataset proposals) {
-		proposals.begin(ReadWrite.WRITE);
-		proposals.removeNamedModel(proposalUri.toString());
-		proposals.commit();
-	}
-	
-	private  void cancelAgreement(URI toCancel, Dataset agreements) {
-		agreements.begin(ReadWrite.WRITE);
-		agreements.removeNamedModel(toCancel.toString());
-		agreements.commit();
-	}
 	
 
 }

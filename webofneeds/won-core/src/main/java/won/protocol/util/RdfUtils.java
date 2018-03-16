@@ -11,10 +11,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -157,7 +159,10 @@ public class RdfUtils
 
   public static Dataset cloneDataset(Dataset dataset) {
     if (dataset == null) return null;
-    dataset.begin(ReadWrite.READ);
+    boolean existingTransaction = dataset.isInTransaction();
+    if (!existingTransaction) {
+    	dataset.begin(ReadWrite.READ);
+    }
     Dataset clonedDataset = DatasetFactory.createGeneral();
     clonedDataset.begin(ReadWrite.WRITE);
     Model model = dataset.getDefaultModel();
@@ -169,7 +174,9 @@ public class RdfUtils
       clonedDataset.addNamedModel(modelName, cloneModel(dataset.getNamedModel(modelName)));
     }
     clonedDataset.commit();
-    dataset.end();
+    if (!existingTransaction) {
+    	dataset.end();
+    }
     return clonedDataset;
   }
 
@@ -542,8 +549,17 @@ public class RdfUtils
     return result;
   }
   
-  
+  public static Set<URI> getGraphUris(Dataset dataset){
+	  Iterator<String> urisIterator = dataset.listNames();
+	  Set<URI> uris = new HashSet<URI>();
+	  while (urisIterator.hasNext()) {
+		  uris.add(URI.create(urisIterator.next()));
+	  }
+	  return uris;
+  }
 
+  
+  
   /**
    * Adds the specified objectModel to the model of the specified subject. In the objectModel, the resource
    * that is identified by the objectModel's base URI (the "" URI prefix) will be replaced by a newly created
