@@ -1583,7 +1583,7 @@ import won from './won.js';
             */
             fetchParams.doNotFetch = true;
             const correspondingEvent = await won.getNode(event.hasCorrespondingRemoteMessage, fetchParams);
-            await addContentGraphTrig(event, fetchParams);
+            await addContentGraphTrig(correspondingEvent, fetchParams);
             if (correspondingEvent.type) {
                 //if we have at least a type attribute, we add the remote event to the
                 //local event. if not, it is just an URI.
