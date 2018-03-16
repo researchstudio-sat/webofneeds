@@ -1,13 +1,8 @@
 package won.bot.framework.eventbot.action.impl.factory.model;
 
-import won.bot.framework.eventbot.action.impl.mail.model.UriType;
-
 import java.io.Serializable;
 import java.net.URI;
 
-/**
- * Created by fsuda on 13.03.2018.
- */
 public class Proposal implements Serializable {
     private URI uri;
     private ProposalState state;
@@ -46,5 +41,13 @@ public class Proposal implements Serializable {
     @Override
     public int hashCode() {
         return uri.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Proposal{" +
+                "uri=" + uri +
+                ", state=" + state +
+                '}';
     }
 }

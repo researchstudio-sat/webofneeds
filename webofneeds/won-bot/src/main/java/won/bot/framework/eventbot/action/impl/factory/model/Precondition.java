@@ -1,11 +1,7 @@
 package won.bot.framework.eventbot.action.impl.factory.model;
 
 import java.io.Serializable;
-import java.net.URI;
 
-/**
- * Created by fsuda on 15.03.2018.
- */
 public class Precondition implements Serializable{
     private String uri;
     private boolean met;
@@ -40,5 +36,13 @@ public class Precondition implements Serializable{
     @Override
     public int hashCode() {
         return uri.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Precondition{" +
+                "uri='" + uri + '\'' +
+                ", met=" + met +
+                '}';
     }
 }
