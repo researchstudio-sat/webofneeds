@@ -65,8 +65,8 @@ function genComponentConf() {
                     <use href="#ico16_arrow_up"></use>
                 </svg>
             	<button class="won-button--filled thin black"
-            		ng-click="self.show()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement)">
+            		ng-click="self.proposeToCancel()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement) && !self.clicked">
             		 Cancel
             	</button>
             	<button class="won-button--filled thin red"
@@ -142,6 +142,17 @@ function genComponentConf() {
         	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
       
+        proposeToCancel() {
+        	this.clicked = true;
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	
+
+        	//this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
+        	
+        	this.onUpdate({draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        }
         
         
         checkDeclaration(declaration) {
