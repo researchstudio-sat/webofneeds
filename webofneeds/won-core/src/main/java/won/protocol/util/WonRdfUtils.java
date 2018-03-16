@@ -531,6 +531,38 @@ public class WonRdfUtils
           return proposesToCancelEvents;
       }
 
+      public static List<URI> getRejectEvents(final WonMessage wonMessage) {
+          return getRejectEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getRejectEvents(final Dataset messageDataset) {
+          List<URI> rejectEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:reject ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      rejectEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return rejectEvents;
+      }
+
+
       public static List<URI> getProposesToCancelEvents(final WonMessage wonMessage) {
           return getProposesToCancelEvents(wonMessage.getCompleteDataset());
       }
