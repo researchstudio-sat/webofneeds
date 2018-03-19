@@ -1639,48 +1639,6 @@ import won from './won.js';
             .catch(e => {
                 event.contentGraphTrigError = JSON.stringify(e);
             }); 
-
-
-        /*
-
-
-
-        const tryRetrieveAndSerialize = async () => {
-            if(event.hasContent) {
-                const contentGraphUri = event.hasContent;
-                const contentGraph = await won.getGraph(contentGraphUri, eventUri, fetchParams); 
-                console.log(contentGraph);
-                if(!contentGraph) {
-                    throw new Error(
-                        "Couldn't find the following content-graph in the store: " + 
-                        contentGraphUri + "\n\n" + 
-                        contentGraph
-                    );
-                }
-                const quads = contentGraph.triples.map(t => ({
-                    subject: t.subject.nominalValue,
-                    predicate: t.predicate.nominalValue,
-                    object: t.object.nominalValue,
-                    graph: contentGraphUri,
-                }));
-
-                const trig = await won.n3Write(quads, { format: 'application/trig' });
-                // event.contentGraphNT = contentGraph? contentGraph.toNT() : "";
-                event.contentGraphTrig = trig;
-                console.log(
-                    "\n\n\ngetEvent - contentGraph: ", event, 
-                    '\n\n\n', event.contentGraphNT, 
-                    '\n\n\n', event.contentGraphTrig,
-                    '\n\n\n', quads,
-                );
-            }
-
-        }
-        return tryRetrieveAndSerialize()
-            .catch(e => {
-                event.contentGraphTrigError = JSON.stringify(e);
-            })
-            */
     }
 
     /**
