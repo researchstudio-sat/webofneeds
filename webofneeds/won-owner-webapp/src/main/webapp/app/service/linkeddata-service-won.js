@@ -2168,7 +2168,7 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
     });
 }
 
-window.groupByGraphs = groupByGraphs;
+window.groupByGraphs4dbg = groupByGraphs;
 function groupByGraphs(jsonldData) {
 
     const context = jsonldData['@context'];
