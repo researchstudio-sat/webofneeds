@@ -39,7 +39,7 @@ const declarations = deepFreeze({
 	proposal: "proposal",
 	agreement: "agreement",
 	proposeToCancel: "proposeToCancel",
-	acceptedProposalToCancel: "acceptedProposalToCancel",
+	//acceptedProposalToCancel: "acceptedProposalToCancel",
 	
 });
 function genComponentConf() {
@@ -91,10 +91,29 @@ function genComponentConf() {
 	                on-update="self.showAgreementData = false; self.updateAgreementData(draft)">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
-            	<!-- PROPOSALS -->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposal.size">
+	            <!-- ProposeToCancel -->
+	            <!--
+	            <div class="pm__content__agreement__title" ng-show="self.agreementData.proposeToCancel.size">
             		<br ng-show="self.agreementData.agreement.size" />
             		<hr ng-show="self.agreementData.agreement.size" />
+            		Proposals To Cancel
+    				<span ng-show="self.loading.proposeToCancel"> (loading...)</span>
+            		<span ng-if="!self.loading.proposeToCancel"> (up-to-date)</span>
+            	</div>
+            	-->
+	            <won-connection-agreement
+	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementData.proposeToCancel) track by $index"
+	                event-uri="proptoc"
+	                agreement-number="$index"
+	                agreement-declaration="self.declarations.proposeToCancel"
+	                connection-uri="self.connectionUri"
+	                on-update="self.showAgreementData = false; self.removeAcceptedProposalToCancel(draft);">
+	            </won-connection-agreement>
+	            <!-- /ProposeToCancel -->
+            	<!-- PROPOSALS -->
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.proposal.size">
+            		<br ng-show="self.agreementData.agreement.size || self.agreementData.proposeToCancel.size" />
+            		<hr ng-show="self.agreementData.agreement.size || self.agreementData.proposeToCancel.size" />
             		Proposals
     				<span ng-show="self.loading.proposal"> (loading...)</span>
             		<span ng-if="!self.loading.proposal"> (up-to-date)</span>
@@ -108,6 +127,7 @@ function genComponentConf() {
 	                on-update="self.showAgreementData = false; self.updateAgreementData(draft);">
 	            </won-connection-agreement>
 	            <!-- /PROPOSALS -->
+	            
             </div>
             <!-- Loading Text -->
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.isStillLoading() && self.showLoadingInfo && !self.agreementDataIsValid()">
@@ -205,13 +225,13 @@ function genComponentConf() {
             		proposal: new Set(), 
             		agreement: new Set(), 
             		proposeToCancel: new Set(),
-            		acceptedProposalToCancel: new Set(),
+            		//acceptedProposalToCancel: new Set(),
             };
             this.loading = {
             		proposal: false, 
             		agreement: false, 
             		proposeToCancel: false,
-            		acceptedProposalToCancel: false,
+            		//acceptedProposalToCancel: false,
             };
             
             this.showAgreementData = false;
@@ -233,7 +253,7 @@ function genComponentConf() {
                 let sortedMessages = chatMessages && chatMessages.toArray();
                 if(sortedMessages) {
                 	var msgSet = new Set(sortedMessages);
-                	for(msg of msgSet) {
+                	/*for(msg of msgSet) {
                 		if(msg.get("isProposeMessage")){
 	                		if(this.agreementData.agreement.has(msg.get("uri")) || this.agreementData.agreement.has(msg.get("remoteUri"))) {
 	                			msgSet.delete(msg);
@@ -243,7 +263,7 @@ function genComponentConf() {
 	                			this.agreementData.proposal.add(msg.get("uri"));
 	                		}
                 		}
-                	}
+                	}*/
                 	sortedMessages = Array.from(msgSet);
 	            	sortedMessages.sort(function(a,b) {
 	                    return a.get("date").getTime() - b.get("date").getTime();
@@ -365,13 +385,16 @@ function genComponentConf() {
         
         agreementDataIsValid() {
         	var aD = this.agreementData;
-        	if(aD.proposal.size ||aD.agreement.size ||aD.proposeToCancel.size || aD.acceptedProposalToCancel.size){
+        	if(aD.proposal.size ||aD.agreement.size ||aD.proposeToCancel.size/* || aD.acceptedProposalToCancel.size*/){
         		return true;
         	}
         	return false;
         }
         
         getAgreementData(connection) {
+        	
+        	this.filterAgreementDataList();
+        	
         	if(connection) {
         		this.connection = connection;
         	}
@@ -380,8 +403,8 @@ function genComponentConf() {
         	
         	//Get just uris
         	this.getAgreementUris();
-        	this.getProposalUris() 
-        	
+        	this.getProposalUris() ;
+        	this.getAgreementsProposedToBeCancelledUris();
         	//Get whole dataset
         	//this.getAgreements();
         	//this.getProposals();
@@ -392,15 +415,20 @@ function genComponentConf() {
         }
         
         updateAgreementData(uri) {
-        	console.log("Is Accepted: " + uri);
+        	console.log("on-update: " + uri);
 
         	//TODO: Reaload AgreementData, refresh uri list
         	//this.ensureMessagesAreLoaded();
         }
         
+        removeAcceptedProposalToCancel(uri) {
+        	this.agreementData.acceptedProposalToCancel.delete(uri);
+        }
+        
         startLoading() {
         	this.loading.proposal = true;
         	this.loading.agreement = true;
+        	this.proposeToCancel = true;
         	/*
         	this.loading = {
         		proposal: true, 
@@ -411,7 +439,7 @@ function genComponentConf() {
         }
         
         isStillLoading(){
-        	if(!this.loading.proposal && !this.loading.agreement && !this.loading.proposeToCancel && !this.loading.acceptedProposalToCancel) {
+        	if(!this.loading.proposal && !this.loading.agreement && !this.loading.proposeToCancel/* && !this.loading.acceptedProposalToCancel*/) {
         		return false;
         	}
         	return true;
@@ -427,11 +455,12 @@ function genComponentConf() {
         			this.agreementData.agreement.delete(agreement)
         		}
         	}
+        	/*
         	for(agreement of this.agreementData.acceptedProposalToCancel) {
         		if(this.agreementData.proposeToCancel.has(agreement)) {
         			this.agreementData.proposeToCancel.delete(agreement)
         		}
-        	}
+        	}*/
         }
         
        getAgreementUris() {
@@ -483,6 +512,7 @@ function genComponentConf() {
         	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelledUris?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
+    			console.log(response);
     			this.updateAgreementDataInSate(response, this.declarations.proposeToCancel);
     		}).catch(error => {
 				console.error('Error:', error);
@@ -501,7 +531,7 @@ function genComponentConf() {
 			})
         }
         
-        // TODO:
+        // TODO: after an accept -> agreementData ist deleted
         /*
         getAcceptedPropsalsToCancelUris() {
         	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
@@ -512,7 +542,7 @@ function genComponentConf() {
 				console.error('Error:', error);
 				this.loading.acceptedPropsalToCancel = false;
 			})
-        }*/
+        }
         
         getAcceptedPropsalsToCancel() {
         	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
@@ -523,7 +553,7 @@ function genComponentConf() {
 				console.error('Error:', error);
 				this.loading.acceptedPropsalToCancel = false;
 			})
-        }
+        }*/
         
         parseResponseGraph(response, type){
         	if(response["@id"]) {

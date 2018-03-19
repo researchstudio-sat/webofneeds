@@ -1324,7 +1324,7 @@ window.N34dbg = N3;
         isAcceptMessage: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#accepts");
         },
-        isProposeToCancelMessage: function () {
+        isProposeToCancel: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel");
         },
         isProposal: function () {

@@ -54,9 +54,11 @@ function genComponentConf() {
 
             <div 
                 class="won-cm__center__bubble" 
-                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}">
-
+                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
+    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage'))}">
                     <span class="won-cm__center__bubble__text">
+                    <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
+                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>		
                         {{ self.text? self.text : self.noTextPlaceholder }}
                     </span>
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>

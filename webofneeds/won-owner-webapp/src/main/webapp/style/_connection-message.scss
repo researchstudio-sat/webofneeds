@@ -35,11 +35,11 @@ won-connection-message {
             border: $thinGrayBorder;
             //background: $won-light-gray;
 
-            // &.proposal {
-            //     padding: 0.5rem;
-            //     border:  $thinDarkBorder;
-            //     background: $won-light-gray;
-            // }
+                &.agreement {
+                   padding: 0.5rem;
+                   border:  $thinDarkBorder;
+                   background: $won-light-gray;
+                }
         }
 
         &.won-cm__center--nondisplayable {

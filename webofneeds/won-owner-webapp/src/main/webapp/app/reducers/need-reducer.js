@@ -541,6 +541,7 @@ function parseMessage(wonMessage, isNewMessage) {
             connectMessage: wonMessage.isConnectMessage(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
+            isProposeToCancel: won.Message.isProposeToCancel(),
             //isAccepted: wonMessage.isAccepted(),
             contentGraphTrig: wonMessage.contentGraphTrig,
 

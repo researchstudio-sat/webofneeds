@@ -49,11 +49,11 @@ function genComponentConf() {
         </won-square-image>-->
         <div class="won-ca__content">
             <div class="won-ca__content__text">
-            	{{ self.agreementNumber+1  }}: {{ self.message.get('text') }}<br />
+            	{{ self.agreementNumber+1  }}: {{self.checkDeclaration(self.declarations.proposeToCancel)? "Propose to cancel: " : "" }}{{ self.message.get('text') }}<br />
             	EventUri: {{ self.eventUri }}<br />
             	RealUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
             </div>
-            <div class="won-ca__content__button">
+            <div class="won-ca__content__button" ng-show="!self.clicked">
             	<svg class="won-ca__content__carret clickable"
             	 		ng-click="self.showDetail = !self.showDetail"
             	 		ng-show="!self.showDetail">
@@ -66,12 +66,17 @@ function genComponentConf() {
                 </svg>
             	<button class="won-button--filled thin black"
             		ng-click="self.proposeToCancel()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement) && !self.clicked">
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement)">
             		 Cancel
             	</button>
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposal()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn && !self.clicked"">
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn"">
+            		 Accept
+            	</button>
+            	<button class="won-button--filled thin red"
+            		ng-click="self.acceptProposeToCancel()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.isOwn">
             		 Accept
             	</button>
             </div>
@@ -144,16 +149,25 @@ function genComponentConf() {
       
         proposeToCancel() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
-        	
-
-        	//this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
+        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
+        	const msg = ("Propose to cancel agreement : " + uri);
+        	const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.onUpdate({draft: this.eventUri});
         	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
         
+        acceptProposeToCancel() {
+        	//TODO: send accept msg
+        	this.clicked = true;
+        	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
+        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	this.onUpdate({draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        }
         
         checkDeclaration(declaration) {
         	return (this.agreementDeclaration === declaration)? true : false;

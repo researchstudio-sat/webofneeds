@@ -803,7 +803,10 @@ import won from './won.js';
                     g, g['@id']
                 )
             )
-        });
+        }).catch(error => {
+        	//TODO: reactivate error msg
+			//console.error('Error:', error);
+		});
 
 
         const triplesAddedToDocumentGraphP = loadIntoRdfStore(
@@ -2170,7 +2173,8 @@ function groupByGraphs(jsonldData) {
                 graphUri + ' and context ' + JSON.stringify(graphUri) + 
                 ' with the following jsonld: \n' + 
                 JSON.stringify(graphWithContext);
-            console.error(msg);
+            //TODO: reactivate error msg
+            //console.error(msg);
             return Promise.reject(msg);
         } else {
             /*
