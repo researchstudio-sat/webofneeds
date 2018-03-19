@@ -2150,9 +2150,9 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
 
         try {
             if(graphUri) {
-                store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
+                store.load(mediaType, jsonldData, graphUri, callback); // add to graph of that uri
             } else {
-                store.load("application/ld+json", jsonldData, callback); // add to default graph
+                store.load(mediaType, jsonldData, callback); // add to default graph
             }
         } catch (e) {
             rethrow(e, 'Failed to store json-ld data for ' + uri);
