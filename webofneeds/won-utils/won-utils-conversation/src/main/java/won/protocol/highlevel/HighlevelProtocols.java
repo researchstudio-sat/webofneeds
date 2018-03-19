@@ -69,6 +69,10 @@ public class HighlevelProtocols {
 	public static Model getProposal(Dataset conversationDataset, String proposalUri) {
 		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
 	}	
+
+	public static Set<URI> getProposalUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposalUris();
+	}
 	
 	public static Set<URI> getAgreementUris(Dataset conversationDataset){
 		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreementUris();

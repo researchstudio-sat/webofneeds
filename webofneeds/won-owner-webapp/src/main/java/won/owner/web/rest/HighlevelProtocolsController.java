@@ -76,7 +76,7 @@ public class HighlevelProtocolsController {
 	@RequestMapping(value = "/getProposalUris", method = RequestMethod.GET)
 	public ResponseEntity<Set<URI>> getProposalUris(String connectionUri) {
 		Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
-		Set<URI> uris = HighlevelProtocols.getRejectedProposalUris(conversationDataset);
+		Set<URI> uris = HighlevelProtocols.getProposalUris(conversationDataset);
 		return new ResponseEntity<>(uris, HttpStatus.OK);
 	}
 
