@@ -191,11 +191,11 @@ public class AnalyzeAction extends BaseEventBotAction {
 
                 if(oldGoalState == null || newGoalState != oldGoalState) {
                     if(newGoalState) {
-                        ctx.getEventBus().publish(new PreconditionMetEvent(connection, result));
+                        ctx.getEventBus().publish(new PreconditionMetEvent(connection, preconditionUri, result));
                     }else{
-                        ctx.getEventBus().publish(new PreconditionUnmetEvent(connection, result));
+                        ctx.getEventBus().publish(new PreconditionUnmetEvent(connection, preconditionUri, result));
                     }
-                    botContextWrapper.addPreconditionConversationState(getUniqueGoalId(goal, needDataset, connection), newGoalState);
+                    botContextWrapper.addPreconditionConversationState(preconditionUri, newGoalState);
                 }
             } else {
                 logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
