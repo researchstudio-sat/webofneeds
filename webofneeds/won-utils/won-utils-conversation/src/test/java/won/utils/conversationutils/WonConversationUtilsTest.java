@@ -190,9 +190,13 @@ public class WonConversationUtilsTest {
 		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
 		
 		sw.start();
-		HighlevelProtocols.getAgreements(input);
+		Dataset agreements = HighlevelProtocols.getAgreements(input);
 		sw.stop();
-		System.out.println("getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		RDFDataMgr.write(System.out, agreements, Lang.TRIG);
+		System.out.println("HP.getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		
+		
+		
 		/*
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(input, output);
 		if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
