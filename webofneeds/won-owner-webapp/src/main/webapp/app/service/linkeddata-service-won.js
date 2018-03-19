@@ -527,7 +527,7 @@ import won from './won.js';
      *            it will return the second page of size N)
      * @return {*}
      */
-    won.ensureLoaded = function(uri, fetchParams = {}) {
+    won.ensureLoaded = async function(uri, fetchParams = {}) {
         if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
 
         //console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
@@ -546,67 +546,55 @@ import won from './won.js';
          * and thus always reload them.
          */
         const partialFetch = fetchesPartialRessource(fetchParams);
-        if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) {
+
+        // we might not even need to aquire a lock, if another call to ensureLoaded
+        // has already finished.
+        if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) { 
             cacheItemMarkAccessed(uri);
-            return Promise.resolve(uri);
+            return uri;
         }
 
-
-        cacheItemMarkFetching(uri);
-        return won.fetch(uri, fetchParams, true)
-            .then(
-                (dataset) => {
-                    if( !(fetchParams && fetchParams.deep) ) {
-                        cacheItemInsertOrOverwrite(uri, partialFetch);
-                        return uri;
-                    } else {
-                        return selectLoadedResourcesFromDataset(dataset)
-                            .then(allLoadedResources => {
-                                allLoadedResources.forEach(resourceUri => {
-                                    /*
-                                     * only mark root resource as partial.
-                                     * the other ressources should
-                                     * have been fetched fully during a
-                                     * request with the `deep`-flag
-                                     */
-                                    cacheItemInsertOrOverwrite(
-                                        resourceUri,
-                                        partialFetch && resourceUri === uri
-                                    )
-                                });
-                                return allLoadedResources;
-                            }
-                        )
-                    }
-                },
-                reason => cacheItemMarkUnresolvable(uri, reason)
-            )
-
-    };
-
-    /**
-     * Fetches the rdf-node with the given uri from
-     * the standard API_ENDPOINT.
-     * @param uri
-     * @param params: see `loadFromOwnServerIntoCache`
-     * @returns {*}
-     */
-    won.fetch = function(uri, params, removeCacheItem=false) {
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "fetch: uri must not be null"};
-        }
-        //console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
-        return lock.acquireUpdateLock().then(
-                () => loadFromOwnServerIntoCache(uri, params, removeCacheItem)
-            ).then(dataset => {
-                lock.releaseUpdateLock();
-                return dataset;
-            })
-            .catch(error => {
-                lock.releaseUpdateLock();
-                throw({msg: 'Failed to fetch ' + uri, causedBy: error});
-            });
+        await lock.acquireUpdateLock()
+
+        try {
+
+            // lock has been aquired, but do we still need to load the resource?
+            if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) { 
+                // another call to ensureLoaded has finished while we have been aquiring the lock.
+                cacheItemMarkAccessed(uri);
+                return uri;
+            } else {
+                // ok, we actually need to load the resource
+                cacheItemMarkFetching(uri);
+                const dataset = await loadFromOwnServerIntoCache(uri, fetchParams, true)
+
+                if( !(fetchParams && fetchParams.deep) ) {
+                    cacheItemInsertOrOverwrite(uri, partialFetch);
+                    return uri;
+                } else {
+                    const allLoadedResources = await selectLoadedResourcesFromDataset(dataset);
+                    allLoadedResources.forEach(resourceUri => {
+                        /*
+                            * only mark root resource as partial.
+                            * the other ressources should
+                            * have been fetched fully during a
+                            * request with the `deep`-flag
+                            */
+                        cacheItemInsertOrOverwrite(
+                            resourceUri,
+                            partialFetch && resourceUri === uri
+                        )
+                    });
+                    return allLoadedResources;
+                }
+            }
+        } catch (e) {
+            rethrow(e, 'Failed to fetch ' + uri);
+        } finally {
+            lock.releaseUpdateLock();
+        }
+
     };
 
     function fetchesPartialRessource(requestParams) {
@@ -1122,7 +1110,7 @@ import won from './won.js';
     // loads all triples starting from start uri, using each array in 'paths' like a
     // property path, collecting all reachable triples
     // returns a JS RDF Interfaces Graph object
-    async function loadStarshapedGraph(store, startUri, tree) {
+    /*async*/ function loadStarshapedGraph(store, startUri, tree) {
         let prefixes = tree.prefixes;
         if (prefixes != null) {
             for (let key in prefixes) {
@@ -1606,7 +1594,7 @@ import won from './won.js';
      * should be stored as seperate graphs for all events loaded via the store 
      * (see won.addJsonLdData).
      * @param {*} event 
-     * @param {*} fetchParams see won.getGraph/won.ensureLoaded/won.fetch 
+     * @param {*} fetchParams see won.getGraph/won.ensureLoaded
      */
     /*async*/ function addContentGraphTrig(event, fetchParams) {
         if(!event.hasContent) {
