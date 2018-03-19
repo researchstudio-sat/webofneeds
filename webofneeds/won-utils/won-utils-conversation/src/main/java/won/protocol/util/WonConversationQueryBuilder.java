@@ -67,6 +67,11 @@ public class WonConversationQueryBuilder<T> {
 		delegate.having(SSE.parseExpr("(bound(?proposesToCancel))"));
 		return this;
 	}
+
+    public WonConversationQueryBuilder isRejectsMessage() {
+        delegate.having(SSE.parseExpr("(bound(?reject))"));
+        return this;
+    }
 	
 	public WonConversationQueryBuilder isAcceptsMessage() {
 		delegate.having(SSE.parseExpr("(bound(?accepts))"));

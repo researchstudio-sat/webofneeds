@@ -16,7 +16,11 @@ import {
     getIn,
     clone,
     deepFreeze,
+    dispatchEvent,
 } from '../utils.js'
+import {
+	buildProposalMessage,
+} from '../won-message-utils.js';
 import {
     actionCreators
 }  from '../actions/actions.js';
@@ -46,7 +50,8 @@ function genComponentConf() {
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: {{ self.message.get('text') }}<br />
-            	{{ self.eventUri }}
+            	EventUri: {{ self.eventUri }}<br />
+            	RealUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
             </div>
             <div class="won-ca__content__button">
             	<svg class="won-ca__content__carret clickable"
@@ -60,13 +65,13 @@ function genComponentConf() {
                     <use href="#ico16_arrow_up"></use>
                 </svg>
             	<button class="won-button--filled thin black"
-            		ng-click="self.show()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement)">
+            		ng-click="self.proposeToCancel()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement) && !self.clicked">
             		 Cancel
             	</button>
             	<button class="won-button--filled thin red"
-            		ng-click="self.show()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
+            		ng-click="self.acceptProposal()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn && !self.clicked"">
             		 Accept
             	</button>
             </div>
@@ -109,6 +114,7 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const message = chatMessages && chatMessages.get(this.eventUri);
                 const outgoingMessage = message && message.get("outgoingMessage");
+                
                 return {
                 	message: message,
                 	isOwn: outgoingMessage,
@@ -122,18 +128,32 @@ function genComponentConf() {
         acceptProposal() {
         	this.clicked = true;
         	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
-        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
+        	/*	
+        	this.message = this.message.set("isAccepted", true);
+        	this.connections__sendChatMessage(this.message, this.connectionUri);
+        	*/
+        	this.onUpdate({draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
       
-        buildProposalMessage(uri, type, text) {
-        	const msgP = won.WONMSG.msguriPlaceholder;
-        	const sc = "http://purl.org/webofneeds/agreement#"+type;
-        	const whM = "\n won:hasTextMessage ";
-        	return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
+        proposeToCancel() {
+        	this.clicked = true;
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	
+
+        	//this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
+        	
+        	this.onUpdate({draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
+        
         
         checkDeclaration(declaration) {
         	return (this.agreementDeclaration === declaration)? true : false;
@@ -159,6 +179,11 @@ function genComponentConf() {
         	agreementDeclaration: '=',
         	connectionUri: '=',
         	//agreementObject: '=',
+        	 /*
+             * Usage:
+             *  on-update="::myCallback(draft)"
+             */
+            onUpdate: '&',
         },
         template: template,
     }

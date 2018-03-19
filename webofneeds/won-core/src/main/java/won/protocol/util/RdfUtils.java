@@ -11,10 +11,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -28,6 +30,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -156,7 +159,12 @@ public class RdfUtils
 
   public static Dataset cloneDataset(Dataset dataset) {
     if (dataset == null) return null;
+    boolean existingTransaction = dataset.isInTransaction();
+    if (!existingTransaction) {
+    	dataset.begin(ReadWrite.READ);
+    }
     Dataset clonedDataset = DatasetFactory.createGeneral();
+    clonedDataset.begin(ReadWrite.WRITE);
     Model model = dataset.getDefaultModel();
     if (model != null) {
       clonedDataset.setDefaultModel(cloneModel(model));
@@ -164,6 +172,10 @@ public class RdfUtils
     for (Iterator<String> modelNames = dataset.listNames(); modelNames.hasNext(); ){
       String modelName = modelNames.next();
       clonedDataset.addNamedModel(modelName, cloneModel(dataset.getNamedModel(modelName)));
+    }
+    clonedDataset.commit();
+    if (!existingTransaction) {
+    	dataset.end();
     }
     return clonedDataset;
   }
@@ -537,8 +549,17 @@ public class RdfUtils
     return result;
   }
   
-  
+  public static Set<URI> getGraphUris(Dataset dataset){
+	  Iterator<String> urisIterator = dataset.listNames();
+	  Set<URI> uris = new HashSet<URI>();
+	  while (urisIterator.hasNext()) {
+		  uris.add(URI.create(urisIterator.next()));
+	  }
+	  return uris;
+  }
 
+  
+  
   /**
    * Adds the specified objectModel to the model of the specified subject. In the objectModel, the resource
    * that is identified by the objectModel's base URI (the "" URI prefix) will be replaced by a newly created

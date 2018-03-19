@@ -265,13 +265,17 @@ public class WonRdfUtils
     public static Model proposesMessage(URI... toPropose) {
         return addProposes(createModelWithBaseResource(), toPropose);
     }
+
+    public static Model rejectMessage(URI... toReject) {
+        return addRejects(createModelWithBaseResource(), toReject);
+    }
     
     public static Model acceptsMessage(URI... toAccept) {
         return addAccepts(createModelWithBaseResource(), toAccept);
     }
  
-    public static Model proposesToCancelMessage(URI... toProposeToCancel) {
-        return addProposesToCancel(createModelWithBaseResource(), toProposeToCancel);
+    public static Model proposesToCancelMessage(URI... toProposesToCancel) {
+        return addProposesToCancel(createModelWithBaseResource(), toProposesToCancel);
     }
     
     public static Model addRetracts(Model messageModel, URI... toRetract) {
@@ -295,7 +299,18 @@ public class WonRdfUtils
     	}
     	return messageModel;
     }
-    
+
+    public static Model addRejects(Model messageModel, URI... toReject) {
+      Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
+      if (toReject == null) return messageModel;
+      for(URI uri: toReject) {
+          if (uri != null) {
+              baseRes.addProperty(WONAGR.REJECT, baseRes.getModel().getResource(uri.toString()));
+          }
+      }
+      return messageModel;
+    }
+
     public static Model addAccepts(Model messageModel, URI... toAccept) {
     	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
     	if (toAccept == null) return messageModel;
@@ -307,10 +322,10 @@ public class WonRdfUtils
     	return messageModel;
     }
     
-    public static Model addProposesToCancel(Model messageModel, URI... toProposeToCancel) {
+    public static Model addProposesToCancel(Model messageModel, URI... toProposesToCancel) {
     	Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-    	if (toProposeToCancel == null) return messageModel;
-    	for(URI uri: toProposeToCancel) {
+    	if (toProposesToCancel == null) return messageModel;
+    	for(URI uri: toProposesToCancel) {
     		if (uri != null) {
     			baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(uri.toString()));
     		}
@@ -485,18 +500,18 @@ public class WonRdfUtils
           return acceptedEvents;
       }
 
-      public static List<URI> getProposeToCancelEvents(final WonMessage wonMessage) {
-          return getProposeToCancelEvents(wonMessage.getCompleteDataset());
+      public static List<URI> getProposesEvents(final WonMessage wonMessage) {
+          return getProposesEvents(wonMessage.getCompleteDataset());
       }
 
-      public static List<URI> getProposeToCancelEvents(final Dataset messageDataset) {
-          List<URI> proposeToCancelEvents = new ArrayList<>();
+      public static List<URI> getProposesEvents(final Dataset messageDataset) {
+          List<URI> proposesToCancelEvents = new ArrayList<>();
           String queryString =
                   "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
                           "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
                           "SELECT ?eventUri where {\n" +
                           " graph ?g {"+
-                          "  ?s agr:proposeToCancel ?eventUri .\n" +
+                          "  ?s agr:proposes ?eventUri .\n" +
                           "}}";
           Query query = QueryFactory.create(queryString);
 
@@ -509,11 +524,42 @@ public class WonRdfUtils
                   String eventUri = rdfNodeToString(qs.get("eventUri"));
 
                   if(eventUri != null) {
-                      proposeToCancelEvents.add(URI.create(eventUri));
+                      proposesToCancelEvents.add(URI.create(eventUri));
                   }
               }
           }
-          return proposeToCancelEvents;
+          return proposesToCancelEvents;
+      }
+
+      public static List<URI> getProposesToCancelEvents(final WonMessage wonMessage) {
+          return getProposesToCancelEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getProposesToCancelEvents(final Dataset messageDataset) {
+          List<URI> proposesToCancelEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:proposesToCancel ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      proposesToCancelEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return proposesToCancelEvents;
       }
 
       private static String rdfNodeToString(RDFNode node) {

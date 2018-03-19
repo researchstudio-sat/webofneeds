@@ -62,11 +62,12 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
 		return this;
 	}
 
-	public void addInitialBinding(String varName, RDFNode value) {
+	public SparqlSelectFunction<T> addInitialBinding(String varName, RDFNode value) {
 		if (this.initialBinding == null) {
 			this.initialBinding = new QuerySolutionMap();
 		}
 		this.initialBinding.add(varName, value);
+		return this;
 	}
 	
 	public SparqlSelectFunction<T> addInitialBindings(QuerySolution moreInitialBindings) {
@@ -135,7 +136,10 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
 
 	@Override
 	public List<T> apply(Dataset dataset) {
-		dataset.begin(ReadWrite.READ);
+		boolean existingTransaction = dataset.isInTransaction();
+		if (! existingTransaction) {
+			dataset.begin(ReadWrite.READ);
+		}
 		Dataset result = DatasetFactory.createGeneral();
 		result.begin(ReadWrite.WRITE);
 		try {
@@ -169,7 +173,9 @@ public class SparqlSelectFunction<T> extends SparqlFunction<Dataset, List<T>> {
 		}
 		return ret;
 		} finally {
-			dataset.end();
+			if (!existingTransaction) {
+				dataset.end();
+			}
 			result.commit();
 		}
 	}

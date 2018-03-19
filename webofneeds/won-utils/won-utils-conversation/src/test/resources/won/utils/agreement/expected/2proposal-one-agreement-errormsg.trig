@@ -19,7 +19,7 @@
 @prefix agr: <http://purl.org/webofneeds/agreement#> .
 
 
-<https://localhost:8443/won/resource/event/557600936467257340> {
+<https://localhost:8443/won/resource/event/usi9yhill1lo2xi70sjx> {
     <https://localhost:8443/won/resource/event/6671551888677331000>
             <http://purl.org/webofneeds/model#hasFacet>
                     <http://purl.org/webofneeds/model#OwnerFacet> ;

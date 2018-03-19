@@ -1,27 +1,59 @@
 package won.protocol.highlevel;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.SparqlSelectFunction;
+import won.protocol.vocabulary.WONAGR;
+
 
 public class HighlevelProtocols {
+	private static final Logger logger = LoggerFactory.getLogger(HighlevelProtocols.class);
+	
+	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutAfterMessageFunction;
+	
+	
 	/**
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-
-		return HighlevelFunctionFactory.getAcknowledgedSelection()
-				.andThen(HighlevelFunctionFactory.getModifiedSelection())
-				.andThen(HighlevelFunctionFactory.getAgreementFunction())
-				.apply(conversationDataset);
+		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements();
 	}
-
-    public static Model getAgreement(Dataset conversationDataset, String agreementUri) {
-        return HighlevelFunctionFactory.getAcknowledgedSelection()
-                .andThen(HighlevelFunctionFactory.getModifiedSelection())
-                .andThen(HighlevelFunctionFactory.getAgreementFunction())
-                .apply(conversationDataset)
-                .getNamedModel(agreementUri);
-    }
+	
+	public static Model getAgreement(Dataset conversationDataset, URI agreementURI) {
+		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements().getNamedModel(agreementURI.toString());
+	}
 	
 	/**
 	 * Calculates all open proposals present in the specified conversation dataset.
@@ -31,19 +63,31 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
-		return HighlevelFunctionFactory.getAcknowledgedSelection()
-					.andThen(HighlevelFunctionFactory.getModifiedSelection())
-					.andThen(HighlevelFunctionFactory.getProposalFunction())
-					.apply(conversationDataset);
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals();
+	}
+	
+	public static Model getProposal(Dataset conversationDataset, String proposalUri) {
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
+	}	
+	
+	public static Set<URI> getAgreementUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreementUris();
+	}
+	
+	public static Set<URI> getCancelledAgreementUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getCancelledAreementUris();
+	}
+	
+	public static Set<URI> getAgreementsProposedToBeCancelledUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getProposedToBeCancelledAgreementUris();
+	}
+	
+	public static Set<URI> getRejectedProposalUris(Dataset conversationDataset){
+		return new HighlevelProtocolAnalyzer(conversationDataset).getRejectedProposalUris();
 	}
 
-    public static Model getProposal(Dataset conversationDataset, String proposalUri) {
-        return HighlevelFunctionFactory.getAcknowledgedSelection()
-                .andThen(HighlevelFunctionFactory.getModifiedSelection())
-                .andThen(HighlevelFunctionFactory.getAgreementFunction())
-                .apply(conversationDataset)
-                .getNamedModel(proposalUri);
-    }
+
+
 	
 	/** reveiw and rewrite the JavaDoc descriptions below **/
 	
@@ -55,11 +99,8 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
-		
-		return HighlevelFunctionFactory.getAcknowledgedSelection()
-				.andThen(HighlevelFunctionFactory.getModifiedSelection())
-				.andThen(HighlevelFunctionFactory.getProposalToCancelFunction())
-				.apply(conversationDataset);
+		//TODO
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -70,8 +111,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getPendingProposes(Dataset conversationDataset) {
-		Model pendingproposes  = HighlevelFunctionFactory.getPendingProposesFunction().apply(conversationDataset);
-		return pendingproposes;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	
@@ -83,8 +123,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getPendingProposesToCancel(Dataset conversationDataset) {
-		Model pendingproposestocancel  = HighlevelFunctionFactory.getPendingProposesToCancelFunction().apply(conversationDataset);
-		return pendingproposestocancel;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -95,8 +134,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposes(Dataset conversationDataset) {
-		Model acceptedproposes = HighlevelFunctionFactory.getAcceptedProposesFunction().apply(conversationDataset);
-		return acceptedproposes;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -107,8 +145,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsProposes(Dataset conversationDataset) {
-		Model acceptsproposes = HighlevelFunctionFactory.getAcceptsProposesFunction().apply(conversationDataset);
-		return acceptsproposes;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -119,8 +156,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedProposesToCancel(Dataset conversationDataset) {
-		Model acceptedproposestocancel = HighlevelFunctionFactory.getAcceptedProposesToCancelFunction().apply(conversationDataset);
-		return acceptedproposestocancel;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -131,8 +167,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsProposesToCancel(Dataset conversationDataset) {
-		Model acceptsproposestocancel = HighlevelFunctionFactory.getAcceptsProposesToCancelFunction().apply(conversationDataset);
-		return acceptsproposestocancel;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -143,8 +178,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getProposesInCancelledAgreement(Dataset conversationDataset) {
-		Model  proposesincancelledagreement = HighlevelFunctionFactory.getProposesInCancelledAgreementFunction().apply(conversationDataset);
-		return proposesincancelledagreement;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	
@@ -156,8 +190,7 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptsInCancelledAgreement(Dataset conversationDataset) {
-		Model  acceptscancelledagreement = HighlevelFunctionFactory.getAcceptsInCancelledAgreementFunction().apply(conversationDataset);
-		return acceptscancelledagreement;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -168,8 +201,27 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Model getAcceptedRetracts(Dataset conversationDataset) {
-		Model  acceptedretracts = HighlevelFunctionFactory.getAcceptedRetractsFunction().apply(conversationDataset);
-		return acceptedretracts;
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static List<URI> getRetractedAgreements(Dataset input, URI acceptsMessageURI) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+	
+	public static Set<URI> getRetractedUris(Dataset input){
+		return new HighlevelProtocolAnalyzer(input).getRetractedUris();
+	}
+
+	public static Dataset cutOffAfterMessage(Dataset input, URI acceptsMessageURI) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static List<URI> getAcceptMessages(Dataset input) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	public static List<URI> getProposalSingleAgreement(Dataset actual, URI acceptsMessageURI) {
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 }

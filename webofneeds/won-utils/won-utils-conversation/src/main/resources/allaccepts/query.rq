@@ -1,0 +1,19 @@
+PREFIX mod: <http://purl.org/webofneeds/modification#>
+PREFIX agr: <http://purl.org/webofneeds/agreement#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+
+# Select ?acc (the accept message subject), or the ?g1, accept message graph...the test on the CutOFF suggests ?acc
+CONSTRUCT { ?acc rdfs:comment "Accept Message" . }
+WHERE { 
+
+    GRAPH ?g1 {
+       ?acc agr:accepts ?prop .
+    }
+    
+    GRAPH <urn:x-arq:UnionGraph> {
+           ?acc msg:hasPreviousMessage+/msg:hasCorrespondingRemoteMessage ?prop .
+    }
+
+}
