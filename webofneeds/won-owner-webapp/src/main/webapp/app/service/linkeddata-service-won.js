@@ -1606,20 +1606,21 @@ import won from './won.js';
             contentGraphUri, event.uri, fetchParams
         );
 
-        const trigP = graphP.then(contentGraph => {
-            if(!contentGraph) {
+        const trigP = graphP.then(contentGraphTriples => {
+            if(!contentGraphTriples) {
                 throw new Error(
                     "Couldn't find the following content-graph in the store: " + 
                     contentGraphUri + "\n\n" + 
-                    contentGraph
+                    contentGraphTriples
                 );
             }
-            const quads = contentGraph.triples.map(t => ({
-                subject: t.subject.nominalValue,
-                predicate: t.predicate.nominalValue,
-                object: t.object.nominalValue,
-                graph: contentGraphUri,
-            }));
+            const quads = contentGraphTriples
+                .map(t => ({
+                    subject: t.subject.nominalValue,
+                    predicate: t.predicate.nominalValue,
+                    object: t.object.nominalValue,
+                    graph: contentGraphUri,
+                }));
             console.log(
                 "\ngetEvent - contentGraph - quads:\n\n", quads, "\n\n", event
             );
@@ -1773,14 +1774,14 @@ import won from './won.js';
      * from all graphs.
      */
     won.deleteDocumentFromStore = function(documentUri, removeCacheItem=true) {
-        return won.getCachedGraph(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
+        return won.getCachedGraphTriples(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
         .catch(e => {
             const msg = 'Failed to retrieve triples for the document ' + documentUri + '.';
             console.error(msg);
             e.message += msg;
             throw e;
         })
-        .then(result => {
+        .then(triples => {
 
             //remove entry from documentToGraph
             delete privateData.documentToGraph[documentUri];
@@ -1788,19 +1789,19 @@ import won from './won.js';
             const urisOfContainedGraphs = (privateData.documentToGraph[documentUri] || new Set());
 
             return Promise.all([
-                won.deleteTriples(result.triples), // deletion from default graph
-                won.deleteTriples(result.triples, documentUri), // deletion from document-graph
+                won.deleteTriples(triples), // deletion from default graph
+                won.deleteTriples(triples, documentUri), // deletion from document-graph
 
                 //deletion from subgraphs
                 ...Array.from(urisOfContainedGraphs).map(graphUri => 
-                    won.deleteTriples(result.triples, graphUri, 
+                    won.deleteTriples(triples, graphUri, 
                         (success) => success? 
                             Promise.resolve() : 
                             Promise.reject(
                                 "Failed to delete the following triples from" +
                                 " the graph " + graphUri + 
                                 " contained in document " + documentUri + ": " + 
-                                JSON.stringify(result.triples)
+                                JSON.stringify(triples)
                             )
                     )
                 )
@@ -1884,7 +1885,26 @@ import won from './won.js';
         });
     };
 
-    won.getCachedGraph = function(graphUri) {
+    won.getCachedGraphTriples = async function(graphUri, removeAtGraphTriples=true) {
+        const graph = await rdfStoreGetGraph(graphUri);
+
+        if(removeAtGraphTriples) {
+            return graph.triples
+                // `store.graph` in `rdfStoreGetGraph` returns some 
+                // triples with `@graph` as predicate and a string
+                // as value, which isn't proper json-ld, so we filter
+                // them out here.
+                .filter(t => getIn(t, ['predicate', 'nominalValue']) !== '@graph'); 
+        } else {
+            return graph.triples;
+        }
+    }
+
+    /**
+     * Thin wrapper around `store.graph` that returns a promise.
+     * @param {*} graphUri 
+     */
+    function rdfStoreGetGraph(graphUri) {
         return new Promise((resolve, reject) => {
             const callback = (success, graph) => {
                 if(success) {
@@ -1914,7 +1934,7 @@ import won from './won.js';
         return won
         .ensureLoaded(documentUri, fetchParams)
         .then(() => 
-            won.getCachedGraph(graphUri)
+            won.getCachedGraphTriples(graphUri)
         )
     }
 
