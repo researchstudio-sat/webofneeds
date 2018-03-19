@@ -719,7 +719,7 @@ import won from './won.js';
                      * the previously loaded data. For everything
                      * remove any remaining stale data: */
                     // won.deleteNode(uri, removeCacheItem) 
-                    won.removeDocumentFromStore(uri, removeCacheItem)
+                    won.deleteDocumentFromStore(uri, removeCacheItem)
                 }
             })
             .then(() =>
@@ -1772,7 +1772,7 @@ import won from './won.js';
      * Deletes all triples belonging to that particular document (e.g. need, event, etc)
      * from all graphs.
      */
-    won.removeDocumentFromStore = function(documentUri, removeCacheItem=true) {
+    won.deleteDocumentFromStore = function(documentUri, removeCacheItem=true) {
         return won.getCachedGraph(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
         .catch(e => {
             const msg = 'Failed to retrieve triples for the document ' + documentUri + '.';
