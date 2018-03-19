@@ -804,6 +804,7 @@ import won from './won.js';
                 )
             )
         }).catch(error => {
+            rethrow(error, "Failed to add subgraphs: ");
         	//TODO: reactivate error msg
 			//console.error('Error:', error);
 		});
