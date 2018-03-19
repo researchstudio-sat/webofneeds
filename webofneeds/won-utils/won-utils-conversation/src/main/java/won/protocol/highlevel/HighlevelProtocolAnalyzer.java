@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -20,14 +19,14 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mchange.v1.lang.GentleThread;
-
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
 import won.protocol.vocabulary.WONAGR;
@@ -111,6 +110,9 @@ public class HighlevelProtocolAnalyzer {
 		conversationDataset.begin(ReadWrite.READ);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
+		
+		
+		
 		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
 		SparqlSelectFunction<ConversationMessage> selectfunction = 
 				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", resultMapper )

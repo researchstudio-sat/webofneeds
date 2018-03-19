@@ -177,6 +177,7 @@ public class WonConversationUtilsTest {
 	public static void main (String... args) throws Exception {
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
+		
 		//Dataset input = loadDataset("/won/utils/agreement/input/one-agreement-one-cancellation.trig");
 		Dataset input = loadDataset("/won/utils/conversationutils/input/longer-conversation.trig");
 		SparqlSelectFunction<QuerySolution> selectfunction = 
@@ -188,7 +189,7 @@ public class WonConversationUtilsTest {
 		selectfunction.apply(input).forEach(x -> System.out.println("solution:" + x.toString()));
 		sw.stop();
 		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
-		
+		//Thread.currentThread().sleep(30000);
 		sw.start();
 		Dataset agreements = HighlevelProtocols.getAgreements(input);
 		sw.stop();
