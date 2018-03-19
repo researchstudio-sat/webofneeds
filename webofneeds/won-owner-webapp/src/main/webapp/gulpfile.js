@@ -16,6 +16,7 @@ gulp.task('build', ['config', 'sass', 'iconsprite', 'bundlejs', 'copy-static-res
 gulp.task('watch', ['config', 'sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
     gulp.watch('./*.js', ['bundlejs']);
     gulp.watch('./app/**/*.js', ['bundlejs']);
+    gulp.watch('./scripts/**/*.js', ['bundlejs']);
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
