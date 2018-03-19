@@ -160,26 +160,15 @@ public class AnalyzeAction extends BaseEventBotAction {
             }
         }
 
-        if(!rejectEventUris.isEmpty()) {
+        if(!rejectEventUris.isEmpty() || !retractEventUris.isEmpty()) {
             conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
             Set<URI> agreementUris = HighlevelProtocols.getAgreementUris(conversationAndNeedsDataset);
 
-            rejectEventUris.forEach(rejectEventUri -> {
-                if(!agreementUris.contains(rejectEventUri)) {
+            retractEventUris.addAll(rejectEventUris);
+            retractEventUris.forEach(eventUri -> {
+                if(!agreementUris.contains(eventUri)) {
                     //if the agreement payload is empty we can be certain that the uri was "just" a proposal before and can be dereferenced from our maps
-                    botContextWrapper.removeProposalReferences(rejectEventUri);
-                }
-            });
-        }
-
-        if(!retractEventUris.isEmpty()) {
-            conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-            Set<URI> agreementUris = HighlevelProtocols.getAgreementUris(conversationAndNeedsDataset);
-
-            rejectEventUris.forEach(retractEventUri -> {
-                if(!agreementUris.contains(retractEventUri)) {
-                    //if the agreement payload is empty we can be certain that the uri was "just" a proposal before and can be dereferenced from our maps
-                    botContextWrapper.removeProposalReferences(retractEventUri);
+                    botContextWrapper.removeProposalReferences(eventUri);
                 }
             });
         }
