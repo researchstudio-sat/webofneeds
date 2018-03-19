@@ -195,7 +195,6 @@ public class AnalyzeAction extends BaseEventBotAction {
                     }else{
                         ctx.getEventBus().publish(new PreconditionUnmetEvent(connection, preconditionUri, result));
                     }
-                    botContextWrapper.addPreconditionConversationState(preconditionUri, newGoalState);
                 }
             } else {
                 logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
