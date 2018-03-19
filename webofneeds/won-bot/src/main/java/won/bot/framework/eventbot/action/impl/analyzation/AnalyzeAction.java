@@ -181,6 +181,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             String preconditionUri = getUniqueGoalId(goal, needDataset, connection);
 
             if(!botContextWrapper.isPreconditionMetInProposals(preconditionUri)) { //ONLY HANDLE PRECONDITIONS THAT ARE NOT YET MET WITHIN THE PROPOSALS
+                logger.debug("Goal/Precondition not yet met in a proposal/agreement, " + preconditionUri);
                 conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
                 goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset, remoteNeedDataset, conversationDataset);
 
@@ -196,6 +197,8 @@ public class AnalyzeAction extends BaseEventBotAction {
                     }
                     botContextWrapper.addPreconditionConversationState(getUniqueGoalId(goal, needDataset, connection), newGoalState);
                 }
+            } else {
+                logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
             }
         }
 
