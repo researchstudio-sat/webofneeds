@@ -13,10 +13,11 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     private final String connectionToPreconditionListMapName = getBotName() + ":connectionToPreconditionListMap";
     private final String connectionToProposalListMapName = getBotName() + ":connectionToProposalListMap";
     private final String preconditionToConnectionMapName = getBotName() + ":preconditionToConnectionMap";
-    private final String preconditionToProposalListMapName = getBotName() + ":precondtionToProposalListMap";
+    private final String preconditionToProposalListMapName = getBotName() + ":preconditionToProposalListMap";
     private final String preconditionConversationStateMapName = getBotName() + ":preconditionConversationStateMap";
     private final String proposalToPreconditionListMapName = getBotName() + ":proposalToPreconditionListMap";
     private final String proposalToConnectionMapName = getBotName() + ":proposalToConnectionMap";
+    private final String preconditionMetPending = getBotName() + ":preconditionMetPending";
 
     public FactoryBotContextWrapper(BotContext botContext, String botName) {
         super(botContext, botName);
@@ -63,6 +64,18 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
         getBotContext().saveToObjectMap(preconditionConversationStateMapName, preconditionURI, state);
     }
 
+    public void addPreconditionMetPending(String preconditionURI){
+        getBotContext().saveToObjectMap(preconditionMetPending, preconditionURI, true);
+    }
+
+    public void removePreconditionMetPending(String preconditionURI){
+        getBotContext().removeFromObjectMap(preconditionMetPending, preconditionURI);
+    }
+
+    public boolean isPreconditionMetPending(String preconditionURI) {
+        return getBotContext().loadFromObjectMap(preconditionMetPending, preconditionURI) != null;
+    }
+
     /**
      * Adds one or more preconditions to the given connection Uri ListMap
      * @param connectionURI a single connectionUri to store as the key of the ListMap
@@ -103,6 +116,8 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     }
 
     public void addPreconditionProposalRelation(Precondition precondition, Proposal proposal) {
+        //TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED OR NOT BEFORE WE REMOVE THE TEMP STATUS
+        removePreconditionMetPending(precondition.getUri());
         getBotContext().addToListMap(preconditionToProposalListMapName, precondition.getUri(), proposal);
         getBotContext().addToListMap(proposalToPreconditionListMapName, proposal.getUri().toString(), precondition);
     }
@@ -142,10 +157,10 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
      */
     public boolean isPreconditionMetInProposals(String preconditionURI) {
         List<Proposal> proposals = getProposalsForPreconditionUri(preconditionURI);
-        for(Proposal p : proposals) {
+        for (Proposal p : proposals) {
             List<Precondition> preconditions = getPreconditionsForProposalUri(p.getUri().toString());
-            for(Precondition condition : preconditions) {
-                if(condition.isMet()) return true;
+            for (Precondition condition : preconditions) {
+                if (condition.isMet()) return true;
             }
         }
         return false;
@@ -169,7 +184,6 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
      * @param connectionURI the string of the connection URI that is to be removed from here
      */
     public void removeConnectionReferences(String connectionURI) {
-        //TODO: REMOVE ALL UNUSED VALUES (TO BE DETERMINED)
         getPreconditionsForConnectionUri(connectionURI).forEach(this::removePreconditionReferences);
         getProposalsForConnectionUri(connectionURI).forEach(this::removeProposalReferences);
 
@@ -205,6 +219,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     }
 
     public void removePreconditionReferences(String preconditionURI) {
+        removePreconditionMetPending(preconditionURI);
         getBotContext().removeFromObjectMap(preconditionConversationStateMapName, preconditionURI);
         getBotContext().removeLeavesFromListMap(connectionToPreconditionListMapName, new Precondition(preconditionURI, false)); //Status of the Precondition is irrelevant (equals works on uri alone)
         getBotContext().removeFromObjectMap(preconditionToConnectionMapName, preconditionURI);
