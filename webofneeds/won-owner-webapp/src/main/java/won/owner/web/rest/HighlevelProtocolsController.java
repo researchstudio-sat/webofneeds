@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import won.protocol.highlevel.HighlevelProtocolUris;
 import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -29,10 +30,10 @@ public class HighlevelProtocolsController {
 		this.linkedDataSourceOnBehalfOfNeed = linkedDataSource;
 	}
 	
-	@RequestMapping(value = "/getRetracts", method = RequestMethod.GET)
-    public Model getRetracts(String connectionUri) {
+	@RequestMapping(value = "/getHighlevelProtocolUris", method = RequestMethod.GET)
+    public HighlevelProtocolUris getHighlevelProtocolUris(String connectionUri) {
         Dataset conversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
-        return HighlevelProtocols.getAcceptedRetracts(conversationDataset);
+        return HighlevelProtocols.getHighlevelProtocolUris(conversationDataset);
     }
 	
 	@RequestMapping(value = "/getRetractedUris", method = RequestMethod.GET)

@@ -51,6 +51,10 @@ public class HighlevelProtocols {
 		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements();
 	}
 	
+	public static HighlevelProtocolUris getHighlevelProtocolUris(Dataset connectionDataset) {
+		return new HighlevelProtocolAnalyzer(connectionDataset).getHighlevelProtocolUris();
+	}
+	
 	public static Model getAgreement(Dataset conversationDataset, URI agreementURI) {
 		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements().getNamedModel(agreementURI.toString());
 	}
@@ -71,7 +75,7 @@ public class HighlevelProtocols {
 	}	
 
 	public static Set<URI> getProposalUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposalUris();
+		return new HighlevelProtocolAnalyzer(conversationDataset).getPendingProposalUris();
 	}
 	
 	public static Set<URI> getAgreementUris(Dataset conversationDataset){
@@ -83,11 +87,11 @@ public class HighlevelProtocols {
 	}
 	
 	public static Set<URI> getAgreementsProposedToBeCancelledUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposedToBeCancelledAgreementUris();
+		return new HighlevelProtocolAnalyzer(conversationDataset).getCancellationPendingAgreementUris();
 	}
 	
 	public static Set<URI> getRejectedProposalUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getRejectedProposalUris();
+		return new HighlevelProtocolAnalyzer(conversationDataset).getRejectedUris();
 	}
 
 
