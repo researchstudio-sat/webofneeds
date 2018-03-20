@@ -125,7 +125,7 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
      * @return List of all URI-Strings of preconditions save for the given connectionURI
      */
     public List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
-        return (List<Precondition>)(List<?>) getBotContext().loadFromListMap(connectionToPreconditionListMapName, proposalURI.toString());
+        return (List<Precondition>)(List<?>) getBotContext().loadFromListMap(proposalToPreconditionListMapName, proposalURI.toString());
     }
 
     /**
