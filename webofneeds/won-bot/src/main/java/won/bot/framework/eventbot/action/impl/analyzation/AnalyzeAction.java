@@ -22,9 +22,12 @@ import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
+import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
+import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementAcceptedEvent;
+import won.bot.framework.eventbot.event.*;
+import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCanceledEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
@@ -34,6 +37,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConn
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
@@ -45,9 +49,8 @@ import won.utils.goals.GoalInstantiationResult;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class AnalyzeAction extends BaseEventBotAction {
 
@@ -65,150 +68,194 @@ public class AnalyzeAction extends BaseEventBotAction {
             return ;
         }
 
+        FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) ctx.getBotContextWrapper();
+        LinkedDataSource linkedDataSource = ctx.getLinkedDataSource();
+
+        boolean receivedMessage;
+
         if(event instanceof WonMessageSentOnConnectionEvent) {
-            logger.debug("AnalyzeAction was called for a WonMessageSentOnConnectionEvent, this handling is not implemented yet");
-        }else if(event instanceof WonMessageReceivedOnConnectionEvent){
-            LinkedDataSource linkedDataSource = ctx.getLinkedDataSource();
+            receivedMessage = false;
+        } else if(event instanceof WonMessageReceivedOnConnectionEvent) {
+            receivedMessage = true;
+        } else {
+            logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent, was an event of class: " + event.getClass());
+            return;
+        }
 
+        URI needUri = ((NeedSpecificEvent) event).getNeedURI();
+        URI remoteNeedUri = ((RemoteNeedSpecificEvent) event).getRemoteNeedURI();
+        URI connectionUri = ((ConnectionSpecificEvent) event).getConnectionURI();
+        Connection connection = makeConnection(needUri, remoteNeedUri, connectionUri);
+        WonMessage wonMessage = ((MessageEvent) event).getWonMessage();
+
+        if(connectionUri == null || WonRdfUtils.MessageUtils.isProcessingMessage(wonMessage)){
+            logger.debug("AnalyzeAction will not execute on processing messages or messages without a connectionUri (e.g. connect messages)");
+            return;
+        }
+
+        if(receivedMessage) {
+            publishAnalyzingMessage(connection);
+        }
+
+        List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(wonMessage);
+        List<URI> rejectEventUris = WonRdfUtils.MessageUtils.getRejectEvents(wonMessage);
+        List<URI> retractEventUris = WonRdfUtils.MessageUtils.getRetractEvents(wonMessage);
+        List<URI> proposesToCancelEvents = WonRdfUtils.MessageUtils.getProposesToCancelEvents(wonMessage);
+        List<URI> acceptedEventUris = WonRdfUtils.MessageUtils.getAcceptedEvents(wonMessage);
+
+        Dataset conversationAndNeedsDataset = null; //Initialize with null, to ensure some form of lazy init for the conversationAndNeedsDataset
+
+        if(receivedMessage) {
             WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
-            Connection con = receivedOnConnectionEvent.getCon();
-            publishAnalyzingMessage(con);
 
-            List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(receivedOnConnectionEvent.getWonMessage());
-            List<URI> proposesToCancelEvents = WonRdfUtils.MessageUtils.getProposesToCancelEvents(receivedOnConnectionEvent.getWonMessage());
-
-            if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()){
+            if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()) {
                 //If the message contains proposes or proposesToCancel the event itself is a proposal
-                bus.publish(new ProposalReceivedEvent(con, receivedOnConnectionEvent));
+                bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
             }
 
-            List<URI> acceptedEvents = WonRdfUtils.MessageUtils.getAcceptedEvents(receivedOnConnectionEvent.getWonMessage());
+            if(!acceptedEventUris.isEmpty()) {
+                for(URI acceptedEventURI : acceptedEventUris) {
+                    Dataset acceptedEventData = linkedDataSource.getDataForResource(acceptedEventURI, connection.getNeedURI());
 
-            if(!acceptedEvents.isEmpty()) {
-                //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
-                Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
-                URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI();
-                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri);
-
-                if(!agreementPayload.isEmpty()){
-                    bus.publish(new AgreementAcceptedEvent(con, agreementUri, agreementPayload));
-                }else{
-                    for (URI acceptedEvent : acceptedEvents) {
-                        Dataset acceptedEventData = linkedDataSource.getDataForResource(acceptedEvent, con.getNeedURI());
-
-                        if(!acceptedEventData.isEmpty()) {
-                            List<URI> canceledAgreementUris = WonRdfUtils.MessageUtils.getProposesToCancelEvents(acceptedEventData);
-
-                            for (URI canceledAgreementUri : canceledAgreementUris) {
-                                bus.publish(new AgreementCanceledEvent(con, canceledAgreementUri));
-                            }
+                    List<URI> proposedToCancelAgreementUris = WonRdfUtils.MessageUtils.getProposesToCancelEvents(acceptedEventData);
+                    if(!proposedToCancelAgreementUris.isEmpty()){
+                        for(URI proposedToCancelAgreementUri : proposedToCancelAgreementUris){
+                            bus.publish(new AgreementCanceledEvent(connection, proposedToCancelAgreementUri));
+                        }
+                    } else {
+                        conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
+                        Model agreementPayload = HighlevelProtocols.getAgreement(conversationAndNeedsDataset, acceptedEventURI);
+                        if(!agreementPayload.isEmpty()) {
+                            bus.publish(new ProposalAcceptedEvent(connection, acceptedEventURI, agreementPayload));
                         }
                     }
                 }
-                publishAnalyzingCompleteMessage(con, "Accept Message Parsing complete");
             }
+        }
 
-            if(acceptedEvents.isEmpty() && proposesToCancelEvents.isEmpty()) { //TODO: REMOVE THIS CHECK WE NEED TO ANALYZE THE CONVERSATION ON EVERY MESSAGE ANYWAY
-                Dataset needDataset = linkedDataSource.getDataForResource(receivedOnConnectionEvent.getNeedURI());
-                NeedModelWrapper needWrapper = new NeedModelWrapper(needDataset);
+        //Things to do for each individual message regardless of it being received or sent
+        Dataset needDataset = linkedDataSource.getDataForResource(needUri);
+        Collection<Resource> goalsInNeed = new NeedModelWrapper(needDataset).getGoals();
 
-                Collection<Resource> goalsInNeed = needWrapper.getGoals();
+        if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()){
+            //If the message contains proposesEvents or proposesToCancel events it is considered a proposal so we save the status of it in the botContext
+            Proposal proposal = new Proposal(receivedMessage? wonMessage.getCorrespondingRemoteMessageURI() : wonMessage.getMessageURI(), ProposalState.SUGGESTED);
+            conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
+            Model proposalModel = HighlevelProtocols.getProposal(conversationAndNeedsDataset, proposal.getUri().toString());
 
-                if(goalsInNeed.isEmpty()){
-                    logger.debug("No Goals Present, no need to check agreements/proposals for goal conformity");
-                    //no need to check for preconditions that are met since the need does not contain any goals anyway
-                    publishAnalyzingCompleteMessage(con, "No Goals Present, no need to check agreements/proposals for goal conformity");
-                    return;
-                }
-                Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
-                Dataset proposals = HighlevelProtocols.getProposals(fullConversationDataset);
+            if(!proposalModel.isEmpty()) {
+                for(Resource goal : goalsInNeed){
+                    String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
 
-                if (!proposals.isEmpty()) {
-                    goalsInNeed.removeAll(this.getGoalsWithPreconditionMet(needDataset, proposals, goalsInNeed));
+                    if(!botContextWrapper.hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
+                        GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
+                        Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
 
-                    if(goalsInNeed.isEmpty()){
-                        logger.debug("No Goals that are unmet anymore, do not validate any further");
-                        publishAnalyzingCompleteMessage(con, "No Goals that are unmet anymore, do not validate any further");
-                        return;
+                        logger.debug("Adding Precondition/Proposal Relation: " + precondition + "/" + proposal);
+                        botContextWrapper.addPreconditionProposalRelation(precondition, proposal);
                     }
                 }
-
-                Dataset agreements = HighlevelProtocols.getAgreements(fullConversationDataset);
-                if (!agreements.isEmpty()) {
-                    goalsInNeed.removeAll(this.getGoalsWithPreconditionMet(needDataset, agreements, goalsInNeed));
-
-                    if (goalsInNeed.isEmpty()) {
-                        logger.debug("No Goals that are unmet anymore, do not validate any further");
-                        publishAnalyzingCompleteMessage(con, "No Goals that are unmet anymore, do not validate any further");
-                        return;
-                    }
-                }
-
-                checkChangedPreconditionsOfRemainingGoals(ctx, receivedOnConnectionEvent, needDataset, goalsInNeed);
-                publishAnalyzingCompleteMessage(con, null);
+            } else {
+                logger.debug("No PreconditionProposalRelations to add... proposalModel is empty");
             }
-        } else {
-            logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent, was an event of class: " + event.getClass());
+        }
+
+        if(!rejectEventUris.isEmpty() || !retractEventUris.isEmpty()) {
+            conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
+            Set<URI> agreementUris = HighlevelProtocols.getAgreementUris(conversationAndNeedsDataset);
+
+            retractEventUris.addAll(rejectEventUris);
+            retractEventUris.forEach(eventUri -> {
+                if(!agreementUris.contains(eventUri)) {
+                    //if the agreement payload is empty we can be certain that the uri was "just" a proposal before and can be dereferenced from our maps
+                    botContextWrapper.removeProposalReferences(eventUri);
+                }
+            });
+        }
+
+        Dataset remoteNeedDataset = ctx.getLinkedDataSource().getDataForResource(remoteNeedUri);
+        Dataset conversationDataset = null;  //Initialize with null, to ensure some form of lazy init for the conversationDataset
+        GoalInstantiationProducer goalInstantiationProducer = null;
+
+        for (Resource goal : goalsInNeed) {
+            String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
+
+            if(botContextWrapper.isPreconditionMetInProposals(preconditionUri)){
+                logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
+            } else if(botContextWrapper.isPreconditionMetPending(preconditionUri)){
+                logger.debug("Goal/Precondition already met temporarily by a pending proposal that does not exist yet, " + preconditionUri);
+            } else {
+                logger.debug("Goal/Precondition not yet met in a proposal/agreement, " + preconditionUri);
+                conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
+                goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset, remoteNeedDataset, conversationDataset);
+
+                GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
+                Boolean oldGoalState = botContextWrapper.getPreconditionConversationState(preconditionUri);
+                boolean newGoalState = result.getShaclReportWrapper().isConform();
+
+                if(oldGoalState == null || newGoalState != oldGoalState) {
+                    botContextWrapper.addPreconditionConversationState(preconditionUri, newGoalState);
+                    if(newGoalState) {
+                        logger.debug("sending PreconditionMetEvent, because the precon state for the conversation changed");
+                        botContextWrapper.addPreconditionMetPending(preconditionUri);
+                        ctx.getEventBus().publish(new PreconditionMetEvent(connection, preconditionUri, result));
+                    }else{
+                        logger.debug("sending PreconditionUnmetEvent because the precon state for the conversation changed");
+                        ctx.getEventBus().publish(new PreconditionUnmetEvent(connection, preconditionUri, result));
+                    }
+                }else{
+                    logger.debug("Goal/Precondition State did not change in the conversation");
+                }
+            }
+        }
+
+        if(receivedMessage){
+            publishAnalyzingCompleteMessage(connection, null);
+        }
+    }
+
+    //********* Helper Methods **********
+    private Dataset getFullConversationDatasetLazyInit(Dataset conversationAndNeedsDataset, URI connectionUri){
+        if(conversationAndNeedsDataset == null) {
+            logger.debug("Retrieving FullConversation Of Connection");
+            return WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, getEventListenerContext().getLinkedDataSource());
+        }else{
+            logger.debug("Already retrieved FullConversation Of Connection");
+            return conversationAndNeedsDataset;
+        }
+    }
+
+    private Dataset getConversationDatasetLazyInit(Dataset conversationDataset, URI connectionUri) {
+        if(conversationDataset == null){
+            logger.debug("Retrieving Conversation Of Connection");
+            return WonLinkedDataUtils.getConversationDataset(connectionUri, getEventListenerContext().getLinkedDataSource());
+        }else{
+            logger.debug("Already retrieved FullConversation Of Connection");
+            return conversationDataset;
+        }
+    }
+
+    private GoalInstantiationProducer getGoalInstantiationProducerLazyInit(GoalInstantiationProducer goalInstantiationProducer, Dataset needDataset, Dataset remoteNeedDataset, Dataset conversationDataset){
+        if(goalInstantiationProducer == null){
+            logger.debug("Instantiating GoalInstantiationProducer");
+            return new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
+        }else{
+            logger.debug("Already instantiated GoalInstantiationProducer");
+            return goalInstantiationProducer;
         }
     }
 
     private void publishAnalyzingMessage(Connection connection) {
-        Model messageModel = WonRdfUtils.MessageUtils.textMessage(getEventListenerContext().getBotContextWrapper().getBotName() + " - Starting Analyzation");
-        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel)); //TODO: REMOVE THIS OR CHANGE IT TO A SORT-OF PROCESSING MESSAGE TYPE
+        Model messageModel = WonRdfUtils.MessageUtils.processingMessage(getEventListenerContext().getBotContextWrapper().getBotName() + " - Starting Analyzation");
+        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel));
     }
 
     private void publishAnalyzingCompleteMessage(Connection connection, String detailMessage) {
-        Model messageModel = WonRdfUtils.MessageUtils.textMessage(getEventListenerContext().getBotContextWrapper().getBotName() + " - Analyzation complete" + (detailMessage!= null? (", DetailMessage: "+detailMessage): ""));
-        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel)); //TODO: REMOVE THIS OR CHANGE IT TO A SORT-OF PROCESSING MESSAGE TYPE
+        Model messageModel = WonRdfUtils.MessageUtils.processingMessage(getEventListenerContext().getBotContextWrapper().getBotName() + " - Analyzation complete" + (detailMessage!= null? (", DetailMessage: "+detailMessage): ""));
+        getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel));
     }
 
-    private Collection<Resource> getGoalsWithPreconditionMet(Dataset needDataset, Dataset datasetToCheck, Collection<Resource> goals) {
-        logger.debug("Checking Dataset with goals");
-        Collection<Resource> metGoals = new LinkedList<>();
-        Iterator<String> datasetIterator = datasetToCheck.listNames();
-
-        while(datasetIterator.hasNext()){
-            Model currentModelToCheck = datasetToCheck.getNamedModel(datasetIterator.next());
-
-            for(Resource goal : goals){
-                GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, currentModelToCheck);
-                if(result.isConform()){
-                    logger.debug("Goal Precondition is met by a part of the dataset removing further validationcheck for this goal");
-                    metGoals.add(goal);
-                }else{
-                    logger.debug("Goal Precondition is unmet by a part of the dataset");
-                }
-            }
-        }
-
-        return metGoals;
-    }
-
-    private void checkChangedPreconditionsOfRemainingGoals(EventListenerContext ctx, WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent, Dataset needDataset, Collection<Resource> goalsInNeed) {
-        FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) ctx.getBotContextWrapper();
-
-        Dataset remoteNeedDataset = ctx.getLinkedDataSource().getDataForResource(receivedOnConnectionEvent.getRemoteNeedURI());
-        Dataset conversationDataset = WonLinkedDataUtils.getConversationDataset(receivedOnConnectionEvent.getConnectionURI(), ctx.getLinkedDataSource());
-
-        GoalInstantiationProducer goalInstantiationProducer = new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
-
-        for (Resource goal : goalsInNeed) {
-            GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
-            Boolean oldGoalState = botContextWrapper.getGoalPreconditionState(getUniqueGoalId(goal, needDataset, receivedOnConnectionEvent.getCon()));
-            boolean newGoalState = result.getShaclReportWrapper().isConform();
-
-            if(oldGoalState == null || newGoalState != oldGoalState) {
-                if(newGoalState) {
-                    ctx.getEventBus().publish(new PreconditionMetEvent(receivedOnConnectionEvent.getCon(), result));
-                }else{
-                    ctx.getEventBus().publish(new PreconditionUnmetEvent(receivedOnConnectionEvent.getCon(), result));
-                }
-                botContextWrapper.addGoalPreconditionState(getUniqueGoalId(goal, needDataset, receivedOnConnectionEvent.getCon()), newGoalState);
-            }
-        }
-    }
-
-    private static String getUniqueGoalId(Resource goal, Dataset needDataset, Connection con) { //TODO: GOAL STATE RETRIEVAL IS NOT BASED ON THE CORRECT URI SO FAR
+    private static String getUniqueGoalId(Resource goal, Dataset needDataset, URI connectionURI) { //TODO: GOAL STATE RETRIEVAL IS NOT BASED ON THE CORRECT URI SO FAR
         if(goal.getURI() != null) {
             return goal.getURI();
         }else{
@@ -224,7 +271,15 @@ public class AnalyzeAction extends BaseEventBotAction {
                 dataModel.write(writer, "TRIG");
             }
 
-            return con.getConnectionURI() +"#"+ writer.toString();
+            return connectionURI +"#"+ writer.toString().replaceAll("\\R", " ");
         }
+    }
+
+    private static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
+        Connection con = new Connection();
+        con.setConnectionURI(connectionURI);
+        con.setNeedURI(needURI);
+        con.setRemoteNeedURI(remoteNeedURI);
+        return con;
     }
 }

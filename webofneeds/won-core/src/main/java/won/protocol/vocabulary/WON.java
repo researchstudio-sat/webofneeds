@@ -68,6 +68,7 @@ public class WON {
 
 
     public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
+    public static final Property IS_PROCESSING = m.createProperty(BASE_URI + "isProcessing");
     public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
     public static final Property HAS_FEEDBACK = m.createProperty(BASE_URI, "hasFeedback");
     public static final Property HAS_FEEDBACK_EVENT = m.createProperty(BASE_URI, "hasFeedbackEvent");

@@ -231,6 +231,16 @@ public class WonRdfUtils
     }
 
     /**
+    * Create an RDF model containing a text message and a processing message
+    * @param message
+    * @return
+    */
+    public static Model processingMessage(String message) {
+        Model messageModel = textMessage(message);
+        return addProcessing(messageModel, message);
+    }
+
+    /**
      * Creates an RDF model containing a generic message.
      *
      * @return
@@ -448,34 +458,6 @@ public class WonRdfUtils
           return null;
       }
 
-      public static URI getAcceptedEvent(final WonMessage wonMessage) {
-          String queryString =
-                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
-                          "SELECT ?eventUri where {\n" +
-                          " graph ?g {"+
-                          "  ?s agr:accepts ?eventUri .\n" +
-                          "}}";
-          Query query = QueryFactory.create(queryString);
-
-
-          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
-              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
-              ResultSet rs = qexec.execSelect();
-              if (rs.hasNext()) {
-                  QuerySolution qs = rs.nextSolution();
-                  String eventUri = rdfNodeToString(qs.get("eventUri"));
-                  if (rs.hasNext()) {
-                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
-                      throw new IllegalArgumentException("wonMessage has more than one accepts eventUri");
-                  }
-
-                  return eventUri != null? URI.create(eventUri) : null;
-              }
-          }
-          return null;
-      }
-
       public static List<URI> getAcceptedEvents(final WonMessage wonMessage) {
           return getAcceptedEvents(wonMessage.getCompleteDataset());
       }
@@ -505,6 +487,43 @@ public class WonRdfUtils
           }
           return acceptedEvents;
       }
+
+      public static boolean isProcessingMessage(final WonMessage wonMessage) {
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+                          "SELECT ?text where {\n" +
+                          " graph ?g {"+
+                          "  ?s won:isProcessing ?text .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String text = rdfNodeToString(qs.get("text"));
+
+                  if(text != null) {
+                      return true;
+                  }
+              }
+          }
+          return false;
+      }
+
+      /**
+       * Adds the specified text as a won:hasTextMessage to the model's base resource.
+       * @param message
+       * @return
+       */
+      public static Model addProcessing(Model model, String message) {
+          Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
+          baseRes.addProperty(WON.IS_PROCESSING, message, XSDDatatype.XSDstring);
+          return model;
+      }
+
 
       public static List<URI> getProposesEvents(final WonMessage wonMessage) {
           return getProposesEvents(wonMessage.getCompleteDataset());
@@ -536,6 +555,69 @@ public class WonRdfUtils
           }
           return proposesToCancelEvents;
       }
+
+      public static List<URI> getRejectEvents(final WonMessage wonMessage) {
+          return getRejectEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getRejectEvents(final Dataset messageDataset) {
+          List<URI> rejectEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:reject ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      rejectEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return rejectEvents;
+      }
+
+      public static List<URI> getRetractEvents(final WonMessage wonMessage) {
+          return getRetractEvents(wonMessage.getCompleteDataset());
+      }
+
+      public static List<URI> getRetractEvents(final Dataset messageDataset) {
+          List<URI> retractEvents = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT ?eventUri where {\n" +
+                          " graph ?g {"+
+                          "  ?s agr:retract ?eventUri .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, messageDataset)) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("eventUri"));
+
+                  if(eventUri != null) {
+                      retractEvents.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return retractEvents;
+      }
+
 
       public static List<URI> getProposesToCancelEvents(final WonMessage wonMessage) {
           return getProposesToCancelEvents(wonMessage.getCompleteDataset());
