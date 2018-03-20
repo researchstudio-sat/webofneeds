@@ -180,9 +180,11 @@ public class AnalyzeAction extends BaseEventBotAction {
         for (Resource goal : goalsInNeed) {
             String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
 
-            //TODO: RACE CONDITION, IT IS POSSIBLE THAT WE SENT A PRECONMET EVENT BUT DID NOT HAVE THE PROPOSAL PRECON RELATION SAVED SO FAR....
-            //THIS IS THE CASE WHENEVER WE SEND A MERSSAGE WITH A PAYLOAD BEFORE WE ACTUALLY PROPOSE THE MESSAGE
-            if(!botContextWrapper.isPreconditionMetInProposals(preconditionUri)) { //ONLY HANDLE PRECONDITIONS THAT ARE NOT YET MET WITHIN THE PROPOSALS
+            if(botContextWrapper.isPreconditionMetInProposals(preconditionUri)){
+                logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
+            } else if(botContextWrapper.isPreconditionMetPending(preconditionUri)){
+                logger.debug("Goal/Precondition already met temporarily by a pending proposal that does not exist yet, " + preconditionUri);
+            } else {
                 logger.debug("Goal/Precondition not yet met in a proposal/agreement, " + preconditionUri);
                 conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
                 goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset, remoteNeedDataset, conversationDataset);
@@ -195,6 +197,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                     botContextWrapper.addPreconditionConversationState(preconditionUri, newGoalState);
                     if(newGoalState) {
                         logger.debug("sending PreconditionMetEvent, because the precon state for the conversation changed");
+                        botContextWrapper.addPreconditionMetPending(preconditionUri);
                         ctx.getEventBus().publish(new PreconditionMetEvent(connection, preconditionUri, result));
                     }else{
                         logger.debug("sending PreconditionUnmetEvent because the precon state for the conversation changed");
@@ -203,8 +206,6 @@ public class AnalyzeAction extends BaseEventBotAction {
                 }else{
                     logger.debug("Goal/Precondition State did not change in the conversation");
                 }
-            } else {
-                logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
             }
         }
 
