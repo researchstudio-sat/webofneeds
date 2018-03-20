@@ -27,7 +27,7 @@ import org.springframework.util.StopWatch;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.highlevel.AgreementProtocol;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
 import won.protocol.util.WonConversationUtils;
@@ -191,11 +191,11 @@ public class WonConversationUtilsTest {
 		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
 		//Thread.currentThread().sleep(30000);
 		sw.start();
-		Dataset agreements = HighlevelProtocols.getAgreements(input);
+		Dataset agreements = AgreementProtocol.getAgreements(input);
 		sw.stop();
 		RDFDataMgr.write(System.out, agreements, Lang.TRIG);
 		System.out.println("HP.getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
-		
+		System.out.println(AgreementProtocol.getHighlevelProtocolUris(input));
 		
 		
 		/*

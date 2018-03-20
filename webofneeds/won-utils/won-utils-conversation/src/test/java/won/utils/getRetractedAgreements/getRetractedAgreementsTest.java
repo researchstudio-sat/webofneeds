@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.highlevel.AgreementProtocol;
 
 public class getRetractedAgreementsTest {
 	
@@ -52,7 +52,7 @@ public class getRetractedAgreementsTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 List<URI> actual = HighlevelProtocols.getRetractedAgreements(input, acceptsMessageURI);
+		 List<URI> actual = AgreementProtocol.getRetractedAgreements(input, acceptsMessageURI);
 		
 	        for(URI uri : actual) {
 	        	System.out.println(uri.toString());

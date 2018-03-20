@@ -31,8 +31,8 @@ import won.protocol.util.SparqlSelectFunction;
 import won.protocol.vocabulary.WONAGR;
 
 
-public class HighlevelProtocolAnalyzer {
-	private  final Logger logger = LoggerFactory.getLogger(HighlevelProtocolAnalyzer.class);
+public class AgreementProtocolAnalyzer {
+	private  final Logger logger = LoggerFactory.getLogger(AgreementProtocolAnalyzer.class);
 	
 	private final Dataset pendingProposals = DatasetFactory.createGeneral();
 	private final Dataset agreements = DatasetFactory.createGeneral();
@@ -41,13 +41,13 @@ public class HighlevelProtocolAnalyzer {
 	private final Set<URI> retractedUris = new HashSet<URI>();
 	private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
 	
-	public HighlevelProtocolAnalyzer(Dataset conversation) {
+	public AgreementProtocolAnalyzer(Dataset conversation) {
 		recalculate(conversation);
 	}
 	
 	
-	public HighlevelProtocolUris getHighlevelProtocolUris() {
-		HighlevelProtocolUris uris = new HighlevelProtocolUris();
+	public AgreementProtocolUris getHighlevelProtocolUris() {
+		AgreementProtocolUris uris = new AgreementProtocolUris();
 		uris.addAgreementUris(getAgreementUris());
 		uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
 		uris.addCancellationPendingAgreementUris(getCancellationPendingAgreementUris());
@@ -129,6 +129,7 @@ public class HighlevelProtocolAnalyzer {
 		return RdfUtils.getGraphUris(rejected);		
 	}
 	
+	
 	/**
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
@@ -160,52 +161,61 @@ public class HighlevelProtocolAnalyzer {
 		messages.stream().forEach(message -> {
 			if (message.getCorrespondingRemoteMessageURI() != null && ! message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
+				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getCorrespondingRemoteMessageURI(), other, "msg:hasCorrespondingRemoteMessage");
 				message.setCorrespondingRemoteMessageRef(other);
 				other.setCorrespondingRemoteMessageRef(message);
 			}
 			message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
+				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "msg:hasPreviousMessage");
 				message.addPreviousRef(other);
 				other.addPreviousInverseRef(message);
 			});
 			message.getAccepts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
+				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:accepts");
 				message.addAcceptsRef(other); 
 				other.addAcceptsInverseRef(message);
 			});
 			message.getProposes().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
+				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:proposes");
 				message.addProposesRef(other);
 				other.addProposesInverseRef(message);
 				});
 			message.getRejects().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
+				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:rejects");
 				message.addRejectsRef(other);
 				other.addRejectsInverseRef(message);
 				});
 			message.getProposesToCancel().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
+				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:proposesToCancel");
 				message.addProposesToCancelRef(other);
 				other.addProposesToCancelInverseRef(message);
 				});
 			message.getRetracts().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
+				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "mod:retracts");
 				message.addRetractsRef(other);
 				other.addRetractsInverseRef(message);
 				});
 			if (message.getIsResponseTo() != null && ! message.getIsResponseTo().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getIsResponseTo());
+				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getIsResponseTo(), other, "msg:isResponseTo");
 				message.setIsResponseToRef(other);
 				other.setIsResponseToInverseRef(message);
 			}
 			if (message.getIsRemoteResponseTo() != null && ! message.getIsRemoteResponseTo().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getIsRemoteResponseTo());
+				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getIsRemoteResponseTo(), other, "msg:isRemoteResponseTo");
 				message.setIsRemoteResponseToRef(other);
 				other.setIsRemoteResponseToInverseRef(message);
 			}
@@ -395,6 +405,12 @@ public class HighlevelProtocolAnalyzer {
 		rejected.commit();
 	}
 	
+	private void throwExceptionIfOtherisMissing(URI messageUri, URI otherMessageUri, ConversationMessage otherMessage, String predicate) {
+		if (otherMessage != null) {
+			return;
+		}
+		throw new WonProtocolException("message " + messageUri + " refers to other " + otherMessageUri + " via " + predicate + ", but that other message is not present in the conversation");
+	}
 	
 	
 	private  Dataset acknowledgedSelection(Dataset conversationDataset, Collection<ConversationMessage> messages ) {

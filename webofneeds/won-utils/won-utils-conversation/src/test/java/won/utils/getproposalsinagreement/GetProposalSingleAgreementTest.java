@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.highlevel.AgreementProtocol;
 import won.protocol.util.RdfUtils;
 
 public class GetProposalSingleAgreementTest {
@@ -50,7 +50,7 @@ public class GetProposalSingleAgreementTest {
         // check that the computed dataset is the expected one
     	// replace example.com with accepts message URI
     	URI acceptsMessageURI = new URI("https://localhost:8443/won/resource/event/557600936467257340");
-        Dataset actual = HighlevelProtocols.cutOffAfterMessage(input, acceptsMessageURI);
+        Dataset actual = AgreementProtocol.cutOffAfterMessage(input, acceptsMessageURI);
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
             System.out.println("diff - only in expected:");
@@ -60,7 +60,7 @@ public class GetProposalSingleAgreementTest {
         }
         
         //List accept messages for each proposal
-        List<URI> actualproposal = HighlevelProtocols.getProposalSingleAgreement(actual, acceptsMessageURI);
+        List<URI> actualproposal = AgreementProtocol.getProposalSingleAgreement(actual, acceptsMessageURI);
  
         for(URI uri : actualproposal) {
         	System.out.println(uri.toString());

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HighlevelProtocolUris {
+public class AgreementProtocolUris {
 	private Set<URI> retracted = new HashSet<URI>();
 	private Set<URI> rejected = new HashSet<URI>();
 	private Set<URI> agreements = new HashSet<URI>();
@@ -15,7 +15,7 @@ public class HighlevelProtocolUris {
 	private Set<URI> pendingCancellationProposals = new HashSet<URI>();
 	private Set<URI> acceptedCancellationProposals = new HashSet<URI>();
 	
-	public HighlevelProtocolUris() {
+	public AgreementProtocolUris() {
 	
 	}
 	
@@ -85,7 +85,7 @@ public class HighlevelProtocolUris {
 
 	@Override
 	public String toString() {
-		return "HighlevelProtocolUris [retracted=" + retracted + ", rejected=" + rejected + ", agreements=" + agreements
+		return "AgreementProtocolUris [retracted=" + retracted + ", rejected=" + rejected + ", agreements=" + agreements
 				+ ", pendingProposals=" + pendingProposals + ", cancelledAgreements=" + cancelledAgreements
 				+ ", cancellationPendingAgreements=" + cancellationPendingAgreements + ", pendingCancellationProposals="
 				+ pendingCancellationProposals + ", acceptedCancellationProposals=" + acceptedCancellationProposals

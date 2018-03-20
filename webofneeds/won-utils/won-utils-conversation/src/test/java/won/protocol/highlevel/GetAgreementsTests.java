@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import won.protocol.highlevel.HighlevelFunctionFactory;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.highlevel.AgreementProtocol;
 import won.protocol.util.RdfUtils;
 
 public class GetAgreementsTests {
@@ -436,7 +436,7 @@ public class GetAgreementsTests {
 		expectedOutput = RdfUtils.cloneDataset(expectedOutput);
 
 		// check that the computed dataset is the expected one
-		Dataset actual = HighlevelProtocols.getAgreements(input);
+		Dataset actual = AgreementProtocol.getAgreements(input);
 		// TODO: remove before checking in
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
 		if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

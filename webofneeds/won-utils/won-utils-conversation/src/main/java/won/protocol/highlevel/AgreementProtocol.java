@@ -38,8 +38,8 @@ import won.protocol.util.SparqlSelectFunction;
 import won.protocol.vocabulary.WONAGR;
 
 
-public class HighlevelProtocols {
-	private static final Logger logger = LoggerFactory.getLogger(HighlevelProtocols.class);
+public class AgreementProtocol {
+	private static final Logger logger = LoggerFactory.getLogger(AgreementProtocol.class);
 	
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutAfterMessageFunction;
 	
@@ -48,15 +48,15 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements();
+		return new AgreementProtocolAnalyzer(conversationDataset).getAgreements();
 	}
 	
-	public static HighlevelProtocolUris getHighlevelProtocolUris(Dataset connectionDataset) {
-		return new HighlevelProtocolAnalyzer(connectionDataset).getHighlevelProtocolUris();
+	public static AgreementProtocolUris getHighlevelProtocolUris(Dataset connectionDataset) {
+		return new AgreementProtocolAnalyzer(connectionDataset).getHighlevelProtocolUris();
 	}
 	
 	public static Model getAgreement(Dataset conversationDataset, URI agreementURI) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements().getNamedModel(agreementURI.toString());
+		return new AgreementProtocolAnalyzer(conversationDataset).getAgreements().getNamedModel(agreementURI.toString());
 	}
 	
 	/**
@@ -67,31 +67,31 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals();
+		return new AgreementProtocolAnalyzer(conversationDataset).getProposals();
 	}
 	
 	public static Model getProposal(Dataset conversationDataset, String proposalUri) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
+		return new AgreementProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
 	}	
 
 	public static Set<URI> getProposalUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getPendingProposalUris();
+		return new AgreementProtocolAnalyzer(conversationDataset).getPendingProposalUris();
 	}
 	
 	public static Set<URI> getAgreementUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreementUris();
+		return new AgreementProtocolAnalyzer(conversationDataset).getAgreementUris();
 	}
 	
 	public static Set<URI> getCancelledAgreementUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getCancelledAreementUris();
+		return new AgreementProtocolAnalyzer(conversationDataset).getCancelledAreementUris();
 	}
 	
 	public static Set<URI> getAgreementsProposedToBeCancelledUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getCancellationPendingAgreementUris();
+		return new AgreementProtocolAnalyzer(conversationDataset).getCancellationPendingAgreementUris();
 	}
 	
 	public static Set<URI> getRejectedProposalUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getRejectedUris();
+		return new AgreementProtocolAnalyzer(conversationDataset).getRejectedUris();
 	}
 
 
@@ -217,7 +217,7 @@ public class HighlevelProtocols {
 	}
 	
 	public static Set<URI> getRetractedUris(Dataset input){
-		return new HighlevelProtocolAnalyzer(input).getRetractedUris();
+		return new AgreementProtocolAnalyzer(input).getRetractedUris();
 	}
 
 	public static Dataset cutOffAfterMessage(Dataset input, URI acceptsMessageURI) {

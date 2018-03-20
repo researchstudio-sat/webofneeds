@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.highlevel.AgreementProtocol;
 import won.protocol.util.RdfUtils;
 
 public class CutOffAfterMessageTest {
@@ -50,7 +50,7 @@ public class CutOffAfterMessageTest {
         // check that the computed dataset is the expected one
     	// replace example.com with accepts message URI
     	URI acceptsMessageURI = new URI("https://localhost:8443/won/resource/event/6671551888677331000");
-        Dataset actual = HighlevelProtocols.cutOffAfterMessage(input, acceptsMessageURI);
+        Dataset actual = AgreementProtocol.cutOffAfterMessage(input, acceptsMessageURI);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
