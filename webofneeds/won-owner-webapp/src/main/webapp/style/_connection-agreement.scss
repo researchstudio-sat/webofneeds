@@ -22,13 +22,18 @@ won-connection-agreement {
         border: $thinRedBorder;
         background: $won-light-gray;*/
 
-        &__text{
+        &__text {
             padding: 0.5rem;
             justify-content: flex-end;
             border-top: $thinBorderWidth solid $won-line-gray;
+            
+            span.title {
+              //font-size: $smallFontSize;
+              font-weight: 560;
+            }
         }
     
-        &__button{
+        &__button {
             padding: 0.5rem;
         }
 

@@ -77,7 +77,7 @@ function genComponentConf() {
             		src="generated/icon-sprite.svg#ico36_close"
             		ng-click="self.showAgreementData = !self.showAgreementData"/>
             	<!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreement.size"> 
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreement.size || self.agreementData.proposeToCancel.size"> 
             		Agreements
             		<span ng-show="self.loading.agreement"> (loading...)</span>
             		<span ng-if="!self.loading.agreement"> (up-to-date)</span>
@@ -104,7 +104,7 @@ function genComponentConf() {
 	            <won-connection-agreement
 	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementData.proposeToCancel) track by $index"
 	                event-uri="proptoc"
-	                agreement-number="$index"
+	                agreement-number="self.agreementData.agreement.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
 	                on-update="self.showAgreementData = false; self.removeAcceptedProposalToCancel(draft);">
@@ -253,17 +253,17 @@ function genComponentConf() {
                 let sortedMessages = chatMessages && chatMessages.toArray();
                 if(sortedMessages) {
                 	var msgSet = new Set(sortedMessages);
-                	/*for(msg of msgSet) {
+                	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage")){
 	                		if(this.agreementData.agreement.has(msg.get("uri")) || this.agreementData.agreement.has(msg.get("remoteUri"))) {
 	                			msgSet.delete(msg);
 	                		} else {
 	                			//TODO: add messages from state to agreementDate with right uri
 	                			//msg.get("remoteUri")? this.agreementData.proposal.add(msg.get("remoteUri")) : this.agreementData.proposal.add(msg.get("uri"));
-	                			this.agreementData.proposal.add(msg.get("uri"));
+	                			//this.agreementData.proposal.add(msg.get("uri"));
 	                		}
                 		}
-                	}*/
+                	}
                 	sortedMessages = Array.from(msgSet);
 	            	sortedMessages.sort(function(a,b) {
 	                    return a.get("date").getTime() - b.get("date").getTime();
@@ -411,7 +411,6 @@ function genComponentConf() {
         	//this.getAgreementsProposedToBeCancelled();
         	//this.getAcceptedPropsalsToCancel();
         	
-        	this.filterAgreementDataList();
         }
         
         updateAgreementData(uri) {
@@ -422,7 +421,7 @@ function genComponentConf() {
         }
         
         removeAcceptedProposalToCancel(uri) {
-        	this.agreementData.acceptedProposalToCancel.delete(uri);
+        	this.agreementData.proposeToCancel.delete(uri);
         }
         
         startLoading() {
@@ -443,24 +442,6 @@ function genComponentConf() {
         		return false;
         	}
         	return true;
-        }
-        
-        //Filter and update the agreementData object
-        filterAgreementDataList() {
-        	for(agreement of this.agreementData.agreement) {
-        		if(this.agreementData.proposal.has(agreement)) {
-        			this.agreementData.proposal.delete(agreement)
-        		}
-        		if(this.agreementData.proposeToCancel.has(agreement)) {
-        			this.agreementData.agreement.delete(agreement)
-        		}
-        	}
-        	/*
-        	for(agreement of this.agreementData.acceptedProposalToCancel) {
-        		if(this.agreementData.proposeToCancel.has(agreement)) {
-        			this.agreementData.proposeToCancel.delete(agreement)
-        		}
-        	}*/
         }
         
        getAgreementUris() {
@@ -594,10 +575,44 @@ function genComponentConf() {
                         this.addLoadedAgreementDataToSate(msg.getRemoteMessageUri(), type);
                     }else{
                         this.messages__connectionMessageReceived(msg);
-                        this.agreementData[type].add(eventUri);
+                        this.clearAndAddAgreementData(eventUri, type);
                     }
                 })
 			})
+        }
+        
+        
+        //Filter and update the agreementData object
+        filterAgreementDataList() {
+        	for(agreement of this.agreementData.agreement) {
+        		if(this.agreementData.proposal.has(agreement)) {
+        			this.agreementData.proposal.delete(agreement)
+        		}
+        		if(this.agreementData.proposeToCancel.has(agreement)) {
+        			this.agreementData.agreement.delete(agreement)
+        		}
+        	}
+        	/*
+        	for(agreement of this.agreementData.acceptedProposalToCancel) {
+        		if(this.agreementData.proposeToCancel.has(agreement)) {
+        			this.agreementData.proposeToCancel.delete(agreement)
+        		}
+        	}*/
+        }
+        
+        clearAndAddAgreementData(uri, type) {
+        	if(!this.agreementData[type].has(uri)) {
+        		//uri is new/changed type
+        		this.agreementData[type].add(uri);
+        		
+        		//Remove from other lists
+        		if(this.declarations.agreement != type && this.agreementData.agreement.has(uri)) {
+        			this.agreementData.agreement.delete(uri);
+        		}
+        		else if(this.declarations.proposal != type && this.agreementData.proposal.has(uri)) {
+        			this.agreementData.proposal.delete(uri);
+        		}
+        	}
         }
         
         getArrayFromSet(set) {

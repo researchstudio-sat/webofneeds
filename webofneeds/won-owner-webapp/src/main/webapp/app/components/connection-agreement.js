@@ -49,7 +49,9 @@ function genComponentConf() {
         </won-square-image>-->
         <div class="won-ca__content">
             <div class="won-ca__content__text">
-            	{{ self.agreementNumber+1  }}: {{self.checkDeclaration(self.declarations.proposeToCancel)? "Propose to cancel: " : "" }}{{ self.message.get('text') }}<br />
+            	{{ self.agreementNumber+1  }}: 
+            	<span class="title" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Propose to cancel:</br></span>
+            	{{ self.message.get('text') }}<br />
             	EventUri: {{ self.eventUri }}<br />
             	RealUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
             </div>
@@ -71,7 +73,7 @@ function genComponentConf() {
             	</button>
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposal()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn"">
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Accept
             	</button>
             	<button class="won-button--filled thin red"
@@ -80,7 +82,7 @@ function genComponentConf() {
             		 Accept
             	</button>
             </div>
-        	<div class="won-ca__content__text" ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && self.isOwn">
+        	<div class="won-ca__content__text" ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
         		You proposed this
         	</div>
             	<!--

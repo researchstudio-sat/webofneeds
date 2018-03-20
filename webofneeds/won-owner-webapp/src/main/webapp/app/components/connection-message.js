@@ -55,10 +55,11 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage'))}">
+    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage') || self.message.get('isProposeToCancel'))}">
                     <span class="won-cm__center__bubble__text">
                     <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
-                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>		
+                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>
+                	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>		
                         {{ self.text? self.text : self.noTextPlaceholder }}
                     </span>
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
@@ -77,7 +78,8 @@ function genComponentConf() {
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('outgoingMessage')
                             && !self.message.get('isProposeMessage') 
-                            && !self.message.get('isAcceptMessage')">
+                            && !self.message.get('isAcceptMessage')
+                            && !self.message.get('isProposeToCancel')">
                         <svg class="won-cm__center__carret clickable"
                                 ng-click="self.showDetail = !self.showDetail"
                                 ng-show="!self.showDetail">
