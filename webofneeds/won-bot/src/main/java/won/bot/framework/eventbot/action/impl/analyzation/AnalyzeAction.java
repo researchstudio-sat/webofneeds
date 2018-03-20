@@ -88,8 +88,8 @@ public class AnalyzeAction extends BaseEventBotAction {
         Connection connection = makeConnection(needUri, remoteNeedUri, connectionUri);
         WonMessage wonMessage = ((MessageEvent) event).getWonMessage();
 
-        if(WonRdfUtils.MessageUtils.isProcessingMessage(wonMessage)){
-            logger.debug("AnalyzeAction will not execute on processing messages");
+        if(connectionUri == null || WonRdfUtils.MessageUtils.isProcessingMessage(wonMessage)){
+            logger.debug("AnalyzeAction will not execute on processing messages or messages without a connectionUri (e.g. connect messages)");
             return;
         }
 
@@ -149,7 +149,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
                     if(!botContextWrapper.hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
                         GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
-                        Precondition precondition = new Precondition(preconditionUri, result.isConform());
+                        Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
 
                         logger.debug("Adding Precondition/Proposal Relation: " + precondition + "/" + proposal);
                         botContextWrapper.addPreconditionProposalRelation(precondition, proposal);
@@ -178,23 +178,30 @@ public class AnalyzeAction extends BaseEventBotAction {
         GoalInstantiationProducer goalInstantiationProducer = null;
 
         for (Resource goal : goalsInNeed) {
-            String preconditionUri = getUniqueGoalId(goal, needDataset, connection);
+            String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
 
+            //TODO: RACE CONDITION, IT IS POSSIBLE THAT WE SENT A PRECONMET EVENT BUT DID NOT HAVE THE PROPOSAL PRECON RELATION SAVED SO FAR....
+            //THIS IS THE CASE WHENEVER WE SEND A MERSSAGE WITH A PAYLOAD BEFORE WE ACTUALLY PROPOSE THE MESSAGE
             if(!botContextWrapper.isPreconditionMetInProposals(preconditionUri)) { //ONLY HANDLE PRECONDITIONS THAT ARE NOT YET MET WITHIN THE PROPOSALS
                 logger.debug("Goal/Precondition not yet met in a proposal/agreement, " + preconditionUri);
                 conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
                 goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset, remoteNeedDataset, conversationDataset);
 
                 GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
-                Boolean oldGoalState = botContextWrapper.getPreconditionConversationState(getUniqueGoalId(goal, needDataset, connection));
+                Boolean oldGoalState = botContextWrapper.getPreconditionConversationState(preconditionUri);
                 boolean newGoalState = result.getShaclReportWrapper().isConform();
 
                 if(oldGoalState == null || newGoalState != oldGoalState) {
+                    botContextWrapper.addPreconditionConversationState(preconditionUri, newGoalState);
                     if(newGoalState) {
+                        logger.debug("sending PreconditionMetEvent, because the precon state for the conversation changed");
                         ctx.getEventBus().publish(new PreconditionMetEvent(connection, preconditionUri, result));
                     }else{
+                        logger.debug("sending PreconditionUnmetEvent because the precon state for the conversation changed");
                         ctx.getEventBus().publish(new PreconditionUnmetEvent(connection, preconditionUri, result));
                     }
+                }else{
+                    logger.debug("Goal/Precondition State did not change in the conversation");
                 }
             } else {
                 logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
@@ -247,10 +254,6 @@ public class AnalyzeAction extends BaseEventBotAction {
         getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel));
     }
 
-    private static String getUniqueGoalId(Resource goal, Dataset needDataset, Connection con) {
-        return getUniqueGoalId(goal, needDataset, con.getConnectionURI());
-    }
-
     private static String getUniqueGoalId(Resource goal, Dataset needDataset, URI connectionURI) { //TODO: GOAL STATE RETRIEVAL IS NOT BASED ON THE CORRECT URI SO FAR
         if(goal.getURI() != null) {
             return goal.getURI();
@@ -267,7 +270,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                 dataModel.write(writer, "TRIG");
             }
 
-            return connectionURI +"#"+ writer.toString();
+            return connectionURI +"#"+ writer.toString().replaceAll("\\R", " ");
         }
     }
 
