@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -20,12 +19,14 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
 import won.protocol.vocabulary.WONAGR;
@@ -109,6 +110,9 @@ public class HighlevelProtocolAnalyzer {
 		conversationDataset.begin(ReadWrite.READ);
 		
 		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
+		
+		
+		
 		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
 		SparqlSelectFunction<ConversationMessage> selectfunction = 
 				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", resultMapper )
@@ -189,7 +193,7 @@ public class HighlevelProtocolAnalyzer {
 		
 		//find interleaved delivery chains
 		deliveryChains.stream().forEach(dc -> deliveryChains.stream().forEach(dc2 -> {
-			dc.rememberIfInterleavedWith(dc2);	
+			dc.determineRelationshipWith(dc2);	
 		}));			
 				
 
@@ -404,40 +408,33 @@ public class HighlevelProtocolAnalyzer {
 					break;
 			}
 			// delivery chain checking:
-			// 1. if delivery chains are interleaved, and one contains the other (first msg before, last msg after the other),
+			// 1. if a chain contains another (first msg before, last msg after the other),
 			// 	  the containing chain is disregarded (content graph of root message removed
 			// 2. if two delivery chains are interleaved, and none contains the other, both are disregarded.
 
 			DeliveryChain msgChain = message.getDeliveryChain();
-			msgChain.getInterleavedDeliveryChains().stream()
+			if (msgChain.containsOtherChains()) {
+				// In this case, it is not possible to determine if the other
+				// one has been delayed maliciously. Removing it is the only safe option. Downside: It allows the recipient of the
+				// message to delay it such that it is removed by this rule, but that at least has immediate effects: the 
+				// message never seems acknowledged and then later, when some other chain terminates, is found not to. 
+				// Rather, as soon as the chain of such a maliciously delayed message terminates, it is dropped.
+				if (logger.isDebugEnabled()) {
+					logger.debug("ignoring delivery chain {} as it contains other chains", msgChain.getHeadURI()); 
+				}
+				notAcknowledged(copy, message);
+			} else {
+				msgChain.getInterleavedDeliveryChains().stream()
 				.filter(otherChain -> otherChain.isTerminated())
 				.forEach(otherChain -> {
-					// does the other contain this one? In this case, it is not possible to determine if the other
-					// one has been delayed maliciously. Removing it is the only safe option. Downside: It allows the recipient of the
-					// message to delay it such that it is removed by this rule, but that at least has immediate effects: the 
-					// message never seems acknowledged and then later, when some other chain terminates, is found not to. 
-					// Rather, as soon as the chain of such a maliciously delayed message terminates, it is dropped.
-					if (otherChain.contains(msgChain)) {
-						//remove the other
+						// "interleaved" relationship is symmetric -> drop this message (chain), the other message will be dropped when it is processed 
 						if (logger.isDebugEnabled()) {
-							logger.debug("ignoring delivery chain {} as it conatins {}", otherChain.getHead().getMessageURI(), message.getMessageURI());
-						}
-						notAcknowledged(copy, otherChain.getHead());
-					} else {
-						//the other does not contain this one: 
-						// * either this one contains the other -> drop this one
-						// * or both are same-time: drop both  (in which case the other one is removed when that message's chain is checked)
-						if (logger.isDebugEnabled()) {
-							logger.debug("ignoring delivery chain {} as it is interleaved with {}",  message.getMessageURI(), otherChain.getHead().getMessageURI());
+							logger.debug("dropping delivery chain {} as it is interleaved with {}",  message.getMessageURI(), otherChain.getHead().getMessageURI());
 						}
 						notAcknowledged(copy, message);
 					}
-				});
-		
-		{
-				
+				);
 			}
-
 		});
 		return copy;
 	}

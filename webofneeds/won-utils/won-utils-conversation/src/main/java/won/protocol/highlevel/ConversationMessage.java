@@ -64,6 +64,8 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	private OptionalInt maxDistanceToOwnRoot = OptionalInt.empty();
 	private OptionalInt order = OptionalInt.empty();
 	
+	private Set<ConversationMessage> knownMessagesOnPathToRoot = new HashSet<ConversationMessage>();
+	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
 	}
@@ -313,11 +315,19 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	
 	public boolean isMessageOnPathToRoot(ConversationMessage other) {
 		if (this == other) return false;
-		return isMessageOnPathToRoot(other, new HashSet<>());
+		boolean foundIt = isMessageOnPathToRoot(other, new HashSet<>());
+		return foundIt;
 	}
 	
 	private boolean isMessageOnPathToRoot(ConversationMessage other, Set<ConversationMessage> visited) {
 		if (this == other) return true;
+		if (this.getOrder() < other.getOrder()) {
+			//if this is the case, it's impossible that the other message is on the path to root
+			return false;
+		}
+		if (this.knownMessagesOnPathToRoot.contains(other)) {
+			return true;
+		}
 		visited.add(this);
 		if (!this.hasPreviousMessage()) {
 			return false;
@@ -325,7 +335,10 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		Boolean foundIt = getPreviousRefs().stream()
 				.filter(msg -> !visited.contains(msg))
 				.anyMatch(msg -> msg.isMessageOnPathToRoot(other, visited));
-		if (foundIt) return true;
+		if (foundIt) {
+			this.knownMessagesOnPathToRoot.add(other);
+			return true;
+		}
 		if (this.hasCorrespondingRemoteMessage() && !visited.contains(this.getCorrespondingRemoteMessageRef())) {
 			return this.getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(other, visited);
 		}

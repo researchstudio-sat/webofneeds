@@ -4,6 +4,9 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Group of messages that represent the delivery of one message, including the responses.
  * @author fkleedorfer
@@ -12,6 +15,7 @@ import java.util.Set;
 public class DeliveryChain {
 	private Set<ConversationMessage> messages = new HashSet<>();
 	private Set<DeliveryChain> interleavedDeliveryChains = new HashSet<>();
+	private Set<DeliveryChain> containedDeliveryChains = new HashSet<>();
 	private ConversationMessage head; 
 	public DeliveryChain() {}
 	
@@ -96,7 +100,7 @@ public class DeliveryChain {
 	 * @param other
 	 * @return
 	 */
-	public boolean contains(DeliveryChain other) {
+	private boolean _contains(DeliveryChain other) {
 		if (!isTerminated()) {
 			return false;
 		}
@@ -105,17 +109,19 @@ public class DeliveryChain {
 		}
 		return other.getMessages().stream()
 				.allMatch(
-						msg -> 
+						msg -> {
 						//is the root before and the end after msg?
-						(msg.isMessageOnPathToRoot(this.getHead())
-						 || (this.getHead().hasCorrespondingRemoteMessage() 
-								&& msg.isMessageOnPathToRoot(getHead().getCorrespondingRemoteMessageRef())))
-						&&
-						(getEnd().isMessageOnPathToRoot(msg)
-								 || (this.getEnd().hasCorrespondingRemoteMessage() 
-										&& this.getEnd().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg)))
-						 
-						);
+						boolean isHeadBeforeAllOtherMsgs = 
+								msg.isMessageOnPathToRoot(this.getHead()) || 
+									(getHead().hasCorrespondingRemoteMessage() 
+											&& msg.isMessageOnPathToRoot(getHead().getCorrespondingRemoteMessageRef()));
+						
+						boolean isEndAfterAllOtherMsgs = getEnd().isMessageOnPathToRoot(msg)
+								 || (getEnd().hasCorrespondingRemoteMessage() 
+										&& getEnd().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg));
+						
+						return isHeadBeforeAllOtherMsgs && isEndAfterAllOtherMsgs;
+				});
 	}
 
 	/**
@@ -132,12 +138,27 @@ public class DeliveryChain {
 		return ! (this.isAfter(other) || other.isAfter(this)); 
 	}
 
-	public void rememberIfInterleavedWith(DeliveryChain other) {
+	public boolean contains(DeliveryChain other) {
+		return this.containedDeliveryChains.contains(other);
+	}
+	
+	public boolean containsOtherChains() {
+		return !this.containedDeliveryChains.isEmpty();
+	}
+	
+	public void determineRelationshipWith(DeliveryChain other) {
+		if (this == other) return;
 		if (this.interleavedDeliveryChains.contains(other)) {
 			//checked that earlier
 			return;
 		}
-		if (_isInterleavedWith(other)) {
+		if (this.containedDeliveryChains.contains(other)) {
+			//checked that earlier
+			return;
+		}
+		if (_contains(other)) {
+			this.containedDeliveryChains.add(other);
+		} else if (_isInterleavedWith(other)) {
 			this.interleavedDeliveryChains.add(other);
 			other.interleavedDeliveryChains.add(this);
 		}
@@ -157,6 +178,8 @@ public class DeliveryChain {
 				+ "root=" + head.getMessageURI()
 				+ ", isTerminated():" + isTerminated()
 				+ ", end:" + ((getEnd() != null) ? getEnd().getMessageURI() : "null")
+				+ ", interleaved with: " + (this.interleavedDeliveryChains.size() == 0 ? "none" : this.interleavedDeliveryChains.stream().map(x -> x.getHead()))
+				+ ", contains : " + (this.containedDeliveryChains.size() == 0 ? "none" : this.containedDeliveryChains.stream().map(x -> x.getHead()))
 				+ "]";
 	}
 	
