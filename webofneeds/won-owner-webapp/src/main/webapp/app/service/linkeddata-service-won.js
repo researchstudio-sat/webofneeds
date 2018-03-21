@@ -25,6 +25,7 @@ import {
     contains,
     deepFreeze,
     rethrow,
+    get,
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
@@ -569,7 +570,7 @@ import won from './won.js';
                 cacheItemMarkFetching(uri);
                 const dataset = await loadFromOwnServerIntoCache(uri, fetchParams, true)
 
-                if( !(fetchParams && fetchParams.deep) ) {
+                if( !get(fetchParams, 'deep') ) {
                     cacheItemInsertOrOverwrite(uri, partialFetch);
                     return uri;
                 } else {
