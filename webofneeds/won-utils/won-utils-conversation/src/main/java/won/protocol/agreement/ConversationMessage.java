@@ -1,4 +1,4 @@
-package won.protocol.highlevel;
+package won.protocol.agreement;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -65,6 +65,12 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	private OptionalInt order = OptionalInt.empty();
 	
 	private Set<ConversationMessage> knownMessagesOnPathToRoot = new HashSet<ConversationMessage>();
+	
+	private boolean validAccepts = false;
+	private boolean validProposes = false;
+	private boolean validRetracts = false;
+	private boolean validRejects = false;
+	private boolean validProposesToCancel = false;
 	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
@@ -345,7 +351,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 		return false;
 	}
 	
-	public boolean isHighlevelProtocolMessage() {
+	public boolean isAgreementProtocolMessage() {
 		return this.isRetractsMessage() || this.isProposesMessage() || this.isProposesToCancelMessage() || this.isAcceptsMessage() || this.isRejectsMessage(); 
 	}
 	
@@ -581,6 +587,48 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 
 	public void setDirection(WonMessageDirection direction) {
 		this.direction = direction;
+	}
+
+	
+	
+	public boolean isValidAccepts() {
+		return validAccepts;
+	}
+
+	public void setValidAccepts(boolean validAccepts) {
+		this.validAccepts = validAccepts;
+	}
+
+	public boolean isValidProposes() {
+		return validProposes;
+	}
+
+	public void setValidProposes(boolean validProposes) {
+		this.validProposes = validProposes;
+	}
+
+	public boolean isValidRetracts() {
+		return validRetracts;
+	}
+
+	public void setValidRetracts(boolean validRetracts) {
+		this.validRetracts = validRetracts;
+	}
+
+	public boolean isValidRejects() {
+		return validRejects;
+	}
+
+	public void setValidRejects(boolean validRejects) {
+		this.validRejects = validRejects;
+	}
+
+	public boolean isValidProposesToCancel() {
+		return validProposesToCancel;
+	}
+
+	public void setValidProposesToCancel(boolean validProposesToCancel) {
+		this.validProposesToCancel = validProposesToCancel;
 	}
 
 	@Override

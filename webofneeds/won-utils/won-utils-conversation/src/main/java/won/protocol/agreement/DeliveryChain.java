@@ -1,4 +1,4 @@
-package won.protocol.highlevel;
+package won.protocol.agreement;
 
 import java.net.URI;
 import java.util.HashSet;

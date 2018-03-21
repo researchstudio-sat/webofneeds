@@ -11,7 +11,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import won.protocol.highlevel.AgreementProtocol;
+
+import won.protocol.agreement.AgreementProtocol;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;

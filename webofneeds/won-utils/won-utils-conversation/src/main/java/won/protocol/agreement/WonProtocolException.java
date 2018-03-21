@@ -1,4 +1,4 @@
-package won.protocol.highlevel;
+package won.protocol.agreement;
 
 public class WonProtocolException extends RuntimeException {
 

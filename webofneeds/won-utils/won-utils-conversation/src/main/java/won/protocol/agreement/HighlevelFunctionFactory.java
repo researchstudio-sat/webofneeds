@@ -1,4 +1,4 @@
-package won.protocol.highlevel;
+package won.protocol.agreement;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolutionMap;

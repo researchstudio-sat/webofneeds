@@ -1,4 +1,4 @@
-package won.protocol.highlevel;
+package won.protocol.agreement;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -26,13 +26,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import won.protocol.message.WonMessageDirection;
+import won.protocol.service.LinkedDataService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONAGR;
 
 
-public class AgreementProtocolAnalyzer {
-	private  final Logger logger = LoggerFactory.getLogger(AgreementProtocolAnalyzer.class);
+public class AgreementProtocolState {
+	private  final Logger logger = LoggerFactory.getLogger(AgreementProtocolState.class);
 	
 	private final Dataset pendingProposals = DatasetFactory.createGeneral();
 	private final Dataset agreements = DatasetFactory.createGeneral();
@@ -40,13 +43,23 @@ public class AgreementProtocolAnalyzer {
 	private final Dataset rejected = DatasetFactory.createGeneral();
 	private final Set<URI> retractedUris = new HashSet<URI>();
 	private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
+	private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
 	
-	public AgreementProtocolAnalyzer(Dataset conversation) {
-		recalculate(conversation);
+	public static AgreementProtocolState of(URI connectionURI, LinkedDataSource linkedDataSource) {
+		Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionURI, linkedDataSource);
+	    return AgreementProtocolState.of(fullConversationDataset);
 	}
 	
+	public static AgreementProtocolState of(Dataset conversation) {
+		AgreementProtocolState instance = new AgreementProtocolState();
+		instance.recalculate(conversation);
+		return instance;
+	}
 	
-	public AgreementProtocolUris getHighlevelProtocolUris() {
+	private AgreementProtocolState() {}
+	
+	
+	public AgreementProtocolUris getAgreementProtocolUris() {
 		AgreementProtocolUris uris = new AgreementProtocolUris();
 		uris.addAgreementUris(getAgreementUris());
 		uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
@@ -64,12 +77,36 @@ public class AgreementProtocolAnalyzer {
 		return agreements;
 	}
 	
-	public Dataset getProposals() {
+	public Model getAgreement(URI agreementURI) {
+		return agreements.getNamedModel(agreementURI.toString());
+	}
+	
+	public Dataset getPendingProposals() {
 		return pendingProposals;
+	}
+	
+	public Model getPendingProposal(URI proposalURI) {
+		return pendingProposals.getNamedModel(proposalURI.toString());
+	}
+	
+	public Model getProposals(URI proposalURI) {
+		return pendingProposals.getNamedModel(proposalURI.toString());
 	}
 	
 	public Dataset getCancelledAgreements() {
 		return cancelledAgreements;
+	}
+	
+	public Model getCancelledAgreement(URI cancelledAgreementURI) {
+		return cancelledAgreements.getNamedModel(cancelledAgreementURI.toString());
+	}
+	
+	public Dataset getRejectedProposals() {
+		return rejected;
+	}
+	
+	public Model getRejectedProposal(URI rejectedProposalURI) {
+		return rejected.getNamedModel(rejectedProposalURI.toString());
 	}
 	
 	public Model getPendingCancellations() {
@@ -96,7 +133,7 @@ public class AgreementProtocolAnalyzer {
 	public Set<URI> getAcceptedCancellationProposalUris() {
 		return acceptedCancellationProposalUris;
 	}
-	
+			
 	public Set<URI> getCancellationPendingAgreementUris(){
 		Model cancellations = pendingProposals.getDefaultModel();
 		if (cancellations == null) {
@@ -129,6 +166,31 @@ public class AgreementProtocolAnalyzer {
 		return RdfUtils.getGraphUris(rejected);		
 	}
 	
+	public boolean isValidAccepts(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		return msg == null ? false : msg.isValidAccepts();
+	}
+	
+	public boolean isValidProposes(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		return msg == null ? false : msg.isValidProposes();
+	}
+	
+	public boolean isValidProposesToCancel(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		return msg == null ? false : msg.isValidProposesToCancel();
+	}
+	
+	public boolean isValidRejects(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		return msg == null ? false : msg.isValidRejects();
+	}
+	
+	public boolean isValidRetracts(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		return msg == null ? false : msg.isValidRetracts();
+	}
+	
 	
 	/**
 	 * Calculates all agreements present in the specified conversation dataset.
@@ -143,9 +205,7 @@ public class AgreementProtocolAnalyzer {
 		rejected.begin(ReadWrite.WRITE);
 		conversationDataset.begin(ReadWrite.READ);
 		
-		Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
-		
-		
+		this.messagesByURI = new HashMap<>();
 		
 		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
 		SparqlSelectFunction<ConversationMessage> selectfunction = 
@@ -279,7 +339,7 @@ public class AgreementProtocolAnalyzer {
 			if (!msg.isHeadOfDeliveryChain() ) {
 				continue;
 			}
-			if (!msg.isHighlevelProtocolMessage()) {
+			if (!msg.isAgreementProtocolMessage()) {
 				continue;
 			}
 			if (msg.isRetractsMessage()) {
@@ -304,6 +364,7 @@ public class AgreementProtocolAnalyzer {
 						if (other.isProposesMessage()) {
 							retractProposal(other.getMessageURI());
 						}
+						msg.setValidRetracts(true);
 					});
 			}
 			if (msg.isRejectsMessage()) {
@@ -325,6 +386,7 @@ public class AgreementProtocolAnalyzer {
 							logger.debug("{} rejects {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
 						rejectProposal(other.getMessageURI());
+						msg.setValidRejects(true);
 				});
 			}
 			if (msg.isProposesMessage()) {
@@ -343,6 +405,7 @@ public class AgreementProtocolAnalyzer {
 						logger.debug("{} proposes {}: valid", msg.getMessageURI(), other.getMessageURI());
 					}
 					proposalContent.add(aggregateGraphs(conversation, other.getContentGraphs()));
+					msg.setValidProposes(true);
 				});
 				
 
@@ -365,6 +428,7 @@ public class AgreementProtocolAnalyzer {
 							logger.debug("{} accepts {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
 						acceptProposal(other.getMessageURI());
+						msg.setValidAccepts(true);
 					});
 			}
 			if (msg.isProposesToCancelMessage()) {
@@ -388,6 +452,7 @@ public class AgreementProtocolAnalyzer {
 							WONAGR.PROPOSES_TO_CANCEL,
 							cancellationProposals.getResource(other.getMessageURI().toString())));
 					pendingProposals.setDefaultModel(cancellationProposals);
+					msg.setValidProposesToCancel(true);
 				});
 			}
 		}
@@ -488,7 +553,7 @@ public class AgreementProtocolAnalyzer {
 		return copy;
 	}
 
-
+	
 
 	private  void notAcknowledged(Dataset copy, ConversationMessage message) {
 		message.removeHighlevelProtocolProperties();
