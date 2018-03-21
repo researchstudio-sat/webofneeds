@@ -385,7 +385,7 @@ function genComponentConf() {
         }
         
         getAgreements() {
-        	var url = '/owner/rest/highlevel/getAgreements?connectionUri='+this.connection.get('uri');
+        	var url = '/owner/rest/agreement/getAgreements?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
     			if(response["@id"]) {
@@ -410,7 +410,7 @@ function genComponentConf() {
         }
         
         getProposals() {
-        	var url = '/owner/rest/highlevel/getProposals?connectionUri='+this.connection.get('uri');
+        	var url = '/owner/rest/agreement/getProposals?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
     			if(response["@id"]) {
@@ -436,7 +436,7 @@ function genComponentConf() {
         
         /*
         getAgreementsProposedToBeCancelled() {
-        	var url = '/owner/rest/highlevel/getAgreementsProposedToBeCancelled?connectionUri='+this.connection.get('uri');
+        	var url = '/owner/rest/agreement/getAgreementsProposedToBeCancelled?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
     			if(response["@graph"]) {
@@ -447,7 +447,7 @@ function genComponentConf() {
         }
         
         getAcceptedPropsalsToCancel() {
-        	var url = '/owner/rest/highlevel/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
+        	var url = '/owner/rest/agreement/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
     			if(response["@graph"]) {

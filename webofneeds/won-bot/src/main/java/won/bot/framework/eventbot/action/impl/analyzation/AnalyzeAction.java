@@ -36,8 +36,8 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.highlevel.HighlevelProtocols;
 import won.protocol.message.WonMessage;
+import won.protocol.highlevel.AgreementProtocol;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
@@ -124,7 +124,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                         }
                     } else {
                         conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-                        Model agreementPayload = HighlevelProtocols.getAgreement(conversationAndNeedsDataset, acceptedEventURI);
+                        Model agreementPayload = AgreementProtocol.getAgreement(conversationAndNeedsDataset, acceptedEventURI);
                         if(!agreementPayload.isEmpty()) {
                             bus.publish(new ProposalAcceptedEvent(connection, acceptedEventURI, agreementPayload));
                         }
@@ -141,7 +141,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             //If the message contains proposesEvents or proposesToCancel events it is considered a proposal so we save the status of it in the botContext
             Proposal proposal = new Proposal(receivedMessage? wonMessage.getCorrespondingRemoteMessageURI() : wonMessage.getMessageURI(), ProposalState.SUGGESTED);
             conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-            Model proposalModel = HighlevelProtocols.getProposal(conversationAndNeedsDataset, proposal.getUri().toString());
+            Model proposalModel = AgreementProtocol.getProposal(conversationAndNeedsDataset, proposal.getUri().toString());
 
             if(!proposalModel.isEmpty()) {
                 for(Resource goal : goalsInNeed){
@@ -162,7 +162,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
         if(!rejectEventUris.isEmpty() || !retractEventUris.isEmpty()) {
             conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-            Set<URI> agreementUris = HighlevelProtocols.getAgreementUris(conversationAndNeedsDataset);
+            Set<URI> agreementUris = AgreementProtocol.getAgreementUris(conversationAndNeedsDataset);
 
             retractEventUris.addAll(rejectEventUris);
             retractEventUris.forEach(eventUri -> {
