@@ -1,4 +1,4 @@
-package won.protocol.highlevel;
+package won.protocol.agreement;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,8 +38,8 @@ import won.protocol.util.SparqlSelectFunction;
 import won.protocol.vocabulary.WONAGR;
 
 
-public class HighlevelProtocols {
-	private static final Logger logger = LoggerFactory.getLogger(HighlevelProtocols.class);
+public class AgreementProtocol {
+	private static final Logger logger = LoggerFactory.getLogger(AgreementProtocol.class);
 	
 	private static DynamicDatasetToDatasetBySparqlGSPOSelectFunction cutAfterMessageFunction;
 	
@@ -48,11 +48,15 @@ public class HighlevelProtocols {
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	public static Dataset getAgreements(Dataset conversationDataset) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements();
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+	
+	public static AgreementProtocolUris getHighlevelProtocolUris(Dataset connectionDataset) {
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public static Model getAgreement(Dataset conversationDataset, URI agreementURI) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreements().getNamedModel(agreementURI.toString());
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	/**
@@ -63,31 +67,31 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposals(Dataset conversationDataset) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public static Model getProposal(Dataset conversationDataset, String proposalUri) {
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposals().getNamedModel(proposalUri);
+		throw new UnsupportedOperationException("not yet implemented");
 	}	
 
 	public static Set<URI> getProposalUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposalUris();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public static Set<URI> getAgreementUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getAgreementUris();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public static Set<URI> getCancelledAgreementUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getCancelledAreementUris();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public static Set<URI> getAgreementsProposedToBeCancelledUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getProposedToBeCancelledAgreementUris();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public static Set<URI> getRejectedProposalUris(Dataset conversationDataset){
-		return new HighlevelProtocolAnalyzer(conversationDataset).getRejectedProposalUris();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 
 
@@ -103,7 +107,6 @@ public class HighlevelProtocols {
 	 * @return
 	 */
 	public static Dataset getProposalsToCancel(Dataset conversationDataset) {
-		//TODO
 		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
@@ -213,7 +216,7 @@ public class HighlevelProtocols {
 	}
 	
 	public static Set<URI> getRetractedUris(Dataset input){
-		return new HighlevelProtocolAnalyzer(input).getRetractedUris();
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 
 	public static Dataset cutOffAfterMessage(Dataset input, URI acceptsMessageURI) {

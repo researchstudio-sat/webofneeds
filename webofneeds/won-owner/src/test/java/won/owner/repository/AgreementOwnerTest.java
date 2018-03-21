@@ -11,7 +11,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import won.protocol.highlevel.HighlevelProtocols;
+
+import won.protocol.agreement.AgreementProtocol;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;
@@ -54,6 +55,6 @@ public class AgreementOwnerTest {
         Dataset conversationDataset = linkedDataSource.getDataForResourceWithPropertyPath(
                 URI.create(CONNECTION_URI_WITH_CONVERSATION),
                 propertyPaths, maxRequests, depth, false);
-        Dataset agreementDataset = HighlevelProtocols.getAgreements(conversationDataset);
+        Dataset agreementDataset = AgreementProtocol.getAgreements(conversationDataset);
     }
 }

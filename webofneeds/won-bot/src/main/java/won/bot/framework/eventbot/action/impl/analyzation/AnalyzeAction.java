@@ -33,7 +33,7 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocol;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
@@ -88,7 +88,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                 //IF ACCEPTS MESSAGE -> ACCEPT AGREEMENT
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
                 URI agreementUri = receivedOnConnectionEvent.getWonMessage().getCorrespondingRemoteMessageURI();
-                Model agreementPayload = HighlevelProtocols.getAgreement(fullConversationDataset, agreementUri);
+                Model agreementPayload = AgreementProtocol.getAgreement(fullConversationDataset, agreementUri);
 
                 if(!agreementPayload.isEmpty()){
                     bus.publish(new AgreementAcceptedEvent(con, agreementUri, agreementPayload));
@@ -121,7 +121,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                     return;
                 }
                 Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(receivedOnConnectionEvent.getConnectionURI(), linkedDataSource);
-                Dataset proposals = HighlevelProtocols.getProposals(fullConversationDataset);
+                Dataset proposals = AgreementProtocol.getProposals(fullConversationDataset);
 
                 if (!proposals.isEmpty()) {
                     goalsInNeed.removeAll(this.getGoalsWithPreconditionMet(needDataset, proposals, goalsInNeed));
@@ -133,7 +133,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                     }
                 }
 
-                Dataset agreements = HighlevelProtocols.getAgreements(fullConversationDataset);
+                Dataset agreements = AgreementProtocol.getAgreements(fullConversationDataset);
                 if (!agreements.isEmpty()) {
                     goalsInNeed.removeAll(this.getGoalsWithPreconditionMet(needDataset, agreements, goalsInNeed));
 

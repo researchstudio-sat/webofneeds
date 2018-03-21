@@ -49,14 +49,22 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.1.xsd">
     -->
     <mvc:annotation-driven conversion-service="conversionService">
         <mvc:message-converters>
-            <bean class="won.protocol.rest.RdfModelConverter"/>
+            <bean class="won.protocol.rest.RdfModelConverter" />
             <bean class="won.protocol.rest.RdfDatasetConverter"/>
             <bean class="won.protocol.rest.RdfDatasetAttachmentConverter"/>
+				    <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				              <property name="supportedMediaTypes">
+				                <list>
+				                  <value>application/json</value>
+				                </list>
+				              </property>
+				    </bean>         
         </mvc:message-converters>
     </mvc:annotation-driven>
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
 	
 	
+    
     <!--
     we move to annotation config in WebSocketConfig.java
     websocket:handlers>

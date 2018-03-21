@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocol;
 import won.protocol.util.RdfUtils;
 
 public class GetProposalsTest {
@@ -67,7 +67,7 @@ public class GetProposalsTest {
     public void test(Dataset input, Dataset expectedOutput) {
 
         // check that the computed dataset is the expected one
-        Dataset actual =  HighlevelProtocols.getProposals(input);
+        Dataset actual =  AgreementProtocol.getProposals(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocol;
 
 public class GetAcceptsMessagesTest {
 
@@ -48,7 +48,7 @@ public class GetAcceptsMessagesTest {
         // check that the computed dataset is the expected one
     	// replace example.com with accepts message URI
     //	URI acceptsMessageURI = new URI("https://localhost:8443/won/resource/event/6671551888677331000");
-        List<URI> actual = HighlevelProtocols.getAcceptMessages(input);
+        List<URI> actual = AgreementProtocol.getAcceptMessages(input);
         
         for(URI uri : actual) {
         	System.out.println(uri.toString());

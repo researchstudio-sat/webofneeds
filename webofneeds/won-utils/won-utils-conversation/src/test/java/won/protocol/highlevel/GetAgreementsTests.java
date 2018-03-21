@@ -39,23 +39,16 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelFunctionFactory;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocol;
+import won.protocol.agreement.AgreementProtocolState;
+import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 public class GetAgreementsTests {
 
 	// for agreement protocol::
-	private static final String inputFolder = "/won/utils/agreement/input/";
-	private static final String expectedOutputFolder = "/won/utils/agreement/expected/";
-
-	// Boolean that sets whether we include the base level agreement protocol tests
-	private static final Boolean agreementTests = true;
-
-	// for getAgreements with acknowledgement, modification, and agreement
-	// protocol...
-	private static final String getAGinputFolder = "/won/utils/getagreements/input/";
-	private static final String getAGexpectedOutputFolder = "/won/utils/getagreements/expected/";
+	private static final String inputFolder = "/won/protocol/highlevel/agreements/input/";
+	private static final String expectedOutputFolder = "/won/protocol/highlevel/agreements/expected/";
 
 	@BeforeClass
 	public static void setLogLevel() {
@@ -359,8 +352,8 @@ public class GetAgreementsTests {
 	// This includes a Accept that is retracted
 	@Test
 	public void oneAgreementAcceptsRetracted() throws IOException {
-		Dataset input = loadDataset(getAGinputFolder + "one-agreement-accepts-retracted.trig");
-		Dataset expectedOutput = loadDataset(getAGexpectedOutputFolder + "one-agreement-accepts-retracted.trig");
+		Dataset input = loadDataset(inputFolder + "one-agreement-accepts-retracted.trig");
+		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-accepts-retracted.trig");
 		test(input, expectedOutput);
 
 	}
@@ -368,8 +361,8 @@ public class GetAgreementsTests {
 	// proposal is first accepted, then retracted
 	@Test
 	public void oneAgreementProposalRetractedTooLate() throws IOException {
-		Dataset input = loadDataset(getAGinputFolder + "one-agreement-proposes-retracted.trig");
-		Dataset expectedOutput = loadDataset(getAGexpectedOutputFolder + "one-agreement-proposes-retracted.trig");
+		Dataset input = loadDataset(inputFolder + "one-agreement-proposes-retracted.trig");
+		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposes-retracted.trig");
 		test(input, expectedOutput);
 	}
 	
@@ -383,7 +376,6 @@ public class GetAgreementsTests {
 	
 	// proposal not accepted as accept chain is interleaved with retracts chain
 	@Test
-	@Ignore
 	public void oneAgreementAcceptContainsRetract() throws IOException {
 		Dataset input = loadDataset(inputFolder + "one-agreement-proposes-accept-contains-retract.trig");
 		Dataset expectedOutput = loadDataset(expectedOutputFolder + "one-agreement-proposes-accept-contains-retract.trig");
@@ -394,36 +386,36 @@ public class GetAgreementsTests {
 	// This includes a Proposal that is retracted
 	@Test
 	public void oneProposalTwoAcceptsFirstRetractedFirstCancelled() throws IOException {
-		Dataset input = loadDataset(getAGinputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
+		Dataset input = loadDataset(inputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
 		Dataset expectedOutput = loadDataset(
-				getAGexpectedOutputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
+				expectedOutputFolder + "oneProposalTwoAcceptsFirstRetractedFirstCancelled.trig");
 		test(input, expectedOutput);
 	}
 
 	// This tests a retraction of a proposal before an accept
 	@Test
 	public void oneAgreementProposalRetractedb4Accept() throws IOException {
-		Dataset input = loadDataset(getAGinputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
+		Dataset input = loadDataset(inputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
 		Dataset expectedOutput = loadDataset(
-				getAGexpectedOutputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
+				expectedOutputFolder + "one-agreement-proposes-retracted-b4-accept.trig");
 		test(input, expectedOutput);
 	}
 
 	// This retracts a proposaltocancel making a still cancelled agreement
 	@Test
 	public void retractProposalTocancelAfterAgreement() throws IOException {
-		Dataset input = loadDataset(getAGinputFolder + "one-agreement-proposaltocancel-retracted.trig");
+		Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-retracted.trig");
 		Dataset expectedOutput = loadDataset(
-				getAGexpectedOutputFolder + "one-agreement-proposaltocancel-retracted.trig");
+				expectedOutputFolder + "one-agreement-proposaltocancel-retracted.trig");
 		test(input, expectedOutput);
 	}
 
 	// This retracts a proposaltocancel before the accept message
 	@Test
 	public void retractProposalTocancelBeforeAccept() throws IOException {
-		Dataset input = loadDataset(getAGinputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
+		Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
 		Dataset expectedOutput = loadDataset(
-				getAGexpectedOutputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
+				expectedOutputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
 		test(input, expectedOutput);
 	}
 
@@ -445,7 +437,7 @@ public class GetAgreementsTests {
 		expectedOutput = RdfUtils.cloneDataset(expectedOutput);
 
 		// check that the computed dataset is the expected one
-		Dataset actual = HighlevelProtocols.getAgreements(input);
+		Dataset actual = AgreementProtocolState.of(input).getAgreements();
 		// TODO: remove before checking in
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
 		if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

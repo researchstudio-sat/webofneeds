@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocol;
 import won.protocol.util.RdfUtils;
 
 public class GetProposalsToCancelTest {
@@ -103,7 +103,7 @@ public class GetProposalsToCancelTest {
 
         // check that the computed dataset is the expected one
       //  Dataset actual =  HighlevelFunctionFactory.getProposalToCancelFunction().apply(input);
-        Dataset actual =  HighlevelProtocols.getProposalsToCancel(input);
+        Dataset actual =  AgreementProtocol.getProposalsToCancel(input);
         //TODO: remove before checking in
         RdfUtils.Pair<Dataset> diff = RdfUtils.diff(expectedOutput, actual);
         if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {
