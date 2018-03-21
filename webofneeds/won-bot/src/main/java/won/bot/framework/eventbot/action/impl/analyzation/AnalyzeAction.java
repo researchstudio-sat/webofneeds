@@ -36,7 +36,7 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.agreement.AgreementProtocol;
+import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
@@ -103,7 +103,7 @@ public class AnalyzeAction extends BaseEventBotAction {
         List<URI> proposesToCancelEvents = WonRdfUtils.MessageUtils.getProposesToCancelEvents(wonMessage);
         List<URI> acceptedEventUris = WonRdfUtils.MessageUtils.getAcceptedEvents(wonMessage);
 
-        Dataset conversationAndNeedsDataset = null; //Initialize with null, to ensure some form of lazy init for the conversationAndNeedsDataset
+        AgreementProtocolState agreementProtocolState = null; //Initialize with null, to ensure some form of lazy init for the agreementProtocolState
 
         if(receivedMessage) {
             WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
@@ -123,8 +123,8 @@ public class AnalyzeAction extends BaseEventBotAction {
                             bus.publish(new AgreementCanceledEvent(connection, proposedToCancelAgreementUri));
                         }
                     } else {
-                        conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-                        Model agreementPayload = AgreementProtocol.getAgreement(conversationAndNeedsDataset, acceptedEventURI);
+                        agreementProtocolState = getAgreementProtocolStateLazyInit(agreementProtocolState, connectionUri);
+                        Model agreementPayload = agreementProtocolState.getAgreement(acceptedEventURI);
                         if(!agreementPayload.isEmpty()) {
                             bus.publish(new ProposalAcceptedEvent(connection, acceptedEventURI, agreementPayload));
                         }
@@ -140,8 +140,8 @@ public class AnalyzeAction extends BaseEventBotAction {
         if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()){
             //If the message contains proposesEvents or proposesToCancel events it is considered a proposal so we save the status of it in the botContext
             Proposal proposal = new Proposal(receivedMessage? wonMessage.getCorrespondingRemoteMessageURI() : wonMessage.getMessageURI(), ProposalState.SUGGESTED);
-            conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-            Model proposalModel = AgreementProtocol.getProposal(conversationAndNeedsDataset, proposal.getUri().toString());
+            agreementProtocolState = getAgreementProtocolStateLazyInit(agreementProtocolState, connectionUri);
+            Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
 
             if(!proposalModel.isEmpty()) {
                 for(Resource goal : goalsInNeed){
@@ -161,8 +161,8 @@ public class AnalyzeAction extends BaseEventBotAction {
         }
 
         if(!rejectEventUris.isEmpty() || !retractEventUris.isEmpty()) {
-            conversationAndNeedsDataset = getFullConversationDatasetLazyInit(conversationAndNeedsDataset, connectionUri);
-            Set<URI> agreementUris = AgreementProtocol.getAgreementUris(conversationAndNeedsDataset);
+            agreementProtocolState = getAgreementProtocolStateLazyInit(agreementProtocolState, connectionUri);
+            Set<URI> agreementUris = agreementProtocolState.getAgreementUris();
 
             retractEventUris.addAll(rejectEventUris);
             retractEventUris.forEach(eventUri -> {
@@ -215,13 +215,13 @@ public class AnalyzeAction extends BaseEventBotAction {
     }
 
     //********* Helper Methods **********
-    private Dataset getFullConversationDatasetLazyInit(Dataset conversationAndNeedsDataset, URI connectionUri){
-        if(conversationAndNeedsDataset == null) {
-            logger.debug("Retrieving FullConversation Of Connection");
-            return WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, getEventListenerContext().getLinkedDataSource());
+    private AgreementProtocolState getAgreementProtocolStateLazyInit(AgreementProtocolState agreementProtocolState, URI connectionUri) {
+        if(agreementProtocolState == null){
+            logger.debug("Retrieving AgreementProtocolState Of Connection");
+            return AgreementProtocolState.of(connectionUri, getEventListenerContext().getLinkedDataSource());
         }else{
-            logger.debug("Already retrieved FullConversation Of Connection");
-            return conversationAndNeedsDataset;
+            logger.debug("Already retrieved AgreementProtocolState Of Connection");
+            return agreementProtocolState;
         }
     }
 
