@@ -1,41 +1,14 @@
 package won.protocol.agreement;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.apache.jena.util.iterator.ExtendedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.SparqlSelectFunction;
-import won.protocol.vocabulary.WONAGR;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Set;
 
 
 public class AgreementProtocol {

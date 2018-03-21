@@ -4,9 +4,6 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Group of messages that represent the delivery of one message, including the responses.
  * @author fkleedorfer

@@ -1,7 +1,7 @@
 package won.utils.acknowledgement;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
@@ -11,15 +11,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 
 public class AcknowledgementProtocolTest {
 

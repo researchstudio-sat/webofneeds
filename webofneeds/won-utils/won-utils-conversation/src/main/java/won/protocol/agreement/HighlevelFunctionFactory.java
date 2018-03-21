@@ -1,14 +1,7 @@
 package won.protocol.agreement;
 
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.rdf.model.Model;
-
-import won.protocol.util.DatasetSelectionBySparqlFunction;
-import won.protocol.util.DatasetToDatasetBySparqlGSPOSelectFunction;
-import won.protocol.util.DatasetToModelBySparqlFunction;
-import won.protocol.util.DynamicDatasetToDatasetBySparqlGSPOSelectFunction;
-import won.protocol.util.DynamicDatasetToModelBySparqlFunction;
+import won.protocol.util.*;
 
 public class HighlevelFunctionFactory {
 	
