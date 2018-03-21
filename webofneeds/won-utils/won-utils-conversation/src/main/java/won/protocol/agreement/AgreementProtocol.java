@@ -10,7 +10,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
-
+/**
+ * @deprecated replaced by {@Link won.protocol.agreement.AgreementProtocolState}
+ */
+@Deprecated
 public class AgreementProtocol {
 	private static final Logger logger = LoggerFactory.getLogger(AgreementProtocol.class);
 	
