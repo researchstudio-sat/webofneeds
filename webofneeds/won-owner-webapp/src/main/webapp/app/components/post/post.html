@@ -57,7 +57,8 @@
             </a>
         </div>
     </div>
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestReceived && !self.hasReceivedRequests">
+    <!-- self.connectionType === self.won.RequestReceived is needed for title bar nav -->
+    <div class="opc__inner empty" ng-if="self.isOwnPost && (self.connectionType === self.won.RequestReceived) && !self.hasReceivedRequests && !self.hasSentRequests">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
@@ -65,34 +66,7 @@
                         <use href="#ico36_incoming"></use>
                 </svg>
                 <span class="opc__empty__description__text">
-                    This view shows you all the incoming request for this specific need. Wait until someone tries to connect with you.
-                </span>
-            </div>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Connected})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_message"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Go to chats</span>
-            </a>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Suggested})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_match"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Go to matches</span>
-            </a>
-        </div>
-    </div>
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestSent && !self.hasSentRequests">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
-                <svg class="opc__empty__description__icon"
-                    style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_outgoing"></use>
-                </svg>
-                <span class="opc__empty__description__text">
-                    This view shows you all your sent requests for this specific need. Connect with a match to see it here.
+                    This view shows you all the requests for this specific need.
                 </span>
             </div>
             <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Connected})" class="opc__empty__link clickable">
