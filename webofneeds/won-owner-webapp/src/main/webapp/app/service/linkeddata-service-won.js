@@ -25,6 +25,7 @@ import {
     contains,
     deepFreeze,
     rethrow,
+    getIn,
     get,
 } from '../utils.js';
 
