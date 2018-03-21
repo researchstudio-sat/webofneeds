@@ -4,13 +4,14 @@
     <won-owner-title-bar
             selection="self.selection"
             ng-if="self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConnectionDetails}">
     </won-owner-title-bar>
+    <!-- TODO: check if it's ok to use showConnectionDetails for visitors (look in git for prev. value) -->
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
             ng-if="!self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConnectionDetails}">
     </won-visitor-title-bar>
 </header>
 <main class="ownerpostcontent">
@@ -87,22 +88,67 @@
     </div>
 
     <!-- left column for connection-typed tabs -->
-    <won-connection-selection
-            class="owner__messages"
-            ng-if="self.isOwnPost && self.showConnectionSelection && (
-                      (connectionTypeInParams === won.WON.Connected && self.hasConversations)
-                   || (connectionTypeInParams === won.WON.RequestReceived && self.hasReceivedRequests)
-                   || (connectionTypeInParams === won.WON.RequestSent && self.hasSentRequests)
-            )"
-            connection-type="self.connectionType"
-            on-selected-connection="self.openConnection(connectionUri)"
-            ng-class="{'hidden' : self.connectionUri !== undefined}"
-            >
-    </won-connection-selection>
+    <div
+        ng-show="self.isOwnPost && self.showConnectionSelection"
+    >
+        <won-connection-selection
+                class="owner__messages"
+                ng-show="self.hasConversations"
+                connection-type="::self.WON.Connected"
+                on-selected-connection="self.openConnection(connectionUri)"
+                >
+        </won-connection-selection>
+        <won-connection-selection
+                class="owner__messages"
+                ng-if="self.hasMatches"
+                connection-type="::self.WON.Suggested"
+                on-selected-connection="self.openConnection(connectionUri)"
+                >
+        </won-connection-selection>
+        <won-connection-selection
+                class="owner__messages"
+                ng-if="self.hasReceivedRequests"
+                connection-type="::self.WON.RequestReceived"
+                on-selected-connection="self.openConnection(connectionUri)"
+                >
+        </won-connection-selection>
+        <!-- TODO: cleanup -->
+        <!--won-connection-selection
+                class="owner__messages"
+                ng-if="self.hasSentRequests"
+                connection-type="::self.WON.RequestSent"
+                on-selected-connection="self.openConnection(connectionUri)"
+                ng-class="{'hidden' : self.connectionUri !== undefined}"
+                >
+        </won-connection-selection> -->
+    </div>
+    <!-- <won-connection-selection
+                class="owner__messages"
+                ng-if="self.isOwnPost && self.showConnectionSelection && (
+                        (connectionTypeInParams === won.WON.Connected && self.hasConversations)
+                    || (connectionTypeInParams === won.WON.RequestReceived && self.hasReceivedRequests)
+                    || (connectionTypeInParams === won.WON.RequestSent && self.hasSentRequests)
+                )"
+                connection-type="self.connectionType"
+                on-selected-connection="self.openConnection(connectionUri)"
+                ng-class="{'hidden' : self.connectionUri !== undefined}"
+                >
+    </won-connection-selection> -->
     <!-- /left column -->
 
     <!-- right column -->
-    <!-- Conversations: -->
+    <div
+        class="post-messages"
+        ng-class="{'post-messages--connected': self.showConnectionDetails}"
+        ng-show="self.post && self.connectionOpen && self.isOwnPost">
+            <div class="post-messages__inner">
+                <won-post-messages></won-post-messages>
+                <!-- TODO: add won-open-request here so that it gets shown for sent/received
+                requests. OR: change won-post-messages so that it's ok for all kinds of 
+                connection states -->
+            </div>
+    </div>
+    <!-- Conversations:
     <div
         class="post-messages"
         ng-if="self.post && self.connectionOpen"
@@ -113,7 +159,7 @@
             </div>
     </div>
 
-    <!-- Incoming Requests: -->
+     Incoming Requests: 
     <div
         class="post-messages"
         ng-if="self.post && self.connectionOpen"
@@ -121,13 +167,13 @@
             <won-open-request></won-open-request>
     </div>
 
-    <!-- Sent Requests: -->
+     Sent Requests: 
     <div
         class="post-messages"
         ng-if="self.post && self.connectionOpen"
         ng-show="self.showSentRequestDetails && self.isOwnPost && self.connectionOpen">
             <won-open-request></won-open-request>
-    </div>
+    </div> -->
     <!-- /right column -->
     <a class="curtain" ng-if="!self.isOwnPost && self.sendAdHocRequest"></a>
     <div class="post__sendrequest" ng-if="!self.isOwnPost && self.sendAdHocRequest">

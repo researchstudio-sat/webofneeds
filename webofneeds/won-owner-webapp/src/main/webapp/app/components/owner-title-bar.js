@@ -143,7 +143,7 @@ function genComponentConf() {
                 const post = state.getIn(["needs", postUri]);
 
                 const connections = post && post.get("connections");
-
+                // TODO: change title bar nav
                 const sentRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestSent);
                 const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
                 const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);

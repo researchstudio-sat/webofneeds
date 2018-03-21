@@ -35,6 +35,7 @@ class Controller {
         this.selection = 0;
         window.p4dbg = this;
         this.wonConnected = won.WON.Connected;
+        this.WON = won.WON;
 
         const selectFromState = (state)=>{
             const postUri = selectOpenPostUri(state);
@@ -80,9 +81,11 @@ class Controller {
                 connectionType: connectionTypeInParams,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
-                showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
-                showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
-                showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
+                showConnectionDetails: connectionIsOpen,
+                // TODO: handle all occurences of connectionTypeInParams
+                //showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
+                //showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
+                //showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
                 won: won.WON,
             };
         };
