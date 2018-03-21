@@ -49,7 +49,7 @@ http://www.springframework.org/schema/context/spring-context-4.1.xsd http://www.
             <bean class="won.protocol.rest.RdfModelConverter" />
             <bean class="won.protocol.rest.RdfDatasetConverter"/>
             <bean class="won.protocol.rest.RdfDatasetAttachmentConverter"/>
-				    <bean id="rdfdatasetattachmentjacksonconverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				    <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
 				              <property name="supportedMediaTypes">
 				                <list>
 				                  <value>application/json</value>
