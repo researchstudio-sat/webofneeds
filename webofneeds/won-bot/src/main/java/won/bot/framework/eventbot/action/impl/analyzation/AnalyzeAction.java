@@ -60,6 +60,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
+        logger.trace("Analyzing Message...");
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = ctx.getEventBus();
 
@@ -87,9 +88,15 @@ public class AnalyzeAction extends BaseEventBotAction {
         URI connectionUri = ((ConnectionSpecificEvent) event).getConnectionURI();
         Connection connection = makeConnection(needUri, remoteNeedUri, connectionUri);
         WonMessage wonMessage = ((MessageEvent) event).getWonMessage();
+        logger.trace("Message Information ------");
+        logger.trace("Message Type: "+ (receivedMessage ? "RECEIVED" : "SENT"));
+        logger.trace("NeedUri: " + needUri);
+        logger.trace("remoteNeedUri: " + remoteNeedUri);
+        logger.trace("connectionUri: " + connectionUri);
 
         if(connectionUri == null || WonRdfUtils.MessageUtils.isProcessingMessage(wonMessage)){
             logger.debug("AnalyzeAction will not execute on processing messages or messages without a connectionUri (e.g. connect messages)");
+            logger.trace("--------------------------");
             return;
         }
 
@@ -99,12 +106,16 @@ public class AnalyzeAction extends BaseEventBotAction {
 
         Dataset needDataset = linkedDataSource.getDataForResource(needUri);
         Collection<Resource> goalsInNeed = new NeedModelWrapper(needDataset).getGoals();
+        logger.trace("Preconditions in Need: " + goalsInNeed.size());
 
         AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri, getEventListenerContext().getLinkedDataSource()); //Initialize with null, to ensure some form of lazy init for the agreementProtocolState
         Set<MessageEffect> messageEffects = agreementProtocolState.getEffects(wonMessage.getMessageURI());
 
+        logger.trace("MessageEffects in Message: "+messageEffects.size()+"\n");
+
         messageEffects.forEach(messageEffect -> {
             if(messageEffect instanceof Accepts) {
+                logger.trace("\tMessageEffect 'Accepts':");
                 if(receivedMessage) {
                     Accepts effect = (Accepts) messageEffect;
 
@@ -119,56 +130,79 @@ public class AnalyzeAction extends BaseEventBotAction {
                     }
                 }
             } else if(messageEffect instanceof Proposes) {
-                WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
-                URI messageUri = messageEffect.getMessageUri();
-
-                Proposal proposal = new Proposal(messageUri, ProposalState.SUGGESTED);
+                logger.trace("\tMessageEffect 'Proposes':");
+                Proposal proposal = new Proposal(messageEffect.getMessageUri(), ProposalState.SUGGESTED);
                 Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
 
                 if(!proposalModel.isEmpty()) {
+                    logger.trace("\t\tProposal: " + proposal);
                     for(Resource goal : goalsInNeed){
                         String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
+                        logger.trace("\t\t\tPreconditionUri: "+preconditionUri);
 
                         if(!botContextWrapper.hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
                             GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
                             Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
 
-                            logger.debug("Adding Precondition/Proposal Relation: " + precondition + "/" + proposal);
+                            logger.trace("\t\t\tPrecondition: " + precondition);
+
+
+                            //TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED OR NOT BEFORE WE REMOVE THE TEMP STATUS
+                            boolean preconditionMetPending = botContextWrapper.isPreconditionMetInProposals(precondition.getUri());
+                            logger.trace("\t\t\tRemove PreconditionMetPending Entry: "+preconditionMetPending);
+
+                            if(preconditionMetPending) {
+                                botContextWrapper.removePreconditionMetPending(precondition.getUri());
+                            }
+
+                            logger.trace("\t\t\tAdding Precondition/Proposal Relation");
                             botContextWrapper.addPreconditionProposalRelation(precondition, proposal);
+                        }else{
+                            logger.trace("\t\t\tPrecondition/Proposal Relation already present");
                         }
                     }
-                } else {
-                    logger.debug("No PreconditionProposalRelations to add... proposalModel is empty");
-                }
 
-                if(receivedMessage) {
-                    bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
+                    if(receivedMessage) {
+                        logger.trace("\t\tSend ProposalReceivedEvent");
+                        WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
+                        bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
+                    }
+                } else {
+                    logger.trace("\t\tProposal: EMPTY");
                 }
             } else if(messageEffect instanceof Rejects) {
+                logger.trace("\tMessageEffect 'Rejects':");
                 Rejects effect = (Rejects) messageEffect;
 
+                logger.trace("\t\tremove Proposal References for: "+effect.getRejectedMessageUri());
                 botContextWrapper.removeProposalReferences(effect.getRejectedMessageUri());
             } else if(messageEffect instanceof Retracts) {
+                logger.trace("\tMessageEffect 'Retracts':");
                 Retracts effect = (Retracts) messageEffect;
 
+                logger.trace("\t\tremove Proposal References for: "+effect.getRetractedMessageUri());
                 botContextWrapper.removeProposalReferences(effect.getRetractedMessageUri());
             }
         });
+        logger.trace("--------------------------");
 
         //Things to do for each individual message regardless of it being received or sent
         Dataset remoteNeedDataset = ctx.getLinkedDataSource().getDataForResource(remoteNeedUri);
         Dataset conversationDataset = null;  //Initialize with null, to ensure some form of lazy init for the conversationDataset
         GoalInstantiationProducer goalInstantiationProducer = null;
+        logger.trace("Conversation Information ------");
 
         for (Resource goal : goalsInNeed) {
             String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
 
+            logger.trace("\tPreconditionUri: "+preconditionUri);
+
             if(botContextWrapper.isPreconditionMetInProposals(preconditionUri)){
-                logger.debug("Goal/Precondition already met in a proposal/agreement, " + preconditionUri);
+                logger.trace("\t\tPrecondition already met in a proposal/agreement");
             } else if(botContextWrapper.isPreconditionMetPending(preconditionUri)){
-                logger.debug("Goal/Precondition already met temporarily by a pending proposal that does not exist yet, " + preconditionUri);
+                logger.trace("\t\tPrecondition already met by a pending proposal that does not exist yet");
             } else {
-                logger.debug("Goal/Precondition not yet met in a proposal/agreement, " + preconditionUri);
+                logger.trace("\t\tPrecondition not yet met in a proposal/agreement");
                 conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
                 goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset, remoteNeedDataset, conversationDataset);
 
@@ -177,17 +211,19 @@ public class AnalyzeAction extends BaseEventBotAction {
                 boolean newGoalState = result.getShaclReportWrapper().isConform();
 
                 if(oldGoalState == null || newGoalState != oldGoalState) {
+                    logger.trace("\t\t\tState changed");
                     botContextWrapper.addPreconditionConversationState(preconditionUri, newGoalState);
                     if(newGoalState) {
-                        logger.debug("sending PreconditionMetEvent, because the precon state for the conversation changed");
+                        logger.trace("\t\t\t\tadding PreconditionMetPending");
                         botContextWrapper.addPreconditionMetPending(preconditionUri);
+                        logger.trace("\t\t\t\tsending PreconditionMetEvent");
                         ctx.getEventBus().publish(new PreconditionMetEvent(connection, preconditionUri, result));
                     }else{
-                        logger.debug("sending PreconditionUnmetEvent because the precon state for the conversation changed");
+                        logger.trace("\t\t\t\tsending PreconditionUnmetEvent");
                         ctx.getEventBus().publish(new PreconditionUnmetEvent(connection, preconditionUri, result));
                     }
                 }else{
-                    logger.debug("Goal/Precondition State did not change in the conversation");
+                    logger.trace("\t\t\tNo state change");
                 }
             }
         }
@@ -219,11 +255,13 @@ public class AnalyzeAction extends BaseEventBotAction {
     }
 
     private void publishAnalyzingMessage(Connection connection) {
+        logger.trace("Publishing AnalyzingMessage for Connection: "+connection.getConnectionURI());
         Model messageModel = WonRdfUtils.MessageUtils.processingMessage(getEventListenerContext().getBotContextWrapper().getBotName() + " - Starting Analyzation");
         getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel));
     }
 
     private void publishAnalyzingCompleteMessage(Connection connection, String detailMessage) {
+        logger.trace("Publishing AnalyzingCompleteMessage for Connection: "+connection.getConnectionURI()+" DetailMessage: "+detailMessage);
         Model messageModel = WonRdfUtils.MessageUtils.processingMessage(getEventListenerContext().getBotContextWrapper().getBotName() + " - Analyzation complete" + (detailMessage!= null? (", DetailMessage: "+detailMessage): ""));
         getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(connection, messageModel));
     }
