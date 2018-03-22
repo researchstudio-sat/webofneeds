@@ -148,7 +148,6 @@ public class AnalyzeAction extends BaseEventBotAction {
 
                             logger.trace("\t\t\tPrecondition: " + precondition);
 
-
                             //TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED OR NOT BEFORE WE REMOVE THE TEMP STATUS
                             boolean preconditionMetPending = botContextWrapper.isPreconditionMetInProposals(precondition.getUri());
                             logger.trace("\t\t\tRemove PreconditionMetPending Entry: "+preconditionMetPending);
@@ -166,8 +165,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
                     if(receivedMessage) {
                         logger.trace("\t\tSend ProposalReceivedEvent");
-                        WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
-                        bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
+                        bus.publish(new ProposalReceivedEvent(connection, (WonMessageReceivedOnConnectionEvent) event));
                     }
                 } else {
                     logger.trace("\t\tProposal: EMPTY");
@@ -238,20 +236,16 @@ public class AnalyzeAction extends BaseEventBotAction {
     //********* Helper Methods **********
     private Dataset getConversationDatasetLazyInit(Dataset conversationDataset, URI connectionUri) {
         if(conversationDataset == null){
-            logger.debug("Retrieving Conversation Of Connection");
             return WonLinkedDataUtils.getConversationDataset(connectionUri, getEventListenerContext().getLinkedDataSource());
         }else{
-            logger.debug("Already retrieved FullConversation Of Connection");
             return conversationDataset;
         }
     }
 
     private GoalInstantiationProducer getGoalInstantiationProducerLazyInit(GoalInstantiationProducer goalInstantiationProducer, Dataset needDataset, Dataset remoteNeedDataset, Dataset conversationDataset){
         if(goalInstantiationProducer == null){
-            logger.debug("Instantiating GoalInstantiationProducer");
             return new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
         }else{
-            logger.debug("Already instantiated GoalInstantiationProducer");
             return goalInstantiationProducer;
         }
     }
