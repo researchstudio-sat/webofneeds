@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 import won.protocol.agreement.AgreementProtocol;
+import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
@@ -185,12 +186,12 @@ public class WonConversationUtilsTest {
 		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
 		//Thread.currentThread().sleep(30000);
 		sw.start();
-		Dataset agreements = AgreementProtocol.getAgreements(input);
+		AgreementProtocolState state = AgreementProtocolState.of(input);
 		sw.stop();
-		RDFDataMgr.write(System.out, agreements, Lang.TRIG);
-		System.out.println("HP.getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
-		System.out.println(AgreementProtocol.getHighlevelProtocolUris(input));
-		
+		RDFDataMgr.write(System.out, state.getAgreements(), Lang.TRIG);
+		System.out.println("Analyzing the state of agreement protocol took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		System.out.println(state.getAgreementProtocolUris());
+		System.out.println(state.getEffects(URI.create("https://localhost:8443/won/resource/event/grj35bbhnkcrlfc72pqo")));
 		
 		/*
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(input, output);

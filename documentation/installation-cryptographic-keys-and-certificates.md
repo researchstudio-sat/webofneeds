@@ -1,20 +1,21 @@
 # Cryptographic Keys and Certificates
 **NOTE:** The following guide assumes you want to run all services on the same machine. If you deploy these on different machines, use the respective IPs and Paths as suited/desired.
 
-1. We use the Apache Portable Runtime (APR) in the security modules of the Web of Needs. Normally, APR is included in the Tomcat by default. But it could happen that if you install the Tomcat by its Windows installer, APR will not be installed with Tomcat. To be sure that you have APR, check your {TomcatPath}/bin. A DLL file called tcnative-1.dll MUST be there. If you do not have this DLL file you need to add the Tomcat Native Downloads to your {TomcatPath}/bin. Follow the instructions here: http://tomcat.apache.org/download-native.cgi (simply download the zip file and then add the DLL to your {TomcatPath}/bin).
-NOTE: After all the configurations below are done, if you have problems starting the tomcat (cannot be started, or started with the default keys, or complains about key format), most probably the APR library is not set up. Check Tomcat documenentation for OS specific setup, e.g. http://tomcat.apache.org/tomcat-8.0-doc/apr.html. For Mac OS users this is helpful: http://mrhaki.blogspot.co.at/2011/01/add-apr-based-native-library-for-tomcat.html (Mac Ports have to be installed)
+1. We use the Apache Portable Runtime (APR) in the security modules of the Web of Needs. Normally, APR is included in the Tomcat by default. But it could happen that if you install the Tomcat by its Windows installer, APR will not be installed with Tomcat. To be sure that you have APR, check your `<TOMCAT_FOLDER>/bin`. A DLL file called `tcnative-1.dll` MUST be there. If you do not have this DLL file you need to add the Tomcat Native Downloads to your `<TOMCAT_FOLDER>/bin`. Follow the instructions here: http://tomcat.apache.org/download-native.cgi (simply download the zip file and then add the DLL to your `<TOMCAT_FOLDER>/bin`).
 
-2. Copy the conf-folder: `cp -r conf conf.local` if you haven't done that already.
+**NOTE:** After all the configurations below are done, if you have problems starting the tomcat (cannot be started, or started with the default keys, or complains about key format), most probably the APR library is not set up. Check Tomcat documenentation for OS specific setup, e.g. http://tomcat.apache.org/tomcat-8.0-doc/apr.html. For Mac OS users this is helpful: http://mrhaki.blogspot.co.at/2011/01/add-apr-based-native-library-for-tomcat.html (Mac Ports have to be installed)
+
+2. Copy the webofneeds conf-folder: `cp -r conf conf.local` if you haven't done that already.
 
 3. Change all instances of `localhost` in the configurations to your your ip (or computer name or domain) if you are not going to run node owner or matcher locally.
 
-4. Change all instances of keystore/truststore locations to point to a folder where you will store generated keys and certificates (in matcher-service.properties, node.properties and owner.properties), e.g. I used `C:/WoN/Keystore/`). Do not change the file name, just the path.
+4. In `conf.local`, edit `matcher-service.properties`, `node.properties` and `owner.properties` and change all instances of keystore/truststore locations to point to a folder where you will store generated keys and certificates (in ), e.g. I used `C:/WoN/Keystore/`). Do not change the file name, just the path.
 
 5. Change the accompanying passwords to something at least 6-letter long (e.g. `"changeit"`)
 
-6. In owner.properties set `http.port` and `node.default.http.port` to `8443`
+6. In `conf.local/owner.properties` set `http.port` and `node.default.http.port` to `8443`
 
-7. Copy the SSL connector statement given below to $TOMCAT/conf/server.xml as a child of the `<Service name="Catalina">`-node and change the password and key-folders there to values used in previous steps as well (e.g. `"changeit"`, `C:/WoN/Keystore/t-cert.pem`, `C:/WoN/Keystore/t-key.pem`)
+7. Copy the SSL connector statement given below to <TOMCAT_FOLDER>/conf/server.xml as a child of the `<Service name="Catalina">`-node and change the password and key-folders there to values used in previous steps as well (e.g. `"changeit"`, `C:/WoN/Keystore/t-cert.pem`, `C:/WoN/Keystore/t-key.pem`). If the instructions on https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/build-with-eclipse.md were followed before, modify the statement already added at step 6 if needed.
 
     ```xml
     <Connector
@@ -33,11 +34,14 @@ NOTE: After all the configurations below are done, if you have problems starting
 
     ```sh
     openssl req -x509 -newkey rsa:2048 -keyout t-key.pem -out t-cert.pem  -passout pass:changeit -days 365 -subj "/CN=myhost.mydomain.com"
+
     openssl pkcs12 -export -out sometmpfile_deletme -passout pass:changeit -inkey t-key.pem -passin pass:changeit -in t-cert.pem
-    {PATH_TO_YOUR_JAVA_INSTALLATION}/bin/keytool.exe -importkeystore -srckeystore sometmpfile_deletme -srcstoretype pkcs12 -destkeystore t-keystore.jks -deststoretype JKS -srcstorepass changeit  -deststorepass changeit
+
+    <YOUR_JDK_DIR>/bin/keytool.exe -importkeystore -srckeystore sometmpfile_deletme -srcstoretype pkcs12 -destkeystore t-keystore.jks -deststoretype JKS -srcstorepass changeit  -deststorepass changeit
+
     rm sometmpfile_deletme
     ```
-NOTE: this openssl commands can be executed in windows using cygwin
+**NOTE:** the openssl commands can be executed in windows using cygwin or the git bash
 
 
 9. The other key stores, and the trust stores are created and filled in automatically when the application is run (in the locations defined in step 4 with the passwords defined in step 5).

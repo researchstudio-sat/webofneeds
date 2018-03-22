@@ -315,7 +315,7 @@ public class WonRdfUtils
       if (toReject == null) return messageModel;
       for(URI uri: toReject) {
           if (uri != null) {
-              baseRes.addProperty(WONAGR.REJECT, baseRes.getModel().getResource(uri.toString()));
+              baseRes.addProperty(WONAGR.REJECTS, baseRes.getModel().getResource(uri.toString()));
           }
       }
       return messageModel;

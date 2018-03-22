@@ -1,13 +1,35 @@
 package won.protocol.agreement;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import won.protocol.agreement.effect.MessageEffect;
+import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
@@ -56,6 +78,14 @@ public class AgreementProtocolState {
 		uris.addRejectedMessageUris(getRejectedUris());
 		uris.addRetractedMessageUris(getRetractedUris());
 		return uris;
+	}
+	
+	public Set<MessageEffect> getEffects(URI messageUri){
+		ConversationMessage message = messagesByURI.get(messageUri);
+		if (message == null) {
+			return Collections.EMPTY_SET;
+		}
+		return message.getEffects();
 	}
 	
 
@@ -152,32 +182,6 @@ public class AgreementProtocolState {
 		return RdfUtils.getGraphUris(rejected);		
 	}
 	
-	public boolean isValidAccepts(URI messageUri) {
-		ConversationMessage msg = messagesByURI.get(messageUri);
-		return msg == null ? false : msg.isValidAccepts();
-	}
-	
-	public boolean isValidProposes(URI messageUri) {
-		ConversationMessage msg = messagesByURI.get(messageUri);
-		return msg == null ? false : msg.isValidProposes();
-	}
-	
-	public boolean isValidProposesToCancel(URI messageUri) {
-		ConversationMessage msg = messagesByURI.get(messageUri);
-		return msg == null ? false : msg.isValidProposesToCancel();
-	}
-	
-	public boolean isValidRejects(URI messageUri) {
-		ConversationMessage msg = messagesByURI.get(messageUri);
-		return msg == null ? false : msg.isValidRejects();
-	}
-	
-	public boolean isValidRetracts(URI messageUri) {
-		ConversationMessage msg = messagesByURI.get(messageUri);
-		return msg == null ? false : msg.isValidRetracts();
-	}
-	
-	
 	/**
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
@@ -191,13 +195,8 @@ public class AgreementProtocolState {
 		rejected.begin(ReadWrite.WRITE);
 		conversationDataset.begin(ReadWrite.READ);
 		
-		this.messagesByURI = new HashMap<>();
 		
-		ConversationResultMapper resultMapper = new ConversationResultMapper(messagesByURI);
-		SparqlSelectFunction<ConversationMessage> selectfunction = 
-				new SparqlSelectFunction<>("/conversation/messagesForHighlevelProtocols.rq", resultMapper )
-				.addOrderBy("msg", Query.ORDER_ASCENDING);
-		selectfunction.apply(conversationDataset);
+		this.messagesByURI = ConversationMessagesReader.readConversationMessages(conversationDataset);
 		
 		Set<ConversationMessage> roots = new HashSet();
 		Collection<ConversationMessage> messages = messagesByURI.values();
@@ -316,6 +315,7 @@ public class AgreementProtocolState {
 				continue;
 			}
 			processed.add(msg);
+			MessageEffectsBuilder effectsBuilder = new MessageEffectsBuilder(msg.getMessageURI());
 			if (logger.isDebugEnabled() && processedInOrder != null) {
 				processedInOrder.add(msg);
 			}
@@ -341,16 +341,20 @@ public class AgreementProtocolState {
 					.filter(other -> other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> msg.isMessageOnPathToRoot(other))
+					
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
 							logger.debug("{} retracts {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
-						removeContentGraphs(conversation, other);
+						boolean changedSomething = false;
+						changedSomething = removeContentGraphs(conversation, other) || changedSomething;
 						retractedUris.add(other.getMessageURI());
 						if (other.isProposesMessage()) {
-							retractProposal(other.getMessageURI());
+							changedSomething = retractProposal(other.getMessageURI()) || changedSomething;
 						}
-						msg.setValidRetracts(true);
+						if (changedSomething) {
+							effectsBuilder.retracts(other.getMessageURI());
+						}
 					});
 			}
 			if (msg.isRejectsMessage()) {
@@ -367,12 +371,19 @@ public class AgreementProtocolState {
 					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
+					.filter(other -> {
+						// check if msg also accepts other - in that case, the message is contradictory in itself 
+						// Resolution: neither statement has any effect.
+						return !msg.accepts(other);
+					})
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
 							logger.debug("{} rejects {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
-						rejectProposal(other.getMessageURI());
-						msg.setValidRejects(true);
+						boolean changedSomething = rejectProposal(other.getMessageURI());
+						if (changedSomething) {
+							effectsBuilder.rejects(other.getMessageURI());
+						}
 				});
 			}
 			if (msg.isProposesMessage()) {
@@ -390,8 +401,10 @@ public class AgreementProtocolState {
 					if (logger.isDebugEnabled()) {
 						logger.debug("{} proposes {}: valid", msg.getMessageURI(), other.getMessageURI());
 					}
-					proposalContent.add(aggregateGraphs(conversation, other.getContentGraphs()));
-					msg.setValidProposes(true);
+					boolean changedSomething =  propose(conversationDataset, other.getContentGraphs(), proposalContent);
+					if (changedSomething) {
+						effectsBuilder.proposes(other.getMessageURI());
+					}
 				});
 				
 
@@ -409,12 +422,19 @@ public class AgreementProtocolState {
 					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
+					.filter(other -> {
+						// check if msg also accepts other - in that case, the message is contradictory in itself 
+						// Resolution: neither statement has any effect.
+						return !msg.rejects(other);
+					})
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
 							logger.debug("{} accepts {}: valid", msg.getMessageURI(), other.getMessageURI());
 						}
-						acceptProposal(other.getMessageURI());
-						msg.setValidAccepts(true);
+						boolean changedSomething = acceptProposal(other.getMessageURI());
+						if (changedSomething) { 
+							effectsBuilder.accepts(other.getMessageURI(), other.getProposesToCancel().stream().collect(Collectors.toSet()));
+						}
 					});
 			}
 			if (msg.isProposesToCancelMessage()) {
@@ -438,9 +458,10 @@ public class AgreementProtocolState {
 							WONAGR.PROPOSES_TO_CANCEL,
 							cancellationProposals.getResource(other.getMessageURI().toString())));
 					pendingProposals.setDefaultModel(cancellationProposals);
-					msg.setValidProposesToCancel(true);
+					effectsBuilder.proposesToCancel(other.getMessageURI());
 				});
 			}
+			msg.setEffects(effectsBuilder.build());
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("messages in the order they were processed:");
@@ -546,22 +567,48 @@ public class AgreementProtocolState {
 		removeContentGraphs(copy, message);
 	}
 	
-	private  void removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
-		message.getContentGraphs().stream().forEach(uri -> conversationDataset.removeNamedModel(uri.toString()));
+	/**
+	 * @param conversationDataset
+	 * @param message
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean removeContentGraphs(Dataset conversationDataset, ConversationMessage message ) {
+		AtomicBoolean changedSomething = new AtomicBoolean(false);
+		message.getContentGraphs().stream().forEach(uri -> {
+			String uriString = uri.toString();
+			if (conversationDataset.containsNamedModel(uriString))
+			conversationDataset.removeNamedModel(uriString);
+			changedSomething.set(true);
+		});
+		return changedSomething.get();
 	}
 	
-	private  Model aggregateGraphs(Dataset conversationDataset, Collection<URI> graphURIs) {
-		Model result = ModelFactory.createDefaultModel();
+	/**
+	 * 
+	 * @param conversationDataset
+	 * @param graphURIs
+	 * @param proposal
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean propose(Dataset conversationDataset, Collection<URI> graphURIs, Model proposal) {
+		long initialSize = proposal.size();
 		graphURIs.forEach(uri -> {
 			Model graph = conversationDataset.getNamedModel(uri.toString());
 			if (graph != null) {
-				result.add(RdfUtils.cloneModel(graph));
+				proposal.add(RdfUtils.cloneModel(graph));
 			}
 		});
-		return result;
+		//did we add anything?
+		return proposal.size() - initialSize > 0;
 	}
 	
-	private void acceptProposal(URI proposalUri) {
+	/**
+	 * 
+	 * @param proposalUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean acceptProposal(URI proposalUri) {
+		boolean changedSomething = false;
 		// first process proposeToCancel triples - this avoids that a message can 
 		// successfully propose to cancel itself, as agreements are only made after the
 		// cancellations are processed.		
@@ -570,53 +617,88 @@ public class AgreementProtocolState {
 		if (nIt.hasNext()) {
 			//remember that this proposal contained a cancellation
 			this.acceptedCancellationProposalUris.add(proposalUri);
+			changedSomething = true;
 		}
 		while (nIt.hasNext()){
 			RDFNode agreementToCancelUri = nIt.next();
-			cancelAgreement(URI.create(agreementToCancelUri.asResource().getURI()));
+			changedSomething = cancelAgreement(URI.create(agreementToCancelUri.asResource().getURI())) || changedSomething;
 		}
-		removeCancellationProposal(proposalUri);
+		changedSomething = removeCancellationProposal(proposalUri) || changedSomething;
 		
 		// move proposal to agreements
-		moveNamedGraph(proposalUri, pendingProposals, agreements);
+		changedSomething = moveNamedGraph(proposalUri, pendingProposals, agreements) || changedSomething;
+		return changedSomething;
 		
 	}
 	
-	private void retractProposal(URI proposalUri) {
+	/**
+	 * 
+	 * @param proposalUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean retractProposal(URI proposalUri) {
+		boolean changedSomething = false;
 		// we don't track retracted proposals (nobody cares about retracted proposals)
 		// so just remove them
-		pendingProposals.removeNamedModel(proposalUri.toString());
-		removeCancellationProposal(proposalUri);
-	}
-	
-	private void rejectProposal(URI proposalUri) {
-		moveNamedGraph(proposalUri, pendingProposals, rejected);
-		removeCancellationProposal(proposalUri);
-	}
-	
-	private void cancelAgreement(URI toCancel) {
-		moveNamedGraph(toCancel, agreements, cancelledAgreements);
-	}
-	
-	private void removeCancellationProposal(URI proposalUri) {
-		Model cancellationProposals = pendingProposals.getDefaultModel();
-		NodeIterator nIt = cancellationProposals.listObjectsOfProperty(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL);
-		while (nIt.hasNext()){
-			RDFNode agreementToCancelUri = nIt.next();
-			agreements.removeNamedModel(agreementToCancelUri.asResource().getURI());
+		if (pendingProposals.containsNamedModel(proposalUri.toString())){
+			changedSomething = true;
 		}
-		cancellationProposals.remove(cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null));
+		pendingProposals.removeNamedModel(proposalUri.toString());
+		changedSomething = removeCancellationProposal(proposalUri) || changedSomething;
+		return changedSomething;
 	}
 	
-	private  void moveNamedGraph(URI graphUri, Dataset fromDataset, Dataset toDataset) {
+	/**
+	 * 
+	 * @param proposalUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean rejectProposal(URI proposalUri) {
+		boolean changedSomething = moveNamedGraph(proposalUri, pendingProposals, rejected);
+		changedSomething = removeCancellationProposal(proposalUri) || changedSomething;
+		return changedSomething;
+	}
+	
+	/**
+	 * 
+	 * @param toCancel
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean cancelAgreement(URI toCancel) {
+		return moveNamedGraph(toCancel, agreements, cancelledAgreements);
+	}
+	
+	/**
+	 * 
+	 * @param proposalUri
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private boolean removeCancellationProposal(URI proposalUri) {
+		boolean changedSomething = false;
+		Model cancellationProposals = pendingProposals.getDefaultModel();
+		StmtIterator it = cancellationProposals.listStatements(cancellationProposals.getResource(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null);
+		changedSomething = it.hasNext();
+		cancellationProposals.remove(it);
+		return changedSomething;
+	}
+	
+	/**
+	 * 
+	 * @param graphUri
+	 * @param fromDataset
+	 * @param toDataset
+	 * @return true if the operation had any effect, false otherwise
+	 */
+	private  boolean moveNamedGraph(URI graphUri, Dataset fromDataset, Dataset toDataset) {
+		boolean changedSomething = false;
 		Model model = fromDataset.getNamedModel(graphUri.toString());
 		fromDataset.removeNamedModel(graphUri.toString());
 		if (model != null && model.size() > 0) {
 			toDataset.addNamedModel(graphUri.toString(), model);
+			changedSomething = true;
 		}
+		return changedSomething;
 	}
 
-	
-	
 
 }
