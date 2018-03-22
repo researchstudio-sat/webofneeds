@@ -170,36 +170,6 @@ public class GoalInstantiationTest {
         Assert.assertTrue(result.isConform());
     }
 
-    private static final String latLngPickupQuery = "prefix s:     <http://schema.org/>\n" +
-            "prefix taxi:  <http://example.org/taxi/> \n" +
-            "\n" +
-            "select ?lat ?lon\n" +
-            "\n" +
-            "where {\n" +
-            "\t?main a s:TravelAction;\n" +
-            "    \t  s:fromLocation ?location.\n" +
-            "  \t?location a s:Place;\n" +
-            "          s:geo ?geo.\n" +
-            "  \t?geo a s:GeoCoordinates;\n" +
-            "          s:latitude ?lat;\n" +
-            "          s:longitude ?lon.\n" +
-            "}";
-
-    private static final String latLngDropoffQuery = "prefix s:     <http://schema.org/>\n" +
-            "prefix taxi:  <http://example.org/taxi/> \n" +
-            "\n" +
-            "select ?lat ?lon\n" +
-            "\n" +
-            "where {\n" +
-            "\t?main a s:TravelAction;\n" +
-            "    \t  s:toLocation ?location.\n" +
-            "  \t?location a s:Place;\n" +
-            "          s:geo ?geo.\n" +
-            "  \t?geo a s:GeoCoordinates;\n" +
-            "          s:latitude ?lat;\n" +
-            "          s:longitude ?lon.\n" +
-            "}";
-
     private static QuerySolution executeQuery(String queryString, Model payload) {
         Query query = QueryFactory.create(queryString);
         try(QueryExecution qexec = QueryExecutionFactory.create(query, payload)){
@@ -239,6 +209,9 @@ public class GoalInstantiationTest {
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
 
+        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+        Assert.assertTrue(recheckResultModel.isConform());
+
         goalInstantiation = new GoalInstantiationProducer(taxiOffer, taxiDemandNoLoc, null, "http://example.org/", "http://example.org/blended/");
         results = goalInstantiation.createGoalInstantiationResultsForNeed1();
 
@@ -277,6 +250,9 @@ public class GoalInstantiationTest {
         Resource goal = needWrapper1.getGoals().iterator().next();
         GoalInstantiationResult result = goalInstantiation.findInstantiationForGoal(goal);
         Assert.assertTrue(result.isConform());
+
+        GoalInstantiationResult recheckResultModel = GoalInstantiationProducer.findInstantiationForGoalInDataset(taxiOffer, goal, result.getInstanceModel());
+        Assert.assertTrue(recheckResultModel.isConform());
     }
 
     private Dataset loadDataset(String path) throws IOException {

@@ -1,15 +1,7 @@
 package won.utils.conversationutils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
@@ -23,14 +15,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.agreement.AgreementProtocol;
+import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
 import won.protocol.util.WonConversationUtils;
+
+import java.io.*;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class WonConversationUtilsTest {
 
@@ -191,12 +185,12 @@ public class WonConversationUtilsTest {
 		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
 		//Thread.currentThread().sleep(30000);
 		sw.start();
-		Dataset agreements = AgreementProtocol.getAgreements(input);
+		AgreementProtocolState state = AgreementProtocolState.of(input);
 		sw.stop();
-		RDFDataMgr.write(System.out, agreements, Lang.TRIG);
-		System.out.println("HP.getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
-		System.out.println(AgreementProtocol.getHighlevelProtocolUris(input));
-		
+		RDFDataMgr.write(System.out, state.getAgreements(), Lang.TRIG);
+		System.out.println("Analyzing the state of agreement protocol took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		System.out.println(state.getAgreementProtocolUris());
+		System.out.println(state.getEffects(URI.create("https://localhost:8443/won/resource/event/grj35bbhnkcrlfc72pqo")));
 		
 		/*
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(input, output);

@@ -150,6 +150,13 @@ public class MemoryBotContext implements BotContext {
     }
 
     @Override
+    public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
+        for(String key : getListMap(collectionName).keySet()){
+            removeFromListMap(collectionName, key, values);
+        }
+    }
+
+    @Override
     public List<Object> loadFromListMap(final String collectionName, final String key) {
         return new LinkedList<>(getList(collectionName, key));
     }
