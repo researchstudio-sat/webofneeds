@@ -49,6 +49,7 @@ import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -72,6 +73,8 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     Pattern PATTERN_DEACTIVATE = Pattern.compile("^deactivate$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CHATTY_ON = Pattern.compile("^chatty\\s+on$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_CHATTY_OFF = Pattern.compile("^chatty\\s+off$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_CACHE_EAGER = Pattern.compile("^cache\\s+eager$", Pattern.CASE_INSENSITIVE);
+    Pattern PATTERN_CACHE_LAZY = Pattern.compile("^cache\\s+lazy$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_SEND_N = Pattern.compile("^send ([1-9])$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_VALIDATE = Pattern.compile("^validate$", Pattern.CASE_INSENSITIVE);
     Pattern PATTERN_RETRACT = Pattern.compile("^retract$", Pattern.CASE_INSENSITIVE);
@@ -86,21 +89,22 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
     public static final String[] USAGE_MESSAGES = {
             "You are connected to the debug bot. You can issue commands that will cause interactions with your need.",
             "Usage:",
-            "    'hint':          create a new need and send hint to it",
-            "    'connect':       create a new need and send connection request to it",
-            "    'close':         close the current connection",
-            "    'deactivate':    deactivate remote need of the current connection",
-            "    'chatty on|off': send chat messages spontaneously every now and then? (default: on)",
-            "    'send N':        send N messages, one per second. N must be an integer between 1 and 9",
-            "    'validate':      download the connection data and validate it",
-            "    'retract':       retract the last message sent",
-            "    'retract mine':  retract the last message you sent (should not have any effect)",
-            "    'propose':       propose my last message for an agreement",
-            "    'propose mine':  propose your last message for an agreement",
-            "    'accept':        accept the last proposal made",
-            "    'propose cancel: propose to cancel the newest agreement",
-            "    'accept cancel:  accept latest proposal to cancel",
-            "    'usage':         display this message"
+            "    'hint':            create a new need and send hint to it",
+            "    'connect':         create a new need and send connection request to it",
+            "    'close':           close the current connection",
+            "    'deactivate':      deactivate remote need of the current connection",
+            "    'chatty on|off':   send chat messages spontaneously every now and then? (default: on)",
+            "    'send N':          send N messages, one per second. N must be an integer between 1 and 9",
+            "    'validate':        download the connection data and validate it",
+            "    'retract':         retract the last message sent",
+            "    'retract mine':    retract the last message you sent (should not have any effect)",
+            "    'propose':         propose my last message for an agreement",
+            "    'propose mine':    propose your last message for an agreement",
+            "    'accept':          accept the last proposal made",
+            "    'propose cancel:   propose to cancel the newest agreement",
+            "    'accept cancel:    accept latest proposal to cancel",
+            "    'cache eager|lazy: use lazy or eager RDF cache",
+            "    'usage':           display this message"
     };
 
     public static final String[] N_MESSAGES = {
@@ -176,6 +180,15 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                     bus.publish(new SetChattinessDebugCommandEvent(con, false));
+                } else if (PATTERN_CACHE_EAGER.matcher(message).matches()) {
+                	Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll put any message I receive or send into the RDF cache. This slows down message processing in general, but operations that require crawling connection data will be faster.");
+                	
+                	bus.publish(new SetCacheEagernessCommandEvent(true));
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+                } else if (PATTERN_CACHE_LAZY.matcher(message).matches()) {
+                	Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I won't put messages I receive or send into the RDF cache. This speeds up message processing in general, but operations that require crawling connection data will be slowed down.");
+                	bus.publish(new SetCacheEagernessCommandEvent(false));
+                    bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                 } else if (PATTERN_SEND_N.matcher(message).matches()) {
                     Matcher m = PATTERN_SEND_N.matcher(message);
                     m.find();
@@ -250,16 +263,6 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 			@Override
 			protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
 				return makeReferringMessage(successEvent.getCrawledData(), messageFinder, messageReferrer, textMessageMaker);	
-			}
-		});
-		crawlConnectionDataBehaviour.onResult(new BaseEventBotAction(ctx) {
-			
-			@Override
-			protected void doRun(Event event, EventListener executingListener) throws Exception {
-				System.out.println("------- beginning of conversation dataset ------");
-				RDFDataMgr.write(System.out, ((CrawlConnectionCommandSuccessEvent)event).getCrawledData(), Lang.TRIG);
-				System.out.println("------- end of conversation dataset ------");
-				
 			}
 		});
 		crawlConnectionDataBehaviour.activate();
