@@ -59,12 +59,20 @@ public class AgreementProtocolState {
 		return uris;
 	}
 	
+	/**
+	 * Returns the set of effects (<code>MessageEffect</code>s) of the head of the delivery
+	 * chain that the specified message belongs to, or an empty set if no message is
+	 * found for that URI.
+	 * 
+	 * @param messageUri
+	 * @return
+	 */
 	public Set<MessageEffect> getEffects(URI messageUri){
 		ConversationMessage message = messagesByURI.get(messageUri);
 		if (message == null) {
 			return Collections.EMPTY_SET;
 		}
-		return message.getEffects();
+		return message.getDeliveryChain().getHead().getEffects();
 	}
 	
 
