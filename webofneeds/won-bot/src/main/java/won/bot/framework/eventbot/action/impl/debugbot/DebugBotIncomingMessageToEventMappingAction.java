@@ -52,7 +52,7 @@ import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocol;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonConversationUtils;
@@ -399,7 +399,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll accept your latest proposal to cancel - but I'll need to crawl the connection data first, please be patient.", 
 				//conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesToCancelMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
-				conversationDataset -> HighlevelProtocols.getAgreementsProposedToBeCancelledUris(conversationDataset).size() > 0? Lists.newArrayList(HighlevelProtocols.getAgreementsProposedToBeCancelledUris(conversationDataset).iterator().next()) : null,
+				conversationDataset -> AgreementProtocol.getAgreementsProposedToBeCancelledUris(conversationDataset).size() > 0? Lists.newArrayList(AgreementProtocol.getAgreementsProposedToBeCancelledUris(conversationDataset).iterator().next()) : null,
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
@@ -415,7 +415,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void proposeToCancelLatestAccept(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> HighlevelProtocols.getAgreementUris(conversationDataset).size() > 0 ? Lists.newArrayList(HighlevelProtocols.getAgreementUris(conversationDataset).iterator().next()) : null, 
+				conversationDataset -> AgreementProtocol.getAgreementUris(conversationDataset).size() > 0 ? Lists.newArrayList(AgreementProtocol.getAgreementUris(conversationDataset).iterator().next()) : null, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
