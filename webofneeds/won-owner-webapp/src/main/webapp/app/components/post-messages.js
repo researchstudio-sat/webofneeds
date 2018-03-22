@@ -77,7 +77,7 @@ function genComponentConf() {
             		src="generated/icon-sprite.svg#ico36_close"
             		ng-click="self.showAgreementData = !self.showAgreementData"/>
             	<!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreementUris.size || self.agreementData.pendingCancellationProposalUris.size"> 
+            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreementUris.size || self.agreementData.cancellationPendingAgreementUris.size"> 
             		Agreements
             		<span ng-show="self.loading"> (loading...)</span>
             		<span ng-if="!self.loading"> (up-to-date)</span>
@@ -88,43 +88,43 @@ function genComponentConf() {
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false; self.updateAgreementData(draft)">
+	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
 	            <!--
-	            <div class="pm__content__agreement__title" ng-show="self.agreementData.pendingCancellationProposalUris.size">
+	            <div class="pm__content__agreement__title" ng-show="self.agreementData.cancellationPendingAgreementUris.size">
             		<br ng-show="self.agreementData.agreementUris.size" />
             		<hr ng-show="self.agreementData.agreementUris.size" />
             		Proposals To Cancel
-    				<span ng-show="self.loading.pendingCancellationProposalUris"> (loading...)</span>
-            		<span ng-if="!self.loading.pendingCancellationProposalUris"> (up-to-date)</span>
+    				<span ng-show="self.loading.cancellationPendingAgreementUris"> (loading...)</span>
+            		<span ng-if="!self.loading.cancellationPendingAgreementUris"> (up-to-date)</span>
             	</div>
             	-->
 	            <won-connection-agreement
-	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementData.pendingCancellationProposalUris) track by $index"
+	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementData.cancellationPendingAgreementUris) track by $index"
 	                event-uri="proptoc"
 	                agreement-number="self.agreementData.agreementUris.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false; self.removeAcceptedProposalToCancel(draft);">
+	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
 	            <!-- /ProposeToCancel -->
             	<!-- PROPOSALS -->
             	<div class="pm__content__agreement__title" ng-show="self.agreementData.pendingProposalUris.size">
-            		<br ng-show="self.agreementData.agreementUris.size || self.agreementData.pendingCancellationProposalUris.size" />
-            		<hr ng-show="self.agreementData.agreementUris.size || self.agreementData.pendingCancellationProposalUris.size" />
+            		<br ng-show="self.agreementData.agreementUris.size || self.agreementData.cancellationPendingAgreementUris.size" />
+            		<hr ng-show="self.agreementData.agreementUris.size || self.agreementData.cancellationPendingAgreementUris.size" />
             		Proposals
-    				<span ng-show="self.loading.pendingCancellationProposalUris"> (loading...)</span>
-            		<span ng-if="!self.loading.pendingCancellationProposalUris"> (up-to-date)</span>
+    				<span ng-show="self.loading.pendingProposalUris"> (loading...)</span>
+            		<span ng-if="!self.loading.pendingProposalUris"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.pendingCancellationProposalUris) track by $index"
+	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.pendingProposalUris) track by $index"
 	                event-uri="prop"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.pendingProposalUris"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false; self.updateAgreementData(draft);">
+	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
 	            <!-- /PROPOSALS -->
 	            
@@ -399,7 +399,7 @@ function genComponentConf() {
         	
         	for(key in aD) {
         		if (aD.hasOwnProperty(key)) {
-        			if(ad[key].size) {
+        			if(aD[key].size) {
         				return true;
         			}
         		}
@@ -437,15 +437,7 @@ function genComponentConf() {
         	
         }
         
-        updateAgreementData(uri) {
-        	console.log("on-update: " + uri);
-
-        	//TODO: Reaload AgreementData, refresh uri list
-        	//this.ensureMessagesAreLoaded();
-        }
-        
-       
-        
+         
         getAgreementDataUris() {
         	var url = this.baseString + 'rest/agreement/getAgreementProtocolUris?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
@@ -456,9 +448,10 @@ function genComponentConf() {
     			
     			for(key in this.agreementData) {
     				if(this.agreementData.hasOwnProperty(key)) {
-	    				for(dataKey in this.agreementData[key]) {
-	    					this.addAgreementDataToSate(this.agreementData[key][dataKey]);
-	    				}
+    					console.log("Key: " + key + " : " + this.agreementData[key]);
+	    				for(data of this.agreementData[key]) {
+	    					this.addAgreementDataToSate(data);
+        				}
     				}
     			}
     			this.loading = false;
@@ -480,10 +473,18 @@ function genComponentConf() {
 	    		retractedMessageUris: new Set(response.retractedMessageUris),
         	}
         	
-        	return tmpAgreementData;
-        	console.log(this.agreementData);
+        	return this.filterAgreementSet(tmpAgreementData);
         }
         
+        filterAgreementSet(tmpAgreementData) {
+        	for(prop of tmpAgreementData.cancellationPendingAgreementUris) {
+        		if(tmpAgreementData.agreementUris.has(prop)){
+        			tmpAgreementData.agreementUris.delete(prop);
+        		}
+        	}
+        	
+        	return tmpAgreementData;
+        }
         
         
         addAgreementDataToSate(eventUri) {

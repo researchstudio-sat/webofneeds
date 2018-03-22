@@ -7,6 +7,7 @@ import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
+import labelledHrModule from './labelled-hr.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import {
     relativeTime,
@@ -71,13 +72,17 @@ function genComponentConf() {
 	                                ng-show="!self.showDetail">
 	                            <use href="#ico16_arrow_down"></use>
 	                        </svg>
-	                        <svg class="won-cm__center__carret clickable"
-	                                ng-click="self.showDetail = !self.showDetail"
-	                                ng-show="self.showDetail">
-	                            <use href="#ico16_arrow_up"></use>
-                        </svg>
-                        <button class="won-button--filled thin black" ng-click="self.sendProposal()" ng-show="self.showDetail">Propose</button>
+	                        <span class="won-cm__center__carret clickable"
+	                            ng-click="self.showDetail = !self.showDetail"
+	                            ng-show="self.showDetail">
+	                        	<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>   
+                    		</span>
                     	</span>
+                    	<span ng-show="self.showDetail"><br /></span>
+                    	<button class="won-button--filled thin black"
+                        		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
+                        		ng-show="self.showDetail">Propose <span ng-show="self.clicked">(again)</span>
+                        </button>
                     </span>
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
@@ -252,6 +257,7 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.connectionMessage', [
     squareImageModule,
+    labelledHrModule,
 ])
     .directive('wonConnectionMessage', genComponentConf)
     .name;
