@@ -1,6 +1,7 @@
 package won.protocol.agreement;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	
 	private Set<ConversationMessage> knownMessagesOnPathToRoot = new HashSet<ConversationMessage>();
 	
-	private Set<MessageEffect> effects;
+	private Set<MessageEffect> effects = Collections.EMPTY_SET;
 	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
