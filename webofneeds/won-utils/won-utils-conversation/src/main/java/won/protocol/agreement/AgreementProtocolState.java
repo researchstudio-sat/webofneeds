@@ -193,9 +193,12 @@ public class AgreementProtocolState {
 		messages.stream().forEach(message -> {
 			if (message.getCorrespondingRemoteMessageURI() != null && ! message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
-				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getCorrespondingRemoteMessageURI(), other, "msg:hasCorrespondingRemoteMessage");
-				message.setCorrespondingRemoteMessageRef(other);
-				other.setCorrespondingRemoteMessageRef(message);
+                if (other == null){
+                    message.setCorrespondingRemoteMessageURI(null);
+                } else {
+                    message.setCorrespondingRemoteMessageRef(other);
+                    other.setCorrespondingRemoteMessageRef(message);
+                }
 			}
 			message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
@@ -208,7 +211,7 @@ public class AgreementProtocolState {
 				.forEach(uri -> {
 				ConversationMessage other = messagesByURI.get(uri);
 				throwExceptionIfOtherisMissing(message.getMessageURI(), uri, other, "agr:accepts");
-				message.addAcceptsRef(other); 
+				message.addAcceptsRef(other);
 				other.addAcceptsInverseRef(message);
 			});
 			message.getProposes().stream().filter(uri -> !uri.equals(message.getMessageURI()))
