@@ -274,7 +274,6 @@ public class AgreementProtocolState {
 
 		//apply acknowledgment protocol to whole conversation first:
 		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
-		conversationDataset.end();
 		
 		//on top of this, apply modification and agreement protocol on a per-message basis, starting with the root(s)
 		
@@ -462,6 +461,7 @@ public class AgreementProtocolState {
 		agreements.commit();
 		cancelledAgreements.commit();
 		rejected.commit();
+		conversationDataset.end();
 	}
 	
 	private void throwExceptionIfOtherisMissing(URI messageUri, URI otherMessageUri, ConversationMessage otherMessage, String predicate) {
