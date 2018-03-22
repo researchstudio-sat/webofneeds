@@ -316,6 +316,9 @@ public class WonRdfUtils
     	if (toAccept == null) return messageModel;
     	for(URI uri: toAccept) {
     		if (uri != null) {
+    			if(logger.isDebugEnabled()) {
+    	    		logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})", new Object[] {uri} );
+    	    	}
     			baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(uri.toString()));
     		}
     	}
@@ -327,6 +330,9 @@ public class WonRdfUtils
     	if (toProposesToCancel == null) return messageModel;
     	for(URI uri: toProposesToCancel) {
     		if (uri != null) {
+    			if(logger.isDebugEnabled()) {
+    	    		logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})", new Object[] {uri} );
+    	    	}
     			baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(uri.toString()));
     		}
     	}

@@ -367,7 +367,7 @@ Utils.lexicalFormTerm = function(term, ns) {
         var label = '_:'+term.value;
         return {'blank': label};
     } else {
-	throw "Error, cannot get lexical form of unknown token: "+term.token;
+	throw new Error("Error, cannot get lexical form of unknown token: "+term.token);
     }
 };
 
@@ -1815,26 +1815,26 @@ Lexicon.Lexicon.prototype.retrieve = function(oid) {
                   if(maybeBlank != null) {
                       return({token:"blank", value:"_:"+oid});
                   } else {
-                      throw("Null value for OID");
+                      throw new Error("Null value for OID");
                   }
               }
           }
         }
     } catch(e) {
-        console.log("error in lexicon retrieving OID:");
-        console.log(oid);
+        console.error("error in lexicon retrieving OID:");
+        console.error(oid);
         if(e.message || e.stack) {
             if(e.message) {
-                console.log(e.message); 
+                console.error(e.message); 
             }
             if(e.stack) {
-                console.log(e.stack);
+                console.error(e.stack);
             }
         } else {
-            console.log(e);
+            console.error(e);
         }
-        throw new Error("Unknown retrieving OID in lexicon:"+oid);
-
+        e.message = "Unknown retrieving OID in lexicon:" + oid + "\n" + e.message;
+        throw e;
     }
 };
 
@@ -1884,7 +1884,7 @@ Lexicon.Lexicon.prototype.unregisterTerm = function (kind, oid) {
                     this.uriToOID[uri] = [oid, counter - 1];
                 }
             } else {
-                throw("Not matching OID : " + oid + " vs " + oidCounter[0]);
+                throw new Error("Not matching OID : " + oid + " vs " + oidCounter[0]);
             }
         }
     } else if (kind === 'literal') {
@@ -1902,7 +1902,7 @@ Lexicon.Lexicon.prototype.unregisterTerm = function (kind, oid) {
                 this.literalToOID[literal] = [oid, counter - 1];
             }
         } else {
-            throw("Not matching OID : " + oid + " vs " + oidCounter[0]);
+            throw new Error("Not matching OID : " + oid + " vs " + oidCounter[0]);
         }
 
     } else if (kind === 'blank') {
@@ -6554,7 +6554,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.collectBasicTriples = function(aqt
     } else if(aqt.kind === 'EMPTY_PATTERN') {
         // nothing
     } else {
-        throw "Unknown pattern: "+aqt.kind;
+        throw new Error("Unknown pattern: "+aqt.kind);
     }
 
     return acum;
@@ -6603,7 +6603,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.bind = function(aqt, bindings) {
     } else if(aqt.kind === 'EMPTY_PATTERN') {
         // nothing
     } else {
-        throw "Unknown pattern: "+aqt.kind;
+        throw new Error("Unknown pattern: "+aqt.kind);
     }
 
     return aqt;
@@ -6715,7 +6715,7 @@ AbstractQueryTree.AbstractQueryTree.prototype.replace = function(aqt, from, to, 
     } else if(aqt.kind === 'EMPTY_PATTERN') {
         // nothing
     } else {
-        throw "Unknown pattern: "+aqt.kind;
+        throw new Error("Unknown pattern: "+aqt.kind);
     }
 
     return aqt;
@@ -11930,10 +11930,12 @@ SparqlParser.parser = (function(){
         if (result0 !== null) {
           result0 = (function(offset, g, ts) {
               var quads = []
-              for(var i=0; i<ts.triplesContext.length; i++) {
-                  var triple = ts.triplesContext[i]
-                  triple.graph = g;
-                  quads.push(triple)
+              if(ts.triplesContext) {
+                for(var i=0; i<ts.triplesContext.length; i++) {
+                    var triple = ts.triplesContext[i]
+                    triple.graph = g;
+                    quads.push(triple)
+                }
               }
         
               return {token:'quadsnottriples',
@@ -24523,14 +24525,14 @@ RDFJSInterface.UrisMap.prototype.values = function() {
 
 RDFJSInterface.UrisMap.prototype.get = function(prefix) {
     if(prefix.indexOf(" ") != -1) {
-        throw "Prefix must not contain any whitespaces";
+        throw new Error("Prefix must not contain any whitespaces");
     }
     return this[prefix];
 };
 
 RDFJSInterface.UrisMap.prototype.remove = function(prefix) {
     if(prefix.indexOf(" ") != -1) {
-        throw "Prefix must not contain any whitespaces";
+        throw new Error("Prefix must not contain any whitespaces");
     }
 
     delete this[prefix];
@@ -24540,7 +24542,7 @@ RDFJSInterface.UrisMap.prototype.remove = function(prefix) {
 
 RDFJSInterface.UrisMap.prototype.set = function(prefix, iri) {
     if(prefix.indexOf(" ") != -1) {
-        throw "Prefix must not contain any whitespaces";
+        throw new Error("Prefix must not contain any whitespaces");
     }
 
     this[prefix] = iri;
@@ -24859,7 +24861,7 @@ RDFJSInterface.Literal.prototype.toString = function(){
                 if(this.nominalValue.match(/"""/)) {
                     var tmp = "'''"+this.nominalValue+"'''";
                     if(this.nominalValue.match(/'''/)) {
-                        throw "Literal not possible to escape in a String.";
+                        throw new Error("Literal not possible to escape in a String.");
                     }
                 }
             }
@@ -25231,7 +25233,7 @@ QueryFilters.boundVars = function(filterExpr) {
     } else {
         console.log("ERROR");
         console.log(filterExpr);
-        throw("Cannot find bound expressions in a no expression token");
+        throw new Error("Cannot find bound expressions in a no expression token");
     }
 };
 
@@ -25480,10 +25482,10 @@ QueryFilters.runFilter = function(filterExpr, bindings, queryEngine, dataset, en
                 }
             }
         } else {
-            throw("Unknown filter expression type");
+            throw new Error("Unknown filter expression type");
         }
     } else {
-        throw("Cannot find bound expressions in a no expression token");
+        throw new Error("Cannot find bound expressions in a no expression token");
     }
 };
 
@@ -25789,7 +25791,7 @@ QueryFilters.runRelationalFilter = function(filterExpr, op1, op2, bindings, quer
     } else if(operator === '>=') {
         return QueryFilters.runGtEqFunction(op1, op2, bindings);
     } else {
-        throw("Error applying relational filter, unknown operator");
+        throw new Error("Error applying relational filter, unknown operator");
     }
 };
 
@@ -25935,7 +25937,7 @@ QueryFilters.effectiveTypeValue = function(val){
         // @todo
         console.log("not implemented yet");
         console.log(val);
-        throw("value not supported in operations yet");
+        throw new Error("value not supported in operations yet");
     }
 };
 
@@ -28543,7 +28545,7 @@ QueryEngine.QueryEngine.prototype.executeZeroOrMorePath = function(pattern, data
 	//console.log(collected);
 	return collected;
     } else {
-	throw "Kind of path not supported!";
+	throw new Error("Kind of path not supported!");
     }
 };
 
@@ -28554,7 +28556,7 @@ QueryEngine.QueryEngine.prototype.executeUNION = function(projection, dataset, p
     var set2 = null;
 
     if(patterns.length != 2) {
-        throw("SPARQL algebra UNION with more than two components");
+        throw new Error("SPARQL algebra UNION with more than two components");
     }
 
     var that = this;
@@ -29907,7 +29909,7 @@ if(!!Worker) {
             var id = this.registerCallback('insert', callback);
             this.connection.postMessage({'fn':'insert', 'args':[triples,graph], 'callback':id})
         } else {
-            throw("The triples to insert, an optional graph and callback must be provided");
+            throw new Error("The triples to insert, an optional graph and callback must be provided");
         }
     };
 
@@ -29920,7 +29922,7 @@ if(!!Worker) {
             callback = arguments[1] || function(){};
             graphUri = arguments[0];
         } else {
-            throw("An optional graph URI and a callback function must be provided");
+            throw new Error("An optional graph URI and a callback function must be provided");
         }
 
         var that = this;
@@ -29959,7 +29961,7 @@ if(!!Worker) {
             graphUri = arguments[1];
             callback = arguments[2] || function(){};
         } else {
-            throw("An optional graph URI and a callback function must be provided");
+            throw new Error("An optional graph URI and a callback function must be provided");
         }
 
         var that = this;
@@ -30017,7 +30019,7 @@ if(!!Worker) {
             var id = this.registerCallback('delete', callback);
             this.connection.postMessage({'fn':'delete', 'args':[triples,graph], 'callback':id})
         } else {
-            throw("The triples to delete, an optional graph and callback must be provided");
+            throw new Error("The triples to delete, an optional graph and callback must be provided");
         }
     };
 
@@ -30036,7 +30038,7 @@ if(!!Worker) {
             var id = this.registerCallback('clear', callback);
             this.connection.postMessage({'fn':'clear', 'args':[graph], 'callback':id})
         } else {
-            throw("The optional graph and a callback must be provided");
+            throw new Error("The optional graph and a callback must be provided");
         }
     };
 
@@ -30086,7 +30088,7 @@ if(!!Worker) {
             var id = this.registerCallback('load', callback);
             this.connection.postMessage({'fn':'load', 'args':[mediaType, data, graph], 'callback':id})
         } else if(arguments.length === 2) {
-            throw("The mediaType of the parser, the data a callback and an optional graph must be provided");
+            throw new Error("The mediaType of the parser, the data a callback and an optional graph must be provided");
         }
      
     };
@@ -30376,7 +30378,7 @@ Store.Store = function(arg1, arg2) {
         params   = arg1;
         callback = arg2;
     } else {
-        throw("An optional argument map and a callback must be provided");
+        throw new Error("An optional argument map and a callback must be provided");
     }
 
     if(params['treeOrder'] == null) {
@@ -30581,7 +30583,7 @@ Store.Store.prototype.graph = function() {
         callback = arguments[1] || function(){};
         graphUri = arguments[0];
     } else {
-        throw("An optional graph URI and a callback function must be provided");
+        throw new Error("An optional graph URI and a callback function must be provided");
     }
 
     if(this.rdf.resolve(graphUri) != null) {
@@ -30624,7 +30626,7 @@ Store.Store.prototype.node = function() {
         graphUri = arguments[1];
         callback = arguments[2] || function(){};
     } else {
-        throw("An optional graph URI, node URI and a callback function must be provided");
+        throw new Error("An optional graph URI, node URI and a callback function must be provided");
     }
 
     if(this.rdf.resolve(graphUri) != null) {
@@ -30850,7 +30852,7 @@ Store.Store.prototype.insert = function() {
         graph = this.rdf.createNamedNode(arguments[1]);
         callback= arguments[2] || function(){};
     } else {
-        throw("The triples to insert, an optional graph and callback must be provided");
+        throw new Error("The triples to insert, an optional graph and callback must be provided");
     }
 
     var query = "";
@@ -30914,7 +30916,7 @@ Store.Store.prototype['delete'] = function() {
         graph = this.rdf.createNamedNode(arguments[1]);
         callback= arguments[2] || function(){};
     } else {
-        throw("The triples to delete, an optional graph and callback must be provided");
+        throw new Error("The triples to delete, an optional graph and callback must be provided");
     }
 
     var query = "";
@@ -30959,7 +30961,7 @@ Store.Store.prototype.clear = function() {
         graph = this.rdf.createNamedNode(arguments[0]);
         callback= arguments[1] || function(){};
     } else {
-        throw("The optional graph and a callback must be provided");
+        throw new Error("The optional graph and a callback must be provided");
     }
 
     var query = "CLEAR GRAPH " + this._nodeToQuery(graph);
@@ -31055,7 +31057,7 @@ Store.Store.prototype.load = function(){
         }
         callback= arguments[3] || function(){};
     } else if(arguments.length === 2) {
-        throw("The mediaType of the parser, the data a callback and an optional graph must be provided");
+        throw new Error("The mediaType of the parser, the data a callback and an optional graph must be provided");
     }
 
     if(mediaType === 'remote') {

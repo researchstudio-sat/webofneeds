@@ -18,10 +18,6 @@ import {
 } from './utils.js';
 
 import {
-    ttlToJsonLd,
-} from './won-utils.js';
-
-import {
     actionTypes,
 } from './actions/actions.js';
 
@@ -161,7 +157,7 @@ export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, thei
 export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
 
     let jsonldGraphPayloadP = isTTL?
-        ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
+        won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
         Promise.resolve();
 
     const envelopeDataP = won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
@@ -312,6 +308,15 @@ export function buildCreateMessage(needData, wonNodeUri) {
     };
 }
 
+
+export function buildProposalMessage(uri, type, text) {
+    const msgP = won.WONMSG.msguriPlaceholder;
+    const sc = "http://purl.org/webofneeds/agreement#"+type;
+    const whM = "\n won:hasTextMessage ";
+    return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
+}
+
+
 export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
@@ -369,7 +374,7 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
-    return fetch("/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
+        return fetch("/owner/rest/linked-data/?requester="+encodeURI(needUri)+"&uri="+encodeURI(eventUri), {
             method: 'get',
             headers : { 
                 'Accept': 'application/ld+json',

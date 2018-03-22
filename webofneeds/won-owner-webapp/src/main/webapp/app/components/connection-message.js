@@ -2,6 +2,7 @@
 ;
 
 import angular from 'angular';
+import won from '../won-es6.js';
 import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
@@ -12,7 +13,6 @@ import {
 } from '../won-label-utils.js'
 import {
     connect2Redux,
-    jsonLdToTrig,
 } from '../won-utils.js';
 import {
     attach,
@@ -21,6 +21,9 @@ import {
     getIn,
     deepFreeze,
 } from '../utils.js'
+import {
+	buildProposalMessage,
+} from '../won-message-utils.js';
 import {
     actionCreators
 }  from '../actions/actions.js';
@@ -47,53 +50,57 @@ function genComponentConf() {
             ng-click="self.router__stateGoAbs('post', {postUri: self.theirNeed.get('uri')})"
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
-        <div class="won-cm__content">
-            <div class="won-cm__content__text"
-            	title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-            	ng-class="{'proposal' : self.message.get('isProposeMessage')}">
-                <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
-                <span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>	
-                {{ self.message.get('text') }}
+        <div class="won-cm__center" ng-class="{'won-cm__center--nondisplayable': !self.text}">
 
-                <br ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
-                <hr ng-show="self.shouldShowRdf && self.contentGraphsTrig"/>
-                <code ng-show="self.shouldShowRdf && self.contentGraphsTrig">
-                    {{ self.contentGraphsTrig }}
-                </code>
-
-                <div class="won-cm__content__button" 
-                	ng-if="self.message.get('isProposeMessage') 
-                		&& !self.message.get('outgoingMessage')
-                		&& !self.message.get('isAcceptMessage')
-                		&& !self.message.isAccepted
-    					&& !self.clicked">
-                	<button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
-                </div>
-                <div class="won-cm__content__button" 
-                	ng-if="self.message.get('outgoingMessage')
-                		&& !self.message.get('isProposeMessage') 
-                		&& !self.message.get('isAcceptMessage')">
-                	 <svg class="won-cm__content__carret clickable"
-                	 		ng-click="self.showDetail = !self.showDetail"
-                	 		ng-show="!self.showDetail">
-	                    <use href="#ico16_arrow_down"></use>
-	                </svg>
-	                <svg class="won-cm__content__carret clickable"
-    						ng-click="self.showDetail = !self.showDetail"
-    						ng-show="self.showDetail">
-	                    <use href="#ico16_arrow_up"></use>
-	                </svg>
-                	<button class="won-button--filled thin black" ng-click="self.sendProposal()" ng-show="self.showDetail">Propose</button>
-                </div>
+            <div 
+                class="won-cm__center__bubble" 
+                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
+    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage') || self.message.get('isProposeToCancel'))}">
+                    <span class="won-cm__center__bubble__text">
+                    <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
+                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>
+                	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>		
+                        {{ self.text? self.text : self.noTextPlaceholder }}
+                    </span>
+                    <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
+                    <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
+                    <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
+                        {{ self.contentGraphTrig }}
+                    </code>
+                    <div class="won-cm__center__button" 
+                        ng-if="self.message.get('isProposeMessage') 
+                            && !self.message.get('outgoingMessage')
+                            && !self.message.get('isAcceptMessage')
+                            && !self.message.isAccepted
+                            && !self.clicked">
+                        <button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
+                    </div>
+                    <div class="won-cm__center__button" 
+                        ng-if="self.message.get('outgoingMessage')
+                            && !self.message.get('isProposeMessage') 
+                            && !self.message.get('isAcceptMessage')
+                            && !self.message.get('isProposeToCancel')">
+                        <svg class="won-cm__center__carret clickable"
+                                ng-click="self.showDetail = !self.showDetail"
+                                ng-show="!self.showDetail">
+                            <use href="#ico16_arrow_down"></use>
+                        </svg>
+                        <svg class="won-cm__center__carret clickable"
+                                ng-click="self.showDetail = !self.showDetail"
+                                ng-show="self.showDetail">
+                            <use href="#ico16_arrow_up"></use>
+                        </svg>
+                        <button class="won-button--filled thin black" ng-click="self.sendProposal()" ng-show="self.showDetail">Propose</button>
+                    </div>
             </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
-                class="won-cm__content__time">
+                class="won-cm__center__time">
                     Pending&nbsp;&hellip;
             </div>
             <div
                 ng-hide="self.message.get('unconfirmed')"
-                class="won-cm__content__time">
+                class="won-cm__center__time">
                     {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
             </div>
             <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
@@ -126,6 +133,11 @@ function genComponentConf() {
             
             const self = this;
 
+            self.noTextPlaceholder = 
+                        '«This message couldn\'t be displayed as it didn\'t contain text! ' +
+                        'Click on the \"RDF\"-logo at ' + 
+                        'the bottom of screen to see the \"raw\" message-data.»'
+
             const selectFromState = state => {
                 /*
                 const connectionUri = selectOpenConnectionUri(state);
@@ -143,7 +155,9 @@ function genComponentConf() {
                     theirNeed,
                     connection,
                     message,
+                    text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
+                    contentGraphTrig: get(message, 'contentGraphTrig') || "",
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }
@@ -158,23 +172,25 @@ function genComponentConf() {
 
             // gotta do this via a $watch, as the whole message parsing before 
             // this point happens synchronously but jsonLdToTrig needs to be async.
+            /*
             this.$scope.$watch(
                 () => this.contentGraphs,
                 (newVal, oldVal) => {
-                    jsonLdToTrig(newVal.toJS())
+                    won.jsonLdToTrig(newVal.toJS())
                     .then(trig => {
-                        this.contentGraphsTrig = trig;
+                        this.contentGraphTrig = trig;
                     })
                     .catch(e => {
-                        this.contentGraphsTrig = JSON.stringify(e);
+                        this.contentGraphTrig = JSON.stringify(e);
                     })
                 }
             )
+            */
         }
         
         sendProposal(){
         	this.clicked = true;
-        	const trimmedMsg = this.buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	const trimmedMsg = buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate();
         }
@@ -183,17 +199,10 @@ function genComponentConf() {
         	this.clicked = true;
         	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
-        	const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
         	this.onUpdate();
-        }
-        
-        buildProposalMessage(uri, type, text) {
-        	const msgP = won.WONMSG.msguriPlaceholder;
-        	const sc = "http://purl.org/webofneeds/agreement#"+type;
-        	const whM = "\n won:hasTextMessage ";
-        	return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
         }
 
         updateAlignment(isOutgoingMessage) {
