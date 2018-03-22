@@ -12,8 +12,11 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.shared.NotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import won.protocol.model.Coordinate;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
+import won.protocol.util.NeedModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
 
