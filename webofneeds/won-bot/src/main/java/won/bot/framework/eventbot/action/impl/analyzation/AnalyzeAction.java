@@ -90,6 +90,8 @@ public class AnalyzeAction extends BaseEventBotAction {
         WonMessage wonMessage = ((MessageEvent) event).getWonMessage();
         logger.trace("Message Information ------");
         logger.trace("Message Type: "+ (receivedMessage ? "RECEIVED" : "SENT"));
+        logger.trace("MessageUri: "+ wonMessage.getMessageURI());
+        logger.trace("CorrespondingRemoteMessageURI: "+ wonMessage.getCorrespondingRemoteMessageURI());
         logger.trace("NeedUri: " + needUri);
         logger.trace("remoteNeedUri: " + remoteNeedUri);
         logger.trace("connectionUri: " + connectionUri);
