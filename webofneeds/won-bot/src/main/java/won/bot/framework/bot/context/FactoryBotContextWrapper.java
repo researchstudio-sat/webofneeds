@@ -116,8 +116,6 @@ public class FactoryBotContextWrapper extends BotContextWrapper {
     }
 
     public void addPreconditionProposalRelation(Precondition precondition, Proposal proposal) {
-        //TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED OR NOT BEFORE WE REMOVE THE TEMP STATUS
-        removePreconditionMetPending(precondition.getUri());
         getBotContext().addToListMap(preconditionToProposalListMapName, precondition.getUri(), proposal);
         getBotContext().addToListMap(proposalToPreconditionListMapName, proposal.getUri().toString(), precondition);
     }
