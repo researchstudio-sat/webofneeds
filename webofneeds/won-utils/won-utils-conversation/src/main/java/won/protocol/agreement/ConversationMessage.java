@@ -1,15 +1,14 @@
 package won.protocol.agreement;
 
+import org.apache.thrift.Option;
+import won.protocol.agreement.effect.MessageEffect;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
+
 import java.net.URI;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
-
-import org.apache.thrift.Option;
-
-import won.protocol.agreement.effect.MessageEffect;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
 
 /**
  * 

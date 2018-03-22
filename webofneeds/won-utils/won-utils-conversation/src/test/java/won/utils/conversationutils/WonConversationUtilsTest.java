@@ -15,7 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-import won.protocol.agreement.AgreementProtocol;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;

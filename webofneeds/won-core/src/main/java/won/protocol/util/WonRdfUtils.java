@@ -21,18 +21,15 @@ import won.protocol.model.Match;
 import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.vocabulary.SFSIG;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONAGR;
-import won.protocol.vocabulary.WONMOD;
-import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.*;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
-import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
-import static won.protocol.util.RdfUtils.visit;
+import static won.protocol.util.RdfUtils.*;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -561,7 +558,7 @@ public class WonRdfUtils
                           "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
                           "SELECT ?eventUri where {\n" +
                           " graph ?g {"+
-                          "  ?s agr:reject ?eventUri .\n" +
+                          "  ?s agr:rejects ?eventUri .\n" +
                           "}}";
           Query query = QueryFactory.create(queryString);
 
