@@ -1,40 +1,24 @@
 package won.protocol.agreement;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.SparqlSelectFunction;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONAGR;
+
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 
 public class AgreementProtocolState {
@@ -346,19 +330,19 @@ public class AgreementProtocolState {
 					.filter(other -> msg.isMessageOnPathToRoot(other))
 					
 					.forEach(other -> {
-						if (logger.isDebugEnabled()) {
-							logger.debug("{} retracts {}: valid", msg.getMessageURI(), other.getMessageURI());
-						}
-						boolean changedSomething = false;
-						changedSomething = removeContentGraphs(conversation, other) || changedSomething;
-						retractedUris.add(other.getMessageURI());
-						if (other.isProposesMessage()) {
-							changedSomething = retractProposal(other.getMessageURI()) || changedSomething;
-						}
-						if (changedSomething) {
-							effectsBuilder.retracts(other.getMessageURI());
-						}
-					});
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("{} retracts {}: valid", msg.getMessageURI(), other.getMessageURI());
+                        }
+                        boolean changedSomething = false;
+                        changedSomething = removeContentGraphs(conversation, other) || changedSomething;
+                        retractedUris.add(other.getMessageURI());
+                        if (other.isProposesMessage()) {
+                            changedSomething = retractProposal(other.getMessageURI()) || changedSomething;
+                        }
+                        if (changedSomething) {
+                            effectsBuilder.retracts(other.getMessageURI());
+                        }
+                    });
 			}
 			if (msg.isRejectsMessage()) {
 				removeContentGraphs(conversation, msg);

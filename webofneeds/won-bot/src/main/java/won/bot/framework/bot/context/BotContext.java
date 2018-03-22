@@ -144,6 +144,14 @@ public interface BotContext {
    */
   void removeFromListMap(String collectionName, String key, final Serializable... values);
 
+    /**
+     * Remove one or more arbitrary objects from the list for all keys in the collection.
+     *
+     * @param collectionName
+     * @param values
+     */
+    void removeLeavesFromListMap(String collectionName, final Serializable... values);
+
   /**
    * Retrieve all objects from one collection at one key previously added using addToListMap().
    *

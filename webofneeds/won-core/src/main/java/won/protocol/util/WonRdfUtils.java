@@ -21,18 +21,15 @@ import won.protocol.model.Match;
 import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.vocabulary.SFSIG;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONAGR;
-import won.protocol.vocabulary.WONMOD;
-import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.*;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
-import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
-import static won.protocol.util.RdfUtils.visit;
+import static won.protocol.util.RdfUtils.*;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -228,6 +225,16 @@ public class WonRdfUtils
       Resource baseRes = messageModel.createResource(messageModel.getNsPrefixURI(""));
       baseRes.addProperty(WON.HAS_TEXT_MESSAGE,message, XSDDatatype.XSDstring);
       return messageModel;
+    }
+
+    /**
+    * Create an RDF model containing a text message and a processing message
+    * @param message
+    * @return
+    */
+    public static Model processingMessage(String message) {
+        Model messageModel = textMessage(message);
+        return addProcessing(messageModel, message);
     }
 
     /**
@@ -448,34 +455,6 @@ public class WonRdfUtils
           return null;
       }
 
-      public static URI getAcceptedEvent(final WonMessage wonMessage) {
-          String queryString =
-                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
-                          "SELECT ?eventUri where {\n" +
-                          " graph ?g {"+
-                          "  ?s agr:accepts ?eventUri .\n" +
-                          "}}";
-          Query query = QueryFactory.create(queryString);
-
-
-          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
-              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
-              ResultSet rs = qexec.execSelect();
-              if (rs.hasNext()) {
-                  QuerySolution qs = rs.nextSolution();
-                  String eventUri = rdfNodeToString(qs.get("eventUri"));
-                  if (rs.hasNext()) {
-                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
-                      throw new IllegalArgumentException("wonMessage has more than one accepts eventUri");
-                  }
-
-                  return eventUri != null? URI.create(eventUri) : null;
-              }
-          }
-          return null;
-      }
-
       public static List<URI> getAcceptedEvents(final WonMessage wonMessage) {
           return getAcceptedEvents(wonMessage.getCompleteDataset());
       }
@@ -505,6 +484,43 @@ public class WonRdfUtils
           }
           return acceptedEvents;
       }
+
+      public static boolean isProcessingMessage(final WonMessage wonMessage) {
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+                          "SELECT ?text where {\n" +
+                          " graph ?g {"+
+                          "  ?s won:isProcessing ?text .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String text = rdfNodeToString(qs.get("text"));
+
+                  if(text != null) {
+                      return true;
+                  }
+              }
+          }
+          return false;
+      }
+
+      /**
+       * Adds the specified text as a won:hasTextMessage to the model's base resource.
+       * @param message
+       * @return
+       */
+      public static Model addProcessing(Model model, String message) {
+          Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
+          baseRes.addProperty(WON.IS_PROCESSING, message, XSDDatatype.XSDstring);
+          return model;
+      }
+
 
       public static List<URI> getProposesEvents(final WonMessage wonMessage) {
           return getProposesEvents(wonMessage.getCompleteDataset());
