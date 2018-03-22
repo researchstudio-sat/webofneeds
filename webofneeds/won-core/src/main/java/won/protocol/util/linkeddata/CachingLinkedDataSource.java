@@ -95,11 +95,13 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 	 */
 	public void invalidate(URI resource) {
 		assert resource != null : "resource must not be null";
+		logger.debug("invalidating cached resource {}", resource );
 		cache.remove(makeCacheKey(resource, null));
 	}
 
 	public void invalidate(URI resource, URI requesterWebID) {
 		assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
+		logger.debug("invalidating cached resource {} for webid {}", resource, requesterWebID );
 		cache.remove(makeCacheKey(resource, requesterWebID));
 	}
 
@@ -340,6 +342,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 				responseData.getResponseHeaders(), responseData.getStatusCode());
 		this.cache.put(new Element(makeCacheKey(resource, requesterWebID), entry));
 		logger.debug("Fetched and cached {} ", resource);
+		if (logger.isDebugEnabled()) {
+			logger.debug("cache size: {} elements, in-memory size: {} bytes",cache.getSize(), cache.calculateInMemorySize());
+		}
 		return responseData;
 	}
 
@@ -518,6 +523,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 		// this.cache = new SelfPopulatingCache(baseCache, new
 		// LinkedDataCacheEntryFactory());
 		this.cache = baseCache;
+		
 	}
 
 	public void setCacheManager(final EhCacheCacheManager cacheManager) {
