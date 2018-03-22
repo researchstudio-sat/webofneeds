@@ -37,6 +37,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConn
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.AgreementProtocolState;
+import won.protocol.agreement.effect.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
@@ -49,7 +50,6 @@ import won.utils.goals.GoalInstantiationResult;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 public class AnalyzeAction extends BaseEventBotAction {
@@ -97,82 +97,65 @@ public class AnalyzeAction extends BaseEventBotAction {
             publishAnalyzingMessage(connection);
         }
 
-        List<URI> proposesEvents = WonRdfUtils.MessageUtils.getProposesEvents(wonMessage);
-        List<URI> rejectEventUris = WonRdfUtils.MessageUtils.getRejectEvents(wonMessage);
-        List<URI> retractEventUris = WonRdfUtils.MessageUtils.getRetractEvents(wonMessage);
-        List<URI> proposesToCancelEvents = WonRdfUtils.MessageUtils.getProposesToCancelEvents(wonMessage);
-        List<URI> acceptedEventUris = WonRdfUtils.MessageUtils.getAcceptedEvents(wonMessage);
-
-        AgreementProtocolState agreementProtocolState = null; //Initialize with null, to ensure some form of lazy init for the agreementProtocolState
-
-        if(receivedMessage) {
-            WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
-
-            if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()) {
-                //If the message contains proposes or proposesToCancel the event itself is a proposal
-                bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
-            }
-
-            if(!acceptedEventUris.isEmpty()) {
-                for(URI acceptedEventURI : acceptedEventUris) {
-                    Dataset acceptedEventData = linkedDataSource.getDataForResource(acceptedEventURI, connection.getNeedURI());
-
-                    List<URI> proposedToCancelAgreementUris = WonRdfUtils.MessageUtils.getProposesToCancelEvents(acceptedEventData);
-                    if(!proposedToCancelAgreementUris.isEmpty()){
-                        for(URI proposedToCancelAgreementUri : proposedToCancelAgreementUris){
-                            bus.publish(new AgreementCanceledEvent(connection, proposedToCancelAgreementUri));
-                        }
-                    } else {
-                        agreementProtocolState = getAgreementProtocolStateLazyInit(agreementProtocolState, connectionUri);
-                        Model agreementPayload = agreementProtocolState.getAgreement(acceptedEventURI);
-                        if(!agreementPayload.isEmpty()) {
-                            bus.publish(new ProposalAcceptedEvent(connection, acceptedEventURI, agreementPayload));
-                        }
-                    }
-                }
-            }
-        }
-
-        //Things to do for each individual message regardless of it being received or sent
         Dataset needDataset = linkedDataSource.getDataForResource(needUri);
         Collection<Resource> goalsInNeed = new NeedModelWrapper(needDataset).getGoals();
 
-        if(!proposesEvents.isEmpty() || !proposesToCancelEvents.isEmpty()){
-            //If the message contains proposesEvents or proposesToCancel events it is considered a proposal so we save the status of it in the botContext
-            Proposal proposal = new Proposal(receivedMessage? wonMessage.getCorrespondingRemoteMessageURI() : wonMessage.getMessageURI(), ProposalState.SUGGESTED);
-            agreementProtocolState = getAgreementProtocolStateLazyInit(agreementProtocolState, connectionUri);
-            Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
+        AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri, getEventListenerContext().getLinkedDataSource()); //Initialize with null, to ensure some form of lazy init for the agreementProtocolState
+        Set<MessageEffect> messageEffects = agreementProtocolState.getEffects(wonMessage.getMessageURI());
 
-            if(!proposalModel.isEmpty()) {
-                for(Resource goal : goalsInNeed){
-                    String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
+        messageEffects.forEach(messageEffect -> {
+            if(messageEffect instanceof Accepts) {
+                if(receivedMessage) {
+                    Accepts effect = (Accepts) messageEffect;
 
-                    if(!botContextWrapper.hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
-                        GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
-                        Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
+                    effect.getCancelledAgreementURIs().forEach(cancelledAgreementUri -> {
+                        bus.publish(new AgreementCanceledEvent(connection, cancelledAgreementUri));
+                    });
 
-                        logger.debug("Adding Precondition/Proposal Relation: " + precondition + "/" + proposal);
-                        botContextWrapper.addPreconditionProposalRelation(precondition, proposal);
+                    Model agreementPayload = agreementProtocolState.getAgreement(effect.getAcceptedMessageUri());
+
+                    if (!agreementPayload.isEmpty()) {
+                        bus.publish(new ProposalAcceptedEvent(connection, effect.getAcceptedMessageUri(), agreementPayload));
                     }
                 }
-            } else {
-                logger.debug("No PreconditionProposalRelations to add... proposalModel is empty");
-            }
-        }
+            } else if(messageEffect instanceof Proposes) {
+                WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
+                URI messageUri = messageEffect.getMessageUri();
 
-        if(!rejectEventUris.isEmpty() || !retractEventUris.isEmpty()) {
-            agreementProtocolState = getAgreementProtocolStateLazyInit(agreementProtocolState, connectionUri);
-            Set<URI> agreementUris = agreementProtocolState.getAgreementUris();
+                Proposal proposal = new Proposal(messageUri, ProposalState.SUGGESTED);
+                Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
 
-            retractEventUris.addAll(rejectEventUris);
-            retractEventUris.forEach(eventUri -> {
-                if(!agreementUris.contains(eventUri)) {
-                    //if the agreement payload is empty we can be certain that the uri was "just" a proposal before and can be dereferenced from our maps
-                    botContextWrapper.removeProposalReferences(eventUri);
+                if(!proposalModel.isEmpty()) {
+                    for(Resource goal : goalsInNeed){
+                        String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
+
+                        if(!botContextWrapper.hasPreconditionProposalRelation(preconditionUri, proposal.getUri().toString())) {
+                            GoalInstantiationResult result = GoalInstantiationProducer.findInstantiationForGoalInDataset(needDataset, goal, proposalModel);
+                            Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
+
+                            logger.debug("Adding Precondition/Proposal Relation: " + precondition + "/" + proposal);
+                            botContextWrapper.addPreconditionProposalRelation(precondition, proposal);
+                        }
+                    }
+                } else {
+                    logger.debug("No PreconditionProposalRelations to add... proposalModel is empty");
                 }
-            });
-        }
 
+                if(receivedMessage) {
+                    bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
+                }
+            } else if(messageEffect instanceof Rejects) {
+                Rejects effect = (Rejects) messageEffect;
+
+                botContextWrapper.removeProposalReferences(effect.getRejectedMessageUri());
+            } else if(messageEffect instanceof Retracts) {
+                Retracts effect = (Retracts) messageEffect;
+
+                botContextWrapper.removeProposalReferences(effect.getRetractedMessageUri());
+            }
+        });
+
+        //Things to do for each individual message regardless of it being received or sent
         Dataset remoteNeedDataset = ctx.getLinkedDataSource().getDataForResource(remoteNeedUri);
         Dataset conversationDataset = null;  //Initialize with null, to ensure some form of lazy init for the conversationDataset
         GoalInstantiationProducer goalInstantiationProducer = null;
@@ -215,16 +198,6 @@ public class AnalyzeAction extends BaseEventBotAction {
     }
 
     //********* Helper Methods **********
-    private AgreementProtocolState getAgreementProtocolStateLazyInit(AgreementProtocolState agreementProtocolState, URI connectionUri) {
-        if(agreementProtocolState == null){
-            logger.debug("Retrieving AgreementProtocolState Of Connection");
-            return AgreementProtocolState.of(connectionUri, getEventListenerContext().getLinkedDataSource());
-        }else{
-            logger.debug("Already retrieved AgreementProtocolState Of Connection");
-            return agreementProtocolState;
-        }
-    }
-
     private Dataset getConversationDatasetLazyInit(Dataset conversationDataset, URI connectionUri) {
         if(conversationDataset == null){
             logger.debug("Retrieving Conversation Of Connection");

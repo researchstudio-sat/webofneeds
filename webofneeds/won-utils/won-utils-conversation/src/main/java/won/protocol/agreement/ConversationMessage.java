@@ -1,14 +1,16 @@
 package won.protocol.agreement;
 
-import org.apache.thrift.Option;
-import won.protocol.agreement.effect.MessageEffect;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
-
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
+
+import org.apache.thrift.Option;
+
+import won.protocol.agreement.effect.MessageEffect;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 
 /**
  * 
@@ -60,7 +62,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	
 	private Set<ConversationMessage> knownMessagesOnPathToRoot = new HashSet<ConversationMessage>();
 	
-	private Set<MessageEffect> effects;
+	private Set<MessageEffect> effects = Collections.EMPTY_SET;
 	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
