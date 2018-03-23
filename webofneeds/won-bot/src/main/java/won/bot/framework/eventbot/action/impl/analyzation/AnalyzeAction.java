@@ -29,7 +29,7 @@ import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.*;
-import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCanceledEvent;
+import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
@@ -135,7 +135,7 @@ public class AnalyzeAction extends BaseEventBotAction {
                     Accepts effect = (Accepts) messageEffect;
 
                     effect.getCancelledAgreementURIs().forEach(cancelledAgreementUri -> {
-                        bus.publish(new AgreementCanceledEvent(connection, cancelledAgreementUri));
+                        bus.publish(new AgreementCancellationAcceptedEvent(connection, cancelledAgreementUri));
                     });
 
                     Model agreementPayload = agreementProtocolState.getAgreement(effect.getAcceptedMessageUri());

@@ -7,16 +7,16 @@ import java.net.URI;
 /**
  * Created by fsuda on 27.11.2017.
  */
-public class AgreementCanceledEvent extends AgreementEvent {
+public class AgreementCancellationRequestedEvent extends AgreementEvent {
     //Uri of the message that contains the agreementUri as proposeToCancel
     //if null then this event is regarding an already Accepted Cancellation
     private URI messageUri;
 
-    public AgreementCanceledEvent(Connection con, URI agreementUri){
+    public AgreementCancellationRequestedEvent(Connection con, URI agreementUri){
         super(con, agreementUri);
     }
 
-    public AgreementCanceledEvent(Connection con, URI agreementUri, URI messageUri) {
+    public AgreementCancellationRequestedEvent(Connection con, URI agreementUri, URI messageUri) {
         super(con, agreementUri);
         this.messageUri = messageUri;
     }
