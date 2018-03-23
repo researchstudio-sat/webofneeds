@@ -19,6 +19,8 @@ package won.bot.framework.eventbot.action.impl.debugbot;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,11 +28,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.util.StopWatch;
-
-import com.google.common.collect.Lists;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -53,7 +51,9 @@ import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEv
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.agreement.AgreementProtocol;
+import won.protocol.agreement.ConversationMessage;
+import won.protocol.agreement.effect.Accepts;
+import won.protocol.agreement.effect.Proposes;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonConversationUtils;
@@ -359,7 +359,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void proposeLatestMessage(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset ->conversationDataset -> {
+				conversationDataset -> {
 					URI uri = WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getNeedURI(),1);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				}, 
@@ -398,7 +398,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> {
-					URI uri = WonConversationUtils.getNthLatestProposesMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),1);
+					URI uri = WonConversationUtils.getLatestProposesMessageOfNeed(conversationDataset, con.getRemoteNeedURI());
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
@@ -419,9 +419,9 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				//conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesToCancelMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
 				conversationDataset -> {
 					URI uri = WonConversationUtils.getNthLatestMessage(conversationDataset, 
-					ConversationMessage m -> con.getRemoteNeedURI().equals(m.getSenderNeed()) 
-						&& m.isProposesToCancelMessage()
-						&& m.getEffects().stream().any(e -> e instanceof Proposes && ((Proposes)e).getProposesToCancel().size() > 0); 
+					msg -> con.getRemoteNeedURI().equals(((ConversationMessage) msg).getSenderNeedURI()) 
+						&& ((ConversationMessage) msg).isProposesToCancelMessage()
+						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e instanceof Proposes && ((Proposes)e).getProposesToCancel().size() > 0) 
 					,1);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				},
@@ -442,12 +442,12 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.", 
 				conversationDataset -> {
 					URI uri = WonConversationUtils.getNthLatestMessage(conversationDataset, 
-					ConversationMessage m -> con.getRemoteNeedURI().equals(m.getSenderNeed()) 
-						&& m.isAcceptsMessage()
-						&& m.getEffects().stream().any(e -> e instanceof Accept); 
+					msg -> con.getRemoteNeedURI().equals(((ConversationMessage) msg).getSenderNeedURI()) 
+						&& ((ConversationMessage) msg).isAcceptsMessage()
+						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e instanceof Accepts) 
 					,1);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
-				}, 
+				},
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {

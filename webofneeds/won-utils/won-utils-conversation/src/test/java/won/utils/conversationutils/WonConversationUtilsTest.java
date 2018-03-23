@@ -72,7 +72,7 @@ public class WonConversationUtilsTest {
 	
 	@Test
 	public void testLatestProposesToCancelMessageOfNeed() throws IOException {
-		Dataset input = loadDataset(inputFolder + "conversation-with-agreements.trig");
+		Dataset input = loadDataset(inputFolder + "2proposal-one-agreement-one-cancellation.trig");
 		URI actual = WonConversationUtils.getLatestProposesToCancelMessageOfNeed(input,URI.create("https://localhost:8443/won/resource/need/7820503869697675000"));
 		List<URI> expectedOutput = loadUriList(expectedOutputFolder + "latestproposestocancelmessagageofneed.txt");
 		if (actual != null && ! expectedOutput.get(0).equals(actual)) {

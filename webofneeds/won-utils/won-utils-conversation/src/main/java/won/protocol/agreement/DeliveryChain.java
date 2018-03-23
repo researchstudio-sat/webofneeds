@@ -19,7 +19,7 @@ public class DeliveryChain {
 	public void addMessage(ConversationMessage msg) {
 		if (msg.isHeadOfDeliveryChain()) {
 			if (this.head != null && this.head != msg) {
-				throw new IllegalArgumentException("Trying to add another root ("+ msg.getMessageURI() + ") to delivery chain " + head.getMessageURI());
+				throw new IllegalArgumentException("Trying to add another head ("+ msg.getMessageURI() + ") to delivery chain " + head.getMessageURI());
 			}
 			this.head = msg;
 		}
@@ -85,9 +85,9 @@ public class DeliveryChain {
 		return other.getMessages().stream()
 				.anyMatch(
 						msg -> 
-						//is the root before msg?
+						//is the head before msg?
 						this.getHead().isMessageOnPathToRoot(msg)
-						//is the remote message of root before msg?
+						//is the remote message of head before msg?
 						|| (this.getHead().hasCorrespondingRemoteMessage() 
 								&& this.getHead().getCorrespondingRemoteMessageRef().isMessageOnPathToRoot(msg)));
 	}
@@ -107,7 +107,7 @@ public class DeliveryChain {
 		return other.getMessages().stream()
 				.allMatch(
 						msg -> {
-						//is the root before and the end after msg?
+						//is the head before and the end after msg?
 						boolean isHeadBeforeAllOtherMsgs = 
 								msg.isMessageOnPathToRoot(this.getHead()) || 
 									(getHead().hasCorrespondingRemoteMessage() 
@@ -122,7 +122,7 @@ public class DeliveryChain {
 	}
 
 	/**
-	 * Another delivery chain is interleaved with this one both root
+	 * Another delivery chain is interleaved with this one both head
 	 * messages are before either chain.
 	 * @param other
 	 * @return
@@ -172,7 +172,7 @@ public class DeliveryChain {
 	@Override
 	public String toString() {
 		return "DeliveryChain ["
-				+ "root=" + head.getMessageURI()
+				+ "head=" + head.getMessageURI()
 				+ ", isTerminated():" + isTerminated()
 				+ ", end:" + ((getEnd() != null) ? getEnd().getMessageURI() : "null")
 				+ ", interleaved with: " + (this.interleavedDeliveryChains.size() == 0 ? "none" : this.interleavedDeliveryChains.stream().map(x -> x.getHead()))
