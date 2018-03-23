@@ -657,11 +657,77 @@ import won from './won.js';
                     { ?s won:hasCorrespondingRemoteMessage ?o } union
                     { ?s won:hasReceiver ?o }.
                 }`);
+
             //final cleanup and return
             return queryPromise.then(queryResults => queryResults.map(r => r.s.value))
         });
 
         return allLoadedResourcesP;
+    }
+
+
+    /**
+     * Note: this is a hack, as it heavily depends on the structure of the 
+     * dataset, the structure of uris and the internal structure of the rdfstore. 
+     * The much cleaner, more standardized and planned alternative is to use HTTP/2 
+     * on the server and replace the entire cache-system implemented here with that.
+     * 
+     * @param {*} data 
+     * @returns a map from document-uri to a set of contained graph-uris
+     */
+    async function selectContainedDocumentAndGraphUrisHACK(data) {
+
+        const loadedDocumentUris = await selectLoadedDocumentUrisFromDataset(data);
+
+        const tmpstore = rdfstore.create(); // TODO reuse tmpstore from `selectLoadedDocumentUrisFromDataset`
+        await loadIntoRdfStore(tmpstore, 'application/ld+json', data);
+
+        const baseUriForEvents = getIn(data, ['@context', 'event']);
+        if(!baseUriForEvents)  {
+            throw new Error(
+                'Couldn\'t resolve the \'event\'-prefix needed ' +
+                'for the document-uris to graph-uris hack.'
+            );
+        }
+
+        const mappingsPromises = loadedDocumentUris.map(async (docUri) => {
+            if(docUri.startsWith('event') || docUri.startsWith(baseUriForEvents)) {
+                const messageUri = docUri;
+                const correspondingRemoteMessageUri = getIn(
+                    await executeQueryOnRdfStore(tmpstore, `
+                        prefix event: <${baseUriForEvents}>
+                        prefix msg: <http://purl.org/webofneeds/message#>
+
+                        select distinct ?remoteUri where {
+                            { <${messageUri}> msg:hasCorrespondingRemoteMessage ?remoteUri } union
+                            { ?remoteUri msg:hasCorrespondingRemoteMessage <${messageUri}> }
+                        }
+                        `), 
+                        [0, 'remoteUri', 'value'] // the result is nested a bit, so we need to extract the uri here
+                    );
+
+                const urisInStoreThatStartWith = (uri) => 
+                    Array.from(new Set(
+                        Object.values(tmpstore.engine.lexicon.OIDToUri)
+                        .filter(u => u.startsWith(uri))
+                    ));
+                
+                const graphUrisInEventDoc = urisInStoreThatStartWith(messageUri + "#")
+                    .concat(urisInStoreThatStartWith(correspondingRemoteMessageUri + "#"));
+
+                return {
+                    uri: messageUri,
+                    correspondingRemoteMessageUri,
+                    containedGraphUris: graphUrisInEventDoc,
+                }
+            }
+        });
+        const mappingsArray = (await Promise.all(mappingsPromises)).filter(m => m);
+
+        const mappings = {}; 
+        mappingsArray.forEach(m => mappings[m.uri] = new Set(m.containedGraphUris));
+
+        return mappings;
     }
 
 
@@ -720,8 +786,8 @@ import won from './won.js';
                     won.deleteDocumentFromStore(uri, removeCacheItem)
                 }
             })
-            .then(() =>
-                won.addJsonLdData(dataset, uri)
+            .then(() => 
+                won.addJsonLdData(dataset, uri, get(params, 'deep'))
             )
             .then(() => dataset)
         )
@@ -765,38 +831,87 @@ import won from './won.js';
      * 
      * @param {*} data 
      * @param {*} documentUri 
+     * @param {boolean} deep whether or not the dataset was loaded with `deep=true` and 
+     *   thus contains data from multiple documents.
      */
-    won.addJsonLdData = async function(data, documentUri) {
+    won.addJsonLdData = async function(data, documentUri, deep) {
         const context = data['@context'];
 
+
         // const graphsAddedSeperatelyP = Promise.resolve();
-        const graphsAddedSeperatelyP = groupByGraphs(data)
+        const groupedP = groupByGraphs(data);
+
+        const graphsAddedSeperatelyP = groupedP
         .then(grouped => {
 
-            // Save mapping from documentUri to graphUris, e.g. for future deletion operations
-            const graphUris = grouped.map(g => g['@id']);
-            const prevGraphUris = privateData.documentToGraph[documentUri];
-            if(!prevGraphUris) {
-                privateData.documentToGraph[documentUri] = new Set(graphUris);
-            } else {
-                graphUris.forEach(u => prevGraphUris.add(u));
+            try {
+
+                //  Save mapping from documentUri to graphUris, e.g. for future deletion operations
+                const graphUris = grouped.map(g => g['@id']);
+                saveDocToGraphMapping(documentUri, graphUris);
+
+                // save all the graphs into the rdf store
+                return Promise.all(grouped.map(g => 
+                    loadIntoRdfStore(
+                        privateData.store, 'application/ld+json', 
+                        g, g['@id']
+                    )
+                ))
+            } catch (error) {
+                rethrow(
+                    error, 
+                    "Failed to add subgraphs for " + documentUri + 
+                    ". jsonld: " + JSON.stringify(grouped)
+                );
+                //TODO: reactivate error msg
+                //console.error('Error:', error);
+
             }
-
-            // save all the graphs into the rdf store
-            return grouped.map(g => 
-                loadIntoRdfStore(
-                    privateData.store, 'application/ld+json', 
-                    g, g['@id']
-                )
-            )
-        }).catch(error => {
-            rethrow(error, "Failed to add subgraphs: ");
-        	//TODO: reactivate error msg
-			//console.error('Error:', error);
-		});
+        });
 
 
-        const triplesAddedToDocumentGraphP = loadIntoRdfStore(
+
+        let triplesAddedToDeepDocumentGraphsP = Promise.resolve();
+        if(deep) {
+            if(!documentUri.search('event')) {
+                console.error(
+                    "Adding a dataset loaded with `deep=true` " +
+                    "that isn't an event-container. The cache will " +
+                    "be faulty and deletion won't work properly."
+                );
+            } else {
+                const documentToGraphUri = 
+                    await selectContainedDocumentAndGraphUrisHACK(data);
+
+                //  Save mapping from documentUri to graphUris, e.g. for future deletion operations
+                Object.entries(documentToGraphUri).map(([documentUri, graphUris]) => {
+                    saveDocToGraphMapping(documentToGraphUri, Array.from(graphUris));
+                })
+
+                triplesAddedToDeepDocumentGraphsP = groupedP.then(grouped => {
+                    console.log(
+                        'about to add deep-loaded document graphs: ', 
+                        documentToGraphUri, grouped
+                    );
+                    return Promise.all(
+                        // iterate over documents contained in the dataset, get the 
+                        // graphs related to those documents and add them to the store.
+                        Object.entries(documentToGraphUri).map(([documentUri, graphUris]) => {
+                            const graphs = grouped.filter(graph => graphUris.has(graph['@id']))
+                            return loadIntoRdfStore(
+                                privateData.store, 'application/ld+json', graphs, documentUri
+                            );
+                        })
+                    )
+                });
+
+                //triplesAddedToDocumentGraphsP 
+            }
+        }
+
+
+
+        const triplesAddedToMainDocumentGraphP = loadIntoRdfStore(
             privateData.store, 'application/ld+json', data, documentUri
         );
         const triplesAddedToDefaultGraphP = loadIntoRdfStore(
@@ -806,10 +921,27 @@ import won from './won.js';
         // const triplesAddedToDefaultGraphP = Promise.resolve();
 
         return Promise
-            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP, triplesAddedToDocumentGraphP])
+            .all([
+                graphsAddedSeperatelyP, 
+                triplesAddedToDefaultGraphP, 
+                triplesAddedToMainDocumentGraphP,
+                triplesAddedToDeepDocumentGraphsP 
+            ])
             .then(() => undefined); // no return value beyond success or failure of promise
     }
 
+
+    /**
+     *  Save mapping from documentUri to graphUris, e.g. for future deletion operations
+     */
+    function saveDocToGraphMapping(documentUri, graphUris) {
+        const prevGraphUris = privateData.documentToGraph[documentUri];
+        if(!prevGraphUris) {
+            privateData.documentToGraph[documentUri] = new Set(graphUris);
+        } else {
+            graphUris.forEach(u => prevGraphUris.add(u));
+        }
+    }
 
     /**
      * Loads the need-data without following up
@@ -1842,7 +1974,7 @@ import won from './won.js';
     };
 
     won.getCachedGraphTriples = async function(graphUri, removeAtGraphTriples=true) {
-        const graph = await rdfStoreGetGraph(graphUri);
+        const graph = await rdfStoreGetGraph(privateData.store, graphUri);
 
         if(removeAtGraphTriples) {
             return graph.triples
@@ -1860,7 +1992,7 @@ import won from './won.js';
      * Thin wrapper around `store.graph` that returns a promise.
      * @param {*} graphUri 
      */
-    function rdfStoreGetGraph(graphUri) {
+    function rdfStoreGetGraph(store, graphUri) {
         return new Promise((resolve, reject) => {
             const callback = (success, graph) => {
                 if(success) {
@@ -1871,15 +2003,17 @@ import won from './won.js';
             }
             try {
                 if(graphUri) {
-                    privateData.store.graph(graphUri, callback);
+                    store.graph(graphUri, callback);
                 } else {
-                    privateData.store.graph(callback);
+                    store.graph(callback);
                 }
             } catch (e) {
                 rethrow(e, "Failed to retrieve graph with uri " + graphUri + ".");
             }
         })
     }
+
+    window.rdfStoreGetGraph4dbg = rdfStoreGetGraph;
 
     /**
      * @param {*} graphUri the uri of the graph to be retrieved
