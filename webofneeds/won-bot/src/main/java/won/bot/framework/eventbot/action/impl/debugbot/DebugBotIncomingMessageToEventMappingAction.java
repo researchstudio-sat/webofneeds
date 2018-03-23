@@ -16,22 +16,13 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.text.DecimalFormat;
-import java.time.Duration;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.util.StopWatch;
-
-import com.google.common.collect.Lists;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.behaviour.CrawlConnectionDataBehaviour;
@@ -45,19 +36,21 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.listener.EventListener;
-import won.protocol.agreement.AgreementProtocol;
+import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.validation.WonConnectionValidator;
+
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -399,7 +392,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll accept your latest proposal to cancel - but I'll need to crawl the connection data first, please be patient.", 
 				//conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesToCancelMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
-				conversationDataset -> AgreementProtocol.getAgreementsProposedToBeCancelledUris(conversationDataset).size() > 0? Lists.newArrayList(AgreementProtocol.getAgreementsProposedToBeCancelledUris(conversationDataset).iterator().next()) : null,
+				conversationDataset -> {
+                    AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(conversationDataset);
+                    return agreementProtocolState.getCancellationPendingAgreementUris().size() > 0? Lists.newArrayList(agreementProtocolState.getCancellationPendingAgreementUris().iterator().next()) : null;
+                },
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
@@ -414,18 +410,22 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	
 	private void proposeToCancelLatestAccept(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
-				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> AgreementProtocol.getAgreementUris(conversationDataset).size() > 0 ? Lists.newArrayList(AgreementProtocol.getAgreementUris(conversationDataset).iterator().next()) : null, 
-				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
-				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
-					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
-						return "Sorry, I cannot propose to cancel - I did not find any 'agr:accept' messages";
-					}
-					String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
-					proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
-			        return "Ok, I am hereby proposing to cancel our latest agreement (if it is one)"+proposeedString+" (uri: " + uris[0]+")."
-			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
-				});
+                "ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.",
+                            conversationDataset -> {
+                                AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(conversationDataset);
+                                return agreementProtocolState.getAgreementUris().size() > 0 ? Lists.newArrayList(agreementProtocolState.getAgreementUris().iterator().next()) : null;
+                            },
+                            (messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
+                            (Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+                                if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
+                                    return "Sorry, I cannot propose to cancel - I did not find any 'agr:accept' messages";
+                                }
+                                String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+                                proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+                                return "Ok, I am hereby proposing to cancel our latest agreement (if it is one)"+proposeedString+" (uri: " + uris[0]+")."
+                                        + "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
+                            }
+                });
 	}
 
    
