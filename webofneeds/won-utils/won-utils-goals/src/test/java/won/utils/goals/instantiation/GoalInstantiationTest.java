@@ -1,5 +1,7 @@
 package won.utils.goals.instantiation;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.*;
@@ -10,7 +12,10 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.shared.NotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
+
 import won.protocol.model.Coordinate;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.NeedModelWrapper;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
@@ -125,6 +130,7 @@ public class GoalInstantiationTest {
 
     @Test
     public void example4_geoCoordinatesFulfilled() throws IOException {
+
         Dataset need1 = loadDataset(baseFolder + "ex4_need.trig");
         Dataset need2 = loadDataset(baseFolder + "ex4_need_debug.trig");
         Dataset conversation = loadDataset(baseFolder + "ex4_conversation.trig");

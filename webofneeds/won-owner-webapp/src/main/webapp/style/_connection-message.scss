@@ -14,37 +14,56 @@ won-connection-message {
     &.won-cm--left {
         justify-content: flex-start;
 
-        & .won-cm__content__text {
+        & .won-cm__center__text {
             @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         }
     }
     &.won-cm--right {
         justify-content: flex-end;
 
-        & .won-cm__content__text {
+        & .won-cm__center__text {
             @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         }
     }
 
-    .won-cm__content {
+    .won-cm__center {
         margin: 0 0.5rem;
         font-size: $smallFontSize;
 
-        &__text{
+        .won-cm__center__bubble {
             padding: 0.5rem;
             border: $thinGrayBorder;
-            background: $won-light-gray;
-            
-            &.proposal {
-                padding: 0.5rem;
-                border:  $thinDarkBorder;
-                background: $won-light-gray;
+            //background: $won-light-gray;
+
+                &.agreement {
+                   padding: 0.5rem;
+                   border:  $thinDarkBorder;
+                   background: $won-light-gray;
+                }
+        }
+
+        &.won-cm__center--nondisplayable {
+            // hsla(57, 100%, 95%, 1);
+            // lighten bg and text color? (might just suggest pending)
+            // float icon on site opposite of bubble-tail
+
+            .won-cm__center__bubble {
+                background-color: white; // like the error toast-notifications
+                color: #8f8f8f;
             }
         }
-    
+
+        &:not(.won-cm__center--nondisplayable) {
+            .won-cm__center__bubble {
+                background-color: $won-light-gray; // like the error toast-notifications
+                color: black;
+            }
+        }
+
         &__button{
             padding: 0.5rem;
         }
+
 
         &__time {
             color: $won-line-gray;

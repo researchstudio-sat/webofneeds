@@ -21,5 +21,13 @@ won-labelled-hr {
     background: $won-lighter-gray;
     @include fine-print;
     padding: 0 0.3rem;
+    
+     &__carret {
+       @include fixed-square(1rem);
+       background-color: $won-light-gray;
+       // visually center icon on line
+       position: relative;
+       top: 0.1em;
+    }
   }
 }

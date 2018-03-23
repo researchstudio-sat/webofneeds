@@ -19,6 +19,8 @@ package won.bot.framework.eventbot.action.impl.analyzation;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -33,8 +35,8 @@ import won.bot.framework.eventbot.event.impl.analyzation.precondition.Preconditi
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.proposal.ProposalReceivedEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
+import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageReceivedOnConnectionEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.effect.*;
@@ -60,12 +62,13 @@ public class AnalyzeAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        logger.trace("Analyzing Message...");
+        logger.trace("################################## ANALYZING MESSAGE #########################################");
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = ctx.getEventBus();
 
         if(!(ctx.getBotContextWrapper() instanceof FactoryBotContextWrapper)) {
             logger.error("AnalyzeAction can only work with a FactoryBotContextWrapper, but was an instance of class: " + ctx.getBotContextWrapper().getClass());
+            logger.trace("################################## ANALYZING COMPLETE #########################################");
             return ;
         }
 
@@ -73,21 +76,28 @@ public class AnalyzeAction extends BaseEventBotAction {
         LinkedDataSource linkedDataSource = ctx.getLinkedDataSource();
 
         boolean receivedMessage;
+        Event eventToAnalyze;
+        WonMessage wonMessage;
 
-        if(event instanceof WonMessageSentOnConnectionEvent) {
+        if(event instanceof ConnectionMessageCommandSuccessEvent) {
+            eventToAnalyze = ((ConnectionMessageCommandSuccessEvent) event).getOriginalCommandEvent();
+            wonMessage = ((ConnectionMessageCommandSuccessEvent) event).getWonMessage(); //TODO STUFF! probably not the correct one message
             receivedMessage = false;
         } else if(event instanceof WonMessageReceivedOnConnectionEvent) {
+            eventToAnalyze = event;
+            wonMessage = ((MessageEvent) event).getWonMessage();
             receivedMessage = true;
         } else {
-            logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or WonMessageSentOnConnectionEvent, was an event of class: " + event.getClass());
+            logger.error("AnalyzeAction can only handle WonMessageReceivedOnConnectionEvent or ConnectionMessageCommandSuccessEvent, was an event of class: " + event.getClass());
+            logger.trace("################################## ANALYZING COMPLETE #########################################");
             return;
         }
 
-        URI needUri = ((NeedSpecificEvent) event).getNeedURI();
-        URI remoteNeedUri = ((RemoteNeedSpecificEvent) event).getRemoteNeedURI();
-        URI connectionUri = ((ConnectionSpecificEvent) event).getConnectionURI();
+        URI needUri = ((NeedSpecificEvent) eventToAnalyze).getNeedURI();
+        URI remoteNeedUri = ((RemoteNeedSpecificEvent) eventToAnalyze).getRemoteNeedURI();
+        URI connectionUri = ((ConnectionSpecificEvent) eventToAnalyze).getConnectionURI();
         Connection connection = makeConnection(needUri, remoteNeedUri, connectionUri);
-        WonMessage wonMessage = ((MessageEvent) event).getWonMessage();
+
         logger.trace("Message Information ------");
         logger.trace("Message Type: "+ (receivedMessage ? "RECEIVED" : "SENT"));
         logger.trace("MessageUri: "+ wonMessage.getMessageURI());
@@ -95,10 +105,13 @@ public class AnalyzeAction extends BaseEventBotAction {
         logger.trace("NeedUri: " + needUri);
         logger.trace("remoteNeedUri: " + remoteNeedUri);
         logger.trace("connectionUri: " + connectionUri);
+        logger.trace("WonMessage Dataset: ");
+        logger.trace(getWonMessageString(wonMessage, Lang.TRIG));
 
         if(connectionUri == null || WonRdfUtils.MessageUtils.isProcessingMessage(wonMessage)){
             logger.debug("AnalyzeAction will not execute on processing messages or messages without a connectionUri (e.g. connect messages)");
             logger.trace("--------------------------");
+            logger.trace("################################## ANALYZING COMPLETE #########################################");
             return;
         }
 
@@ -113,7 +126,7 @@ public class AnalyzeAction extends BaseEventBotAction {
         AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri, getEventListenerContext().getLinkedDataSource()); //Initialize with null, to ensure some form of lazy init for the agreementProtocolState
         Set<MessageEffect> messageEffects = agreementProtocolState.getEffects(wonMessage.getMessageURI());
 
-        logger.trace("MessageEffects in Message: "+messageEffects.size()+"\n");
+        logger.trace("MessageEffects in Message: "+messageEffects.size());
 
         messageEffects.forEach(messageEffect -> {
             if(messageEffect instanceof Accepts) {
@@ -134,7 +147,7 @@ public class AnalyzeAction extends BaseEventBotAction {
             } else if(messageEffect instanceof Proposes) {
                 logger.trace("\tMessageEffect 'Proposes':");
                 Proposal proposal = new Proposal(messageEffect.getMessageUri(), ProposalState.SUGGESTED);
-                Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri());
+                Model proposalModel = agreementProtocolState.getPendingProposal(proposal.getUri()); //TODO: IT COULD BE THAT WE HAVE TO ADD THIS WHOLE SHABANG FOR AGREEMENTS AS WELL
 
                 if(!proposalModel.isEmpty()) {
                     logger.trace("\t\tProposal: " + proposal);
@@ -147,7 +160,6 @@ public class AnalyzeAction extends BaseEventBotAction {
                             Precondition precondition = new Precondition(preconditionUri, result.isConform()); //TODO: GOAL INSTANTIATION PRODUCER DUPLICATES THE DATA SOMEHOW AND THUS MAKING THE INITIALLY CONFORM GOAL NOT MET
 
                             logger.trace("\t\t\tPrecondition: " + precondition);
-
 
                             //TODO: WE MIGHT NEED TO CHECK WHETHER THE PRECONDITION IS ACTUALLY FULFILLED OR NOT BEFORE WE REMOVE THE TEMP STATUS
                             boolean preconditionMetPending = botContextWrapper.isPreconditionMetInProposals(precondition.getUri());
@@ -166,8 +178,7 @@ public class AnalyzeAction extends BaseEventBotAction {
 
                     if(receivedMessage) {
                         logger.trace("\t\tSend ProposalReceivedEvent");
-                        WonMessageReceivedOnConnectionEvent receivedOnConnectionEvent = (WonMessageReceivedOnConnectionEvent) event;
-                        bus.publish(new ProposalReceivedEvent(connection, receivedOnConnectionEvent));
+                        bus.publish(new ProposalReceivedEvent(connection, (WonMessageReceivedOnConnectionEvent) eventToAnalyze));
                     }
                 } else {
                     logger.trace("\t\tProposal: EMPTY");
@@ -233,25 +244,22 @@ public class AnalyzeAction extends BaseEventBotAction {
         if(receivedMessage){
             publishAnalyzingCompleteMessage(connection, null);
         }
+        logger.trace("################################## ANALYZING COMPLETE #########################################");
     }
 
     //********* Helper Methods **********
     private Dataset getConversationDatasetLazyInit(Dataset conversationDataset, URI connectionUri) {
         if(conversationDataset == null){
-            logger.debug("Retrieving Conversation Of Connection");
             return WonLinkedDataUtils.getConversationDataset(connectionUri, getEventListenerContext().getLinkedDataSource());
         }else{
-            logger.debug("Already retrieved FullConversation Of Connection");
             return conversationDataset;
         }
     }
 
     private GoalInstantiationProducer getGoalInstantiationProducerLazyInit(GoalInstantiationProducer goalInstantiationProducer, Dataset needDataset, Dataset remoteNeedDataset, Dataset conversationDataset){
         if(goalInstantiationProducer == null){
-            logger.debug("Instantiating GoalInstantiationProducer");
             return new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
         }else{
-            logger.debug("Already instantiated GoalInstantiationProducer");
             return goalInstantiationProducer;
         }
     }
@@ -286,6 +294,13 @@ public class AnalyzeAction extends BaseEventBotAction {
 
             return connectionURI +"#"+ writer.toString().replaceAll("\\R", " ");
         }
+    }
+
+    private static String getWonMessageString(WonMessage wonMessage, Lang lang) {
+        StringWriter writer = new StringWriter();
+        RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), lang);
+
+        return writer.toString();
     }
 
     private static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){

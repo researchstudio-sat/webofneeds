@@ -50,15 +50,30 @@ public class WonDefaultAccessControlRules implements AccessControlRules
     }
     URI webId = URI.create(firstWebId);
     if (uriService.isEventURI(resourceUri)) {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("checking access for event {} with webID {} ({} of {})", new Object[] {resourceUri, firstWebId, 1, requesterWebIDs.size()} );
+    	}
     	return messageEventRepository.isReadPermittedForWebID( resourceUri, webId);
     } else if (uriService.isConnectionEventsURI(resourceUri)) {
-    	return connectionEventContainerRepository.isReadPermittedForWebID(uriService.getConnectionURIofConnectionEventsURI(resourceUri), webId);
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("checking access for connectionEvent{} with webID {} ({} of {})", new Object[] {resourceUri, firstWebId, 1, requesterWebIDs.size()} );
+    	}
+		return connectionEventContainerRepository.isReadPermittedForWebID(uriService.getConnectionURIofConnectionEventsURI(resourceUri), webId);
     } else if (uriService.isNeedEventsURI(resourceUri)) {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("checking access for needEvent {} with webID {} ({} of {})", new Object[] {resourceUri, firstWebId, 1, requesterWebIDs.size()} );
+    	}
     	return this.needEventContainerRepository.isReadPermittedForWebID(uriService.getNeedURIofNeedEventsURI(resourceUri), webId);
     } else if (uriService.isNeedUnreadURI(resourceUri)) {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("checking access for unreadEventsRequest {} with webID {} ({} of {})", new Object[] {resourceUri, firstWebId, 1, requesterWebIDs.size()} );
+    	}
     	//only the need itself can get unread events
     	return webId.equals(uriService.getNeedURIofNeedUnreadURI(resourceUri));
-  }
+    }
+    if(logger.isDebugEnabled()) {
+    	logger.debug("request could not be categorized, denying: {} with webID {} ({} of {})", new Object[] {resourceUri, firstWebId, 1, requesterWebIDs.size()} );
+    }
     return false;
   }
 

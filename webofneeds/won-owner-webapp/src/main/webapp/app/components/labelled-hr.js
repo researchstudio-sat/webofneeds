@@ -3,7 +3,12 @@
 import angular from 'angular';
 
 function genComponentConf() {
-    let template = `<div class="wlh__label" ng-show="self.label">{{self.label}}</div>`;
+    let template = `<div class="wlh__label" ng-show="self.label">{{self.label}}</div>
+    				<div class="wlh__label" ng-show="self.arrow">
+    					<svg class="wlh__label__carret">
+	                    	<use href="#ico16_arrow_up"></use>
+	                    </svg>
+	                </div>`;
 
     class Controller {
         constructor() { }
@@ -15,7 +20,8 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            label: '='
+            label: '=',
+            arrow: '=',
         },
         template: template
     }
