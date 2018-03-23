@@ -1714,11 +1714,11 @@ import won from './won.js';
                     }
                 });
                 node.uri = uri;
-                releaseLock();
+                releaseLock && releaseLock();
                 return node;
             })
             .catch(e => {
-                releaseLock();
+                releaseLock && releaseLock();
                 rethrow(e, "Couldn't get node " + uri + " with params " + fetchParams + "\n");
             });
 
