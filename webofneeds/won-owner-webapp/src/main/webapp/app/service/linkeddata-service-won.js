@@ -873,7 +873,7 @@ import won from './won.js';
 
         let triplesAddedToDeepDocumentGraphsP = Promise.resolve();
         if(deep) {
-            if(!documentUri.search('event')) {
+            if(!documentUri.endsWith("/events")) { //TODO hack; looking at uri
                 console.error(
                     "Adding a dataset loaded with `deep=true` " +
                     "that isn't an event-container. The cache will " +
