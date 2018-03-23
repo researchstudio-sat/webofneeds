@@ -619,15 +619,10 @@ import won from './won.js';
          * so we only query over the new triples
          */
         const tmpstore = rdfstore.create();
-
-        //TODO avoid duplicate parsing of the dataset
-        const storeWithDatasetP = new Promise((resolve, reject) =>
-                tmpstore.load('application/ld+json', dataset,
-                    (success, results) => success ?
-                        resolve(tmpstore) :
-                        reject(`couldn't load dataset for ${needUri} into temporary store.`)
-                )
-        );
+        const storeWithDatasetP  = loadIntoRdfStore(
+                tmpstore, 'application/ld+json', dataset
+            )
+            .then(() => tmpstore);
 
         const allLoadedResourcesP = storeWithDatasetP.then(tmpstore => {
             const queryPromise = new Promise((resolve, reject) =>
