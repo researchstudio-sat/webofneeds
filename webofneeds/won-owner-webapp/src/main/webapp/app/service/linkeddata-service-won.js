@@ -885,7 +885,7 @@ import won from './won.js';
 
                 //  Save mapping from documentUri to graphUris, e.g. for future deletion operations
                 Object.entries(documentToGraphUri).map(([documentUri, graphUris]) => {
-                    saveDocToGraphMapping(documentToGraphUri, Array.from(graphUris));
+                    saveDocToGraphMapping(documentUri, Array.from(graphUris));
                 })
 
                 triplesAddedToDeepDocumentGraphsP = groupedP.then(grouped => {
