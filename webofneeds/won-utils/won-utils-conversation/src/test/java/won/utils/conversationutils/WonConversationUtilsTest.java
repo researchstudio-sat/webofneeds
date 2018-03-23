@@ -37,19 +37,6 @@ public class WonConversationUtilsTest {
 		root.setLevel(Level.INFO);
 	}
 
-	// This is the case where there are no agreements, that is no predicates from
-	// the agreement protocol. The output should be nothing...
-	@Test
-	public void testAllMessageUris() throws IOException {
-		Dataset input = loadDataset(inputFolder + "allmessageuris.trig");
-		List<URI> expectedOutput = loadUriList(expectedOutputFolder + "allmessageuris.txt");
-		List<URI> actual = WonConversationUtils.getAllMessageURIs(input);
-		if (!expectedOutput.equals(actual)) {
-			System.out.println("actual: \n" + actual.stream().map(x -> x.toString()).collect(Collectors.joining("\n")));
-		}
-		Assert.assertEquals(expectedOutput, actual);
-	}
-	
 	@Test
 	public void testLatestMessageOfNeed() throws IOException {
 		Dataset input = loadDataset(inputFolder + "allmessageuris.trig");

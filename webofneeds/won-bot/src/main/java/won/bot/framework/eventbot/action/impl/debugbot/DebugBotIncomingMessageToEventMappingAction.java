@@ -286,7 +286,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void retractLatestMessage(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll retract my latest message - but 'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getNeedURI(),2)), 
+				conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getNeedURI(),1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				},
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -337,7 +340,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void retractLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll retract your latest message (which should not have any effect) - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),2)), 
+				conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addRetracts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -353,7 +359,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void proposeLatestMessage(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll propose my latest message - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getNeedURI(),2)), 
+				conversationDataset ->conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getNeedURI(),1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -369,7 +378,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void proposeLatestMessageOfCounterpart(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll propose your latest message - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> Lists.newArrayList(WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),2)), 
+				conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposes(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -385,7 +397,10 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void acceptLatestProposal(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll accept your latest proposal - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
+				conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestProposesMessageOfNeed(conversationDataset, con.getRemoteNeedURI(),1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null) {
@@ -402,7 +417,14 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll accept your latest proposal to cancel - but I'll need to crawl the connection data first, please be patient.", 
 				//conversationDataset -> Lists.newArrayList(WonConversationUtils.getLatestProposesToCancelMessageOfNeed(conversationDataset, con.getRemoteNeedURI())), 
-				conversationDataset -> AgreementProtocol.getAgreementsProposedToBeCancelledUris(conversationDataset).size() > 0? Lists.newArrayList(AgreementProtocol.getAgreementsProposedToBeCancelledUris(conversationDataset).iterator().next()) : null,
+				conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestMessage(conversationDataset, 
+					ConversationMessage m -> con.getRemoteNeedURI().equals(m.getSenderNeed()) 
+						&& m.isProposesToCancelMessage()
+						&& m.getEffects().stream().any(e -> e instanceof Proposes && ((Proposes)e).getProposesToCancel().size() > 0); 
+					,1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				},
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
@@ -418,7 +440,14 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void proposeToCancelLatestAccept(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.", 
-				conversationDataset -> AgreementProtocol.getAgreementUris(conversationDataset).size() > 0 ? Lists.newArrayList(AgreementProtocol.getAgreementUris(conversationDataset).iterator().next()) : null, 
+				conversationDataset -> {
+					URI uri = WonConversationUtils.getNthLatestMessage(conversationDataset, 
+					ConversationMessage m -> con.getRemoteNeedURI().equals(m.getSenderNeed()) 
+						&& m.isAcceptsMessage()
+						&& m.getEffects().stream().any(e -> e instanceof Accept); 
+					,1);
+					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
+				}, 
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
 				(Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
 					if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
