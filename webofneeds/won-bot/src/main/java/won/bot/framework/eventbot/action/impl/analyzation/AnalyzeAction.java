@@ -131,19 +131,15 @@ public class AnalyzeAction extends BaseEventBotAction {
         messageEffects.forEach(messageEffect -> {
             if(messageEffect instanceof Accepts) {
                 logger.trace("\tMessageEffect 'Accepts':");
-                Accepts effect = (Accepts) messageEffect;
-
-                effect.getCancelledAgreementURIs().forEach(cancelledAgreementUri -> {
-                    logger.trace("\t\t Accepted Cancellation of: "+cancelledAgreementUri);
-                    if(receivedMessage) {
-                        logger.trace("\t\tPublish AgreementCancellationAcceptedEvent for agreementUri: "+cancelledAgreementUri);
-                        bus.publish(new AgreementCancellationAcceptedEvent(connection, cancelledAgreementUri));
-                    }
-                    botContextWrapper.removeProposalReferences(cancelledAgreementUri);
-                    logger.trace("\t\tremove Proposal References for: "+cancelledAgreementUri);
-                });
 
                 if(receivedMessage) {
+                    Accepts effect = (Accepts) messageEffect;
+
+                    effect.getCancelledAgreementURIs().forEach(cancelledAgreementUri -> {
+                        logger.trace("\t\tPublish AgreementCancellationAcceptedEvent for agreementUri: "+cancelledAgreementUri);
+                        bus.publish(new AgreementCancellationAcceptedEvent(connection, cancelledAgreementUri));
+                    });
+
                     Model agreementPayload = agreementProtocolState.getAgreement(effect.getAcceptedMessageUri());
 
                     if (!agreementPayload.isEmpty()) {
