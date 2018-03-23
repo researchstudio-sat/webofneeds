@@ -1,7 +1,5 @@
 package won.bot.framework.eventbot.event.impl.analyzation.agreement;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import won.protocol.model.Connection;
 
 import java.net.URI;
@@ -10,7 +8,20 @@ import java.net.URI;
  * Created by fsuda on 27.11.2017.
  */
 public class AgreementCanceledEvent extends AgreementEvent {
-    public AgreementCanceledEvent(Connection con, URI agreementUri) {
+    //Uri of the message that contains the agreementUri as proposeToCancel
+    //if null then this event is regarding an already Accepted Cancellation
+    private URI messageUri;
+
+    public AgreementCanceledEvent(Connection con, URI agreementUri){
         super(con, agreementUri);
+    }
+
+    public AgreementCanceledEvent(Connection con, URI agreementUri, URI messageUri) {
+        super(con, agreementUri);
+        this.messageUri = messageUri;
+    }
+
+    public URI getMessageUri() {
+        return messageUri;
     }
 }
