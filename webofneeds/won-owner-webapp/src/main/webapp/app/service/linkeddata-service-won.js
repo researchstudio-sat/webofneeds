@@ -575,7 +575,7 @@ import won from './won.js';
                     cacheItemInsertOrOverwrite(uri, partialFetch);
                     return uri;
                 } else {
-                    const allLoadedResources = await selectLoadedResourcesFromDataset(dataset);
+                    const allLoadedResources = await selectLoadedDocumentUrisFromDataset(dataset);
                     allLoadedResources.forEach(resourceUri => {
                         /*
                             * only mark root resource as partial.
@@ -613,7 +613,17 @@ import won from './won.js';
             }
     };
 
-    function selectLoadedResourcesFromDataset(dataset) {
+    /**
+     * When you have loaded multiple documents via `deep=true`,
+     * use this function to identify which documents you have
+     * actually loaded this way.
+     * 
+     * Note: this function and uses thereof can become deprecated
+     * if we'd use HTTP/2
+     * 
+     * @param {*} dataset 
+     */
+    function selectLoadedDocumentUrisFromDataset(dataset) {
         /*
          * create a temporary store to load the dataset into
          * so we only query over the new triples
