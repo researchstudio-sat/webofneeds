@@ -635,11 +635,7 @@ import won from './won.js';
             .then(() => tmpstore);
 
         const allLoadedResourcesP = storeWithDatasetP.then(tmpstore => {
-            const queryPromise = new Promise((resolve, reject) =>
-                    //TODO use the existing constants for prefixes
-                    //TODO eliminate redundant queries
-                    //TODO rdf:type for connectionContainer?
-                    tmpstore.execute(`
+            const queryPromise = executeQueryOnRdfStore(tmpstore, `
                 prefix won: <http://purl.org/webofneeds/model#>
                 prefix msg: <http://purl.org/webofneeds/message#>
                 prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
@@ -660,12 +656,7 @@ import won from './won.js';
                     { ?s msg:hasMessageType ?o } union
                     { ?s won:hasCorrespondingRemoteMessage ?o } union
                     { ?s won:hasReceiver ?o }.
-                }`,
-                        (success, results) => success ?
-                            resolve(results) :
-                            reject(`couldn't execute query for ${needUri} on temporary store for ${uri}`)
-                    )
-            );
+                }`);
             //final cleanup and return
             return queryPromise.then(queryResults => queryResults.map(r => r.s.value))
         });
@@ -2131,6 +2122,23 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
             rethrow(e, 'Failed to store json-ld data for ' + uri);
         }
     });
+}
+
+/**
+ * Thin wrapper around `store.execute`, that returns a promise.
+ * @param {*} store 
+ * @param {*} sparqlQuery 
+ */
+export async function executeQueryOnRdfStore(store, sparqlQuery) {
+    return new Promise((resolve, reject) =>
+        store.execute( sparqlQuery, (success, results) => {
+            if(success) {
+                resolve(results);
+            } else {
+                reject( `couldn't execute the following query: ` + sparqlQuery)
+            }
+        })
+    );
 }
 
 window.groupByGraphs4dbg = groupByGraphs;
