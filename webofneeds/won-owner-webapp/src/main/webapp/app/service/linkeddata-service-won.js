@@ -1480,6 +1480,25 @@ import won from './won.js';
         return result;
     }
 
+    function rdfstoreTriplesToString(triples, graphUri) {
+        const toToken = x => {
+            switch(x.interfaceName) {
+                case "NamedNode": return `<${x.nominalValue}>`;
+                case "Literal": return `"${x.nominalValue}"`;
+                case "BlankNode": return x.nominalValue;
+                default: throw new Error("Can't parse token: " + JSON.stringify(x));
+            }
+        }
+        const tripleToString = t => 
+            toToken(t.subject) + " " + 
+            toToken(t.predicate) + " " + 
+            toToken(t.object) + " " + 
+            (graphUri? `<${graphUri}>` : "") + 
+            ".";
+
+        return triples.map(tripleToString).join("\n");
+    }
+
 
     /**
      * Impure function, that all cases of `rdfs:member` have. This
@@ -1684,6 +1703,54 @@ import won from './won.js';
     //aliases (formerly functions that were just pass-throughs)
     won.getEvent = async (eventUri, fetchParams) => {
         const event = await won.getNode(eventUri, fetchParams);
+
+        const eventTriples = await won.getGraph(eventUri, eventUri, fetchParams);
+        console.log("rdfjsinterface stuff that should be attached as jsonld: ", 
+            eventTriples.map(t => 
+                t.subject.nominalValue + ' -- ' + 
+                t.predicate.nominalValue + ' -- ' +
+                t.object.nominalValue
+            ),
+            eventUri, 
+            event,
+            fetchParams,
+        );
+
+        await won.ensureLoaded(eventUri, fetchParams);
+        await Promise.all(Array.from(privateData.documentToGraph[eventUri]).map(async (graphUri) => {
+
+            const graphTriples = await won.getCachedGraphTriples(graphUri)
+            const quadString = rdfstoreTriplesToString(graphTriples, graphUri);
+            //graphQuads = graphQuads.map(q => ({ subject: q.subject.nominalValue,  predicate: q.predicate.nominalValue,  object: q.object.nominalValue,  graph: q.graph.nominalValue}))
+            //graphQuads = graphQuads.map(q => toQuadToken(q.subject) + " " + toQuadToken(q.predicate) + " " + toQuadToken(q.object) + " " + toQuadToken(q.graph) + " .").join("\n")
+
+            const parsedJsonLd = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'}), 
+            const compactedJsonLd = await jsonld.promises.compact(
+                won.defaultContext
+            );
+            console.log('graph in event: ', 
+                eventUri, '\n',
+                graphUri,'\n',
+                compactedJsonLd,'\n',
+                quadString,'\n',
+                graphTriples && graphTriples.map(t => 
+                    t.subject.nominalValue + ' -- ' + 
+                    t.predicate.nominalValue + ' -- ' +
+                    t.object.nominalValue
+                ),'\n',
+                graphTriples, '\n',
+                '\n','\n'
+            )
+        }));
+
+        console.log(
+            'graphs in event ', 
+            Array.from(privateData.documentToGraph[eventUri]),
+            '\n\n\n'
+        );
+
+
+        // event.rawJsonLd = eventJsonLd;
         await addContentGraphTrig(event, fetchParams);
 
         // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
