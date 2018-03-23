@@ -411,26 +411,19 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 	private void proposeToCancelLatestAccept(EventListenerContext ctx, EventBus bus, Connection con) {
 		referToEarlierMessages(ctx, bus, con, 
                 "ok, I'll propose to cancel our latest agreement (assuming the latest accept I find is a valid agreement) - but I'll need to crawl the connection data first, please be patient.",
-                            conversationDataset -> {
-                                AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(conversationDataset);
-                                return agreementProtocolState.getAgreementUris().size() > 0 ? Lists.newArrayList(agreementProtocolState.getAgreementUris().iterator().next()) : null;
-                            },
-                            (messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
-                            (Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
-                                if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
-                                    return "Sorry, I cannot propose to cancel - I did not find any 'agr:accept' messages";
-                                }
-                                String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
-                                proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
-                                return "Ok, I am hereby proposing to cancel our latest agreement (if it is one)"+proposeedString+" (uri: " + uris[0]+")."
-                                        + "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
-                            }
+                conversationDataset -> {
+                    AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(conversationDataset);
+                    return agreementProtocolState.getAgreementUris().size() > 0 ? Lists.newArrayList(agreementProtocolState.getAgreementUris().iterator().next()) : null;
+                },
+                (messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
+                (Duration queryDuration, Dataset conversationDataset, URI... uris) -> {
+                    if (uris == null || uris.length == 0 || uris[0] == null || conversationDataset == null) {
+                        return "Sorry, I cannot propose to cancel - I did not find any 'agr:accept' messages";
+                    }
+                    String proposeedString = WonConversationUtils.getTextMessage(conversationDataset, uris[0]);
+                    proposeedString = (proposeedString == null)? ", which had no text message" : ", which read, '"+proposeedString+"'";
+                    return "Ok, I am hereby proposing to cancel our latest agreement (if it is one)"+proposeedString+" (uri: " + uris[0]+")."
+                            + "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
                 });
 	}
-
-   
-    
-   
-    
-    
 }
