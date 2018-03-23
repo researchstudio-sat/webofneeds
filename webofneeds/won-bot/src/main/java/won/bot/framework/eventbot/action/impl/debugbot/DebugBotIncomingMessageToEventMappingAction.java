@@ -421,7 +421,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 					URI uri = WonConversationUtils.getNthLatestMessage(conversationDataset, 
 					msg -> con.getRemoteNeedURI().equals(((ConversationMessage) msg).getSenderNeedURI()) 
 						&& ((ConversationMessage) msg).isProposesToCancelMessage()
-						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e instanceof Proposes && ((Proposes)e).getProposesToCancel().size() > 0) 
+						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e.isProposes() && e.asProposes().hasCancellations()) 
 					,1);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				},
@@ -444,7 +444,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 					URI uri = WonConversationUtils.getNthLatestMessage(conversationDataset, 
 					msg -> con.getRemoteNeedURI().equals(((ConversationMessage) msg).getSenderNeedURI()) 
 						&& ((ConversationMessage) msg).isAcceptsMessage()
-						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e instanceof Accepts) 
+						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e.isAccepts()) 
 					,1);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				},
