@@ -422,7 +422,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 					msg -> con.getRemoteNeedURI().equals(((ConversationMessage) msg).getSenderNeedURI()) 
 						&& ((ConversationMessage) msg).isProposesToCancelMessage()
 						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e.isProposes() && e.asProposes().hasCancellations()) 
-					,1);
+					,0);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				},
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addAccepts(messageModel, uris),
@@ -445,7 +445,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 					msg -> con.getRemoteNeedURI().equals(((ConversationMessage) msg).getSenderNeedURI()) 
 						&& ((ConversationMessage) msg).isAcceptsMessage()
 						&& ((ConversationMessage) msg).getEffects().stream().anyMatch(e -> e.isAccepts()) 
-					,1);
+					,0);
 					return uri == null ? Collections.EMPTY_LIST : Arrays.asList(uri);
 				},
 				(messageModel, uris) -> WonRdfUtils.MessageUtils.addProposesToCancel(messageModel, uris),
