@@ -33,4 +33,5 @@
     <import resource="classpath:/spring/component/ehcache/spring-matcher-ehcache.xml" />
     <import resource="classpath:/spring/component/nodeurisource/matcher-nodeurisource-all.xml" />
     <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
+    <import resource="classpath:/spring/component/threadpool.xml"/>
 </beans>

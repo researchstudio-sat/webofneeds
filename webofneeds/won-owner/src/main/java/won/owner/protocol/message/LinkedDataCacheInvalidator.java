@@ -15,6 +15,7 @@ import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
+ * Removes elements from the linked data cache when certain messages are seen. 
  * User: ypanchenko Date: 27.10.2015
  */
 public class LinkedDataCacheInvalidator implements WonMessageProcessor {
