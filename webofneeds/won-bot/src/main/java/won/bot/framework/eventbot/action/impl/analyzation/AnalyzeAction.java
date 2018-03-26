@@ -29,7 +29,7 @@ import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.*;
-import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCanceledEvent;
+import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionUnmetEvent;
@@ -131,16 +131,19 @@ public class AnalyzeAction extends BaseEventBotAction {
         messageEffects.forEach(messageEffect -> {
             if(messageEffect instanceof Accepts) {
                 logger.trace("\tMessageEffect 'Accepts':");
+
                 if(receivedMessage) {
                     Accepts effect = (Accepts) messageEffect;
 
                     effect.getCancelledAgreementURIs().forEach(cancelledAgreementUri -> {
-                        bus.publish(new AgreementCanceledEvent(connection, cancelledAgreementUri));
+                        logger.trace("\t\tPublish AgreementCancellationAcceptedEvent for agreementUri: "+cancelledAgreementUri);
+                        bus.publish(new AgreementCancellationAcceptedEvent(connection, cancelledAgreementUri));
                     });
 
                     Model agreementPayload = agreementProtocolState.getAgreement(effect.getAcceptedMessageUri());
 
                     if (!agreementPayload.isEmpty()) {
+                        logger.trace("\t\tPublish ProposalAcceptedEvent for agreementUri: "+effect.getAcceptedMessageUri());
                         bus.publish(new ProposalAcceptedEvent(connection, effect.getAcceptedMessageUri(), agreementPayload));
                     }
                 }
