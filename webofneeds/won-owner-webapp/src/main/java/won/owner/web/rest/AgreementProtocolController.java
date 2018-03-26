@@ -128,7 +128,8 @@ public class AgreementProtocolController {
 				// were still in-flight. we allow one re-crawl attempt per exception before
 				// we throw the exception on:
 				URI connectionContainerUri  = WonLinkedDataUtils.getEventContainerURIforConnectionURI(connectionUri, linkedDataSourceOnBehalfOfNeed);
-				if (!recrawl(recrawled, connectionUri, e.getMissingMessageUri(), e.getReferringMessageUri(), connectionContainerUri)){
+				URI remoteConnectionUri = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(connectionUri, linkedDataSourceOnBehalfOfNeed);
+				if (!recrawl(recrawled, connectionUri, e.getMissingMessageUri(), e.getReferringMessageUri(), connectionContainerUri, connectionUri, remoteConnectionUri)){
 					throw e;
 				}
 			} catch (LinkedDataFetchingException e) {
@@ -140,21 +141,23 @@ public class AgreementProtocolController {
 	}
 
 	private boolean recrawl(Set<URI> recrawled, URI connectionUri, URI... uris) {
-		List<URI> uriList = Arrays.asList(uris);
-		uriList.removeAll(recrawled);
-		if (uriList.isEmpty()) {
+		Set<URI> urisToCrawl = new HashSet<URI>();
+		Arrays.stream(uris)
+			.filter(x -> ! recrawled.contains(x))
+			.forEach(urisToCrawl::add);
+		if (urisToCrawl.isEmpty()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("connection {}: not recrawling again: {}", connectionUri, Arrays.toString(uris));
 			}
 			return false;
 		}
 		if (logger.isDebugEnabled()) {
-			logger.debug("connection {}, recrawling: {}", connectionUri, uriList);
+			logger.debug("connection {}, recrawling: {}", connectionUri, urisToCrawl);
 		}
 		if (linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
-			uriList.stream().forEach(((CachingLinkedDataSource)linkedDataSourceOnBehalfOfNeed)::invalidate);
+			urisToCrawl.stream().forEach(((CachingLinkedDataSource)linkedDataSourceOnBehalfOfNeed)::invalidate);
 		}
-		recrawled.addAll(uriList);
+		recrawled.addAll(urisToCrawl);
 		return true;
 	}
 
