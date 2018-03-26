@@ -31,6 +31,7 @@ public class AgreementProtocolState {
 	private final Set<URI> retractedUris = new HashSet<URI>();
 	private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
 	private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
+	private Set<DeliveryChain> deliveryChains = new HashSet<>();
 	
 	public static AgreementProtocolState of(URI connectionURI, LinkedDataSource linkedDataSource) {
 		Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndNeedsDataset(connectionURI, linkedDataSource);
@@ -170,6 +171,90 @@ public class AgreementProtocolState {
 	}
 	
 	/**
+	 * Returns the n-th latest message filtered by the specified predicate.
+	 * @param filterPredicate
+	 * @param n use 0 for the latest message.
+	 * @return
+	 */
+	public URI getNthLatestMessage(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
+		List<URI> uris = deliveryChains.stream()
+				.map(x -> x.getHead())
+				.filter(x -> filterPredicate.test(x))
+				.sorted((x1,x2) -> x2.getOrder() - x1.getOrder())
+				.map(x -> x.getMessageURI())
+				.collect(Collectors.toList());
+		if (uris.size() > n) {
+			return uris.get(n);
+		} else {
+			return null;
+		}
+	}
+	
+	private void logNthLatestMessage(int n, URI needUri, String type, URI result) {
+		logger.debug(
+				n + "-th latest message "
+				+ (type == null ? "" : "of type " + type ) 
+				+ " sent by " + needUri + ": " 
+				+ ( result == null ? " none found" : needUri ));
+	}
+	
+	public URI getLatestMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(x -> needUri.equals(x.getSenderNeedURI()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getNthLatestMessageSentByNeed(URI needUri, int n) {
+		URI uri = getNthLatestMessage(x -> needUri.equals(x.getSenderNeedURI()), n);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(n, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getLatestProposeMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(x -> x.isProposesMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getLatestAcceptsMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(x -> x.isAcceptsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getLatestProposesToCancelMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(x -> x.isProposesToCancelMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getLatestRejectsMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(x -> x.isRejectsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getLatestRetractsMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(x -> x.isRetractsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	/**
 	 * Calculates all agreements present in the specified conversation dataset.
 	 */
 	private void recalculate(Dataset conversationDataset) {
@@ -260,7 +345,7 @@ public class AgreementProtocolState {
 		});
 
 		//link messages to deliveryChains
-		Set<DeliveryChain> deliveryChains = 
+		deliveryChains = 
 				messages.stream().map(m -> {
 					if (logger.isDebugEnabled()) {
 						logger.debug("deliveryChain for message {}: {}", m.getMessageURI(), m.getDeliveryChain());
@@ -553,6 +638,9 @@ public class AgreementProtocolState {
 	
 
 	private  void notAcknowledged(Dataset copy, ConversationMessage message) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("not acknowledged: " + message.getMessageURI());
+		}
 		message.removeHighlevelProtocolProperties();
 		removeContentGraphs(copy, message);
 	}

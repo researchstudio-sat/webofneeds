@@ -46,6 +46,7 @@ public class WonMessage implements Serializable {
     private URI receiverNeedURI;
     private URI receiverNodeURI;
     private List<URI> refersTo = new ArrayList<>();
+    private List<URI> previousMessages = new ArrayList<>();
     private URI isResponseToMessageURI;
     private URI isRemoteResponseToMessageURI;
     private List<String> contentGraphNames;
@@ -458,6 +459,14 @@ public class WonMessage implements Serializable {
         return this.refersTo;
 
     }
+    
+    public synchronized List<URI> getPreviousMessageURIs() {
+        if (this.previousMessages == null) {
+            this.previousMessages = getEnvelopePropertyURIValues(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY);
+        }
+        return this.previousMessages;
+    }
+
 
     public synchronized URI getIsResponseToMessageURI() {
         if (this.isResponseToMessageURI == null) {

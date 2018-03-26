@@ -29,4 +29,6 @@
         <constructor-arg ref="ownerApplicationService" />
     </bean>
 
+    <bean id="eagerlyCachePopulatingMessageProcessor" class="won.owner.web.websocket.EagerlyCachePopulatingMessageProcessor" />
+
 </beans>
