@@ -35,7 +35,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
 
 	@Override
 	public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
-
+		
+		WonMessageType type = message.getMessageType();
+		
 		if (message.getReceiverURI() != null) {
 			// the cached list of events of the receiver need for the involved connection
 			// should be invalidated, since one more
@@ -44,14 +46,15 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
 					+ message.getReceiverURI());
 			URI eventContainerUri = WonLinkedDataUtils.getEventContainerURIforConnectionURI(message.getReceiverURI(),
 					linkedDataSource);
-			linkedDataSource.invalidate(eventContainerUri);
-			if (linkedDataSourceOnBehalfOfNeed != linkedDataSource) {
-				linkedDataSourceOnBehalfOfNeed.invalidate(eventContainerUri);
+			invalidate(eventContainerUri);
+			
+			if (type.causesConnectionStateChange()) {
+				invalidate(message.getReceiverURI());
 			}
+			
 		}
-
-		if (message.getMessageType().equals(WonMessageType.CONNECT)
-				|| message.getMessageType().equals(WonMessageType.HINT_MESSAGE)) {
+		
+		if (type.causesNewConnection()) {
 			// the list of connections of the receiver need should be invalidated, since
 			// these type
 			// of messages mean that the new connection has been created recently
@@ -59,12 +62,21 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
 			Dataset need = linkedDataSource.getDataForResource(message.getReceiverNeedURI());
 			NeedModelWrapper wrapper = new NeedModelWrapper(need);
 			URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
-			linkedDataSource.invalidate(connectionsListUri);
-			if (linkedDataSourceOnBehalfOfNeed != linkedDataSource) {
-				linkedDataSourceOnBehalfOfNeed.invalidate(connectionsListUri);
-			}
+			invalidate(connectionsListUri);
 		}
-
+		
+		if (type.causesNeedStateChange()) {
+			invalidate(message.getReceiverNeedURI());
+		}
+		
 		return message;
+	}
+	
+	private void invalidate(URI uri) {
+		if (uri == null) return;
+		linkedDataSource.invalidate(uri);
+		if (linkedDataSourceOnBehalfOfNeed != linkedDataSource) {
+			linkedDataSourceOnBehalfOfNeed.invalidate(uri);
+		}
 	}
 }
