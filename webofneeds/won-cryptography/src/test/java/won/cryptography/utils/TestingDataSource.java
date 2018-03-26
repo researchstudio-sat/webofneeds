@@ -76,7 +76,8 @@ public class TestingDataSource implements LinkedDataSource
   }
 
   @Override
-  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final URI requesterWebID, final List<Path> properties, final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
-    throw new UnsupportedOperationException();
-  }
+	public Dataset getDataForResourceWithPropertyPath(URI resourceURI, URI requesterWebID, List<Path> properties,
+			int maxRequest, int maxDepth) {
+	  throw new UnsupportedOperationException();
+	}
 }

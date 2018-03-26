@@ -7,7 +7,7 @@ public class Retracts extends MessageEffect {
 	private URI retractedMessageUri;
 	
 	public Retracts(URI messageUri, URI retractedMessageUri) {
-		super(messageUri);
+		super(messageUri, MessageEffectType.RETRACTS);
 		this.retractedMessageUri = retractedMessageUri;
 	}
 		

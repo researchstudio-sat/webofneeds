@@ -60,6 +60,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                             .to("bean:uriNodePathChecker")
                             .to("bean:signatureChecker")
                             .to("bean:linkedDataCacheInvalidator")
+                            .to("bean:linkedDataCacheUpdater")
                             //this expects a bean with name 'mainOwnerMessageProcessor' in the application context
                             //this bean is *not* provided by the won-owner module. This allows the definition of a
                             //different processing chain depending on the use case.

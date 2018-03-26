@@ -1,5 +1,6 @@
 package won.protocol.agreement.effect;
 
+import java.awt.Dialog.ModalExclusionType;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,7 +12,7 @@ public class Accepts extends MessageEffect {
 	private Set<URI> cancelledAgreementURIs = new HashSet<URI>();
 	
 	public Accepts(URI messageUri, URI acceptedMessageUri, Collection<URI> cancelledAgreementUris) {
-		super(messageUri);
+		super(messageUri, MessageEffectType.ACCEPTS);
 		this.acceptedProposalUri = acceptedMessageUri;
 		this.cancelledAgreementURIs.addAll(cancelledAgreementURIs);
 	}

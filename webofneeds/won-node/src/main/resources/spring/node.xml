@@ -28,6 +28,6 @@
 
     <import resource="classpath:/spring/component/ehcache/spring-node-ehcache.xml" />
     <import resource="classpath:/spring/component/wonNodeInformationService-node.xml" />
-
+    <import resource="classpath:/spring/component/threadpool.xml"/>
 
 </beans>

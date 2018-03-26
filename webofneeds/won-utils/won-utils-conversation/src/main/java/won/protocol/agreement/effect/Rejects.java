@@ -7,7 +7,7 @@ public class Rejects extends MessageEffect {
 	private URI rejectedMessageUri;
 	
 	public Rejects(URI messageUri, URI rejectedMessageUri) {
-		super(messageUri);
+		super(messageUri, MessageEffectType.REJECTS);
 		this.rejectedMessageUri = rejectedMessageUri;
 	}
 		
