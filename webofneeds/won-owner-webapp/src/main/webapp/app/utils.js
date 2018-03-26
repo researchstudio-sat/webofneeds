@@ -479,7 +479,13 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
     const asyncLookups = urisAsArray.map(uri =>
             asyncLookupFunction(uri)
                 .catch(error => {
-                    console.error({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
+                    console.error(
+                        `failed lookup for ${uri} in utils.js:urisToLookupMap ` + error.message, '\n\n',
+                        error.stack, '\n\n',
+                        urisAsArray, '\n\n', 
+                        uris, '\n\n',
+                        error
+                    )
                     return undefined;
                 })
     );
