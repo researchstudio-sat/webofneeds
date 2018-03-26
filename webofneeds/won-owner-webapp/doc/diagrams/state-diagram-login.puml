@@ -1,0 +1,63 @@
+@startuml
+[*] --> Not: open owner webapp
+state "Not Logged In" as Not
+state "Logged in with account" as Account 
+state "Logged in with private ID" as Private 
+state "Logging private ID out" as LogoutPrivate
+state "Logging account out" as LogoutAccount
+state "State change not allowed" as NotAllowed
+
+Not --> Not: reload
+Not --> Account: sign in
+Not --> NotAllowed: sign out
+Not -> Not: edit url \nadd wrong private id\n(show error message)
+Not --> Private: paste private url
+Not --> Private: edit url \nadd private id
+Not --> LogoutPrivate: edit url \nchange private id \n(part 1: logs old out)
+LogoutPrivate --> Private:  edit url \nchange private id (part2: logs new in)
+Not --> Private: create need
+Not --> Account: sign up
+Not --> NotAllowed: session timeout
+
+
+
+Account --> Account: reload
+Account --> NotAllowed: sign in
+Account --> Not: sign out
+Account -> Account: edit url \nadd wrong private id\n(show error message)
+
+Account --> LogoutAccount:  paste private url\n(part 1: log out account)
+LogoutAccount --> Private: paste private url\n(part 2: log in private id)
+
+Account --> LogoutAccount:  edit url \nadd private id\n(part 1: log out account)
+LogoutAccount --> Private: edit url \nadd private id\n(part 2: log in private id)
+
+Account --> NotAllowed: edit url \nchange private id 
+
+Account --> Account: create need
+Account --> NotAllowed: sign up
+Account --> Not: session timeout
+
+
+
+Private --> Private: reload
+Private --> LogoutPrivate: sign in \n(step 1: log out private id)
+LogoutPrivate --> Account: sign in \n(step 2: log in account)
+Private --> Not: sign out \n(must remove private id from url)
+Private -> Private: edit url \nadd wrong private id\n(show error message)
+
+Private --> LogoutPrivate:  paste private url\n(part 1: log out old )
+LogoutPrivate --> Private: paste private url\n(part 2: log in new private id)
+
+Private --> NotAllowed:  edit url \nchange private id\n(part 1: log out account)
+LogoutPrivate --> Private: edit url \nchange private id\n(part 2: log in private id)
+
+Private --> NotAllowed: edit url \nadd private id 
+
+Private --> Private: create need
+Private --> LogoutPrivate: sign up \n(step 1: log private id out)
+LogoutPrivate --> Account: sign up \n(step 2: log in account)
+
+Private --> Not: session timeout
+
+@enduml
