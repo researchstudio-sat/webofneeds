@@ -342,23 +342,6 @@ public class AnalyzeBehaviour extends BotBehaviour {
     }
 
     /**
-     * Removes All the stored entries in all Maps Lists or MapList for the given ProposalURI
-     * @param proposalURI to be removed
-     */
-    private void removeProposalReferences(URI proposalURI) {
-        removeProposalReferences(proposalURI.toString());
-    }
-
-    /**
-     * Removes All the stored entries in all Maps Lists or MapList for the given ProposalURI
-     * @param proposalURI the string of the proposalURI to be removed
-     */
-    private void removeProposalReferences(String proposalURI) {
-        botContext.removeFromListMap(proposalToPreconditionListMapName, proposalURI);
-        botContext.removeLeavesFromListMap(preconditionToProposalListMapName, proposalURI);
-    }
-
-    /**
      * @param preconditionURI to retrieve the state from
      * @return the saved state of the precondition, null if the state was never saved before (undeterminable)
      */
@@ -392,11 +375,11 @@ public class AnalyzeBehaviour extends BotBehaviour {
         botContext.addToListMap(proposalToPreconditionListMapName, proposal.getUri().toString(), precondition);
     }
 
-    private boolean hasPreconditionProposalRelation(String preconditionURI, String proposalURI) {
+    public boolean hasPreconditionProposalRelation(String preconditionURI, String proposalURI) {
         return getPreconditionsForProposalUri(proposalURI).contains(new Precondition(preconditionURI, false)); //Status of the Precondition is irrelevant (equals works on uri alone)
     }
 
-    private List<Proposal> getProposalsForPreconditionUri(String preconditionURI){
+    public List<Proposal> getProposalsForPreconditionUri(String preconditionURI){
         return (List<Proposal>)(List<?>) botContext.loadFromListMap(preconditionToProposalListMapName, preconditionURI);
     }
 
@@ -405,7 +388,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
      * @param proposalURI string of the proposaluri to retrieve the preconditionList of
      * @return List of all URI-Strings of preconditions save for the given connectionURI
      */
-    private List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
+    public List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
         return (List<Precondition>)(List<?>) botContext.loadFromListMap(proposalToPreconditionListMapName, proposalURI);
     }
 
@@ -413,7 +396,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
      * @param preconditionURI string of the uri of the precondition
      * @return true if the given precondition is met by at least one proposal
      */
-    private boolean isPreconditionMetInProposals(String preconditionURI) {
+    public boolean isPreconditionMetInProposals(String preconditionURI) {
         List<Proposal> proposals = getProposalsForPreconditionUri(preconditionURI);
         for (Proposal p : proposals) {
             List<Precondition> preconditions = getPreconditionsForProposalUri(p.getUri().toString());
@@ -422,5 +405,35 @@ public class AnalyzeBehaviour extends BotBehaviour {
             }
         }
         return false;
+    }
+
+    /**
+     * @param proposalUri uri of the proposal to retrieve the preconditionList of
+     * @return true if there is at least one Met Precondition for this proposal
+     */
+    public boolean hasMetPrecondition(URI proposalUri) {
+        List<Precondition> preconditions = getPreconditionsForProposalUri(proposalUri.toString());
+
+        for(Precondition p : preconditions) {
+            if(p.isMet()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes All the stored entries in all Maps Lists or MapList for the given ProposalURI
+     * @param proposalURI to be removed
+     */
+    public void removeProposalReferences(URI proposalURI) {
+        removeProposalReferences(proposalURI.toString());
+    }
+
+    /**
+     * Removes All the stored entries in all Maps Lists or MapList for the given ProposalURI
+     * @param proposalURI the string of the proposalURI to be removed
+     */
+    public void removeProposalReferences(String proposalURI) {
+        botContext.removeFromListMap(proposalToPreconditionListMapName, proposalURI);
+        botContext.removeLeavesFromListMap(preconditionToProposalListMapName, proposalURI);
     }
 }
