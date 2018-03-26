@@ -10,7 +10,7 @@ public class Proposes extends MessageEffect {
 	private Set<URI> proposesToCancel = new HashSet<>();
 	
 	public Proposes(URI messageUri) {
-		super(messageUri);
+		super(messageUri, MessageEffectType.PROPOSES);
 	}
 	
 	void addProposes(URI uri){
@@ -27,6 +27,14 @@ public class Proposes extends MessageEffect {
 
 	public Set<URI> getProposesToCancel() {
 		return proposesToCancel;
+	}
+	
+	public boolean hasCancellations() {
+		return ! this.proposesToCancel.isEmpty();
+	}
+	
+	public boolean hasClauses() {
+		return ! this.proposes.isEmpty();
 	}
 
 	@Override

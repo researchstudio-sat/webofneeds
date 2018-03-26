@@ -583,6 +583,43 @@ public class WonRdfUtils
           }
           return proposesToCancelEvents;
       }
+      
+      /** 
+       * Returns previous message URIs for local and remote message.
+       * @param wonMessage
+       * @return
+       */
+      public static List<URI> getPreviousMessageUrisIncludingRemote(final WonMessage wonMessage) {
+          List<URI> uris = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT distinct ?prev where {\n" +
+                          "   {"+
+                          "    ?msg msg:hasPreviousMessage ?prev .\n" +
+                          "   } union {" +
+                          "    ?msg msg:hasCorrespondingRemoteMessage/msg:hasPreviousMessage ?prev " +
+                          "  }" +
+                          "}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              QuerySolutionMap binding = new QuerySolutionMap();
+              binding.add("msg", new ResourceImpl(wonMessage.getMessageURI().toString()));
+              qexec.setInitialBinding(binding);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("prev"));
+                  if(eventUri != null) {
+                      uris.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return uris;
+      }
 
       private static String rdfNodeToString(RDFNode node) {
           if (node.isLiteral()) {

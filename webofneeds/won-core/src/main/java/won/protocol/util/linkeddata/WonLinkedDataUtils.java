@@ -113,7 +113,7 @@ public class WonLinkedDataUtils
       propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasPreviousMessage", pmap));
       URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
 
-      return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth, false);
+      return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth);
   }
 
     public static Dataset getConversationDataset(String connectionURI, LinkedDataSource linkedDataSource) {
@@ -136,7 +136,7 @@ public class WonLinkedDataUtils
         propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
         URI requesterWebId = WonLinkedDataUtils.getNeedURIforConnectionURI(connectionURI, linkedDataSource);
 
-        return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth, false);
+        return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths, maxRequests, depth);
     }
 
   public static Dataset getDatalForResource(final URI connectionURI, final LinkedDataSource linkedDataSource) {
