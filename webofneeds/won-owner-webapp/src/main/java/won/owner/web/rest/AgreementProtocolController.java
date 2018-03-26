@@ -3,6 +3,7 @@ package won.owner.web.rest;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.query.Dataset;
@@ -126,7 +127,8 @@ public class AgreementProtocolController {
 				// we may have tried to crawl a conversation dataset of which messages
 				// were still in-flight. we allow one re-crawl attempt per exception before
 				// we throw the exception on:
-				if (!recrawl(recrawled, connectionUri, e.getMissingMessageUri(), e.getReferringMessageUri())){
+				URI connectionContainerUri  = WonLinkedDataUtils.getEventContainerURIforConnectionURI(connectionUri, linkedDataSourceOnBehalfOfNeed);
+				if (!recrawl(recrawled, connectionUri, e.getMissingMessageUri(), e.getReferringMessageUri(), connectionContainerUri)){
 					throw e;
 				}
 			} catch (LinkedDataFetchingException e) {
@@ -138,19 +140,21 @@ public class AgreementProtocolController {
 	}
 
 	private boolean recrawl(Set<URI> recrawled, URI connectionUri, URI... uris) {
-		if (recrawled.containsAll(Arrays.asList(uris))) {
+		List<URI> uriList = Arrays.asList(uris);
+		uriList.removeAll(recrawled);
+		if (uriList.isEmpty()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("connection {}: not recrawling again: {}", connectionUri, Arrays.toString(uris));
 			}
 			return false;
 		}
 		if (logger.isDebugEnabled()) {
-			logger.debug("connection {}, recrawling: {}", connectionUri, Arrays.toString(uris));
+			logger.debug("connection {}, recrawling: {}", connectionUri, uriList);
 		}
 		if (linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
-			Arrays.stream(uris).forEach(((CachingLinkedDataSource)linkedDataSourceOnBehalfOfNeed)::invalidate);
+			uriList.stream().forEach(((CachingLinkedDataSource)linkedDataSourceOnBehalfOfNeed)::invalidate);
 		}
-		Arrays.stream(uris).forEach(recrawled::add);
+		recrawled.addAll(uriList);
 		return true;
 	}
 

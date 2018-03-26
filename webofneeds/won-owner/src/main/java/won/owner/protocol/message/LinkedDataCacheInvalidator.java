@@ -37,6 +37,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
 	public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
 		
 		WonMessageType type = message.getMessageType();
+		if (type == WonMessageType.SUCCESS_RESPONSE) {
+			type = message.getIsResponseToMessageType();
+		}
 		
 		if (message.getReceiverURI() != null) {
 			// the cached list of events of the receiver need for the involved connection
