@@ -16,20 +16,10 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import java.net.URI;
-import java.text.DecimalFormat;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.util.StopWatch;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.behaviour.CrawlConnectionDataBehaviour;
@@ -43,22 +33,23 @@ import won.bot.framework.eventbot.event.impl.command.connectionmessage.Connectio
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandEvent;
 import won.bot.framework.eventbot.event.impl.crawlconnection.CrawlConnectionCommandSuccessEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.ConnectDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.HintDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetCacheEagernessCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
-import won.bot.framework.eventbot.event.impl.debugbot.UsageDebugCommandEvent;
+import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.ConversationMessage;
-import won.protocol.agreement.effect.Accepts;
-import won.protocol.agreement.effect.Proposes;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.validation.WonConnectionValidator;
+
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -459,10 +450,4 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
 				});
 	}
-
-   
-    
-   
-    
-    
 }
