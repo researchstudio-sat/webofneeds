@@ -89,5 +89,14 @@
         <property name="linkedDataSource" ref="linkedDataSource"/>
         <property name="linkedDataSourceOnBehalfOfNeed" ref="linkedDataSourceOnBehalfOfNeed" />
     </bean>
+     <!-- necessary when linked data source is a caching data source -->
+    <bean name="linkedDataCacheUpdater"
+          class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="ldCacheUpdatingProcessor"/>
+    </bean>
+    <bean name="ldCacheUpdatingProcessor"
+          class="won.owner.protocol.message.LinkedDataCacheUpdater">
+        <property name="linkedDataSourceOnBehalfOfNeed" ref="linkedDataSourceOnBehalfOfNeed" />
+    </bean>
 
 </beans>

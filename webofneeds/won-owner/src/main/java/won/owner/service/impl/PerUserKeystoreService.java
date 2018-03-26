@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import won.cryptography.service.keystore.AbstractKeyStoreService;
 import won.owner.model.User;
 import won.owner.repository.KeystoreHolderRepository;
+import won.protocol.util.AuthenticationThreadLocal;
 
 @Component
 public class PerUserKeystoreService extends AbstractKeyStoreService {
@@ -31,7 +32,7 @@ public class PerUserKeystoreService extends AbstractKeyStoreService {
 	
 	private Authentication getAuthentication() {
 		if (AuthenticationThreadLocal.hasValue()) {
-			return  AuthenticationThreadLocal.get();
+			return  (Authentication) AuthenticationThreadLocal.getAuthentication();
 		} 
 		return SecurityContextHolder.getContext().getAuthentication();
 	}

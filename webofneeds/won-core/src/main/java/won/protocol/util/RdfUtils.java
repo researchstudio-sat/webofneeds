@@ -1683,8 +1683,9 @@ public class RdfUtils {
 	 * @param toBeAddedtoBase
 	 * @param replaceNamedModel
 	 *            if true, named graphs are not merged but replaced
+	 * @return the modified baseDataset           
 	 */
-	public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
+	public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
 			boolean replaceNamedModel) {
 		assert baseDataset != null : "baseDataset must not be null";
 		assert toBeAddedtoBase != null : "toBeAddedToBase must not be null";
@@ -1702,6 +1703,7 @@ public class RdfUtils {
 				baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
 			}
 		}
+		return baseDataset;
 	}
 
 	/**
@@ -1710,9 +1712,10 @@ public class RdfUtils {
 	 * 
 	 * @param baseDataset
 	 * @param toBeAddedtoBase
+	 * @return the modified baseDataset
 	 */
-	public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
-		addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
+	public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
+		return addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
 	}
 
 	public static Model mergeAllDataToSingleModel(final Dataset ds) {
