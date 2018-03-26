@@ -17,7 +17,6 @@
 package won.node.web;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.slf4j.Logger;
@@ -50,11 +49,9 @@ import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.NeedState;
-import won.protocol.model.unread.UnreadMessageInfoForNeed;
 import won.protocol.rest.WonEtagHelper;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.HTTP;
