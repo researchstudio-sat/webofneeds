@@ -1649,14 +1649,42 @@ import won from './won.js';
     /**
      * Returns all events associated with a given connection
      * in a promise for an object of (eventUri -> eventData)
+     * @deprecated doesn't return all events properly. see won.getEventNode.
      * @param connectionUri
      * @param fetchParams See `ensureLoaded`.
      */
     won.getEventsOfConnection = function(connectionUri, fetchParams) {
         return won.getEventUrisOfConnection(connectionUri, fetchParams)
             .then(eventUris => urisToLookupMap(eventUris,
-                    eventUri => won.getEvent(eventUri, fetchParams))
+                    eventUri => won.getEventNode(eventUri, fetchParams))
             )
+    };
+
+    /**
+     * Returns all events associated with a given connection
+     * in a promise for an object of (eventUri -> rawJsonLdOfEvent)
+     * @param connectionUri
+     * @param fetchParams See `ensureLoaded`.
+     */
+    won.getRawEventsOfConnection = async function(connectionUri, fetchParams) {
+        const eventUris = won.getEventUrisOfConnection(connectionUri, fetchParams)
+        return urisToLookupMap(
+            eventUris,
+            eventUri => won.getRawEvent(eventUri, fetchParams)
+        )
+    };
+    /**
+     * Returns all events associated with a given connection
+     * in a promise for an object of (eventUri -> wonMessageObj)
+     * @param connectionUri
+     * @param fetchParams See `ensureLoaded`.
+     */
+    won.getWonMessagesOfConnection = async function(connectionUri, fetchParams) {
+        const eventUris = won.getEventUrisOfConnection(connectionUri, fetchParams)
+        return urisToLookupMap(
+            eventUris,
+            eventUri => won.getWonMessage(eventUri, fetchParams)
+        )
     };
 
     /**
@@ -1699,52 +1727,68 @@ import won from './won.js';
             })
     };
 
+    won.getWonMessage = async (eventUri, fetchParams) => {
+        const rawEvent = await won.getRawEvent(eventUri, fetchParams);
+        const wonMessage = await won.wonMessageFromJsonLd(rawEvent)
+        return wonMessage;
+    }
 
-    //aliases (formerly functions that were just pass-throughs)
-    won.getEvent = async (eventUri, fetchParams) => {
-        const event = await won.getNode(eventUri, fetchParams);
-
-        const eventTriples = await won.getGraph(eventUri, eventUri, fetchParams);
-        console.log("rdfjsinterface stuff that should be attached as jsonld: ", 
-            eventTriples.map(t => 
-                t.subject.nominalValue + ' -- ' + 
-                t.predicate.nominalValue + ' -- ' +
-                t.object.nominalValue
-            ),
-            eventUri, 
-            event,
-            fetchParams,
-        );
-
+    won.getRawEvent = async (eventUri, fetchParams) => {
         await won.ensureLoaded(eventUri, fetchParams);
-        await Promise.all(Array.from(privateData.documentToGraph[eventUri]).map(async (graphUri) => {
+        const eventGraphs = await Promise.all(Array.from(privateData.documentToGraph[eventUri]).map(async (graphUri) => {
 
             const graphTriples = await won.getCachedGraphTriples(graphUri)
             const quadString = rdfstoreTriplesToString(graphTriples, graphUri);
             //graphQuads = graphQuads.map(q => ({ subject: q.subject.nominalValue,  predicate: q.predicate.nominalValue,  object: q.object.nominalValue,  graph: q.graph.nominalValue}))
             //graphQuads = graphQuads.map(q => toQuadToken(q.subject) + " " + toQuadToken(q.predicate) + " " + toQuadToken(q.object) + " " + toQuadToken(q.graph) + " .").join("\n")
 
-            const parsedJsonLd = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'}), 
-            const compactedJsonLd = await jsonld.promises.compact(
-                won.defaultContext
-            );
-            console.log('graph in event: ', 
-                eventUri, '\n',
-                graphUri,'\n',
-                compactedJsonLd,'\n',
-                quadString,'\n',
-                graphTriples && graphTriples.map(t => 
-                    t.subject.nominalValue + ' -- ' + 
-                    t.predicate.nominalValue + ' -- ' +
-                    t.object.nominalValue
-                ),'\n',
-                graphTriples, '\n',
-                '\n','\n'
-            )
+            let parsedJsonLd = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'}); 
+            if(parsedJsonLd.length !== 1) {
+                throw new Error(
+                    "Got more or less than the expected one graph " + 
+                    JSON.stringify(parsedJsonLd)
+                );
+            } else {
+                parsedJsonLd = parsedJsonLd[0];
+            }
+            return parsedJsonLd;
         }));
 
+
+        if(!is('Array', eventGraphs)) {
+            throw new Error(
+                'event graphs weren\'t an array. something ' + 
+                'didn\'t go as expected: ' + JSON.stringify(eventGraphs)
+            )
+        }
+
+        return {
+            '@graph': eventGraphs,
+            '@context': clone(won.defaultContext),
+        };
+
+    }
+
+    /**
+     * @deprecated this function only works for flat content-graphs 
+     *   with the eventUri as '@id'/subject. It doesn't work for the
+     *   arbitrarily deep content-graphs that might occur due to the
+     *   arbitrary rdf-input that we're supporting now. Use
+     *   `won.getRawEvent` instead and handle the jsonld it returns, or
+     *   (the more convenient) `won.getWonMessage`.
+     * @param {*} eventUri 
+     * @param {*} fetchParams 
+     */
+    won.getEventNode = async (eventUri, fetchParams) => {
+        const event = await won.getNode(eventUri, fetchParams);
+
+        event.rawJsonLd = await won.getRawEvent(eventUri, fetchParams)
+        const wonMessage = await won.wonMessageFromJsonLd(event.rawJsonLd)
+
         console.log(
-            'graphs in event ', 
+            'graphs in event \n', 
+            event.rawJsonLd, '\n',
+            wonMessage, '\n',
             Array.from(privateData.documentToGraph[eventUri]),
             '\n\n\n'
         );
