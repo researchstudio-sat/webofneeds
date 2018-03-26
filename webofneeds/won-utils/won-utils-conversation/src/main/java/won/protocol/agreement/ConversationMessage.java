@@ -192,8 +192,8 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public boolean isAcknowledgedRemotely() {
 		boolean hsr = hasSuccessResponse();
 		boolean hcrm = hasCorrespondingRemoteMessage();
-		boolean hrsr = correspondingRemoteMessageRef.hasSuccessResponse();
-		boolean hrr = correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
+		boolean hrsr = hcrm && correspondingRemoteMessageRef.hasSuccessResponse();
+		boolean hrr = hrsr && correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
 		return hsr && hcrm && hrsr && hrr;
 	}
 	
