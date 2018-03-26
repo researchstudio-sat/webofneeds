@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class AnalyzeBehaviour extends BotBehaviour{
+public class AnalyzeBehaviour extends BotBehaviour {
     private final BotContext botContext;
     private final String preconditionToProposalListMapName;
     private final String proposalToPreconditionListMapName;
@@ -67,10 +67,10 @@ public class AnalyzeBehaviour extends BotBehaviour{
         botContext = context.getBotContext();
         String botName = context.getBotContextWrapper().getBotName();
 
-        this.preconditionToProposalListMapName = botName + ":preconditionToProposalListMap";
-        this.proposalToPreconditionListMapName = botName + ":proposalToPreconditionListMap";
-        this.preconditionConversationStateMapName = botName + ":preconditionConversationStateMap";
-        this.preconditionMetPending = botName + ":preconditionMetPending";
+        this.preconditionToProposalListMapName = botName + ":" + name + ":preconditionToProposalListMap";
+        this.proposalToPreconditionListMapName = botName + ":" + name + ":proposalToPreconditionListMap";
+        this.preconditionConversationStateMapName = botName + ":" + name + ":preconditionConversationStateMap";
+        this.preconditionMetPending = botName + ":" + name + ":preconditionMetPending";
     }
 
     @Override
