@@ -188,7 +188,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 
                     bus.publish(new SendNDebugCommandEvent(con, n));
                 }else if (PATTERN_VALIDATE.matcher(message).matches()) {
-                   validate(ctx,bus,con);
+                   validate(ctx, bus, con);
                 } else if (PATTERN_RETRACT.matcher(message).matches()) {
                     retractLatestMessage(ctx, bus, con);
                 } else if (PATTERN_RETRACT_MINE.matcher(message).matches()) {

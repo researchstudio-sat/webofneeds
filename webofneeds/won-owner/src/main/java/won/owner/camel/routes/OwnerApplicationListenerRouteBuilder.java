@@ -16,11 +16,11 @@
 
 package won.owner.camel.routes;
 
-import java.net.URI;
-import java.util.List;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 //TODO: This route builder should not be loaded on startup, but it's being loaded..
 /**

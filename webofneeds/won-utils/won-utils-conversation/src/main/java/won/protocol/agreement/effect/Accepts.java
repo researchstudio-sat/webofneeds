@@ -1,6 +1,5 @@
 package won.protocol.agreement.effect;
 
-import java.awt.Dialog.ModalExclusionType;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;

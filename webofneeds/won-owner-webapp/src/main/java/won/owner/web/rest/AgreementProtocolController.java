@@ -1,8 +1,5 @@
 package won.owner.web.rest;
 
-import java.net.URI;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +9,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.AgreementProtocolUris;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.net.URI;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/rest/agreement")

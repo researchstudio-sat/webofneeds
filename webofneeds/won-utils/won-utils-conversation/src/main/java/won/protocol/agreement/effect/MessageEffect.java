@@ -1,9 +1,6 @@
 package won.protocol.agreement.effect;
 
-import java.awt.Dialog.ModalExclusionType;
-import java.lang.annotation.ElementType;
 import java.net.URI;
-import java.util.EnumSet;
 
 public abstract class MessageEffect {
 
