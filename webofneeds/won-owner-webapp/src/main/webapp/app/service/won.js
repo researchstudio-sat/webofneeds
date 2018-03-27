@@ -969,7 +969,15 @@ window.N34dbg = N3;
         return wonMessage;
     }
 
-    won.jsonLdToTrig = async function (jsonldData) {
+    /**
+     * Serializes the jsonldData into trig.
+     * 
+     * @param {*} jsonldData 
+     * @param {*} addDefaultContext whether or not `won.defaultContext` should be
+     *   used for shortening urls (in addition to any `@context` at the root of
+     *   `jsonldData` that's always used.)
+     */
+    won.jsonLdToTrig = async function (jsonldData, addDefaultContext = true) {
         if(
             !jsonldData || !(
                 (is('Array', jsonldData) && jsonldData.length > 0) ||
@@ -981,8 +989,12 @@ window.N34dbg = N3;
         }
         const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
         const quads = await won.n3Parse(quadString, {format: 'application/n-quads'});
-        console.log("QUAAAADS ", quads);
-        const trig = await won.n3Write(quads, { format: 'application/trig' });
+        
+        const prefixes = addDefaultContext ?
+            Object.assign(clone(won.defaultContext), jsonldData['@context']) :
+            jsonldData['@context'];
+        const trig = await won.n3Write(quads, { format: 'application/trig', prefixes});
+
         return trig;
     }
     window.jsonLdToTrig4dbg = won.jsonLdToTrig;
