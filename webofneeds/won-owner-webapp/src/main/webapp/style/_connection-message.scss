@@ -30,6 +30,7 @@ won-connection-message {
     .won-cm__center {
         margin: 0 0.5rem;
         font-size: $smallFontSize;
+        max-width: 100%;
 
         .won-cm__center__bubble {
             padding: 0.5rem;
@@ -59,6 +60,11 @@ won-connection-message {
                 background-color: $won-light-gray; // like the error toast-notifications
                 color: black;
             }
+        }
+
+        &__trig {
+            max-width: 100%;
+            overflow-x: scroll;
         }
 
         &__button{
