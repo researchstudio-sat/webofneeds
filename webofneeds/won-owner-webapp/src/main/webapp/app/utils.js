@@ -1100,3 +1100,24 @@ export function rethrow(e, prependedMsg="") {
     }
 }
 
+
+/**
+ * Parses an rdf-uri and gets the base-uri, i.e. 
+ * the part before and including the fragment identifier 
+ * ("#") or last slash ("/").
+ * @param {*} uri 
+ */
+export function prefixOfUri(uri) {
+    // if there's hash-tags, the first of these
+    // is the fragment identifier and everything
+    // after is the id. remove everything following it.
+    let prefix = uri.replace(/#.*/, '#');
+
+    // if there's no fragment-identifier, the
+    // everything after the last slash is removed.
+    if(!prefix.endsWith('#')) {
+        prefix = prefix.replace(/\/([^\/]*)$/, '/')
+    }
+
+    return prefix;
+}

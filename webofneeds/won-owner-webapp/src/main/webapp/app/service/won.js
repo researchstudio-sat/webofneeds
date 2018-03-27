@@ -24,6 +24,7 @@ import {
     get,
     getIn,
     clone,
+    prefixOfUri,
 } from '../utils.js'
 import jsonld from 'jsonld';
 
@@ -1122,10 +1123,31 @@ window.N34dbg = N3;
             const contentGraphs = this.getContentGraphs(); 
             if(contentGraphs && contentGraphs.length > 0) {
                 try {
-                    this.contentGraphTrig = await won.jsonLdToTrig(contentGraphs)
+                    if(!is('Array', contentGraphs)) {
+                        throw new Error(
+                            "Unexpected content-graph structure: \n\n" + 
+                            JSON.stringify(contentGraphs)
+                        );
+                    } 
+                    const eventUriPrefix = prefixOfUri(this.getMessageUri());
+                    console.log('eventUriPrefix deleteme: ', eventUriPrefix);
+                    const jsonldData = {
+                        '@context': Object.assign(
+                            { event: eventUriPrefix }, 
+                            won.defaultContext
+                        ),
+                        '@graph': contentGraphs,
+                    };
+                    this.contentGraphTrig = await won.jsonLdToTrig(jsonldData);
                     return this.contentGraphTrig;
                 } catch (e) {
-                    this.contentGraphTrigError = JSON.stringify(e);
+                    const msg = 
+                        "Failed to generate trig for message " +
+                        this.getMessageUri() + "\n\n" +
+                        e.message + '\n\n' +
+                        e.stack;
+                    console.error(msg);
+                    this.contentGraphTrigError = msg;
                 }
             }
         },
