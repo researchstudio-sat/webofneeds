@@ -61,11 +61,13 @@ function genComponentConf() {
                 	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>		
                         {{ self.text? self.text : self.noTextPlaceholder }}
                     </span>
+
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
-                    <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
-                        {{ self.contentGraphTrig }}
-                    </code>
+
+<pre><code ng-show="self.shouldShowRdf && self.contentGraphTrig">
+{{ self.contentGraphTrig }}
+</code></pre>
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage') 
                             && !self.message.get('outgoingMessage')
