@@ -951,9 +951,7 @@ window.N34dbg = N3;
      * @returns {*|Promise.<WonMessage>}
      */
     won.toWonMessage = function(message) {
-        if(message.uri && message.type) {
-            return won.WonMessageFromMessageLoadedFromStore(message);
-        } else if (message['@graph']) {
+        if (message['@graph']) {
             return won.wonMessageFromJsonLd(message);
         } else if (message instanceof WonMessage) {
             return Promise.resolve(message);
@@ -961,81 +959,6 @@ window.N34dbg = N3;
             throw new Exception('Couldn\'t convert the following to a WonMessage: ', message);
         }
     };
-
-    /**
-     * This is a hack that allows us to wrap a WonMessage object around a message that
-     * is retrieved from the local rdf store. This will work for Chat messages
-     * 
-     * @deprecated requires the usage of the deprecated won.getEventNode (see there for details).
-     * @param message
-     * @constructor
-     */
-    won.WonMessageFromMessageLoadedFromStore = async function (message) {
-        //console.log("converting this result from store to WonMessage", message)
-
-        let contentResource = message;
-        if (!message.hasTextMessage){
-            contentResource = message.hasCorrespondingRemoteMessage;
-            if (! contentResource || !contentResource.hasTextMessage) {
-                contentResource = undefined;
-            }
-        }
-
-        //if we have a text message, create a content graph
-        let contentGraph = undefined;
-        if (contentResource) {
-            contentGraph = {
-                "@id": contentResource.uri + "#content",
-                "@graph": [
-                    {
-                        "@id": contentResource.uri,
-                        "http://purl.org/webofneeds/model#hasTextMessage": contentResource.hasTextMessage,
-                    }
-                ]
-            }
-        }
-
-        //create the envelope(s)
-        let envelopeGraphs = [];
-        let envelopeGraph = makeEnvelopeGraphForMessageResource(message);
-        let remoteEnvelopeGraph = undefined;
-        envelopeGraphs.push(envelopeGraph);
-        if (message.hasCorrespondingRemoteMessage && message.hasCorrespondingRemoteMessage.type){
-            // link our message to remote message
-            let res = envelopeGraph["@graph"].filter( x => x["@id"] == message.uri)[0];
-            res["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"] = {"@id": message.hasCorrespondingRemoteMessage.uri }
-            // create envelope for remote message
-            remoteEnvelopeGraph = makeEnvelopeGraphForMessageResource(message.hasCorrespondingRemoteMessage);
-            envelopeGraphs.push(remoteEnvelopeGraph);
-        }
-
-        //link the inner envelope to the content if we have content
-        if (contentGraph) {
-            let innerEnvelopeGraph = (contentResource == message) ? envelopeGraph : remoteEnvelopeGraph;
-            let res = innerEnvelopeGraph["@graph"].filter( x => x["@id"] == contentResource.uri)[0];
-            res["http://purl.org/webofneeds/message#hasContent"] = contentGraph["@id"];
-        }
-
-        //build the complete jsonld structure
-        let jsonld = {"@graph":[]};
-
-        if (contentGraph) {
-            jsonld["@graph"].push(contentGraph);
-        }
-        if (envelopeGraphs && envelopeGraphs.length > 0) {
-            envelopeGraphs.forEach( envelopeGraph => jsonld["@graph"].push(envelopeGraph));
-        }
-        return won.wonMessageFromJsonLd(jsonld)
-        .then(wonMsg => {
-             wonMsg.contentGraphTrig = 
-                get(wonMsg, 'contentGraphTrig') || 
-                get(message, 'contentGraphTrig') || 
-                getIn(message, ['hasCorrespondingRemoteMessage', 'contentGraphTrig']);
-            return wonMsg;
-        });;
-    }
-
-
 
     won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD){
         //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
