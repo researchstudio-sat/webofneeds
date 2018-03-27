@@ -7,7 +7,7 @@ won-connection-message {
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: grid;
     grid-template-areas: "icon content";
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: min-content minmax(min-content, max-content);
 
     won-square-image {
         cursor: pointer; /* the image links to their post info */
