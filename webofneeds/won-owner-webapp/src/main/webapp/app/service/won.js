@@ -965,15 +965,7 @@ window.N34dbg = N3;
         const expandedJsonLd  = await jsonld.promises.expand(wonMessageAsJsonLD);
         const wonMessage = await new WonMessage(expandedJsonLd);
         await wonMessage.frameInPromise()
-        const contentGraphs = wonMessage.getContentGraphs(); 
-        if(contentGraphs && contentGraphs.length > 0) {
-            try {
-                const trig = await won.jsonLdToTrig(contentGraphs)
-                wonMessage.contentGraphTrig = trig;
-            } catch (e) {
-                wonMessage.contentGraphTrigError = JSON.stringify(e);
-            }
-        }
+        await wonMessage.generateContentGraphTrig(); 
         return wonMessage;
     }
 
@@ -1109,6 +1101,21 @@ window.N34dbg = N3;
 
         getMessageDirection: function () {
             return this.__getMessageDirection(this.messageStructure);
+        },
+
+        generateContentGraphTrig: async function () {
+            if(this.contentGraphTrig) {
+                return this.contentGraphTrig;
+            }
+            const contentGraphs = this.getContentGraphs(); 
+            if(contentGraphs && contentGraphs.length > 0) {
+                try {
+                    this.contentGraphTrig = await won.jsonLdToTrig(contentGraphs)
+                    return this.contentGraphTrig;
+                } catch (e) {
+                    this.contentGraphTrigError = JSON.stringify(e);
+                }
+            }
         },
 
         frameInPromise: function () {
