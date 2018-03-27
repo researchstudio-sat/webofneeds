@@ -96,16 +96,16 @@ public abstract class LinkedDataRestClient {
             result = response.getBody();
         } catch (RestClientException e) {
             if (e instanceof HttpClientErrorException) {
-                throw new IllegalArgumentException(
+                throw new LinkedDataFetchingException(resourceURI,
                         MessageFormat.format(
                                 "caught a HttpClientErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}", resourceURI, e.getMessage(), ((HttpClientErrorException) e).getResponseBodyAsString()), e);
             }
             if (e instanceof HttpServerErrorException) {
-                throw new IllegalArgumentException(
+                throw new LinkedDataFetchingException(resourceURI,
                         MessageFormat.format(
                                 "caught a HttpServerErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}", resourceURI, e.getMessage(), ((HttpServerErrorException) e).getResponseBodyAsString()), e);
             }
-            throw new IllegalArgumentException(
+            throw new LinkedDataFetchingException(resourceURI,
                     MessageFormat.format(
                             "caught a clientHandler exception, " +
                                     "which may indicate that the URI that was accessed isn''t a" +

@@ -278,12 +278,9 @@ public class AgreementProtocolState {
 		messages.stream().forEach(message -> {
 			if (message.getCorrespondingRemoteMessageURI() != null && ! message.getCorrespondingRemoteMessageURI().equals(message.getMessageURI())) {
 				ConversationMessage other = messagesByURI.get(message.getCorrespondingRemoteMessageURI());
-                if (other == null){
-                    message.setCorrespondingRemoteMessageURI(null);
-                } else {
-                    message.setCorrespondingRemoteMessageRef(other);
-                    other.setCorrespondingRemoteMessageRef(message);
-                }
+				throwExceptionIfOtherisMissing(message.getMessageURI(), message.getCorrespondingRemoteMessageURI(), other, "msg:hasCorrespondingRemoteMessage");
+				message.setCorrespondingRemoteMessageRef(other);
+                other.setCorrespondingRemoteMessageRef(message);
 			}
 			message.getPrevious().stream().filter(uri -> !uri.equals(message.getMessageURI()))
 				.forEach(uri -> {
@@ -556,7 +553,7 @@ public class AgreementProtocolState {
 		if (otherMessage != null) {
 			return;
 		}
-		throw new WonProtocolException("message " + messageUri + " refers to other " + otherMessageUri + " via " + predicate + ", but that other message is not present in the conversation");
+		throw new IncompleteConversationDataException(messageUri, otherMessageUri, predicate);
 	}
 	
 	

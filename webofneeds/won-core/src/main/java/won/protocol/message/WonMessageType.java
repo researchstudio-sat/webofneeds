@@ -56,7 +56,18 @@ public enum WonMessageType
     if (uri == null) return false;
     return getResource().getURI().toString().equals(uri.toString());
   }
+  
+  public boolean causesConnectionStateChange() {
+	  return this == CLOSE || this == CONNECT || this == OPEN;
+  }
+  
+  public boolean causesNeedStateChange() {
+	  return this == ACTIVATE || this == DEACTIVATE;
+  }
 
+  public boolean causesNewConnection() {
+	  return this == CONNECT || this == HINT_MESSAGE;
+  }
 
   public static WonMessageType getWonMessageType(Resource resource) {
 
