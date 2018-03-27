@@ -236,15 +236,9 @@ function genComponentConf() {
             this.baseString = "/owner/"
             this.declarations = clone(declarations);
             
-            this.agreementHeadData = clone(defaultAgreementData);
-            this.agreementStateData  = clone(defaultAgreementData);
-            /*
-            this.loading = {
-            		proposal: false, 
-            		agreement: false, 
-            		proposeToCancel: false,
-            		//acceptedProposalToCancel: false,
-            };*/
+            this.agreementHeadData = this.cloneDefaultData();
+            this.agreementStateData = this.cloneDefaultData();
+           
             this.loading = false;
             
             this.showAgreementData = false;
@@ -252,7 +246,6 @@ function genComponentConf() {
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
 
-            //this.postmsg = this;
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
                 const ownNeed = selectNeedByConnectionUri(state, connectionUri);
@@ -271,7 +264,7 @@ function genComponentConf() {
                 	//filter proposals
                 	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage")){
-	                		if(this.agreementHeadData.agreementUris.has(msg.get("uri")) || this.agreementHeadData.agreementUris.has(msg.get("remoteUri"))) {
+	                		if(this.isOldAgreementMsg(msg)) {
 	                			msgSet.delete(msg);
 	                		} else {
 	                			//TODO: add messages from state to agreementDate with right uri
@@ -285,9 +278,6 @@ function genComponentConf() {
 	            	sortedMessages.sort(function(a,b) {
 	                    return a.get("date").getTime() - b.get("date").getTime();
 	                });
-	            	
-	            	//Optimization
-	            	//this.filterAgreementDataList();
                 }
               
                 if(this.reload && connection) {
@@ -402,24 +392,10 @@ function genComponentConf() {
         }
         
         agreementDataIsValid() {
-        	
-        	/*
-        	 * only agreementUris, pendingProposalUris and cancellationPendingAgreementUris important for gui
-        	 */
         	var aD = this.agreementStateData;
         	if(aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size) {
         		return true;
         	}
-        	
-        	//all data
-        	/*
-        	for(key in aD) {
-        		if (aD.hasOwnProperty(key)) {
-        			if(aD[key].size) {
-        				return true;
-        			}
-        		}
-        	}*/
         	return false;
         }
         
@@ -429,6 +405,7 @@ function genComponentConf() {
         	}
         	
         	this.loading = true;
+        	this.agreementStateData = this.cloneDefaultData();
         	this.getAgreementDataUris();        	
         }
         
@@ -438,7 +415,6 @@ function genComponentConf() {
         	callAgreementsFetch(url)
     		.then(response => {
     			this.agreementHeadData = this.transformDataToSet(response);
-    			//this.agreementStateData = clone(defaultAgreementHeadData);
     			for(key in this.agreementHeadData) {
     				if(this.agreementHeadData.hasOwnProperty(key)) {
 	    				for(data of this.agreementHeadData[key]) {
@@ -511,24 +487,12 @@ function genComponentConf() {
         }
         
         
-        /**
-         * old
-         */
-        removeAcceptedProposalToCancel(uri) {
-        	this.agreementData.proposeToCancel.delete(uri);
-        }
+        
         
         startLoading() {
         	this.loading.proposal = true;
         	this.loading.agreement = true;
         	this.proposeToCancel = true;
-        	/*
-        	this.loading = {
-        		proposal: true, 
-        		agreement: true, 
-        		proposeToCancel: true,
-        		acceptedProposalToCancel: true,
-            }*/
         }
         
        
@@ -539,6 +503,24 @@ function genComponentConf() {
         	return true;
         }
         
+        isOldAgreementMsg(msg) {
+        	var aD = this.agreementHeadData
+        	if(aD.agreementUris.has(msg.get("uri")) ||
+        			aD.agreementUris.has(msg.get("remoteUri")) ||
+	        		aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
+	        		aD.cancellationPendingAgreementUris.has(msg.get("remoteUri"))) {
+        		return true;
+        	}
+        	return false;
+        }
+        
+        
+        /**
+         * old
+         */
+        removeAcceptedProposalToCancel(uri) {
+        	this.agreementData.proposeToCancel.delete(uri);
+        }
         /**
          * Old functions, single calls
          */
@@ -725,7 +707,20 @@ function genComponentConf() {
         getArrayFromSet(set) {
         	return Array.from(set);
         }
-             
+           
+        cloneDefaultData() {
+        	return defaultData = {
+                	agreementUris: new Set(),
+    	    		pendingProposalUris: new Set(),
+    	    		acceptedCancellationProposalUris: new Set(),
+    	    		cancellationPendingAgreementUris: new Set(),
+    	    		pendingCancellationProposalUris: new Set(),
+    	    		cancelledAgreementUris: new Set(),
+    	    		rejectedMessageUris: new Set(),
+    	    		retractedMessageUris: new Set(),
+                };
+        }
+        
         sendRdfTmpDeletme() { //TODO move to own component
         	this.showAgreementData = false;
             const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');

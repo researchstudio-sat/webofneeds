@@ -61,15 +61,17 @@ function genComponentConf() {
             	 		ng-show="!self.showDetail">
                     <use href="#ico16_arrow_down"></use>
                 </svg>
-                <!-- <svg class="won-ca__content__carret clickable"
-						ng-click="self.showDetail = !self.showDetail"
-						ng-show="self.showDetail"> -->
-				<span class="won-ca__content__carret clickable"
+                <!-- Alternate arrow
+                	<span class="won-ca__content__carret clickable"
 	                            ng-click="self.showDetail = !self.showDetail"
 	                            ng-show="self.showDetail">
-					<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>
-				</span>
-                <!--    <use href="#ico16_arrow_up"></use> -->
+						<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>
+					</span>
+				-->
+                <svg class="won-ca__content__carret clickable"
+						ng-click="self.showDetail = !self.showDetail"
+						ng-show="self.showDetail">
+					<use href="#ico16_arrow_up"></use>
                 </svg>
             	<button class="won-button--filled thin black"
             		ng-click="self.proposeToCancel()"
