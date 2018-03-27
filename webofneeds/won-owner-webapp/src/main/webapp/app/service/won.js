@@ -962,27 +962,19 @@ window.N34dbg = N3;
 
     won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD){
         //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
-        return jsonld.promises.expand(wonMessageAsJsonLD)
-            .then(expandedJsonLd =>
-                new WonMessage(expandedJsonLd)
-            )
-            .then(wonMessage =>
-                wonMessage.frameInPromise()
-                    .then(framed => wonMessage)
-            )
-            .then(wonMessage => {
-                const contentGraphs = wonMessage.getContentGraphs(); 
-                if(contentGraphs && contentGraphs.length > 0) {
-                    won.jsonLdToTrig(contentGraphs)
-                    .then(trig => {
-                        wonMessage.contentGraphTrig = trig;
-                    })
-                    .catch(e => {
-                        wonMessage.contentGraphTrigError = JSON.stringify(e);
-                    })
-                }
-                return wonMessage;
-            });
+        const expandedJsonLd  = await jsonld.promises.expand(wonMessageAsJsonLD);
+        const wonMessage = await new WonMessage(expandedJsonLd);
+        await wonMessage.frameInPromise()
+        const contentGraphs = wonMessage.getContentGraphs(); 
+        if(contentGraphs && contentGraphs.length > 0) {
+            try {
+                const trig = await won.jsonLdToTrig(contentGraphs)
+                wonMessage.contentGraphTrig = trig;
+            } catch (e) {
+                wonMessage.contentGraphTrigError = JSON.stringify(e);
+            }
+        }
+        return wonMessage;
     }
 
     won.jsonLdToTrig = async function (jsonldData) {
