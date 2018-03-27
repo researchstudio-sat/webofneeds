@@ -1,0 +1,148 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://localhost:8443/won/resource/connection/> .
+@prefix need:  <https://localhost:8443/won/resource/need/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix local: <https://localhost:8443/won/resource/> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix s:     <http://schema.org/> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://localhost:8443/won/resource/event/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex1: <http://example.org/1/> .
+@prefix ex2: <http://example.org/2/> .
+@prefix taxi: <http://example.org/taxi/> .
+
+@prefix oln-test:   <http://sat.researchstudio.at/oln/test/> .
+
+<oln-test:taxiService1#need> {
+    oln-test:taxiService1
+		a             won:Need ;
+		won:hasFlag   won:NoHintForCounterpart ;
+		won:is     [ dc:description   "next 10 minutes" ;
+						dc:title "Taxi in Wien"@de ;
+						dc:description "Biete Taxidienstleistungen im Raum Wien und Umgebung"@de ;
+						dc:title "Taxi in Vienna"@en ;
+						dc:description "Offering taxi services in Vienna and around"@en ;
+						won:hasTag "Taxi", "PersonenTransport"@de, "People transport"@en ;
+						won:hasLocation  [ a                   s:Place ;
+										   won:hasBoundingBox  [ won:hasNorthWestCorner  [ a            s:GeoCoordinates ;
+																						   s:latitude   "48.199528" ;
+																						   s:longitude  "16.355209"
+																						 ] ;
+																 won:hasSouthEastCorner  [ a            s:GeoCoordinates ;
+																						   s:latitude   "48.218489" ;
+																						   s:longitude  "16.384895"
+																						 ]
+															   ] ;
+										   s:geo               [ a            s:GeoCoordinates ;
+																 s:latitude   "48.209269" ;
+																 s:longitude  "16.370831"
+															   ] ;
+										   s:name              "Wien, Österreich"@de;
+										   s:name              "Vienna, Austria"@en
+										 ]
+					  ] ;
+		won:seeks [
+            won:seeks [
+                dc:title "Taxi";
+                won:hasLocation [
+                    s:geo [
+                      a s:GeoCoordinates ;
+                      s:latitude   "48.209269" ;
+                      s:longitude  "16.370831"
+                    ] ;
+                    s:name "Wien"
+                ];
+			]
+		];
+		won:seeks [
+            won:seeks [
+              dc:description "Taxi";
+              won:hasLocation [
+                s:geo [
+                  a s:GeoCoordinates ;
+                  s:latitude   "48.209269" ;
+                  s:longitude  "16.370831"
+                ] ;
+                s:name "Wien"
+              ];
+            ]
+		];
+		won:seeks [
+            won:seeks [
+                won:hasTag "Taxi";
+                won:hasLocation [
+                s:geo [
+                  a s:GeoCoordinates ;
+                  s:latitude   "48.209269" ;
+                  s:longitude  "16.370831"
+                ] ;
+                s:name "Wien"
+                ];
+		    ]
+		];
+		won:seeks [
+            won:seeks [
+              dc:title "Taxi Wien"
+            ]
+		];
+		won:seeks [
+            won:seeks [
+              dc:description "Taxi Wien"
+            ]
+		];				  
+		won:goal [
+			won:hasShapesGraph ex2:p2g-shapes ;
+		] .
+}
+
+ex2:p2g-shapes {
+
+   ex2:selfShape
+    a sh:NodeShape ;
+    sh:targetNode oln-test:taxiService1 ;
+    sh:property [
+        sh:path [ sh:inversePath taxi:hasClient ];
+        sh:class taxi:Ride ;
+    ] .
+
+  ex2:TaxiRideShape
+	a sh:NodeShape;
+    sh:targetClass taxi:Ride ;
+	sh:property [
+		sh:path taxi:hasPickupTime;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+        sh:datatype xsd:dateTime;
+	] ;
+	sh:property [
+		sh:path taxi:hasPickupLocation ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+        sh:class s:GeoCoordinates
+	] ;
+	sh:property [
+		sh:path taxi:hasClient;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		sh:hasValue oln-test:taxiService1 ;
+	] ;
+	sh:property [
+		sh:path taxi:hasDriver;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		sh:nodeKind sh:IRI ;
+	] ;
+	sh:ignoredProperties ( rdf:type ) ;
+	sh:closed true .
+}

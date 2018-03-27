@@ -30,7 +30,7 @@ During the projection from the edited conversation dataset to the agreement data
                                                         rdfs:domain <http://purl.org/webofneeds/agreement#Proposal> .
 
 
-###  http://purl.org/webofneeds/agreement#reject
+###  http://purl.org/webofneeds/agreement#rejects
 <http://purl.org/webofneeds/agreement#reject> rdf:type owl:ObjectProperty ;
                                                         rdfs:domain <http://purl.org/webofneeds/agreement#Proposal> .
 

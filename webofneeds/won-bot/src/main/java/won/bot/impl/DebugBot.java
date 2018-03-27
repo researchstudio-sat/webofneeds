@@ -18,16 +18,18 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
 import won.bot.framework.eventbot.action.impl.debugbot.*;
 import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.*;
-import won.bot.framework.eventbot.behaviour.BotBehaviour;
-import won.bot.framework.eventbot.behaviour.CloseBevahiour;
-import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
-import won.bot.framework.eventbot.behaviour.DeactivateNeedBehaviour;
+import won.bot.framework.eventbot.action.impl.wonmessage.ConnectWithAssociatedNeedAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.HintAssociatedNeedAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.SendMultipleMessagesAction;
+import won.bot.framework.eventbot.behaviour.*;
 import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.close.CloseCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
@@ -37,6 +39,7 @@ import won.bot.framework.eventbot.event.impl.wonmessage.*;
 import won.bot.framework.eventbot.filter.impl.NeedUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.model.FacetType;
 
@@ -82,10 +85,29 @@ public class DebugBot extends EventBot {
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = getEventBus();
 
+        //eagerly cache RDF data
+        BotBehaviour eagerlyCacheBehaviour = new EagerlyPopulateCacheBehaviour(ctx);
+        eagerlyCacheBehaviour.activate();
+
+        //react to a bot command activating/deactivating eager caching 
+        bus.subscribe(SetCacheEagernessCommandEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx) {
+			@Override
+			protected void doRun(Event event, EventListener executingListener) throws Exception {
+				if (event instanceof SetCacheEagernessCommandEvent) {
+					if(((SetCacheEagernessCommandEvent)event).isEager()) {
+        				eagerlyCacheBehaviour.activate();
+        			} else {
+        				eagerlyCacheBehaviour.deactivate();
+        			}
+				}
+			}
+		}));
+        
         //react to a message that was not identified as a debug command
         BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
         connectionMessageBehaviour.activate();
 
+        
         //react to the debug deactivate command (deactivate my need)
         BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
         deactivateNeedBehaviour.activate();

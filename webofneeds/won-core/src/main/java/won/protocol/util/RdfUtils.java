@@ -1,46 +1,10 @@
 package won.protocol.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
+import com.google.common.collect.Iterators;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -54,10 +18,14 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
-
 import won.protocol.exception.IncorrectPropertyCountException;
+
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -1683,8 +1651,9 @@ public class RdfUtils {
 	 * @param toBeAddedtoBase
 	 * @param replaceNamedModel
 	 *            if true, named graphs are not merged but replaced
+	 * @return the modified baseDataset           
 	 */
-	public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
+	public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
 			boolean replaceNamedModel) {
 		assert baseDataset != null : "baseDataset must not be null";
 		assert toBeAddedtoBase != null : "toBeAddedToBase must not be null";
@@ -1702,6 +1671,7 @@ public class RdfUtils {
 				baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
 			}
 		}
+		return baseDataset;
 	}
 
 	/**
@@ -1710,9 +1680,10 @@ public class RdfUtils {
 	 * 
 	 * @param baseDataset
 	 * @param toBeAddedtoBase
+	 * @return the modified baseDataset
 	 */
-	public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
-		addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
+	public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
+		return addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
 	}
 
 	public static Model mergeAllDataToSingleModel(final Dataset ds) {

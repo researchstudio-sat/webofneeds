@@ -1,18 +1,14 @@
 package won.protocol.agreement;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.thrift.Option;
 
+import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 
@@ -66,11 +62,7 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	
 	private Set<ConversationMessage> knownMessagesOnPathToRoot = new HashSet<ConversationMessage>();
 	
-	private boolean validAccepts = false;
-	private boolean validProposes = false;
-	private boolean validRetracts = false;
-	private boolean validRejects = false;
-	private boolean validProposesToCancel = false;
+	private Set<MessageEffect> effects = Collections.EMPTY_SET;
 	
 	public ConversationMessage(URI messageURI) {
 		this.messageURI = messageURI;
@@ -200,8 +192,8 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	public boolean isAcknowledgedRemotely() {
 		boolean hsr = hasSuccessResponse();
 		boolean hcrm = hasCorrespondingRemoteMessage();
-		boolean hrsr = correspondingRemoteMessageRef.hasSuccessResponse();
-		boolean hrr = correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
+		boolean hrsr = hcrm && correspondingRemoteMessageRef.hasSuccessResponse();
+		boolean hrr = hrsr && correspondingRemoteMessageRef.getIsResponseToInverseRef().hasCorrespondingRemoteMessage();
 		return hsr && hcrm && hrsr && hrr;
 	}
 	
@@ -390,6 +382,26 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	
 	public boolean isProposesToCancelMessage() {
 		return !this.proposesToCancelRefs.isEmpty();
+	}
+	
+	public boolean proposes(ConversationMessage other) {
+		return this.proposesRefs.contains(other);
+	}
+	
+	public boolean accepts(ConversationMessage other) {
+		return this.acceptsRefs.contains(other);
+	}
+	
+	public boolean proposesToCancel(ConversationMessage other) {
+		return this.proposesToCancelRefs.contains(other);
+	}
+	
+	public boolean retracts(ConversationMessage other) {
+		return this.retractsRefs.contains(other);
+	}
+	
+	public boolean rejects(ConversationMessage other) {
+		return this.rejectsRefs.contains(other);
 	}
 	
 	public URI getMessageURI() {
@@ -590,47 +602,15 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	}
 
 	
+	public void setEffects(Set<MessageEffect> effects) {
+		this.effects = effects;
+	}
 	
-	public boolean isValidAccepts() {
-		return validAccepts;
+	public Set<MessageEffect> getEffects() {
+		return effects;
 	}
-
-	public void setValidAccepts(boolean validAccepts) {
-		this.validAccepts = validAccepts;
-	}
-
-	public boolean isValidProposes() {
-		return validProposes;
-	}
-
-	public void setValidProposes(boolean validProposes) {
-		this.validProposes = validProposes;
-	}
-
-	public boolean isValidRetracts() {
-		return validRetracts;
-	}
-
-	public void setValidRetracts(boolean validRetracts) {
-		this.validRetracts = validRetracts;
-	}
-
-	public boolean isValidRejects() {
-		return validRejects;
-	}
-
-	public void setValidRejects(boolean validRejects) {
-		this.validRejects = validRejects;
-	}
-
-	public boolean isValidProposesToCancel() {
-		return validProposesToCancel;
-	}
-
-	public void setValidProposesToCancel(boolean validProposesToCancel) {
-		this.validProposesToCancel = validProposesToCancel;
-	}
-
+	
+	
 	@Override
 	public String toString() {
 		return "ConversationMessage [messageURI=" + messageURI

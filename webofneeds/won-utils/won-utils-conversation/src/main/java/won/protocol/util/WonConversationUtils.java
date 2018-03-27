@@ -1,12 +1,12 @@
 package won.protocol.util;
 
+import org.apache.jena.query.Dataset;
+import won.protocol.agreement.AgreementProtocolState;
+
 import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
+import java.util.function.Predicate;
 
 
 public class WonConversationUtils {
@@ -28,148 +28,37 @@ public class WonConversationUtils {
 		return null;
 	}
 	
+	public static URI getNthLatestMessage(Dataset conversationDataset, Predicate predicate, int n){
+		return AgreementProtocolState.of(conversationDataset).getNthLatestMessage(predicate, n);
+	}
+	
 	public static URI getLatestMessageOfNeed(Dataset conversationDataset, URI senderNeed){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-					.noResponses()
-					.newestFirst()
-					.limit(1)
-					.senderNeed(senderNeed)
-					.build());
-		/*
-		return (URI) getFirstOrNull(conversationDataset, WonLatestMessageQueryBuilder.getBuilderForMessageUris()
-				.senderNeed(senderNeed)
-				.build());
-				*/
+		return AgreementProtocolState.of(conversationDataset).getLatestMessageSentByNeed(senderNeed);
 	}
 	
 	public static URI getNthLatestMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-					.noResponses()
-					.newestFirst()
-					.limit(1)
-					.offset(n-1)
-					.senderNeed(senderNeed)
-					.build());
-		/*
-		return (URI) getFirstOrNull(conversationDataset, WonLatestMessageQueryBuilder.getBuilderForMessageUris()
-				.senderNeed(senderNeed)
-				.build());
-				*/
+		return AgreementProtocolState.of(conversationDataset).getNthLatestMessageSentByNeed(senderNeed, n);
 	}
+	
 	
 	public static URI getLatestAcceptsMessageOfNeed(Dataset conversationDataset, URI senderNeed){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-					.noResponses()
-					.newestFirst()
-					.limit(1)
-					.senderNeed(senderNeed)
-					.isAcceptsMessage()
-					.build());
-	}
-	
-	public static URI getNthLatestAcceptsMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-					.noResponses()
-					.newestFirst()
-					.limit(1)
-					.offset(n-1)
-					.senderNeed(senderNeed)
-					.isAcceptsMessage()
-					.build());
-	}
-	
-	public static URI getLatestAcceptsMessage(Dataset conversationDataset){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-					.noResponses()
-					.newestFirst()
-					.limit(1)
-					.isAcceptsMessage()
-					.build());
-	}
-	
-	public static URI getNthLatestAcceptsMessage(Dataset conversationDataset,int n){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-					.noResponses()
-					.newestFirst()
-					.limit(1)
-					.offset(n-1)
-					.isAcceptsMessage()
-					.build());
+		return AgreementProtocolState.of(conversationDataset).getLatestAcceptsMessageSentByNeed(senderNeed);
 	}
 	
 	public static URI getLatestRetractsMessageOfNeed(Dataset conversationDataset, URI senderNeed){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-				.noResponses()
-				.newestFirst()
-				.limit(1)
-				.senderNeed(senderNeed)
-				.isRetractsMessage()
-				.build());
-	}
-	
-	public static URI getNthLatestRetractsMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-				.noResponses()
-				.newestFirst()
-				.limit(1)
-				.offset(n-1)
-				.senderNeed(senderNeed)
-				.isRetractsMessage()
-				.build());
+		return AgreementProtocolState.of(conversationDataset).getLatestRetractsMessageSentByNeed(senderNeed);
 	}
 	
 	public static URI getLatestProposesMessageOfNeed(Dataset conversationDataset, URI senderNeed){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-				.noResponses()
-				.newestFirst()
-				.limit(1)
-				.senderNeed(senderNeed)
-				.isProposesMessage()
-				.build());
+		return AgreementProtocolState.of(conversationDataset).getLatestProposeMessageSentByNeed(senderNeed);
 	}
 	
-	public static URI getNthLatestProposesMessageOfNeed(Dataset conversationDataset, URI senderNeed,int n){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-				.noResponses()
-				.newestFirst()
-				.limit(1)
-				.offset(n-1)
-				.senderNeed(senderNeed)
-				.isProposesMessage()
-				.build());
-	}
-		
 	public static URI getLatestProposesToCancelMessageOfNeed(Dataset conversationDataset, URI senderNeed){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-				.noResponses()
-				.newestFirst()
-				.limit(1)
-				.senderNeed(senderNeed)
-				.isProposesToCancelMessage()
-				.build());
+		return AgreementProtocolState.of(conversationDataset).getLatestProposesToCancelMessageSentByNeed(senderNeed);
 	}
 	
-	public static URI getNthLatestProposesToCancelMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
-		return (URI) getFirstOrNull(conversationDataset,
-				WonConversationQueryBuilder.getBuilderForMessageUris()
-				.noResponses()
-				.newestFirst()
-				.limit(1)
-				.offset(n-1)
-				.senderNeed(senderNeed)
-				.isProposesToCancelMessage()
-				.build());
+	public static URI getLatestRejectsMessageOfNeed(Dataset conversationDataset, URI senderNeed, int n){
+		return AgreementProtocolState.of(conversationDataset).getLatestRejectsMessageSentByNeed(senderNeed);
 	}
 	
 	public static String getTextMessage(Dataset conversationDataset, URI messageUri) {

@@ -18,8 +18,18 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6"; /* required to force babel to transpile this so the minifier is happy */
-import {jsonld2simpleFormat} from '../utils.js'
+import {
+    jsonld2simpleFormat,
+    is,
+    get,
+    getIn,
+    clone,
+} from '../utils.js'
 import jsonld from 'jsonld';
+
+import N3 from '../../scripts/N3/n3-browserify.js';
+window.N34dbg = N3;
+
    var won = {};
 
     /**
@@ -1014,7 +1024,14 @@ import jsonld from 'jsonld';
         if (envelopeGraphs && envelopeGraphs.length > 0) {
             envelopeGraphs.forEach( envelopeGraph => jsonld["@graph"].push(envelopeGraph));
         }
-        return won.wonMessageFromJsonLd(jsonld);
+        return won.wonMessageFromJsonLd(jsonld)
+        .then(wonMsg => {
+             wonMsg.contentGraphTrig = 
+                get(wonMsg, 'contentGraphTrig') || 
+                get(message, 'contentGraphTrig') || 
+                getIn(message, ['hasCorrespondingRemoteMessage', 'contentGraphTrig']);
+            return wonMsg;
+        });;
     }
 
 
@@ -1028,8 +1045,109 @@ import jsonld from 'jsonld';
             .then(wonMessage =>
                 wonMessage.frameInPromise()
                     .then(framed => wonMessage)
-            );
+            )
+            .then(wonMessage => {
+                const contentGraphs = wonMessage.getContentGraphs(); 
+                if(contentGraphs && contentGraphs.length > 0) {
+                    won.jsonLdToTrig(contentGraphs)
+                    .then(trig => {
+                        wonMessage.contentGraphTrig = trig;
+                    })
+                    .catch(e => {
+                        wonMessage.contentGraphTrigError = JSON.stringify(e);
+                    })
+                }
+                return wonMessage;
+            });
     }
+
+    won.jsonLdToTrig = async function (jsonldData) {
+        if(
+            !jsonldData || !(
+                (is('Array', jsonldData) && jsonldData.length > 0) ||
+                (is('Object', jsonldData) && jsonldData['@graph'])
+            )
+        ) {
+            const msg = "Couldn't parse the following json-ld to trig: " + JSON.stringify(jsonldData);
+            return Promise.reject(msg);
+        }
+        const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
+        const quads = await won.n3Parse(quadString, {format: 'application/n-quads'});
+        console.log("QUAAAADS ", quads);
+        const trig = await won.n3Write(quads, { format: 'application/trig' });
+        return trig;
+    }
+    window.jsonLdToTrig4dbg = won.jsonLdToTrig;
+
+    /**
+     * An wrapper for N3's writer that returns a promise
+     * @param {*} triples list of triples, each with "subject", "predicate", 
+     *   "object" and optionally "graph"
+     * @param {*} writerArgs the arguments for intializing the writer. 
+     *   e.g. `{format: 'application/trig'}`. See the writer-documentation 
+     *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
+     */
+    won.n3Write = async function (triples, writerArgs) {
+        const writer = N3.Writer(writerArgs);
+        return new Promise((resolve, reject) => {
+            triples.forEach(t => writer.addTriple(t))
+            writer.end((error, result) => {
+                if(error) reject(error);
+                else resolve(result)
+            })
+        });
+    }
+
+    /**
+     * A wrapper for N3's parse that returns a promise
+     * @param {*} rdf a rdf-string to be parsed
+     * @param {*} parserArgs arguments for initializing the parser, 
+     *   e.g. `{format: 'application/n-quads'}` if you want to make
+     *   parser stricter about what it accepts. See the parser-documentation
+     *   (https://github.com/RubenVerborgh/N3.js#parsing) for more details.
+     */
+    won.n3Parse = async function(rdf, parserArgs) {
+        const parser = parserArgs? 
+            N3.Parser(parserArgs) : 
+            N3.Parser();
+        return new Promise((resolve, reject) => {
+            let triples = [];
+            parser.parse( rdf, (error, triple, prefixes) => {
+                if(error) {
+                    reject(error);
+                } else if (triple) {
+                    triples.push(triple);
+                } else {
+                    // all triples collected
+                    resolve(triples, prefixes);
+                }
+            })
+        });
+    }
+
+    won.ttlToJsonLd = async function(ttl) {
+        const tryConversion = async () => {
+
+            const triples = await won.n3Parse(ttl);
+            const graphUri = 'ignoredgraphuri:placeholder';
+
+            const quadObjs = clone(triples); 
+            quadObjs.forEach(t => { t.graph = graphUri }); // add graph-uri to make the triples into quads
+
+            const quadString = await won.n3Write(quadObjs, { format: 'application/n-quads' });
+
+            const parsedJsonld = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'});
+
+            return parsedJsonld;
+        }
+        return tryConversion()
+            .catch(e => {
+                e.message = "error while parsing the following turtle:\n\n" + ttl + "\n\n----\n\n" + e.message;
+                throw e;
+            })
+    }
+
+    window.ttlToJsonLd4dbg = won.ttlToJsonLd;
 
     /**
      * Like the JSONLD-Helper, an object that wraps a won message and
@@ -1206,7 +1324,7 @@ import jsonld from 'jsonld';
         isAcceptMessage: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#accepts");
         },
-        isProposeToCancelMessage: function () {
+        isProposeToCancel: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel");
         },
         isProposal: function () {
@@ -1215,6 +1333,10 @@ import jsonld from 'jsonld';
         isAgreement: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#Agreement");
         },
+        /*
+        isAccepted: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/message#isAccepted");
+        },*/
         
         isFromSystem: function () {
             let direction = this.getMessageDirection();
