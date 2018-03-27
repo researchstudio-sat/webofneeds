@@ -1682,7 +1682,7 @@ import won from './won.js';
      * @param fetchParams See `ensureLoaded`.
      */
     won.getWonMessagesOfConnection = async function(connectionUri, fetchParams) {
-        const eventUris = won.getEventUrisOfConnection(connectionUri, fetchParams)
+        const eventUris = await won.getEventUrisOfConnection(connectionUri, fetchParams)
         return urisToLookupMap(
             eventUris,
             eventUri => won.getWonMessage(eventUri, fetchParams)
