@@ -11,15 +11,7 @@ import java.util.function.Predicate;
 
 public class WonConversationUtils {
 	
-	/**
-	 * Get all message URIs (excluding those of responses) from the conversation, oldest first.
-	 * @param conversationDataset
-	 * @return
-	 */
-	public static List<URI> getAllMessageURIs(Dataset conversationDataset){
-		return WonConversationQueryBuilder
-				.getBuilderForMessageUris().oldestFirst().build().apply(conversationDataset);
-	}
+	
 	
 	private static <T> T getFirstOrNull(Dataset dataset, Function<Dataset, List<T>> function) {
 		//RDFDataMgr.write(System.err, dataset, Lang.TRIG);
@@ -45,6 +37,11 @@ public class WonConversationUtils {
 		return AgreementProtocolState.of(conversationDataset).getLatestAcceptsMessageSentByNeed(senderNeed);
 	}
 	
+	public static URI getLatestAcceptsMessage(Dataset conversationDataset){
+		return AgreementProtocolState.of(conversationDataset).getLatestAcceptsMessage();
+	}
+
+	
 	public static URI getLatestRetractsMessageOfNeed(Dataset conversationDataset, URI senderNeed){
 		return AgreementProtocolState.of(conversationDataset).getLatestRetractsMessageSentByNeed(senderNeed);
 	}
@@ -61,10 +58,6 @@ public class WonConversationUtils {
 		return AgreementProtocolState.of(conversationDataset).getLatestRejectsMessageSentByNeed(senderNeed);
 	}
 	
-	public static String getTextMessage(Dataset conversationDataset, URI messageUri) {
-		return (String) getFirstOrNull(conversationDataset,
-				WonMessageQueryBuilder.getBuilder(x -> x.get("text").asLiteral().toString())
-				.messageUri(messageUri).build());
-	}
+	
 	
 }

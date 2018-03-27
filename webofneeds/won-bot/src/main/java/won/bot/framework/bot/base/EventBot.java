@@ -353,35 +353,16 @@ public abstract class EventBot extends TriggeredBot {
     * Expects to be registered for WorkDoneEvents and ErrorEvents and will not react to a WorkDoneEvent.
     */
     private class ErrorEventListener extends BaseEventListener {
-        private boolean done = false;
-        private Object monitor = new Object();
         public ErrorEventListener(EventListenerContext context) {
         super(context);
         }
 
         @Override
         protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
-            synchronized (monitor) {
-                if (event instanceof ErrorEvent) {
-                    //only react to an ErrorEvent
-                    if (! done) {
-                        //make sure we send only one WorkDoneEvent
-                        logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent", ((ErrorEvent) event).getThrowable());
-                        getEventListenerContext().getEventBus().publish(new WorkDoneEvent(EventBot.this));
-                    }
-                    Throwable t = ((ErrorEvent) event).getThrowable();
-                    logger.info("ErrorEvent contained this throwable:", t);
-                    setDoneAndUnsubscribe();
-                }
-                if (event instanceof WorkDoneEvent) {
-                    setDoneAndUnsubscribe();
-                }
+            if (event instanceof ErrorEvent) {
+                Throwable t = ((ErrorEvent) event).getThrowable();
+                logger.info("Encountered an error:", t);
             }
-        }
-
-        private void setDoneAndUnsubscribe() {
-            done = true;
-            getEventBus().unsubscribe(this);
         }
     }
 
