@@ -33,6 +33,12 @@ won-connection-agreement {
             }
         }
     
+         &__subtext {
+            padding: 0.5rem;
+            justify-content: flex-end;
+            //border-top: $thinBorderWidth solid $won-line-gray;
+        }
+    
         &__button {
             padding: 0.5rem;
         }

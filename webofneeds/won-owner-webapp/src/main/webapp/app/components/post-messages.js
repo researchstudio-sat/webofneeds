@@ -42,6 +42,22 @@ const declarations = deepFreeze({
 	//acceptedProposalToCancel: "acceptedProposalToCancel",
 	
 });
+
+const defaultUriObject = deepFreeze({
+	stateUri: undefined,
+	headUri: undefined,
+});
+
+const defaultAgreementData = deepFreeze({
+		agreementUris: new Set(),
+		pendingProposalUris: new Set(),
+		acceptedCancellationProposalUris: new Set(),
+		cancellationPendingAgreementUris: new Set(),
+		pendingCancellationProposalUris: new Set(),
+		cancelledAgreementUris: new Set(),
+		rejectedMessageUris: new Set(),
+		retractedMessageUris: new Set(),
+});
 function genComponentConf() {
     let template = `
         <div class="pm__header">
@@ -77,13 +93,13 @@ function genComponentConf() {
             		src="generated/icon-sprite.svg#ico36_close"
             		ng-click="self.showAgreementData = !self.showAgreementData"/>
             	<!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.agreementUris.size || self.agreementData.cancellationPendingAgreementUris.size"> 
+            	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
             		<span ng-show="self.loading"> (loading...)</span>
             		<span ng-if="!self.loading"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="agree in self.getArrayFromSet(self.agreementData.agreementUris) track by $index"
+	            	ng-repeat="agree in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
 	                event-uri="agree"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
@@ -93,33 +109,33 @@ function genComponentConf() {
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
 	            <!--
-	            <div class="pm__content__agreement__title" ng-show="self.agreementData.cancellationPendingAgreementUris.size">
-            		<br ng-show="self.agreementData.agreementUris.size" />
-            		<hr ng-show="self.agreementData.agreementUris.size" />
+	            <div class="pm__content__agreement__title" ng-show="self.agreementStateData.cancellationPendingAgreementUris.size">
+            		<br ng-show="self.agreementStateData.agreementUris.size" />
+            		<hr ng-show="self.agreementStateData.agreementUris.size" />
             		Proposals To Cancel
     				<span ng-show="self.loading.cancellationPendingAgreementUris"> (loading...)</span>
             		<span ng-if="!self.loading.cancellationPendingAgreementUris"> (up-to-date)</span>
             	</div>
             	-->
 	            <won-connection-agreement
-	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementData.cancellationPendingAgreementUris) track by $index"
+	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
 	                event-uri="proptoc"
-	                agreement-number="self.agreementData.agreementUris.size + $index"
+	                agreement-number="self.agreementStateData.agreementUris.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
 	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
 	            <!-- /ProposeToCancel -->
             	<!-- PROPOSALS -->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementData.pendingProposalUris.size">
-            		<br ng-show="self.agreementData.agreementUris.size || self.agreementData.cancellationPendingAgreementUris.size" />
-            		<hr ng-show="self.agreementData.agreementUris.size || self.agreementData.cancellationPendingAgreementUris.size" />
+            	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.pendingProposalUris.size">
+            		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
+            		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		Proposals
     				<span ng-show="self.loading.pendingProposalUris"> (loading...)</span>
             		<span ng-if="!self.loading.pendingProposalUris"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="prop in self.getArrayFromSet(self.agreementData.pendingProposalUris) track by $index"
+	            	ng-repeat="prop in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
 	                event-uri="prop"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.pendingProposalUris"
@@ -221,16 +237,8 @@ function genComponentConf() {
             this.baseString = "/owner/"
             this.declarations = clone(declarations);
             
-            this.agreementData = {
-            		agreementUris: new Set(),
-            		pendingProposalUris: new Set(),
-            		acceptedCancellationProposalUris: new Set(),
-            		cancellationPendingAgreementUris: new Set(),
-            		pendingCancellationProposalUris: new Set(),
-            		cancelledAgreementUris: new Set(),
-            		rejectedMessageUris: new Set(),
-            		retractedMessageUris: new Set(),
-            };
+            this.agreementHeadData = clone(defaultAgreementData);
+            this.agreementStateData  = clone(defaultAgreementData);
             /*
             this.loading = {
             		proposal: false, 
@@ -260,10 +268,11 @@ function genComponentConf() {
                 if(sortedMessages) {
                 	var msgSet = new Set(sortedMessages);
                 	
-                	/* TODO: Optimization
+                	// TODO: Optimization
+                	//filter proposals
                 	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage")){
-	                		if(this.agreementData.agreement.has(msg.get("uri")) || this.agreementData.agreement.has(msg.get("remoteUri"))) {
+	                		if(this.agreementHeadData.agreementUris.has(msg.get("uri")) || this.agreementHeadData.agreementUris.has(msg.get("remoteUri"))) {
 	                			msgSet.delete(msg);
 	                		} else {
 	                			//TODO: add messages from state to agreementDate with right uri
@@ -271,7 +280,7 @@ function genComponentConf() {
 	                			//this.agreementData.proposal.add(msg.get("uri"));
 	                		}
                 		}
-                	}*/
+                	}
                 	
                 	sortedMessages = Array.from(msgSet);
 	            	sortedMessages.sort(function(a,b) {
@@ -311,7 +320,7 @@ function genComponentConf() {
             );
 
             this.$scope.$watch(
-                () => (this.chatMessages && this.chatMessages.length) || this.agreementData, // trigger if there's messages added (or removed)
+                () => (this.chatMessages && this.chatMessages.length) || this.agreementHeadData, // trigger if there's messages added (or removed)
                 () => delay(0).then(() =>
                     // scroll to bottom directly after rendering, if snapped
                     this.updateScrollposition()
@@ -395,46 +404,33 @@ function genComponentConf() {
         
         agreementDataIsValid() {
         	
-        	var aD = this.agreementData;
+        	/*
+        	 * only agreementUris, pendingProposalUris and cancellationPendingAgreementUris important for gui
+        	 */
+        	var aD = this.agreementStateData;
+        	if(aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size) {
+        		return true;
+        	}
         	
+        	//all data
+        	/*
         	for(key in aD) {
         		if (aD.hasOwnProperty(key)) {
         			if(aD[key].size) {
         				return true;
         			}
         		}
-        	}
-        
-        	/*
-        	if(aD.proposal.size ||aD.agreement.size ||aD.proposeToCancel.size || aD.acceptedProposalToCancel.size){
-        		return true;
         	}*/
         	return false;
         }
         
         getAgreementData(connection) {
-        	
-        	//this.filterAgreementDataList();
-        	
         	if(connection) {
         		this.connection = connection;
         	}
-        	console.log("Load Agreement Data");
-        	//this.startLoading();
         	
         	this.loading = true;
-        	this.getAgreementDataUris();
-        	
-        	//Get just uris
-        	//this.getAgreementUris();
-        	//this.getProposalUris() ;
-        	//this.getAgreementsProposedToBeCancelledUris();
-        	//Get whole dataset
-        	//this.getAgreements();
-        	//this.getProposals();
-        	//this.getAgreementsProposedToBeCancelled();
-        	//this.getAcceptedPropsalsToCancel();
-        	
+        	this.getAgreementDataUris();        	
         }
         
          
@@ -442,15 +438,12 @@ function genComponentConf() {
         	var url = this.baseString + 'rest/agreement/getAgreementProtocolUris?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
-    			
-    			console.log(response);
-    			this.agreementData = this.transformDataToSet(response);
-    			
-    			for(key in this.agreementData) {
-    				if(this.agreementData.hasOwnProperty(key)) {
-    					console.log("Key: " + key + " : " + this.agreementData[key]);
-	    				for(data of this.agreementData[key]) {
-	    					this.addAgreementDataToSate(data);
+    			this.agreementHeadData = this.transformDataToSet(response);
+    			//this.agreementStateData = clone(defaultAgreementHeadData);
+    			for(key in this.agreementHeadData) {
+    				if(this.agreementHeadData.hasOwnProperty(key)) {
+	    				for(data of this.agreementHeadData[key]) {
+	    					this.addAgreementDataToSate(data, key);
         				}
     				}
     			}
@@ -460,6 +453,7 @@ function genComponentConf() {
     				this.loading = false;
     		})
         }
+        
         
         transformDataToSet(response) {
         	var tmpAgreementData = {        	
@@ -487,7 +481,7 @@ function genComponentConf() {
         }
         
         
-        addAgreementDataToSate(eventUri) {
+        addAgreementDataToSate(eventUri, key) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
 			.then(response => {
@@ -497,8 +491,20 @@ function genComponentConf() {
                         /*if we find out that the receiverneed of the crawled event is actually our
                         need we will call the method again but this time with the correct eventUri
                         */
-                        this.addLoadedAgreementDataToSate(msg.getRemoteMessageUri());
-                    }else{
+                    	/*
+                    	var tmpUriObject = clone(uriObject);
+                    	tmpUriObject.headUri = eventUri;
+                    	*/
+                    	
+                        this.addAgreementDataToSate(msg.getRemoteMessageUri(), key);
+                    }else {
+                    	/*if(!uriObject) {
+                    		var tmpUriObject = clone(uriObject);
+                        	tmpUriObject.headUri = eventUri;
+                        	tmpUriObject.stateUri = eventUri;
+                        	
+                    	}*/
+                    	this.agreementStateData[key].add(eventUri);
                         this.messages__connectionMessageReceived(msg);     
                     }
                 })

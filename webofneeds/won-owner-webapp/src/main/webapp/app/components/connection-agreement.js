@@ -52,8 +52,8 @@ function genComponentConf() {
             	{{ self.agreementNumber+1  }}: 
             	<span class="title" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Propose to cancel:</br></span>
             	{{ self.message.get('text') }}<br />
-            	EventUri: {{ self.eventUri }}<br />
-            	RealUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
+            	StateUri: {{ self.eventUri }}<br />
+            	HeadUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
             </div>
             <div class="won-ca__content__button" ng-show="!self.clicked">
             	<svg class="won-ca__content__carret clickable"
@@ -61,10 +61,15 @@ function genComponentConf() {
             	 		ng-show="!self.showDetail">
                     <use href="#ico16_arrow_down"></use>
                 </svg>
-                <svg class="won-ca__content__carret clickable"
+                <!-- <svg class="won-ca__content__carret clickable"
 						ng-click="self.showDetail = !self.showDetail"
-						ng-show="self.showDetail">
-                    <use href="#ico16_arrow_up"></use>
+						ng-show="self.showDetail"> -->
+				<span class="won-ca__content__carret clickable"
+	                            ng-click="self.showDetail = !self.showDetail"
+	                            ng-show="self.showDetail">
+					<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>
+				</span>
+                <!--    <use href="#ico16_arrow_up"></use> -->
                 </svg>
             	<button class="won-button--filled thin black"
             		ng-click="self.proposeToCancel()"
@@ -82,7 +87,7 @@ function genComponentConf() {
             		 Accept
             	</button>
             </div>
-        	<div class="won-ca__content__text" ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
+        	<div class="won-ca__content__subtext" ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
         		You proposed this
         	</div>
             	<!--
@@ -140,11 +145,6 @@ function genComponentConf() {
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
 
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	//TODO: isAccepted = true;
-        	/*	
-        	this.message = this.message.set("isAccepted", true);
-        	this.connections__sendChatMessage(this.message, this.connectionUri);
-        	*/
         	this.onUpdate({draft: this.eventUri});
         	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
