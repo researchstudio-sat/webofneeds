@@ -762,7 +762,9 @@ import won from './won.js';
             if (response.status === 200)
                 return response;
             else
-                throw new Error(`${response.status} - ${response.statusText}`);
+                throw new Error(
+                    `${response.status} - ${response.statusText} for request ${uri}, ${JSON.stringify(params)}`
+                );
         })
         .then(dataset =>
             dataset.json())
