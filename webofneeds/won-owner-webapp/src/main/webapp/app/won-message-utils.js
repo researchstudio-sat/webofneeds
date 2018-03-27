@@ -6,7 +6,6 @@
 import won from './won-es6.js';
 import Immutable from 'immutable';
 import {
-    getRandomPosInt,
     checkHttpStatus,
     mapJoin,
     urisToLookupMap,
@@ -16,6 +15,10 @@ import {
     is,
     getIn,
 } from './utils.js';
+
+import {
+    getRandomWonId,
+} from './won-utils.js';
 
 import {
     actionTypes,
@@ -34,11 +37,12 @@ export function wellFormedPayload (payload) {
     return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
+
 export function buildRateMessage(msgToRateFor, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, rating){
     return new Promise((resolve, reject) => {
         var buildMessage = function(envelopeData, eventToRateFor) {
             //TODO: use event URI pattern specified by WoN node
-            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomWonId();
             var message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
                 .eventURI(eventUri)
                 .hasOwnerDirection()
@@ -63,7 +67,7 @@ export function buildRateMessage(msgToRateFor, ownNeedUri, theirNeedUri, ownNode
 export function buildCloseMessage(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri){
     var buildMessage = function (envelopeData) {
         //TODO: use event URI pattern specified by WoN node
-        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
         var message = new won.MessageBuilder(won.WONMSG.closeMessage)
             .eventURI(eventUri)
             .forEnvelopeData(envelopeData)
@@ -86,7 +90,7 @@ export function buildCloseMessage(connectionUri, ownNeedUri, theirNeedUri, ownNo
 }
 export function buildCloseNeedMessage(needUri, wonNodeUri){
     const buildMessage = function(envelopeData) {
-        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomWonId();
         var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
             .eventURI(eventUri)
             .hasReceiverNode(wonNodeUri)
@@ -107,7 +111,7 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
 
 export function buildOpenNeedMessage(needUri, wonNodeUri){
     const buildMessage = function(envelopeData) {
-        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomWonId();
         var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
             .eventURI(eventUri)
             .hasReceiverNode(wonNodeUri)
@@ -140,7 +144,7 @@ export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, thei
        envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
     }
     //TODO: use event URI pattern specified by WoN node
-    var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+    var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomWonId();
     var message = new won.MessageBuilder(won.WONMSG.connectMessage)
         .eventURI(eventUri)
         .forEnvelopeData(envelopeData)
@@ -167,7 +171,7 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
             jsonldGraphPayloadP,
         ])
         .then(([envelopeData, graphPayload]) => {
-            const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomPosInt();
+            const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
 
             /*
              * Build the json-ld message that's signed on the owner-server
@@ -213,7 +217,7 @@ export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNod
         .then(envelopeData => {
 
             //TODO: use event URI pattern specified by WoN node
-            const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+            const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomWonId();
             const message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
@@ -259,12 +263,12 @@ export function buildCreateMessage(needData, wonNodeUri) {
         throw new Error('Tried to create post without type or title. ', needData);
     */
     
-    const publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
+    const publishedContentUri = wonNodeUri + '/need/' + getRandomWonId();
 
     const imgs = needData.images;
     let attachmentUris = []
     if(imgs) {
-        imgs.forEach(function(img) { img.uri = wonNodeUri + '/attachment/' + getRandomPosInt(); })
+        imgs.forEach(function(img) { img.uri = wonNodeUri + '/attachment/' + getRandomWonId(); })
         attachmentUris = imgs.map(function(img) { return img.uri });
     }
 
@@ -292,7 +296,7 @@ export function buildCreateMessage(needData, wonNodeUri) {
         });
     
    
-    const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
+    const msgUri = wonNodeUri + '/event/' + getRandomWonId(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {
         receiverNode : wonNodeUri, //mandatory
         senderNode : wonNodeUri, //mandatory

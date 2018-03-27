@@ -256,13 +256,23 @@ export function removeAllProperties(obj){
 export function getKeySize(obj) {
     return Object.keys(obj).length;
 }
+/**
+ * generates a string of random characters
+ * 
+ * @param {*} length the length of the string to be generated. e.g. in the example below: 5
+ * @param {*} chars the allowed characters, e.g. "abc123" to generate strings like "a3cba"
+ */
+export function getRandomString(length, chars = "abcdefghijklmnopqrstuvwxyz0123456789") {
+    var buff = new Array(length);
+    for(let i = 0; i<buff.length; i++) buff[i] = chars[Math.floor(Math.random()*chars.length)];
+    buff.join('')
+}
 export function getRandomPosInt() {
     return getRandomInt(1,9223372036854775807);
 }
 export function getRandomInt(min, max){
     return Math.floor(Math.random()*(max-min+1))+min;
 }
-
 export function isString(o) {
     return typeof o == "string" || (typeof o == "object" && o.constructor === String);
 }
