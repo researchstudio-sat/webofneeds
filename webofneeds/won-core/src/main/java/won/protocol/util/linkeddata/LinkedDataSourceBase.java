@@ -248,13 +248,19 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 		Set<URI> toCrawl = new HashSet<URI>();
 		for (int i = 0; i < properties.size(); i++) {
 			Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset, resourceURI, properties.get(i));
+			Set<URI> newUrisThisIteration = new HashSet<URI>();
 			while (newURIs.hasNext()) {
 				URI newUri = newURIs.next();
 				if (!excludedUris.contains(newUri)) {
-					toCrawl.add(newUri);
+					newUrisThisIteration.add(newUri);
 				}
 			}
+			if (logger.isDebugEnabled()) {
+				logger.debug("new uris found starting at {}, using path {}: {}", new Object[] {resourceURI, properties.get(i), newUrisThisIteration.size()});
+			}
+			toCrawl.addAll(newUrisThisIteration);
 		}
+		
 		return toCrawl;
 	}
 
