@@ -2396,10 +2396,10 @@ function groupByGraphs(jsonldData) {
         const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
 
         if(!graph['@graph'] || !graphUri || !context) {
-            const msg = 'Grouping-by-graph failed for the graph' +
+            const msg = 'Grouping-by-graph failed for the graph ' +
                 graphUri + ' and context ' + JSON.stringify(graphUri) + 
-                ' with the following jsonld: \n' + 
-                JSON.stringify(graphWithContext);
+                ' with the following jsonld: \n\n' + 
+                JSON.stringify(graphWithContext) + '\n\n';
             //TODO: reactivate error msg
             //console.error(msg);
             return Promise.reject(msg);
