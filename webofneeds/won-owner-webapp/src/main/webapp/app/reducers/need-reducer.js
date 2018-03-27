@@ -544,6 +544,7 @@ function parseMessage(wonMessage, isNewMessage) {
             isProposeToCancel: wonMessage.isProposeToCancel(),
             //isAccepted: wonMessage.isAccepted(),
             contentGraphTrig: wonMessage.contentGraphTrig,
+            contentGraphTrigError: wonMessage.contentGraphTrigError,
 
         }
     };
