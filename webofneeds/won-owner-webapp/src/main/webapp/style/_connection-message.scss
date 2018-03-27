@@ -14,14 +14,15 @@ won-connection-message {
     &.won-cm--left {
         justify-content: flex-start;
 
-        & .won-cm__center__text {
+        & .won-cm__center__bubble {
             @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         }
     }
     &.won-cm--right {
         justify-content: flex-end;
+        color:red!important;
 
-        & .won-cm__center__text {
+        & .won-cm__center__bubble {
             @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         }
     }
