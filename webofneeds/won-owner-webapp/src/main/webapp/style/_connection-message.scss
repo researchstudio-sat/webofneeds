@@ -5,10 +5,13 @@
 won-connection-message {
     margin: 0.5rem 0;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
-    display: flex;
+    display: grid;
+    grid-template-areas: "icon content";
+    grid-template-columns: min-content minmax(min-content, max-content);
 
     won-square-image {
         cursor: pointer; /* the image links to their post info */
+        grid-area: icon;
     }
 
     &.won-cm--left {
@@ -27,12 +30,15 @@ won-connection-message {
     }
 
     .won-cm__center {
-        margin: 0 0.5rem;
+        grid-area: content;
         font-size: $smallFontSize;
 
         .won-cm__center__bubble {
             padding: 0.5rem;
             border: $thinGrayBorder;
+            word-break: break-word;
+            min-height: 2.5rem;
+            box-sizing: border-box;
             //background: $won-light-gray;
 
                 &.agreement {
