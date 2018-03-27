@@ -54,8 +54,9 @@ chat-textfield {
       box-sizing: border-box;
 
       min-width: 0; // so a size is specified and break-word works
-      word-wrap: break-word;
-
+      word-break: break-word;
+      max-height: 6rem; // so that we do not allow endless lines
+      overflow-y: auto; // to show a scrollbar if there is too much content in the input field
 
       &.wdt__text--placeholder {
         color: $won-line-gray;
