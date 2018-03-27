@@ -965,7 +965,8 @@ window.N34dbg = N3;
     /**
      * This is a hack that allows us to wrap a WonMessage object around a message that
      * is retrieved from the local rdf store. This will work for Chat messages
-     *
+     * 
+     * @deprecated requires the usage of the deprecated won.getEventNode (see there for details).
      * @param message
      * @constructor
      */
