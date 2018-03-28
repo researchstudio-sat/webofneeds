@@ -2,6 +2,8 @@
 ;
 
 import angular from 'angular';
+import inviewModule from 'angular-inview';
+
 import won from '../won-es6.js';
 import jld from 'jsonld';
 import Immutable from 'immutable';
@@ -40,6 +42,8 @@ const align = deepFreeze({
     right: "won-cm--right",
 });
 
+const MESSAGE_READ_TIMEOUT = 1500;
+
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
@@ -51,7 +55,9 @@ function genComponentConf() {
             ng-click="self.router__stateGoAbs('post', {postUri: self.theirNeed.get('uri')})"
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
-        <div class="won-cm__center" ng-class="{'won-cm__center--nondisplayable': !self.text}">
+        <div class="won-cm__center"
+                ng-class="{'won-cm__center--nondisplayable': !self.text, 'won-cm__center--unread' : self.message.get('newMessage')}"
+                in-view="$inview && self.markAsRead()">
 
             <div 
                 class="won-cm__center__bubble" 
@@ -192,6 +198,22 @@ function genComponentConf() {
             )
             */
         }
+
+        markAsRead(){
+            if(this.message && this.message.get("newMessage")){
+                const payload = {
+                    messageUri: this.message.get("uri"),
+                    connectionUri: this.connectionUri,
+                    needUri: this.ownNeed.get("uri")
+                };
+
+                const tmp_messages__markAsRead = this.messages__markAsRead;
+
+                setTimeout(function(){
+                    tmp_messages__markAsRead(payload);
+                }, MESSAGE_READ_TIMEOUT);
+            }
+        }
         
         sendProposal(){
         	this.clicked = true;
@@ -258,6 +280,7 @@ function genComponentConf() {
 export default angular.module('won.owner.components.connectionMessage', [
     squareImageModule,
     labelledHrModule,
+    inviewModule.name
 ])
     .directive('wonConnectionMessage', genComponentConf)
     .name;
