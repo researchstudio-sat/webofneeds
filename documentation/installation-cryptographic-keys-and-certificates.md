@@ -42,6 +42,7 @@
     rm sometmpfile_deletme
     ```
 **NOTE:** the openssl commands can be executed in windows using cygwin or the git bash
+**NOTE:** If you're getting the error message `Subject does not start with '/'.`, change last parameter to `-subj "//CN=myhost.mydomain.com"`
 
 
 9. The other key stores, and the trust stores are created and filled in automatically when the application is run (in the locations defined in step 4 with the passwords defined in step 5).
