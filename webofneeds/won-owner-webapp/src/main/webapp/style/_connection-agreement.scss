@@ -4,8 +4,10 @@
 
 won-connection-agreement {
     //margin: 0.5rem 0;
-    padding-top: 0.5rem;
-    padding-left: 0.5rem;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    //padding-top: 0.5rem;
+    //padding-left: 0.5rem;
+    //padding-right: 0.5rem;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: flex;
     
@@ -16,11 +18,6 @@ won-connection-agreement {
     }
 
     .won-ca__content {
-        /*@include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
-        margin: 0 0.5rem;
-        font-size: $smallFontSize;
-        border: $thinRedBorder;
-        background: $won-light-gray;*/
 
         &__text {
             padding: 0.5rem;
@@ -31,28 +28,24 @@ won-connection-agreement {
               //font-size: $smallFontSize;
               font-weight: 560;
             }
+            
+            &__subtext {
+              padding-top: 0.3rem;
+              //font-size: 0.75rem;
+            }
         }
     
-         &__subtext {
-            padding: 0.5rem;
-            justify-content: flex-end;
+        &__carret {
+            padding: 0.2rem 0.5rem 0.2rem;
+        }
+        
+        &__footer {
+            padding: 0.2rem 0.5rem 0.2rem;
             //border-top: $thinBorderWidth solid $won-line-gray;
-        }
-    
-        &__button {
-            padding: 0.5rem;
         }
 
         &__time {
             color: $won-line-gray;
-        }
-
-        &__carret {
-            @include fixed-square(1rem);
-        
-            // visually center icon on line
-            position: relative;
-            top: 0.1em;
         }
     }
 }

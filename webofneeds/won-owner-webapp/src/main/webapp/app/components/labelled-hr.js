@@ -4,8 +4,11 @@ import angular from 'angular';
 
 function genComponentConf() {
     let template = `<div class="wlh__label">
-    					<span class="wlh__label__text" ng-show="!self.arrow"> {{ self.label }} </span>
-    					<svg class="wlh__label__carret" ng-show="self.arrow">
+    					<span class="wlh__label__text" ng-show="!self.arrow">{{ self.label }}</span>
+    					<svg class="wlh__label__carret clickable" ng-show="self.arrow == 'down'">
+	                    	<use href="#ico16_arrow_down"></use>
+	                    </svg>
+    					<svg class="wlh__label__carret clickable" ng-show="self.arrow == 'up'">
 	                    	<use href="#ico16_arrow_up"></use>
 	                    </svg>
 	                </div>`;

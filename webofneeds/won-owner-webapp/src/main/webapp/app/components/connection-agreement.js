@@ -40,39 +40,20 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
     let template = `
-       <!-- <won-square-image
-            title="self.theirNeed.get('title')"
-            src="self.theirNeed.get('TODOtitleImgSrc')"
-            uri="self.theirNeed.get('uri')"
-            ng-click="self.router__stateGoAbs('post', {postUri: self.theirNeed.get('uri')})"
-            ng-show="!self.message.get('outgoingMessage')">
-        </won-square-image>-->
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: 
             	<span class="title" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Propose to cancel:</br></span>
-            	{{ self.message.get('text') }}<br />
-            	StateUri: {{ self.eventUri }}<br />
-            	HeadUri: {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}
+            	{{ self.message.get('text') }}
+            	<div class="won-ca__content__text__subtext">
+	            	<code>StateUri: {{ self.eventUri }}</code><br />
+	            	<code>HeadUri:   {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}</code>
+            	</div>
             </div>
-            <div class="won-ca__content__button" ng-show="!self.clicked">
-            	<svg class="won-ca__content__carret clickable"
-            	 		ng-click="self.showDetail = !self.showDetail"
-            	 		ng-show="!self.showDetail">
-                    <use href="#ico16_arrow_down"></use>
-                </svg>
-                <!-- Alternate arrow
-                	<span class="won-ca__content__carret clickable"
-	                            ng-click="self.showDetail = !self.showDetail"
-	                            ng-show="self.showDetail">
-						<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>
-					</span>
-				-->
-                <svg class="won-ca__content__carret clickable"
-						ng-click="self.showDetail = !self.showDetail"
-						ng-show="self.showDetail">
-					<use href="#ico16_arrow_up"></use>
-                </svg>
+            <div class="won-ca__content__carret">
+    			<won-labelled-hr ng-click="self.showDetail = !self.showDetail" arrow="self.showDetail? 'up' : 'down'"></won-labelled-hr>
+    		</div>
+    		<div class="won-ca__content__footer" ng-show="!self.clicked">
             	<button class="won-button--filled thin black"
             		ng-click="self.proposeToCancel()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.agreement)">
@@ -83,23 +64,20 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Accept
             	</button>
+            	<button class="won-button--filled thin black"
+            		ng-click="self.show()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
+            		 Reject
+            	</button>
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposeToCancel()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.isOwn">
             		 Accept
             	</button>
-            </div>
-        	<div class="won-ca__content__subtext" ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
-        		You proposed this
+            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
+        			You proposed this
+        		</span>
         	</div>
-            	<!--
-            	<button class="won-button--filled thin red"
-            		ng-click="self.show()"
-            		ng-show="self.showDetail">
-            		 Test
-            	</button>
-            	-->
-            </div>
         </div>
 `;
 
@@ -117,21 +95,21 @@ function genComponentConf() {
             const self = this;
             this.clicked = false;
             this.showDetail = false;
-            //this.stateLookUp();
             
             const selectFromState = state => {
             	
             	const ownNeed = this.connectionUri && selectNeedByConnectionUri(state, this.connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 
-                //const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
                 const chatMessages = connection && connection.get("messages");
                 const message = chatMessages && chatMessages.get(this.eventUri);
-                const outgoingMessage = message && message.get("outgoingMessage");
+                const remoteUri = message && !!message.get("remoteUri");
+                //const remoteUri = message && message.get("remoteUri");
                 
                 return {
                 	message: message,
-                	isOwn: outgoingMessage,
+                	isOwn: !remoteUri,
+                	//isOwn: (this.eventUri == remoteUri)? true : false,
                 }
             };
 
@@ -141,8 +119,6 @@ function genComponentConf() {
         
         acceptProposal() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
-        	
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
 
@@ -163,7 +139,6 @@ function genComponentConf() {
         }
         
         acceptProposeToCancel() {
-        	//TODO: send accept msg
         	this.clicked = true;
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
@@ -177,11 +152,11 @@ function genComponentConf() {
         	return (this.agreementDeclaration === declaration)? true : false;
         }
         
+        //TODO: delete
         show() {
         	console.log("HERE we go: " + this.eventUri);
         	console.log("My Text: " + this.message.get("text"));
-        	console.log("My Outgoing: " + this.isOwn);
-        	
+        	console.log("My Outgoing: " + this.isOwn);        	
         }
     }
     Controller.$inject = serviceDependencies;

@@ -38,14 +38,7 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 const declarations = deepFreeze({
 	proposal: "proposal",
 	agreement: "agreement",
-	proposeToCancel: "proposeToCancel",
-	//acceptedProposalToCancel: "acceptedProposalToCancel",
-	
-});
-
-const defaultUriObject = deepFreeze({
-	stateUri: undefined,
-	headUri: undefined,
+	proposeToCancel: "proposeToCancel",	
 });
 
 const defaultAgreementData = deepFreeze({
@@ -108,15 +101,6 @@ function genComponentConf() {
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
-	            <!--
-	            <div class="pm__content__agreement__title" ng-show="self.agreementStateData.cancellationPendingAgreementUris.size">
-            		<br ng-show="self.agreementStateData.agreementUris.size" />
-            		<hr ng-show="self.agreementStateData.agreementUris.size" />
-            		Proposals To Cancel
-    				<span ng-show="self.loading.cancellationPendingAgreementUris"> (loading...)</span>
-            		<span ng-if="!self.loading.cancellationPendingAgreementUris"> (up-to-date)</span>
-            	</div>
-            	-->
 	            <won-connection-agreement
 	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
 	                event-uri="proptoc"
@@ -138,7 +122,7 @@ function genComponentConf() {
 	            	ng-repeat="prop in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
 	                event-uri="prop"
 	                agreement-number="$index"
-	                agreement-declaration="self.declarations.pendingProposalUris"
+	                agreement-declaration="self.declarations.proposal"
 	                connection-uri="self.connectionUri"
 	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
@@ -267,9 +251,7 @@ function genComponentConf() {
 	                		if(this.isOldAgreementMsg(msg)) {
 	                			msgSet.delete(msg);
 	                		} else {
-	                			//TODO: add messages from state to agreementDate with right uri
-	                			//msg.get("remoteUri")? this.agreementData.proposal.add(msg.get("remoteUri")) : this.agreementData.proposal.add(msg.get("uri"));
-	                			//this.agreementData.proposal.add(msg.get("uri"));
+	                			//TODO: optimization?
 	                		}
                 		}
                 	}
@@ -388,7 +370,6 @@ function genComponentConf() {
         	this.getAgreementData();
         	this.showLoadingInfo = true;
         	this.showAgreementData = true;
-        	//TODO activate Component?
         }
         
         agreementDataIsValid() {
@@ -455,7 +436,6 @@ function genComponentConf() {
         	return tmpAgreementData;
         }
         
-        
         addAgreementDataToSate(eventUri, key) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
@@ -466,19 +446,8 @@ function genComponentConf() {
                         /*if we find out that the receiverneed of the crawled event is actually our
                         need we will call the method again but this time with the correct eventUri
                         */
-                    	/*
-                    	var tmpUriObject = clone(uriObject);
-                    	tmpUriObject.headUri = eventUri;
-                    	*/
-                    	
                         this.addAgreementDataToSate(msg.getRemoteMessageUri(), key);
                     }else {
-                    	/*if(!uriObject) {
-                    		var tmpUriObject = clone(uriObject);
-                        	tmpUriObject.headUri = eventUri;
-                        	tmpUriObject.stateUri = eventUri;
-                        	
-                    	}*/
                     	this.agreementStateData[key].add(eventUri);
                         this.messages__connectionMessageReceived(msg);     
                     }
@@ -508,200 +477,12 @@ function genComponentConf() {
         	if(aD.agreementUris.has(msg.get("uri")) ||
         			aD.agreementUris.has(msg.get("remoteUri")) ||
 	        		aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
-	        		aD.cancellationPendingAgreementUris.has(msg.get("remoteUri"))) {
+	        		aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
+	        		aD.cancelledAgreementUris.has(msg.get("uri")) ||
+	        		aD.cancelledAgreementUris.has(msg.get("remoteUri"))) {
         		return true;
         	}
         	return false;
-        }
-        
-        
-        /**
-         * old
-         */
-        removeAcceptedProposalToCancel(uri) {
-        	this.agreementData.proposeToCancel.delete(uri);
-        }
-        /**
-         * Old functions, single calls
-         */
-        getAgreementUris() {
-        	var url = this.baseString + 'rest/agreement/getAgreementUris?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			console.log(response);
-    			this.updateAgreementData(response, this.declarations.agreement);
-    		}).catch(error => {
-    				console.error('Error:', error);
-    				this.loading.agreement = false;
-    		})
-        }
-        
-        getAgreements() {
-        	var url = this.baseString + 'rest/agreement/getAgreements?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			this.parseResponseGraph(response, this.declarations.agreement);
-    		}).catch(error => {
-    				console.error('Error:', error);
-    				this.loading.agreement = false;
-    		})
-        }
-        
-        getProposalUris() {
-        	var url = this.baseString + 'rest/agreement/getProposalUris?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			this.updateAgreementData(response, this.declarations.proposal);
-    		}).catch(error => {
-				console.error('Error:', error);
-				this.loading.proposal = false;
-			})
-        }
-        
-        getProposals() {
-        	var url = this.baseString + 'rest/agreement/getProposals?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			this.parseResponseGraph(response, this.declarations.proposal);
-    		}).catch(error => {
-				console.error('Error:', error);
-				this.loading.proposal = false;
-			})
-        }
-        
-        getAgreementsProposedToBeCancelledUris() {
-        	var url = this.baseString + 'rest/agreement/getAgreementsProposedToBeCancelledUris?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			console.log(response);
-    			this.updateAgreementData(response, this.declarations.proposeToCancel);
-    		}).catch(error => {
-				console.error('Error:', error);
-				this.loading.proposeToCancel = false;
-			})
-        }
-        
-        getAgreementsProposedToBeCancelled() {
-        	var url = this.baseString + 'rest/agreement/getAgreementsProposedToBeCancelled?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			this.parseResponseGraph(response, this.declarations.proposeToCancel);
-    		}).catch(error => {
-				console.error('Error:', error);
-				this.loading.proposeToCancel = false;
-			})
-        }
-        // TODO: after an accept -> agreementData ist deleted
-        /*
-        getAcceptedPropsalsToCancelUris() {
-        	var url = this.baseString + 'rest/agreement/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			this.parseResponseGraph(response, this.declarations.acceptedPropsalToCancel);
-    		}).catch(error => {
-				console.error('Error:', error);
-				this.loading.acceptedPropsalToCancel = false;
-			})
-        }
-        
-        getAcceptedPropsalsToCancel() {
-        	var url = this.baseString + 'rest/agreement/getAcceptedPropsalsToCancel?connectionUri='+this.connection.get('uri');
-        	callAgreementsFetch(url)
-    		.then(response => {
-    			this.parseResponseGraph(response, this.declarations.acceptedPropsalToCancel);
-    		}).catch(error => {
-				console.error('Error:', error);
-				this.loading.acceptedPropsalToCancel = false;
-			})
-        }
-        */
-        /**
-         * Old graph response
-         */
-        parseResponseGraph(response, type){
-        	if(response["@id"]) {
-				var eventUri = response["@id"];
-				if(!this.agreementData[type].has(eventUri)) {
-					this.addLoadedAgreementDataToSate(eventUri, type);
-				}
-			}
-			else if(response["@graph"]) {
-				var graph = response["@graph"];
-				for(i = 0; i<graph.length; i++) {
-					var eventUri = graph[i]["@id"];
-					if(!this.agreementData[type].has(eventUri)) {
-						this.addLoadedAgreementDataToSate(eventUri, type);
-					}
-				}
-			}
-			this.loading[type] = false;
-        }
-        
-        updateAgreementData(response, type) {
-        	for(resp of response) {
-        		this.addLoadedAgreementDataToSate(resp, type);
-        	}
-        	this.agreementData[type] = new Set(response);
-        	this.loading[type] = false;
-        }
-        
-        addLoadedAgreementDataToSate(eventUri, type) {
-            const ownNeedUri = this.ownNeed.get("uri");
-            callAgreementEventFetch(ownNeedUri, eventUri)
-			.then(response => {
-				won.wonMessageFromJsonLd(response)
-				.then(msg => {
-                    if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
-                        /*if we find out that the receiverneed of the crawled event is actually our
-                        need we will call the method again but this time with the correct eventUri
-                        */
-                        this.addLoadedAgreementDataToSate(msg.getRemoteMessageUri(), type);
-                    }else{
-                        this.messages__connectionMessageReceived(msg);
-                        this.clearAndAddAgreementData(eventUri, type);
-                    }
-                })
-			})
-        }
-        
-        /**
-         * Needed for optimization
-         * Filter and update the agreementData object
-         */
-        filterAgreementDataList() {
-        	for(agreement of this.agreementData.agreement) {
-        		if(this.agreementData.proposal.has(agreement)) {
-        			this.agreementData.proposal.delete(agreement)
-        		}
-        		if(this.agreementData.proposeToCancel.has(agreement)) {
-        			this.agreementData.agreement.delete(agreement)
-        		}
-        	}
-        	/*
-        	for(agreement of this.agreementData.acceptedProposalToCancel) {
-        		if(this.agreementData.proposeToCancel.has(agreement)) {
-        			this.agreementData.proposeToCancel.delete(agreement)
-        		}
-        	}*/
-        }
-
-        /**
-         * Needed for optimization
-         */
-        clearAndAddAgreementData(uri, type) {
-
-        	if(!this.agreementData[type].has(uri)) {
-        		//uri is new/changed type
-        		this.agreementData[type].add(uri);
-        		
-        		//Remove from other lists
-        		if(this.declarations.agreement != type && this.agreementData.agreement.has(uri)) {
-        			this.agreementData.agreement.delete(uri);
-        		}
-        		else if(this.declarations.proposal != type && this.agreementData.proposal.has(uri)) {
-        			this.agreementData.proposal.delete(uri);
-        		}
-        	}
         }
         
         getArrayFromSet(set) {
