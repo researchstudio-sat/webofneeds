@@ -59,12 +59,17 @@ won-connection-message {
             }
         }
 
-        &:not(.won-cm__center--nondisplayable) {
-            .won-cm__center__bubble {
-                background-color: $won-light-gray; // like the error toast-notifications
-                color: black;
-            }
+        &.won-cm__center--unread {
+          .won-cm__center__bubble {
+            background-color: $won-helpbox-yellow;
+          }
         }
+
+        .won-cm__center__bubble {
+            background-color: $won-light-gray; // like the error toast-notifications
+            color: black;
+        }
+
 
         &__button{
             padding: 0.5rem;
