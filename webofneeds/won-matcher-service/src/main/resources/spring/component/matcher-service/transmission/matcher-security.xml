@@ -19,6 +19,8 @@
 
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher-service.properties" ignore-unresolvable="true"/>
 
+    <import resource="classpath:/spring/component/threadpool.xml"/>
+
     <bean id="keyStoreService" class="won.cryptography.service.keystore.FileBasedKeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
         <constructor-arg type="java.lang.String" value="${keystore.password}" />
