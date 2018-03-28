@@ -456,7 +456,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 						return "Sorry, I cannot accept any proposal - I did not find any 'agr:proposes' messages";
 					}
 					Optional<String> proposedString = state.getTextMessage(uris[0]);
-					String finalProposedString = (proposedString.isPresent())? ", which read, '"+proposedString+"'" : ", which had no text message" ;
+					String finalProposedString = (proposedString.isPresent())? ", which read, '"+proposedString.get()+"'" : ", which had no text message" ;
 			        return "Ok, I am hereby accepting your last proposal"+finalProposedString+" (uri: " + uris[0]+")."
 			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
 				});
