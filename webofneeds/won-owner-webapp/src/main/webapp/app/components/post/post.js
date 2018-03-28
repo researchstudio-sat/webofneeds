@@ -61,9 +61,6 @@ class Controller {
                 getIn(state, ['router', 'currentParams', 'connectionType'])
             );
 
-            console.log("actual type: " + actualConnectionType);
-            console.log("params type" + connectionTypeInParams);
-
             const sendAdHocRequest = post && !post.get("ownNeed") && getIn(state, ['router', 'currentParams', 'sendAdHocRequest']);
 
             const connectionIsOpen = !!connectionUri &&
