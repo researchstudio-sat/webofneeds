@@ -35,6 +35,7 @@ class Controller {
         this.selection = 0;
         window.p4dbg = this;
         this.wonConnected = won.WON.Connected;
+        this.WON = won.WON;
 
         const selectFromState = (state)=>{
             const postUri = selectOpenPostUri(state);
@@ -54,7 +55,7 @@ class Controller {
                 .size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
-            const actualConnectionType = post && post.getIn(['connections', connectionUri, 'state']);
+            const actualConnectionType = post && connectionUri && post.getIn(['connections', connectionUri, 'state']);
 
             const connectionTypeInParams = decodeUriComponentProperly(
                 getIn(state, ['router', 'currentParams', 'connectionType'])
@@ -78,11 +79,11 @@ class Controller {
                 hasConversations,
                 sendAdHocRequest,
                 connectionType: connectionTypeInParams,
+                actualConnectionType,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
-                showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
-                showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
-                showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
+                // TODO: check if this can be shortened
+                showConnectionDetails: connectionIsOpen && (actualConnectionType === won.WON.Connected || actualConnectionType === won.WON.RequestReceived || actualConnectionType === won.WON.RequestSent),
                 won: won.WON,
             };
         };

@@ -46,10 +46,13 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const ownNeed = getIn(state, ["needs", postUri]);
 
+                // TODO: delete connectionTypeInParams
                 const connectionTypeInParams = decodeUriComponentProperly(
                     getIn(state, ['router', 'currentParams', 'connectionType'])
                 );
-                const connectionType = connectionTypeInParams || self.connectionType;
+                
+                const connectionType = self.connectionType;
+                // const connectionType = connectionTypeInParams || self.connectionType;
                 const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);
                 return {
                     connectionsArray: connections && connections.toArray(),
