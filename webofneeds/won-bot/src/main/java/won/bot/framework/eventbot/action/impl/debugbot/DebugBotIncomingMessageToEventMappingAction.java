@@ -476,7 +476,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 						return "Sorry, I cannot accept a proposal to cancel - I did not find any 'agr:proposesToCancel' messages";
 					}
 					Optional<String> proposedString = state.getTextMessage(uris[0]);
-					String finalProposedString = (proposedString.isPresent())? ", which read, '"+proposedString+"'" : ", which had no text message" ;
+					String finalProposedString = (proposedString.isPresent())? ", which read, '"+proposedString.get()+"'" : ", which had no text message" ;
 			        return "Ok, I am hereby accepting your last proposal to cancel"+finalProposedString+" (uri: " + uris[0]+")."
 			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
 				});
@@ -495,7 +495,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 						return "Sorry, I cannot propose to cancel - I did not find any 'agr:accept' messages";
 					}
 					Optional<String> proposedString = state.getTextMessage(uris[0]);
-					String finalProposedString = (proposedString.isPresent())? ", which read, '"+proposedString+"'" : ", which had no text message" ;
+					String finalProposedString = (proposedString.isPresent())? ", which read, '"+proposedString.get()+"'" : ", which had no text message" ;
 			        return "Ok, I am hereby proposing to cancel our latest agreement (if it is one)"+finalProposedString+" (uri: " + uris[0]+")."
 			        		+ "\n The query for finding that message took " + getDurationString(queryDuration) + " seconds.";
 				});
