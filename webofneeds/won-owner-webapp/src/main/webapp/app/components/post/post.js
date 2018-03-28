@@ -55,11 +55,14 @@ class Controller {
                 .size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
-            const actualConnectionType = post && post.getIn(['connections', connectionUri, 'state']);
+            const actualConnectionType = post && connectionUri && post.getIn(['connections', connectionUri, 'state']);
 
             const connectionTypeInParams = decodeUriComponentProperly(
                 getIn(state, ['router', 'currentParams', 'connectionType'])
             );
+
+            console.log("actual type: " + actualConnectionType);
+            console.log("params type" + connectionTypeInParams);
 
             const sendAdHocRequest = post && !post.get("ownNeed") && getIn(state, ['router', 'currentParams', 'sendAdHocRequest']);
 
@@ -79,10 +82,11 @@ class Controller {
                 hasConversations,
                 sendAdHocRequest,
                 connectionType: connectionTypeInParams,
+                actualConnectionType,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
                 // TODO: check if this can be shortened
-                showConnectionDetails: connectionIsOpen && (connectionTypeInParams === won.WON.Connected || connectionTypeInParams === won.WON.RequestReceived || connectionTypeInParams === won.WON.RequestSent),
+                showConnectionDetails: connectionIsOpen && (actualConnectionType === won.WON.Connected || actualConnectionType === won.WON.RequestReceived || actualConnectionType === won.WON.RequestSent),
                 won: won.WON,
             };
         };
