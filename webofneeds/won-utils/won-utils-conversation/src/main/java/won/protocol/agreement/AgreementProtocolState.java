@@ -62,6 +62,10 @@ public class AgreementProtocolState {
 		return uris;
 	}
 	
+	
+	public Dataset getConversationDataset() {
+		return this.conversation;
+	}
 	/**
 	 * Returns the set of effects (<code>MessageEffect</code>s) of the head of the delivery
 	 * chain that the specified message belongs to, or an empty set if no message is

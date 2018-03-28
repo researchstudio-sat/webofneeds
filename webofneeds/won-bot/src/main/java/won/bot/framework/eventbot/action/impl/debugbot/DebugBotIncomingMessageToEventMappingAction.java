@@ -55,7 +55,9 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
+import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.validation.WonConnectionValidator;
 
 
@@ -259,27 +261,29 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		Model messageModel = WonRdfUtils.MessageUtils
 		        .textMessage(crawlAnnouncement);
 		bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
+		
 		// initiate crawl behaviour
 		CrawlConnectionCommandEvent command = new CrawlConnectionCommandEvent(con.getNeedURI(), con.getConnectionURI());
 		CrawlConnectionDataBehaviour crawlConnectionDataBehaviour = new CrawlConnectionDataBehaviour(ctx, command, Duration.ofSeconds(60));
 		final StopWatch crawlStopWatch = new StopWatch();
 		crawlStopWatch.start("crawl");
-		crawlConnectionDataBehaviour.onResult(new SendMessageReportingCrawlResultAction(ctx, con, crawlStopWatch));
-		crawlConnectionDataBehaviour.onResult(new SendMessageOnCrawlResultAction(ctx, con) {
-			@Override
-			protected Model makeSuccessMessage(CrawlConnectionCommandSuccessEvent successEvent) {
-				return makeReferringMessage(successEvent.getCrawledData(), messageFinder, messageReferrer, textMessageMaker);	
-			}
-		});
+		AgreementProtocolState state = WonConversationUtils.getAgreementProtocolState(con.getConnectionURI(), ctx.getLinkedDataSource());
+		crawlStopWatch.stop();
+		Duration crawlDuration = Duration.ofMillis(crawlStopWatch.getLastTaskTimeMillis());
+		messageModel = WonRdfUtils.MessageUtils
+				.textMessage("Finished crawl in " + getDurationString(crawlDuration) + " seconds. The dataset has "
+						+ state.getConversationDataset().asDatasetGraph().size() + " rdf graphs.");
+		getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
+		messageModel = makeReferringMessage(state, messageFinder, messageReferrer, textMessageMaker);	
+		getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
 		crawlConnectionDataBehaviour.activate();
 	}
     
-    private Model makeReferringMessage(Dataset conversation, MessageFinder messageFinder, MessageReferrer messageReferrer, TextMessageMaker textMessageMaker) {
+    private Model makeReferringMessage(AgreementProtocolState state, MessageFinder messageFinder, MessageReferrer messageReferrer, TextMessageMaker textMessageMaker) {
 		int origPrio = Thread.currentThread().getPriority();
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		StopWatch queryStopWatch = new StopWatch();
 		queryStopWatch.start("query");
-		AgreementProtocolState state = AgreementProtocolState.of(conversation);
 		List<URI> targetUris = messageFinder.findMessages(state); 
 		URI[] targetUriArray = targetUris.toArray(new URI[targetUris.size()]);
 		queryStopWatch.stop();
