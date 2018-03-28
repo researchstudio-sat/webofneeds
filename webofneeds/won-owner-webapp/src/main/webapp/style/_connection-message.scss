@@ -60,9 +60,9 @@ won-connection-message {
         }
 
         &.won-cm__center--unread {
-          .won-cm__center__bubble {
-            background-color: $won-helpbox-yellow;
-          }
+            .won-cm__center__bubble {
+                //add any styling you seem fit for messages that are unread
+            }
         }
 
         .won-cm__center__bubble {
