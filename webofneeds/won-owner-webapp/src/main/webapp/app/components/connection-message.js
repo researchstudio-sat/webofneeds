@@ -75,7 +75,7 @@ function genComponentConf() {
 	                        <span class="won-cm__center__carret clickable"
 	                            ng-click="self.showDetail = !self.showDetail"
 	                            ng-show="self.showDetail">
-	                        	<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>   
+	                        	<won-labelled-hr arrow="'up'" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>   
                     		</span>
                     	</span>
                     	<span ng-show="self.showDetail"><br /></span>

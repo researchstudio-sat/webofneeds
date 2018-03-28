@@ -1073,7 +1073,7 @@ window.N34dbg = N3;
         }
         const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
         const quads = await won.n3Parse(quadString, {format: 'application/n-quads'});
-        console.log("QUAAAADS ", quads);
+        //console.log("QUAAAADS ", quads);
         const trig = await won.n3Write(quads, { format: 'application/trig' });
         return trig;
     }

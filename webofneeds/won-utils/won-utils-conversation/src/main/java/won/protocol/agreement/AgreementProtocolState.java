@@ -11,6 +11,7 @@ import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONAGR;
@@ -28,6 +29,7 @@ public class AgreementProtocolState {
 	private final Dataset agreements = DatasetFactory.createGeneral();
 	private final Dataset cancelledAgreements = DatasetFactory.createGeneral();
 	private final Dataset rejected = DatasetFactory.createGeneral();
+	private Dataset conversation = null;
 	private final Set<URI> retractedUris = new HashSet<URI>();
 	private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
 	private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
@@ -178,10 +180,10 @@ public class AgreementProtocolState {
 	 */
 	public URI getNthLatestMessage(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
 		List<URI> uris = deliveryChains.stream()
-				.map(x -> x.getHead())
+				.map(m -> m.getHead())
 				.filter(x -> filterPredicate.test(x))
 				.sorted((x1,x2) -> x2.getOrder() - x1.getOrder())
-				.map(x -> x.getMessageURI())
+				.map(m -> m.getMessageURI())
 				.collect(Collectors.toList());
 		if (uris.size() > n) {
 			return uris.get(n);
@@ -194,12 +196,13 @@ public class AgreementProtocolState {
 		logger.debug(
 				n + "-th latest message "
 				+ (type == null ? "" : "of type " + type ) 
-				+ " sent by " + needUri + ": " 
+				+ ( needUri == null ? "" : " sent by " + needUri ) 
+				+ ": " 
 				+ ( result == null ? " none found" : needUri ));
 	}
 	
 	public URI getLatestMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -207,7 +210,7 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getNthLatestMessageSentByNeed(URI needUri, int n) {
-		URI uri = getNthLatestMessage(x -> needUri.equals(x.getSenderNeedURI()), n);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()), n);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(n, needUri, null, uri);
 		}
@@ -215,7 +218,8 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestProposeMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isProposesMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isProposesMessage() && m.getEffects().stream().anyMatch(e->e.isProposes()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -223,15 +227,27 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestAcceptsMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isAcceptsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isAcceptsMessage() && m.getEffects().stream().anyMatch(e->e.isAccepts()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
 		return uri;
 	}
 	
+	public URI getLatestAcceptsMessage() {
+		URI uri = getNthLatestMessage(m ->  
+				m.isAcceptsMessage() && m.getEffects().stream().anyMatch(e->e.isAccepts()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, null, null, uri);
+		}
+		return uri;
+	}
+	
+	
 	public URI getLatestProposesToCancelMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isProposesToCancelMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isProposesToCancelMessage() && m.getEffects().stream().anyMatch(e->e.isProposes() && e.asProposes().hasCancellations()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -239,7 +255,8 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestRejectsMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isRejectsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isRejectsMessage() && m.getEffects().stream().anyMatch(e->e.isRejects()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -247,11 +264,34 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestRetractsMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isRetractsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isRetractsMessage() && m.getEffects().stream().anyMatch(e->e.isRetracts()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
 		return uri;
+	}
+	
+	/**
+	 * Returns all text messages found in the head of the delivery chain of the specified message, concatenated by ', '.
+	 * @param messageUri
+	 * @return
+	 */
+	public Optional<String> getTextMessage(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		if (msg == null) {
+			return Optional.empty();
+		}
+		ConversationMessage head = msg.getDeliveryChain().getHead();
+		if (head == null) {
+			return Optional.empty();
+		}
+		return head.getContentGraphs()
+			.stream()
+			.flatMap(contentGraphURI -> WonRdfUtils.MessageUtils.getTextMessages(
+							conversation.getNamedModel(contentGraphURI.toString()), 
+							head.getMessageURI()).stream())
+			.reduce((msg1, msg2) -> msg1 + ", " + msg2);
 	}
 	
 	/**
@@ -358,7 +398,7 @@ public class AgreementProtocolState {
 				
 
 		//apply acknowledgment protocol to whole conversation first:
-		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
+		conversation = acknowledgedSelection(conversationDataset, messages);
 		
 		//on top of this, apply modification and agreement protocol on a per-message basis, starting with the root(s)
 		
