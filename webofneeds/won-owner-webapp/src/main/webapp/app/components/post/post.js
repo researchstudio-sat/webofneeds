@@ -81,11 +81,8 @@ class Controller {
                 connectionType: connectionTypeInParams,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
-                showConnectionDetails: connectionIsOpen,
-                // TODO: handle all occurences of connectionTypeInParams
-                //showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
-                //showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
-                //showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
+                // TODO: check if this can be shortened
+                showConnectionDetails: connectionIsOpen && (connectionTypeInParams === won.WON.Connected || connectionTypeInParams === won.WON.RequestReceived || connectionTypeInParams === won.WON.RequestSent),
                 won: won.WON,
             };
         };

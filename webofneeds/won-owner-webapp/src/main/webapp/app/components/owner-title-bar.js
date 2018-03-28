@@ -91,9 +91,9 @@ function genComponentConf() {
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}"
                                 class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Connected, postUri: self.postUri})"
-                                    ng-class="{'disabled' : !self.hasConnected || !self.isActive}">
+                                    ng-class="{'disabled' : (!self.hasConnected && !self.hasIncomingRequests && !self.hasSentRequests) || !self.isActive}">
                                     Chats
-                                    <span class="ntb__tabs__unread">{{ self.unreadMessagesCount }}</span>
+                                    <span class="ntb__tabs__unread">{{ self.unreadConnectionsCount }}</span>
                                 </a>
                             </li>
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}"
@@ -102,22 +102,6 @@ function genComponentConf() {
                                     ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
                                     Matches
                                     <span class="ntb__tabs__unread">{{ self.unreadMatchesCount }}</span>
-                                </a>
-                            </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}"
-                                class="clickable">
-                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestReceived, postUri: self.postUri})"
-                                    ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
-                                    Requests
-                                    <span class="ntb__tabs__unread">{{ self.unreadIncomingRequestsCount }}</span>
-                                </a>
-                            </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}"
-                                class="clickable">
-                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.RequestSent, postUri: self.postUri})"
-                                    ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
-                                    Sent Requests
-                                    <span class="ntb__tabs__unread">{{ self.unreadSentRequestsCount }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -143,7 +127,6 @@ function genComponentConf() {
                 const post = state.getIn(["needs", postUri]);
 
                 const connections = post && post.get("connections");
-                // TODO: change title bar nav
                 const sentRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestSent);
                 const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
                 const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);
@@ -154,6 +137,7 @@ function genComponentConf() {
                 const unreadSentRequestsCount = sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size;
                 const unreadIncomingRequestsCount = incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size;
                 const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;
+                const unreadConnectionsCount = unreadSentRequestsCount + unreadIncomingRequestsCount + unreadMessagesCount;
 
                 return {
                     selectedTab: decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionType'])) || 'Info',
@@ -168,6 +152,7 @@ function genComponentConf() {
                     unreadIncomingRequestsCount: unreadIncomingRequestsCount > 0 ? unreadIncomingRequestsCount : undefined,
                     unreadSentRequestsCount: unreadSentRequestsCount > 0 ? unreadSentRequestsCount : undefined,
                     unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
+                    unreadConnectionsCount: unreadConnectionsCount > 0 ? unreadConnectionsCount : undefined,
                     isActive: post && post.get('state') === won.WON.ActiveCompacted,
                 };
             };

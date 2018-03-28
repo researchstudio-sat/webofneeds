@@ -46,16 +46,14 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const ownNeed = getIn(state, ["needs", postUri]);
 
+                // TODO: delete connectionTypeInParams
                 const connectionTypeInParams = decodeUriComponentProperly(
                     getIn(state, ['router', 'currentParams', 'connectionType'])
                 );
-                // TODO: what uses this? what problems occur by not checking?
+                
                 const connectionType = self.connectionType;
-                //const connectionType = connectionTypeInParams || self.connectionType;
+                // const connectionType = connectionTypeInParams || self.connectionType;
                 const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);
-                // TODO: remove those
-                console.log("given type: " + connectionType);
-                console.log("param type: " + connectionTypeInParams);
                 return {
                     connectionsArray: connections && connections.toArray(),
                 };
