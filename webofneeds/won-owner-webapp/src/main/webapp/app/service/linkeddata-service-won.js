@@ -1821,7 +1821,12 @@ import won from './won.js';
             * we fetch it here.
             */
             fetchParams.doNotFetch = true;
-            const correspondingEvent = await won.getNode(event.hasCorrespondingRemoteMessage, fetchParams);
+            const correspondingEventUri = event.hasCorrespondingRemoteMessage;
+            const correspondingEvent = await won.getNode(correspondingEventUri, fetchParams);
+            // const correspondingEventJsonLd = await won.getGraph(
+            //     correspondingEventUri, correspondingEventUri, fetchParams
+            // );
+            // correspondingEvent.rawJsonLd = correspondingEventJsonLd;
             await addContentGraphTrig(correspondingEvent, fetchParams);
             if (correspondingEvent.type) {
                 //if we have at least a type attribute, we add the remote event to the
