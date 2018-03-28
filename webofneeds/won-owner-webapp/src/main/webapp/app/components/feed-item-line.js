@@ -5,6 +5,7 @@
 
 
 import angular from 'angular';
+import ngAnimate from 'angular-animate';
 import squareImageModule from '../components/square-image.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
@@ -101,6 +102,7 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.feedItemLine', [
     squareImageModule,
+    ngAnimate,
 ])
     .directive('wonFeedItemLine', genComponentConf)
     .name;
