@@ -1,4 +1,6 @@
 import angular from 'angular';
+import ngAnimate from 'angular-animate';
+
 import Immutable from 'immutable';
 import squareImageModule from '../components/square-image.js';
 import won from '../won-es6.js';
@@ -25,6 +27,7 @@ function genComponentConf() {
 
         <a
             class="fi clickable"
+            ng-class="{'fi--withconn' : self.connectionsSize > 0}"
             href="{{ self.absHRef(
                 self.$state,
                 'post',
@@ -62,14 +65,13 @@ function genComponentConf() {
                 </div>
             </div>
         </a>
-        <div class="fmil">
-
+        <div class="fmil" ng-if="self.connectionsSize > 0">
             <won-feed-item-line
                 class="fmil__item clickable"
                 ng-repeat="conn in self.connectionsArray track by $index"
                 connection-uri="conn.get('uri')"
                 need-uri="self.ownNeed.get('uri')"
-                ng-show="$index < self.maxNrOfItemsShown"
+                ng-if="$index < self.maxNrOfItemsShown"
                 ng-click="self.router__stateGoAbs('post', {
                     postUri: self.ownNeed.get('uri'),
                     connectionUri: conn.get('uri'),
@@ -78,18 +80,18 @@ function genComponentConf() {
             </won-feed-item-line>
 
             <div class="fmil__more clickable"
-                 ng-show="self.connectionsSize === self.maxNrOfItemsShown + 1"
+                 ng-if="self.connectionsSize === self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
                     1 more activity
             </div>
             <div class="fmil__more clickable"
-                 ng-show="self.connectionsSize > self.maxNrOfItemsShown + 1"
+                 ng-if="self.connectionsSize > self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
                     {{self.connectionsSize - self.maxNrOfItemsShown}} more activities
             </div>
         </div>
 
-        <div class="fi__footer" ng-show="self.unreadMatchesCount || self.unreadRequestsCount">
+        <div class="fi__footer" ng-if="self.unreadMatchesCount || self.unreadRequestsCount">
             <div class="fi__footer__indicators">
                 <a class="fi__footer__indicators__item clickable"
                     href="{{ self.absHRef(
@@ -176,6 +178,7 @@ function genComponentConf() {
 export default angular.module('won.owner.components.feedItem', [
     squareImageModule,
     feedItemLineModule,
+    ngAnimate,
 ])
     .directive('wonFeedItem', genComponentConf)
     .name;
