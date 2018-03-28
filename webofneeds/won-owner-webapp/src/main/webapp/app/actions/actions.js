@@ -185,6 +185,7 @@ const actionHierarchy = {
             success: messages.successfulReopenNeed,
             failure: messages.failedReopenNeed,
         },
+        markAsRead: INJ_DEFAULT,
         connectionMessageReceived: INJ_DEFAULT,
         needMessageReceived: messages.needMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,
