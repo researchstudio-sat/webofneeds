@@ -96,13 +96,17 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 	 * @param resource
 	 */
 	public void invalidate(URI resource) {
-		assert resource != null : "resource must not be null";
+		if (resource == null) {
+			return;
+		}
 		logger.debug("invalidating cached resource {}", resource );
 		cache.remove(makeCacheKey(resource, null));
 	}
 
 	public void invalidate(URI resource, URI requesterWebID) {
-		assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
+		if (resource == null || requesterWebID == null) {
+			return;
+		}
 		logger.debug("invalidating cached resource {} for webid {}", resource, requesterWebID );
 		cache.remove(makeCacheKey(resource, requesterWebID));
 	}
@@ -133,7 +137,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 
 	public Dataset getDataForResource(URI resource, URI requesterWebID) {
 
-		assert resource != null : "resource must not be null";
+		if (resource == null) throw new IllegalArgumentException("resource cannot be null");
 		Element element = null;
 
 		try {
@@ -418,9 +422,17 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 		if (requesterWebID != null) {
 			logger.debug("fetching linked data for URI {} with WebID {}", resource, requesterWebID);
 			responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, requesterWebID, headers);
+			if (logger.isDebugEnabled()) {
+				logger.debug("fetched resource {} with requesterWebID {}: ", resource, requesterWebID);
+				RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
+			}
 		} else {
 			logger.debug("fetching linked data for URI {} without WebID", resource, requesterWebID);
 			responseData = linkedDataRestClient.readResourceDataWithHeaders(resource, headers);
+			if (logger.isDebugEnabled()) {
+				logger.debug("fetched resource {} without requesterWebID:", resource, requesterWebID);
+				RDFDataMgr.write(System.out, responseData.getDataset(), Lang.TRIG);
+			}
 		}
 		return responseData;
 	}

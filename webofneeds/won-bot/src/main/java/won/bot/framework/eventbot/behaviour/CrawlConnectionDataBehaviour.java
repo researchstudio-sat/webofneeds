@@ -114,12 +114,14 @@ public class CrawlConnectionDataBehaviour extends BotBehaviour {
         propertyPaths = new ArrayList();
         propertyPaths.add(PathParser.parse("won:hasEventContainer", pmap));
         propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage", pmap));
         propertyPaths.add(PathParser.parse("won:hasRemoteNeed", pmap));
         propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer", pmap));
         propertyPaths.add(PathParser.parse("won:hasRemoteNeed/won:hasEventContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse("won:hasRemoteConnection", pmap));
         propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer", pmap));
         propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member", pmap));
+        propertyPaths.add(PathParser.parse("won:hasRemoteConnection/won:hasEventContainer/rdfs:member/msg:hasCorrespondingRemoteMessage", pmap));
         CrawlCommandEvent crawlConnectionCommandEvent = new CrawlCommandEvent(command.getNeedURI(), command.getConnectionURI(), propertyPaths, 10000, 5);
 
 
