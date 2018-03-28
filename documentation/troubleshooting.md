@@ -76,8 +76,8 @@ This happens when Tomcat can't find or access the the bc `.jar` files during sta
 
 You should be able to find both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` in your maven directory (default location is: `C:/Users/[user name]/.m2/repository/org/bouncycastle/`). If not, build the whole project with `mvn install -Dmaven.test.skip=true` and check again. 
 
-* in Eclipse, edit the server launch configuration properties (accessible via "Run As...") and add both `.jar` files as External JARs to User Entries (suggested in: https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/build-with-eclipse.md Step 9)
-* copy both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to `%tomcat_dir%/lib/` (suggested in: https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md Step 11)
-* copy both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to `C:/Program Files/Java/[jre dir]/lib/ext/` and [install the bouncy castle security provider](http://www.bouncycastle.org/wiki/display/JA1/Provider+Installation) (suggested in: https://github.com/researchstudio-sat/webofneeds/issues/1393)
+* in Eclipse, edit the server launch configuration properties (accessible via "Run As...") and add both `.jar` files as External JARs to User Entries (suggested in: [Build WON in Eclipse](https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/build-with-eclipse.md), Step 9)
+* copy both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to `%tomcat_dir%/lib/` (suggested in: [Crytpographic Keys and Certificates](https://github.com/researchstudio-sat/webofneeds/blob/5dc0db3747c201a87d94621453b8b898a34e7fc4/documentation/installation-cryptographic-keys-and-certificates.md), Step 11)
+* copy both `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar` to `C:/Program Files/Java/[jre dir]/lib/ext/` and [install the bouncy castle security provider](http://www.bouncycastle.org/wiki/display/JA1/Provider+Installation) (suggested in: issue#1393)
 * In the Tomcat server's `server.xml`, find the xml element `<Host appBase="webapps" ...` and add the xml attribute `startStopThreads="2"`
-    * This only has an effect if two or more webapps, e.g. a node and an owner, are started on the server.
+    * **NOTE:** This only has an effect if two or more webapps, e.g. a node and an owner, are started on the server.
