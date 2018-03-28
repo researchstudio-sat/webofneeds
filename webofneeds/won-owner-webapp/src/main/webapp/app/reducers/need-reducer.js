@@ -219,6 +219,8 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.messages.close.success:
             return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
+        case actionTypes.messages.markAsRead:
+            return markAsRead(allNeedsInState, action.payload.messageUri, action.payload.connectionUri, action.payload.needUri);
 
         // NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
@@ -444,6 +446,22 @@ function changeConnectionState(state, connectionUri, newState) {
             .setIn([needUri, "connections", connectionUri, "newConnection"], true);
 }
 
+function markAsRead(state, messageUri, connectionUri, needUri) {
+    let tmpNeedUri;
+    let tmpConnectionUri;
+
+    let need = state.get(needUri);
+    let connection = need && need.getIn(["connections", connectionUri]);
+    let message = connection && connection.getIn(["messages", messageUri]);
+
+    if(!message) {
+        console.error("no message with messageUri: <", messageUri,"> found within needUri: <", needUri, "> connectionUri: <", connectionUri, ">");
+        return state;
+    }
+
+    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "newMessage"], false);
+}
+
 function changeConnectionStateByFun(state, connectionUri, fun) {
     const need = selectNeedByConnectionUri(state, connectionUri);
 
@@ -537,7 +555,7 @@ function parseMessage(wonMessage, isNewMessage) {
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: wonMessage.isFromOwner(),
-            newMessage: !!isNewMessage,
+            newMessage: !!isNewMessage && !wonMessage.isFromOwner(),
             connectMessage: wonMessage.isConnectMessage(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
