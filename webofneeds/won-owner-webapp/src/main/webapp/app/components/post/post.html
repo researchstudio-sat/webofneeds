@@ -106,12 +106,12 @@
     <!-- right column -->
     <div
         class="post-messages"
+        ng-if="self.isOwnPost && self.post && self.connectionOpen && self.connectionType !== self.won.Suggested">
         ng-class="{'post-messages--connected': self.showConnectionDetails}"
-        ng-if="self.post && self.connectionOpen && self.isOwnPost && self.connectionType !== self.won.Suggested">
-            <div class="post-messages__inner">
-                <won-post-messages ng-if="(self.connectionType === self.WON.Connected)"></won-post-messages>
-                <won-open-request ng-if="(self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent)"></won-open-request>
-            </div>
+        <div class="post-messages__inner">
+            <won-post-messages ng-if="(self.connectionType === self.WON.Connected)"></won-post-messages>
+            <won-open-request ng-if="(self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent)"></won-open-request>
+        </div>
     </div>
     
     <!-- /right column -->

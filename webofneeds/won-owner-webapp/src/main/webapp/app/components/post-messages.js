@@ -148,60 +148,59 @@ function genComponentConf() {
             	</div>
             </div>
         </div>
-        <chat-textfield
-            class="pm__footer"
-            placeholder="::'Your Message'"
-            on-input="::self.input(value)"
-            on-paste="::self.input(value)"
-            on-submit="::self.send()"
-            submit-button-label="::'Send'"
-            >
-        </chat-textfield>
-        <!--
-        <chat-textfield-simple
-            class="pm__footer"
-            placeholder="::'Your Message'"
-            on-input="::self.input(value)"
-            on-paste="::self.input(value)"
-            on-submit="::self.send()"
-            submit-button-label="::'Send'"
-            >
-        </chat-textfield-simple>
-        -->
+        <div class="pm__footer">
+            <chat-textfield
+                placeholder="::'Your Message'"
+                on-input="::self.input(value)"
+                on-paste="::self.input(value)"
+                on-submit="::self.send()"
+                submit-button-label="::'Send'"
+                >
+            </chat-textfield>
+            <!--
+            <chat-textfield-simple
+                class="pm__footer"
+                placeholder="::'Your Message'"
+                on-input="::self.input(value)"
+                on-paste="::self.input(value)"
+                on-submit="::self.send()"
+                submit-button-label="::'Send'"
+                >
+            </chat-textfield-simple>
+            -->
 
-        <!-- 
-        quick'n'dirty textfield and button so flo can use it for his branch. 
-        TODO implement and style chat-textfield-simple and use that instead.
-        -->
-        <div style="display: flex;">
-            <textarea 
-                class="rdfTxtTmpDeletme" 
-                ng-show="self.shouldShowRdf" 
-                won-textarea-autogrow 
-                style="resize: none; height: auto;   flex-grow: 1;   font-family: monospace;"
-                placeholder="Expects valid turtle. <{{self.msguriPlaceholder}}> will be the uri generated for this message. See \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
-            ></textarea>
-            <button 
-                class="rdfMsgBtnTmpDeletme" 
-                ng-show="self.shouldShowRdf" 
-                ng-click="self.sendRdfTmpDeletme()">
-                    Send RDF
-            </button>
-        </div>
-        <div>
-            <a class="rdflink withlabel clickable"
-               ng-click="self.toggleRdfDisplay()">
-                   <svg class="rdflink__small">
-                       <use href="#rdf_logo_1"></use>
-                   </svg>
-                  <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span> 
-            </a>
-            <!-- quick and dirty button to get agreements -->
-	        <button class="won-button--filled thin black"
-	            ng-click="self.showAgreementDataField()"
-	            ng-show="!self.showAgreementData">
-	                Show Agreement Data
-		     </button>
+            <!--
+            quick'n'dirty textfield and button so flo can use it for his branch.
+            TODO implement and style chat-textfield-simple and use that instead.
+            -->
+            <div class="pm__footer__rdfinput" ng-show="self.shouldShowRdf">
+                <textarea
+                    class="rdfTxtTmpDeletme"
+                    won-textarea-autogrow
+                    style="resize: none; height: auto;   flex-grow: 1;   font-family: monospace;"
+                    placeholder="Expects valid turtle. <{{self.msguriPlaceholder}}> will be the uri generated for this message. See \`won.minimalTurtlePrefixes \` for prefixes that will be added automatically."
+                ></textarea>
+                <button
+                    class="rdfMsgBtnTmpDeletme"
+                    ng-click="self.sendRdfTmpDeletme()">
+                        Send RDF
+                </button>
+            </div>
+            <div class="pm__footer__agreement">
+                <a class="rdflink withlabel clickable"
+                   ng-click="self.toggleRdfDisplay()">
+                       <svg class="rdflink__small">
+                           <use href="#rdf_logo_1"></use>
+                       </svg>
+                      <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span>
+                </a>
+                <!-- quick and dirty button to get agreements -->
+                <button class="won-button--filled thin black"
+                    ng-click="self.showAgreementDataField()"
+                    ng-show="!self.showAgreementData">
+                        Show Agreement Data
+                 </button>
+            </div>
         </div>
     `;
 
