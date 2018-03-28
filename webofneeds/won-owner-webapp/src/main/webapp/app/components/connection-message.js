@@ -7,6 +7,7 @@ import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
 import chatTextFieldModule from './chat-textfield.js';
+import labelledHrModule from './labelled-hr.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import {
     relativeTime,
@@ -55,11 +56,33 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage'))}">
+    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage') || self.message.get('isProposeToCancel'))}">
                     <span class="won-cm__center__bubble__text">
                     <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
-                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>		
+                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>
+                	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>		
                         {{ self.text? self.text : self.noTextPlaceholder }}
+                         <span class="won-cm__center__button" 
+	                        ng-if="self.message.get('outgoingMessage')
+	                            && !self.message.get('isProposeMessage') 
+	                            && !self.message.get('isAcceptMessage')
+	                            && !self.message.get('isProposeToCancel')">
+	                        <svg class="won-cm__center__carret clickable"
+	                                ng-click="self.showDetail = !self.showDetail"
+	                                ng-show="!self.showDetail">
+	                            <use href="#ico16_arrow_down"></use>
+	                        </svg>
+	                        <span class="won-cm__center__carret clickable"
+	                            ng-click="self.showDetail = !self.showDetail"
+	                            ng-show="self.showDetail">
+	                        	<won-labelled-hr arrow="true" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>   
+                    		</span>
+                    	</span>
+                    	<span ng-show="self.showDetail"><br /></span>
+                    	<button class="won-button--filled thin black"
+                        		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
+                        		ng-show="self.showDetail">Propose <span ng-show="self.clicked">(again)</span>
+                        </button>
                     </span>
 
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
@@ -77,22 +100,6 @@ function genComponentConf() {
                             && !self.message.isAccepted
                             && !self.clicked">
                         <button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
-                    </div>
-                    <div class="won-cm__center__button" 
-                        ng-if="self.message.get('outgoingMessage')
-                            && !self.message.get('isProposeMessage') 
-                            && !self.message.get('isAcceptMessage')">
-                        <svg class="won-cm__center__carret clickable"
-                                ng-click="self.showDetail = !self.showDetail"
-                                ng-show="!self.showDetail">
-                            <use href="#ico16_arrow_down"></use>
-                        </svg>
-                        <svg class="won-cm__center__carret clickable"
-                                ng-click="self.showDetail = !self.showDetail"
-                                ng-show="self.showDetail">
-                            <use href="#ico16_arrow_up"></use>
-                        </svg>
-                        <button class="won-button--filled thin black" ng-click="self.sendProposal()" ng-show="self.showDetail">Propose</button>
                     </div>
             </div>
             <div
@@ -254,6 +261,7 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.connectionMessage', [
     squareImageModule,
+    labelledHrModule,
 ])
     .directive('wonConnectionMessage', genComponentConf)
     .name;

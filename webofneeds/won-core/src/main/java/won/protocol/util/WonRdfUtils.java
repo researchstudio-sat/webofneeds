@@ -21,18 +21,15 @@ import won.protocol.model.Match;
 import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.vocabulary.SFSIG;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONAGR;
-import won.protocol.vocabulary.WONMOD;
-import won.protocol.vocabulary.WONMSG;
+import won.protocol.vocabulary.*;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
-import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
-import static won.protocol.util.RdfUtils.visit;
+import static won.protocol.util.RdfUtils.*;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -231,6 +228,16 @@ public class WonRdfUtils
     }
 
     /**
+    * Create an RDF model containing a text message and a processing message
+    * @param message
+    * @return
+    */
+    public static Model processingMessage(String message) {
+        Model messageModel = textMessage(message);
+        return addProcessing(messageModel, message);
+    }
+
+    /**
      * Creates an RDF model containing a generic message.
      *
      * @return
@@ -305,7 +312,7 @@ public class WonRdfUtils
       if (toReject == null) return messageModel;
       for(URI uri: toReject) {
           if (uri != null) {
-              baseRes.addProperty(WONAGR.REJECT, baseRes.getModel().getResource(uri.toString()));
+              baseRes.addProperty(WONAGR.REJECTS, baseRes.getModel().getResource(uri.toString()));
           }
       }
       return messageModel;
@@ -316,6 +323,9 @@ public class WonRdfUtils
     	if (toAccept == null) return messageModel;
     	for(URI uri: toAccept) {
     		if (uri != null) {
+    			if(logger.isDebugEnabled()) {
+    	    		logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})", new Object[] {uri} );
+    	    	}
     			baseRes.addProperty(WONAGR.ACCEPTS, baseRes.getModel().getResource(uri.toString()));
     		}
     	}
@@ -327,6 +337,9 @@ public class WonRdfUtils
     	if (toProposesToCancel == null) return messageModel;
     	for(URI uri: toProposesToCancel) {
     		if (uri != null) {
+    			if(logger.isDebugEnabled()) {
+    	    		logger.debug("checking uri for addProposesToCancel{} with uri {} ({} of {})", new Object[] {uri} );
+    	    	}
     			baseRes.addProperty(WONAGR.PROPOSES_TO_CANCEL, baseRes.getModel().getResource(uri.toString()));
     		}
     	}
@@ -442,34 +455,6 @@ public class WonRdfUtils
           return null;
       }
 
-      public static URI getAcceptedEvent(final WonMessage wonMessage) {
-          String queryString =
-                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
-                          "SELECT ?eventUri where {\n" +
-                          " graph ?g {"+
-                          "  ?s agr:accepts ?eventUri .\n" +
-                          "}}";
-          Query query = QueryFactory.create(queryString);
-
-
-          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
-              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
-              ResultSet rs = qexec.execSelect();
-              if (rs.hasNext()) {
-                  QuerySolution qs = rs.nextSolution();
-                  String eventUri = rdfNodeToString(qs.get("eventUri"));
-                  if (rs.hasNext()) {
-                      //TODO as soon as we have use cases for multiple messages, we need to refactor this
-                      throw new IllegalArgumentException("wonMessage has more than one accepts eventUri");
-                  }
-
-                  return eventUri != null? URI.create(eventUri) : null;
-              }
-          }
-          return null;
-      }
-
       public static List<URI> getAcceptedEvents(final WonMessage wonMessage) {
           return getAcceptedEvents(wonMessage.getCompleteDataset());
       }
@@ -499,6 +484,43 @@ public class WonRdfUtils
           }
           return acceptedEvents;
       }
+
+      public static boolean isProcessingMessage(final WonMessage wonMessage) {
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+                          "SELECT ?text where {\n" +
+                          " graph ?g {"+
+                          "  ?s won:isProcessing ?text .\n" +
+                          "}}";
+          Query query = QueryFactory.create(queryString);
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String text = rdfNodeToString(qs.get("text"));
+
+                  if(text != null) {
+                      return true;
+                  }
+              }
+          }
+          return false;
+      }
+
+      /**
+       * Adds the specified text as a won:hasTextMessage to the model's base resource.
+       * @param message
+       * @return
+       */
+      public static Model addProcessing(Model model, String message) {
+          Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
+          baseRes.addProperty(WON.IS_PROCESSING, message, XSDDatatype.XSDstring);
+          return model;
+      }
+
 
       public static List<URI> getProposesEvents(final WonMessage wonMessage) {
           return getProposesEvents(wonMessage.getCompleteDataset());
@@ -560,6 +582,43 @@ public class WonRdfUtils
               }
           }
           return proposesToCancelEvents;
+      }
+      
+      /** 
+       * Returns previous message URIs for local and remote message.
+       * @param wonMessage
+       * @return
+       */
+      public static List<URI> getPreviousMessageUrisIncludingRemote(final WonMessage wonMessage) {
+          List<URI> uris = new ArrayList<>();
+          String queryString =
+                  "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                          "prefix agr:   <http://purl.org/webofneeds/agreement#>\n" +
+                          "SELECT distinct ?prev where {\n" +
+                          "   {"+
+                          "    ?msg msg:hasPreviousMessage ?prev .\n" +
+                          "   } union {" +
+                          "    ?msg msg:hasCorrespondingRemoteMessage/msg:hasPreviousMessage ?prev " +
+                          "  }" +
+                          "}";
+          Query query = QueryFactory.create(queryString);
+
+
+          try (QueryExecution qexec = QueryExecutionFactory.create(query, wonMessage.getCompleteDataset())) {
+              qexec.getContext().set(TDB.symUnionDefaultGraph, true);
+              QuerySolutionMap binding = new QuerySolutionMap();
+              binding.add("msg", new ResourceImpl(wonMessage.getMessageURI().toString()));
+              qexec.setInitialBinding(binding);
+              ResultSet rs = qexec.execSelect();
+              if (rs.hasNext()) {
+                  QuerySolution qs = rs.nextSolution();
+                  String eventUri = rdfNodeToString(qs.get("prev"));
+                  if(eventUri != null) {
+                      uris.add(URI.create(eventUri));
+                  }
+              }
+          }
+          return uris;
       }
 
       private static String rdfNodeToString(RDFNode node) {

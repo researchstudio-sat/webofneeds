@@ -54,8 +54,7 @@ public class CrawlAction extends BaseEventBotAction {
                     crawlCommandEvent.getNeedURI(),
                     crawlCommandEvent.getPropertyPaths(),
                     crawlCommandEvent.getGetMaxRequest(),
-                    crawlCommandEvent.getMaxDepth(),
-                    false);
+                    crawlCommandEvent.getMaxDepth());
         } catch (Exception e) {
             logger.debug("caught exeption during crawl for {}", crawlCommandEvent.getStartURI(), e);
             ctx.getEventBus().publish(

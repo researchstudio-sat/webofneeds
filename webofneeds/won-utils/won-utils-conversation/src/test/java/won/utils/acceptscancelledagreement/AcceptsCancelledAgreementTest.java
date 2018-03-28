@@ -1,9 +1,8 @@
 package won.utils.acceptscancelledagreement;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -16,11 +15,11 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelFunctionFactory;
+import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class AcceptsCancelledAgreementTest {
 	  

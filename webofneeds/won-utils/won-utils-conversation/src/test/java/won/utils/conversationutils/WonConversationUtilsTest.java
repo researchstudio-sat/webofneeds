@@ -1,15 +1,7 @@
 package won.utils.conversationutils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
@@ -23,14 +15,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import won.protocol.highlevel.HighlevelFunctionFactory;
-import won.protocol.highlevel.HighlevelProtocols;
+import won.protocol.agreement.AgreementProtocolState;
+import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.SparqlSelectFunction;
 import won.protocol.util.WonConversationUtils;
+
+import java.io.*;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class WonConversationUtilsTest {
 
@@ -43,19 +37,6 @@ public class WonConversationUtilsTest {
 		root.setLevel(Level.INFO);
 	}
 
-	// This is the case where there are no agreements, that is no predicates from
-	// the agreement protocol. The output should be nothing...
-	@Test
-	public void testAllMessageUris() throws IOException {
-		Dataset input = loadDataset(inputFolder + "allmessageuris.trig");
-		List<URI> expectedOutput = loadUriList(expectedOutputFolder + "allmessageuris.txt");
-		List<URI> actual = WonConversationUtils.getAllMessageURIs(input);
-		if (!expectedOutput.equals(actual)) {
-			System.out.println("actual: \n" + actual.stream().map(x -> x.toString()).collect(Collectors.joining("\n")));
-		}
-		Assert.assertEquals(expectedOutput, actual);
-	}
-	
 	@Test
 	public void testLatestMessageOfNeed() throws IOException {
 		Dataset input = loadDataset(inputFolder + "allmessageuris.trig");
@@ -91,7 +72,7 @@ public class WonConversationUtilsTest {
 	
 	@Test
 	public void testLatestProposesToCancelMessageOfNeed() throws IOException {
-		Dataset input = loadDataset(inputFolder + "conversation-with-agreements.trig");
+		Dataset input = loadDataset(inputFolder + "2proposal-one-agreement-one-cancellation.trig");
 		URI actual = WonConversationUtils.getLatestProposesToCancelMessageOfNeed(input,URI.create("https://localhost:8443/won/resource/need/7820503869697675000"));
 		List<URI> expectedOutput = loadUriList(expectedOutputFolder + "latestproposestocancelmessagageofneed.txt");
 		if (actual != null && ! expectedOutput.get(0).equals(actual)) {
@@ -177,6 +158,7 @@ public class WonConversationUtilsTest {
 	public static void main (String... args) throws Exception {
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
+		
 		//Dataset input = loadDataset("/won/utils/agreement/input/one-agreement-one-cancellation.trig");
 		Dataset input = loadDataset("/won/utils/conversationutils/input/longer-conversation.trig");
 		SparqlSelectFunction<QuerySolution> selectfunction = 
@@ -188,11 +170,15 @@ public class WonConversationUtilsTest {
 		selectfunction.apply(input).forEach(x -> System.out.println("solution:" + x.toString()));
 		sw.stop();
 		System.out.println("query took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
-		
+		//Thread.currentThread().sleep(30000);
 		sw.start();
-		HighlevelProtocols.getAgreements(input);
+		AgreementProtocolState state = AgreementProtocolState.of(input);
 		sw.stop();
-		System.out.println("getAgreements took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		RDFDataMgr.write(System.out, state.getAgreements(), Lang.TRIG);
+		System.out.println("Analyzing the state of agreement protocol took: " + sw.getLastTaskTimeMillis() / 1000d +  " seconds ");
+		System.out.println(state.getAgreementProtocolUris());
+		System.out.println(state.getEffects(URI.create("https://localhost:8443/won/resource/event/grj35bbhnkcrlfc72pqo")));
+		
 		/*
 		RdfUtils.Pair<Dataset> diff = RdfUtils.diff(input, output);
 		if (!(diff.getFirst().isEmpty() && diff.getSecond().isEmpty())) {

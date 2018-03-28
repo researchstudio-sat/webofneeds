@@ -200,6 +200,14 @@ public class MongoBotContext implements BotContext {
         pull(collectionName, key, values);
     }
 
+    public void removeLeavesFromListMap(String collectionName, final Serializable... values) {
+        checkValidCollectionName(collectionName);
+
+        for(String key : loadListMap(collectionName).keySet()){
+            removeFromListMap(collectionName, key, values);
+        }
+    }
+
     private void pull(String collectionName, String key, final Serializable... values) {
 
         Update update = new Update();

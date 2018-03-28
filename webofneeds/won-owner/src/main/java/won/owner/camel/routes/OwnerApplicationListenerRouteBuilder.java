@@ -16,11 +16,11 @@
 
 package won.owner.camel.routes;
 
-import java.net.URI;
-import java.util.List;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 //TODO: This route builder should not be loaded on startup, but it's being loaded..
 /**
@@ -60,6 +60,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                             .to("bean:uriNodePathChecker")
                             .to("bean:signatureChecker")
                             .to("bean:linkedDataCacheInvalidator")
+                            .to("bean:linkedDataCacheUpdater")
                             //this expects a bean with name 'mainOwnerMessageProcessor' in the application context
                             //this bean is *not* provided by the won-owner module. This allows the definition of a
                             //different processing chain depending on the use case.

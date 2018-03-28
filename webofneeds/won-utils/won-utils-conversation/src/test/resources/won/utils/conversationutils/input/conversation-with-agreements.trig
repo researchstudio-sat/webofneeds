@@ -1458,8 +1458,7 @@
 <https://localhost:8443/won/resource/event/557600936467257340#content> {
     event:557600936467257340
             won:hasTextMessage  "two" ;
-            agr:accepts event:00d5wzbbf8hzzt2eewcc ;
-            agr:proposesToCancel event:557600936467257340 .
+            agr:accepts event:00d5wzbbf8hzzt2eewcc .
 }
 
 <https://localhost:8443/won/resource/event/mt1f8i41bogt7kc91fi6#envelope-ua55> {

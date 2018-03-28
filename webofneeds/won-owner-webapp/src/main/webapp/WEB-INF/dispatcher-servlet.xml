@@ -19,13 +19,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:websocket="http://www.springframework.org/schema/websocket"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-4.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
-http://www.springframework.org/schema/websocket
-http://www.springframework.org/schema/websocket/spring-websocket-4.1.xsd">
+http://www.springframework.org/schema/context/spring-context-4.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
 
 
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
@@ -49,14 +46,22 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.1.xsd">
     -->
     <mvc:annotation-driven conversion-service="conversionService">
         <mvc:message-converters>
-            <bean class="won.protocol.rest.RdfModelConverter"/>
+            <bean class="won.protocol.rest.RdfModelConverter" />
             <bean class="won.protocol.rest.RdfDatasetConverter"/>
             <bean class="won.protocol.rest.RdfDatasetAttachmentConverter"/>
+				    <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				              <property name="supportedMediaTypes">
+				                <list>
+				                  <value>application/json</value>
+				                </list>
+				              </property>
+				    </bean>         
         </mvc:message-converters>
     </mvc:annotation-driven>
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
 	
 	
+    
     <!--
     we move to annotation config in WebSocketConfig.java
     websocket:handlers>
@@ -66,8 +71,6 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.1.xsd">
         </websocket:handshake-interceptors>
         <websocket:sockjs/>
     </websocket:handlers-->
-
-
 
     <bean id="wonWebSocketHandler" class="won.owner.web.websocket.WonWebSocketHandler">
         <property name="ownerApplicationService" ref="ownerApplicationService"/>

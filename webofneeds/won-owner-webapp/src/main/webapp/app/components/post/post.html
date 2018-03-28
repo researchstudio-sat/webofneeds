@@ -134,9 +134,7 @@
         ng-if="self.post && self.connectionOpen"
         ng-class="{'post-messages--connected': self.showConversationDetails}"
         ng-show="self.showConversationDetails && self.isOwnPost">
-            <div class="post-messages__inner">
-                <won-post-messages></won-post-messages>
-            </div>
+            <won-post-messages></won-post-messages>
     </div>
 
     <!-- Incoming Requests: -->

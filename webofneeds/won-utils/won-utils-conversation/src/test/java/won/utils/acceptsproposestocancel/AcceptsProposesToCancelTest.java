@@ -14,7 +14,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
-import won.protocol.highlevel.HighlevelFunctionFactory;
+import won.protocol.agreement.HighlevelFunctionFactory;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;

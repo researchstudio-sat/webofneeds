@@ -35,7 +35,7 @@ public class AppConfigController
 
   @RequestMapping(value = "/getDefaultWonNodeUri", method = RequestMethod.GET)
   public ResponseEntity<URI> getDefaultWonNodeUri(){
-      return new ResponseEntity("\"" + this.wonNodeInformationService.getDefaultWonNodeURI().toString() + "\"", HttpStatus.OK);
+      return new ResponseEntity(this.wonNodeInformationService.getDefaultWonNodeURI().toString(), HttpStatus.OK);
   }
 
 
