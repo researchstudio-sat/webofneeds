@@ -36,12 +36,6 @@ import {
 } from '../selectors.js';
 import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
-
-const align = deepFreeze({
-    left:  "won-cm--left",
-    right: "won-cm--right",
-});
-
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
@@ -56,7 +50,7 @@ function genComponentConf() {
             ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__center"
-                ng-class="{'won-cm__center--nondisplayable': !self.text, 'won-cm__center--unread' : self.message.get('newMessage')}"
+                ng-class="{'won-cm__center--nondisplayable': !self.text}"
                 in-view="$inview && self.markAsRead()">
 
             <div 
@@ -176,11 +170,6 @@ function genComponentConf() {
 
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.messageUri'], this);
 
-            this.$scope.$watch(
-                () => this.message.get('outgoingMessage'),
-                (newVal, oldVal) => this.updateAlignment(newVal)
-            )
-
             // gotta do this via a $watch, as the whole message parsing before 
             // this point happens synchronously but jsonLdToTrig needs to be async.
             /*
@@ -232,17 +221,6 @@ function genComponentConf() {
         	this.onUpdate();
         }
 
-        updateAlignment(isOutgoingMessage) {
-            const classes = this.$element[0].classList;
-            if(isOutgoingMessage) {
-                classes.remove(align.left);
-                classes.add(align.right);
-            } else {
-                classes.add(align.left);
-                classes.remove(align.right);
-            }
-        }
-
         rdfToString(jsonld){
         	return JSON.stringify(jsonld);
         }
@@ -264,7 +242,6 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: { 
-            message: '=',
             messageUri: '=',
             connectionUri: '=',
             /*

@@ -3,7 +3,7 @@
 @import 'square-image';
 
 won-connection-message {
-    margin: 0.5rem 0;
+    padding: 0.5rem 1rem;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: grid;
     grid-template-areas: "icon content";
@@ -56,12 +56,6 @@ won-connection-message {
             .won-cm__center__bubble {
                 background-color: white; // like the error toast-notifications
                 color: #8f8f8f;
-            }
-        }
-
-        &.won-cm__center--unread {
-            .won-cm__center__bubble {
-                //add any styling you seem fit for messages that are unread
             }
         }
 
