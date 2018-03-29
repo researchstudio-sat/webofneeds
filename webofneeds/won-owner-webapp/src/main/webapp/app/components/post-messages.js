@@ -78,7 +78,11 @@ function genComponentConf() {
                 ng-repeat="msg in self.chatMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
-                message="msg"
+                ng-class="{
+                    'won-unread' : msg.get('newMessage'),
+                    'won-cm--left' : !msg.get('outgoingMessage'),
+                    'won-cm--right' : msg.get('outgoingMessage')
+                }"
                 on-update="::self.showAgreementData = false">
             </won-connection-message>
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	

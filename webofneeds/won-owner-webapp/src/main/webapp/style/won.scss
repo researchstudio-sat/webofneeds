@@ -154,6 +154,11 @@ a {
   }
 }
 
+.won-unread {
+  //Default Styling of everything that is unread
+  background-color: $won-unread;
+}
+
 @import 'gallery';
 @import 'post-info';
 @import 'post-messages';
