@@ -28,7 +28,7 @@ function genComponentConf() {
       ng-class="self.isOpen() ? 'selected' : ''">
         <won-post-header
           need-uri="self.theirNeed.get('uri')"
-          timestamp="self.theiNeed.get('creationDate')"
+          timestamp="self.lastUpdateTimestamp"
           ng-click="self.setOpen()"
           class="clickable">
         </won-post-header>
@@ -74,6 +74,7 @@ function genComponentConf() {
 
                 return {
                     openConnectionUri: selectOpenConnectionUri(state),
+                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
                     theirNeed,
                     unreadCount: undefined //TODO: WHAT SHOULD BE HERE?
                 }

@@ -53,7 +53,7 @@ function genComponentConf() {
                 
                 const connectionType = self.connectionType;
                 // const connectionType = connectionTypeInParams || self.connectionType;
-                const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);
+                const connections = ownNeed && ownNeed.get("connections");
                 return {
                     connectionsArray: connections && connections.toArray(),
                 };
@@ -74,7 +74,6 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionType: "=",
             /*
              * Usage:
              *  on-selected-connection="myCallback(connectionUri)"

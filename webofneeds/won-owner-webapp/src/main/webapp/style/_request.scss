@@ -14,16 +14,19 @@ won-open-request {
   .request__header {
     grid-area: header;
     display: flex;
-    border-bottom: $thinGrayBorder;
-    padding: 0.5rem;
 
     &__icon {
       @include fixed-square($postIconSize);
     }
   }
 
-  .request_content {
+  .request__content {
     grid-area: content;
+    border-top: $thinGrayBorder;
+
+    won-post-content {
+      padding: 1rem;
+    }
   }
 
   .request__footer {
@@ -44,10 +47,6 @@ won-open-request {
         margin-left: 0.5rem;
       }
     }
-  }
-
-  won-post-content {
-    padding: 1rem;
   }
 }
 

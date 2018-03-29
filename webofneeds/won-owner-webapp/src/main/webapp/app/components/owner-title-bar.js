@@ -42,8 +42,6 @@ function genComponentConf() {
 
 
                 <div class="ntb__inner__right">
-
-
                     <div class ="ntb__inner__right__upper">
                         <hgroup>
                             <h1 class="ntb__title">{{ self.post.get('title') }}</h1>
@@ -91,17 +89,9 @@ function genComponentConf() {
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}"
                                 class="clickable">
                                 <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Connected, postUri: self.postUri})"
-                                    ng-class="{'disabled' : (!self.hasConnected && !self.hasIncomingRequests && !self.hasSentRequests) || !self.isActive}">
+                                    ng-class="{'disabled' : (!self.hasConnections) || !self.isActive}">
                                     Chats
                                     <span class="ntb__tabs__unread">{{ self.unreadConnectionsCount }}</span>
-                                </a>
-                            </li>
-                            <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}"
-                                class="clickable">
-                                <a ng-click="self.router__stateGoAbs('post', {connectionType: self.WON.Suggested, postUri: self.postUri})"
-                                    ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
-                                    Matches
-                                    <span class="ntb__tabs__unread">{{ self.unreadMatchesCount }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -127,31 +117,17 @@ function genComponentConf() {
                 const post = state.getIn(["needs", postUri]);
 
                 const connections = post && post.get("connections");
-                const sentRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestSent);
-                const incomingRequests = connections && connections.filter(conn => conn.get("state") === won.WON.RequestReceived);
-                const matches = connections && connections.filter(conn => conn.get("state") === won.WON.Suggested);
-                const connected = connections && connections.filter(conn => conn.get("state") === won.WON.Connected);
                 const messages = selectAllMessagesByNeedUriAndConnected(state, postUri);
-
-                const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
-                const unreadSentRequestsCount = sentRequests && sentRequests.filter(conn => conn.get("newConnection")).size;
-                const unreadIncomingRequestsCount = incomingRequests && incomingRequests.filter(conn => conn.get("newConnection")).size;
+                const unreadConnectionCount = connections && connections.filter(conn => conn.get("state") !== won.WON.Connected && conn.get('newConnection')).size;
                 const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;
-                const unreadConnectionsCount = unreadSentRequestsCount + unreadIncomingRequestsCount + unreadMessagesCount;
+                const unreadConnectionsCount = unreadConnectionCount + unreadMessagesCount;
 
                 return {
                     selectedTab: decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionType'])) || 'Info',
                     WON: won.WON,
                     postUri: postUri,
                     post: post,
-                    hasIncomingRequests: incomingRequests && incomingRequests.size > 0,
-                    hasSentRequests: sentRequests && sentRequests.size > 0,
-                    hasMatches: matches && matches.size > 0,
-                    hasConnected: connected && connected.size > 0,
-                    unreadMessagesCount: unreadMessagesCount > 0 ? unreadMessagesCount : undefined,
-                    unreadIncomingRequestsCount: unreadIncomingRequestsCount > 0 ? unreadIncomingRequestsCount : undefined,
-                    unreadSentRequestsCount: unreadSentRequestsCount > 0 ? unreadSentRequestsCount : undefined,
-                    unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
+                    hasConnections: connections && connections.size > 0,
                     unreadConnectionsCount: unreadConnectionsCount > 0 ? unreadConnectionsCount : undefined,
                     isActive: post && post.get('state') === won.WON.ActiveCompacted,
                 };

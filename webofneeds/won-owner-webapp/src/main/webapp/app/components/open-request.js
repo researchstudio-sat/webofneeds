@@ -38,7 +38,7 @@ function genComponentConf() {
         </won-post-header>
       </div>
 
-      <won-post-content
+      <won-post-content class="request__content"
         need-uri="self.remoteNeedUri"
         text-message="self.textMsg">
       </won-post-content>

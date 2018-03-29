@@ -19,22 +19,26 @@ import { actionCreators }  from '../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 
+
 function genComponentConf() {
     let template = `
       <div class="request__header">
         <a ng-click="self.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null})"
             class="clickable">
-          <img
-            class="request__header__icon clickable"
-            src="generated/icon-sprite.svg#ico36_close"/>
+            <svg style="--local-primary:var(--won-primary-color);"
+              class="request__header__icon clickable">
+                <use href="#ico36_close"></use>
+            </svg>
         </a>
+
+        <won-post-header
+            need-uri="self.postUriToConnectTo"
+            timestamp="self.lastUpdateTimestamp"
+            hide-image="::true">
+        </won-post-header>
       </div>
 
-      <won-post-header
-        need-uri="self.postUriToConnectTo">
-      </won-post-header>
-
-      <won-post-content
+      <won-post-content class="request__content"
         need-uri="self.postUriToConnectTo">
       </won-post-content>
 
@@ -77,12 +81,12 @@ function genComponentConf() {
                 const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
                 const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-
                 const postUriToConnectTo = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
 
                 return {
                     ownNeed,
                     sendAdHocRequest,
+                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
                     connectionUri,
                     postUriToConnectTo,
                 }

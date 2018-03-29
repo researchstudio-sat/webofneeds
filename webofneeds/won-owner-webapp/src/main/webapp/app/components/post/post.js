@@ -41,17 +41,7 @@ class Controller {
             const postUri = selectOpenPostUri(state);
             const post = state.getIn(["needs", postUri]);
 
-            const hasReceivedRequests = post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.RequestReceived)
-                .size > 0;
-            const hasSentRequests= post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.RequestSent)
-                .size > 0;
-            const hasMatches= post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.Suggested)
-                .size > 0;
-            const hasConversations = post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.Connected)
+            const hasConnections = post && post.get('connections')
                 .size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
@@ -73,17 +63,12 @@ class Controller {
                 post,
                 isOwnPost: post && post.get("ownNeed"),
                 connectionUri,
-                hasMatches,
-                hasReceivedRequests,
-                hasSentRequests,
-                hasConversations,
+                hasConnections,
                 sendAdHocRequest,
                 connectionType: connectionTypeInParams,
                 actualConnectionType,
-                showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
-                showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
                 // TODO: check if this can be shortened
-                showConnectionDetails: connectionIsOpen && (actualConnectionType === won.WON.Connected || actualConnectionType === won.WON.RequestReceived || actualConnectionType === won.WON.RequestSent),
+                showConnectionDetails: connectionIsOpen,
                 won: won.WON,
             };
         };

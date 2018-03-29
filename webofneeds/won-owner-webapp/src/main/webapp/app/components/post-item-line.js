@@ -103,7 +103,7 @@ function genComponentConf() {
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasMatches"
-                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Suggested})">
+                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})">
 
                         <svg class="pil__indicators__item__icon"
                             style="--local-primary:#F09F9F;"

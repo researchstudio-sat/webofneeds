@@ -59,42 +59,8 @@
       text-align: left;
       width: 100%;
 
-      &__title{
-        flex-grow:2;
-        padding-top:0.5em;
-
-        cursor: pointer;
-      }
       &__icon {
-        flex-grow:1;
-        padding-right: 0.25rem;
-        @include fixed-square(2.5rem);
-
-      }
-      &__options__icon {
-        flex-grow:1;
-        padding-right: 0.25rem;
-        @include fixed-square(1.5rem);
-        height:1em;
-        min-height:1em;
-        max-height:1em;
-        width:auto;
-        padding-right: 0.25rem;
-        padding-top:0.7em;
-      }
-      &__options {
-        color: $won-primary-color;
-        padding-top:0.5em;
-        padding-right:0.3em;
-        &__icon{
-          flex-grow:1;
-          height:1em;
-          min-height:1em;
-          max-height:1em;
-          width:auto;
-          padding-right: 0.25rem;
-          @include fixed-square(1rem);
-        }
+        @include fixed-square($postIconSize);
       }
     }
 
