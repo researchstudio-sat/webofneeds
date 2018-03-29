@@ -3,34 +3,34 @@
 @import 'fonts';
 @import 'flex-layout';
 
+won-send-request,
 won-open-request {
-  display: block;
+  display: grid;
+  grid-template-areas: "header" "content" "footer";
+  grid-template-rows: min-content minmax(10rem, 1fr) min-content;
+  grid-row-gap: $gridRowGap;
   width: 100%;
 
-  won-post-content {
-    padding: 1rem;
-  }
-
-  .or__header {
+  .request__header {
+    grid-area: header;
     display: flex;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 1rem;
-
     border-bottom: $thinGrayBorder;
+    padding: 0.5rem;
 
     &__icon {
       @include fixed-square($postIconSize);
-      padding-right: 0.5rem;
     }
   }
 
-  .or__footer {
+  .request_content {
+    grid-area: content;
+  }
+
+  .request__footer {
+    grid-area: footer;
     margin: 0 1rem;
     padding: 1rem 0;
     border-top: $thinGrayBorder;
-
 
     input {
       width: 100%;
@@ -44,6 +44,10 @@ won-open-request {
         margin-left: 0.5rem;
       }
     }
+  }
+
+  won-post-content {
+    padding: 1rem;
   }
 }
 

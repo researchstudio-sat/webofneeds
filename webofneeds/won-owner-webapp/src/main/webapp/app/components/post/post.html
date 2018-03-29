@@ -63,7 +63,7 @@
     </div>
 
     <!-- left column for connection-typed tabs -->
-    <div
+    <div class="post__listside"
         ng-if="self.isOwnPost && self.connectionType && self.connectionType !== self.won.Suggested"
         ng-class="{'hidden' : self.connectionUri !== undefined}"
     >
@@ -104,12 +104,14 @@
     <!-- /left column -->
 
     <!-- right column -->
-    <div
-        class="post-messages"
-        ng-if="self.isOwnPost && self.post && self.connectionOpen && self.connectionType !== self.won.Suggested"
-        ng-class="{'post-messages--connected': self.showConnectionDetails}">
+    <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionOpen && self.connectionType !== self.won.Suggested">
         <won-post-messages ng-if="(self.actualConnectionType === self.WON.Connected)"></won-post-messages>
         <won-open-request ng-if="(self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent)"></won-open-request>
+    </div>
+    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionType !== self.won.Suggested && !self.connectionOpen">
+        <span class="post__contentside__description__text">
+            No Element selected
+        </span>
     </div>
     
     <!-- /right column -->

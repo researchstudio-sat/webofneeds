@@ -21,12 +21,11 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `
-      <div class="sr__caption">
-        <div class="sr__caption__title">Send Conversation Request</div>
+      <div class="request__header">
         <a ng-click="self.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null})"
             class="clickable">
           <img
-            class="sr__caption__icon clickable"
+            class="request__header__icon clickable"
             src="generated/icon-sprite.svg#ico36_close"/>
         </a>
       </div>
@@ -39,7 +38,7 @@ function genComponentConf() {
         need-uri="self.postUriToConnectTo">
       </won-post-content>
 
-      <div class="sr__footer">
+      <div class="request__footer">
         <input
           type="text"
           ng-model="self.message"

@@ -162,6 +162,7 @@ a {
 @import 'gallery';
 @import 'post-info';
 @import 'post-messages';
+@import 'post-content';
 @import 'create-post';
 
 //TODO in topnav, make create-button black when the dialog is open
@@ -183,7 +184,7 @@ a {
 @import 'feed';
 @import 'overview-matches';
 @import 'feedback-grid';
-@import 'send-request';
+@import 'request';
 @import 'post-owner';
 @import 'connections-map';
 @import 'covering-dropdown';

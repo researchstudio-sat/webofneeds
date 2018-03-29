@@ -22,11 +22,11 @@ import postHeaderModule from './post-header.js';
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-      <div class="or__header">
+      <div class="request__header">
         <a ng-click="self.router__stateGoCurrent({connectionUri: null})"
            class="clickable">
             <svg style="--local-primary:var(--won-primary-color);"
-              class="or__header__icon clickable">
+              class="request__header__icon clickable">
                 <use href="#ico36_close"></use>
             </svg>
         </a>
@@ -43,11 +43,11 @@ function genComponentConf() {
         text-message="self.textMsg">
       </won-post-content>
 
-      <div class="or__footer" ng-show="self.isSentRequest">
+      <div class="request__footer" ng-show="self.isSentRequest">
         Waiting for them to accept your chat request.
       </div>
 
-      <div class="or__footer" ng-show="self.isReceivedRequest">
+      <div class="request__footer" ng-show="self.isReceivedRequest">
         <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
         <div class="flexbuttons">
           <button

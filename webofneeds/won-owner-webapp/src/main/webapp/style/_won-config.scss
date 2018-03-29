@@ -42,7 +42,7 @@ $thinGrayBorder: $thinBorderWidth solid $won-line-gray;
 $thinRedBorder: $thinBorderWidth solid $won-primary-color;
 $thinDarkBorder: $thinBorderWidth solid $won-dark-gray;
 
-
+$gridRowGap: 0.5rem;
 
 @mixin carretSized { //the small down-arrow
   /*
