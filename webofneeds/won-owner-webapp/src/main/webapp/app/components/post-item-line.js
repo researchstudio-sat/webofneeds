@@ -63,11 +63,11 @@ function genComponentConf() {
                                 <use href="#ico36_message"></use>
                         </svg>
 
-                        <span class="pil__indicators__item__caption">
+                        <span class="pil__indicators__item__caption" title="Number of chats with unread messages">
                             {{ self.unreadConversationsCount }}
                         </span>
                 </a>
-                <div class="pil__indicators__item" ng-show="!self.hasConversations">
+                <div class="pil__indicators__item" ng-show="!self.hasConversations" title="No chats in this post">
                     <svg class="pil__indicators__item__icon"
                         style="--local-primary:#CCD2D2;">
                             <use href="#ico36_message"></use>
@@ -77,7 +77,7 @@ function genComponentConf() {
                 <a
                     class="pil__indicators__item clickable"
                     ng-show="self.hasRequests"
-                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.RequestReceived})">
+                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})"> <!-- TODO: set the connectionType to connected since we pulled these views together -->
 
                         <svg class="pil__indicators__item__icon"
                             style="--local-primary:#F09F9F;"
@@ -89,11 +89,11 @@ function genComponentConf() {
                             class="pil__indicators__item__icon">
                                 <use href="#ico36_incoming"></use>
                         </svg>
-                        <span class="pil__indicators__item__caption">
+                        <span class="pil__indicators__item__caption" title="Number of new requests">
                             {{ self.unreadRequestsCount }}
                         </span>
                 </a>
-                <div class="pil__indicators__item" ng-show="!self.hasRequests">
+                <div class="pil__indicators__item" ng-show="!self.hasRequests" title="No requests to this post">
                     <svg class="pil__indicators__item__icon"
                         style="--local-primary:#CCD2D2;">
                             <use href="#ico36_incoming"></use>
@@ -116,11 +116,11 @@ function genComponentConf() {
                             class="pil__indicators__item__icon">
                                 <use href="#ico36_match"></use>
                         </svg>
-                        <span class="pil__indicators__item__caption">
+                        <span class="pil__indicators__item__caption" title="Number of new matches">
                             {{ self.unreadMatchesCount }}
                         </span>
                 </a>
-                <div class="pil__indicators__item" ng-show="!self.hasMatches">
+                <div class="pil__indicators__item" ng-show="!self.hasMatches" title="No matches for this post">
                     <svg class="pil__indicators__item__icon"
                         style="--local-primary:#CCD2D2;">
                             <use href="#ico36_match"></use>
@@ -147,7 +147,7 @@ function genComponentConf() {
                 const requests = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.RequestReceived);
                 const matches = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
 
-                const unreadConversationsCount = conversations && conversations.filter(conn => conn.get("newConnection")).size;
+                const unreadConversationsCount = conversations && conversations.filter(conn => (conn.get("messages").filter(msg => msg.get("newMessage")).size > 0)).size;
                 const unreadRequestsCount = requests && requests.filter(conn => conn.get("newConnection")).size;
                 const unreadMatchesCount = matches && matches.filter(conn => conn.get("newConnection")).size;
 
