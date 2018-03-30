@@ -3,8 +3,7 @@
 @import 'won-config';
 @import 'connection-message';
 @import 'connection-agreement';
-
-
+@import 'animate';
 
 @media (max-width: $responsivenessBreakPoint) {
   won-visitor-title-bar.hidden,
