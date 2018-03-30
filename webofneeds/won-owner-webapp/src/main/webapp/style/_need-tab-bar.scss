@@ -80,11 +80,6 @@
         > .#{$prefix}__tabs {
           align-self: stretch;
 
-          @media (max-width: $responsivenessBreakPoint) {
-            width: 17rem;
-            overflow-x: scroll;
-          }
-          //height: 100%;
         }
       }
     }
