@@ -6,7 +6,6 @@
             ng-if="self.isOwnPost"
             ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
     </won-owner-title-bar>
-    <!-- TODO: check if it's ok to use showConnectionDetails for visitors -->
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
@@ -57,12 +56,12 @@
     <!-- /left column -->
 
     <!-- right column -->
-    <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionOpen && self.hasConnections">
+    <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionOpen && self.hasConnections && self.actualConnectionType !== self.WON.Closed">
         <won-post-messages ng-if="self.actualConnectionType === self.WON.Connected"></won-post-messages>
         <won-open-request ng-if="self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent"></won-open-request>
         <won-send-request ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
     </div>
-    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && !self.connectionOpen">
+    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)">
         <span class="post__contentside__description__text">
             No Element selected
         </span>
