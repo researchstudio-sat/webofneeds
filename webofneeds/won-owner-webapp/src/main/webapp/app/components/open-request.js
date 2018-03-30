@@ -77,11 +77,12 @@ function genComponentConf() {
                 const connectMsg = connection && connection.get("messages").filter(msg => msg.get("connectMessage")).first();
 
                 return {
+                    connection,
                     connectionUri,
                     remoteNeedUri: connection && connection.get("remoteNeedUri"),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
                     isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
-                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     textMsg: connectMsg && connectMsg.get("text"),
                 }
             };

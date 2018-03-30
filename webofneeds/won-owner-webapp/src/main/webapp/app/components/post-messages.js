@@ -283,7 +283,7 @@ function genComponentConf() {
                     connection,
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     chatMessages: sortedMessages,
-                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     debugmode: won.debugmode,
                     shouldShowRdf: state.get('showRdf'),
                     // if the connect-message is here, everything else should be as well

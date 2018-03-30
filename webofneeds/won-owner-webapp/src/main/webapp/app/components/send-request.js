@@ -4,6 +4,8 @@ import angular from 'angular';
 import 'ng-redux';
 import postContentModule from './post-content.js';
 import postHeaderModule from './post-header.js';
+import feedbackGridModule from './feedback-grid.js';
+
 import {
     selectOpenPostUri,
     selectNeedByConnectionUri,
@@ -49,11 +51,6 @@ function genComponentConf() {
           placeholder="Request Message (optional)"/>
         <div class="flexbuttons">
           <button
-            class="won-button--filled black"
-            ng-click="self.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null})">
-              Cancel
-          </button>
-          <button
             class="won-button--filled red"
             ng-click="self.sendRequest(self.message)">
               Chat
@@ -84,9 +81,10 @@ function genComponentConf() {
                 const postUriToConnectTo = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
 
                 return {
+                    connection,
                     ownNeed,
                     sendAdHocRequest,
-                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
                 }
@@ -131,6 +129,7 @@ function genComponentConf() {
 export default angular.module('won.owner.components.sendRequest', [
     postContentModule,
     postHeaderModule,
+    feedbackGridModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;
