@@ -108,6 +108,7 @@ const actionHierarchy = {
         sendChatMessageFailed: INJ_DEFAULT,
         showLatestMessages: cnct.showLatestMessages,
         showMoreMessages: cnct.showMoreMessages,
+        markAsRead: INJ_DEFAULT,
     },
     needs: {
         received: INJ_DEFAULT,

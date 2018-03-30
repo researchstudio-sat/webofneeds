@@ -4,45 +4,22 @@
     <won-owner-title-bar
             selection="self.selection"
             ng-if="self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConnectionDetails}">
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
     </won-owner-title-bar>
-    <!-- TODO: check if it's ok to use showConnectionDetails for visitors -->
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
             ng-if="!self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConnectionDetails}">
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
     </won-visitor-title-bar>
 </header>
 <main class="ownerpostcontent">
-
-
     <!-- Post info view when there's no connection-state/-type selected -->
     <won-post-info ng-if="self.post" ng-show="!self.connectionType || !self.isOwnPost"></won-post-info>
 
-    <!-- Matches: -->
-    <won-matches ng-if="self.showMatches && self.isOwnPost"></won-matches>
-
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Suggested && !self.hasMatches">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
-                <svg class="opc__empty__description__icon"
-                    style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_match"></use>
-                </svg>
-                <span class="opc__empty__description__text">
-                    The matches to this need will be listed here.
-                    You cannot influence the matching process. It might take some time, or maybe there is nothing to
-                    be found for you, yet. Check back later!
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chats and Requests: -->
+    <!-- No Connections: -->
     <div class="opc__inner empty" 
-         ng-if="self.isOwnPost && self.connectionType && self.connectionType !== self.won.Suggested && !self.hasConversations
-                            && !self.hasReceivedRequests && !self.hasSentRequests">
+         ng-if="self.isOwnPost && self.connectionType && !self.hasConnections">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <!-- TODO: decide which icon should be used here -->
@@ -63,39 +40,14 @@
     </div>
 
     <!-- left column for connection-typed tabs -->
-    <div
-        ng-if="self.isOwnPost && self.connectionType && self.connectionType !== self.won.Suggested"
+    <div class="post__listside"
+        ng-if="self.isOwnPost && self.connectionType && self.hasConnections"
         ng-class="{'hidden' : self.connectionUri !== undefined}"
     >
         <!-- Chats -->
         <won-connection-selection
                 class="owner__messages"
-                ng-show="self.hasConversations"
-                connection-type="::self.WON.Connected"
-                on-selected-connection="self.openConnection(connectionUri)"
-                >
-        </won-connection-selection>
-        <!-- Matches -->
-        <!-- <won-connection-selection
-                class="owner__messages"
-                ng-show="self.hasMatches"
-                connection-type="::self.WON.Suggested"
-                on-selected-connection="self.openConnection(connectionUri)"
-                >
-        </won-connection-selection> -->
-        <!-- Incoming Requests -->
-        <won-connection-selection
-                class="owner__messages"
-                ng-show="self.hasReceivedRequests"
-                connection-type="::self.WON.RequestReceived"
-                on-selected-connection="self.openConnection(connectionUri)"
-                >
-        </won-connection-selection>
-        <!-- Sent Requests -->
-        <won-connection-selection
-                class="owner__messages"
-                ng-show="self.hasSentRequests"
-                connection-type="::self.WON.RequestSent"
+                ng-show="self.hasConnections"
                 on-selected-connection="self.openConnection(connectionUri)"
                 >
         </won-connection-selection>
@@ -104,12 +56,15 @@
     <!-- /left column -->
 
     <!-- right column -->
-    <div
-        class="post-messages"
-        ng-if="self.isOwnPost && self.post && self.connectionOpen && self.connectionType !== self.won.Suggested"
-        ng-class="{'post-messages--connected': self.showConnectionDetails}">
-        <won-post-messages ng-if="(self.actualConnectionType === self.WON.Connected)"></won-post-messages>
-        <won-open-request ng-if="(self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent)"></won-open-request>
+    <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionOpen && self.hasConnections && self.actualConnectionType !== self.WON.Closed">
+        <won-post-messages ng-if="self.actualConnectionType === self.WON.Connected"></won-post-messages>
+        <won-open-request ng-if="self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent"></won-open-request>
+        <won-send-request ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
+    </div>
+    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)">
+        <span class="post__contentside__description__text">
+            No Element selected
+        </span>
     </div>
     
     <!-- /right column -->

@@ -8,6 +8,8 @@ import chatTextFieldModule from './chat-textfield.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
+import postHeaderModule from './post-header.js';
+
 import {
 } from '../won-label-utils.js'
 import {
@@ -56,13 +58,16 @@ function genComponentConf() {
         <div class="pm__header">
             <a class="clickable"
                 ng-click="self.router__stateGoCurrent({connectionUri : null})">
-                <img class="pm__header__icon clickable"
-                     src="generated/icon-sprite.svg#ico36_close"/>
-            </a>
-            <div class="pm__header__title clickable"
-                ng-click="self.router__stateGoAbs('post', { postUri: self.theirNeed.get('uri')})">
-                {{ self.theirNeed.get('title') }}
-            </div>
+            <svg style="--local-primary:var(--won-primary-color);"
+              class="pm__header__icon clickable">
+                <use href="#ico36_close"></use>
+            </svg>
+        </a>
+            <won-post-header
+                need-uri="self.theirNeed.get('uri')"
+                timestamp="self.lastUpdateTimestamp"
+                hide-image="::true">
+            </won-post-header>
         </div>
         <div class="pm__content">
             <img src="images/spinner/on_white.gif"
@@ -278,6 +283,7 @@ function genComponentConf() {
                     connection,
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     chatMessages: sortedMessages,
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     debugmode: won.debugmode,
                     shouldShowRdf: state.get('showRdf'),
                     // if the connect-message is here, everything else should be as well
@@ -537,6 +543,7 @@ export default angular.module('won.owner.components.postMessages', [
     chatTextFieldSimpleModule,
     connectionMessageModule,
     connectionAgreementModule,
+    postHeaderModule
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;

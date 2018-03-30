@@ -19,6 +19,7 @@ import { actionCreators }  from '../actions/actions.js';
 import {
     selectOpenPostUri,
 } from '../selectors.js';
+import won from '../won-es6.js';
 
 import connectionSelectionItemModule from './connection-selection-item.js';
 
@@ -29,7 +30,8 @@ function genComponentConf() {
       <won-connection-selection-item
         ng-repeat="conn in self.connectionsArray"
         on-selected-connection="self.setOpen(connectionUri)"
-        connection-uri="conn.get('uri')">
+        connection-uri="conn.get('uri')"
+        ng-class="{'won-unread': conn.get('newConnection')}">
       </won-connection-selection-item>
     `;
 
@@ -39,6 +41,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
             this.settingsOpen = false;
+            this.WON = won.WON;
 
             const self = this;
 
@@ -53,9 +56,23 @@ function genComponentConf() {
                 
                 const connectionType = self.connectionType;
                 // const connectionType = connectionTypeInParams || self.connectionType;
-                const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") === connectionType);
+                const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") !== won.WON.Closed);
+
+                let sortedConnections = connections && connections.toArray();
+                if(sortedConnections) {
+                    sortedConnections.sort(function(a,b) {
+                        const bDate = b.get("lastUpdateDate");
+                        const aDate = b.get("lastUpdateDate");
+
+                        if(!!bDate && !!aDate) return 0;
+                        if(!!bDate) return -1;
+                        if(!!aDate) return 1;
+                        return b.get("lastUpdateDate").getTime() - a.get("lastUpdateDate").getTime();
+                    });
+                }
+
                 return {
-                    connectionsArray: connections && connections.toArray(),
+                    connectionsArray: sortedConnections,
                 };
             };
 
@@ -74,7 +91,6 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionType: "=",
             /*
              * Usage:
              *  on-selected-connection="myCallback(connectionUri)"

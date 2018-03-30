@@ -68,7 +68,7 @@ function genComponentConf() {
                     need,
                     friendlyTimestamp: need && relativeTime(
                         selectLastUpdateTime(state),
-                        this.timestamp || need.get('creationDate')
+                        this.timestamp || need.get('lastUpdateDate')
                     ),
                 }
             };

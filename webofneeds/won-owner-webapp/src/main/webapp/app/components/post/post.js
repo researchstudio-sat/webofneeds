@@ -4,6 +4,7 @@
 ;
 
 import angular from 'angular';
+import ngAnimate from 'angular-animate';
 import ownerTitleBarModule from '../owner-title-bar.js';
 //import galleryModule from '../gallery.js';
 import postMessagesModule from '../post-messages.js';
@@ -18,7 +19,6 @@ import { actionCreators }  from '../../actions/actions.js';
 import openRequestModule from '../open-request.js';
 import connectionSelectionModule from '../connection-selection.js';
 import postInfoModule from '../post-info.js';
-import matchesModule from '../matches.js';
 import {
     selectOpenPostUri,
     selectOpenConnectionUri,
@@ -34,25 +34,14 @@ class Controller {
         attach(this, serviceDependencies, arguments);
         this.selection = 0;
         window.p4dbg = this;
-        this.wonConnected = won.WON.Connected;
         this.WON = won.WON;
 
         const selectFromState = (state)=>{
             const postUri = selectOpenPostUri(state);
             const post = state.getIn(["needs", postUri]);
 
-            const hasReceivedRequests = post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.RequestReceived)
-                .size > 0;
-            const hasSentRequests= post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.RequestSent)
-                .size > 0;
-            const hasMatches= post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.Suggested)
-                .size > 0;
-            const hasConversations = post && post.get('connections')
-                .filter(conn => conn.get('state') === won.WON.Connected)
-                .size > 0;
+
+            const hasConnections = post && post.get('connections').filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
             const actualConnectionType = post && connectionUri && post.getIn(['connections', connectionUri, 'state']);
@@ -63,27 +52,16 @@ class Controller {
 
             const sendAdHocRequest = post && !post.get("ownNeed") && getIn(state, ['router', 'currentParams', 'sendAdHocRequest']);
 
-            const connectionIsOpen = !!connectionUri &&
-                //make sure we don't get a mismatch between supposed type and actual type:
-                actualConnectionType == connectionTypeInParams;
-
             return {
                 connectionOpen: !!connectionUri,
                 postUri,
                 post,
                 isOwnPost: post && post.get("ownNeed"),
                 connectionUri,
-                hasMatches,
-                hasReceivedRequests,
-                hasSentRequests,
-                hasConversations,
+                hasConnections,
                 sendAdHocRequest,
                 connectionType: connectionTypeInParams,
                 actualConnectionType,
-                showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
-                showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
-                // TODO: check if this can be shortened
-                showConnectionDetails: connectionIsOpen && (actualConnectionType === won.WON.Connected || actualConnectionType === won.WON.RequestReceived || actualConnectionType === won.WON.RequestSent),
                 won: won.WON,
             };
         };
@@ -111,8 +89,8 @@ export default angular.module('won.owner.components.post', [
     postMessagesModule,
     connectionSelectionModule,
     openRequestModule,
-    matchesModule,
     postInfoModule,
+    ngAnimate,
 ])
     .controller('PostController', Controller)
     .name;

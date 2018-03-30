@@ -16,7 +16,7 @@ $won-subtitle-gray: var(--won-subtitle-gray);
 $won-helpbox-yellow: var(--won-helpbox-yellow);
 $won-dark-purple: var(--won-dark-purple);
 $won-dark-gray: var(--won-dark-gray);
-$won-unread: var(--won-lighter-gray);
+$won-unread: var(--won-helpbox-yellow);
 
 // sizes
 $hugeiconSize: 5rem;
@@ -42,7 +42,7 @@ $thinGrayBorder: $thinBorderWidth solid $won-line-gray;
 $thinRedBorder: $thinBorderWidth solid $won-primary-color;
 $thinDarkBorder: $thinBorderWidth solid $won-dark-gray;
 
-
+$gridRowGap: 0.5rem;
 
 @mixin carretSized { //the small down-arrow
   /*
