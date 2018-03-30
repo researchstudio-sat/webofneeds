@@ -36,26 +36,6 @@ function genComponentConf() {
         <div class="conn__unreadCount">
           {{ self.unreadCount }}
         </div>
-
-        <svg class="conn__icon clickable"
-            style="--local-primary:#CCD2D2;"
-            ng-click="self.settingsOpen = true">
-                <use href="#ico_settings"></use>
-        </svg>
-      </div>
-
-      <div class="conn__contextmenu"
-        ng-show="self.settingsOpen">
-          <svg class="conn__icon clickable" 
-            style="--local-primary:black;"
-            ng-click="self.settingsOpen = false">
-                <use href="#ico_settings"></use>
-          </svg>
-          <button
-            class="won-button--filled thin red"
-            ng-click="self.closeConnection()">
-              Close Connection
-          </button>
       </div>
     `;
 
@@ -103,11 +83,6 @@ function genComponentConf() {
 
                 this.connections__markAsRead(payload);
             }
-        }
-
-        closeConnection() {
-            this.settingsOpen = false;
-            this.connections__close(this.connectionUri);
         }
     }
     Controller.$inject = serviceDependencies;

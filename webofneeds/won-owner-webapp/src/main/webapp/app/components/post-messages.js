@@ -57,17 +57,43 @@ function genComponentConf() {
     let template = `
         <div class="pm__header">
             <a class="clickable"
-                ng-click="self.router__stateGoCurrent({connectionUri : null})">
-            <svg style="--local-primary:var(--won-primary-color);"
-              class="pm__header__icon clickable">
-                <use href="#ico36_close"></use>
-            </svg>
-        </a>
+               ng-click="self.router__stateGoCurrent({connectionUri : null})">
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="pm__header__icon clickable">
+                    <use href="#ico36_close"></use>
+                </svg>
+            </a>
             <won-post-header
                 need-uri="self.theirNeed.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::true">
             </won-post-header>
+            <svg class="pm__header__icon__small clickable"
+                style="--local-primary:#CCD2D2;"
+                ng-click="self.contextMenuOpen = true">
+                    <use href="#ico16_arrow_down"></use>
+            </svg>
+            <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
+                <div class="content">
+                    <div class="topline">
+                      <svg class="pm__header__icon__small contextmenu__icon clickable"
+                        style="--local-primary:black;"
+                        ng-click="self.contextMenuOpen = false">
+                            <use href="#ico16_arrow_up"></use>
+                      </svg>
+                    </div>
+                  <button
+                    class="won-button--outlined thin red"
+                    ng-click="self.goToPost()">
+                      Go To Post
+                  </button>
+                  <button
+                    class="won-button--filled thin red"
+                    ng-click="self.closeRequest()">
+                      Close Connection
+                  </button>
+                </div>
+            </div>
         </div>
         <div class="pm__content">
             <img src="images/spinner/on_white.gif"
@@ -523,6 +549,15 @@ function genComponentConf() {
                 }
             }
 
+        }
+
+        closeRequest(){
+            this.connections__close(this.connection.get('uri'));
+            this.router__stateGoCurrent({connectionUri: null});
+        }
+
+        goToPost() {
+            this.router__stateGoAbs('post', {postUri: this.connection.get('remoteNeedUri')});
         }
     }
     Controller.$inject = serviceDependencies;
