@@ -59,7 +59,7 @@ public class WonConversationUtils {
 	}
 	
 	public static URI getLatestProposesMessageOfNeed(Dataset conversationDataset, URI senderNeed){
-		return AgreementProtocolState.of(conversationDataset).getLatestProposeMessageSentByNeed(senderNeed);
+		return AgreementProtocolState.of(conversationDataset).getLatestProposesMessageSentByNeed(senderNeed);
 	}
 	
 	public static URI getLatestProposesToCancelMessageOfNeed(Dataset conversationDataset, URI senderNeed){
