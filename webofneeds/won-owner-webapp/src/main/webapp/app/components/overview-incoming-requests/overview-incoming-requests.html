@@ -3,8 +3,8 @@
     <won-overview-title-bar selection="self.selection" ng-if="!self.post"></won-overview-title-bar>
     <won-owner-title-bar selection="self.ownerSelection" ng-if="self.post"></won-owner-title-bar>
 </header>
-<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasRequests}">
-    <div class="opc__inner empty" ng-if="!self.hasRequests">
+<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasOpenConnections}">
+    <div class="opc__inner empty" ng-if="!self.hasOpenConnections">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
@@ -24,13 +24,16 @@
         </div>
     </div>
     <div class="oir__requests" ng-class="{'hidden': self.connection}">
+        <!-- connection-type="::self.WON.RequestReceived" -->
         <won-connections-overview
-            connection-type="::self.WON.RequestReceived"
             on-selected-connection="self.selectedConnection(connectionUri)">
         </won-connections-overview>
     </div>
-    <won-open-request
-        class="oir__openrequest"
-        ng-if="self.connection">
-    </won-open-request>
+    <div class="oir__openrequest">
+        <!-- <won-open-request ng-if="self.connection"></won-open-request> -->
+        <won-open-request ng-if="self.connectionType === self.WON.RequestReceived"></won-open-request>
+        <won-send-request ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
+        <won-post-messages ng-if="self.connectionType === self.WON.Connected"></won-post-messages>
+    </div>
+    <!-- TODO: additional div if nothing is selected, similar to post.html? -->
 </main>
