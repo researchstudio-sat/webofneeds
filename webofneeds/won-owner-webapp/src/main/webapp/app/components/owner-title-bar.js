@@ -116,9 +116,9 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
 
-                const connections = post && post.get("connections");
+                const openConnections = post && post.get("connections").filter(conn => conn.get("type") !== won.WON.Closed);
                 const messages = selectAllMessagesByNeedUriAndConnected(state, postUri);
-                const unreadConnectionCount = connections && connections.filter(conn => conn.get("state") !== won.WON.Connected && conn.get('newConnection')).size;
+                const unreadConnectionCount = openConnections && openConnections.filter(conn => conn.get("state") !== won.WON.Connected && conn.get('newConnection')).size;
                 const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;
                 const unreadConnectionsCount = unreadConnectionCount + unreadMessagesCount;
 
@@ -127,7 +127,7 @@ function genComponentConf() {
                     WON: won.WON,
                     postUri: postUri,
                     post: post,
-                    hasConnections: connections && connections.size > 0,
+                    hasConnections: openConnections && openConnections.size > 0,
                     unreadConnectionsCount: unreadConnectionsCount > 0 ? unreadConnectionsCount : undefined,
                     isActive: post && post.get('state') === won.WON.ActiveCompacted,
                 };
