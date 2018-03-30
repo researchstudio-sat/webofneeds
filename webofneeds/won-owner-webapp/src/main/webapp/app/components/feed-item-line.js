@@ -71,7 +71,7 @@ function genComponentConf() {
                     connection,
                     remoteNeedUri,
                     remoteNeed,
-                    lastUpdated: connection && relativeTime(lastUpdated, connection.get('creationDate')),
+                    lastUpdated: connection && relativeTime(lastUpdated, connection.get('lastUpdateDate')),
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.needUri', 'self.connectionUri'], this);
