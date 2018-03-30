@@ -16,7 +16,6 @@ import {
 import {
     is,
     urisToLookupMap,
-    msStringToDate,
     getIn,
     get,
     jsonld2simpleFormat,
