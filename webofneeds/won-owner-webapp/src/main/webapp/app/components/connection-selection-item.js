@@ -73,8 +73,10 @@ function genComponentConf() {
                 const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 return {
+                    ownNeed,
+                    connection,
                     openConnectionUri: selectOpenConnectionUri(state),
-                    lastUpdateTimestamp: connection && connection.get('creationDate'), //TODO: CORRECT TIMESTAMP LAST UPDATE
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     theirNeed,
                     unreadCount: undefined //TODO: WHAT SHOULD BE HERE?
                 }
@@ -87,8 +89,20 @@ function genComponentConf() {
         }
 
         setOpen() {
+            this.markAsRead();
             this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
+        }
+
+        markAsRead(){
+            if(this.connection && this.connection.get("newConnection")){
+                const payload = {
+                    connectionUri: this.connection.get("uri"),
+                    needUri: this.ownNeed.get("uri")
+                };
+
+                this.connections__markAsRead(payload);
+            }
         }
 
         closeConnection() {
