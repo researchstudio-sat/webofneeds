@@ -116,7 +116,7 @@ function genComponentConf() {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
 
-                const openConnections = post && post.get("connections").filter(conn => conn.get("type") !== won.WON.Closed);
+                const openConnections = post && post.get("connections").filter(conn => conn.get("state") !== won.WON.Closed);
                 const messages = selectAllMessagesByNeedUriAndConnected(state, postUri);
                 const unreadConnectionCount = openConnections && openConnections.filter(conn => conn.get("state") !== won.WON.Connected && conn.get('newConnection')).size;
                 const unreadMessagesCount = messages && messages.filter(msg => msg.get('newMessage') && !msg.get("connectMessage")).size;

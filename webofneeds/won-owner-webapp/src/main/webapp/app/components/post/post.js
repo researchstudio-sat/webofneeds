@@ -41,7 +41,7 @@ class Controller {
             const post = state.getIn(["needs", postUri]);
 
 
-            const hasConnections = post && post.get('connections').filter(conn => conn.get("type") !== won.WON.Closed).size > 0;
+            const hasConnections = post && post.get('connections').filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
             const actualConnectionType = post && connectionUri && post.getIn(['connections', connectionUri, 'state']);
