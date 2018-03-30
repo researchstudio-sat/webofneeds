@@ -118,7 +118,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         // NEW CONNECTIONS STATE UPDATES
         case actionTypes.connections.close:
             return changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.Closed);
-
      
         case actionTypes.needs.connect: // user has sent a connect request
         	
@@ -223,6 +222,8 @@ export default function(allNeedsInState = initialState, action = {}) {
             return markMessageAsRead(allNeedsInState, action.payload.messageUri, action.payload.connectionUri, action.payload.needUri);
         case actionTypes.connections.markAsRead:
             return markConnectionAsRead(allNeedsInState, action.payload.connectionUri, action.payload.needUri);
+        case actionTypes.connections.markAsRated:
+            return markConnectionAsRated(allNeedsInState, action.payload.connectionUri);
 
         // NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
@@ -475,9 +476,6 @@ function markMessageAsRead(state, messageUri, connectionUri, needUri) {
 }
 
 function markConnectionAsRead(state, connectionUri, needUri) {
-    let tmpNeedUri;
-    let tmpConnectionUri;
-
     let need = state.get(needUri);
     let connection = need && need.getIn(["connections", connectionUri]);
 
@@ -487,6 +485,18 @@ function markConnectionAsRead(state, connectionUri, needUri) {
     }
 
     return state.setIn([needUri, "connections", connectionUri, "newConnection"], false);
+}
+
+function markConnectionAsRated(state, connectionUri) {
+    let need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+    let connection = need && need.getIn(["connections", connectionUri]);
+
+    if(!connection) {
+        console.error("no connection with connectionUri: <", connectionUri,"> found within needUri: <", need.get("uri"), ">");
+        return state;
+    }
+
+    return state.setIn([need.get("uri"), "connections", connectionUri, "isRated"], true);
 }
 
 function changeConnectionStateByFun(state, connectionUri, fun) {
@@ -527,6 +537,7 @@ function parseConnection(jsonldConnection, newConnection) {
             creationDate: undefined,
             lastUpdateDate: undefined,
             newConnection: !!newConnection,
+            isRated: false,
         }
     };
 

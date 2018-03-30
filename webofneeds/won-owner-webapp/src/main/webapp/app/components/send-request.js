@@ -45,15 +45,23 @@ function genComponentConf() {
       </won-post-content>
 
       <div class="request__footer">
+        <won-feedback-grid ng-if="!self.sendAdHocRequest && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
         <input
           type="text"
+          ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
           ng-model="self.message"
           placeholder="Request Message (optional)"/>
-        <div class="flexbuttons">
+        <div class="flexbuttons" ng-if="self.sendAdHocRequest || self.connection.get('isRated')">
+          <button
+            ng-if="!self.sendAdHocRequest"
+            class="won-button--filled black"
+            ng-click="self.closeRequest()">
+              Remove
+          </button>
           <button
             class="won-button--filled red"
             ng-click="self.sendRequest(self.message)">
-              Chat
+              Send Request
           </button>
         </div>
         <a target="_blank"
@@ -82,6 +90,7 @@ function genComponentConf() {
 
                 return {
                     connection,
+                    connectionUri,
                     ownNeed,
                     sendAdHocRequest,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
@@ -110,8 +119,13 @@ function genComponentConf() {
                 		this.connectionUri,
                 		this.ownNeed.getIn(['connections',this.connectionUri]).get("remoteNeedUri"), 
                 		message);
-                this.router__stateGoCurrent({connectionUri: null})
+                this.router__stateGoCurrent({connectionUri: this.connectionUri})
             }
+        }
+
+        closeRequest(){
+            this.connections__close(this.connectionUri);
+            this.router__stateGoCurrent({connectionUri: null});
         }
     }
     Controller.$inject = serviceDependencies;
