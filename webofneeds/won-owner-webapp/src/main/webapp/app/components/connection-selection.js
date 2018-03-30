@@ -72,7 +72,7 @@ function genComponentConf() {
                 }
 
                 return {
-                    connectionsArray: sortedConnections && sortedConnections.toArray(),
+                    connectionsArray: sortedConnections,
                 };
             };
 
