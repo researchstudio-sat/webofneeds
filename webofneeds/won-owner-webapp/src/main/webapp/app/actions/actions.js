@@ -109,6 +109,7 @@ const actionHierarchy = {
         showLatestMessages: cnct.showLatestMessages,
         showMoreMessages: cnct.showMoreMessages,
         markAsRead: INJ_DEFAULT,
+        markAsRated: INJ_DEFAULT,
     },
     needs: {
         received: INJ_DEFAULT,
