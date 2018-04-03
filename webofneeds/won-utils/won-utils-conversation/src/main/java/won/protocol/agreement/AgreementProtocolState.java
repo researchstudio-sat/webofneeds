@@ -13,6 +13,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -212,17 +213,28 @@ public class AgreementProtocolState {
 		return RdfUtils.getGraphUris(rejected);		
 	}
 	
+	
 	/**
-	 * Returns the n latest message filtered by the specified predicate, sorted descending by order (latest first).
+	 * Returns the n latest messages filtered by the specified predicate, sorted descending by order (latest first).
 	 * @param filterPredicate
 	 * @param n use 0 for the latest message.
 	 * @return
 	 */
-	public List<URI> getNLatestMessages(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
-		List<URI> uris = deliveryChains.stream()
+	private Stream<ConversationMessage> getMessagesAsOrderedStream(java.util.function.Predicate<ConversationMessage> filterPredicate) {
+		return deliveryChains.stream()
 				.map(m -> m.getHead())
 				.filter(x -> filterPredicate.test(x))
-				.sorted((x1,x2) -> x2.getOrder() - x1.getOrder())
+				.sorted((x1,x2) -> x2.getOrder() - x1.getOrder());
+	}
+	
+	/**
+	 * Returns the n latest message uris filtered by the specified predicate, sorted descending by order (latest first).
+	 * @param filterPredicate
+	 * @param n use 0 for the latest message.
+	 * @return
+	 */
+	public List<URI> getNLatestMessageUris(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
+		List<URI> uris = getMessagesAsOrderedStream(filterPredicate)
 				.map(m -> m.getMessageURI())
 				.collect(Collectors.toList());
 		if (uris.size() > n) {
@@ -239,7 +251,7 @@ public class AgreementProtocolState {
 	 * @return
 	 */
 	public URI getNthLatestMessage(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
-		List<URI> uris = getNLatestMessages(filterPredicate, n+1);
+		List<URI> uris = getNLatestMessageUris(filterPredicate, n+1);
 		if (uris.size() > n) {
 			return uris.get(n);
 		} else {
@@ -305,7 +317,7 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestAgreement(Optional<URI> senderNeedUri) {
-		URI uri = getNthLatestMessage(
+		Optional<ConversationMessage> acceptMsgOpt = getMessagesAsOrderedStream(
 				m -> m.isAcceptsMessage() && 
 				(! senderNeedUri.isPresent() || senderNeedUri.get().equals(m.getSenderNeedURI())) &&
 				m.getEffects()
@@ -313,11 +325,15 @@ public class AgreementProtocolState {
 					.filter(e->e.isAccepts())
 					.map(e -> e.asAccepts())
 					.map(a -> a.getAcceptedMessageUri())
-					.anyMatch(this::isAgreement), 0);
-		if (logger.isDebugEnabled()) {
-			logNthLatestMessage(0, null, null, uri);
+					.anyMatch(this::isAgreement)).findFirst();
+		if (!acceptMsgOpt.isPresent()) {
+			return null;
 		}
-		return uri;
+		return acceptMsgOpt.get().getEffects()
+				.stream()
+				.map(e -> e.asAccepts().getAcceptedMessageUri())
+				.filter(this::isAgreement)
+				.findFirst().get();
 	}
 	
 	public URI getLatestAcceptsMessage() {
