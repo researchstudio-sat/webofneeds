@@ -60,8 +60,9 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
 
-            this.labels = labels;
-            this.open = {};
+            //this.labels = labels;
+            this.open = open;
+            window.co4dbg = this;
 
             const self = this;
             const selectFromState = (state)=> {
@@ -83,7 +84,7 @@ function genComponentConf() {
             this.open[ownNeedUri] = !this.open[ownNeedUri]
         }
         isOpen(ownNeedUri) {
-            return !!this.open[ownNeedUri] || this.needImpliedInRoute === ownNeedUri;
+            return !!this.open[ownNeedUri];
         }
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
@@ -108,7 +109,8 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionType: "=",
+            open: "=",
+            //connectionType: "=",
             /*
              * Usage:
              *  on-selected-connection="myCallback(connectionUri)"

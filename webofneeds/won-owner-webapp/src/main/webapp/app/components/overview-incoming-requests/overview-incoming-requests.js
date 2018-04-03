@@ -27,6 +27,8 @@ class IncomingRequestsController {
         window.oir4dbg = this; // TODO: remove this
         this.resetParams = resetParams;
 
+        this.open = {};
+
         this.selection = 2;
         this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
 
@@ -45,6 +47,7 @@ class IncomingRequestsController {
                     connectionType,
                     //hasRequests: connections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
                     hasOpenConnections: connections.filter(conn => conn.get("state") !== won.WON.Closed).size > 0,
+                    open,
                 };
             }else{
                 const postId = decodeURIComponent(getIn(state, ['router', 'currentParams', 'myUri']));
@@ -55,6 +58,7 @@ class IncomingRequestsController {
                     post,
                     connection,
                     connectionType,
+                    open,
                 };
             }
         };
