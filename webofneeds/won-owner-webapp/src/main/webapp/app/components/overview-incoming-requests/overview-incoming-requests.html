@@ -30,11 +30,15 @@
             open="self.open">
         </won-connections-overview>
     </div>
-    <div class="post__contentside">
-        <!-- <won-open-request ng-if="self.connection"></won-open-request> -->
+    <div class="post__contentside" ng-if="self.connection && self.connectionType !== self.WON.Closed">
         <won-open-request ng-if="self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-open-request>
         <won-send-request ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="self.connectionType === self.WON.Connected"></won-post-messages>
     </div>
-    <!-- TODO: additional div if nothing is selected, similar to post.html? -->
+    <div class="post__contentside post__contentside--empty" ng-if="!self.connection || self.connectionType === self.WON.Closed"
+        ng-class="{'hidden' : self.connectionUri === undefined}">
+        <span class="post__contentside__description__text">
+            No Element selected
+        </span>
+    </div>
 </main>
