@@ -282,7 +282,7 @@ function genComponentConf() {
                 	// TODO: Optimization
                 	//filter proposals
                 	for(msg of msgSet) {
-                		if(msg.get("isProposeMessage")){
+                		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
 	                		if(this.isOldAgreementMsg(msg)) {
 	                			msgSet.delete(msg);
 	                		} else {
@@ -515,7 +515,9 @@ function genComponentConf() {
 	        		aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
 	        		aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
 	        		aD.cancelledAgreementUris.has(msg.get("uri")) ||
-	        		aD.cancelledAgreementUris.has(msg.get("remoteUri"))) {
+	        		aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
+	        		aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
+	        		aD.acceptedCancellationProposalUris.has(msg.get("remoteUri"))) {
         		return true;
         	}
         	return false;
