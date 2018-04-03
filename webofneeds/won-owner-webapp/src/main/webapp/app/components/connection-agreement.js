@@ -20,6 +20,7 @@ import {
 } from '../utils.js'
 import {
 	buildProposalMessage,
+	buildModificationMessage,
 } from '../won-message-utils.js';
 import {
     actionCreators
@@ -66,9 +67,14 @@ function genComponentConf() {
             		 Accept
             	</button>
             	<button class="won-button--filled thin black"
-            		ng-click="self.show()"
+            		ng-click="self.rejectMessage()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Reject
+            	</button>
+            	<button class="won-button--filled thin black"
+            		ng-click="self.retractMessage()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && self.isOwn">
+            		 Retract
             	</button>
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposeToCancel()"
@@ -154,6 +160,28 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate({draft: this.eventUri});
         	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});*/
+        }
+        
+        retractMessage() {
+        	this.clicked = true;
+        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
+        	const msg = ("Retract message : " + uri);
+        	const trimmedMsg = buildModificationMessage(uri, "retracts", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
+        	this.onUpdate({draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        }
+        
+        rejectMessage() {
+        	this.clicked = true;
+        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
+        	const msg = ("Reject message : " + uri);
+        	const trimmedMsg = buildProposalMessage(uri, "rejects", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
+        	this.onUpdate({draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
         
         checkDeclaration(declaration) {

@@ -82,6 +82,11 @@ function genComponentConf() {
                         		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
                         		ng-show="self.showDetail">Propose <span ng-show="self.clicked">(again)</span>
                         </button>
+                        <button class="won-button--filled thin black"
+                        		ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
+                        		ng-show="self.showDetail && self.message.get('outgoingMessage')">
+                        		Retract
+                        </button>
                     </span>
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
@@ -209,6 +214,13 @@ function genComponentConf() {
                     tmp_messages__markAsRead(payload);
                 }, MESSAGE_READ_TIMEOUT);
             }
+        }
+        
+        retractMessage() {
+        	this.clicked = true;
+        	const trimmedMsg = buildModificationMessage(this.message.get("uri"), "retracts", this.message.get("text"));
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	this.onUpdate();
         }
         
         sendProposal(){
