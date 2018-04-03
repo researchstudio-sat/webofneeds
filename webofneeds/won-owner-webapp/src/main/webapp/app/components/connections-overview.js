@@ -77,7 +77,6 @@ function genComponentConf() {
                     relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
                 }
             };
-            //connect2Redux(selectFromState, actionCreators, ['self.connectionType'], this);
             connect2Redux(selectFromState, actionCreators, [], this);
         }
         toggleConnections(ownNeedUri) {
@@ -89,12 +88,6 @@ function genComponentConf() {
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
         }
-        // getConnectionsArrayFilteredByType(need) {
-        //     return need.get('connections').filter(conn => conn.get('state') === this.connectionType).toArray();
-        // }
-        // getUnreadConnectionsCountFilteredByType(need){
-        //     return need.get('connections').filter(conn => conn.get('newConnection') && conn.get('state') === this.connectionType).size;
-        // }
         getOpenConnectionsArray(need){
             return need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed).toArray();
         }
