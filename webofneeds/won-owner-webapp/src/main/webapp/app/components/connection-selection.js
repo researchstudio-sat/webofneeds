@@ -72,6 +72,7 @@ function genComponentConf() {
                 }
 
                 return {
+                    connections,
                     connectionsArray: sortedConnections,
                 };
             };

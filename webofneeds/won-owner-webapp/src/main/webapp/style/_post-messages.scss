@@ -7,9 +7,15 @@
 
 @media (max-width: $responsivenessBreakPoint) {
   won-visitor-title-bar.hidden,
-  won-owner-title-bar.hidden {
+  won-owner-title-bar.hidden,
+  .post__listside.hidden,
+  .post__contentside--empty.hidden{
     display: none; //hide the subheader when a conversation is open on a mobile device
   }
+}
+.post__listside {
+  width: 100%;
+  max-width: $maxContentWidth / 2;
 }
 
 .post__contentside {
@@ -18,7 +24,7 @@
   border-right: $thinGrayBorder;
   border-bottom: $thinGrayBorder;
   width: 100%;
-  max-width: $maxContentWidth / 2;
+  max-width: ($maxContentWidth / 2);
   //margin-ri: 0.5rem;
 
   box-sizing: border-box;
@@ -60,6 +66,20 @@
 
       &__icon {
         @include fixed-square($postIconSize);
+      }
+
+      &__icon__small {
+        @include fixed-square(1.5rem);
+        padding-left: 0.5rem;
+      }
+
+      .pm__header__contextmenu .content {
+        max-width: 10rem;
+
+        button {
+          margin-top: 0.5rem;
+          width: 100%;
+        }
       }
     }
 

@@ -53,10 +53,13 @@ function genComponentConf() {
         }
 
         rateMatch(rating) {
+
+
             switch(rating) {
                 case 0:
                     console.log("RATE GOOD");
                     this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
+                    this.connections__markAsRated({connectionUri: this.connectionUri});
                     break;
                 /*case 1:
                     //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE

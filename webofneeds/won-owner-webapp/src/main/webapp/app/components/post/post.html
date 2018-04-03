@@ -47,7 +47,7 @@
         <!-- Chats -->
         <won-connection-selection
                 class="owner__messages"
-                ng-show="self.hasConnections"
+                ng-if="self.hasConnections"
                 on-selected-connection="self.openConnection(connectionUri)"
                 >
         </won-connection-selection>
@@ -61,7 +61,8 @@
         <won-open-request ng-if="self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent"></won-open-request>
         <won-send-request ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
     </div>
-    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)">
+    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)"
+        ng-class="{'hidden' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
             No Element selected
         </span>
