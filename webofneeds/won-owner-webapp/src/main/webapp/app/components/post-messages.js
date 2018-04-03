@@ -145,6 +145,20 @@ function genComponentConf() {
 	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
 	            <!-- /ProposeToCancel -->
+	            
+	            <!-- ProposeToCancel REAL-->
+	            <!--
+	            <won-connection-agreement
+	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementStateData.pendingCancellationProposalUris) track by $index"
+	                event-uri="proptoc"
+	                agreement-number="self.agreementStateData.agreementUris.size + $index"
+	                agreement-declaration="self.declarations.proposeToCancel"
+	                connection-uri="self.connectionUri"
+	                on-update="self.showAgreementData = false;">
+	            </won-connection-agreement>
+	            -->
+	            <!-- /ProposeToCancel -->
+            	
             	<!-- PROPOSALS -->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.pendingProposalUris.size">
             		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
@@ -410,7 +424,7 @@ function genComponentConf() {
         
         agreementDataIsValid() {
         	var aD = this.agreementStateData;
-        	if(aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size) {
+        	if(aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size || aD.cancellationPendingAgreementUris.size) {
         		return true;
         	}
         	return false;

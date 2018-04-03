@@ -63,8 +63,7 @@ function genComponentConf() {
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>		
                         {{ self.text? self.text : self.noTextPlaceholder }}
                          <span class="won-cm__center__button" 
-	                        ng-if="self.message.get('outgoingMessage')
-	                            && !self.message.get('isProposeMessage') 
+	                        ng-if="!self.message.get('isProposeMessage') 
 	                            && !self.message.get('isAcceptMessage')
 	                            && !self.message.get('isProposeToCancel')">
 	                        <svg class="won-cm__center__carret clickable"
@@ -214,7 +213,8 @@ function genComponentConf() {
         
         sendProposal(){
         	this.clicked = true;
-        	const trimmedMsg = buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
+        	const trimmedMsg = buildProposalMessage(uri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate();
         }
