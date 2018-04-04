@@ -24,8 +24,10 @@ class IncomingRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.WON = won.WON;
-
+        window.oir4dbg = this; // TODO: remove this
         this.resetParams = resetParams;
+
+        this.open = {};
 
         this.selection = 2;
         this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
@@ -33,7 +35,8 @@ class IncomingRequestsController {
         const selectFromState = (state)=>{
             const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
-            const connection = need && need.getIn(["connections", connectionUri]);
+            const connection = need && need.getIn(["connections", connectionUri]); // TODO: can this be deleted?
+            const connectionType = need && connectionUri && need.getIn(["connections", connectionUri, 'state']);
 
             if(getIn(state, ['router', 'currentParams', 'myUri']) === undefined) {
                 const connections = selectAllConnections(state);
@@ -41,7 +44,10 @@ class IncomingRequestsController {
                 return {
                     WON: won.WON,
                     connection,
-                    hasRequests: connections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
+                    connectionType,
+                    //hasRequests: connections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
+                    hasOpenConnections: connections.filter(conn => conn.get("state") !== won.WON.Closed).size > 0,
+                    open,
                 };
             }else{
                 const postId = decodeURIComponent(getIn(state, ['router', 'currentParams', 'myUri']));
@@ -51,6 +57,8 @@ class IncomingRequestsController {
                     WON: won.WON,
                     post,
                     connection,
+                    connectionType,
+                    open,
                 };
             }
         };
