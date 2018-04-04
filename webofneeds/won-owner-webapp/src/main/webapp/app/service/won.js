@@ -1333,10 +1333,13 @@ window.N34dbg = N3;
         isAgreement: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#Agreement");
         },
-        /*
-        isAccepted: function () {
-        	return !!this.getProperty("http://purl.org/webofneeds/message#isAccepted");
-        },*/
+        
+        isRejectMessage: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/agreement#rejects");
+        },
+        isRetractMessage: function () {
+        	return !!this.getProperty("http://purl.org/webofneeds/modification#retracts");
+        },
         
         isFromSystem: function () {
             let direction = this.getMessageDirection();

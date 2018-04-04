@@ -26,6 +26,7 @@ import {
 } from '../utils.js'
 import {
 	buildProposalMessage,
+	buildModificationMessage,
 } from '../won-message-utils.js';
 import {
     actionCreators
@@ -56,16 +57,14 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			ng-class="{'agreement' : (self.message.get('isProposeMessage') || self.message.get('isAcceptMessage') || self.message.get('isProposeToCancel'))}">
+    			ng-class="{'agreement' : 	!self.isNormalMessage()}">
                     <span class="won-cm__center__bubble__text">
                     <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
                 	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>
-                	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>		
+                	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
+                	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
                         {{ self.text? self.text : self.noTextPlaceholder }}
-                         <span class="won-cm__center__button" 
-	                        ng-if="!self.message.get('isProposeMessage') 
-	                            && !self.message.get('isAcceptMessage')
-	                            && !self.message.get('isProposeToCancel')">
+                         <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
 	                                ng-click="self.showDetail = !self.showDetail"
 	                                ng-show="!self.showDetail">
@@ -167,6 +166,7 @@ function genComponentConf() {
                     getIn(connection, ['messages', this.messageUri]) :
                     Immutable.Map();
 
+                
                 return {
                     ownNeed,
                     theirNeed,
@@ -217,7 +217,7 @@ function genComponentConf() {
         }
         
         retractMessage() {
-        	this.clicked = true;
+        	//this.clicked = true;
         	const trimmedMsg = buildModificationMessage(this.message.get("uri"), "retracts", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate();
@@ -253,6 +253,13 @@ function genComponentConf() {
 
         rdfToString(jsonld){
         	return JSON.stringify(jsonld);
+        }
+        
+        isNormalMessage() {
+        	return !(this.message.get('isProposeMessage') ||
+					this.message.get('isAcceptMessage') || 
+					this.message.get('isProposeToCancel') ||
+					this.message.get('isRetractMessage'));
         }
 
         encodeParam(param) {

@@ -71,11 +71,6 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Reject
             	</button>
-            	<button class="won-button--filled thin black"
-            		ng-click="self.retractMessage()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && self.isOwn">
-            		 Retract
-            	</button>
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposeToCancel()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.isOwn">
@@ -83,6 +78,11 @@ function genComponentConf() {
             	</button>
             	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
         			You proposed this
+        			<button class="won-button--filled thin black"
+            			ng-click="self.retractMessage()"
+            			ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && self.isOwn">
+    					Retract
+            		</button>
         		</span>
         	</div>
         </div>
@@ -147,25 +147,17 @@ function genComponentConf() {
         
         acceptProposeToCancel() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate({draft: this.eventUri});
-        	/*
-        	this.clicked = true;
-        	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
-        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
-
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate({draft: this.eventUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});*/
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
         }
         
         retractMessage() {
         	this.clicked = true;
         	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const msg = ("Retract message : " + uri);
+        	const msg = ("Retract: + " + uri);
         	const trimmedMsg = buildModificationMessage(uri, "retracts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
