@@ -77,10 +77,10 @@ function genComponentConf() {
             		 Accept
             	</button>
             	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
-        			You proposed this
+        			You proposed this | 
         			<button class="won-button--filled thin black"
             			ng-click="self.retractMessage()"
-            			ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && self.isOwn">
+            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
     					Retract
             		</button>
         		</span>
@@ -157,7 +157,7 @@ function genComponentConf() {
         retractMessage() {
         	this.clicked = true;
         	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const msg = ("Retract: + " + uri);
+        	const msg = ("Retract: " + uri);
         	const trimmedMsg = buildModificationMessage(uri, "retracts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
