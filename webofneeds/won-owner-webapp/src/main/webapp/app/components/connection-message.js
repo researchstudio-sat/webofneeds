@@ -63,8 +63,7 @@ function genComponentConf() {
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>		
                         {{ self.text? self.text : self.noTextPlaceholder }}
                          <span class="won-cm__center__button" 
-	                        ng-if="self.message.get('outgoingMessage')
-	                            && !self.message.get('isProposeMessage') 
+	                        ng-if="!self.message.get('isProposeMessage') 
 	                            && !self.message.get('isAcceptMessage')
 	                            && !self.message.get('isProposeToCancel')">
 	                        <svg class="won-cm__center__carret clickable"
@@ -90,12 +89,20 @@ function genComponentConf() {
                         {{ self.contentGraphTrig }}
                     </code>
                     <div class="won-cm__center__button" 
-                        ng-if="self.message.get('isProposeMessage') 
+                        ng-if="self.message.get('isProposeMessage')
                             && !self.message.get('outgoingMessage')
                             && !self.message.get('isAcceptMessage')
                             && !self.message.isAccepted
                             && !self.clicked">
                         <button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
+                    </div>
+                    <div class="won-cm__center__button" 
+                        ng-if="self.message.get('isProposeToCancel')
+                            && !self.message.get('outgoingMessage')
+                            && !self.message.get('isAcceptMessage')
+                            && !self.message.isAccepted
+                            && !self.clicked">
+                        <button class="won-button--filled thin red" ng-click="self.acceptProposeToCancel()">Accept</button>
                     </div>
             </div>
             <div
@@ -206,7 +213,8 @@ function genComponentConf() {
         
         sendProposal(){
         	this.clicked = true;
-        	const trimmedMsg = buildProposalMessage(this.messageUri, "proposes", this.message.get("text"));
+        	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
+        	const trimmedMsg = buildProposalMessage(uri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate();
         }
@@ -215,6 +223,16 @@ function genComponentConf() {
         	this.clicked = true;
         	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
+        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	//TODO: isAccepted = true;
+        	this.onUpdate();
+        }
+        
+        acceptProposeToCancel() {
+        	this.clicked = true;
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;

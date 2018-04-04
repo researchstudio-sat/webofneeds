@@ -417,7 +417,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
 		referToEarlierMessages(ctx, bus, con, 
 				"ok, I'll make a proposal containing " + count + " of " + whose + " latest messages as clauses - but I'll need to crawl the connection data first, please be patient.", 
 				state -> {
-					return state.getNLatestMessages(m -> {
+					return state.getNLatestMessageUris(m -> {
 						URI ownNeedUri = con.getNeedURI();
 						URI remoteNeedUri = con.getRemoteNeedURI();
 						return 

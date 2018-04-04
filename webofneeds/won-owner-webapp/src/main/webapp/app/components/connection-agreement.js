@@ -43,12 +43,13 @@ function genComponentConf() {
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: 
-            	<span class="title" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Propose to cancel:</br></span>
-            	{{ self.message.get('text') }}
+            	{{ self.message.get('text') }}<br />
+            	<span class="subtitle" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Proposed to cancel</span>
             	<div class="won-ca__content__text__subtext">
 	            	<code>StateUri: {{ self.eventUri }}</code><br />
 	            	<code>HeadUri:   {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}</code>
             	</div>
+            	
             </div>
             <div class="won-ca__content__carret">
     			<won-labelled-hr ng-click="self.showDetail = !self.showDetail" arrow="self.showDetail? 'up' : 'down'"></won-labelled-hr>
@@ -94,7 +95,7 @@ function genComponentConf() {
             
             const self = this;
             this.clicked = false;
-            this.showDetail = false;
+            this.showDetail = true;
             
             const selectFromState = state => {
             	
@@ -140,12 +141,19 @@ function genComponentConf() {
         
         acceptProposeToCancel() {
         	this.clicked = true;
+        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
+        	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
+        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	this.onUpdate({draft: this.eventUri});
+        	/*
+        	this.clicked = true;
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
 
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate({draft: this.eventUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});*/
         }
         
         checkDeclaration(declaration) {
