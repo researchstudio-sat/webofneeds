@@ -2404,7 +2404,7 @@ function groupByGraphs(jsonldData) {
 
         if(!graph['@graph'] || !graphUri || !context) {
             const msg = 'Grouping-by-graph failed for the graph ' +
-                graphUri + ' and context ' + JSON.stringify(graphUri) + 
+                graphUri + ' and context ' + JSON.stringify(context) + 
                 ' with the following jsonld: \n\n' + 
                 JSON.stringify(graphWithContext) + '\n\n';
             //TODO: reactivate error msg
