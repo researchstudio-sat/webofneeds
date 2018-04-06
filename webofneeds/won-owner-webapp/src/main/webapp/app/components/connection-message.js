@@ -88,11 +88,11 @@ function genComponentConf() {
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
 
-<pre class="won-cm__center__trig">
+<div class="won-cm__center__trig">
 <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
 {{ self.contentGraphTrig }}
 </code>
-</pre>
+</div>
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage') 
                             && !self.message.get('outgoingMessage')

@@ -70,7 +70,7 @@ won-connection-message {
 
         &__trig {
             max-width: 100%;
-            overflow-x: scroll;
+            white-space:pre-wrap;
         }
 
         &__button{
