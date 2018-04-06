@@ -20,6 +20,7 @@ import {
 } from '../utils.js'
 import {
 	buildProposalMessage,
+	buildModificationMessage,
 } from '../won-message-utils.js';
 import {
     actionCreators
@@ -43,12 +44,14 @@ function genComponentConf() {
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: 
-            	<span class="title" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Propose to cancel:</br></span>
-            	{{ self.message.get('text') }}
+            	{{ self.message.get('text') }}<br />
+            	<span class="subtitle" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Proposed to cancel</span>
             	<div class="won-ca__content__text__subtext">
-	            	<code>StateUri: {{ self.eventUri }}</code><br />
+	            	<code>StateUri: {{ self.stateUri }}</code><br />
 	            	<code>HeadUri:   {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}</code>
+	            	<code ng-show="self.cancelUri">CancelUri: {{ self.cancelUri }} </code>
             	</div>
+            	
             </div>
             <div class="won-ca__content__carret">
     			<won-labelled-hr ng-click="self.showDetail = !self.showDetail" arrow="self.showDetail? 'up' : 'down'"></won-labelled-hr>
@@ -64,18 +67,25 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Accept
             	</button>
+            	<!--
             	<button class="won-button--filled thin black"
-            		ng-click="self.show()"
+            		ng-click="self.rejectMessage()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Reject
             	</button>
+            	-->
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposeToCancel()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.isOwn">
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
             		 Accept
             	</button>
-            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn">
+            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && !self.ownCancel">
         			You proposed this
+        			<!-- <button class="won-button--filled thin black"
+            			ng-click="self.retractMessage()"
+            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
+    					Retract
+            		</button> -->
         		</span>
         	</div>
         </div>
@@ -94,7 +104,7 @@ function genComponentConf() {
             
             const self = this;
             this.clicked = false;
-            this.showDetail = false;
+            this.showDetail = true;
             
             const selectFromState = state => {
             	
@@ -102,19 +112,19 @@ function genComponentConf() {
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 
                 const chatMessages = connection && connection.get("messages");
-                const message = chatMessages && chatMessages.get(this.eventUri);
+                const message = chatMessages && chatMessages.get(this.stateUri);
                 const remoteUri = message && !!message.get("remoteUri");
                 //const remoteUri = message && message.get("remoteUri");
                 
                 return {
                 	message: message,
                 	isOwn: !remoteUri,
-                	//isOwn: (this.eventUri == remoteUri)? true : false,
+                	//isOwn: (this.stateUri == remoteUri)? true : false,
                 }
             };
 
             // Using actionCreators like this means that every action defined there is available in the template.
-            connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.eventUri'], this);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.stateUri'], this);
         }
         
         acceptProposal() {
@@ -123,8 +133,8 @@ function genComponentConf() {
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
 
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate({draft: this.eventUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        	this.onUpdate({draft: this.stateUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
         }
       
         proposeToCancel() {
@@ -134,18 +144,44 @@ function genComponentConf() {
         	const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
-        	this.onUpdate({draft: this.eventUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        	this.onUpdate({draft: this.stateUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
         }
         
         acceptProposeToCancel() {
         	this.clicked = true;
-        	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
-        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
-
+        	var uri = this.cancelUri;
+        	if(!uri) {
+        		uri = this.message.get("remoteUri");
+        	}
+        	
+        	const msg = ("Accepted propose to cancel agreement: " + uri);
+        	const trimmedMsg = buildProposalMessage(uri, "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate({draft: this.eventUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.eventUri});
+        	this.onUpdate({draft: this.stateUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        }
+        
+        retractMessage() {
+        	this.clicked = true;
+        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
+        	const msg = ("Retract: " + uri);
+        	const trimmedMsg = buildModificationMessage(uri, "retracts", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
+        	this.onUpdate({draft: this.stateUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        }
+        
+        rejectMessage() {
+        	this.clicked = true;
+        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
+        	const msg = ("Reject message : " + uri);
+        	const trimmedMsg = buildProposalMessage(uri, "rejects", msg);
+        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
+        	this.onUpdate({draft: this.stateUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
         }
         
         checkDeclaration(declaration) {
@@ -154,7 +190,7 @@ function genComponentConf() {
         
         //TODO: delete
         show() {
-        	console.log("HERE we go: " + this.eventUri);
+        	console.log("HERE we go: " + this.stateUri);
         	console.log("My Text: " + this.message.get("text"));
         	console.log("My Outgoing: " + this.isOwn);        	
         }
@@ -167,7 +203,9 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-        	eventUri: "=",
+        	stateUri: "=",
+        	cancelUri: "=",
+        	ownCancel: "=",
         	agreementNumber: '=',
         	agreementDeclaration: '=',
         	connectionUri: '=',

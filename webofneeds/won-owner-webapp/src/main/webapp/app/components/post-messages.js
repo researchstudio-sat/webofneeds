@@ -46,6 +46,7 @@ const declarations = deepFreeze({
 const defaultAgreementData = deepFreeze({
 		agreementUris: new Set(),
 		pendingProposalUris: new Set(),
+		pendingProposals: new Set(),
 		acceptedCancellationProposalUris: new Set(),
 		cancellationPendingAgreementUris: new Set(),
 		pendingCancellationProposalUris: new Set(),
@@ -128,8 +129,8 @@ function genComponentConf() {
             		<span ng-if="!self.loading"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="agree in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
-	                event-uri="agree"
+	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
+	                state-Uri="agreement.stateUri"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
 	                connection-uri="self.connectionUri"
@@ -138,14 +139,16 @@ function genComponentConf() {
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
 	            <won-connection-agreement
-	            	ng-repeat="proptoc in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
-	                event-uri="proptoc"
+	            	ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
+	                state-Uri="proposeToCancel.stateUri"
+	                cancel-uri="self.getCancelUri(proposeToCancel.headUri)"
+	                own-cancel="self.checkOwnCancel(proposeToCancel.headUri)"
 	                agreement-number="self.agreementStateData.agreementUris.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
 	                on-update="self.showAgreementData = false;">
 	            </won-connection-agreement>
-	            <!-- /ProposeToCancel -->
+	            <!-- /ProposeToCancel -->           	
             	<!-- PROPOSALS -->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.pendingProposalUris.size">
             		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
@@ -155,8 +158,8 @@ function genComponentConf() {
             		<span ng-if="!self.loading.pendingProposalUris"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
-	            	ng-repeat="prop in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
-	                event-uri="prop"
+	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
+	                state-Uri="proposal.stateUri"
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.proposal"
 	                connection-uri="self.connectionUri"
@@ -257,8 +260,10 @@ function genComponentConf() {
             this.declarations = clone(declarations);
             
             this.agreementHeadData = this.cloneDefaultData();
-            this.agreementStateData = this.cloneDefaultData();
+            this.agreementStateData = this.cloneDefaultSateData();
            
+            
+            
             this.loading = false;
             
             this.showAgreementData = false;
@@ -283,7 +288,7 @@ function genComponentConf() {
                 	// TODO: Optimization
                 	//filter proposals
                 	for(msg of msgSet) {
-                		if(msg.get("isProposeMessage")){
+                		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
 	                		if(this.isOldAgreementMsg(msg)) {
 	                			msgSet.delete(msg);
 	                		} else {
@@ -423,7 +428,7 @@ function genComponentConf() {
         	}
         	
         	this.loading = true;
-        	this.agreementStateData = this.cloneDefaultData();
+        	this.agreementStateData = this.cloneDefaultSateData();
         	this.getAgreementDataUris();        	
         }
         
@@ -433,13 +438,15 @@ function genComponentConf() {
         	callAgreementsFetch(url)
     		.then(response => {
     			this.agreementHeadData = this.transformDataToSet(response);
-    			for(key in this.agreementHeadData) {
+    			var keySet = new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"])
+    			for(key of keySet) {
     				if(this.agreementHeadData.hasOwnProperty(key)) {
 	    				for(data of this.agreementHeadData[key]) {
 	    					this.addAgreementDataToSate(data, key);
         				}
     				}
     			}
+    			
     			this.loading = false;
     		}).catch(error => {
     				console.error('Error:', error);
@@ -452,6 +459,7 @@ function genComponentConf() {
         	var tmpAgreementData = {        	
         		agreementUris: new Set(response.agreementUris),
 	    		pendingProposalUris: new Set(response.pendingProposalUris),
+	    		pendingProposals: new Set(response.pendingProposals),
 	    		acceptedCancellationProposalUris: new Set(response.acceptedCancellationProposalUris),
 	    		cancellationPendingAgreementUris: new Set(response.cancellationPendingAgreementUris),
 	    		pendingCancellationProposalUris: new Set(response.pendingCancellationProposalUris),
@@ -473,27 +481,58 @@ function genComponentConf() {
         	return tmpAgreementData;
         }
         
-        addAgreementDataToSate(eventUri, key) {
+        addAgreementDataToSate(eventUri, key, obj) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
 			.then(response => {
 				won.wonMessageFromJsonLd(response)
 				.then(msg => {
-                    if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
+					var agreementObject = obj;
+					
+					if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
                         /*if we find out that the receiverneed of the crawled event is actually our
                         need we will call the method again but this time with the correct eventUri
                         */
-                        this.addAgreementDataToSate(msg.getRemoteMessageUri(), key);
+						if(!agreementObject) {
+							agreementObject = this.cloneDefaultAgreementObject();
+						}
+                    	agreementObject.headUri = msg.getMessageUri();
+                        this.addAgreementDataToSate(msg.getRemoteMessageUri(), key, agreementObject);
                     }else {
-                    	this.agreementStateData[key].add(eventUri);
+                    	if(!agreementObject) {
+                    		agreementObject = this.cloneDefaultAgreementObject();
+                    		agreementObject.headUri = msg.getMessageUri();
+                    	}
+                    	agreementObject.stateUri = msg.getMessageUri();
+                    	
+                    	this.agreementStateData[key].add(agreementObject);
                         this.messages__connectionMessageReceived(msg);     
                     }
                 })
 			})
         }
         
+        getCancelUri(agreementUri) {
+        	const pendingProposals = this.agreementHeadData.pendingProposals;
+        	for(prop of pendingProposals) {
+        		if(prop.proposesToCancel.includes(agreementUri)){
+        			return prop.uri;
+        		}
+        	}
+        	return undefined;
+        }
         
-        
+        checkOwnCancel(headUri) {
+        	const pendingProposals = this.agreementHeadData.pendingProposals;
+        	for(prop of pendingProposals) {
+        		if(prop.proposesToCancel.includes(headUri)){
+        			if(prop.proposingNeedUri === this.ownNeed.get("uri")) {
+        				return true;
+        			}
+        		}
+        	}
+        	return false;
+        }
         
         startLoading() {
         	this.loading.proposal = true;
@@ -516,7 +555,9 @@ function genComponentConf() {
 	        		aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
 	        		aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
 	        		aD.cancelledAgreementUris.has(msg.get("uri")) ||
-	        		aD.cancelledAgreementUris.has(msg.get("remoteUri"))) {
+	        		aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
+	        		aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
+	        		aD.acceptedCancellationProposalUris.has(msg.get("remoteUri"))) {
         		return true;
         	}
         	return false;
@@ -530,6 +571,7 @@ function genComponentConf() {
         	return defaultData = {
                 	agreementUris: new Set(),
     	    		pendingProposalUris: new Set(),
+    	    		pendingProposals: new Set(),
     	    		acceptedCancellationProposalUris: new Set(),
     	    		cancellationPendingAgreementUris: new Set(),
     	    		pendingCancellationProposalUris: new Set(),
@@ -537,6 +579,21 @@ function genComponentConf() {
     	    		rejectedMessageUris: new Set(),
     	    		retractedMessageUris: new Set(),
                 };
+        }
+        
+        cloneDefaultSateData() {
+        	return defaultStateData = {
+        		pendingProposalUris: new Set(),
+        		agreementUris: new Set(),
+        		cancellationPendingAgreementUris: new Set(),
+        	}
+        }
+        
+        cloneDefaultAgreementObject() {
+        	return agreementObject = {
+        			stateUri: undefined,
+        			headUri: undefined,
+        	}
         }
         
         sendRdfTmpDeletme() { //TODO move to own component
