@@ -4,154 +4,70 @@
     <won-owner-title-bar
             selection="self.selection"
             ng-if="self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
     </won-owner-title-bar>
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
             ng-if="!self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
     </won-visitor-title-bar>
 </header>
 <main class="ownerpostcontent">
-
-
     <!-- Post info view when there's no connection-state/-type selected -->
     <won-post-info ng-if="self.post" ng-show="!self.connectionType || !self.isOwnPost"></won-post-info>
 
-    <!-- Matches: -->
-    <won-matches ng-if="self.showMatches && self.isOwnPost"></won-matches>
-
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Suggested && !self.hasMatches">
+    <!-- No Connections: -->
+    <div class="opc__inner empty" 
+         ng-if="self.isOwnPost && self.connectionType && !self.hasConnections">
         <div class="opc__empty">
             <div class="opc__empty__description">
-                <svg class="opc__empty__description__icon"
-                    style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_match"></use>
-                </svg>
-                <span class="opc__empty__description__text">
-                    The matches to this need will be listed here.
-                    You cannot influence the matching process. It might take some time, or maybe there is nothing to
-                    be found for you, yet. Check back later!
-                </span>
-            </div>
-        </div>
-    </div>
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.Connected && !self.hasConversations">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
+                <!-- TODO: decide which icon should be used here -->
                 <svg class="opc__empty__description__icon"
                     style="--local-primary:#CCD2D2;">
                         <use href="#ico36_message"></use>
                 </svg>
-                <span class="opc__empty__description__text">
-                    You will be able to communicate with others once there are accepted chats. Accept a request or send requests and wait until the counterpart accepts it.
-                </span>
-            </div>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.RequestReceived})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_incoming"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Accept requests</span>
-            </a>
-        </div>
-    </div>
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestReceived && !self.hasReceivedRequests">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
-                <svg class="opc__empty__description__icon"
+                <!-- <svg class="opc__empty__description__icon"
                     style="--local-primary:#CCD2D2;">
                         <use href="#ico36_incoming"></use>
-                </svg>
+                </svg> -->
                 <span class="opc__empty__description__text">
-                    This view shows you all the incoming request for this specific need. Wait until someone tries to connect with you.
+                    TODO: Find a nice description text in case this is empty.
+                    Chats, incoming requests and sent requests go here.
                 </span>
             </div>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Connected})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_message"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Go to chats</span>
-            </a>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Suggested})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_match"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Go to matches</span>
-            </a>
-        </div>
-    </div>
-    <div class="opc__inner empty" ng-if="self.isOwnPost && self.connectionType === self.won.RequestSent && !self.hasSentRequests">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
-                <svg class="opc__empty__description__icon"
-                    style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_outgoing"></use>
-                </svg>
-                <span class="opc__empty__description__text">
-                    This view shows you all your sent requests for this specific need. Connect with a match to see it here.
-                </span>
-            </div>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Connected})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_message"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Go to chats</span>
-            </a>
-            <a ng-click="self.router__stateGoCurrent({connectionType: self.won.Suggested})" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_match"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Go to matches</span>
-            </a>
         </div>
     </div>
 
     <!-- left column for connection-typed tabs -->
-    <won-connection-selection
-            class="owner__messages"
-            ng-if="self.isOwnPost && self.showConnectionSelection && (
-                      (connectionTypeInParams === won.WON.Connected && self.hasConversations)
-                   || (connectionTypeInParams === won.WON.RequestReceived && self.hasReceivedRequests)
-                   || (connectionTypeInParams === won.WON.RequestSent && self.hasSentRequests)
-            )"
-            connection-type="self.connectionType"
-            on-selected-connection="self.openConnection(connectionUri)"
-            ng-class="{'hidden' : self.connectionUri !== undefined}"
-            >
-    </won-connection-selection>
+    <div class="post__listside"
+        ng-if="self.isOwnPost && self.connectionType && self.hasConnections"
+        ng-class="{'hidden' : self.connectionUri !== undefined}"
+    >
+        <!-- Chats -->
+        <won-connection-selection
+                class="owner__messages"
+                ng-if="self.hasConnections"
+                on-selected-connection="self.openConnection(connectionUri)"
+                >
+        </won-connection-selection>
+    </div>
+ 
     <!-- /left column -->
 
     <!-- right column -->
-    <!-- Conversations: -->
-    <div
-        class="post-messages"
-        ng-if="self.post && self.connectionOpen"
-        ng-class="{'post-messages--connected': self.showConversationDetails}"
-        ng-show="self.showConversationDetails && self.isOwnPost">
-            <won-post-messages></won-post-messages>
+    <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionOpen && self.hasConnections && self.actualConnectionType !== self.WON.Closed">
+        <won-post-messages ng-if="self.actualConnectionType === self.WON.Connected"></won-post-messages>
+        <won-open-request ng-if="self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent"></won-open-request>
+        <won-send-request ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
     </div>
-
-    <!-- Incoming Requests: -->
-    <div
-        class="post-messages"
-        ng-if="self.post && self.connectionOpen"
-        ng-show="self.showIncomingRequestDetails && self.isOwnPost">
-            <won-open-request></won-open-request>
+    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)"
+        ng-class="{'hidden' : self.connectionUri === undefined}">
+        <span class="post__contentside__description__text">
+            No Element selected
+        </span>
     </div>
-
-    <!-- Sent Requests: -->
-    <div
-        class="post-messages"
-        ng-if="self.post && self.connectionOpen"
-        ng-show="self.showSentRequestDetails && self.isOwnPost && self.connectionOpen">
-            <won-open-request></won-open-request>
-    </div>
+    
     <!-- /right column -->
     <a class="curtain" ng-if="!self.isOwnPost && self.sendAdHocRequest"></a>
     <div class="post__sendrequest" ng-if="!self.isOwnPost && self.sendAdHocRequest">

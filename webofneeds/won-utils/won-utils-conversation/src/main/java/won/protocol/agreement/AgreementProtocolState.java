@@ -1,24 +1,43 @@
 package won.protocol.agreement;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
+import won.protocol.agreement.effect.ProposalType;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WONAGR;
-
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 
 public class AgreementProtocolState {
@@ -28,6 +47,7 @@ public class AgreementProtocolState {
 	private final Dataset agreements = DatasetFactory.createGeneral();
 	private final Dataset cancelledAgreements = DatasetFactory.createGeneral();
 	private final Dataset rejected = DatasetFactory.createGeneral();
+	private Dataset conversation = null;
 	private final Set<URI> retractedUris = new HashSet<URI>();
 	private final Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
 	private Map<URI, ConversationMessage> messagesByURI = new HashMap<>();
@@ -51,15 +71,57 @@ public class AgreementProtocolState {
 		AgreementProtocolUris uris = new AgreementProtocolUris();
 		uris.addAgreementUris(getAgreementUris());
 		uris.addAcceptedCancellationProposalUris(getAcceptedCancellationProposalUris());
-		uris.addCancellationPendingAgreementUris(getCancellationPendingAgreementUris());
+		
 		uris.addCancelledAgreementUris(getCancelledAreementUris());
-		uris.addPendingCancellationProposalUris(getPendingCancellationProposalUris());
-		uris.addPendingProposalUris(getPendingProposalUris());
+		
+		//walk over pending proposals and collect the relevant uris:
+		messagesByURI.values()
+			.stream()
+			.filter(m -> isPendingProposal(m.getMessageURI()))
+			.forEach(m -> {
+				
+				Set<URI> cancelled = 
+						m.getEffects().stream()
+						.filter(e -> e.isProposes())
+						.map(e -> e.asProposes())
+						.flatMap(e -> e.getProposesToCancel().stream())
+						.filter(this::isAgreement)
+						.collect(Collectors.toSet());
+			
+				Set<URI> proposed = m.getEffects().stream()
+						.filter(e -> e.isProposes())
+						.map(e -> e.asProposes())
+						.flatMap(e -> e.getProposes().stream())
+						.collect(Collectors.toSet());
+						
+				uris.addCancellationPendingAgreementUris(cancelled);
+				boolean isProposal = false;
+				if (!cancelled.isEmpty()) {
+					uris.addPendingCancellationProposalUri(m.getMessageURI());
+					isProposal = true;
+				}
+				if (!proposed.isEmpty()) {
+					uris.addPendingProposalUri(m.getMessageURI());
+					isProposal = true;
+				}
+				if (isProposal) {
+					ProposalUris proposal = new ProposalUris(m.getMessageURI(), m.getSenderNeedURI());
+					proposal.addProposes(proposed);
+					proposal.addProposesToCancel(cancelled);
+					uris.addPendingProposal(proposal);
+				}
+			});
+		
 		uris.addRejectedMessageUris(getRejectedUris());
 		uris.addRetractedMessageUris(getRetractedUris());
+		
 		return uris;
 	}
 	
+	
+	public Dataset getConversationDataset() {
+		return this.conversation;
+	}
 	/**
 	 * Returns the set of effects (<code>MessageEffect</code>s) of the head of the delivery
 	 * chain that the specified message belongs to, or an empty set if no message is
@@ -85,6 +147,10 @@ public class AgreementProtocolState {
 		return agreements.getNamedModel(agreementURI.toString());
 	}
 	
+	public boolean isAgreement(URI agreementUri) {
+		return agreements.containsNamedModel(agreementUri.toString());
+	}
+	
 	public Dataset getPendingProposals() {
 		return pendingProposals;
 	}
@@ -93,8 +159,55 @@ public class AgreementProtocolState {
 		return pendingProposals.getNamedModel(proposalURI.toString());
 	}
 	
-	public Model getProposals(URI proposalURI) {
-		return pendingProposals.getNamedModel(proposalURI.toString());
+	public boolean isPendingProposal(URI proposalUri) {
+		return pendingProposals.containsNamedModel(proposalUri.toString()) || isPendingCancellation(proposalUri);
+	}
+	
+	public Set<URI> getPendingProposalUris(){
+		Set<URI> uris = RdfUtils.getGraphUris(pendingProposals);
+		uris.addAll(getPendingCancellationProposalUris());
+		return uris;
+	}
+	
+	public Set<URI> getClauseUrisProposedByPendingProposal(URI proposalUri){
+		if (!isPendingProposal(proposalUri)) {
+			return Collections.EMPTY_SET;
+		}
+		ConversationMessage msg = messagesByURI.get(proposalUri);
+		return msg.getEffects()
+				.stream().filter(e -> e.isProposes())
+				.map(e -> e.asProposes())
+				.filter(e -> e.hasClauses())
+				.flatMap(e -> e.getProposes().stream())
+				.collect(Collectors.toSet());
+	}
+	
+	public Set<URI> getAgreementUrisCancelledByPendingProposal(URI proposalUri){
+		if (!isPendingProposal(proposalUri)) {
+			return Collections.EMPTY_SET;
+		}
+		ConversationMessage msg = messagesByURI.get(proposalUri);
+		return msg.getEffects()
+				.stream().filter(e -> e.isProposes())
+				.map(e -> e.asProposes())
+				.filter(e -> e.hasCancellations())
+				.flatMap(e -> e.getProposesToCancel().stream())
+				.collect(Collectors.toSet());
+	}
+
+	
+	public Set<URI> getPendingCancellationProposalUris(){
+		Model cancellations = pendingProposals.getDefaultModel();
+		if (cancellations == null) {
+			return Collections.EMPTY_SET;
+		}
+		Set ret = new HashSet<URI>();
+		ResIterator it = cancellations.listSubjectsWithProperty(WONAGR.PROPOSES_TO_CANCEL);
+		while(it.hasNext()) {
+			String uri = it.next().asResource().getURI();
+			ret.add(URI.create(uri));
+		}
+		return ret;
 	}
 	
 	public Dataset getCancelledAgreements() {
@@ -105,6 +218,10 @@ public class AgreementProtocolState {
 		return cancelledAgreements.getNamedModel(cancelledAgreementURI.toString());
 	}
 	
+	public boolean isCancelledAgreement(URI agreementUri) {
+		return cancelledAgreements.containsNamedModel(agreementUri.toString());
+	}
+	
 	public Dataset getRejectedProposals() {
 		return rejected;
 	}
@@ -113,18 +230,21 @@ public class AgreementProtocolState {
 		return rejected.getNamedModel(rejectedProposalURI.toString());
 	}
 	
+	public boolean isRejectedProposal(URI rejectedProposalUri) {
+		return rejected.containsNamedModel(rejectedProposalUri.toString());
+	}
+	
 	public Model getPendingCancellations() {
 		return pendingProposals.getDefaultModel();
 	}
 	
+	public boolean isPendingCancellation(URI proposalUri) {
+		return pendingProposals.getDefaultModel().contains(new ResourceImpl(proposalUri.toString()), WONAGR.PROPOSES_TO_CANCEL, (RDFNode) null);
+	}
 	
 	public Set<URI> getAgreementUris(){
 		return RdfUtils.getGraphUris(agreements);		
 	}
-	
-	public Set<URI> getPendingProposalUris(){
-		return RdfUtils.getGraphUris(pendingProposals);		
-	}	
 	
 	public Set<URI> getCancelledAreementUris(){
 		return RdfUtils.getGraphUris(cancelledAgreements);		
@@ -152,22 +272,41 @@ public class AgreementProtocolState {
 		return ret;
 	}
 	
-	public Set<URI> getPendingCancellationProposalUris(){
-		Model cancellations = pendingProposals.getDefaultModel();
-		if (cancellations == null) {
-			return Collections.EMPTY_SET;
-		}
-		Set ret = new HashSet<URI>();
-		ResIterator it = cancellations.listSubjectsWithProperty(WONAGR.PROPOSES_TO_CANCEL);
-		while(it.hasNext()) {
-			String uri = it.next().asResource().getURI();
-			ret.add(URI.create(uri));
-		}
-		return ret;
-	}
+	
 	
 	public Set<URI> getRejectedUris(){
 		return RdfUtils.getGraphUris(rejected);		
+	}
+	
+	
+	/**
+	 * Returns the n latest messages filtered by the specified predicate, sorted descending by order (latest first).
+	 * @param filterPredicate
+	 * @param n use 0 for the latest message.
+	 * @return
+	 */
+	private Stream<ConversationMessage> getMessagesAsOrderedStream(java.util.function.Predicate<ConversationMessage> filterPredicate) {
+		return deliveryChains.stream()
+				.map(m -> m.getHead())
+				.filter(x -> filterPredicate.test(x))
+				.sorted((x1,x2) -> x2.getOrder() - x1.getOrder());
+	}
+	
+	/**
+	 * Returns the n latest message uris filtered by the specified predicate, sorted descending by order (latest first).
+	 * @param filterPredicate
+	 * @param n use 0 for the latest message.
+	 * @return
+	 */
+	public List<URI> getNLatestMessageUris(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
+		List<URI> uris = getMessagesAsOrderedStream(filterPredicate)
+				.map(m -> m.getMessageURI())
+				.collect(Collectors.toList());
+		if (uris.size() > n) {
+			return uris.subList(0,n);
+		} else {
+			return uris;
+		}
 	}
 	
 	/**
@@ -177,12 +316,7 @@ public class AgreementProtocolState {
 	 * @return
 	 */
 	public URI getNthLatestMessage(java.util.function.Predicate<ConversationMessage> filterPredicate, int n) {
-		List<URI> uris = deliveryChains.stream()
-				.map(x -> x.getHead())
-				.filter(x -> filterPredicate.test(x))
-				.sorted((x1,x2) -> x2.getOrder() - x1.getOrder())
-				.map(x -> x.getMessageURI())
-				.collect(Collectors.toList());
+		List<URI> uris = getNLatestMessageUris(filterPredicate, n+1);
 		if (uris.size() > n) {
 			return uris.get(n);
 		} else {
@@ -194,12 +328,13 @@ public class AgreementProtocolState {
 		logger.debug(
 				n + "-th latest message "
 				+ (type == null ? "" : "of type " + type ) 
-				+ " sent by " + needUri + ": " 
+				+ ( needUri == null ? "" : " sent by " + needUri ) 
+				+ ": " 
 				+ ( result == null ? " none found" : needUri ));
 	}
 	
 	public URI getLatestMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -207,15 +342,26 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getNthLatestMessageSentByNeed(URI needUri, int n) {
-		URI uri = getNthLatestMessage(x -> needUri.equals(x.getSenderNeedURI()), n);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()), n);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(n, needUri, null, uri);
 		}
 		return uri;
 	}
 	
-	public URI getLatestProposeMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isProposesMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+	public URI getLatestProposesMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isProposesMessage() && m.getEffects().stream().anyMatch(e->e.isProposes()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	public URI getLatestPendingProposesMessageSentByNeed(URI needUri) {
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isProposesMessage() && m.getEffects().stream().anyMatch(e->e.isProposes()
+						&& isPendingProposal(m.getMessageURI())), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -223,23 +369,84 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestAcceptsMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isAcceptsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isAcceptsMessage() && m.getEffects().stream().anyMatch(e->e.isAccepts()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
 		return uri;
 	}
 	
+	public URI getLatestAgreement() {
+		return getLatestAgreement(Optional.empty());
+	}
+	
+	public URI getLatestAgreement(Optional<URI> senderNeedUri) {
+		Optional<ConversationMessage> acceptMsgOpt = getMessagesAsOrderedStream(
+				m -> m.isAcceptsMessage() && 
+				(! senderNeedUri.isPresent() || senderNeedUri.get().equals(m.getSenderNeedURI())) &&
+				m.getEffects()
+					.stream()
+					.filter(e->e.isAccepts())
+					.map(e -> e.asAccepts())
+					.map(a -> a.getAcceptedMessageUri())
+					.anyMatch(this::isAgreement)).findFirst();
+		if (!acceptMsgOpt.isPresent()) {
+			return null;
+		}
+		return acceptMsgOpt.get().getEffects()
+				.stream()
+				.map(e -> e.asAccepts().getAcceptedMessageUri())
+				.filter(this::isAgreement)
+				.findFirst().get();
+	}
+	
+	public URI getLatestAcceptsMessage() {
+		URI uri = getNthLatestMessage(m ->  
+				m.isAcceptsMessage() && m.getEffects().stream().anyMatch(e->e.isAccepts()), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, null, null, uri);
+		}
+		return uri;
+	}
+	
+	
 	public URI getLatestProposesToCancelMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isProposesToCancelMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isProposesToCancelMessage() && m.getEffects().stream().anyMatch(e->e.isProposes() && e.asProposes().hasCancellations()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
+		}
+		return uri;
+	}
+	
+	
+	public URI getLatestPendingProposal() {
+		return getLatestPendingProposal(Optional.empty(), Optional.empty());
+	}
+	
+	public URI getLatestPendingProposal(Optional<ProposalType> type) {
+		return getLatestPendingProposal(type, Optional.empty());
+	}
+	
+	public URI getLatestPendingProposal(Optional<ProposalType> type, Optional<URI> senderNeedUri) {
+		URI uri = getNthLatestMessage(
+				m -> (m.isProposesMessage() || m.isProposesToCancelMessage()) &&
+				(! senderNeedUri.isPresent() || senderNeedUri.get().equals(m.getSenderNeedURI())) && 
+				m.getEffects()
+					.stream()
+					.filter(e->e.isProposes() && (!type.isPresent() || e.asProposes().getProposalType() == type.get()))
+					.map(e -> e.getMessageUri())
+					.anyMatch(msgUri -> isPendingProposal(msgUri) || isPendingCancellation(msgUri)), 0);
+		if (logger.isDebugEnabled()) {
+			logNthLatestMessage(0, senderNeedUri.orElse(null), null, uri);
 		}
 		return uri;
 	}
 	
 	public URI getLatestRejectsMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isRejectsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isRejectsMessage() && m.getEffects().stream().anyMatch(e->e.isRejects()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
@@ -247,11 +454,34 @@ public class AgreementProtocolState {
 	}
 	
 	public URI getLatestRetractsMessageSentByNeed(URI needUri) {
-		URI uri = getNthLatestMessage(x -> x.isRetractsMessage() && needUri.equals(x.getSenderNeedURI()), 0);
+		URI uri = getNthLatestMessage(m -> needUri.equals(m.getSenderNeedURI()) 
+				&& m.isRetractsMessage() && m.getEffects().stream().anyMatch(e->e.isRetracts()), 0);
 		if (logger.isDebugEnabled()) {
 			logNthLatestMessage(0, needUri, null, uri);
 		}
 		return uri;
+	}
+	
+	/**
+	 * Returns all text messages found in the head of the delivery chain of the specified message, concatenated by ', '.
+	 * @param messageUri
+	 * @return
+	 */
+	public Optional<String> getTextMessage(URI messageUri) {
+		ConversationMessage msg = messagesByURI.get(messageUri);
+		if (msg == null) {
+			return Optional.empty();
+		}
+		ConversationMessage head = msg.getDeliveryChain().getHead();
+		if (head == null) {
+			return Optional.empty();
+		}
+		return head.getContentGraphs()
+			.stream()
+			.flatMap(contentGraphURI -> WonRdfUtils.MessageUtils.getTextMessages(
+							conversation.getNamedModel(contentGraphURI.toString()), 
+							head.getMessageURI()).stream())
+			.reduce((msg1, msg2) -> msg1 + ", " + msg2);
 	}
 	
 	/**
@@ -358,7 +588,7 @@ public class AgreementProtocolState {
 				
 
 		//apply acknowledgment protocol to whole conversation first:
-		Dataset conversation = acknowledgedSelection(conversationDataset, messages);
+		conversation = acknowledgedSelection(conversationDataset, messages);
 		
 		//on top of this, apply modification and agreement protocol on a per-message basis, starting with the root(s)
 		

@@ -136,7 +136,18 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         this.randomNumberService = randomNumberService;
     }
 
+    /**
+     * Returns a random string that does not start with a number.
+     * We do this so that we generate URIs for which prefixing will always work with N3.js
+     * https://github.com/RubenVerborgh/N3.js/issues/121
+     * 
+     * @return
+     */
     private String generateRandomID() {
-        return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
+    	String id = null;
+    	do {
+    		id = randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
+    	} while (Character.isDigit(id.charAt(0)));
+    	return id;
     }
 }

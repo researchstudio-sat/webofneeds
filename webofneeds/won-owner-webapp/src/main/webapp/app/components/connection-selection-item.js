@@ -28,7 +28,7 @@ function genComponentConf() {
       ng-class="self.isOpen() ? 'selected' : ''">
         <won-post-header
           need-uri="self.theirNeed.get('uri')"
-          timestamp="self.theiNeed.get('creationDate')"
+          timestamp="self.lastUpdateTimestamp"
           ng-click="self.setOpen()"
           class="clickable">
         </won-post-header>
@@ -36,26 +36,6 @@ function genComponentConf() {
         <div class="conn__unreadCount">
           {{ self.unreadCount }}
         </div>
-
-        <svg class="conn__icon clickable"
-            style="--local-primary:#CCD2D2;"
-            ng-click="self.settingsOpen = true">
-                <use href="#ico_settings"></use>
-        </svg>
-      </div>
-
-      <div class="conn__contextmenu"
-        ng-show="self.settingsOpen">
-          <svg class="conn__icon clickable" 
-            style="--local-primary:black;"
-            ng-click="self.settingsOpen = false">
-                <use href="#ico_settings"></use>
-          </svg>
-          <button
-            class="won-button--filled thin red"
-            ng-click="self.closeConnection()">
-              Close Connection
-          </button>
       </div>
     `;
 
@@ -73,7 +53,10 @@ function genComponentConf() {
                 const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 return {
+                    ownNeed,
+                    connection,
                     openConnectionUri: selectOpenConnectionUri(state),
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     theirNeed,
                     unreadCount: undefined //TODO: WHAT SHOULD BE HERE?
                 }
@@ -86,13 +69,20 @@ function genComponentConf() {
         }
 
         setOpen() {
+            this.markAsRead();
             this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
         }
 
-        closeConnection() {
-            this.settingsOpen = false;
-            this.connections__close(this.connectionUri);
+        markAsRead(){
+            if(this.connection && this.connection.get("newConnection")){
+                const payload = {
+                    connectionUri: this.connection.get("uri"),
+                    needUri: this.ownNeed.get("uri")
+                };
+
+                this.connections__markAsRead(payload);
+            }
         }
     }
     Controller.$inject = serviceDependencies;

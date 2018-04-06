@@ -2,96 +2,116 @@ package won.protocol.agreement;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 public class AgreementProtocolUris {
-	private Set<URI> retracted = new HashSet<URI>();
-	private Set<URI> rejected = new HashSet<URI>();
-	private Set<URI> agreements = new HashSet<URI>();
-	private Set<URI> pendingProposals = new HashSet<URI>();
-	private Set<URI> cancelledAgreements = new HashSet<URI>();
-	private Set<URI> cancellationPendingAgreements = new HashSet<URI>();
-	private Set<URI> pendingCancellationProposals = new HashSet<URI>();
-	private Set<URI> acceptedCancellationProposals = new HashSet<URI>();
+	private Set<URI> retractedUris = new HashSet<URI>();
+	private Set<URI> rejectedUris = new HashSet<URI>();
+	private Set<URI> agreementUris = new HashSet<URI>();
+	private Set<URI> pendingProposalUris = new HashSet<URI>();
+	private Set<URI> cancelledAgreementUris = new HashSet<URI>();
+	private Set<URI> cancellationPendingAgreementUris = new HashSet<URI>();
+	private Set<URI> pendingCancellationProposalUris = new HashSet<URI>();
+	private Set<URI> acceptedCancellationProposalUris = new HashSet<URI>();
+	private Set<ProposalUris> pendingProposals = new HashSet<ProposalUris>();
 	
 	public AgreementProtocolUris() {
 	
 	}
 	
 	public void addRetractedMessageUris(Collection<URI> uris) {
-		this.retracted.addAll(uris);
+		this.retractedUris.addAll(uris);
 	}
 	
 	public void addRejectedMessageUris(Collection<URI> uris) {
-		this.rejected.addAll(uris);
+		this.rejectedUris.addAll(uris);
 	}
 	
 	public void addAgreementUris(Collection<URI> uris) {
-		this.agreements.addAll(uris);
+		this.agreementUris.addAll(uris);
 	}
 	
 	public void addPendingProposalUris(Collection<URI> uris) {
-		this.pendingProposals.addAll(uris);
+		this.pendingProposalUris.addAll(uris);
 	}
 	
+	public void addPendingProposalUri(URI uri) {
+		this.pendingProposalUris.add(uri);
+	}
+	
+	public void addPendingProposal(ProposalUris proposal) {
+		this.pendingProposals.add(proposal);
+	}
+
+	
 	public void addCancelledAgreementUris(Collection<URI> uris) {
-		this.cancelledAgreements.addAll(uris);
+		this.cancelledAgreementUris.addAll(uris);
 	}
 	
 	public void addCancellationPendingAgreementUris(Collection<URI> uris) {
-		this.cancellationPendingAgreements.addAll(uris);
+		this.cancellationPendingAgreementUris.addAll(uris);
 	}
 	
 	public void addPendingCancellationProposalUris(Collection<URI> uris) {
-		this.pendingCancellationProposals.addAll(uris);
+		this.pendingCancellationProposalUris.addAll(uris);
+	}
+	
+	public void addPendingCancellationProposalUri(URI uri) {
+		this.pendingCancellationProposalUris.add(uri);
 	}
 	
 	public void addAcceptedCancellationProposalUris(Collection<URI> uris) {
-		this.acceptedCancellationProposals.addAll(uris);
+		this.acceptedCancellationProposalUris.addAll(uris);
 	}
 
 	public Set<URI> getRetractedMessageUris() {
-		return retracted;
+		return retractedUris;
 	}
 
 	public Set<URI> getRejectedMessageUris() {
-		return rejected;
+		return rejectedUris;
 	}
 
 	public Set<URI> getAgreementUris() {
-		return agreements;
+		return agreementUris;
 	}
 
 	public Set<URI> getPendingProposalUris() {
-		return pendingProposals;
+		return pendingProposalUris;
 	}
 
 	public Set<URI> getCancelledAgreementUris() {
-		return cancelledAgreements;
+		return cancelledAgreementUris;
 	}
 
 	public Set<URI> getCancellationPendingAgreementUris() {
-		return cancellationPendingAgreements;
+		return cancellationPendingAgreementUris;
 	}
 
 	public Set<URI> getPendingCancellationProposalUris() {
-		return pendingCancellationProposals;
+		return pendingCancellationProposalUris;
 	}
 
 	public Set<URI> getAcceptedCancellationProposalUris() {
-		return acceptedCancellationProposals;
+		return acceptedCancellationProposalUris;
+	}
+	
+	public Set<ProposalUris> getPendingProposals(){
+		return pendingProposals;
 	}
 
 	@Override
 	public String toString() {
-		return "AgreementProtocolUris [retracted=" + retracted + ", rejected=" + rejected + ", agreements=" + agreements
-				+ ", pendingProposals=" + pendingProposals + ", cancelledAgreements=" + cancelledAgreements
-				+ ", cancellationPendingAgreements=" + cancellationPendingAgreements + ", pendingCancellationProposals="
-				+ pendingCancellationProposals + ", acceptedCancellationProposals=" + acceptedCancellationProposals
+		return "AgreementProtocolUris [retracted=" + retractedUris + ", rejected=" + rejectedUris + ", agreements=" + agreementUris
+				+ ", pendingProposals=" + pendingProposalUris + ", cancelledAgreements=" + cancelledAgreementUris
+				+ ", cancellationPendingAgreements=" + cancellationPendingAgreementUris + ", pendingCancellationProposals="
+				+ pendingCancellationProposalUris + ", acceptedCancellationProposals=" + acceptedCancellationProposalUris
 				+ "]";
 	}
-
-	
 	
 }

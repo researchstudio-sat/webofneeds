@@ -1,8 +1,35 @@
 package won.protocol.util;
 
+import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
+import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
+import static won.protocol.util.RdfUtils.visit;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
@@ -13,6 +40,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
@@ -21,15 +49,11 @@ import won.protocol.model.Match;
 import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.vocabulary.*;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import static won.protocol.util.RdfUtils.*;
+import won.protocol.vocabulary.SFSIG;
+import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONAGR;
+import won.protocol.vocabulary.WONMOD;
+import won.protocol.vocabulary.WONMSG;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
@@ -375,6 +399,24 @@ public class WonRdfUtils
         return stmt.getObject().asLiteral().getLexicalForm();
       }
       return null;
+    }
+    
+    /**
+     * Returns all won:hasTextMessage objects, or an empty set if none is found. The specified model has to be a
+     * message's content graph.
+     * @param model
+     * @return
+     */
+    public static Set<String> getTextMessages(Model model, URI messageUri){
+      Set<String> ret = new HashSet<>();
+      StmtIterator stmtIt = model.listStatements(model.getResource(messageUri.toString()), WON.HAS_TEXT_MESSAGE, (RDFNode) null);
+      while(stmtIt.hasNext()) {
+    	  RDFNode node = stmtIt.next().getObject();
+    	  if (node.isLiteral()) {
+    		  ret.add(node.asLiteral().getLexicalForm());
+    	  }
+      }
+      return ret;
     }
 
 

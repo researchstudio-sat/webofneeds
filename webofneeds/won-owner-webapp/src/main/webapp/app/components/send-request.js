@@ -4,6 +4,8 @@ import angular from 'angular';
 import 'ng-redux';
 import postContentModule from './post-content.js';
 import postHeaderModule from './post-header.js';
+import feedbackGridModule from './feedback-grid.js';
+
 import {
     selectOpenPostUri,
     selectNeedByConnectionUri,
@@ -19,41 +21,47 @@ import { actionCreators }  from '../actions/actions.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 
+
 function genComponentConf() {
     let template = `
-      <div class="sr__caption">
-        <div class="sr__caption__title">Send Conversation Request</div>
+      <div class="request__header">
         <a ng-click="self.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null})"
             class="clickable">
-          <img
-            class="sr__caption__icon clickable"
-            src="generated/icon-sprite.svg#ico36_close"/>
+            <svg style="--local-primary:var(--won-primary-color);"
+              class="request__header__icon clickable">
+                <use href="#ico36_close"></use>
+            </svg>
         </a>
+
+        <won-post-header
+            need-uri="self.postUriToConnectTo"
+            timestamp="self.lastUpdateTimestamp"
+            hide-image="::true">
+        </won-post-header>
       </div>
 
-      <won-post-header
-        need-uri="self.postUriToConnectTo">
-      </won-post-header>
-
-      <won-post-content
+      <won-post-content class="request__content"
         need-uri="self.postUriToConnectTo">
       </won-post-content>
 
-      <div class="sr__footer">
+      <div class="request__footer">
+        <won-feedback-grid ng-if="!self.sendAdHocRequest && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
         <input
           type="text"
+          ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
           ng-model="self.message"
           placeholder="Request Message (optional)"/>
-        <div class="flexbuttons">
+        <div class="flexbuttons" ng-if="self.sendAdHocRequest || self.connection.get('isRated')">
           <button
+            ng-if="!self.sendAdHocRequest"
             class="won-button--filled black"
-            ng-click="self.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null})">
-              Cancel
+            ng-click="self.closeRequest()">
+              Remove
           </button>
           <button
             class="won-button--filled red"
             ng-click="self.sendRequest(self.message)">
-              Chat
+              Send Request
           </button>
         </div>
         <a target="_blank"
@@ -78,12 +86,14 @@ function genComponentConf() {
                 const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
                 const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-
                 const postUriToConnectTo = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
 
                 return {
+                    connection,
+                    connectionUri,
                     ownNeed,
                     sendAdHocRequest,
+                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
                 }
@@ -109,8 +119,13 @@ function genComponentConf() {
                 		this.connectionUri,
                 		this.ownNeed.getIn(['connections',this.connectionUri]).get("remoteNeedUri"), 
                 		message);
-                this.router__stateGoCurrent({connectionUri: null})
+                this.router__stateGoCurrent({connectionUri: this.connectionUri})
             }
+        }
+
+        closeRequest(){
+            this.connections__close(this.connectionUri);
+            this.router__stateGoCurrent({connectionUri: null});
         }
     }
     Controller.$inject = serviceDependencies;
@@ -128,6 +143,7 @@ function genComponentConf() {
 export default angular.module('won.owner.components.sendRequest', [
     postContentModule,
     postHeaderModule,
+    feedbackGridModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;

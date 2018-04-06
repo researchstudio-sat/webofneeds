@@ -37,6 +37,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.path.Path;
@@ -110,12 +112,18 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 	@Override
 	public Dataset getDataForResource(URI resource) {
 
-		assert resource != null : "resource must not be null";
+		if (resource == null) {
+			throw new IllegalArgumentException("resource must not be null");
+		}
 
 		logger.debug("fetching linked data for URI {}", resource);
 		Dataset dataset = DatasetFactory.createGeneral();
 		try {
 			dataset = linkedDataRestClient.readResourceData(resource);
+			if (logger.isDebugEnabled()) {
+				logger.debug("fetched resource {}:", resource);
+				RDFDataMgr.write(System.out, dataset, Lang.TRIG);
+			}			
 		} catch (Exception e) {
 			logger.debug(String.format("Couldn't fetch resource %s", resource), e);
 		}
@@ -124,12 +132,18 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 
 	@Override
 	public Dataset getDataForResource(final URI resource, final URI requesterWebID) {
-		assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
-
+		if (resource == null || requesterWebID == null) {
+			throw new IllegalArgumentException("resource and requester must not be null");
+		}
+		
 		logger.debug("fetching linked data for URI {} requester {}", resource, requesterWebID);
 		Dataset dataset = DatasetFactory.createGeneral();
 		try {
 			dataset = linkedDataRestClient.readResourceData(resource, requesterWebID);
+			if (logger.isDebugEnabled()) {
+				logger.debug("fetched resource {} with requesterWebId {}:", resource, requesterWebID);
+				RDFDataMgr.write(System.out, dataset, Lang.TRIG);
+			}
 		} catch (Exception e) {
 			logger.debug(String.format("Couldn't fetch resource %s", resource), e);
 		}
@@ -245,16 +259,36 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 	 */
 	private Set<URI> getURIsToCrawlWithPropertyPath(Dataset dataset, URI resourceURI, Set<URI> excludedUris,
 			List<Path> properties) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("evaluating property paths on data crawled so far");
+			RDFDataMgr.write(System.out, dataset, Lang.TRIG);
+		}
 		Set<URI> toCrawl = new HashSet<URI>();
-		for (int i = 0; i < properties.size(); i++) {
-			Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset, resourceURI, properties.get(i));
+		properties.stream().forEach(path -> {
+			Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset, resourceURI, path);
+			if (!newURIs.hasNext()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("found no uris starting at {}, using path {}", new Object[] {resourceURI, path});
+				}
+				return;
+			}
+			Set<URI> newUrisThisIteration = new HashSet<URI>();
+			int skipped = 0;
 			while (newURIs.hasNext()) {
 				URI newUri = newURIs.next();
-				if (!excludedUris.contains(newUri)) {
-					toCrawl.add(newUri);
+				boolean skip = excludedUris.contains(newUri);
+				if (skip){
+					skipped++;
+				} else {
+					newUrisThisIteration.add(newUri);
+				}
+				if (logger.isDebugEnabled()) {
+					logger.debug("found uri {} starting at {}, using path {}, will {} ", new Object[] {newUri, resourceURI, path, skip ? "skip" : "fetch"});
 				}
 			}
-		}
+			toCrawl.addAll(newUrisThisIteration);
+		});
+		
 		return toCrawl;
 	}
 

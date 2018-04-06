@@ -3,7 +3,7 @@
 @import 'square-image';
 
 won-connection-message {
-    margin: 0.5rem 0;
+    padding: 0.5rem 1rem;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: grid;
     grid-template-areas: "icon content";
@@ -61,11 +61,9 @@ won-connection-message {
             }
         }
 
-        &:not(.won-cm__center--nondisplayable) {
-            .won-cm__center__bubble {
-                background-color: $won-light-gray; // like the error toast-notifications
-                color: black;
-            }
+        .won-cm__center__bubble {
+            background-color: $won-light-gray; // like the error toast-notifications
+            color: black;
         }
 
         &__trig {

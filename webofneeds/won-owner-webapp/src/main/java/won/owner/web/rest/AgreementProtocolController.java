@@ -23,6 +23,7 @@ import won.protocol.agreement.AgreementProtocolUris;
 import won.protocol.agreement.IncompleteConversationDataException;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.AuthenticationThreadLocal;
+import won.protocol.util.WonConversationUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -106,59 +107,14 @@ public class AgreementProtocolController {
 		return new ResponseEntity<>(uris, HttpStatus.OK);
 	}
 
-	private Dataset getConversationDataset(URI connectionUri) {
+	private AgreementProtocolState getAgreementProtocolState(URI connectionUri) {
 		try {
 			AuthenticationThreadLocal.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
-			return WonLinkedDataUtils.getConversationAndNeedsDataset(connectionUri, linkedDataSourceOnBehalfOfNeed);
+			return WonConversationUtils.getAgreementProtocolState(connectionUri, linkedDataSourceOnBehalfOfNeed);
 		} finally {
 			// be sure to remove the principal from the threadlocal
 			AuthenticationThreadLocal.remove();
 		}
 	}
-
-	private AgreementProtocolState getAgreementProtocolState(URI connectionUri) {
-		Set<URI> recrawled = new HashSet<>();
-		while(true) {
-			//we leave the loop either with a runtime exception or with the result
-			try {
-				Dataset conversationDataset = getConversationDataset(connectionUri);
-				return AgreementProtocolState.of(conversationDataset);
-			} catch (IncompleteConversationDataException e) {
-				// we may have tried to crawl a conversation dataset of which messages
-				// were still in-flight. we allow one re-crawl attempt per exception before
-				// we throw the exception on:
-				URI connectionContainerUri  = WonLinkedDataUtils.getEventContainerURIforConnectionURI(connectionUri, linkedDataSourceOnBehalfOfNeed);
-				URI remoteConnectionUri = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(connectionUri, linkedDataSourceOnBehalfOfNeed);
-				if (!recrawl(recrawled, connectionUri, e.getMissingMessageUri(), e.getReferringMessageUri(), connectionContainerUri, connectionUri, remoteConnectionUri)){
-					throw e;
-				}
-			} catch (LinkedDataFetchingException e) {
-				if (!recrawl(recrawled, connectionUri, e.getResourceUri())){
-					throw e;
-				}
-			} 
-		}
-	}
-
-	private boolean recrawl(Set<URI> recrawled, URI connectionUri, URI... uris) {
-		Set<URI> urisToCrawl = new HashSet<URI>();
-		Arrays.stream(uris)
-			.filter(x -> ! recrawled.contains(x))
-			.forEach(urisToCrawl::add);
-		if (urisToCrawl.isEmpty()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("connection {}: not recrawling again: {}", connectionUri, Arrays.toString(uris));
-			}
-			return false;
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("connection {}, recrawling: {}", connectionUri, urisToCrawl);
-		}
-		if (linkedDataSourceOnBehalfOfNeed instanceof CachingLinkedDataSource) {
-			urisToCrawl.stream().forEach(((CachingLinkedDataSource)linkedDataSourceOnBehalfOfNeed)::invalidate);
-		}
-		recrawled.addAll(urisToCrawl);
-		return true;
-	}
-
+		
 }

@@ -105,6 +105,7 @@ $ngRedux.getState()
         connections: { //Immutable.Map() containing all corresponding Connections to this need
             [connectionUri]: {
                 creationDate: date, //creationDate of the connection
+                lastUpdateDate: date, //date of lastUpdate of this connection (last date of the message that was added)
                 messages: { //Immutable.Map() of all the TextMessages sent over this connection
                     [messageUri]: {
                         connectMessage: true|false, //whether or not this was the connectMessage(a.k.a firstMessage)
@@ -117,6 +118,7 @@ $ngRedux.getState()
                     ...
                 },
                 newConnection: true|false, //whether or not this connection is new (or already seen if you will)
+                isRated: true|false, //whether or not this connection has been rated yet
                 remoteNeedUri: string, //corresponding remote Need identifier
                 state: string, //state of the connection
                 uri: string //unique identifier of this connection
@@ -124,6 +126,7 @@ $ngRedux.getState()
             ...
         },
         creationDate: Date, //creationDate of this need
+        lastUpdateDate: date, //date of lastUpdate of this need (last date of the message or connection that was added)
         description: string, //description of the need as a string (non mandatory, empty if not present)
         location: { //non mandatory but if present it contains all elements below
             address: string, //address as human readable string

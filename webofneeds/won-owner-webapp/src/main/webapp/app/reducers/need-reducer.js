@@ -118,7 +118,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         // NEW CONNECTIONS STATE UPDATES
         case actionTypes.connections.close:
             return changeConnectionState(allNeedsInState, action.payload.connectionUri, won.WON.Closed);
-
      
         case actionTypes.needs.connect: // user has sent a connect request
         	
@@ -219,6 +218,12 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.messages.close.success:
             return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
+        case actionTypes.messages.markAsRead:
+            return markMessageAsRead(allNeedsInState, action.payload.messageUri, action.payload.connectionUri, action.payload.needUri);
+        case actionTypes.connections.markAsRead:
+            return markConnectionAsRead(allNeedsInState, action.payload.connectionUri, action.payload.needUri);
+        case actionTypes.connections.markAsRated:
+            return markConnectionAsRated(allNeedsInState, action.payload.connectionUri);
 
         // NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
@@ -370,6 +375,13 @@ function addConnectionFull(state, connection, newConnection) {
 
         if(connections){
             const connectionUri = parsedConnection.getIn(["data", "uri"]);
+
+            if(newConnection){
+                //If there is a new message for the connection we will set the connection to newConnection
+                state = state.setIn([needUri, "lastUpdateDate"], parsedConnection.getIn(["data", "lastUpdateDate"]));
+            }
+
+
             return state.mergeDeepIn([needUri, "connections", connectionUri], parsedConnection.get("data"));
         }else{
             console.error("Couldnt add valid connection - missing need data in state", needUri, "parsedConnection: ", parsedConnection.toJS());
@@ -396,11 +408,16 @@ function addMessage(state, wonMessage, isNewMessage) {
             } else {
                 // needUri is the remote message's hasReceiverNeed
                 needUri = wonMessage.getReceiverNeed();
+                if(isNewMessage){
+                    //If there is a new message for the connection we will set the connection to newConnection
+                    state = state.setIn([needUri, "lastUpdateDate"], parsedMessage.getIn(["data", "date"]));
+                    state = state.setIn([needUri, "connections", connectionUri, "lastUpdateDate"], parsedMessage.getIn(["data", "date"]));
+                    state = state.setIn([needUri, "connections", connectionUri, "newConnection"], true);
+                }
             }
             if (needUri) {
                 let messages = state.getIn([needUri, "connections", connectionUri, "messages"]);
                 messages = messages.set(parsedMessage.getIn(["data", "uri"]), parsedMessage.get("data"));
-
                 return state.setIn([needUri, "connections", connectionUri, "messages"], messages);
             }
         }
@@ -444,6 +461,44 @@ function changeConnectionState(state, connectionUri, newState) {
             .setIn([needUri, "connections", connectionUri, "newConnection"], true);
 }
 
+function markMessageAsRead(state, messageUri, connectionUri, needUri) {
+
+    let need = state.get(needUri);
+    let connection = need && need.getIn(["connections", connectionUri]);
+    let message = connection && connection.getIn(["messages", messageUri]);
+
+    if(!message) {
+        console.error("no message with messageUri: <", messageUri,"> found within needUri: <", needUri, "> connectionUri: <", connectionUri, ">");
+        return state;
+    }
+
+    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "newMessage"], false);
+}
+
+function markConnectionAsRead(state, connectionUri, needUri) {
+    let need = state.get(needUri);
+    let connection = need && need.getIn(["connections", connectionUri]);
+
+    if(!connection) {
+        console.error("no connection with connectionUri: <", connectionUri,"> found within needUri: <", needUri, ">");
+        return state;
+    }
+
+    return state.setIn([needUri, "connections", connectionUri, "newConnection"], false);
+}
+
+function markConnectionAsRated(state, connectionUri) {
+    let need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+    let connection = need && need.getIn(["connections", connectionUri]);
+
+    if(!connection) {
+        console.error("no connection with connectionUri: <", connectionUri,"> found within needUri: <", need.get("uri"), ">");
+        return state;
+    }
+
+    return state.setIn([need.get("uri"), "connections", connectionUri, "isRated"], true);
+}
+
 function changeConnectionStateByFun(state, connectionUri, fun) {
     const need = selectNeedByConnectionUri(state, connectionUri);
 
@@ -480,7 +535,9 @@ function parseConnection(jsonldConnection, newConnection) {
             remoteNeedUri: undefined,
             remoteConnectionUri: undefined,
             creationDate: undefined,
+            lastUpdateDate: undefined,
             newConnection: !!newConnection,
+            isRated: false,
         }
     };
 
@@ -495,14 +552,10 @@ function parseConnection(jsonldConnection, newConnection) {
         parsedConnection.data.remoteNeedUri = remoteNeedUri;
         parsedConnection.data.remoteConnectionUri = remoteConnectionUri;
 
-        const creationDate = jsonldConnectionImm.get("dct:created"); // THIS
-																		// IS
-																		// NOT
-																		// IN
-																		// THE
-																		// DATA
-        if(creationDate){
-            parsedConnection.data.creationDate = creationDate;
+        const creationDate = jsonldConnectionImm.get("modified");
+        if(!!creationDate){
+            parsedConnection.data.creationDate = new Date(creationDate);
+            parsedConnection.data.lastUpdateDate = parsedConnection.data.creationDate;
         }
 
         const state = jsonldConnectionImm.get("hasConnectionState");
@@ -558,12 +611,13 @@ function parseMessage(wonMessage, isNewMessage) {
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: wonMessage.isFromOwner(),
-            newMessage: !!isNewMessage,
+            newMessage: !!isNewMessage && !wonMessage.isFromOwner(),
             connectMessage: wonMessage.isConnectMessage(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
             isProposeToCancel: wonMessage.isProposeToCancel(),
-            //isAccepted: wonMessage.isAccepted(),
+            isRejectMessage: wonMessage.isRejectMessage(),
+            isRetractMessage: wonMessage.isRetractMessage(),
             contentGraphTrig: {
                 prefixes: contentGraphTrigPrefixes,
                 body: contentGraphTrigBody,
@@ -606,6 +660,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         location: undefined,
         connections: Immutable.Map(),
         creationDate: undefined,
+        lastUpdateDate: undefined,
         ownNeed: !!ownNeed,
         isWhatsAround: false,
         matchingContexts: undefined,
@@ -650,7 +705,8 @@ function parseNeed(jsonldNeed, ownNeed) {
                 
         const creationDate = jsonldNeedImm.get("dct:created");
         if(creationDate){
-            parsedNeed.creationDate = creationDate;
+            parsedNeed.creationDate = new Date(creationDate);
+            parsedNeed.lastUpdateDate = parsedNeed.creationDate;
         }
 
         const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);

@@ -108,6 +108,8 @@ const actionHierarchy = {
         sendChatMessageFailed: INJ_DEFAULT,
         showLatestMessages: cnct.showLatestMessages,
         showMoreMessages: cnct.showMoreMessages,
+        markAsRead: INJ_DEFAULT,
+        markAsRated: INJ_DEFAULT,
     },
     needs: {
         received: INJ_DEFAULT,
@@ -185,6 +187,7 @@ const actionHierarchy = {
             success: messages.successfulReopenNeed,
             failure: messages.failedReopenNeed,
         },
+        markAsRead: INJ_DEFAULT,
         connectionMessageReceived: INJ_DEFAULT,
         needMessageReceived: messages.needMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,

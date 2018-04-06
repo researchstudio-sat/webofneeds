@@ -3,43 +3,57 @@
 @import 'won-config';
 @import 'connection-message';
 @import 'connection-agreement';
-
-$messageBoxPadding: 0.5rem;
+@import 'animate';
 
 @media (max-width: $responsivenessBreakPoint) {
   won-visitor-title-bar.hidden,
-  won-owner-title-bar.hidden {
+  won-owner-title-bar.hidden,
+  .post__listside.hidden,
+  .post__contentside--empty.hidden{
     display: none; //hide the subheader when a conversation is open on a mobile device
   }
 }
-
-.post-messages--connected {
-  flex-grow:1;
-  height: calc(100% - 1rem); //minus double the margin
+.post__listside {
+  width: 100%;
+  max-width: $maxContentWidth / 2;
 }
 
-.post-messages, .post-messages--connected {
+.post__contentside {
   background: white;
   border-left: $thinGrayBorder;
   border-right: $thinGrayBorder;
   border-bottom: $thinGrayBorder;
   width: 100%;
-  max-width: $maxContentWidth / 2;
+  max-width: ($maxContentWidth / 2);
   //margin-ri: 0.5rem;
 
   box-sizing: border-box;
 
+  &--empty {
+      background-color: unset;
+
+      .post__contentside__description__text {
+        display: flex;
+        align-self: center;
+        font-weight: 300;
+        color: var(--won-dark-gray);
+        font-size: $bigFontSize;
+      }
+  }
+
   display: flex;
+  flex-grow:1;
+  height: 100%;
   justify-content: center;
   align-content: center;
   flex-direction: row;
-  padding: $messageBoxPadding;
+  padding: $gridRowGap;
 
   won-post-messages{
     display: grid;
     grid-template-areas: "header" "main" "footer";
     grid-template-rows: min-content minmax(10rem, 1fr) min-content;
-    grid-row-gap: $messageBoxPadding;
+    grid-row-gap: $gridRowGap;
     width: 100%;
     box-sizing: border-box;
 
@@ -50,41 +64,30 @@ $messageBoxPadding: 0.5rem;
       text-align: left;
       width: 100%;
 
-      &__title{
-        flex-grow:2;
-        padding-top:0.5em;
-
-        cursor: pointer;
-      }
       &__icon {
-        flex-grow:1;
-        padding-right: 0.25rem;
-        @include fixed-square(2.5rem);
+        @include fixed-square($postIconSize);
+      }
 
-      }
-      &__options__icon {
-        flex-grow:1;
-        padding-right: 0.25rem;
+      &__icon__small {
         @include fixed-square(1.5rem);
-        height:1em;
-        min-height:1em;
-        max-height:1em;
-        width:auto;
-        padding-right: 0.25rem;
-        padding-top:0.7em;
+        padding-left: 0.5rem;
       }
-      &__options {
-        color: $won-primary-color;
-        padding-top:0.5em;
-        padding-right:0.3em;
-        &__icon{
-          flex-grow:1;
-          height:1em;
-          min-height:1em;
-          max-height:1em;
-          width:auto;
-          padding-right: 0.25rem;
-          @include fixed-square(1rem);
+
+      &__icon__small__contextmenu {
+        @include fixed-square(1.5rem);
+        //padding-left: 0.5rem;
+        position: relative;
+        top: -0.5rem;
+        right: -0.5rem;
+        float: right;
+      }
+
+      .pm__header__contextmenu .content {
+        max-width: 10rem;
+
+        button {
+          margin-top: 0.5rem;
+          width: 100%;
         }
       }
     }
@@ -104,7 +107,7 @@ $messageBoxPadding: 0.5rem;
     }
 
     .pm__content {
-      padding: 1rem;
+      padding: 1rem 0;
       background: white;
       border: $thinGrayBorder;
       overflow: auto;
@@ -122,6 +125,7 @@ $messageBoxPadding: 0.5rem;
           font-size: 0.85rem;
           font-weight: 550;
           padding-left: 0.5rem;
+          padding-right: 0.5rem;
         }
     
         &__icon {
