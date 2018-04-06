@@ -93,21 +93,23 @@ function genComponentConf() {
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
 
+                    <div 
+                        class="clickable"
+                        ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
+                        ng-show="self.shouldShowRdf && self.contentGraphTrig"
+                    >
 <div 
-    class="won-cm__center__trig clickable" 
-    ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
-    ng-show="self.showTrigPrefixes">
-<code ng-show="self.shouldShowRdf && self.contentGraphTrigPrefixes">
-{{ self.contentGraphTrigPrefixes }}
-</code>
+    class="won-cm__center__trig" 
+    ng-show="self.contentGraphTrigPrefixes">
+<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
+<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
 </div>
 <div 
-    class="won-cm__center__trig clickable" 
-    ng-click="self.showTrigPrefixes = !self.showTrigPrefixes">
-<code ng-show="self.shouldShowRdf && self.contentGraphTrig">
-{{ self.contentGraphTrig }}
-</code>
+    class="won-cm__center__trig">
+<code>{{ self.contentGraphTrig }}</code>
 </div>
+                    </div>
+
                     <!--
                     <div class="won-cm__center__button" 
                         ng-if="!self.message.get('isProposeMessage')
