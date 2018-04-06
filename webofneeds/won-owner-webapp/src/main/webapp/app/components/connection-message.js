@@ -60,9 +60,9 @@ function genComponentConf() {
     			ng-class="{'agreement' : 	!self.isNormalMessage()}">
                     <span class="won-cm__center__bubble__text">
                     <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
-                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Agreement</h3></span>
+                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Accept</h3></span>
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
-                	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
+                	<!--<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>-->
                         {{ self.text? self.text : self.noTextPlaceholder }}
                          <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
@@ -81,25 +81,28 @@ function genComponentConf() {
                         		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
                         		ng-show="self.showDetail">Propose <span ng-show="self.clicked">(again)</span>
                         </button>
+                        <!--
                         <button class="won-button--filled thin black"
                         		ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
                         		ng-show="self.showDetail && self.message.get('outgoingMessage')">
                         		Retract
                         </button>
+                        -->
                     </span>
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
                         {{ self.contentGraphTrig }}
                     </code>
-                     <div class="won-cm__center__button" 
+                    <!--
+                    <div class="won-cm__center__button" 
                         ng-if="!self.message.get('isProposeMessage')
                             && !self.message.get('outgoingMessage')
                             && self.message.get('isAcceptMessage')
                             && !self.clicked">
-                        <button class="won-button--filled thin red" ng-click="self.acceptProposal()">Accept</button>
                         <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">Cancel</button>
                     </div>
+                    -->
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage')
                             && !self.message.get('isAcceptMessage')
@@ -110,6 +113,7 @@ function genComponentConf() {
     							ng-click="self.acceptProposal()">
     						Accept
     					</button>
+    					<!--
                         <button class="won-button--filled thin black"
     							ng-show="!self.message.get('outgoingMessage')"
     							ng-click="self.rejectMessage()">
@@ -119,6 +123,7 @@ function genComponentConf() {
     							ng-click="self.retractMessage()">
     						Retract
     					</button>
+    					-->
                     </div>
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeToCancel')
@@ -129,7 +134,7 @@ function genComponentConf() {
                         		ng-click="self.acceptProposeToCancel()">
                         	Accept
                         </button>
-                        <button class="won-button--filled thin black" ng-click="self.rejectMessage()">Reject</button>
+                        <!-- <button class="won-button--filled thin black" ng-click="self.rejectMessage()">Reject</button> -->
                     </div>
             </div>
             <div
@@ -189,6 +194,7 @@ function genComponentConf() {
                     getIn(connection, ['messages', this.messageUri]) :
                     Immutable.Map();
 
+                
                 
                 return {
                     ownNeed,
@@ -278,7 +284,7 @@ function genComponentConf() {
         }
         
         retractMessage() {
-        	//this.clicked = true;
+        	this.clicked = true;
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	const trimmedMsg = buildModificationMessage(uri, "retracts", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
