@@ -2394,9 +2394,16 @@ export async function executeQueryOnRdfStore(store, sparqlQuery) {
 }
 
 window.groupByGraphs4dbg = groupByGraphs;
-function groupByGraphs(jsonldData) {
+/**
+ * 
+ * @param {*} jsonldData 
+ * @param {*} addDefaultContext
+ */
+function groupByGraphs(jsonldData, addDefaultContext=true) {
 
-    const context = jsonldData['@context'];
+    const context = addDefaultContext?
+        Object.assign(clone(won.defaultContext), jsonldData['@context']) : 
+        jsonldData['@context'];
 
     const cleanUpGraph = graph => {
         const graphUri = graph['@id'];
