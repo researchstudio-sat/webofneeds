@@ -528,6 +528,20 @@ function parseConnection(jsonldConnection, newConnection) {
 
 function parseMessage(wonMessage, isNewMessage) {
 
+    const rawContentGraphTrig = (wonMessage.contentGraphTrig || "")
+
+    const contentGraphTrigLines = (wonMessage.contentGraphTrig || "").split('\n')
+
+    //seperating off header/@prefix-statements, so they can be folded in
+    const contentGraphTrigPrefixes = contentGraphTrigLines
+        .filter(line => line.startsWith('@prefix'))
+        .join('\n');
+
+    const contentGraphTrigBody = contentGraphTrigLines
+        .filter(line => !line.startsWith('@prefix'))
+        .join('\n')
+        .trim();
+
     let parsedMessage = {
         belongsToUri: undefined,
         data: {
@@ -543,7 +557,11 @@ function parseMessage(wonMessage, isNewMessage) {
             isAcceptMessage: wonMessage.isAcceptMessage(),
             isProposeToCancel: wonMessage.isProposeToCancel(),
             //isAccepted: wonMessage.isAccepted(),
-            contentGraphTrig: wonMessage.contentGraphTrig,
+            contentGraphTrig: {
+                prefixes: contentGraphTrigPrefixes,
+                body: contentGraphTrigBody,
+            },
+            contentGraphTrigRaw: wonMessage.contentGraphTrig,
             contentGraphTrigError: wonMessage.contentGraphTrigError,
 
         }

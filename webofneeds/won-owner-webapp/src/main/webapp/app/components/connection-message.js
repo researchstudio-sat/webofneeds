@@ -88,7 +88,12 @@ function genComponentConf() {
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
 
-<div class="won-cm__center__trig">
+<div class="won-cm__center__trig clickable" ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" ng-show="self.showTrigPrefixes">
+<code ng-show="self.shouldShowRdf && self.contentGraphTrigPrefixes">
+{{ self.contentGraphTrigPrefixes }}
+</code>
+</div>
+<div class="won-cm__center__trig clickable" ng-click="self.showTrigPrefixes = !self.showTrigPrefixes">
 <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
 {{ self.contentGraphTrig }}
 </code>
@@ -159,6 +164,8 @@ function genComponentConf() {
                     getIn(connection, ['messages', this.messageUri]) :
                     Immutable.Map();
 
+                // const rawContentGraphTrig = get(message, 'contentGraphTrig') || "";
+
                 return {
                     ownNeed,
                     theirNeed,
@@ -166,7 +173,8 @@ function genComponentConf() {
                     message,
                     text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
-                    contentGraphTrig: get(message, 'contentGraphTrig') || "",
+                    contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
+                    contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }
