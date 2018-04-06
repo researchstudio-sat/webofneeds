@@ -541,10 +541,10 @@ function parseMessage(wonMessage, isNewMessage) {
         .filter(line => !line.startsWith('@prefix'))
         .map(line => line
             // add some extra white-space between statements, so they stay readable even when they wrap.
-            .replace(/\.$/, '.\n\n\n')
+            .replace(/\.$/, '.\n')
             .replace(/\;$/, ';\n')
-            .replace(/\{$/, '{\n\n\n')
-            .replace(/^\}$/, '\n\n\n}')
+            .replace(/\{$/, '{\n')
+            .replace(/^\}$/, '\n}')
         )
         .join('\n')
         .trim();
