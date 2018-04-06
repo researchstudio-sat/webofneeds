@@ -88,12 +88,17 @@ function genComponentConf() {
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
 
-<div class="won-cm__center__trig clickable" ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" ng-show="self.showTrigPrefixes">
+<div 
+    class="won-cm__center__trig clickable" 
+    ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
+    ng-show="self.showTrigPrefixes">
 <code ng-show="self.shouldShowRdf && self.contentGraphTrigPrefixes">
 {{ self.contentGraphTrigPrefixes }}
 </code>
 </div>
-<div class="won-cm__center__trig clickable" ng-click="self.showTrigPrefixes = !self.showTrigPrefixes">
+<div 
+    class="won-cm__center__trig clickable" 
+    ng-click="self.showTrigPrefixes = !self.showTrigPrefixes">
 <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
 {{ self.contentGraphTrig }}
 </code>
