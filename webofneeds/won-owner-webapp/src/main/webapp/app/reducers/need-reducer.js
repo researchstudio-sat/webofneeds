@@ -539,6 +539,13 @@ function parseMessage(wonMessage, isNewMessage) {
 
     const contentGraphTrigBody = contentGraphTrigLines
         .filter(line => !line.startsWith('@prefix'))
+        .map(line => line
+            // add some extra white-space between statements, so they stay readable even when they wrap.
+            .replace(/\.$/, '.\n\n\n')
+            .replace(/\;$/, ';\n')
+            .replace(/\{$/, '{\n\n\n')
+            .replace(/^\}$/, '\n\n\n}')
+        )
         .join('\n')
         .trim();
 
