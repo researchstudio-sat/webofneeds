@@ -47,19 +47,21 @@ function genComponentConf() {
                             <h1 class="ntb__title">{{ self.post.get('title') }}</h1>
                             <div class="ntb__titles__type">{{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : ' (no matching context specified)' }}</div>
                         </hgroup>
-                        <img
-                            class="ntb__icon clickable"
-                            src="generated/icon-sprite.svg#ico_settings"
-                            ng-show="!self.settingsOpen"
+                        <svg class="ntb__icon clickable"
+                            style="--local-primary:var(--won-primary-color);"
+                            ng-show="!self.settingsOpen" 
                             ng-click="self.settingsOpen = true">
+                            <use href="#ico_settings"></use>
+                        </svg>
                         <div class="ntb__contextmenu contextmenu"
                             ng-show="self.settingsOpen">
                             <div class="content">
                                 <div class="topline">
-                                    <img
-                                        class="contextmenu__icon clickable"
-                                        src="generated/icon-sprite.svg#ico_settings"
+                                    <svg class="contextmenu__icon clickable"
+                                        style="--local-primary:var(--won-secondary-color);"
                                         ng-click="self.settingsOpen = false">
+                                        <use href="#ico_settings"></use>
+                                    </svg>
                                 </div>
                                 <button
                                     class="won-button--filled thin red"

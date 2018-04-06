@@ -17,6 +17,10 @@
       top: -0.05rem;
       right: -0.05rem;
 
+      // assuming there's no icons that are wider than tall.
+      max-width: 1.8rem;
+      width: auto;
+
       @media (max-width: $responsivenessBreakPoint){
         @include fixed-height(1rem);
         padding-bottom: 0.25rem;

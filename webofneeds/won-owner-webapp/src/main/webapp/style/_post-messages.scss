@@ -73,6 +73,15 @@
         padding-left: 0.5rem;
       }
 
+      &__icon__small__contextmenu {
+        @include fixed-square(1.5rem);
+        //padding-left: 0.5rem;
+        position: relative;
+        top: -0.5rem;
+        right: -0.5rem;
+        float: right;
+      }
+
       .pm__header__contextmenu .content {
         max-width: 10rem;
 
