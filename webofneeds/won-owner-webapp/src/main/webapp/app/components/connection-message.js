@@ -108,6 +108,7 @@ function genComponentConf() {
 {{ self.contentGraphTrig }}
 </code>
 </div>
+                    <!--
                     <div class="won-cm__center__button" 
                         ng-if="!self.message.get('isProposeMessage')
                             && !self.message.get('outgoingMessage')
