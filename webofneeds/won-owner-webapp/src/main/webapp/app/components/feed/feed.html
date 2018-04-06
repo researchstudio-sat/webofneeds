@@ -3,7 +3,7 @@
     <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="feedcontent">
-    <div class="fc__inner" ng-class="{'empty' : self.ownNeedUris.length == 0}">
+    <div class="fc__inner" ng-class="{'empty' : !self.showFeed}">
         <div class="fc__empty" ng-if="self.showPlaceholder">
             <div class="fc__empty__description">
                 <svg class="fc__empty__description__icon"
@@ -30,7 +30,7 @@
         <h1 class="title" ng-if="self.showFeed">Recent activities</h1>
         <won-feed-item ng-repeat="uri in self.ownNeedUris"
                        need-uri="uri"
-                       ng-show="self.showFeed">
+                       ng-if="self.showFeed">
         </won-feed-item>
 
         <div class="fc__loading" ng-show="self.showSpinner">

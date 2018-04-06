@@ -1,4 +1,5 @@
 import angular from 'angular';
+import ngAnimate from 'angular-animate';
 import overviewTitleBarModule from '../overview-title-bar.js';
 import feedItemModule from '../feed-item.js'
 import { actionCreators }  from '../../actions/actions.js';
@@ -55,7 +56,8 @@ class FeedController {
 
 export default angular.module('won.owner.components.feed', [
     overviewTitleBarModule,
-    feedItemModule
+    feedItemModule,
+    ngAnimate,
 ])
     .controller('FeedController', [...serviceDependencies,FeedController])
     .name;

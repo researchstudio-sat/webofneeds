@@ -2,11 +2,13 @@
 @import 'sizing-utils';
 @import 'fonts';
 @import 'flex-layout';
+@import 'animate';
 
 won-feed-item {
   display: block;
   border: $thinGrayBorder;
   margin-bottom: 1rem;
+  @include appearAnimation(0.5s, linear);
 
   .fi {
     background: $won-light-gray;
@@ -14,8 +16,11 @@ won-feed-item {
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 0.5rem;
-    border-bottom: $thinGrayBorder;
     text-decoration: none;
+
+    &--withconn {
+      border-bottom: $thinGrayBorder;
+    }
 
     a {
       text-decoration: none;
@@ -79,6 +84,7 @@ won-feed-item {
       padding: 0.5rem;
       max-width: 33rem;
 
+      @include slideWithOpacityAnimation(.5s, linear, $postIconSize, 0.5rem, 0);
       @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
       &__description {
@@ -120,6 +126,7 @@ won-feed-item {
     padding: 0.5rem;
     border-top: $thinGrayBorder;
     font-size: $smallFontSize;
+    @include appearAnimation(0.5s, linear);
 
     a {
       text-decoration: none;
