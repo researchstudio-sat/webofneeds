@@ -264,8 +264,10 @@ export function getKeySize(obj) {
  */
 export function getRandomString(length, chars = "abcdefghijklmnopqrstuvwxyz0123456789") {
     var buff = new Array(length);
-    for(let i = 0; i<buff.length; i++) buff[i] = chars[Math.floor(Math.random()*chars.length)];
-    buff.join('')
+    for(let i = 0; i<buff.length; i++) {
+        buff[i] = chars[ Math.floor( Math.random() * chars.length ) ];
+    }
+    return buff.join('');
 }
 export function getRandomPosInt() {
     return getRandomInt(1,9223372036854775807);
