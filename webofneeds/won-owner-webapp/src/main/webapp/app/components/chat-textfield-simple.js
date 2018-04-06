@@ -10,10 +10,10 @@
 
 // import Medium from '../mediumjs-es6.js';
 import angular from 'angular';
-import 'ng-redux';
+// import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
-import Medium from 'medium.js';
+// import Medium from 'medium.js';
 import {
     dispatchEvent,
     attach,
@@ -26,14 +26,13 @@ import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 function genComponentConf() {
     let template = `
         <div class="wdt__left">
-            <div class="wdt__text"
-                    ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }">
-                <div class="medium-mount" tabindex="0"></div>
-                <textarea 
-                    won-textarea-autogrow 
-                    style="resize: none; height: auto;" 
-                    tabindex="0"></textarea>
-            </div>
+            <textarea 
+                class="wdt__text"
+                ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }"
+                won-textarea-autogrow 
+                style="resize: none; height: auto;" 
+                tabindex="0"
+                placeholder="{{::self.placeholder}}"></textarea>
             <span class="wdt__charcount" ng-show="self.maxChars">
                 {{ self.charactersLeft() }} characters left
             </span>
@@ -46,7 +45,7 @@ function genComponentConf() {
         </button>
     `;
 
-    const serviceDependencies = ['$scope', '$element', '$ngRedux',/*injections as strings here*/];
+    const serviceDependencies = ['$scope', '$element', /*'$ngRedux',/*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
@@ -61,21 +60,17 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
             */
 
-            /*
-            this.initMedium();
-
-            this.mediumMountNg().bind('input', e => {
+            this.textFieldNg().bind('input', e => {
                 this.input()
                 return false;
             });
-            this.mediumMountNg().bind('paste', e => {
+            this.textFieldNg().bind('paste', e => {
                 this.paste()
             });
-            this.mediumMountNg().bind('keydown', e => {
+            this.textFieldNg().bind('keydown', e => {
                 this.keydown(e)
                 return false;
             });
-            */
         }
         keydown(e) {
             if(e.keyCode === 13 && !e.shiftKey) {
@@ -103,9 +98,11 @@ function genComponentConf() {
             const value = this.value();
             const valid = this.valid();
             if(value && valid) {
-                this.medium.clear(); // clear text
-                this.mediumMount().focus(); //refocus so people can keep writing
-
+                const txtEl = this.textField();
+                if(txtEl) {
+                    txtEl.value = "";
+                    txtEl.focus(); //refocus so people can keep writing
+                }
                 const payload = { value, valid };
                 this.onSubmit(payload);
                 dispatchEvent(this.$element[0], 'submit', payload);
@@ -118,81 +115,10 @@ function genComponentConf() {
             return !this.maxChars || this.charactersLeft() >= 0;
         }
         value() {
-            return this.medium
-                .value()
-                /*
-                 * the replace fixes odd behaviour of FF. it inserts
-                 * a `<br>` at the end after the first space is
-                 * typed -- unless the space is the first character
-                 * in the field.
-                 */
-                .replace(/<br>$/, '')
-                .replace('&nbsp;','')
-                .trim();
-        }
-
-        initMedium() {
-            // initialising editor. see http://jakiestfu.github.io/Medium.js/docs/
-            this.medium = new Medium({
-                element: this.mediumMount(),
-
-                modifier: 'auto',
-
-                placeholder: is('string', this.placeholder) ?
-                    // make sure we've got a string to avoid errors internal to medium.js
-                    this.placeholder : "",
-
-                autoHR: false, //if true, inserts <hr> after two empty lines
-                //mode: Medium.inlineMode, // no newlines, no styling
-                mode: Medium.partialMode, // allows newlines, no styling
-                //maxLength: this.maxChars, // -1 would disable it
-                tags: {
-                    'break': 'br',
-                    /*
-                     'break': 'br',
-                     'horizontalRule': 'hr',
-                     'paragraph': 'p',
-                     'outerLevel': ['pre', 'blockquote', 'figure'],
-                     'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
-                     */
-                },
-                attributes: {
-                    //remove: ['style', 'class'] //TODO does this remove the ng-class?
-                    remove: ['style'] //TODO does this remove the ng-class?
-                },
-            });
-
-            //remove the inline-styles placed by medium.js
-            this.medium.placeholder.style = "";
-            this.mediumMount().addEventListener('blur', e =>
-                delay(0) //push to end end of task-queue (and thus all other `blur`-listeners
-                    .then(() => {
-                        const style = this.medium.placeholder.style;
-                        style.minHeight = 0;
-                        style.minWidth = 0;
-                    })
-            );
-        }
-
-        textareaNg() {
-            return angular.element(this.textarea());
-        }
-        textarea() {
-            if(!this._mediumMount) {
-                this._mediumMount = this.textField().querySelector('.medium-mount')
+            const txtEl = this.textField();
+            if(txtEl) {
+                return txtEl.value.trim();
             }
-            return this._mediumMount;
-        }
-
-        mediumMountNg() {
-            return angular.element(this.mediumMount());
-        }
-
-        mediumMount() {
-            if(!this._mediumMount) {
-                this._mediumMount = this.textField().querySelector('.medium-mount')
-            }
-            return this._mediumMount;
         }
 
         textFieldNg() {
@@ -214,7 +140,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            placeholder: '=',
+            placeholder: '=', // NOTE: bound only once
             maxChars: '=',
             /*
              * Usage:

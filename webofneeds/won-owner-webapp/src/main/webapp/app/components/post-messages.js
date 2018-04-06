@@ -196,35 +196,20 @@ function genComponentConf() {
                 submit-button-label="::'Send'"
                 >
             </chat-textfield>
-            <!--
-            <chat-textfield-simple
-                class="pm__footer"
-                placeholder="::'Your Message'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.send()"
-                submit-button-label="::'Send'"
-                >
-            </chat-textfield-simple>
-            -->
 
             <!--
-            quick'n'dirty textfield and button so flo can use it for his branch.
-            TODO implement and style chat-textfield-simple and use that instead.
+            TODO finish implementing and styling chat-textfield-simple and use that for both 
+            ways of writing messages instead.
             -->
-            <div class="pm__footer__rdfinput" ng-show="self.shouldShowRdf">
-                <textarea
-                    class="rdfTxtTmpDeletme"
-                    won-textarea-autogrow
-                    style="resize: none; height: auto;   flex-grow: 1;   font-family: monospace;"
-                    placeholder="Expects valid turtle. <{{self.msguriPlaceholder}}> will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` for prefixes that will be added automatically."
-                ></textarea>
-                <button
-                    class="rdfMsgBtnTmpDeletme"
-                    ng-click="self.sendRdfTmpDeletme()">
-                        Send RDF
-                </button>
-            </div>
+
+            <chat-textfield-simple
+                class="pm__footer__rdfinput"
+                ng-show="self.shouldShowRdf"
+                placeholder="::self.rdftextfieldPlaceholder"
+                submit-button-label="::'Send RDF'"
+                on-submit="::self.sendRdf(value)"
+            >
+            </chat-textfield-simple>
             <div class="pm__footer__agreement">
                 <a class="rdflink withlabel clickable"
                    ng-click="self.toggleRdfDisplay()">
@@ -270,6 +255,10 @@ function genComponentConf() {
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
+            this.rdftextfieldPlaceholder = "Expects valid turtle. <" +
+                won.WONMSG.msguriPlaceholder +
+                "> will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` " +
+                "for prefixes that will be added automatically.";
 
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
@@ -595,18 +584,15 @@ function genComponentConf() {
         			headUri: undefined,
         	}
         }
-        
-        sendRdfTmpDeletme() { //TODO move to own component
-        	this.showAgreementData = false;
-            const rdftxtEl = this.$element[0].querySelector('.rdfTxtTmpDeletme');
-            if(rdftxtEl) {
-                console.log('found rdftxtel: ', rdftxtEl.value);
-                const trimmedMsg = rdftxtEl.value.trim();
-                if(trimmedMsg) {
-                    this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'), isTTL=true);
-                }
-            }
 
+        sendRdf(rdfString) {
+            if(rdfString) {
+                this.connections__sendChatMessage(
+                    rdfString, 
+                    this.connection.get('uri'), 
+                    isTTL=true
+                );
+            }
         }
 
         closeRequest(){
