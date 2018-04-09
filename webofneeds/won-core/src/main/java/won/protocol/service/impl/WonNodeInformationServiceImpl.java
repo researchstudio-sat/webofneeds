@@ -144,10 +144,6 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
      * @return
      */
     private String generateRandomID() {
-    	String id = null;
-    	do {
-    		id = randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
-    	} while (Character.isDigit(id.charAt(0)));
-    	return id;
+    	return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
     }
 }

@@ -20,21 +20,28 @@ import java.security.SecureRandom;
 
 /**
  * Generates a random string of specified length quite securely, but not cheaply
- * Taken from: http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
+ * The String always starts with a letter
+ * We do this so that we generate URIs for which prefixing will always work with N3.js
+ * Based on: http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
  */
 public class ExpensiveSecureRandomString
 {
 
-  private static final char[] symbols;
+    private static final char[] symbols;
+    private static final char[] letters;
 
-  static {
-    StringBuilder tmp = new StringBuilder();
-    for (char ch = '0'; ch <= '9'; ++ch)
-      tmp.append(ch);
-    for (char ch = 'a'; ch <= 'z'; ++ch)
-      tmp.append(ch);
-    symbols = tmp.toString().toCharArray();
-  }
+    static {
+        StringBuilder tmp = new StringBuilder();
+        for (char ch = 'a'; ch <= 'z'; ++ch) {
+            tmp.append(ch);
+        }
+        letters = tmp.toString().toCharArray();
+
+        for (char ch = '0'; ch <= '9'; ++ch) {
+            tmp.append(ch);
+        }
+        symbols = tmp.toString().toCharArray();
+    }
 
   private final SecureRandom random = new SecureRandom();
 
@@ -46,7 +53,9 @@ public class ExpensiveSecureRandomString
 
   public String nextString(int length) {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < length; i++) {
+    sb.append(letters[random.nextInt(letters.length)]); //make sure the first symbol is always a letter
+
+    for (int i = 1; i < length; i++) {
       sb.append(symbols[random.nextInt(symbols.length)]);
     }
     return sb.toString();
