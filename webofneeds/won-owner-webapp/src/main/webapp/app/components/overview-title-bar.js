@@ -72,9 +72,9 @@ function genComponentConf() {
                 const allConnections = selectAllConnections(state);
                 const allMessages = selectAllMessages(state);
 
-                const nrOfUnreadMessages= allMessages && allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size; //only count incoming messages
+                const nrOfUnreadMessages= allMessages && allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("unread")).size; //only count incoming messages
                 const nrOfNeedsWithUnreadEvents= undefined; //TODO: COUNT HOW MANY NEEDS HAVE AT LEAST ONE NEW CONNECTION OR ONE NEW MESSAGE
-                const nrOfUnreadConnections = allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed && conn.get("newConnection")).size;
+                const nrOfUnreadConnections = allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed && conn.get("unread")).size;
 
                 return {
                     hasPosts: ownNeeds && ownNeeds.size > 0,

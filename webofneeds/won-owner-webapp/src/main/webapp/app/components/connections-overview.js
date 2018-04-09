@@ -32,6 +32,7 @@ function genComponentConf() {
     let template = `
       <div ng-repeat="need in self.relevantOwnNeeds">
         <div class="covw__own-need clickable"
+          ng-class="{'won-unread': need.get('unread')}"
           ng-click="self.toggleConnections(need.get('uri'))">
           <won-post-header
             need-uri="need.get('uri')"
@@ -51,7 +52,7 @@ function genComponentConf() {
           ng-repeat="conn in self.getOpenConnectionsArray(need)"
           on-selected-connection="self.selectConnection(connectionUri)"
           connection-uri="conn.get('uri')"
-          ng-class="{'won-unread': conn.get('newConnection')}">
+          ng-class="{'won-unread': conn.get('unread')}">
         </won-connection-selection-item>
       </div>
     `;
@@ -92,7 +93,7 @@ function genComponentConf() {
             return need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed).toArray();
         }
         getUnreadConnectionsCountFilteredByType(need){
-            return need.get('connections').filter(conn => conn.get('newConnection') && conn.get('state') !== won.WON.Closed).size;
+            return need.get('connections').filter(conn => conn.get('unread') && conn.get('state') !== won.WON.Closed).size;
         }
     }
     Controller.$inject = serviceDependencies;

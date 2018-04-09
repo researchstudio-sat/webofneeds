@@ -112,7 +112,7 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
                 ng-class="{
-                    'won-unread' : msg.get('newMessage'),
+                    'won-unread' : msg.get('unread'),
                     'won-cm--left' : !msg.get('outgoingMessage'),
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"

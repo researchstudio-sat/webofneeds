@@ -31,7 +31,7 @@ function genComponentConf() {
         ng-repeat="conn in self.connectionsArray"
         on-selected-connection="self.setOpen(connectionUri)"
         connection-uri="conn.get('uri')"
-        ng-class="{'won-unread': conn.get('newConnection')}">
+        ng-class="{'won-unread': conn.get('unread')}">
       </won-connection-selection-item>
     `;
 

@@ -53,6 +53,7 @@ function genComponentConf() {
                 const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 return {
+                    WON: won.WON,
                     ownNeed,
                     connection,
                     openConnectionUri: selectOpenConnectionUri(state),
@@ -75,7 +76,7 @@ function genComponentConf() {
         }
 
         markAsRead(){
-            if(this.connection && this.connection.get("newConnection")){
+            if(this.connection && this.connection.get("unread") && this.connection.get("state") !== won.WON.Connected){
                 const payload = {
                     connectionUri: this.connection.get("uri"),
                     needUri: this.ownNeed.get("uri")

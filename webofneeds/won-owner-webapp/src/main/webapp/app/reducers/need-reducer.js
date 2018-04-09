@@ -142,14 +142,14 @@ export default function(allNeedsInState = initialState, action = {}) {
 	                usingTemporaryUri: true,
 	                state: won.WON.RequestSent,
 	                remoteNeedUri: theirNeedUri,
-	                newConnection: true,
+	                unread: true,
 	                messages: {
 	                    [eventUri]: {
 	                        uri: eventUri,
 	                        text: optimisticEvent.getTextMessage(),
 	                        date: msStringToDate(optimisticEvent.getSentTimestamp()),
 	                        outgoingMessage: true,
-	                        newMessage: true,
+	                        unread: true,
 	                        connectMessage: true,
 	                    }
 	                }
@@ -273,7 +273,7 @@ export default function(allNeedsInState = initialState, action = {}) {
     }
 }
 
-function storeConnectionAndRelatedData(state, connectionWithRelatedData, newConnection) {
+function storeConnectionAndRelatedData(state, connectionWithRelatedData, unread) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     const stateWithOwnNeed = addNeed(state, ownNeed, true); // guarantee that
 															// ownNeed is in
@@ -285,7 +285,7 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData, newConn
 																				// in
 																				// state
 
-    return addConnectionFull(stateWithBothNeeds, connection, newConnection);
+    return addConnectionFull(stateWithBothNeeds, connection, unread);
 }
 
 function addNeed(needs, jsonldNeed, ownNeed) {
@@ -356,15 +356,15 @@ function storeConnectionsData(state, connectionsToStore, newConnections) {
  * @param newConnection
  * @return {*}
  */
-function addConnectionFull(state, connection, newConnection) {
+function addConnectionFull(state, connection, unread) {
 
     // console.log("Adding Full Connection");
-    if(newConnection === undefined) {
-        newConnection = !!selectNeedByConnectionUri(
+    if(unread === undefined) {
+        unread = !!selectNeedByConnectionUri(
             state, connection.uri || connection.get('uri')
         ); //do we already have a connection like that?
     }
-    let parsedConnection = parseConnection(connection, newConnection);
+    let parsedConnection = parseConnection(connection, unread);
 
     if(parsedConnection){
         // console.log("parsedConnection: ", parsedConnection.toJS(), "immutable
@@ -376,9 +376,10 @@ function addConnectionFull(state, connection, newConnection) {
         if(connections){
             const connectionUri = parsedConnection.getIn(["data", "uri"]);
 
-            if(newConnection){
+            if(unread){
                 //If there is a new message for the connection we will set the connection to newConnection
                 state = state.setIn([needUri, "lastUpdateDate"], parsedConnection.getIn(["data", "lastUpdateDate"]));
+                state = state.setIn([needUri, "unread"], true);
             }
 
 
@@ -411,8 +412,9 @@ function addMessage(state, wonMessage, isNewMessage) {
                 if(isNewMessage){
                     //If there is a new message for the connection we will set the connection to newConnection
                     state = state.setIn([needUri, "lastUpdateDate"], parsedMessage.getIn(["data", "date"]));
+                    state = state.setIn([needUri, "unread"], true);
                     state = state.setIn([needUri, "connections", connectionUri, "lastUpdateDate"], parsedMessage.getIn(["data", "date"]));
-                    state = state.setIn([needUri, "connections", connectionUri, "newConnection"], true);
+                    state = state.setIn([needUri, "connections", connectionUri, "unread"], true);
                 }
             }
             if (needUri) {
@@ -458,7 +460,7 @@ function changeConnectionState(state, connectionUri, newState) {
 
     return state
             .setIn([needUri, "connections", connectionUri, "state"], newState)
-            .setIn([needUri, "connections", connectionUri, "newConnection"], true);
+            .setIn([needUri, "connections", connectionUri, "unread"], true);
 }
 
 function markMessageAsRead(state, messageUri, connectionUri, needUri) {
@@ -472,7 +474,13 @@ function markMessageAsRead(state, messageUri, connectionUri, needUri) {
         return state;
     }
 
-    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "newMessage"], false);
+    state = state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "unread"], false);
+
+    if( state.getIn([needUri, "connections", connectionUri, "messages"]).filter(msg => msg.get("unread")).size == 0){
+        state = markConnectionAsRead(state, connectionUri, needUri);
+    }
+
+    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "unread"], false);
 }
 
 function markConnectionAsRead(state, connectionUri, needUri) {
@@ -484,7 +492,23 @@ function markConnectionAsRead(state, connectionUri, needUri) {
         return state;
     }
 
-    return state.setIn([needUri, "connections", connectionUri, "newConnection"], false);
+    state = state.setIn([needUri, "connections", connectionUri, "unread"], false);
+
+    if( state.getIn([needUri, "connections"]).filter(conn => conn.get("unread")).size == 0 ) {
+        state = markNeedAsRead(state, needUri);
+    }
+
+    return state;
+}
+
+function markNeedAsRead(state, needUri) {
+    let need = state.get(needUri);
+
+    if(!need) {
+        console.error("no need with needUri: <", needUri, ">");
+        return state;
+    }
+    return state.setIn([needUri, "unread"], false);
 }
 
 function markConnectionAsRated(state, connectionUri) {
@@ -511,7 +535,7 @@ function changeConnectionStateByFun(state, connectionUri, fun) {
     const connectionState = state.getIn([needUri, "connections", connectionUri, "state"]);
     return state
             .setIn([needUri, "connections", connectionUri, "state"], fun(connectionState))
-            .setIn([needUri, "connections", connectionUri, "newConnection"], true);
+            .setIn([needUri, "connections", connectionUri, "unread"], true);
 }
 
 
@@ -522,7 +546,7 @@ function changeNeedState(state, needUri, newState) {
 
 
 
-function parseConnection(jsonldConnection, newConnection) {
+function parseConnection(jsonldConnection, unread) {
     const jsonldConnectionImm = Immutable.fromJS(jsonldConnection);
     // console.log("Connection to parse: ", jsonldConnectionImm.toJS());
 
@@ -536,7 +560,7 @@ function parseConnection(jsonldConnection, newConnection) {
             remoteConnectionUri: undefined,
             creationDate: undefined,
             lastUpdateDate: undefined,
-            newConnection: !!newConnection,
+            unread: !!unread,
             isRated: false,
         }
     };
@@ -568,13 +592,13 @@ function parseConnection(jsonldConnection, newConnection) {
         ) {
             parsedConnection.data.state = state;
         }else{
-            console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
+            console.error('Cant parse connection, data is an invalid connection-object (faulty state): ', jsonldConnectionImm.toJS());
             return undefined; // FOR UNKNOWN STATES
         }
 
         return Immutable.fromJS(parsedConnection);
     }else{
-        console.error('Cant parse connection, data is an invalid connection-object: ', jsonldConnectionImm.toJS());
+        console.error('Cant parse connection, data is an invalid connection-object (mandatory uris could not be retrieved): ', jsonldConnectionImm.toJS());
         return undefined;
     }
 }
@@ -611,7 +635,7 @@ function parseMessage(wonMessage, isNewMessage) {
             contentGraphs: wonMessage.getContentGraphs(), 
             date: msStringToDate(wonMessage.getTimestamp()),
             outgoingMessage: wonMessage.isFromOwner(),
-            newMessage: !!isNewMessage && !wonMessage.isFromOwner(),
+            unread: !!isNewMessage && !wonMessage.isFromOwner(),
             connectMessage: wonMessage.isConnectMessage(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
@@ -661,6 +685,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         connections: Immutable.Map(),
         creationDate: undefined,
         lastUpdateDate: undefined,
+        unread: false,
         ownNeed: !!ownNeed,
         isWhatsAround: false,
         matchingContexts: undefined,
