@@ -1,7 +1,7 @@
 @import 'won';
 @import 'button';
 
-chat-textfield {
+chat-textfield, chat-textfield-simple {
   display: flex;
   flex-direction: row;
   align-items: stretch; //all same height

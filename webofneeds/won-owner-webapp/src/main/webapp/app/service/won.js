@@ -24,6 +24,7 @@ import {
     get,
     getIn,
     clone,
+    prefixOfUri,
 } from '../utils.js'
 import jsonld from 'jsonld';
 
@@ -951,9 +952,7 @@ window.N34dbg = N3;
      * @returns {*|Promise.<WonMessage>}
      */
     won.toWonMessage = function(message) {
-        if(message.uri && message.type) {
-            return won.WonMessageFromMessageLoadedFromStore(message);
-        } else if (message['@graph']) {
+        if (message['@graph']) {
             return won.wonMessageFromJsonLd(message);
         } else if (message instanceof WonMessage) {
             return Promise.resolve(message);
@@ -962,106 +961,24 @@ window.N34dbg = N3;
         }
     };
 
-    /**
-     * This is a hack that allows us to wrap a WonMessage object around a message that
-     * is retrieved from the local rdf store. This will work for Chat messages
-     *
-     * @param message
-     * @constructor
-     */
-    won.WonMessageFromMessageLoadedFromStore = async function (message) {
-        //console.log("converting this result from store to WonMessage", message)
-
-        let contentResource = message;
-        if (!message.hasTextMessage){
-            contentResource = message.hasCorrespondingRemoteMessage;
-            if (! contentResource || !contentResource.hasTextMessage) {
-                contentResource = undefined;
-            }
-        }
-
-        //if we have a text message, create a content graph
-        let contentGraph = undefined;
-        if (contentResource) {
-            contentGraph = {
-                "@id": contentResource.uri + "#content",
-                "@graph": [
-                    {
-                        "@id": contentResource.uri,
-                        "http://purl.org/webofneeds/model#hasTextMessage": contentResource.hasTextMessage,
-                    }
-                ]
-            }
-        }
-
-        //create the envelope(s)
-        let envelopeGraphs = [];
-        let envelopeGraph = makeEnvelopeGraphForMessageResource(message);
-        let remoteEnvelopeGraph = undefined;
-        envelopeGraphs.push(envelopeGraph);
-        if (message.hasCorrespondingRemoteMessage && message.hasCorrespondingRemoteMessage.type){
-            // link our message to remote message
-            let res = envelopeGraph["@graph"].filter( x => x["@id"] == message.uri)[0];
-            res["http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"] = {"@id": message.hasCorrespondingRemoteMessage.uri }
-            // create envelope for remote message
-            remoteEnvelopeGraph = makeEnvelopeGraphForMessageResource(message.hasCorrespondingRemoteMessage);
-            envelopeGraphs.push(remoteEnvelopeGraph);
-        }
-
-        //link the inner envelope to the content if we have content
-        if (contentGraph) {
-            let innerEnvelopeGraph = (contentResource == message) ? envelopeGraph : remoteEnvelopeGraph;
-            let res = innerEnvelopeGraph["@graph"].filter( x => x["@id"] == contentResource.uri)[0];
-            res["http://purl.org/webofneeds/message#hasContent"] = contentGraph["@id"];
-        }
-
-        //build the complete jsonld structure
-        let jsonld = {"@graph":[]};
-
-        if (contentGraph) {
-            jsonld["@graph"].push(contentGraph);
-        }
-        if (envelopeGraphs && envelopeGraphs.length > 0) {
-            envelopeGraphs.forEach( envelopeGraph => jsonld["@graph"].push(envelopeGraph));
-        }
-        return won.wonMessageFromJsonLd(jsonld)
-        .then(wonMsg => {
-             wonMsg.contentGraphTrig = 
-                get(wonMsg, 'contentGraphTrig') || 
-                get(message, 'contentGraphTrig') || 
-                getIn(message, ['hasCorrespondingRemoteMessage', 'contentGraphTrig']);
-            return wonMsg;
-        });;
-    }
-
-
-
     won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD){
         //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
-        return jsonld.promises.expand(wonMessageAsJsonLD)
-            .then(expandedJsonLd =>
-                new WonMessage(expandedJsonLd)
-            )
-            .then(wonMessage =>
-                wonMessage.frameInPromise()
-                    .then(framed => wonMessage)
-            )
-            .then(wonMessage => {
-                const contentGraphs = wonMessage.getContentGraphs(); 
-                if(contentGraphs && contentGraphs.length > 0) {
-                    won.jsonLdToTrig(contentGraphs)
-                    .then(trig => {
-                        wonMessage.contentGraphTrig = trig;
-                    })
-                    .catch(e => {
-                        wonMessage.contentGraphTrigError = JSON.stringify(e);
-                    })
-                }
-                return wonMessage;
-            });
+        const expandedJsonLd  = await jsonld.promises.expand(wonMessageAsJsonLD);
+        const wonMessage = await new WonMessage(expandedJsonLd);
+        await wonMessage.frameInPromise()
+        await wonMessage.generateContentGraphTrig(); 
+        return wonMessage;
     }
 
-    won.jsonLdToTrig = async function (jsonldData) {
+    /**
+     * Serializes the jsonldData into trig.
+     * 
+     * @param {*} jsonldData 
+     * @param {*} addDefaultContext whether or not `won.defaultContext` should be
+     *   used for shortening urls (in addition to any `@context` at the root of
+     *   `jsonldData` that's always used.)
+     */
+    won.jsonLdToTrig = async function (jsonldData, addDefaultContext = true) {
         if(
             !jsonldData || !(
                 (is('Array', jsonldData) && jsonldData.length > 0) ||
@@ -1073,8 +990,12 @@ window.N34dbg = N3;
         }
         const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
         const quads = await won.n3Parse(quadString, {format: 'application/n-quads'});
-        //console.log("QUAAAADS ", quads);
-        const trig = await won.n3Write(quads, { format: 'application/trig' });
+        
+        const prefixes = addDefaultContext ?
+            Object.assign(clone(won.defaultContext), jsonldData['@context']) :
+            jsonldData['@context'];
+        const trig = await won.n3Write(quads, { format: 'application/trig', prefixes});
+
         return trig;
     }
     window.jsonLdToTrig4dbg = won.jsonLdToTrig;
@@ -1193,6 +1114,42 @@ window.N34dbg = N3;
 
         getMessageDirection: function () {
             return this.__getMessageDirection(this.messageStructure);
+        },
+
+        generateContentGraphTrig: async function () {
+            if(this.contentGraphTrig) {
+                return this.contentGraphTrig;
+            }
+            const contentGraphs = this.getContentGraphs(); 
+            if(contentGraphs && contentGraphs.length > 0) {
+                try {
+                    if(!is('Array', contentGraphs)) {
+                        throw new Error(
+                            "Unexpected content-graph structure: \n\n" + 
+                            JSON.stringify(contentGraphs)
+                        );
+                    } 
+                    const eventUriPrefix = prefixOfUri(this.getMessageUri());
+                    console.log('eventUriPrefix deleteme: ', eventUriPrefix);
+                    const jsonldData = {
+                        '@context': Object.assign(
+                            { event: eventUriPrefix }, 
+                            won.defaultContext
+                        ),
+                        '@graph': contentGraphs,
+                    };
+                    this.contentGraphTrig = await won.jsonLdToTrig(jsonldData);
+                    return this.contentGraphTrig;
+                } catch (e) {
+                    const msg = 
+                        "Failed to generate trig for message " +
+                        this.getMessageUri() + "\n\n" +
+                        e.message + '\n\n' +
+                        e.stack;
+                    console.error(msg);
+                    this.contentGraphTrigError = msg;
+                }
+            }
         },
 
         frameInPromise: function () {

@@ -11,6 +11,7 @@ import {
     getIn,
     is,
     clone,
+    getRandomString,
 } from './utils.js';
 
 import N3 from '../scripts/N3/n3-browserify.js';
@@ -245,4 +246,12 @@ export function parseCredentials(credentials) {
     return credentials.privateId ?
         privateId2Credentials(credentials.privateId) :
         credentials;
+}
+
+export function getRandomWonId() {
+    // needs to start with a letter, so N3 doesn't run into 
+    // problems when serializing, see 
+    // https://github.com/RubenVerborgh/N3.js/issues/121
+    return getRandomString(1, 'abcdefghijklmnopqrstuvwxyz') + 
+        getRandomString(11, 'abcdefghijklmnopqrstuvwxyz0123456789');
 }

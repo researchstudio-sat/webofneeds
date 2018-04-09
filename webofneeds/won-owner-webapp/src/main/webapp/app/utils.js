@@ -256,13 +256,25 @@ export function removeAllProperties(obj){
 export function getKeySize(obj) {
     return Object.keys(obj).length;
 }
+/**
+ * generates a string of random characters
+ * 
+ * @param {*} length the length of the string to be generated. e.g. in the example below: 5
+ * @param {*} chars the allowed characters, e.g. "abc123" to generate strings like "a3cba"
+ */
+export function getRandomString(length, chars = "abcdefghijklmnopqrstuvwxyz0123456789") {
+    var buff = new Array(length);
+    for(let i = 0; i<buff.length; i++) {
+        buff[i] = chars[ Math.floor( Math.random() * chars.length ) ];
+    }
+    return buff.join('');
+}
 export function getRandomPosInt() {
     return getRandomInt(1,9223372036854775807);
 }
 export function getRandomInt(min, max){
     return Math.floor(Math.random()*(max-min+1))+min;
 }
-
 export function isString(o) {
     return typeof o == "string" || (typeof o == "object" && o.constructor === String);
 }
@@ -479,7 +491,13 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
     const asyncLookups = urisAsArray.map(uri =>
             asyncLookupFunction(uri)
                 .catch(error => {
-                    console.error({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
+                    console.error(
+                        `failed lookup for ${uri} in utils.js:urisToLookupMap ` + error.message, '\n\n',
+                        error.stack, '\n\n',
+                        urisAsArray, '\n\n', 
+                        uris, '\n\n',
+                        error
+                    )
                     return undefined;
                 })
     );
@@ -1084,3 +1102,24 @@ export function rethrow(e, prependedMsg="") {
     }
 }
 
+
+/**
+ * Parses an rdf-uri and gets the base-uri, i.e. 
+ * the part before and including the fragment identifier 
+ * ("#") or last slash ("/").
+ * @param {*} uri 
+ */
+export function prefixOfUri(uri) {
+    // if there's hash-tags, the first of these
+    // is the fragment identifier and everything
+    // after is the id. remove everything following it.
+    let prefix = uri.replace(/#.*/, '#');
+
+    // if there's no fragment-identifier, the
+    // everything after the last slash is removed.
+    if(!prefix.endsWith('#')) {
+        prefix = prefix.replace(/\/([^\/]*)$/, '/')
+    }
+
+    return prefix;
+}

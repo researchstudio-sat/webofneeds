@@ -581,6 +581,27 @@ function parseConnection(jsonldConnection, newConnection) {
 
 function parseMessage(wonMessage, isNewMessage) {
 
+    const rawContentGraphTrig = (wonMessage.contentGraphTrig || "")
+
+    const contentGraphTrigLines = (wonMessage.contentGraphTrig || "").split('\n')
+
+    //seperating off header/@prefix-statements, so they can be folded in
+    const contentGraphTrigPrefixes = contentGraphTrigLines
+        .filter(line => line.startsWith('@prefix'))
+        .join('\n');
+
+    const contentGraphTrigBody = contentGraphTrigLines
+        .filter(line => !line.startsWith('@prefix'))
+        .map(line => line
+            // add some extra white-space between statements, so they stay readable even when they wrap.
+            .replace(/\.$/, '.\n')
+            .replace(/\;$/, ';\n')
+            .replace(/\{$/, '{\n')
+            .replace(/^\}$/, '\n}')
+        )
+        .join('\n')
+        .trim();
+
     let parsedMessage = {
         belongsToUri: undefined,
         data: {
@@ -597,7 +618,12 @@ function parseMessage(wonMessage, isNewMessage) {
             isProposeToCancel: wonMessage.isProposeToCancel(),
             isRejectMessage: wonMessage.isRejectMessage(),
             isRetractMessage: wonMessage.isRetractMessage(),
-            contentGraphTrig: wonMessage.contentGraphTrig,
+            contentGraphTrig: {
+                prefixes: contentGraphTrigPrefixes,
+                body: contentGraphTrigBody,
+            },
+            contentGraphTrigRaw: wonMessage.contentGraphTrig,
+            contentGraphTrigError: wonMessage.contentGraphTrigError,
 
         }
     };

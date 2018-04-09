@@ -89,11 +89,27 @@ function genComponentConf() {
                         </button>
                         -->
                     </span>
+
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
-                    <code ng-show="self.shouldShowRdf && self.contentGraphTrig">
-                        {{ self.contentGraphTrig }}
-                    </code>
+
+                    <div 
+                        class="clickable"
+                        ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
+                        ng-show="self.shouldShowRdf && self.contentGraphTrig"
+                    >
+<div 
+    class="won-cm__center__trig" 
+    ng-show="self.contentGraphTrigPrefixes">
+<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
+<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
+</div>
+<div 
+    class="won-cm__center__trig">
+<code>{{ self.contentGraphTrig }}</code>
+</div>
+                    </div>
+
                     <!--
                     <div class="won-cm__center__button" 
                         ng-if="!self.message.get('isProposeMessage')
@@ -203,7 +219,8 @@ function genComponentConf() {
                     message,
                     text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
-                    contentGraphTrig: get(message, 'contentGraphTrig') || "",
+                    contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
+                    contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                 }

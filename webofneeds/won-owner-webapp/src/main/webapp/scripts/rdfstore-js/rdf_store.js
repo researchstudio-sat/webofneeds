@@ -1859,8 +1859,8 @@ Lexicon.Lexicon.prototype.unregister = function (quad, key) {
         }
         return(true);
     } catch (e) {
-        console.log("Error unregistering quad");
-        console.log(e.message);
+        console.error("Error unregistering quad");
+        console.error(e.message);
         return(false);
     }
 };
@@ -6195,8 +6195,8 @@ RDFLoader.RDFLoader.prototype.tryToParse = function(parser, graph, input, option
             }
         }
     } catch(e) {
-        console.log(e.message);
-        console.log(e.stack);
+        console.error(e.message);
+        console.error(e.stack);
         callback(false, "parsing error with mime type : " + e);
     }
 };
@@ -25231,8 +25231,8 @@ QueryFilters.boundVars = function(filterExpr) {
             }
         }
     } else {
-        console.log("ERROR");
-        console.log(filterExpr);
+        console.error("ERROR");
+        console.error(filterExpr);
         throw new Error("Cannot find bound expressions in a no expression token");
     }
 };
@@ -28748,7 +28748,7 @@ QueryEngine.QueryEngine.prototype.rangeQuery = function(quad, queryEnv) {
             return quads;
         }
     } else {
-        console.log("ERROR normalizing quad");
+        console.error("ERROR normalizing quad");
         return null;
     }
 };
@@ -29160,12 +29160,12 @@ QueryEngine.QueryEngine.prototype._executeQuadInsert = function(quad, queryEnv) 
                 that.callbacksBackend.nextGraphModification(Callbacks.added, [quad, normalized]);
                 return true;
             } else {
-                console.log("ERROR inserting quad");
+                console.error("ERROR inserting quad");
                 return false;
             }
         }
     } else {
-        console.log("ERROR normalizing quad");
+        console.error("ERROR normalizing quad");
         return false;
     }
 };
@@ -29181,11 +29181,11 @@ QueryEngine.QueryEngine.prototype._executeQuadDelete = function(quad, queryEnv) 
             that.callbacksBackend.nextGraphModification(Callbacks['deleted'], [quad, normalized]);
             return true;
         } else {
-            console.log("ERROR unregistering quad");
+            console.error("ERROR unregistering quad");
             return false;
         }
     } else {
-        console.log("ERROR normalizing quad");
+        console.error("ERROR normalizing quad");
         return false;
     }
 };
@@ -29690,7 +29690,7 @@ Callbacks.CallbacksBackend.prototype.observeQuery = function(query, callback, en
         if(success){
             callback(results);
         } else {
-            console.log("ERROR in query callback "+results);
+            console.error("ERROR in query callback "+results);
         }                                             
     });
 
@@ -31281,8 +31281,8 @@ Store.Store.prototype.close = function(cb) {
             try {
                 RDFStoreWorker.store[msg.fn].apply(RDFStoreWorker.store,msg.args);
             } catch(e) {
-                console.log("Error executing method through connection");
-                console.log(e);
+                console.error("Error executing method through connection");
+                console.error(e);
             }
         } else if((msg.fn === 'insert'||
                    msg.fn === 'delete') && msg.args != null) {
@@ -31310,8 +31310,8 @@ Store.Store.prototype.close = function(cb) {
                 
                 RDFStoreWorker.store[msg.fn].apply(RDFStoreWorker.store,msg.args);
             } catch(e) {
-                console.log("Error executing method through connection");
-                console.log(e);
+                console.error("Error executing method through connection");
+                console.erro(e);
             }
         } else if(msg.fn === 'rdf/setPrefix' && msg.args != null) {
             RDFStoreWorker.store.rdf.setPrefix(msg.args[0], msg.args[1]);

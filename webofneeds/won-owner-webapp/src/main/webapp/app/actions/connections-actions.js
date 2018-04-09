@@ -318,16 +318,14 @@ export function showLatestMessages(connectionUri, numberOfEvents){
             payload: Immutable.fromJS({connectionUri, pending: true}),
         });
 
-        won.getEventsOfConnection(
+
+        won.getWonMessagesOfConnection(
             connectionUri,
             {
                 requesterWebId: needUri,
                 pagingSize: numOfEvts2pageSize(numberOfEvents),
                 deep: true
             }
-        ).then(events =>
-            //convert each event to a WonMessage object
-            Promise.all(Object.keys(events).map(key => won.WonMessageFromMessageLoadedFromStore(events[key])))
         )
         .then(events =>
             dispatch({
@@ -411,7 +409,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
             payload: Immutable.fromJS({connectionUri, pending: true}),
         });
 
-        won.getEventsOfConnection(
+        won.getWonMessagesOfConnection(
             connectionUri,
             {
                 requesterWebId: needUri,
@@ -419,9 +417,6 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
                 deep: true,
                 resumebefore: eventHashValue,
             }
-        ).then(events =>
-            //convert each event to a WonMessage object
-            Promise.all(Object.keys(events).map(key => won.WonMessageFromMessageLoadedFromStore(events[key])))
         ).then(events =>
             dispatch({
                 type: actionTypes.connections.showMoreMessages,

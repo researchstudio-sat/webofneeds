@@ -25,6 +25,8 @@ import {
     contains,
     deepFreeze,
     rethrow,
+    getIn,
+    get,
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
@@ -527,7 +529,7 @@ import won from './won.js';
      *            it will return the second page of size N)
      * @return {*}
      */
-    won.ensureLoaded = function(uri, fetchParams = {}) {
+    won.ensureLoaded = async function(uri, fetchParams = {}) {
         if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
 
         //console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
@@ -546,67 +548,55 @@ import won from './won.js';
          * and thus always reload them.
          */
         const partialFetch = fetchesPartialRessource(fetchParams);
-        if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) {
+
+        // we might not even need to aquire a lock, if another call to ensureLoaded
+        // has already finished.
+        if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) { 
             cacheItemMarkAccessed(uri);
-            return Promise.resolve(uri);
+            return uri;
         }
 
-
-        cacheItemMarkFetching(uri);
-        return won.fetch(uri, fetchParams, true)
-            .then(
-                (dataset) => {
-                    if( !(fetchParams && fetchParams.deep) ) {
-                        cacheItemInsertOrOverwrite(uri, partialFetch);
-                        return uri;
-                    } else {
-                        return selectLoadedResourcesFromDataset(dataset)
-                            .then(allLoadedResources => {
-                                allLoadedResources.forEach(resourceUri => {
-                                    /*
-                                     * only mark root resource as partial.
-                                     * the other ressources should
-                                     * have been fetched fully during a
-                                     * request with the `deep`-flag
-                                     */
-                                    cacheItemInsertOrOverwrite(
-                                        resourceUri,
-                                        partialFetch && resourceUri === uri
-                                    )
-                                });
-                                return allLoadedResources;
-                            }
-                        )
-                    }
-                },
-                reason => cacheItemMarkUnresolvable(uri, reason)
-            )
-
-    };
-
-    /**
-     * Fetches the rdf-node with the given uri from
-     * the standard API_ENDPOINT.
-     * @param uri
-     * @param params: see `loadFromOwnServerIntoCache`
-     * @returns {*}
-     */
-    won.fetch = function(uri, params, removeCacheItem=false) {
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "fetch: uri must not be null"};
-        }
-        //console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
-        return lock.acquireUpdateLock().then(
-                () => loadFromOwnServerIntoCache(uri, params, removeCacheItem)
-            ).then(dataset => {
-                lock.releaseUpdateLock();
-                return dataset;
-            })
-            .catch(error => {
-                lock.releaseUpdateLock();
-                throw({msg: 'Failed to fetch ' + uri, causedBy: error});
-            });
+        await lock.acquireUpdateLock()
+
+        try {
+
+            // lock has been aquired, but do we still need to load the resource?
+            if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) { 
+                // another call to ensureLoaded has finished while we have been aquiring the lock.
+                cacheItemMarkAccessed(uri);
+                return uri;
+            } else {
+                // ok, we actually need to load the resource
+                cacheItemMarkFetching(uri);
+                const dataset = await loadFromOwnServerIntoCache(uri, fetchParams, true)
+
+                if( !get(fetchParams, 'deep') ) {
+                    cacheItemInsertOrOverwrite(uri, partialFetch);
+                    return uri;
+                } else {
+                    const allLoadedResources = await selectLoadedDocumentUrisFromDataset(dataset);
+                    allLoadedResources.forEach(resourceUri => {
+                        /*
+                            * only mark root resource as partial.
+                            * the other ressources should
+                            * have been fetched fully during a
+                            * request with the `deep`-flag
+                            */
+                        cacheItemInsertOrOverwrite(
+                            resourceUri,
+                            partialFetch && resourceUri === uri
+                        )
+                    });
+                    return allLoadedResources;
+                }
+            }
+        } catch (e) {
+            rethrow(e, 'Failed to fetch ' + uri);
+        } finally {
+            lock.releaseUpdateLock();
+        }
+
     };
 
     function fetchesPartialRessource(requestParams) {
@@ -623,28 +613,29 @@ import won from './won.js';
             }
     };
 
-    function selectLoadedResourcesFromDataset(dataset) {
+    /**
+     * When you have loaded multiple documents via `deep=true`,
+     * use this function to identify which documents you have
+     * actually loaded this way.
+     * 
+     * Note: this function and uses thereof can become deprecated
+     * if we'd use HTTP/2
+     * 
+     * @param {*} dataset 
+     */
+    function selectLoadedDocumentUrisFromDataset(dataset) {
         /*
          * create a temporary store to load the dataset into
          * so we only query over the new triples
          */
         const tmpstore = rdfstore.create();
-
-        //TODO avoid duplicate parsing of the dataset
-        const storeWithDatasetP = new Promise((resolve, reject) =>
-                tmpstore.load('application/ld+json', dataset,
-                    (success, results) => success ?
-                        resolve(tmpstore) :
-                        reject(`couldn't load dataset for ${needUri} into temporary store.`)
-                )
-        );
+        const storeWithDatasetP  = loadIntoRdfStore(
+                tmpstore, 'application/ld+json', dataset
+            )
+            .then(() => tmpstore);
 
         const allLoadedResourcesP = storeWithDatasetP.then(tmpstore => {
-            const queryPromise = new Promise((resolve, reject) =>
-                    //TODO use the existing constants for prefixes
-                    //TODO eliminate redundant queries
-                    //TODO rdf:type for connectionContainer?
-                    tmpstore.execute(`
+            const queryPromise = executeQueryOnRdfStore(tmpstore, `
                 prefix won: <http://purl.org/webofneeds/model#>
                 prefix msg: <http://purl.org/webofneeds/message#>
                 prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
@@ -665,17 +656,78 @@ import won from './won.js';
                     { ?s msg:hasMessageType ?o } union
                     { ?s won:hasCorrespondingRemoteMessage ?o } union
                     { ?s won:hasReceiver ?o }.
-                }`,
-                        (success, results) => success ?
-                            resolve(results) :
-                            reject(`couldn't execute query for ${needUri} on temporary store for ${uri}`)
-                    )
-            );
+                }`);
+
             //final cleanup and return
             return queryPromise.then(queryResults => queryResults.map(r => r.s.value))
         });
 
         return allLoadedResourcesP;
+    }
+
+
+    /**
+     * Note: this is a hack, as it heavily depends on the structure of the 
+     * dataset, the structure of uris and the internal structure of the rdfstore. 
+     * The much cleaner, more standardized and planned alternative is to use HTTP/2 
+     * on the server and replace the entire cache-system implemented here with that.
+     * 
+     * @param {*} data 
+     * @returns a map from document-uri to a set of contained graph-uris
+     */
+    async function selectContainedDocumentAndGraphUrisHACK(data) {
+
+        const loadedDocumentUris = await selectLoadedDocumentUrisFromDataset(data);
+
+        const tmpstore = rdfstore.create(); // TODO reuse tmpstore from `selectLoadedDocumentUrisFromDataset`
+        await loadIntoRdfStore(tmpstore, 'application/ld+json', data);
+
+        const baseUriForEvents = getIn(data, ['@context', 'event']);
+        if(!baseUriForEvents)  {
+            throw new Error(
+                'Couldn\'t resolve the \'event\'-prefix needed ' +
+                'for the document-uris to graph-uris hack.'
+            );
+        }
+
+        const mappingsPromises = loadedDocumentUris.map(async (docUri) => {
+            if(docUri.startsWith('event') || docUri.startsWith(baseUriForEvents)) {
+                const messageUri = docUri;
+                const correspondingRemoteMessageUri = getIn(
+                    await executeQueryOnRdfStore(tmpstore, `
+                        prefix event: <${baseUriForEvents}>
+                        prefix msg: <http://purl.org/webofneeds/message#>
+
+                        select distinct ?remoteUri where {
+                            { <${messageUri}> msg:hasCorrespondingRemoteMessage ?remoteUri } union
+                            { ?remoteUri msg:hasCorrespondingRemoteMessage <${messageUri}> }
+                        }
+                        `), 
+                        [0, 'remoteUri', 'value'] // the result is nested a bit, so we need to extract the uri here
+                    );
+
+                const urisInStoreThatStartWith = (uri) => 
+                    Array.from(new Set(
+                        Object.values(tmpstore.engine.lexicon.OIDToUri)
+                        .filter(u => u.startsWith(uri))
+                    ));
+                
+                const graphUrisInEventDoc = urisInStoreThatStartWith(messageUri + "#")
+                    .concat(urisInStoreThatStartWith(correspondingRemoteMessageUri + "#"));
+
+                return {
+                    uri: messageUri,
+                    correspondingRemoteMessageUri,
+                    containedGraphUris: graphUrisInEventDoc,
+                }
+            }
+        });
+        const mappingsArray = (await Promise.all(mappingsPromises)).filter(m => m);
+
+        const mappings = {}; 
+        mappingsArray.forEach(m => mappings[m.uri] = new Set(m.containedGraphUris));
+
+        return mappings;
     }
 
 
@@ -710,7 +762,9 @@ import won from './won.js';
             if (response.status === 200)
                 return response;
             else
-                throw new Error(`${response.status} - ${response.statusText}`);
+                throw new Error(
+                    `${response.status} - ${response.statusText} for request ${uri}, ${JSON.stringify(params)}`
+                );
         })
         .then(dataset =>
             dataset.json())
@@ -731,11 +785,11 @@ import won from './won.js';
                      * the previously loaded data. For everything
                      * remove any remaining stale data: */
                     // won.deleteNode(uri, removeCacheItem) 
-                    won.removeDocumentFromStore(uri, removeCacheItem)
+                    won.deleteDocumentFromStore(uri, removeCacheItem)
                 }
             })
-            .then(() =>
-                won.addJsonLdData(dataset, uri)
+            .then(() => 
+                won.addJsonLdData(dataset, uri, get(params, 'deep'))
             )
             .then(() => dataset)
         )
@@ -779,37 +833,87 @@ import won from './won.js';
      * 
      * @param {*} data 
      * @param {*} documentUri 
+     * @param {boolean} deep whether or not the dataset was loaded with `deep=true` and 
+     *   thus contains data from multiple documents.
      */
-    won.addJsonLdData = async function(data, documentUri) {
+    won.addJsonLdData = async function(data, documentUri, deep) {
         const context = data['@context'];
 
+
         // const graphsAddedSeperatelyP = Promise.resolve();
-        const graphsAddedSeperatelyP = groupByGraphs(data)
+        const groupedP = groupByGraphs(data);
+
+        const graphsAddedSeperatelyP = groupedP
         .then(grouped => {
 
-            // Save mapping from documentUri to graphUris, e.g. for future deletion operations
-            const graphUris = grouped.map(g => g['@id']);
-            const prevGraphUris = privateData.documentToGraph[documentUri];
-            if(!prevGraphUris) {
-                privateData.documentToGraph[documentUri] = new Set(graphUris);
-            } else {
-                graphUris.forEach(u => prevGraphUris.add(u));
+            try {
+
+                //  Save mapping from documentUri to graphUris, e.g. for future deletion operations
+                const graphUris = grouped.map(g => g['@id']);
+                saveDocToGraphMapping(documentUri, graphUris);
+
+                // save all the graphs into the rdf store
+                return Promise.all(grouped.map(g => 
+                    loadIntoRdfStore(
+                        privateData.store, 'application/ld+json', 
+                        g, g['@id']
+                    )
+                ))
+            } catch (error) {
+                rethrow(
+                    error, 
+                    "Failed to add subgraphs for " + documentUri + 
+                    ". jsonld: " + JSON.stringify(grouped)
+                );
+                //TODO: reactivate error msg
+                //console.error('Error:', error);
+
             }
-
-            // save all the graphs into the rdf store
-            return grouped.map(g => 
-                loadIntoRdfStore(
-                    privateData.store, 'application/ld+json', 
-                    g, g['@id']
-                )
-            )
-        }).catch(error => {
-        	//TODO: reactivate error msg
-			//console.error('Error:', error);
-		});
+        });
 
 
-        const triplesAddedToDocumentGraphP = loadIntoRdfStore(
+
+        let triplesAddedToDeepDocumentGraphsP = Promise.resolve();
+        if(deep) {
+            if(!documentUri.endsWith("/events")) { //TODO hack; looking at uri
+                console.error(
+                    "Adding a dataset loaded with `deep=true` " +
+                    "that isn't an event-container. The cache will " +
+                    "be faulty and deletion won't work properly."
+                );
+            } else {
+                const documentToGraphUri = 
+                    await selectContainedDocumentAndGraphUrisHACK(data);
+
+                //  Save mapping from documentUri to graphUris, e.g. for future deletion operations
+                Object.entries(documentToGraphUri).map(([documentUri, graphUris]) => {
+                    saveDocToGraphMapping(documentUri, Array.from(graphUris));
+                })
+
+                triplesAddedToDeepDocumentGraphsP = groupedP.then(grouped => {
+                    console.log(
+                        'about to add deep-loaded document graphs: ', 
+                        documentToGraphUri, grouped
+                    );
+                    return Promise.all(
+                        // iterate over documents contained in the dataset, get the 
+                        // graphs related to those documents and add them to the store.
+                        Object.entries(documentToGraphUri).map(([documentUri, graphUris]) => {
+                            const graphs = grouped.filter(graph => graphUris.has(graph['@id']))
+                            return loadIntoRdfStore(
+                                privateData.store, 'application/ld+json', graphs, documentUri
+                            );
+                        })
+                    )
+                });
+
+                //triplesAddedToDocumentGraphsP 
+            }
+        }
+
+
+
+        const triplesAddedToMainDocumentGraphP = loadIntoRdfStore(
             privateData.store, 'application/ld+json', data, documentUri
         );
         const triplesAddedToDefaultGraphP = loadIntoRdfStore(
@@ -819,10 +923,27 @@ import won from './won.js';
         // const triplesAddedToDefaultGraphP = Promise.resolve();
 
         return Promise
-            .all([graphsAddedSeperatelyP, triplesAddedToDefaultGraphP, triplesAddedToDocumentGraphP])
+            .all([
+                graphsAddedSeperatelyP, 
+                triplesAddedToDefaultGraphP, 
+                triplesAddedToMainDocumentGraphP,
+                triplesAddedToDeepDocumentGraphsP 
+            ])
             .then(() => undefined); // no return value beyond success or failure of promise
     }
 
+
+    /**
+     *  Save mapping from documentUri to graphUris, e.g. for future deletion operations
+     */
+    function saveDocToGraphMapping(documentUri, graphUris) {
+        const prevGraphUris = privateData.documentToGraph[documentUri];
+        if(!prevGraphUris) {
+            privateData.documentToGraph[documentUri] = new Set(graphUris);
+        } else {
+            graphUris.forEach(u => prevGraphUris.add(u));
+        }
+    }
 
     /**
      * Loads the need-data without following up
@@ -1121,7 +1242,7 @@ import won from './won.js';
     // loads all triples starting from start uri, using each array in 'paths' like a
     // property path, collecting all reachable triples
     // returns a JS RDF Interfaces Graph object
-    async function loadStarshapedGraph(store, startUri, tree) {
+    /*async*/ function loadStarshapedGraph(store, startUri, tree) {
         let prefixes = tree.prefixes;
         if (prefixes != null) {
             for (let key in prefixes) {
@@ -1361,6 +1482,25 @@ import won from './won.js';
         return result;
     }
 
+    function rdfstoreTriplesToString(triples, graphUri) {
+        const toToken = x => {
+            switch(x.interfaceName) {
+                case "NamedNode": return `<${x.nominalValue}>`;
+                case "Literal": return `"${x.nominalValue}"`;
+                case "BlankNode": return x.nominalValue;
+                default: throw new Error("Can't parse token: " + JSON.stringify(x));
+            }
+        }
+        const tripleToString = t => 
+            toToken(t.subject) + " " + 
+            toToken(t.predicate) + " " + 
+            toToken(t.object) + " " + 
+            (graphUri? `<${graphUri}>` : "") + 
+            ".";
+
+        return triples.map(tripleToString).join("\n");
+    }
+
 
     /**
      * Impure function, that all cases of `rdfs:member` have. This
@@ -1511,14 +1651,42 @@ import won from './won.js';
     /**
      * Returns all events associated with a given connection
      * in a promise for an object of (eventUri -> eventData)
+     * @deprecated doesn't return all events properly. see won.getEventNode.
      * @param connectionUri
      * @param fetchParams See `ensureLoaded`.
      */
     won.getEventsOfConnection = function(connectionUri, fetchParams) {
         return won.getEventUrisOfConnection(connectionUri, fetchParams)
             .then(eventUris => urisToLookupMap(eventUris,
-                    eventUri => won.getEvent(eventUri, fetchParams))
+                    eventUri => won.getEventNode(eventUri, fetchParams))
             )
+    };
+
+    /**
+     * Returns all events associated with a given connection
+     * in a promise for an object of (eventUri -> rawJsonLdOfEvent)
+     * @param connectionUri
+     * @param fetchParams See `ensureLoaded`.
+     */
+    won.getRawEventsOfConnection = async function(connectionUri, fetchParams) {
+        const eventUris = won.getEventUrisOfConnection(connectionUri, fetchParams)
+        return urisToLookupMap(
+            eventUris,
+            eventUri => won.getRawEvent(eventUri, fetchParams)
+        )
+    };
+    /**
+     * Returns all events associated with a given connection
+     * in a promise for an object of (eventUri -> wonMessageObj)
+     * @param connectionUri
+     * @param fetchParams See `ensureLoaded`.
+     */
+    won.getWonMessagesOfConnection = async function(connectionUri, fetchParams) {
+        const eventUris = await won.getEventUrisOfConnection(connectionUri, fetchParams)
+        return urisToLookupMap(
+            eventUris,
+            eventUri => won.getWonMessage(eventUri, fetchParams)
+        )
     };
 
     /**
@@ -1561,10 +1729,74 @@ import won from './won.js';
             })
     };
 
+    won.getWonMessage = async (eventUri, fetchParams) => {
+        const rawEvent = await won.getRawEvent(eventUri, fetchParams);
+        const wonMessage = await won.wonMessageFromJsonLd(rawEvent)
+        return wonMessage;
+    }
 
-    //aliases (formerly functions that were just pass-throughs)
-    won.getEvent = async (eventUri, fetchParams) => {
+    won.getRawEvent = async (eventUri, fetchParams) => {
+        await won.ensureLoaded(eventUri, fetchParams);
+        const eventGraphs = await Promise.all(Array.from(privateData.documentToGraph[eventUri]).map(async (graphUri) => {
+
+            const graphTriples = await won.getCachedGraphTriples(graphUri)
+            const quadString = rdfstoreTriplesToString(graphTriples, graphUri);
+            //graphQuads = graphQuads.map(q => ({ subject: q.subject.nominalValue,  predicate: q.predicate.nominalValue,  object: q.object.nominalValue,  graph: q.graph.nominalValue}))
+            //graphQuads = graphQuads.map(q => toQuadToken(q.subject) + " " + toQuadToken(q.predicate) + " " + toQuadToken(q.object) + " " + toQuadToken(q.graph) + " .").join("\n")
+
+            let parsedJsonLd = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'}); 
+            if(parsedJsonLd.length !== 1) {
+                throw new Error(
+                    "Got more or less than the expected one graph " + 
+                    JSON.stringify(parsedJsonLd)
+                );
+            } else {
+                parsedJsonLd = parsedJsonLd[0];
+            }
+            return parsedJsonLd;
+        }));
+
+
+        if(!is('Array', eventGraphs)) {
+            throw new Error(
+                'event graphs weren\'t an array. something ' + 
+                'didn\'t go as expected: ' + JSON.stringify(eventGraphs)
+            )
+        }
+
+        return {
+            '@graph': eventGraphs,
+            '@context': clone(won.defaultContext),
+        };
+
+    }
+
+    /**
+     * @deprecated this function only works for flat content-graphs 
+     *   with the eventUri as '@id'/subject. It doesn't work for the
+     *   arbitrarily deep content-graphs that might occur due to the
+     *   arbitrary rdf-input that we're supporting now. Use
+     *   `won.getRawEvent` instead and handle the jsonld it returns, or
+     *   (the more convenient) `won.getWonMessage`.
+     * @param {*} eventUri 
+     * @param {*} fetchParams 
+     */
+    won.getEventNode = async (eventUri, fetchParams) => {
         const event = await won.getNode(eventUri, fetchParams);
+
+        event.rawJsonLd = await won.getRawEvent(eventUri, fetchParams)
+        const wonMessage = await won.wonMessageFromJsonLd(event.rawJsonLd)
+
+        console.log(
+            'graphs in event \n', 
+            event.rawJsonLd, '\n',
+            wonMessage, '\n',
+            Array.from(privateData.documentToGraph[eventUri]),
+            '\n\n\n'
+        );
+
+
+        // event.rawJsonLd = eventJsonLd;
         await addContentGraphTrig(event, fetchParams);
 
         // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
@@ -1589,7 +1821,12 @@ import won from './won.js';
             * we fetch it here.
             */
             fetchParams.doNotFetch = true;
-            const correspondingEvent = await won.getNode(event.hasCorrespondingRemoteMessage, fetchParams);
+            const correspondingEventUri = event.hasCorrespondingRemoteMessage;
+            const correspondingEvent = await won.getNode(correspondingEventUri, fetchParams);
+            // const correspondingEventJsonLd = await won.getGraph(
+            //     correspondingEventUri, correspondingEventUri, fetchParams
+            // );
+            // correspondingEvent.rawJsonLd = correspondingEventJsonLd;
             await addContentGraphTrig(correspondingEvent, fetchParams);
             if (correspondingEvent.type) {
                 //if we have at least a type attribute, we add the remote event to the
@@ -1605,7 +1842,7 @@ import won from './won.js';
      * should be stored as seperate graphs for all events loaded via the store 
      * (see won.addJsonLdData).
      * @param {*} event 
-     * @param {*} fetchParams see won.getGraph/won.ensureLoaded/won.fetch 
+     * @param {*} fetchParams see won.getGraph/won.ensureLoaded
      */
     /*async*/ function addContentGraphTrig(event, fetchParams) {
         if(!event.hasContent) {
@@ -1617,20 +1854,21 @@ import won from './won.js';
             contentGraphUri, event.uri, fetchParams
         );
 
-        const trigP = graphP.then(contentGraph => {
-            if(!contentGraph) {
+        const trigP = graphP.then(contentGraphTriples => {
+            if(!contentGraphTriples) {
                 throw new Error(
                     "Couldn't find the following content-graph in the store: " + 
                     contentGraphUri + "\n\n" + 
-                    contentGraph
+                    contentGraphTriples
                 );
             }
-            const quads = contentGraph.triples.map(t => ({
-                subject: t.subject.nominalValue,
-                predicate: t.predicate.nominalValue,
-                object: t.object.nominalValue,
-                graph: contentGraphUri,
-            }));
+            const quads = contentGraphTriples
+                .map(t => ({
+                    subject: t.subject.nominalValue,
+                    predicate: t.predicate.nominalValue,
+                    object: t.object.nominalValue,
+                    graph: contentGraphUri,
+                }));
             console.log(
                 "\ngetEvent - contentGraph - quads:\n\n", quads, "\n\n", event
             );
@@ -1649,48 +1887,6 @@ import won from './won.js';
             .catch(e => {
                 event.contentGraphTrigError = JSON.stringify(e);
             }); 
-
-
-        /*
-
-
-
-        const tryRetrieveAndSerialize = async () => {
-            if(event.hasContent) {
-                const contentGraphUri = event.hasContent;
-                const contentGraph = await won.getGraph(contentGraphUri, eventUri, fetchParams); 
-                console.log(contentGraph);
-                if(!contentGraph) {
-                    throw new Error(
-                        "Couldn't find the following content-graph in the store: " + 
-                        contentGraphUri + "\n\n" + 
-                        contentGraph
-                    );
-                }
-                const quads = contentGraph.triples.map(t => ({
-                    subject: t.subject.nominalValue,
-                    predicate: t.predicate.nominalValue,
-                    object: t.object.nominalValue,
-                    graph: contentGraphUri,
-                }));
-
-                const trig = await won.n3Write(quads, { format: 'application/trig' });
-                // event.contentGraphNT = contentGraph? contentGraph.toNT() : "";
-                event.contentGraphTrig = trig;
-                console.log(
-                    "\n\n\ngetEvent - contentGraph: ", event, 
-                    '\n\n\n', event.contentGraphNT, 
-                    '\n\n\n', event.contentGraphTrig,
-                    '\n\n\n', quads,
-                );
-            }
-
-        }
-        return tryRetrieveAndSerialize()
-            .catch(e => {
-                event.contentGraphTrigError = JSON.stringify(e);
-            })
-            */
     }
 
     /**
@@ -1768,11 +1964,11 @@ import won from './won.js';
                     }
                 });
                 node.uri = uri;
-                releaseLock();
+                releaseLock && releaseLock();
                 return node;
             })
             .catch(e => {
-                releaseLock();
+                releaseLock && releaseLock();
                 rethrow(e, "Couldn't get node " + uri + " with params " + fetchParams + "\n");
             });
 
@@ -1783,15 +1979,15 @@ import won from './won.js';
      * Deletes all triples belonging to that particular document (e.g. need, event, etc)
      * from all graphs.
      */
-    won.removeDocumentFromStore = function(documentUri, removeCacheItem=true) {
-        return won.getCachedGraph(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
+    won.deleteDocumentFromStore = function(documentUri, removeCacheItem=true) {
+        return won.getCachedGraphTriples(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
         .catch(e => {
             const msg = 'Failed to retrieve triples for the document ' + documentUri + '.';
             console.error(msg);
             e.message += msg;
             throw e;
         })
-        .then(result => {
+        .then(triples => {
 
             //remove entry from documentToGraph
             delete privateData.documentToGraph[documentUri];
@@ -1799,19 +1995,19 @@ import won from './won.js';
             const urisOfContainedGraphs = (privateData.documentToGraph[documentUri] || new Set());
 
             return Promise.all([
-                won.deleteTriples(result.triples), // deletion from default graph
-                won.deleteTriples(result.triples, documentUri), // deletion from document-graph
+                won.deleteTriples(triples), // deletion from default graph
+                won.deleteTriples(triples, documentUri), // deletion from document-graph
 
                 //deletion from subgraphs
                 ...Array.from(urisOfContainedGraphs).map(graphUri => 
-                    won.deleteTriples(result.triples, graphUri, 
+                    won.deleteTriples(triples, graphUri, 
                         (success) => success? 
                             Promise.resolve() : 
                             Promise.reject(
                                 "Failed to delete the following triples from" +
                                 " the graph " + graphUri + 
                                 " contained in document " + documentUri + ": " + 
-                                JSON.stringify(result.triples)
+                                JSON.stringify(triples)
                             )
                     )
                 )
@@ -1895,7 +2091,26 @@ import won from './won.js';
         });
     };
 
-    won.getCachedGraph = function(graphUri) {
+    won.getCachedGraphTriples = async function(graphUri, removeAtGraphTriples=true) {
+        const graph = await rdfStoreGetGraph(privateData.store, graphUri);
+
+        if(removeAtGraphTriples) {
+            return graph.triples
+                // `store.graph` in `rdfStoreGetGraph` returns some 
+                // triples with `@graph` as predicate and a string
+                // as value, which isn't proper json-ld, so we filter
+                // them out here.
+                .filter(t => getIn(t, ['predicate', 'nominalValue']) !== '@graph'); 
+        } else {
+            return graph.triples;
+        }
+    }
+
+    /**
+     * Thin wrapper around `store.graph` that returns a promise.
+     * @param {*} graphUri 
+     */
+    function rdfStoreGetGraph(store, graphUri) {
         return new Promise((resolve, reject) => {
             const callback = (success, graph) => {
                 if(success) {
@@ -1906,15 +2121,17 @@ import won from './won.js';
             }
             try {
                 if(graphUri) {
-                    privateData.store.graph(graphUri, callback);
+                    store.graph(graphUri, callback);
                 } else {
-                    privateData.store.graph(callback);
+                    store.graph(callback);
                 }
             } catch (e) {
                 rethrow(e, "Failed to retrieve graph with uri " + graphUri + ".");
             }
         })
     }
+
+    window.rdfStoreGetGraph4dbg = rdfStoreGetGraph;
 
     /**
      * @param {*} graphUri the uri of the graph to be retrieved
@@ -1925,7 +2142,7 @@ import won from './won.js';
         return won
         .ensureLoaded(documentUri, fetchParams)
         .then(() => 
-            won.getCachedGraph(graphUri)
+            won.getCachedGraphTriples(graphUri)
         )
     }
 
@@ -2149,9 +2366,9 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
 
         try {
             if(graphUri) {
-                store.load("application/ld+json", jsonldData, graphUri, callback); // add to graph of that uri
+                store.load(mediaType, jsonldData, graphUri, callback); // add to graph of that uri
             } else {
-                store.load("application/ld+json", jsonldData, callback); // add to default graph
+                store.load(mediaType, jsonldData, callback); // add to default graph
             }
         } catch (e) {
             rethrow(e, 'Failed to store json-ld data for ' + uri);
@@ -2159,20 +2376,44 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
     });
 }
 
-window.groupByGraphs = groupByGraphs;
-function groupByGraphs(jsonldData) {
+/**
+ * Thin wrapper around `store.execute`, that returns a promise.
+ * @param {*} store 
+ * @param {*} sparqlQuery 
+ */
+export async function executeQueryOnRdfStore(store, sparqlQuery) {
+    return new Promise((resolve, reject) =>
+        store.execute( sparqlQuery, (success, results) => {
+            if(success) {
+                resolve(results);
+            } else {
+                reject( `couldn't execute the following query: ` + sparqlQuery)
+            }
+        })
+    );
+}
 
-    const context = jsonldData['@context'];
+window.groupByGraphs4dbg = groupByGraphs;
+/**
+ * 
+ * @param {*} jsonldData 
+ * @param {*} addDefaultContext
+ */
+function groupByGraphs(jsonldData, addDefaultContext=true) {
+
+    const context = addDefaultContext?
+        Object.assign(clone(won.defaultContext), jsonldData['@context']) : 
+        jsonldData['@context'];
 
     const cleanUpGraph = graph => {
         const graphUri = graph['@id'];
         const graphWithContext = { '@graph': graph['@graph'], '@id': graphUri, '@context': context};
 
         if(!graph['@graph'] || !graphUri || !context) {
-            const msg = 'Grouping-by-graph failed for the graph' +
-                graphUri + ' and context ' + JSON.stringify(graphUri) + 
-                ' with the following jsonld: \n' + 
-                JSON.stringify(graphWithContext);
+            const msg = 'Grouping-by-graph failed for the graph ' +
+                graphUri + ' and context ' + JSON.stringify(context) + 
+                ' with the following jsonld: \n\n' + 
+                JSON.stringify(graphWithContext) + '\n\n';
             //TODO: reactivate error msg
             //console.error(msg);
             return Promise.reject(msg);
