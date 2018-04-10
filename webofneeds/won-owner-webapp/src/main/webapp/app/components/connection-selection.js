@@ -61,13 +61,10 @@ function genComponentConf() {
                 let sortedConnections = connections && connections.toArray();
                 if(sortedConnections) {
                     sortedConnections.sort(function(a,b) {
-                        const bDate = b.get("lastUpdateDate");
-                        const aDate = b.get("lastUpdateDate");
+                        const bDate = b.get("lastUpdateDate") && b.get("lastUpdateDate").getTime();
+                        const aDate = a.get("lastUpdateDate") && a.get("lastUpdateDate").getTime();
 
-                        if(!!bDate && !!aDate) return 0;
-                        if(!!bDate) return -1;
-                        if(!!aDate) return 1;
-                        return b.get("lastUpdateDate").getTime() - a.get("lastUpdateDate").getTime();
+                        return bDate - aDate;
                     });
                 }
 
