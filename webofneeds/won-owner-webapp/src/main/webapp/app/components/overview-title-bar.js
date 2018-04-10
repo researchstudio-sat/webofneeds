@@ -36,7 +36,7 @@ function genComponentConf() {
                             ng-class="{'disabled' : !self.hasPosts}"
                             class="clickable">
                             Posts
-                            <span class="mtb__tabs__unread">{{ self.nrOfNeedsWithUnreadEvents }}</span>
+                            <span class="mtb__tabs__unread">{{ self.nrOfUnreadNeeds }}</span>
                         </a>
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 2}"
@@ -44,7 +44,7 @@ function genComponentConf() {
                         <a ng-click="self.router__stateGoResetParams('overviewIncomingRequests')"
                             ng-class="{'disabled' : !self.hasConnections}">
                             Chats
-                            <span class="mtb__tabs__unread">{{ self.nrOfUnreadConnections }}</span>
+                            <span class="mtb__tabs__unread"> {{ self.nrOfUnreadConnections }}</span>
                         </a>
                     </li>
                 </ul>
@@ -70,18 +70,17 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const ownNeeds = selectAllOwnNeeds(state);
                 const allConnections = selectAllConnections(state);
-                const allMessages = selectAllMessages(state);
 
-                const nrOfUnreadMessages= allMessages && allMessages.filter(msg => !msg.get("outgoingMessage") && msg.get("newMessage")).size; //only count incoming messages
-                const nrOfNeedsWithUnreadEvents= undefined; //TODO: COUNT HOW MANY NEEDS HAVE AT LEAST ONE NEW CONNECTION OR ONE NEW MESSAGE
-                const nrOfUnreadConnections = allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed && conn.get("newConnection")).size;
+                const nrOfUnreadNeeds = ownNeeds && ownNeeds.filter(need => need.get("unread")).size;
+
+                const nonClosedConnections = allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed);
+                const nrOfUnreadConnections = nonClosedConnections && nonClosedConnections.filter(conn => conn.get("unread"));
 
                 return {
                     hasPosts: ownNeeds && ownNeeds.size > 0,
                     hasConnections: allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed).size > 0,
-                    nrOfUnreadMessages: nrOfUnreadMessages ? nrOfUnreadMessages : undefined,
-                    nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnreadEvents ? nrOfNeedsWithUnreadEvents : undefined,
-                    nrOfUnreadConnections: nrOfUnreadConnections ? nrOfUnreadConnections : undefined,
+                    nrOfUnreadNeeds: nrOfUnreadNeeds > 0 ? nrOfUnreadNeeds : undefined,
+                    nrOfUnreadConnections: nrOfUnreadConnections > 0 ? nrOfUnreadConnections : undefined,
                 };
             };
 

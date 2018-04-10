@@ -30,8 +30,9 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-      <div ng-repeat="need in self.relevantOwnNeeds">
+      <div ng-repeat="need in self.sortedNeeds">
         <div class="covw__own-need clickable"
+          ng-class="{'won-unread': need.get('unread')}"
           ng-click="self.toggleConnections(need.get('uri'))">
           <won-post-header
             need-uri="need.get('uri')"
@@ -48,10 +49,10 @@ function genComponentConf() {
         </div>
         <won-connection-selection-item
           ng-show="self.isOpen(need.get('uri'))"
-          ng-repeat="conn in self.getOpenConnectionsArray(need)"
+          ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
           on-selected-connection="self.selectConnection(connectionUri)"
           connection-uri="conn.get('uri')"
-          ng-class="{'won-unread': conn.get('newConnection')}">
+          ng-class="{'won-unread': conn.get('unread')}">
         </won-connection-selection-item>
       </div>
     `;
@@ -72,9 +73,19 @@ function genComponentConf() {
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
 
+                let sortedNeeds = relevantOwnNeeds && relevantOwnNeeds.toArray();
+                if(sortedNeeds) {
+                    sortedNeeds.sort(function(a,b) {
+                        const bDate = b.get("lastUpdateDate") && b.get("lastUpdateDate").getTime();
+                        const aDate = a.get("lastUpdateDate") && a.get("lastUpdateDate").getTime();
+
+                        return bDate - aDate;
+                    });
+                }
+
                 return {
                     needImpliedInRoute,
-                    relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
+                    sortedNeeds: sortedNeeds,
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
@@ -88,11 +99,29 @@ function genComponentConf() {
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
         }
-        getOpenConnectionsArray(need){
+
+        getOpenConnectionsArraySorted(need){
+            let sortedConnections = this.getOpenConnectionsArray(need);
+
+            if(sortedConnections) {
+                sortedConnections.sort(function(a,b) {
+                    const bDate = b.get("lastUpdateDate") && b.get("lastUpdateDate").getTime();
+                    const aDate = a.get("lastUpdateDate") && a.get("lastUpdateDate").getTime();
+
+                    return bDate - aDate;
+                });
+            }
+
+            return sortedConnections;
+        }
+
+        getOpenConnectionsArray(need) {
             return need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed).toArray();
         }
-        getUnreadConnectionsCountFilteredByType(need){
-            return need.get('connections').filter(conn => conn.get('newConnection') && conn.get('state') !== won.WON.Closed).size;
+
+        getUnreadConnectionsCount(need){
+            const unreadConnections = need && need.get('connections').filter(conn => conn.get('unread') && conn.get('state') !== won.WON.Closed);
+            return unreadConnections && unreadConnections.size > 0 ? unreadConnections.size : undefined;
         }
     }
     Controller.$inject = serviceDependencies;

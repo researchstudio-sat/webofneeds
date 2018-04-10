@@ -247,7 +247,7 @@ function genComponentConf() {
         }
 
         markAsRead(){
-            if(this.message && this.message.get("newMessage")){
+            if(this.message && this.message.get("unread")){
                 const payload = {
                     messageUri: this.message.get("uri"),
                     connectionUri: this.connectionUri,

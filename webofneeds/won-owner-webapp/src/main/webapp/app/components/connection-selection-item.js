@@ -34,7 +34,7 @@ function genComponentConf() {
         </won-post-header>
 
         <div class="conn__unreadCount">
-          {{ self.unreadCount }}
+          {{ self.unreadMessagesCount }}
         </div>
       </div>
     `;
@@ -52,13 +52,17 @@ function genComponentConf() {
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
                 const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
+                const allMessages = connection && connection.get("messages");
+                const unreadMessages = allMessages && allMessages.filter(msg => msg.get("unread"));
+
                 return {
+                    WON: won.WON,
                     ownNeed,
                     connection,
                     openConnectionUri: selectOpenConnectionUri(state),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     theirNeed,
-                    unreadCount: undefined //TODO: WHAT SHOULD BE HERE?
+                    unreadMessagesCount: unreadMessages && unreadMessages.size > 0 ? unreadMessages.size : undefined,
                 }
             };
 
@@ -75,7 +79,7 @@ function genComponentConf() {
         }
 
         markAsRead(){
-            if(this.connection && this.connection.get("newConnection")){
+            if(this.connection && this.connection.get("unread") && this.connection.get("state") !== won.WON.Connected){
                 const payload = {
                     connectionUri: this.connection.get("uri"),
                     needUri: this.ownNeed.get("uri")
