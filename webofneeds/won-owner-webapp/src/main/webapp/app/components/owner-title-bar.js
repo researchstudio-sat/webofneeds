@@ -120,9 +120,7 @@ function genComponentConf() {
 
                 const openConnections = post && post.get("connections").filter(conn => conn.get("state") !== won.WON.Closed);
                 const messages = selectAllMessagesByNeedUriAndConnected(state, postUri);
-                const unreadConnectionCount = openConnections && openConnections.filter(conn => conn.get("state") !== won.WON.Connected && conn.get('unread')).size;
-                const unreadMessagesCount = messages && messages.filter(msg => msg.get('unread') && !msg.get("connectMessage")).size;
-                const unreadConnectionsCount = unreadConnectionCount + unreadMessagesCount;
+                const unreadConnectionsCount = openConnections && openConnections.filter(conn => conn.get('unread')).size;
 
                 return {
                     selectedTab: decodeUriComponentProperly(getIn(state, ['router', 'currentParams', 'connectionType'])) || 'Info',
@@ -130,7 +128,7 @@ function genComponentConf() {
                     postUri: postUri,
                     post: post,
                     hasConnections: openConnections && openConnections.size > 0,
-                    unreadConnectionsCount: unreadConnectionsCount > 0 ? unreadConnectionsCount : undefined,
+                    unreadConnectionsCount: unreadConnectionsCount && unreadConnectionsCount > 0 ? unreadConnectionsCount : undefined,
                     isActive: post && post.get('state') === won.WON.ActiveCompacted,
                 };
             };
