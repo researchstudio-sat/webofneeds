@@ -19,6 +19,7 @@ import {
 } from '../selectors.js';
 
 import postHeaderModule from './post-header.js';
+import connectionStateModule from './connection-state.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -26,6 +27,8 @@ function genComponentConf() {
       <div
       class="conn__inner"
       ng-class="self.isOpen() ? 'selected' : ''">
+        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get("type") !== self.WON.Connected">
+        </won-connection-state>
         <won-post-header
           need-uri="self.theirNeed.get('uri')"
           timestamp="self.lastUpdateTimestamp"
@@ -33,7 +36,7 @@ function genComponentConf() {
           class="clickable">
         </won-post-header>
 
-        <div class="conn__unreadCount">
+        <div class="conn__unreadCount" ng-if="self.connection.get("type") === self.WON.Connected>
           {{ self.unreadMessagesCount }}
         </div>
       </div>
@@ -59,6 +62,7 @@ function genComponentConf() {
                     WON: won.WON,
                     ownNeed,
                     connection,
+                    connectionUri: connection && connection.get("uri"),
                     openConnectionUri: selectOpenConnectionUri(state),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     theirNeed,
@@ -108,6 +112,7 @@ function genComponentConf() {
 }
 export default angular.module('won.owner.components.connectionSelectionItem', [
         postHeaderModule,
+        connectionStateModule,
     ])
     .directive('wonConnectionSelectionItem', genComponentConf)
     .name;
