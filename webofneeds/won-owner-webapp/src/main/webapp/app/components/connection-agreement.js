@@ -119,12 +119,25 @@ function genComponentConf() {
                 return {
                 	message: message,
                 	isOwn: !remoteUri,
+                	ownNeed: ownNeed,
                 	//isOwn: (this.stateUri == remoteUri)? true : false,
                 }
             };
 
             // Using actionCreators like this means that every action defined there is available in the template.
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.stateUri'], this);
+        }
+        
+
+        markAsRelevant(relevant){
+        	const payload = {
+                messageUri: this.message.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                relevant: relevant,
+            };
+            	
+        	this.messages__markAsRelevant(payload);
         }
         
         acceptProposal() {
@@ -135,6 +148,8 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	this.onUpdate({draft: this.stateUri});
         	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        	
+        	this.markAsRelevant(false);
         }
       
         proposeToCancel() {
@@ -158,8 +173,11 @@ function genComponentConf() {
         	const msg = ("Accepted propose to cancel agreement: " + uri);
         	const trimmedMsg = buildProposalMessage(uri, "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
+        	
         	this.onUpdate({draft: this.stateUri});
         	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        	
+        	this.markAsRelevant(false);
         }
         
         retractMessage() {

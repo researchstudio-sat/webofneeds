@@ -221,6 +221,9 @@ window.N34dbg = N3;
     won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
     won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
 
+    //won.WONMSG.isRelevant = won.WONMSG.baseUri + "isRelevant";
+    //won.WONMSG.isRelevantCompacted = won.WONMSG.prefix + ":isRelevant";
+    
     won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
     won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
     won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
@@ -1296,6 +1299,11 @@ window.N34dbg = N3;
         isRetractMessage: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/modification#retracts");
         },
+        
+        /*
+        isRelevant: function () {
+            return !!this.getMessageType() === "http://purl.org/webofneeds/message#isRelevant";
+        },*/
         
         isFromSystem: function () {
             let direction = this.getMessageDirection();

@@ -68,20 +68,20 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.theirNeed.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
-                class="clickable"
-                hide-image="::false">
+                hide-image="::true">
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
-                style="--local-primary:#var(--won-secondary-color);"
-                ng-style="{'visibility': !self.contextMenuOpen}"
+                style="--local-primary:#CCD2D2;" 
+                ng-show="!self.contextMenuOpen" 
                 ng-click="self.contextMenuOpen = true">
                     <use href="#ico16_arrow_down"></use>
             </svg>
             <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content" ng-click="self.contextMenuOpen=false">
+                <div class="content">
                     <div class="topline">
                       <svg class="pm__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;">
+                        style="--local-primary:black;"
+                        ng-click="self.contextMenuOpen = false">
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
@@ -139,11 +139,12 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
                 ng-class="{
-                    'won-unread' : msg.get('unread'),
+                    'won-unread' : msg.get('newMessage'),
+                    'won-not-relevant': !msg.get('isRelevant'),
                     'won-cm--left' : !msg.get('outgoingMessage'),
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"
-                on-update="::self.showAgreementData = false">
+                on-update="[self.showAgreementData = false, self.filterMessages(draft)]">
             </won-connection-message>
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
 	            <img class="pm__content__agreement__icon clickable"
@@ -173,7 +174,7 @@ function genComponentConf() {
 	                agreement-number="self.agreementStateData.agreementUris.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false;">
+	                on-update="[self.showAgreementData = false, self.filterMessages(draft)]">
 	            </won-connection-agreement>
 	            <!-- /ProposeToCancel -->           	
             	<!-- PROPOSALS -->
@@ -302,17 +303,23 @@ function genComponentConf() {
                 if(sortedMessages) {
                     var msgSet = new Set(sortedMessages);
 
-                    // TODO: Optimization
-                    //filter proposals
-                    for(msg of msgSet) {
-                        if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
+                	// TODO: Optimization
+                	//filter proposals
+                	/*
+                	for(msg of msgSet) {
+                		if(!msg.get("isRelevant")) {
+                			console.log("Message is no longer relevant: " + msg);
+                			msgSet.delete(msg);
+                		}
+                		/*
+                		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
 	                		if(this.isOldAgreementMsg(msg)) {
 	                			msgSet.delete(msg);
 	                		} else {
                                 //TODO: optimization?
                             }
                         }
-                    }
+                    }*/
 
                     sortedMessages = Array.from(msgSet);
                     sortedMessages.sort(function(a,b) {
@@ -534,9 +541,55 @@ function genComponentConf() {
                                     this.messages__connectionMessageReceived(msg);
                                 }
                         })
+                    	//Dont load in state agein!
+                    	var found = false;
+                    	for(i = 0; i < this.chatMessages.length; i++) {
+                    		if(agreementObject.stateUri === this.chatMessages[i].get("uri")) {
+                    			found = true;
+                    		}
+                    	}
+                    	if(!found) {
+                    		this.messages__connectionMessageReceived(msg);
+                    	}
+                    	/*
+                    	if(!this.checkObject(this.agreementLoadingData[key], agreementObject)) {
+                    		if(!this.filterAgreementStateData(this.agreementLoadingData, agreementObject, false)) {
+                    			this.messages__connectionMessageReceived(msg);
+                    		}
+                    		//this.filterAgreementStateData(agreementObject);
+                    	}*/
+                    }
                 })
         }
 
+        filterAgreementStateData(agreementObject, remove) {
+        	var keySet = new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"])
+			for(key of keySet) {
+    			this.checkObject(this.agreementStateData[key], agreementObject, remove)
+			}
+        }
+        
+        checkObject(data, agreementObject, remove) {
+        	for(object of data) {
+        		if(object.stateUri === agreementObject.stateUri) {
+        			if(remove) {
+        				data.delete(object);
+        			}
+        			return true;
+        		}
+        	}
+        	
+        	return false;
+        }
+        
+        filterMessages(stateUri) {
+        	var object = {
+        			stateUri: stateUri,
+        			headUri: undefined,
+        	}
+        	this.filterAgreementStateData(object, true);
+        }
+        
         getCancelUri(agreementUri) {
             const pendingProposals = this.agreementHeadData.pendingProposals;
             for(prop of pendingProposals) {
