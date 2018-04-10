@@ -92,8 +92,9 @@ function genComponentConf() {
         getOpenConnectionsArray(need){
             return need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed).toArray();
         }
-        getUnreadConnectionsCountFilteredByType(need){
-            return need.get('connections').filter(conn => conn.get('unread') && conn.get('state') !== won.WON.Closed).size;
+        getUnreadConnectionsCount(need){
+            const unreadConnections = need && need.get('connections').filter(conn => conn.get('unread') && conn.get('state') !== won.WON.Closed);
+            return unreadConnections && unreadConnections.size > 0 ? unreadConnections.size : undefined;
         }
     }
     Controller.$inject = serviceDependencies;
