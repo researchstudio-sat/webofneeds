@@ -30,6 +30,10 @@ won-connection-message {
         }
     }
 
+    &.won-not-relevant {
+        text-decoration: line-through;
+    }
+
     .won-cm__center {
         grid-area: content;
         font-size: $smallFontSize;

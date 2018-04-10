@@ -23,6 +23,7 @@ import {
     get,
     getIn,
     deepFreeze,
+    dispatchEvent,
 } from '../utils.js'
 import {
 	buildProposalMessage,
@@ -98,34 +99,37 @@ function genComponentConf() {
                         ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
                         ng-show="self.shouldShowRdf && self.contentGraphTrig"
                     >
-<div 
-    class="won-cm__center__trig" 
-    ng-show="self.contentGraphTrigPrefixes">
-<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
-<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
-</div>
-<div 
-    class="won-cm__center__trig">
-<code>{{ self.contentGraphTrig }}</code>
-</div>
+					<div 
+					    class="won-cm__center__trig" 
+					    ng-show="self.contentGraphTrigPrefixes">
+						<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
+						<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
+					</div>
+					<div 
+					    class="won-cm__center__trig">
+						<code>{{ self.contentGraphTrig }}</code>
+					</div>
                     </div>
-
                     <!--
                     <div class="won-cm__center__button" 
                         ng-if="!self.message.get('isProposeMessage')
                             && !self.message.get('outgoingMessage')
                             && self.message.get('isAcceptMessage')
-                            && !self.clicked">
-                        <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">Cancel</button>
+                            && !self.clicked"
+                            && self.message.get('isRelevant')>
+                        <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">
+                        	Cancel
+                       	</button>
                     </div>
                     -->
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage')
                             && !self.message.get('isAcceptMessage')
                             && !self.message.isAccepted
-                            && !self.clicked">
+                            && !self.clicked
+                            && self.message.get('isRelevant')">
                         <button class="won-button--filled thin red" 
-                        		ng-show="!self.message.get('outgoingMessage')" 
+                        		ng-show="!self.message.get('outgoingMessage') && !self.clicked" 
     							ng-click="self.acceptProposal()">
     						Accept
     					</button>
@@ -144,7 +148,8 @@ function genComponentConf() {
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeToCancel')
                             && !self.message.get('isAcceptMessage')
-                            && !self.clicked">
+                            && !self.clicked
+                            && self.message.get('isRelevant')">
                         <button class="won-button--filled thin red" 
                         		ng-show="!self.message.get('outgoingMessage')" 
                         		ng-click="self.acceptProposeToCancel()">
@@ -262,6 +267,17 @@ function genComponentConf() {
             }
         }
         
+        markAsRelevant(relevant){
+        	const payload = {
+                    messageUri: this.message.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                relevant: relevant,
+            };
+        	
+        	this.messages__markAsRelevant(payload);
+        }
+        
         sendProposal(){
         	this.clicked = true;
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
@@ -278,6 +294,8 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	//TODO: isAccepted = true;
         	this.onUpdate();
+        	
+        	this.markAsRelevant(false);
         }
         
         proposeToCancel() {
@@ -296,8 +314,11 @@ function genComponentConf() {
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	//TODO: isAccepted = true;
-        	this.onUpdate();
+        	
+        	this.onUpdate({draft: this.messageUri});
+        	dispatchEvent(this.$element[0], 'update', {draft: this.messageUri});
+        	
+        	this.markAsRelevant(false);
         }
         
         retractMessage() {
