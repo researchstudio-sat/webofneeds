@@ -27,7 +27,7 @@ function genComponentConf() {
       <div
       class="conn__inner"
       ng-class="self.isOpen() ? 'selected' : ''">
-        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get("type") !== self.WON.Connected">
+        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') !== self.WON.Connected">
         </won-connection-state>
         <won-post-header
           need-uri="self.theirNeed.get('uri')"
@@ -36,7 +36,7 @@ function genComponentConf() {
           class="clickable">
         </won-post-header>
 
-        <div class="conn__unreadCount" ng-if="self.connection.get("type") === self.WON.Connected>
+        <div class="conn__unreadCount" ng-if="self.connection.get('state') === self.WON.Connected">
           {{ self.unreadMessagesCount }}
         </div>
       </div>
@@ -77,20 +77,8 @@ function genComponentConf() {
         }
 
         setOpen() {
-            this.markAsRead();
             this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
-        }
-
-        markAsRead(){
-            if(this.connection && this.connection.get("unread") && this.connection.get("state") !== won.WON.Connected){
-                const payload = {
-                    connectionUri: this.connection.get("uri"),
-                    needUri: this.ownNeed.get("uri")
-                };
-
-                this.connections__markAsRead(payload);
-            }
         }
     }
     Controller.$inject = serviceDependencies;
