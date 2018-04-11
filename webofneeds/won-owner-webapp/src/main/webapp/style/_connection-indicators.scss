@@ -1,0 +1,34 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-connection-indicators {
+  display: flex;
+  flex-direction: row;
+
+  @media (max-width: $responsivenessBreakPoint) {
+    padding-top: 0.5rem;
+    justify-content: space-between;
+    width: 75%;
+  }
+
+
+  .indicators__item {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+    padding-right: 1em;
+
+    &__icon {
+      @include fixed-square($bigiconSize);
+    }
+
+    &__caption {
+      line-height: $bigiconSize;
+      padding-left: 0.5em;
+      min-width: 0.5rem;
+      color: black;
+    }
+  }
+}

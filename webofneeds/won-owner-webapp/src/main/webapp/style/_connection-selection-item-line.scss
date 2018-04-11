@@ -12,6 +12,16 @@ won-connection-selection-item {
     @include fixed-square(1rem);
   }
 
+  won-connection-state {
+    position: absolute;
+    left: 0.25rem;
+    top: 0.25rem;
+
+    svg {
+      @include fixed-square(1.5rem);
+    }
+  }
+
   .conn__unreadCount {
     color: $won-primary-color;
     margin-left: 0.5rem;

@@ -35,7 +35,7 @@ class IncomingRequestsController {
         const selectFromState = (state)=>{
             const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
-            const connection = need && need.getIn(["connections", connectionUri]); // TODO: can this be deleted?
+            const connection = need && need.getIn(["connections", connectionUri]);
             const connectionType = need && connectionUri && need.getIn(["connections", connectionUri, 'state']);
 
             if(getIn(state, ['router', 'currentParams', 'myUri']) === undefined) {
@@ -68,7 +68,23 @@ class IncomingRequestsController {
     }
 
     selectedConnection(connectionUri) {
+        this.markAsRead(connectionUri);
         this.router__stateGoCurrent({connectionUri});
+    }
+
+    markAsRead(connectionUri){
+        const need = selectNeedByConnectionUri(this.$ngRedux.getState(), connectionUri);
+        const connections = need && need.get("connections");
+        const connection = connections && connections.get(connectionUri);
+
+        if(connection && connection.get("unread") && connection.get("state") !== won.WON.Connected) {
+            const payload = {
+                connectionUri: connectionUri,
+                needUri: need.get("uri"),
+            };
+
+            this.connections__markAsRead(payload);
+        }
     }
 }
 

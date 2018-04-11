@@ -10,12 +10,16 @@ import angular from 'angular';
 import squareImageModule from './square-image.js';
 import connectionSelectionModule from './connection-selection.js';
 import postHeaderModule from './post-header.js';
+import connectionIndicatorsModule from './connection-indicators.js';
 
 import {
     labels,
 } from '../won-label-utils.js';
 
-import { attach } from '../utils.js';
+import {
+    attach,
+    sortByDate,
+} from '../utils.js';
 import {
     connect2Redux,
 } from '../won-utils.js';
@@ -30,39 +34,49 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-      <div ng-repeat="need in self.sortedNeeds">
-        <div class="covw__own-need clickable"
-          ng-class="{'won-unread': need.get('unread')}"
-          ng-click="self.toggleConnections(need.get('uri'))">
-          <won-post-header
-            need-uri="need.get('uri')"
-            timestamp="'TODOlatestOfThatType'">
-          </won-post-header>
-
-          <div class="covw__unreadCount">
-            {{self.getUnreadConnectionsCount(need)}}
-          </div>
-          <img class="covw__arrow" ng-show="self.isOpen(need.get('uri'))"
-              src="generated/icon-sprite.svg#ico16_arrow_up"/>
-          <img class="covw__arrow" ng-show="!self.isOpen(need.get('uri'))"
-              src="generated/icon-sprite.svg#ico16_arrow_down"/>
+        <div ng-repeat="need in self.sortedNeeds">
+            <div class="covw__own-need"
+                ng-class="{'won-unread': need.get('unread')}">
+                <won-post-header
+                    need-uri="need.get('uri')"
+                    timestamp="'TODOlatestOfThatType'">
+                </won-post-header>
+                <won-connection-indicators on-selected-connection="self.selectConnection(connectionUri)" need-uri="need.get('uri')"></won-connection-indicators>
+                <svg
+                    style="--local-primary:var(--won-secondary-color);"
+                    class="covw__arrow clickable"
+                    ng-show="self.isOpen(need.get('uri')) && !self.isOpenByConnection(need.get('uri'))"
+                    ng-click="self.closeConnections(need.get('uri'))" >
+                        <use href="#ico16_arrow_up"></use>
+                </svg>
+                <svg
+                    style="--local-primary:var(--won-disabled-color);"
+                    class="covw__arrow"
+                    ng-show="self.isOpen(need.get('uri')) && self.isOpenByConnection(need.get('uri'))" >
+                        <use href="#ico16_arrow_up"></use>
+                </svg>
+                <svg style="--local-primary:var(--won-secondary-color);"
+                    class="covw__arrow clickable"
+                    ng-show="!self.isOpen(need.get('uri'))"
+                    ng-click="self.openConnections(need.get('uri'))" >
+                        <use href="#ico16_arrow_down"></use>
+                </svg>
+            </div>
+            <won-connection-selection-item
+                ng-if="self.isOpen(need.get('uri'))"
+                ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
+                on-selected-connection="self.selectConnection(connectionUri)"
+                connection-uri="conn.get('uri')"
+                ng-class="{'won-unread': conn.get('unread')}">
+            </won-connection-selection-item>
         </div>
-        <won-connection-selection-item
-          ng-show="self.isOpen(need.get('uri'))"
-          ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
-          on-selected-connection="self.selectConnection(connectionUri)"
-          connection-uri="conn.get('uri')"
-          ng-class="{'won-unread': conn.get('unread')}">
-        </won-connection-selection-item>
-      </div>
     `;
 
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-
-            //this.labels = labels;
             this.open = open;
+            //this.labels = labels;
             window.co4dbg = this;
 
             const self = this;
@@ -72,56 +86,46 @@ function genComponentConf() {
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
+                const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
-                let sortedNeeds = relevantOwnNeeds && relevantOwnNeeds.toArray();
-                if(sortedNeeds) {
-                    sortedNeeds.sort(function(a,b) {
-                        const bDate = b.get("lastUpdateDate") && b.get("lastUpdateDate").getTime();
-                        const aDate = a.get("lastUpdateDate") && a.get("lastUpdateDate").getTime();
-
-                        return bDate - aDate;
-                    });
+                if(needUriImpliedInRoute) {
+                    this.open[needUriImpliedInRoute] = true;
                 }
 
+                let sortedNeeds = sortByDate(relevantOwnNeeds);
+
                 return {
-                    needImpliedInRoute,
+                    needUriImpliedInRoute,
                     sortedNeeds: sortedNeeds,
                 }
             };
-            connect2Redux(selectFromState, actionCreators, [], this);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
         }
-        toggleConnections(ownNeedUri) {
-            this.open[ownNeedUri] = !this.open[ownNeedUri]
+
+        openConnections(ownNeedUri) {
+            this.open[ownNeedUri] = true;
         }
+
+        closeConnections(ownNeedUri) {
+            if(!this.isOpenByConnection(ownNeedUri)) {
+                this.open[ownNeedUri] = false;
+            }
+        }
+
         isOpen(ownNeedUri) {
-            return !!this.open[ownNeedUri];
+            return this.isOpenByConnection(ownNeedUri) || !!this.open[ownNeedUri];
         }
+
+        isOpenByConnection(ownNeedUri) {
+            return this.needUriImpliedInRoute === ownNeedUri;
+        }
+
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
         }
 
         getOpenConnectionsArraySorted(need){
-            let sortedConnections = this.getOpenConnectionsArray(need);
-
-            if(sortedConnections) {
-                sortedConnections.sort(function(a,b) {
-                    const bDate = b.get("lastUpdateDate") && b.get("lastUpdateDate").getTime();
-                    const aDate = a.get("lastUpdateDate") && a.get("lastUpdateDate").getTime();
-
-                    return bDate - aDate;
-                });
-            }
-
-            return sortedConnections;
-        }
-
-        getOpenConnectionsArray(need) {
-            return need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed).toArray();
-        }
-
-        getUnreadConnectionsCount(need){
-            const unreadConnections = need && need.get('connections').filter(conn => conn.get('unread') && conn.get('state') !== won.WON.Closed);
-            return unreadConnections && unreadConnections.size > 0 ? unreadConnections.size : undefined;
+            return sortByDate(need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed));
         }
     }
     Controller.$inject = serviceDependencies;
@@ -150,6 +154,7 @@ export default angular.module('won.owner.components.connectionsOverview', [
         squareImageModule,
         connectionSelectionModule,
         postHeaderModule,
-    ])
+        connectionIndicatorsModule,
+])
     .directive('wonConnectionsOverview', genComponentConf)
     .name;

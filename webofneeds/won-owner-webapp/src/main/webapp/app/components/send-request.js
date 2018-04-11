@@ -56,12 +56,12 @@ function genComponentConf() {
             ng-if="!self.sendAdHocRequest"
             class="won-button--filled black"
             ng-click="self.closeRequest()">
-              Remove
+              Remove This
           </button>
           <button
             class="won-button--filled red"
             ng-click="self.sendRequest(self.message)">
-              Send Request
+              Ask to Chat
           </button>
         </div>
         <a target="_blank"

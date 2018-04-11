@@ -131,28 +131,5 @@ won-feed-item {
     a {
       text-decoration: none;
     }
-
-
-    &__indicators {
-      display: flex;
-      flex-direction: row;
-
-      &__item {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        padding-right: 1em;
-
-        &__icon {
-          @include fixed-square($bigiconSize);
-        }
-
-        &__caption {
-          padding-left: 1.25rem;
-          padding-right: 1.25rem; //TODO: CAPTION PADDING COULD LEAD TO PROBLEMS WHEN RESIZING WINDOW
-          color: $won-primary-color;
-        }
-      }
-    }
   }
 }

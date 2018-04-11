@@ -1,13 +1,15 @@
 ;
 
 import angular from 'angular';
-import squareImageModule from '../components/square-image.js';
+import squareImageModule from './square-image.js';
+import connectionIndicatorsModule from './connection-indicators.js';
 import won from '../won-es6.js';
 import { attach } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import { labels, relativeTime, } from '../won-label-utils.js';
 import {
     selectAllOwnNeeds,
+    selectNeedByConnectionUri,
 } from '../selectors.js';
 import {
     connect2Redux,
@@ -46,88 +48,7 @@ function genComponentConf() {
                     </div>
                 </a>
             </div>
-            <div class="pil__indicators">
-                <a
-                    class="pil__indicators__item clickable"
-                    ng-show="self.hasConversations"
-                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})">
-                        <svg class="pil__indicators__item__icon"
-                            style="--local-primary:#F09F9F;"
-                            ng-show="!self.unreadConversationsCount">
-                                <use href="#ico36_message"></use>
-                        </svg>
-
-                        <svg style="--local-primary:var(--won-primary-color);"
-                             ng-show="self.unreadConversationsCount"
-                             class="pil__indicators__item__icon">
-                                <use href="#ico36_message"></use>
-                        </svg>
-
-                        <span class="pil__indicators__item__caption" title="Number of chats with unread messages">
-                            {{ self.unreadConversationsCount }}
-                        </span>
-                </a>
-                <div class="pil__indicators__item" ng-show="!self.hasConversations" title="No chats in this post">
-                    <svg class="pil__indicators__item__icon"
-                        style="--local-primary:#CCD2D2;">
-                            <use href="#ico36_message"></use>
-                    </svg>
-                     <span class="pil__indicators__item__caption"></span>
-                </div>
-                <a
-                    class="pil__indicators__item clickable"
-                    ng-show="self.hasRequests"
-                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})"> <!-- TODO: set the connectionType to connected since we pulled these views together -->
-
-                        <svg class="pil__indicators__item__icon"
-                            style="--local-primary:#F09F9F;"
-                            ng-show="!self.unreadRequestsCount">
-                                <use href="#ico36_incoming"></use>
-                        </svg>
-                        <svg style="--local-primary:var(--won-primary-color);"
-                            ng-show="self.unreadRequestsCount"
-                            class="pil__indicators__item__icon">
-                                <use href="#ico36_incoming"></use>
-                        </svg>
-                        <span class="pil__indicators__item__caption" title="Number of new requests">
-                            {{ self.unreadRequestsCount }}
-                        </span>
-                </a>
-                <div class="pil__indicators__item" ng-show="!self.hasRequests" title="No requests to this post">
-                    <svg class="pil__indicators__item__icon"
-                        style="--local-primary:#CCD2D2;">
-                            <use href="#ico36_incoming"></use>
-                    </svg>
-                     <span class="pil__indicators__item__caption"></span>
-                </div>
-                <a
-                    class="pil__indicators__item clickable"
-                    ng-show="self.hasMatches"
-                    ng-click="self.router__stateGoAbs('post', {postUri: self.needUri, connectionType: self.WON.Connected})">
-
-                        <svg class="pil__indicators__item__icon"
-                            style="--local-primary:#F09F9F;"
-                            ng-show="!self.unreadMatchesCount">
-                                <use href="#ico36_match"></use>
-                        </svg>
-
-                        <svg style="--local-primary:var(--won-primary-color);"
-                            ng-show="self.unreadMatchesCount"
-                            class="pil__indicators__item__icon">
-                                <use href="#ico36_match"></use>
-                        </svg>
-                        <span class="pil__indicators__item__caption" title="Number of new matches">
-                            {{ self.unreadMatchesCount }}
-                        </span>
-                </a>
-                <div class="pil__indicators__item" ng-show="!self.hasMatches" title="No matches for this post">
-                    <svg class="pil__indicators__item__icon"
-                        style="--local-primary:#CCD2D2;">
-                            <use href="#ico36_match"></use>
-                    </svg>
-                    <span class="pil__indicators__item__caption"></span>
-                </div>
-            </div>
+            <won-connection-indicators need-uri="self.need.get('uri')" on-selected-connection="self.selectConnection(connectionUri)"></won-connection-indicators>
     `;
 
     class Controller {
@@ -157,17 +78,31 @@ function genComponentConf() {
                     relativeCreationDate: need ?
                         relativeTime(state.get('lastUpdateTime'), need.get('creationDate')) :
                         "",
-                    hasConversations: conversations && conversations.size > 0,
-                    hasRequests: requests && requests.size > 0,
-                    hasMatches: matches && matches.size > 0,
-                    unreadConversationsCount: unreadConversationsCount > 0 ? unreadConversationsCount : undefined,
-                    unreadRequestsCount: unreadRequestsCount > 0 ? unreadRequestsCount : undefined,
-                    unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
                     WON: won.WON,
                 };
             };
 
             connect2Redux(selectFromState, actionCreators, ['self.needUri'], this);
+        }
+
+        selectConnection(connectionUri) {
+            this.markAsRead(connectionUri);
+            this.router__stateGoAbs('post', {connectionUri: connectionUri, postUri: this.needUri, connectionType: won.WON.Connected});
+        }
+
+        markAsRead(connectionUri) {
+            const need = selectNeedByConnectionUri(this.$ngRedux.getState(), connectionUri);
+            const connections = need && need.get("connections");
+            const connection = connections && connections.get(connectionUri);
+
+            if (connection && connection.get("unread") && connection.get("state") !== won.WON.Connected) {
+                const payload = {
+                    connectionUri: connectionUri,
+                    needUri: this.needUri,
+                };
+
+                this.connections__markAsRead(payload);
+            }
         }
 
         isActive() {
@@ -189,7 +124,8 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.postItemLine', [
-    squareImageModule
+    squareImageModule,
+    connectionIndicatorsModule,
 ])
     .directive('wonPostItemLine', genComponentConf)
     .name;

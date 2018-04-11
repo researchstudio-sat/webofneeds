@@ -19,6 +19,7 @@ import {
 } from '../selectors.js';
 
 import postHeaderModule from './post-header.js';
+import connectionStateModule from './connection-state.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -26,6 +27,8 @@ function genComponentConf() {
       <div
       class="conn__inner"
       ng-class="self.isOpen() ? 'selected' : ''">
+        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') !== self.WON.Connected">
+        </won-connection-state>
         <won-post-header
           need-uri="self.theirNeed.get('uri')"
           timestamp="self.lastUpdateTimestamp"
@@ -33,7 +36,7 @@ function genComponentConf() {
           class="clickable">
         </won-post-header>
 
-        <div class="conn__unreadCount">
+        <div class="conn__unreadCount" ng-if="self.connection.get('state') === self.WON.Connected">
           {{ self.unreadMessagesCount }}
         </div>
       </div>
@@ -59,6 +62,7 @@ function genComponentConf() {
                     WON: won.WON,
                     ownNeed,
                     connection,
+                    connectionUri: connection && connection.get("uri"),
                     openConnectionUri: selectOpenConnectionUri(state),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     theirNeed,
@@ -73,20 +77,8 @@ function genComponentConf() {
         }
 
         setOpen() {
-            this.markAsRead();
             this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
-        }
-
-        markAsRead(){
-            if(this.connection && this.connection.get("unread") && this.connection.get("state") !== won.WON.Connected){
-                const payload = {
-                    connectionUri: this.connection.get("uri"),
-                    needUri: this.ownNeed.get("uri")
-                };
-
-                this.connections__markAsRead(payload);
-            }
         }
     }
     Controller.$inject = serviceDependencies;
@@ -108,6 +100,7 @@ function genComponentConf() {
 }
 export default angular.module('won.owner.components.connectionSelectionItem', [
         postHeaderModule,
+        connectionStateModule,
     ])
     .directive('wonConnectionSelectionItem', genComponentConf)
     .name;
