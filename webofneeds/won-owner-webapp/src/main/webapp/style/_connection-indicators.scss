@@ -1,4 +1,9 @@
-won-connection-indicator {
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-connection-indicators {
   display: flex;
   flex-direction: row;
 
@@ -8,7 +13,8 @@ won-connection-indicator {
     width: 75%;
   }
 
-  &__item {
+
+  .indicators__item {
     display: flex;
     align-items: flex-start;
     flex-direction: row;
