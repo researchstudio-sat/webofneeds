@@ -10,9 +10,10 @@ won-connections-overview {
   .covw__own-need {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
 
     padding: 0.5rem 0; // vert horiz
+    padding-right: 0.5rem;
 
     border-bottom: $thinGrayBorder;
 
