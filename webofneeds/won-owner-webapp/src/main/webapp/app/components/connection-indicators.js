@@ -44,7 +44,7 @@ function genComponentConf() {
         </a>
         <div class="indicators__item" ng-show="!self.latestConnectedUri" title="No chats in this post">
             <svg class="indicators__item__icon"
-                style="--local-primary:#CCD2D2;">
+                style="--local-primary:var(--won-disabled-color);">
                     <use href="#ico36_message"></use>
             </svg>
              <span class="indicators__item__caption"></span>
@@ -69,7 +69,7 @@ function genComponentConf() {
         </a>
         <div class="indicators__item" ng-show="!self.latestIncomingRequestUri" title="No requests to this post">
             <svg class="indicators__item__icon"
-                style="--local-primary:#CCD2D2;">
+                style="--local-primary:var(--won-disabled-color);">
                     <use href="#ico36_incoming"></use>
             </svg>
              <span class="indicators__item__caption"></span>
@@ -96,7 +96,7 @@ function genComponentConf() {
         </a>
         <div class="indicators__item" ng-show="!self.latestMatchUri" title="No matches for this post">
             <svg class="indicators__item__icon"
-                style="--local-primary:#CCD2D2;">
+                style="--local-primary:var(--won-disabled-color);">
                     <use href="#ico36_match"></use>
             </svg>
             <span class="indicators__item__caption"></span>
