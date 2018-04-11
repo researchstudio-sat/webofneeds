@@ -46,11 +46,27 @@ function genComponentConf() {
                     on-selected-connection="self.selectConnection(connectionUri)" 
                     need-uri="need.get('uri')">
                 </won-connection-indicators>
-                <img class="covw__arrow" ng-show="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
-                    ng-class="{'clickable' : !self.isOpenByConnection(need.get('uri'))}"
-                    src="generated/icon-sprite.svg#ico16_arrow_up" ng-click="self.closeConnections(need.get('uri'))"/>
-                <img class="covw__arrow clickable" ng-show="!self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
-                    src="generated/icon-sprite.svg#ico16_arrow_down" ng-click="self.openConnections(need.get('uri'))"/>
+                <div ng-style="{'visibility': self.showConnectionsDropdown(need) ? 'visible' : 'hidden'}">
+                    <svg
+                        style="--local-primary:var(--won-secondary-color);"
+                        class="covw__arrow clickable"
+                        ng-show="self.isOpen(need.get('uri')) && !self.isOpenByConnection(need.get('uri'))"
+                        ng-click="self.closeConnections(need.get('uri'))" >
+                            <use href="#ico16_arrow_up"></use>
+                    </svg>
+                    <svg
+                        style="--local-primary:var(--won-disabled-color);"
+                        class="covw__arrow"
+                        ng-show="self.isOpen(need.get('uri')) && self.isOpenByConnection(need.get('uri'))" >
+                            <use href="#ico16_arrow_up"></use>
+                    </svg>
+                    <svg style="--local-primary:var(--won-secondary-color);"
+                        class="covw__arrow clickable"
+                        ng-show="!self.isOpen(need.get('uri'))"
+                        ng-click="self.openConnections(need.get('uri'))" >
+                            <use href="#ico16_arrow_down"></use>
+                    </svg>
+                </div>
             </div>
             <won-connection-selection-item
                 ng-if="self.isOpen(need.get('uri'))"
@@ -81,6 +97,10 @@ function genComponentConf() {
 
                 let sortedNeeds = self.sortNeeds(allOwnNeeds);
 
+                if(needUriImpliedInRoute) {
+                    this.open[needUriImpliedInRoute] = true;
+                }
+
                 return {
                     needUriImpliedInRoute,
                     sortedNeeds: sortedNeeds,
@@ -94,7 +114,9 @@ function genComponentConf() {
         }
 
         closeConnections(ownNeedUri) {
-            this.open[ownNeedUri] = false;
+            if(!this.isOpenByConnection(ownNeedUri)) {
+                this.open[ownNeedUri] = false;
+            }
         }
 
         isOpen(ownNeedUri) {
