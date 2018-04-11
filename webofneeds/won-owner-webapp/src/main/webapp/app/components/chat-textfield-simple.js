@@ -75,6 +75,7 @@ function genComponentConf() {
         }
         keydown(e) {
             if(e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault(); // prevent a newline from being entered
                 this.submit();
                 return false;
             }
@@ -102,6 +103,7 @@ function genComponentConf() {
                 const txtEl = this.textField();
                 if(txtEl) {
                     txtEl.value = "";
+                    txtEl.dispatchEvent(new Event('input')); // dispatch input event so autoresizer notices value-change
                     txtEl.focus(); //refocus so people can keep writing
                 }
                 const payload = { value, valid };
