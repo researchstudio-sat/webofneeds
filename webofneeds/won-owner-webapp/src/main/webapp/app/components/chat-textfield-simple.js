@@ -13,15 +13,12 @@ import angular from 'angular';
 // import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
-// import Medium from 'medium.js';
 import {
     dispatchEvent,
     attach,
     delay,
     is,
 } from '../utils.js';
-// import Autogrow from 'textarea-autogrow';
-window.autogrow4dbg = Autogrow;
 import { actionCreators }  from '../actions/actions.js';
 import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
@@ -52,9 +49,6 @@ function genComponentConf() {
         constructor(/* arguments <- serviceDependencies */) {
             attach(this, serviceDependencies, arguments);
             window.ctfs4dbg = this;
-
-            // this.autogrow = new Autogrow(this.textField(), 3 /* lines max-height */);
-            // this.autogrow.autogrowFn(); // trigger resize at least once so it doesn't jump during first input later
 
             /*
             const selectFromState = (state) => ({
