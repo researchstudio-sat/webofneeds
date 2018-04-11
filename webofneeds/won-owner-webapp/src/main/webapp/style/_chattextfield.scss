@@ -55,6 +55,15 @@ chat-textfield, chat-textfield-simple {
     }
   }
 
+  textarea.wdt__text {
+    &.valid {
+        border-color: $won-line-gray;
+    }
+    &.invalid {
+        border-color: $won-primary-color;
+    }
+  }
+
   .wdt__text .Medium, 
   .wdt__text .Medium-placeholder {
     box-sizing: border-box;
