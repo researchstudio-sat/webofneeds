@@ -113,8 +113,12 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
                 ng-class="{
+<<<<<<< HEAD
                     'won-unread' : msg.get('newMessage'),
                     'won-not-relevant': !msg.get('isRelevant'),
+=======
+                    'won-unread' : msg.get('unread'),
+>>>>>>> branch 'master' of https://github.com/researchstudio-sat/webofneeds.git
                     'won-cm--left' : !msg.get('outgoingMessage'),
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"
