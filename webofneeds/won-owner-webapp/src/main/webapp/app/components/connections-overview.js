@@ -67,21 +67,18 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state)=> {
-                //Select all needs with at least one connection
-                const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0);
-                //Select all needs, regardless of connections
-                const allOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections"));
+                const allOwnNeeds = selectAllOwnNeeds(state);
+
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
-                let sortedNeeds = sortByDate(allOwnNeeds);
+                let sortedNeeds = self.sortNeeds(allOwnNeeds);
 
                 return {
                     needUriImpliedInRoute,
                     sortedNeeds: sortedNeeds,
-                    relevantOwnNeeds,
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
@@ -105,6 +102,14 @@ function genComponentConf() {
 
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
+        }
+
+        // sort needs by date and put closed needs at the end of the list
+        sortNeeds(allNeeds) {
+            openNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted));
+            closedNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.InactiveCompacted));
+
+            return openNeeds.concat(closedNeeds);
         }
 
         hasRelevantConnections(need){
