@@ -24,26 +24,30 @@ import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
 function genComponentConf() {
     let template = `
-        <div class="wdt__left">
-            <textarea 
-                won-textarea-autogrow
-                data-min-rows="1"
-                data-max-rows="4"
+        <textarea 
+            won-textarea-autogrow
+            data-min-rows="1"
+            data-max-rows="4"
 
-                class="wdt__text"
-                ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }"
-                tabindex="0"
-                placeholder="{{::self.placeholder}}"></textarea>
-            <span class="wdt__charcount" ng-show="self.maxChars">
-                {{ self.charactersLeft() }} characters left
-            </span>
-        </div>
+            class="wdt__text"
+            ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }"
+            tabindex="0"
+            placeholder="{{::self.placeholder}}"></textarea>
+
         <button
             class="wdt__submitbutton red"
             ng-show="::self.submitButtonLabel"
             ng-click="::self.submit()">
             {{ ::(self.submitButtonLabel || 'Submit') }}
         </button>
+
+        <div class="wdt__charcount" ng-show="self.maxChars">
+            {{ self.charactersLeft() }} characters left
+        </div>
+
+        <div class="wdt__helptext" ng-show="self.helpText">
+            {{ self.helpText }}
+        </div>
     `;
 
     const serviceDependencies = ['$scope', '$element', /*'$ngRedux',/*injections as strings here*/];
@@ -145,6 +149,8 @@ function genComponentConf() {
         scope: {
             placeholder: '=', // NOTE: bound only once
             maxChars: '=',
+            helpText: '=',
+
             /*
              * Usage:
              *  on-input="::myCallback(value, valid)"

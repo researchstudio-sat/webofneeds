@@ -228,13 +228,17 @@ function genComponentConf() {
                 placeholder="::'Enter ttl...'"
                 submit-button-label="::'Send RDF'"
                 on-submit="::self.sendRdf(value)"
+                help-text="::self.rdfTextfieldHelpText"
             >
             </chat-textfield-simple>
+            <!--
+
             <p ng-show="self.shouldShowRdf">
                 Expects valid turtle. &lt;{{ self.msguriPlaceholder }}&gt;
                 will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` 
                 for prefixes that will be added automatically.
             </p>
+            -->
             <div class="pm__footer__agreement">
                 <!-- quick and dirty button to get agreements -->
                 <button class="won-button--filled thin black"
@@ -272,6 +276,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             
+
             
             this.reload = true;
             
@@ -283,15 +288,18 @@ function genComponentConf() {
             
             this.agreementHeadData = this.cloneDefaultData();
             this.agreementStateData = this.cloneDefaultSateData();
+            this.showAgreementData = false;
            
-            
-            
             this.loading = false;
             
-            this.showAgreementData = false;
+            this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
+                `<${won.WONMSG.msguriPlaceholder}> will ` +
+                'be the uri generated for this message. See \`won.minimalTurtlePrefixes\` ' +
+                'for prefixes that will be added automatically. E.g.' +
+                `\`<${won.WONMSG.msguriPlaceholder}> won:hasTextMessage "hello world!". \``;
+            
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
-            this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
 
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);

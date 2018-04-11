@@ -3,32 +3,19 @@
 
 
 chat-textfield, chat-textfield-simple {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch; //all same height
-
   min-width: 0; // so a size is specified and break-word works
 
-  .wdt__left {
-    flex-grow: 1; // use up all the space not occupied by the button
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-
-    min-width: 0; // so a size is specified and break-word works
-  }
 
   .wdt__submitbutton {
     @extend .won-button--filled;
-    margin-left: 0.5rem;
   }
 
-
-
   .wdt__text {
-    align-self: stretch;
-    flex-grow: 1;
+    .Medium {
+      border-style: solid;
+      border-width: $thinBorderWidth;
+      border-radius: 0.1rem;
+    }
 
     &.valid { .Medium {
         border-color: $won-line-gray;
@@ -37,11 +24,22 @@ chat-textfield, chat-textfield-simple {
     &.invalid { .Medium {
         border-color: $won-primary-color;
     }}
+  }
 
+  textarea.wdt__text {
+    border-style: solid;
+    border-width: $thinBorderWidth;
+    border-radius: 0.1rem;
+    &.valid {
+        border-color: $won-line-gray;
+    }
+    &.invalid {
+        border-color: $won-primary-color;
+    }
+  }
+
+  .wdt__text {
     .Medium {
-      border-width: $thinBorderWidth;
-      border-style: solid;
-      border-radius: 0.1rem;
       background-color: white;
     }
 
@@ -55,14 +53,6 @@ chat-textfield, chat-textfield-simple {
     }
   }
 
-  textarea.wdt__text {
-    &.valid {
-        border-color: $won-line-gray;
-    }
-    &.invalid {
-        border-color: $won-primary-color;
-    }
-  }
 
   .wdt__text .Medium, 
   .wdt__text .Medium-placeholder {
@@ -97,8 +87,70 @@ chat-textfield, chat-textfield-simple {
 
 
 
-  .wdt__charcount {
+  .wdt__charcount, 
+  .wdt__helptext {
     @include fine-print;
+  }
+}
+
+
+
+
+chat-textfield {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch; //all same height
+
+  .wdt__left {
+    flex-grow: 1; // use up all the space not occupied by the button
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    min-width: 0; // so a size is specified and break-word works
+  }
+
+  .wdt__text {
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  .wdt__submitbutton {
+    margin-left: 0.5rem;
+  }
+  .wdt__charcount, 
+  .wdt__helptext {
     margin-top: $smallFontSize * 0.5;
+  }
+}
+
+
+
+chat-textfield-simple {
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-template-columns: 1fr auto;
+  // grid-template-rows: auto;
+  // grid-template-areas:
+  //   "text button";
+    // "cnt cnt"
+    // "help help";
+  .wdt__text { 
+    grid-area: text; 
+    grid-row: 1 / span 1;
+    grid-column: 1 / span 1;
+  }
+  .wdt__submitbutton { 
+    grid-area: button; 
+    grid-row: 1 / span 1;
+    grid-column: 2 / span 1;
+  }
+  .wdt__charcount { 
+    grid-area: cnt; 
+    grid-column: 1 / span 2;
+  }
+  .wdt__helptext { 
+    grid-area: help; 
+    grid-column: 1 / span 2;
   }
 }
