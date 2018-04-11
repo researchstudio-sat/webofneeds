@@ -71,11 +71,26 @@ class Controller {
     }
 
     openConnection(connectionUri) {
+        this.markAsRead(connectionUri);
         this.router__stateGoAbs('post', {
             postUri: decodeURIComponent(this.postUri),
             connectionUri: connectionUri,
             connectionType: this.connectionType,
         });
+    }
+
+    markAsRead(connectionUri){
+        const connections = this.post && this.post.get("connections");
+        const connection = connections && connections.get(connectionUri);
+
+        if(connection && connection.get("unread") && connection.get("state") !== won.WON.Connected) {
+            const payload = {
+                connectionUri: connectionUri,
+                needUri: this.postUri,
+            };
+
+            this.connections__markAsRead(payload);
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import {
     getIn,
     attach,
     decodeUriComponentProperly,
+    sortByDate,
 } from '../utils.js';
 import {
     labels,
@@ -58,15 +59,7 @@ function genComponentConf() {
                 // const connectionType = connectionTypeInParams || self.connectionType;
                 const connections = ownNeed && ownNeed.get("connections").filter(conn => conn.get("state") !== won.WON.Closed);
 
-                let sortedConnections = connections && connections.toArray();
-                if(sortedConnections) {
-                    sortedConnections.sort(function(a,b) {
-                        const bDate = b.get("lastUpdateDate") && b.get("lastUpdateDate").getTime();
-                        const aDate = a.get("lastUpdateDate") && a.get("lastUpdateDate").getTime();
-
-                        return bDate - aDate;
-                    });
-                }
+                let sortedConnections = sortByDate(connections);
 
                 return {
                     connections,
