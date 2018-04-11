@@ -145,6 +145,8 @@ function genComponentConf() {
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"
                 on-update="[self.showAgreementData = false, self.filterMessages(draft)]">
+                on-update="[self.showAgreementData = false, self.filterMessages(draft)]"
+                on-send-proposal="::self.addProposal(proposalUri)">
             </won-connection-message>
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
 	            <img class="pm__content__agreement__icon clickable"
@@ -197,7 +199,7 @@ function genComponentConf() {
 	            
             </div>
             <!-- Loading Text -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.loading && self.showLoadingInfo && !self.agreementDataIsValid()">
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.showLoadingInfo && !self.agreementDataIsValid()">
 	            <img class="pm__content__agreement__icon clickable"
 	            		src="generated/icon-sprite.svg#ico36_close"
 	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
@@ -212,6 +214,8 @@ function genComponentConf() {
 	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
 	            <div class="pm__content__agreement__title">
 	            		No Agreement Data found
+	            		<span class="ng-hide" ng-show="loading">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!loading">No Agreement Data found</span>
                 </div>
             </div>
         </div>
@@ -359,7 +363,7 @@ function genComponentConf() {
             );
 
             this.$scope.$watch(
-                () => (this.chatMessages && this.chatMessages.length) || this.agreementHeadData, // trigger if there's messages added (or removed)
+                () => (this.chatMessages && this.chatMessages.length), // trigger if there's messages added (or removed)
                 () => delay(0).then(() =>
                         // scroll to bottom directly after rendering, if snapped
                         this.updateScrollposition()
@@ -459,8 +463,10 @@ function genComponentConf() {
                 this.connection = connection;
             }
 
-        	this.loading = true;
-        	this.agreementStateData = this.cloneDefaultSateData();
+        	this.$scope.loading = true;
+        	//this.setLoading(true);
+        	//this.loading["value"] = true;
+        	this.agreementLoadingData = this.cloneDefaultStateData();
             this.getAgreementDataUris();
         }
 
@@ -480,9 +486,13 @@ function genComponentConf() {
                     }
 
     			    this.loading = false;
-                }).catch(error => {
-                    console.error('Error:', error);
-    				this.loading = false;
+                }).then(response => {
+    				this.agreementStateData = this.agreementLoadingData;
+    				this.$scope.loading = false;
+    				this.snapToBottom();
+    		}).catch(error => {
+    				console.error('Error:', error);
+    				this.$scope.loading = false;
                 })
         }
 
@@ -516,31 +526,29 @@ function genComponentConf() {
         addAgreementDataToSate(eventUri, key, obj) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
-                .then(response => {
-                    won.wonMessageFromJsonLd(response)
-                        .then(msg => {
-                            var agreementObject = obj;
+            .then(response => {
+                won.wonMessageFromJsonLd(response)
+                .then(msg => {
+                    var agreementObject = obj;
 
-                            if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
-                                /*if we find out that the receiverneed of the crawled event is actually our
-                                 need we will call the method again but this time with the correct eventUri
-                                 */
-                                if(!agreementObject) {
-                                    agreementObject = this.cloneDefaultAgreementObject();
-                                }
-                                agreementObject.headUri = msg.getMessageUri();
+                    if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
+                        /*if we find out that the receiverneed of the crawled event is actually our
+                         need we will call the method again but this time with the correct eventUri
+                         */
+                        if(!agreementObject) {
+                            agreementObject = this.cloneDefaultAgreementObject();
+                        }
+                        agreementObject.headUri = msg.getMessageUri();
                         this.addAgreementDataToSate(msg.getRemoteMessageUri(), key, agreementObject);
-                            }else {
-                                if(!agreementObject) {
-                                    agreementObject = this.cloneDefaultAgreementObject();
-                                    agreementObject.headUri = msg.getMessageUri();
-                                }
-                                agreementObject.stateUri = msg.getMessageUri();
-
-                    	this.agreementStateData[key].add(agreementObject);
-                                    this.messages__connectionMessageReceived(msg);
-                                }
-                        })
+                    }else {
+                        if(!agreementObject) {
+                            agreementObject = this.cloneDefaultAgreementObject();
+                            agreementObject.headUri = msg.getMessageUri();
+                        }
+                    
+                    	agreementObject.stateUri = msg.getMessageUri();
+                    	this.agreementLoadingData[key].add(agreementObject);
+                    	
                     	//Dont load in state agein!
                     	var found = false;
                     	for(i = 0; i < this.chatMessages.length; i++) {
@@ -551,19 +559,13 @@ function genComponentConf() {
                     	if(!found) {
                     		this.messages__connectionMessageReceived(msg);
                     	}
-                    	/*
-                    	if(!this.checkObject(this.agreementLoadingData[key], agreementObject)) {
-                    		if(!this.filterAgreementStateData(this.agreementLoadingData, agreementObject, false)) {
-                    			this.messages__connectionMessageReceived(msg);
-                    		}
-                    		//this.filterAgreementStateData(agreementObject);
-                    	}*/
                     }
                 })
+            })
         }
 
         filterAgreementStateData(agreementObject, remove) {
-        	var keySet = new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"])
+        	var keySet = new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"]);
 			for(key of keySet) {
     			this.checkObject(this.agreementStateData[key], agreementObject, remove)
 			}

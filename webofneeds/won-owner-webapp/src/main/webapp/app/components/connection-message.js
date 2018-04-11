@@ -284,7 +284,8 @@ function genComponentConf() {
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	const trimmedMsg = buildProposalMessage(uri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate();
+        	//this.onUpdate();
+        	this.onSendProposal({proposalUri: uri});
         }
         
         acceptProposal() {
@@ -335,9 +336,7 @@ function genComponentConf() {
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	const trimmedMsg = buildProposalMessage(uri, "rejects",  this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.onUpdate();
-            
+        	this.onUpdate();  
         }
 
         rdfToString(jsonld){
@@ -375,6 +374,7 @@ function genComponentConf() {
              *  on-update="::myCallback(draft)"
              */
             onUpdate: '&',
+            onSendProposal: '&',
         },
         template: template,
     }
