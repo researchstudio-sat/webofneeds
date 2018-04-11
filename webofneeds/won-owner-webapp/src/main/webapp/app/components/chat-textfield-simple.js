@@ -42,7 +42,7 @@ function genComponentConf() {
             class="wdt__submitbutton red"
             ng-show="::self.submitButtonLabel"
             ng-click="::self.submit()">
-            {{ ::(self.submitButtonLabel || 'Send') }}
+            {{ ::(self.submitButtonLabel || 'Submit') }}
         </button>
     `;
 
