@@ -223,13 +223,18 @@ function genComponentConf() {
             -->
 
             <chat-textfield-simple
-                class="pm__footer__rdfinput"
                 ng-show="self.shouldShowRdf"
-                placeholder="::self.rdftextfieldPlaceholder"
+                class="pm__footer__rdfinput"
+                placeholder="::'Enter ttl...'"
                 submit-button-label="::'Send RDF'"
                 on-submit="::self.sendRdf(value)"
             >
             </chat-textfield-simple>
+            <p ng-show="self.shouldShowRdf">
+                Expects valid turtle. &lt;{{ self.msguriPlaceholder }}&gt;
+                will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` 
+                for prefixes that will be added automatically.
+            </p>
             <div class="pm__footer__agreement">
                 <!-- quick and dirty button to get agreements -->
                 <button class="won-button--filled thin black"
@@ -287,10 +292,6 @@ function genComponentConf() {
             
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
             this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
-            this.rdftextfieldPlaceholder = "Expects valid turtle. <" +
-                won.WONMSG.msguriPlaceholder +
-                "> will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` " +
-                "for prefixes that will be added automatically.";
 
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);

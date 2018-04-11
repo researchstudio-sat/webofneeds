@@ -1,6 +1,7 @@
 @import 'won';
 @import 'button';
 
+
 chat-textfield, chat-textfield-simple {
   display: flex;
   flex-direction: row;
@@ -53,6 +54,18 @@ chat-textfield, chat-textfield-simple {
       pointer-events: none; //click-through
     }
   }
+
+  .wdt__text .Medium, 
+  .wdt__text .Medium-placeholder {
+    box-sizing: border-box;
+    max-height: 6rem; // so that we do not allow endless lines
+    overflow-y: auto; // to show a scrollbar if there is too much content in the input field
+    min-height: $formInputHeight;
+
+    &.wdt__text--placeholder {
+      color: $won-line-gray;
+    }
+  }
   textarea.wdt__text,
   .wdt__text .Medium, 
   .wdt__text .Medium-placeholder   
@@ -60,22 +73,13 @@ chat-textfield, chat-textfield-simple {
     //$padding: 0.3rem;
     //padding: $padding;
     font-size: $normalFontSize;
-    min-height: $formInputHeight;
 
-    $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+    $lineHeight: $normalFontSize * 22/16; /* of one line of text */
+    $verticalPadding: ($formInputHeight - $lineHeight) / 2 - $thinBorderWidth;
     padding: $verticalPadding 0.438rem;
-
-    box-sizing: border-box;
 
     min-width: 0; // so a size is specified and break-word works
     word-break: break-word;
-    max-height: 6rem; // so that we do not allow endless lines
-    overflow-y: auto; // to show a scrollbar if there is too much content in the input field
-
-    &.wdt__text--placeholder {
-      color: $won-line-gray;
-    }
 
     &:focus {
       color: black;
