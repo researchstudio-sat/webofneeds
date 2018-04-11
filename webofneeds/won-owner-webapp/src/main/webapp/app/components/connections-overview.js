@@ -41,11 +41,15 @@ function genComponentConf() {
                     need-uri="need.get('uri')"
                     timestamp="'TODOlatestOfThatType'">
                 </won-post-header>
-                <won-connection-indicators on-selected-connection="self.selectConnection(connectionUri)" need-uri="need.get('uri')"></won-connection-indicators>
-                <img class="covw__arrow" ng-show="self.isOpen(need.get('uri')) && self.hasRelevantConnections(need)"
+                <won-connection-indicators 
+                    ng-show="need.get('state') === self.WON.ActiveCompacted"
+                    on-selected-connection="self.selectConnection(connectionUri)" 
+                    need-uri="need.get('uri')">
+                </won-connection-indicators>
+                <img class="covw__arrow" ng-show="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
                     ng-class="{'clickable' : !self.isOpenByConnection(need.get('uri'))}"
                     src="generated/icon-sprite.svg#ico16_arrow_up" ng-click="self.closeConnections(need.get('uri'))"/>
-                <img class="covw__arrow clickable" ng-show="!self.isOpen(need.get('uri')) && self.hasRelevantConnections(need)"
+                <img class="covw__arrow clickable" ng-show="!self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
                     src="generated/icon-sprite.svg#ico16_arrow_down" ng-click="self.openConnections(need.get('uri'))"/>
             </div>
             <won-connection-selection-item
@@ -62,6 +66,7 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
             this.open = open;
+            this.WON = won.WON;
             //this.labels = labels;
             window.co4dbg = this;
 
@@ -112,8 +117,8 @@ function genComponentConf() {
             return openNeeds.concat(closedNeeds);
         }
 
-        hasRelevantConnections(need){
-            return need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
+        showConnectionsDropdown(need){
+            return need.get("state") === won.WON.ActiveCompacted && need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
         }
 
         getOpenConnectionsArraySorted(need){
