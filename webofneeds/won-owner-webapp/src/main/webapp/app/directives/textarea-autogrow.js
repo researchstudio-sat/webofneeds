@@ -7,9 +7,11 @@ import {
 function genDirectiveConf() {
     return {
       restrict: 'A',
-      link: (scope, element) => {
+      link: (scope, element, attributes) => {
 
-        let area = element[0];
+        const minRows = parseInt(attributes.minRows) || 1;
+        const maxRows = parseInt(attributes.maxRows) || 999;
+        const area = element[0];
 
 
         /* 
@@ -53,8 +55,8 @@ function genDirectiveConf() {
           area.style.height = '0px';
           const height = area.scrollHeight - offsets;
           
-          const lines = clamp(Math.floor(height/lineHeight), 1, 4);
-          if(height > lineHeight*4) {
+          const lines = clamp(Math.floor(height/lineHeight), minRows, maxRows);
+          if(height > lineHeight*maxRows) {
             area.style.overflowY = 'scroll';
           } else {
             area.style.overflowY = 'hidden';

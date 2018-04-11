@@ -26,7 +26,10 @@ function genComponentConf() {
     let template = `
         <div class="wdt__left">
             <textarea 
-                won-textarea-autogrow 
+                won-textarea-autogrow
+                data-min-rows="1"
+                data-max-rows="4"
+
                 class="wdt__text"
                 ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }"
                 tabindex="0"
