@@ -88,6 +88,10 @@ function genComponentConf() {
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
+                if(needUriImpliedInRoute) {
+                    this.open[needUriImpliedInRoute] = true;
+                }
+
                 let sortedNeeds = sortByDate(relevantOwnNeeds);
 
                 return {
@@ -103,7 +107,9 @@ function genComponentConf() {
         }
 
         closeConnections(ownNeedUri) {
-            this.open[ownNeedUri] = false;
+            if(!this.isOpenByConnection(ownNeedUri)) {
+                this.open[ownNeedUri] = false;
+            }
         }
 
         isOpen(ownNeedUri) {
