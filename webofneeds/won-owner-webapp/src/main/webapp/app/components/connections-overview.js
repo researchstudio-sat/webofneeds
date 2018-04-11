@@ -42,10 +42,10 @@ function genComponentConf() {
                     timestamp="'TODOlatestOfThatType'">
                 </won-post-header>
                 <won-connection-indicators on-selected-connection="self.selectConnection(connectionUri)" need-uri="need.get('uri')"></won-connection-indicators>
-                <img class="covw__arrow" ng-show="self.isOpen(need.get('uri'))"
+                <img class="covw__arrow" ng-show="self.isOpen(need.get('uri')) && self.hasRelevantConnections(need)"
                     ng-class="{'clickable' : !self.isOpenByConnection(need.get('uri'))}"
                     src="generated/icon-sprite.svg#ico16_arrow_up" ng-click="self.closeConnections(need.get('uri'))"/>
-                <img class="covw__arrow clickable" ng-show="!self.isOpen(need.get('uri'))"
+                <img class="covw__arrow clickable" ng-show="!self.isOpen(need.get('uri')) && self.hasRelevantConnections(need)"
                     src="generated/icon-sprite.svg#ico16_arrow_down" ng-click="self.openConnections(need.get('uri'))"/>
             </div>
             <won-connection-selection-item
@@ -69,16 +69,19 @@ function genComponentConf() {
             const selectFromState = (state)=> {
                 //Select all needs with at least one connection
                 const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0);
+                //Select all needs, regardless of connections
+                const allOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections"));
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
-                let sortedNeeds = sortByDate(relevantOwnNeeds);
+                let sortedNeeds = sortByDate(allOwnNeeds);
 
                 return {
                     needUriImpliedInRoute,
                     sortedNeeds: sortedNeeds,
+                    relevantOwnNeeds,
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
@@ -102,6 +105,10 @@ function genComponentConf() {
 
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
+        }
+
+        hasRelevantConnections(need){
+            return need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
         }
 
         getOpenConnectionsArraySorted(need){

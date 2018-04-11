@@ -46,7 +46,8 @@ class IncomingRequestsController {
                     connection,
                     connectionType,
                     //hasRequests: connections.filter(conn => conn.get("state") === won.WON.RequestReceived).size > 0,
-                    hasOpenConnections: connections.filter(conn => conn.get("state") !== won.WON.Closed).size > 0,
+                    //hasOpenConnections: connections.filter(conn => conn.get("state") !== won.WON.Closed).size > 0,
+                    hasConnections: connections.size > 0,
                     open,
                 };
             }else{

@@ -3,8 +3,8 @@
     <won-overview-title-bar selection="self.selection" ng-if="!self.post"></won-overview-title-bar>
     <won-owner-title-bar selection="self.ownerSelection" ng-if="self.post"></won-owner-title-bar>
 </header>
-<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasOpenConnections}">
-    <div class="opc__inner empty" ng-if="!self.hasOpenConnections">
+<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasConnections}">
+    <div class="opc__inner empty" ng-if="!self.hasConnections">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
@@ -34,7 +34,7 @@
         <won-send-request ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="self.connectionType === self.WON.Connected"></won-post-messages>
     </div>
-    <div class="post__contentside post__contentside--empty" ng-if="self.hasOpenConnections && (!self.connection || self.connectionType === self.WON.Closed)"
+    <div class="post__contentside post__contentside--empty" ng-if="self.hasConnections && (!self.connection || self.connectionType === self.WON.Closed)"
                ng-class="{'hidden' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
             No Element selected
