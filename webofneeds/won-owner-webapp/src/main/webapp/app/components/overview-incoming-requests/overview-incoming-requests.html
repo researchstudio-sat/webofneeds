@@ -9,9 +9,9 @@
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
                     style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_incoming"></use>
+                        <use href="#ico36_message"></use>
                 </svg>
-                <span class="opc__empty__description__text">Here you will see all incoming requests for your needs, but
+                <span class="opc__empty__description__text">Here you will see all chats, requests, and suggestions for your needs, but
                     currently there are none. Check again later!</span>
             </div>
             <a ng-click="self.router__stateGoResetParams('createNeed')" class="opc__empty__link clickable">
@@ -24,7 +24,6 @@
         </div>
     </div>
     <div class="oir__requests" ng-class="{'hidden': self.connection}">
-        <!-- connection-type="::self.WON.RequestReceived" -->
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)",
             open="self.open">
@@ -36,9 +35,9 @@
         <won-post-messages ng-if="self.connectionType === self.WON.Connected"></won-post-messages>
     </div>
     <div class="post__contentside post__contentside--empty" ng-if="self.hasOpenConnections && (!self.connection || self.connectionType === self.WON.Closed)"
-        ng-class="{'hidden' : self.connectionUri === undefined}">
+               ng-class="{'hidden' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
             No Element selected
         </span>
-    </div>
+</div>
 </main>
