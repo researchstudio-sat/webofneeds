@@ -39,7 +39,8 @@ function genComponentConf() {
                 ng-class="{'won-unread': need.get('unread')}">
                 <won-post-header
                     need-uri="need.get('uri')"
-                    timestamp="'TODOlatestOfThatType'">
+                    timestamp="'TODOlatestOfThatType'"
+                    ng-click="self.selectNeed(need.get('uri'))>
                 </won-post-header>
                 <won-connection-indicators 
                     ng-show="need.get('state') === self.WON.ActiveCompacted"
@@ -130,6 +131,9 @@ function genComponentConf() {
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
         }
+        selectNeed(needUri) {
+            this.onSelectedNeed({needUri}); //trigger callback with scope-object
+        }
 
         // sort needs by date and put closed needs at the end of the list
         sortNeeds(allNeeds) {
@@ -160,7 +164,8 @@ function genComponentConf() {
              * Usage:
              *  on-selected-connection="myCallback(connectionUri)"
              */
-            onSelectedConnection: "&"
+            onSelectedConnection: "&",
+            onSelectedNeed: "&",
         },
         template: template
     }

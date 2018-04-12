@@ -28,20 +28,9 @@ class SentRequestsController {
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
             const connection = need && need.getIn(["connections", connectionUri]);
 
-            if(getIn(state, ['router', 'currentParams', 'myUri']) === undefined) {
-                return {
-                    connection,
-                };
-            }else{
-                const postId = decodeURIComponent(getIn(state, ['router', 'currentParams', 'myUri']));
-                const post = state.getIn(["needs", postId]);
-
-                return {
-                    WON: won.WON,
-                    post,
-                    connection,
-                };
-            }
+            return {
+                connection,
+            };
         };
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

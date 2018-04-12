@@ -44,7 +44,7 @@ function genComponentConf() {
                             <span class="vtb__tabs__unread">{{self.post.get('messages').length}}</span>
                         </a></li>
                         <li class="clickable" ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
-                        <a ng-click="self.router__stateGoAbs('postVisitor', {myUri: 'http://example.org/121337345'})">
+                        <a ng-click="self.router__stateGoAbs('postVisitor', {postUri: 'http://example.org/121337345'})">
                             Post Info
                         </a></li>
                     </ul>
