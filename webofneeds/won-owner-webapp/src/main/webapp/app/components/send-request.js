@@ -2,9 +2,10 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import postContentModule from './post-content.js';
 import postHeaderModule from './post-header.js';
 import feedbackGridModule from './feedback-grid.js';
+import postSeeksInfoModule from './post-seeks-info.js';
+import postIsInfoModule from './post-is-info.js';
 
 import {
     selectOpenPostUri,
@@ -24,53 +25,89 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `
-      <div class="request__header">
-        <a ng-click="self.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null})"
-            class="clickable">
-            <svg style="--local-primary:var(--won-primary-color);"
-              class="request__header__icon clickable">
-                <use href="#ico36_close"></use>
+        <div class="post-info__header">
+            <a class="clickable"
+               ng-click="self.router__stateGoCurrent({connectionUri : undefined, sendAdHocRequest: undefined})">
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="post-info__header__icon clickable">
+                    <use href="#ico36_close"></use>
+                </svg>
+            </a>
+            <won-post-header
+                need-uri="self.postUriToConnectTo"
+                timestamp="self.lastUpdateTimestamp"
+                hide-image="::true">
+            </won-post-header>
+            <!-- TODO: Implement a menu with all the necessary buttons -->
+            <!-- svg class="post-info__header__icon__small clickable"
+                style="--local-primary:#var(--won-secondary-color);"
+                ng-show="!self.contextMenuOpen"
+                ng-click="self.contextMenuOpen = true">
+                    <use href="#ico16_arrow_down"></use>
             </svg>
-        </a>
-
-        <won-post-header
-            need-uri="self.postUriToConnectTo"
-            timestamp="self.lastUpdateTimestamp"
-            hide-image="::true">
-        </won-post-header>
-      </div>
-
-      <won-post-content class="request__content"
-        need-uri="self.postUriToConnectTo">
-      </won-post-content>
-
-      <div class="request__footer">
-        <won-feedback-grid ng-if="!self.sendAdHocRequest && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
-        <input
-          type="text"
-          ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
-          ng-model="self.message"
-          placeholder="Request Message (optional)"/>
-        <div class="flexbuttons" ng-if="self.sendAdHocRequest || self.connection.get('isRated')">
-          <button
-            ng-if="!self.sendAdHocRequest"
-            class="won-button--filled black"
-            ng-click="self.closeRequest()">
-              Remove This
-          </button>
-          <button
-            class="won-button--filled red"
-            ng-click="self.sendRequest(self.message)">
-              Ask to Chat
-          </button>
+            <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
+                <div class="content">
+                    <div class="topline">
+                      <svg class="post-info__header__icon__small__contextmenu clickable"
+                        style="--local-primary:black;"
+                        ng-click="self.contextMenuOpen = false">
+                            <use href="#ico16_arrow_up"></use>
+                      </svg>
+                    </div>
+                  <button
+                    class="won-button--filled thin red"
+                    ng-click="">
+                      DO POST ACTIONS
+                  </button>
+                </div>
+            </div-->
         </div>
-        <a target="_blank"
-          href="{{self.sendAdHocRequest ? self.postUriToConnectTo : self.connectionUri}}">
-            <svg class="rdflink__big clickable">
-                <use href="#rdf_logo_1"></use>
-            </svg>
-        </a>
-      </div>
+        <div class="post-info__content">
+            <won-gallery ng-show="self.suggestedPost.get('hasImages')">
+            </won-gallery>
+
+            <!-- GENERAL Part -->
+            <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
+                Created
+            </h2>
+            <p class="post-info__details" ng-show="self.friendlyTimestamp">
+                {{ self.friendlyTimestamp }}
+            </p>
+            <!-- IS Part -->
+            <div ng-show="self.isPart">
+                <won-post-is-info is-part="::self.isPart"></won-post-is-info>
+            </div>
+            </br>
+            <!-- SEEKS Part -->
+            <div ng-show="self.seeksPart">
+                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
+            </div>
+            </br>
+        </div>
+        <div class="post-info__footer">
+            <won-feedback-grid ng-if="!self.sendAdHocRequest && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
+            <input
+                type="text"
+                ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
+                ng-model="self.message"
+                placeholder="Request Message (optional)"/>
+            <button class="won-button--filled red"
+                ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
+                ng-click="self.sendRequest(self.message)">
+                Ask to Chat
+            </button>
+            <button ng-if="!self.sendAdHocRequest && self.connection.get('isRated')"
+                class="won-button--filled black"
+                ng-click="self.closeConnection()">
+                    Remove This
+            </button>
+            <a target="_blank"
+                href="{{self.sendAdHocRequest ? self.postUriToConnectTo : self.connectionUri}}">
+                <svg class="rdflink__big clickable">
+                    <use href="#rdf_logo_1"></use>
+                </svg>
+            </a>
+        </div>
     `;
 
     class Controller {
@@ -88,10 +125,31 @@ function genComponentConf() {
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
                 const postUriToConnectTo = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
 
+                const suggestedPost = state.getIn(["needs", postUriToConnectTo]);
+
+                const is = suggestedPost? suggestedPost.get('is') : undefined;
+                //TODO it will be possible to have more than one seeks
+                const seeks = suggestedPost? suggestedPost.get('seeks') : undefined;
+
                 return {
                     connection,
                     connectionUri,
                     ownNeed,
+                    isPart: is? {
+                        postUri: postUriToConnectTo,
+                        is: is,
+                        isString: 'is',
+                        location: is && is.get('location'),
+                        address: is.get('location') && is.get('location').get('address'),
+                    }: undefined,
+                    seeksPart: seeks? {
+                        postUri: postUriToConnectTo,
+                        seeks: seeks,
+                        seeksString: 'seeks',
+                        location: seeks && seeks.get('location'),
+                        address: seeks.get('location') && seeks.get('location').get('address'),
+                    }: undefined,
+                    suggestedPost,
                     sendAdHocRequest,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
@@ -123,7 +181,7 @@ function genComponentConf() {
             }
         }
 
-        closeRequest(){
+        closeConnection(){
             this.connections__close(this.connectionUri);
             this.router__stateGoCurrent({connectionUri: null});
         }
@@ -141,7 +199,8 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.sendRequest', [
-    postContentModule,
+    postIsInfoModule,
+    postSeeksInfoModule,
     postHeaderModule,
     feedbackGridModule,
 ])
