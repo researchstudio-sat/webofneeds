@@ -37,7 +37,6 @@ import { actionCreators }  from './actions/actions.js';
 import topnav from './components/topnav.js';
 import createNeedComponent from './components/create-need/create-need.js';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests.js';
-import overviewSentRequestsComponent from './components/overview-sent-requests/overview-sent-requests.js';
 import postComponent from './components/post/post.js';
 import landingPageComponent from './components/landingpage/landingpage.js';
 import overviewPostsComponent from './components/overview-posts/overview-posts.js';
@@ -80,7 +79,6 @@ let app = angular.module('won.owner', [
     //views
     createNeedComponent,
     overviewIncomingRequestsComponent,
-    overviewSentRequestsComponent,
     postComponent,
     landingPageComponent,
     overviewPostsComponent,

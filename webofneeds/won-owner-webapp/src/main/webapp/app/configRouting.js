@@ -90,7 +90,6 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/feed?privateId', component: 'feed' },
         { path: '/overview/matches?privateId?layout?connectionUri?sendAdHocRequest', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests?privateId?postUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
-        { path: '/overview/sent-requests?privateId?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts?privateId', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/?privateId?postUri?connectionUri?connectionType?layout?sendAdHocRequest', component: 'post', as: 'post' },
 
