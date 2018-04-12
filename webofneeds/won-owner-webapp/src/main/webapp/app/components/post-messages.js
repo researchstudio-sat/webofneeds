@@ -58,7 +58,7 @@ function genComponentConf() {
     let template = `
         <div class="pm__header">
             <a class="clickable"
-               ng-click="self.router__stateGoCurrent({connectionUri : null})">
+               ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="pm__header__icon clickable">
                     <use href="#ico36_close"></use>
@@ -67,6 +67,8 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.theirNeed.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
+                ng-click="self.router__stateGoCurrent({connectionUri : undefined})"
+                class="clickable"
                 hide-image="::true">
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
@@ -87,11 +89,11 @@ function genComponentConf() {
                   <button
                     class="won-button--outlined thin red"
                     ng-click="self.goToPost()">
-                      Go To Post
+                      Show Post Details
                   </button>
                   <button
                     class="won-button--filled thin red"
-                    ng-click="self.closeRequest()">
+                    ng-click="self.closeConnection()">
                       Close Connection
                   </button>
                 </div>
@@ -187,7 +189,7 @@ function genComponentConf() {
             	</div>
             </div>
         </div>
-        <div class="pm__footer">
+        <div class="pm__footer" ng-show="self.isConnected">
             <chat-textfield
                 placeholder="::'Your Message'"
                 on-input="::self.input(value)"
@@ -225,6 +227,25 @@ function genComponentConf() {
                         Show Agreement Data
                  </button>
             </div>
+        </div>
+        <div class="pm__footer" ng-show="self.isSentRequest">
+            Waiting for them to accept your chat request.
+        </div>
+
+        <div class="pm__footer" ng-show="self.isReceivedRequest">
+            <input class="pm__footer__acceptmessage" type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
+
+            <button class="won-button--filled red" ng-click="self.openRequest(self.message)">
+                Accept Chat
+            </button>
+            <button class="won-button--filled black" ng-click="self.closeConnection()">
+                Decline
+            </button>
+            <a target="_blank" href="{{self.connectionUri}}">
+                <svg class="rdflink__big clickable">
+                    <use href="#rdf_logo_1"></use>
+                </svg>
+            </a>
         </div>
     `;
 
@@ -305,6 +326,9 @@ function genComponentConf() {
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     chatMessages: sortedMessages,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
+                    isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
+                    isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
+                    isConnected: connection && connection.get('state') === won.WON.Connected,
                     debugmode: won.debugmode,
                     shouldShowRdf: state.get('showRdf'),
                     // if the connect-message is here, everything else should be as well
@@ -595,13 +619,17 @@ function genComponentConf() {
             }
         }
 
-        closeRequest(){
+        openRequest(message){
+            this.connections__open(this.connectionUri, message);
+        }
+
+        closeConnection(){
             this.connections__close(this.connection.get('uri'));
             this.router__stateGoCurrent({connectionUri: null});
         }
 
         goToPost() {
-            this.router__stateGoAbs('post', {postUri: this.connection.get('remoteNeedUri')});
+            this.router__stateGoCurrent({postUri: this.connection.get('remoteNeedUri')});
         }
     }
     Controller.$inject = serviceDependencies;

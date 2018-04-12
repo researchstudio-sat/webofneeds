@@ -36,11 +36,12 @@ function genComponentConf() {
     let template = `
         <div ng-repeat="need in self.sortedNeeds">
             <div class="covw__own-need"
-                ng-class="{'won-unread': need.get('unread')}">
+                ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
                 <won-post-header
                     need-uri="need.get('uri')"
                     timestamp="'TODOlatestOfThatType'"
-                    ng-click="self.selectNeed(need.get('uri'))>
+                    ng-click="self.selectNeed(need.get('uri'))"
+                    class="clickable">
                 </won-post-header>
                 <won-connection-indicators 
                     ng-show="need.get('state') === self.WON.ActiveCompacted"
@@ -93,6 +94,7 @@ function genComponentConf() {
 
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
+                const needUriInRoute = routerParams && decodeURIComponent(routerParams['postUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
@@ -103,6 +105,7 @@ function genComponentConf() {
                 }
 
                 return {
+                    needUriInRoute,
                     needUriImpliedInRoute,
                     sortedNeeds: sortedNeeds,
                 }

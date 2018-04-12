@@ -34,6 +34,11 @@ won-connection-selection-item {
     border-top: $greyBorder;
     border-left: $greyBorder;
     border-bottom: $greyBorder;
+
+    /*
+    box-sizing: border-box;
+    width: calc(100% + 0.1rem);
+    border-right-color: white; */
   }
 
   &:first-child .conn__inner.selected {

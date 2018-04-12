@@ -5,9 +5,11 @@
 
 
 .ownerpostcontent {
+  padding: 0 1rem 1rem 1rem;
+  box-sizing: border-box;
   @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
   @include empty-description('opc');
-  align-items: flex-start;
+  align-items: stretch;
 
   .oir__openrequest,
   .owner__messages{
