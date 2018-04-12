@@ -233,11 +233,14 @@ function genComponentConf() {
         </div>
 
         <div class="pm__footer" ng-show="self.isReceivedRequest">
-            <input class="pm__footer__acceptmessage" type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
-
-            <button class="won-button--filled red" ng-click="self.openRequest(self.message)">
-                Accept Chat
-            </button>
+            <chat-textfield
+                placeholder="::'Reply Message (optional, in case of acceptance)'"
+                on-input="::self.input(value)"
+                on-paste="::self.input(value)"
+                on-submit="::self.openRequest()"
+                submit-button-label="::'Accept Chat'"
+                >
+            </chat-textfield>
             <button class="won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
@@ -620,7 +623,7 @@ function genComponentConf() {
         }
 
         openRequest(message){
-            this.connections__open(this.connectionUri, message);
+            this.connections__open(this.connectionUri, this.chatMessage);
         }
 
         closeConnection(){

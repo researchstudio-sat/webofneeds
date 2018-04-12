@@ -37,7 +37,7 @@ won-connections-overview {
 
   &:first-child .covw__own-need.selected {
     //don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $invisibleBorder;
+    border-top: 0;
   }
   &:not(:first-child) .covw__own-need.selected {
     //don't show border for first item to avoid duplicate borders with the title bar
