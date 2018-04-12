@@ -6,6 +6,7 @@ import postHeaderModule from './post-header.js';
 import feedbackGridModule from './feedback-grid.js';
 import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
+import labelledHrModule from './labelled-hr.js';
 
 import {
     selectOpenPostUri,
@@ -96,6 +97,7 @@ function genComponentConf() {
                 ng-click="self.sendRequest(self.message)">
                 Ask to Chat
             </button>
+            <won-labelled-hr label="::'Or'" ng-if="!self.sendAdHocRequest && self.connection.get('isRated')" class="post-info__footer__labelledhr"></won-labelled-hr>
             <button ng-if="!self.sendAdHocRequest && self.connection.get('isRated')"
                 class="won-button--filled black"
                 ng-click="self.closeConnection()">
@@ -203,6 +205,7 @@ export default angular.module('won.owner.components.sendRequest', [
     postSeeksInfoModule,
     postHeaderModule,
     feedbackGridModule,
+    labelledHrModule
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;

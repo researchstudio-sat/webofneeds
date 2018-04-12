@@ -9,6 +9,7 @@ import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
 import postHeaderModule from './post-header.js';
+import labelledHrModule from './labelled-hr.js';
 
 import {
 } from '../won-label-utils.js'
@@ -241,7 +242,8 @@ function genComponentConf() {
                 submit-button-label="::'Accept Chat'"
                 >
             </chat-textfield>
-            <button class="won-button--filled black" ng-click="self.closeConnection()">
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
+            <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
             <a target="_blank" href="{{self.connectionUri}}">
@@ -653,7 +655,8 @@ export default angular.module('won.owner.components.postMessages', [
     chatTextFieldSimpleModule,
     connectionMessageModule,
     connectionAgreementModule,
-    postHeaderModule
+    postHeaderModule,
+    labelledHrModule
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
