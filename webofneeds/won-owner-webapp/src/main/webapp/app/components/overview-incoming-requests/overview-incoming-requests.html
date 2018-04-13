@@ -23,7 +23,7 @@
             </a>
         </div>
     </div>
-    <div class="oir__requests" ng-class="{'hidden': self.connection}">
+    <div class="oir__requests" ng-class="{'hidden': self.connection || self.selectedPost}">
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)",
             on-selected-need="self.selectedNeed(needUri)",
