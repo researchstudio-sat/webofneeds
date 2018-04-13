@@ -28,23 +28,27 @@ function genDirectiveConf() {
         /*
          * calculate line-height
          */
+        let lineHeight, offsets;
+        function updateLineHeightAndOffsets() {
+          const originalContent = area.value;
+          const originalPlaceholder = area.placeholder;
 
-        const originalContent = area.value;
-        const originalPlaceholder = area.placeholder;
+          // reduce to one line in height, so lineHeight can be calculated correctly
+          area.value = '';
+          area.placeholder = '';
+          area.style.height = '0px';
+          
+          const style = window.getComputedStyle(area, null);
+          offsets = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
 
-        // reduce to one line in height, so lineHeight can be calculated correctly
-        area.value = '';
-        area.placeholder = '';
-        area.style.height = '0px';
-        
-        const style = window.getComputedStyle(area, null);
-        const offsets = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+          lineHeight = area.scrollHeight - offsets;
+          
+          area.value = originalContent;
+          area.placeholder = originalPlaceholder;
+          return { lineHeight, offsets };
+        }
+        updateLineHeightAndOffsets();
 
-        const lineHeight = area.scrollHeight - offsets;
-        
-        area.value = originalContent;
-        area.placeholder = originalPlaceholder;
-        
 
 
         /*
@@ -52,6 +56,9 @@ function genDirectiveConf() {
          */
 
         function updateHeight() {
+          stopObservingStyleChange(); // we don't want the style listener to trigger due to the height-change
+
+
           area.style.height = '0px';
           const height = area.scrollHeight - offsets;
           
@@ -62,13 +69,39 @@ function genDirectiveConf() {
             area.style.overflowY = 'hidden';
           }
           area.style.height = lines * lineHeight + 'px';
+
+          startObservingStyleChange(); // start listening for style changes again
         }
+
+        updateHeight();
+
+
+
+        /*
+         * Listen for changes of input and style
+         */
 
         element.on('input', updateHeight);
         // area.addEventListener('input', updateHeight);
 
+        const observer = new MutationObserver(mutations => 
+            mutations.forEach(mutationRecord => {
+                updateLineHeightAndOffsets();
+                updateHeight();
+            })    
+        );
+        function startObservingStyleChange() {
+          observer && observer.observe(area, { 
+            attributes : true, 
+            attributeFilter : ['style', 'class'],
+          });
+        }
+        function stopObservingStyleChange() {
+          observer && observer.disconnect();
+        }
+        startObservingStyleChange();
 
-        updateHeight();
+
       },
     };
   }
