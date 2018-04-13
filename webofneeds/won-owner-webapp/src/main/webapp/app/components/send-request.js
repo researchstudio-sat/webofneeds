@@ -191,6 +191,9 @@ function genComponentConf() {
             message = this.chatMessage;
 
             if(!this.connection || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
+
+                this.router__stateGoResetParams('overviewIncomingRequests');
+                
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
                     //Close the connection if there was a present connection for a whatsaround need
                     this.connections__close(this.connectionUri);
@@ -201,7 +204,6 @@ function genComponentConf() {
                 }
 
                 //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
-                this.router__stateGoResetParams('overviewIncomingRequests');
             }else{
                 this.needs__connect(
                 		this.ownNeed.get("uri"), 
