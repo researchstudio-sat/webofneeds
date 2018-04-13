@@ -121,7 +121,6 @@ function genComponentConf() {
                 	message: message,
                 	isOwn: !remoteUri,
                 	ownNeed: ownNeed,
-                	//isOwn: (this.stateUri == remoteUri)? true : false,
                 }
             };
 
@@ -145,12 +144,10 @@ function genComponentConf() {
         	this.clicked = true;
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
-
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
-        	
+
         	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.stateUri});
         }
       
         proposeToCancel() {
@@ -161,7 +158,6 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
         }
         
         acceptProposeToCancel() {
@@ -175,10 +171,8 @@ function genComponentConf() {
         	const trimmedMsg = buildProposalMessage(uri, "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
-        	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
-        	
         	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.sateUri});
         }
         
         retractMessage() {
@@ -234,6 +228,7 @@ function genComponentConf() {
              *  on-update="::myCallback(draft)"
              */
             onUpdate: '&',
+            onRemoveData: '&',
         },
         template: template,
     }

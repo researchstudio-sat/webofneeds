@@ -35,7 +35,13 @@ won-connection-message {
     }
 
     &.won-not-relevant {
-        text-decoration: line-through;
+        opacity: 0.35;
+        
+        .won-cm__center__bubble {
+                text-decoration: line-through;
+                text-decoration-color: black;               
+            }
+       
     }
 
     .won-cm__center {
