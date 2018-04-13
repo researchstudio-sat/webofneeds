@@ -39,7 +39,7 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.post.get('uri')"
                 timestamp="self.createdTimestamp"
-                hide-image="::true">
+                hide-image="::false">
             </won-post-header>
             <!-- TODO: Implement a menu with all the necessary buttons -->
             <!-- svg class="post-info__header__icon__small clickable"
@@ -95,21 +95,21 @@ function genComponentConf() {
                 <p class="post-info__footer__link__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('ownNeed')) || !self.post.get('ownNeed')">
                     Know someone who might also be interested in this posting? Consider sharing the link below in social media.
                 </p>
-                <input class="post-info__link" value="{{self.linkToPost}}" disabled type="text">
+                <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
             </div>
 
             <!-- TODO: implement sendAdHocRequest in chat-overview -->
-            <!-- button class="won-button--filled red"
+            <!-- button class="post-info__footer__button won-button--filled red"
                     ng-show="self.showRequestButton"
                     ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})">
                     Chat
             </button-->
-            <button class="won-button--filled red"
+            <button class="post-info__footer__button won-button--filled red"
                     ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
                     ng-click="self.reOpenPost()">
                     Reopen Post
             </button>
-            <button class="won-button--filled red"
+            <button class="post-info__footer__button won-button--filled red"
                     ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
                     ng-click="self.closePost()">
                     Close Post

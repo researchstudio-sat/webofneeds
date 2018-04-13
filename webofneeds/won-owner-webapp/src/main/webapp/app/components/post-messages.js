@@ -68,9 +68,8 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.theirNeed.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
-                ng-click="self.router__stateGoCurrent({connectionUri : undefined})"
                 class="clickable"
-                hide-image="::true">
+                hide-image="::false">
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);" 
@@ -196,6 +195,7 @@ function genComponentConf() {
                 on-input="::self.input(value)"
                 on-paste="::self.input(value)"
                 on-submit="::self.send()"
+                allow-empty-submit="false"
                 submit-button-label="::'Send'"
                 >
             </chat-textfield>
@@ -239,6 +239,7 @@ function genComponentConf() {
                 on-input="::self.input(value)"
                 on-paste="::self.input(value)"
                 on-submit="::self.openRequest()"
+                allow-empty-submit="true"
                 submit-button-label="::'Accept Chat'"
                 >
             </chat-textfield>
@@ -267,7 +268,7 @@ function genComponentConf() {
             this.showLoadingInfo = false;
             
             const self = this;
-            this.baseString = "/owner/"
+            this.baseString = "/owner/";
             this.declarations = clone(declarations);
             
             this.agreementHeadData = this.cloneDefaultData();

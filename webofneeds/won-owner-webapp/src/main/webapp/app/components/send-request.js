@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import 'ng-redux';
+import chatTextFieldModule from './chat-textfield.js';
 import postHeaderModule from './post-header.js';
 import feedbackGridModule from './feedback-grid.js';
 import postSeeksInfoModule from './post-seeks-info.js';
@@ -37,7 +38,7 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.postUriToConnectTo"
                 timestamp="self.lastUpdateTimestamp"
-                hide-image="::true">
+                hide-image="::false">
             </won-post-header>
             <!-- TODO: Implement a menu with all the necessary buttons -->
             <!-- svg class="post-info__header__icon__small clickable"
@@ -87,19 +88,19 @@ function genComponentConf() {
         </div>
         <div class="post-info__footer">
             <won-feedback-grid ng-if="!self.sendAdHocRequest && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
-            <input
-                type="text"
+            <chat-textfield
+                placeholder="::'Request Message (optional)'"
+                on-input="::self.input(value)"
+                on-paste="::self.input(value)"
+                on-submit="::self.sendRequest()"
+                allow-empty-submit="true"
+                submit-button-label="::'Ask to Chat'"
                 ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
-                ng-model="self.message"
-                placeholder="Request Message (optional)"/>
-            <button class="won-button--filled red"
-                ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
-                ng-click="self.sendRequest(self.message)">
-                Ask to Chat
-            </button>
+                >
+            </chat-textfield>
             <won-labelled-hr label="::'Or'" ng-if="!self.sendAdHocRequest && self.connection.get('isRated')" class="post-info__footer__labelledhr"></won-labelled-hr>
             <button ng-if="!self.sendAdHocRequest && self.connection.get('isRated')"
-                class="won-button--filled black"
+                class="post-info__footer__button won-button--filled black"
                 ng-click="self.closeConnection()">
                     Remove This
             </button>
@@ -161,7 +162,13 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, [], this);
         }
 
-        sendRequest(message) {
+        input(userInput) {
+            this.chatMessage = userInput;
+        }
+
+        sendRequest() {
+            message = this.chatMessage;
+
             if(this.sendAdHocRequest || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
                     //Close the connection if there was a present connection for a whatsaround need
@@ -205,7 +212,8 @@ export default angular.module('won.owner.components.sendRequest', [
     postSeeksInfoModule,
     postHeaderModule,
     feedbackGridModule,
-    labelledHrModule
+    labelledHrModule,
+    chatTextFieldModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;
