@@ -36,6 +36,11 @@ chat-textfield, chat-textfield-simple {
     &.invalid {
         border-color: $won-primary-color;
     }
+
+    &.wdt__text--is-code {
+      font-size: 0.8rem;
+      font-family: $font-family-monospace;
+    }
   }
 
   .wdt__text {

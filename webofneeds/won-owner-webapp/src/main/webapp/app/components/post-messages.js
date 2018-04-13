@@ -215,6 +215,7 @@ function genComponentConf() {
                 on-submit="self.send(value, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
+                is-code="self.shouldShowRdf? 'true' : ''"
             >
             </chat-textfield-simple>
 
