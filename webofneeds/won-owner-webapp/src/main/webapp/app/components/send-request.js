@@ -12,10 +12,14 @@ import labelledHrModule from './labelled-hr.js';
 import {
     selectOpenPostUri,
     selectNeedByConnectionUri,
+    selectLastUpdateTime,
 } from '../selectors.js';
 import {
     connect2Redux,
 } from '../won-utils.js';
+import {
+    relativeTime,
+} from '../won-label-utils.js';
 import {
     attach,
     getIn,
@@ -27,7 +31,7 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `
-        <div class="post-info__header">
+        <div class="post-info__header" ng-if="self.includeHeader">
             <a class="clickable"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined, sendAdHocRequest: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -37,7 +41,7 @@ function genComponentConf() {
             </a>
             <won-post-header
                 need-uri="self.postUriToConnectTo"
-                timestamp="self.lastUpdateTimestamp"
+                timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
             <!-- TODO: Implement a menu with all the necessary buttons -->
@@ -157,6 +161,11 @@ function genComponentConf() {
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
+                    friendlyTimestamp: suggestedPost && relativeTime(
+                        selectLastUpdateTime(state),
+                        suggestedPost.get('creationDate')
+                    ),
+                    createdTimestamp: suggestedPost && suggestedPost.get('creationDate'),
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
@@ -202,7 +211,9 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {},
+        scope: {
+            includeHeader: '='
+        },
         template: template
     }
 }

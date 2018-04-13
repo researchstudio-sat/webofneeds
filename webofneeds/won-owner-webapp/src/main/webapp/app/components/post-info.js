@@ -98,12 +98,11 @@ function genComponentConf() {
                 <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
             </div>
 
-            <!-- TODO: implement sendAdHocRequest in chat-overview -->
-            <!-- button class="post-info__footer__button won-button--filled red"
+            <button class="post-info__footer__button won-button--filled red"
                     ng-show="self.showRequestButton"
                     ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})">
                     Chat
-            </button-->
+            </button>
             <button class="post-info__footer__button won-button--filled red"
                     ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
                     ng-click="self.reOpenPost()">

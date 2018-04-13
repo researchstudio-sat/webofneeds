@@ -99,7 +99,7 @@ let template = `
         </div>
     </div>
     <div class="omc__sendrequest" ng-if="self.hasMatches && self.connection">
-        <won-send-request></won-send-request>
+        <won-send-request include-header="true"></won-send-request>
     </div>
 `;
 
