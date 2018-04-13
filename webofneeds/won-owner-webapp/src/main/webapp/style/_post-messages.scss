@@ -26,6 +26,10 @@
   box-sizing: border-box;
 
   &--empty {
+      border-left: $thinGrayBorder;
+      border-right: $thinGrayBorder;
+      border-bottom: $thinGrayBorder;
+
       .post__contentside__description__text {
         display: flex;
         align-self: center;
