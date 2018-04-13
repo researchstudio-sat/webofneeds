@@ -3,6 +3,11 @@
 @import 'fonts';
 @import 'flex-layout';
 
+@media (max-width: $responsivenessBreakPoint){
+  .ownerpostcontent {
+    padding: 0;
+  }
+}
 
 .ownerpostcontent {
   padding: 0 1rem;
@@ -18,6 +23,7 @@
   }
 
   @media (max-width: $responsivenessBreakPoint){
+
     .owner__messages.hidden {
       display: none;
     }
