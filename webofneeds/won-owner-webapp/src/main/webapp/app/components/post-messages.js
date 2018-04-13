@@ -68,7 +68,6 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.theirNeed.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
-                ng-click="self.router__stateGoCurrent({connectionUri : undefined})"
                 class="clickable"
                 hide-image="::false">
             </won-post-header>
