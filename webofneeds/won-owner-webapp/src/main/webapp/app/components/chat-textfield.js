@@ -89,7 +89,7 @@ function genComponentConf() {
         submit() {
             const value = this.value();
             const valid = this.valid();
-            if(value && valid) {
+            if((this.allowEmptySubmit || value) && valid) {
                 this.medium.clear(); // clear text
                 this.mediumMount().focus(); //refocus so people can keep writing
 
@@ -125,7 +125,7 @@ function genComponentConf() {
 
                 modifier: 'auto',
 
-                placeholder: is('string', this.placeholder) ?
+                placeholder: is('String', this.placeholder) ?
                     // make sure we've got a string to avoid errors internal to medium.js
                     this.placeholder : "",
 
@@ -190,6 +190,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
+            allowEmptySubmit: "=", /*set this parameter to true in order to allow submit without text input*/
             placeholder: '=',
             maxChars: '=',
             /*
