@@ -19,9 +19,6 @@
 }
 
 .post__contentside {
-  border-left: $thinGrayBorder;
-  border-right: $thinGrayBorder;
-  border-bottom: $thinGrayBorder;
   width: 100%;
   max-width: ($maxContentWidth / 2);
   //margin-ri: 0.5rem;
@@ -29,8 +26,6 @@
   box-sizing: border-box;
 
   &--empty {
-      background-color: unset;
-
       .post__contentside__description__text {
         display: flex;
         align-self: center;
@@ -48,6 +43,9 @@
   flex-direction: row;
 
   won-post-messages {
+    border-left: $thinGrayBorder;
+    border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
     background: white;
     display: grid;
     grid-template-areas: "header" "main" "footer";

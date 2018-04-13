@@ -6,6 +6,9 @@ won-send-request,
 won-post-info {
   background: white;
   display: grid;
+  border-left: $thinGrayBorder;
+  border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax(10rem, 1fr) min-content;
   grid-row-gap: $gridRowGap;
