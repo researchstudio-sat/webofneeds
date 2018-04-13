@@ -15,7 +15,8 @@
 </header>
 <main class="ownerpostcontent">
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-post-info ng-if="self.post" ng-show="!self.connectionType || !self.isOwnPost" include-header="false"></won-post-info>
+    <won-post-info ng-if="self.post && self.isOwnPost" ng-show="!self.connectionType" include-header="false"></won-post-info>
+    <won-send-request include-header="false" ng-if="self.post && !self.isOwnPost"></won-send-request>
 
     <!-- No Connections: -->
     <div class="opc__inner empty" 
@@ -53,7 +54,7 @@
     <!-- right column -->
     <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionOpen && self.hasConnections && self.actualConnectionType !== self.WON.Closed">
         <won-post-messages ng-if="self.actualConnectionType === self.WON.Connected || self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent"></won-post-messages>
-        <won-send-request ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
+        <won-send-request include-header="true" ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
     </div>
     <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)"
         ng-class="{'hidden' : self.connectionUri === undefined}">
@@ -61,10 +62,5 @@
             No Element selected
         </span>
     </div>
-    
-    <!-- /right column -->
-    <a class="curtain" ng-if="!self.isOwnPost && self.sendAdHocRequest"></a>
-    <div class="post__sendrequest" ng-if="!self.isOwnPost && self.sendAdHocRequest">
-        <won-send-request></won-send-request>
-    </div>
+ 
 </main>

@@ -12,10 +12,14 @@ import labelledHrModule from './labelled-hr.js';
 import {
     selectOpenPostUri,
     selectNeedByConnectionUri,
+    selectLastUpdateTime,
 } from '../selectors.js';
 import {
     connect2Redux,
 } from '../won-utils.js';
+import {
+    relativeTime,
+} from '../won-label-utils.js';
 import {
     attach,
     getIn,
@@ -27,7 +31,7 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `
-        <div class="post-info__header">
+        <div class="post-info__header" ng-if="self.includeHeader">
             <a class="clickable"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined, sendAdHocRequest: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -37,7 +41,7 @@ function genComponentConf() {
             </a>
             <won-post-header
                 need-uri="self.postUriToConnectTo"
-                timestamp="self.lastUpdateTimestamp"
+                timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
             <!-- TODO: Implement a menu with all the necessary buttons -->
@@ -87,7 +91,16 @@ function genComponentConf() {
             </br>
         </div>
         <div class="post-info__footer">
-            <won-feedback-grid ng-if="!self.sendAdHocRequest && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
+
+            <div class="post-info__footer__link" ng-if="self.suggestedPost.get('state') !== self.WON.InactiveCompacted">
+                <p class="post-info__footer__link__text">
+                    Know someone who might also be interested in this posting? Consider sharing the link below in social media.
+                </p>
+                <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
+            </div>
+            <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
+
+            <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
             <chat-textfield
                 placeholder="::'Request Message (optional)'"
                 on-input="::self.input(value)"
@@ -95,17 +108,19 @@ function genComponentConf() {
                 on-submit="::self.sendRequest()"
                 allow-empty-submit="true"
                 submit-button-label="::'Ask to Chat'"
-                ng-if="self.sendAdHocRequest || self.connection.get('isRated')"
+                ng-if="!self.connection || self.connection.get('isRated')"
                 >
             </chat-textfield>
-            <won-labelled-hr label="::'Or'" ng-if="!self.sendAdHocRequest && self.connection.get('isRated')" class="post-info__footer__labelledhr"></won-labelled-hr>
-            <button ng-if="!self.sendAdHocRequest && self.connection.get('isRated')"
+            
+            <!-- TODO: move this button from footer to header -->
+            <!-- won-labelled-hr label="::'Or'" ng-if="self.connection && self.connection.get('isRated')" class="post-info__footer__labelledhr"></won-labelled-hr>
+            <button ng-if="self.connection && self.connection.get('isRated')"
                 class="post-info__footer__button won-button--filled black"
                 ng-click="self.closeConnection()">
                     Remove This
-            </button>
+            </button -->
             <a target="_blank"
-                href="{{self.sendAdHocRequest ? self.postUriToConnectTo : self.connectionUri}}">
+                href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
                 <svg class="rdflink__big clickable">
                     <use href="#rdf_logo_1"></use>
                 </svg>
@@ -118,15 +133,16 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.maxThumbnails = 9;
             this.message = '';
+            this.WON = won.WON;
             window.openMatch4dbg = this;
 
             const selectFromState = (state) => {
-                const sendAdHocRequest = getIn(state, ['router', 'currentParams', 'sendAdHocRequest']); //if this parameter is set we will not have a connection to send this request to
+                //const sendAdHocRequest = getIn(state, ['router', 'currentParams', 'sendAdHocRequest']); //if this parameter is set we will not have a connection to send this request to
 
                 const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
                 const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-                const postUriToConnectTo = sendAdHocRequest? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
+                const postUriToConnectTo = !connection ? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
 
                 const suggestedPost = state.getIn(["needs", postUriToConnectTo]);
 
@@ -153,10 +169,15 @@ function genComponentConf() {
                         address: seeks.get('location') && seeks.get('location').get('address'),
                     }: undefined,
                     suggestedPost,
-                    sendAdHocRequest,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
+                    linkToPost: suggestedPost && suggestedPost.get('uri'), //TODO: MAKE SURE TO CREATE THE CORRECT LINK
+                    friendlyTimestamp: suggestedPost && relativeTime(
+                        selectLastUpdateTime(state),
+                        suggestedPost.get('creationDate')
+                    ),
+                    createdTimestamp: suggestedPost && suggestedPost.get('creationDate'),
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
@@ -169,7 +190,7 @@ function genComponentConf() {
         sendRequest() {
             message = this.chatMessage;
 
-            if(this.sendAdHocRequest || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
+            if(!this.connection || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
                     //Close the connection if there was a present connection for a whatsaround need
                     this.connections__close(this.connectionUri);
@@ -179,7 +200,8 @@ function genComponentConf() {
                     this.connections__connectAdHoc(this.postUriToConnectTo, message);
                 }
 
-                this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
+                //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
+                this.router__stateGoResetParams('overviewIncomingRequests');
             }else{
                 this.needs__connect(
                 		this.ownNeed.get("uri"), 
@@ -202,7 +224,9 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {},
+        scope: {
+            includeHeader: '='
+        },
         template: template
     }
 }
