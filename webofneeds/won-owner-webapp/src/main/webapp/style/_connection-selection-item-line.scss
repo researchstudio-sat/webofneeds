@@ -8,6 +8,10 @@ won-connection-selection-item {
   display: block;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
 
+  &.won-unread {
+    background-color: $won-unread;
+  }
+
   .conn__icon {
     @include fixed-square(1rem);
   }
@@ -34,6 +38,11 @@ won-connection-selection-item {
     border-top: $greyBorder;
     border-left: $greyBorder;
     border-bottom: $greyBorder;
+
+    /*
+    box-sizing: border-box;
+    width: calc(100% + 0.1rem);
+    border-right-color: white; */
   }
 
   &:first-child .conn__inner.selected {

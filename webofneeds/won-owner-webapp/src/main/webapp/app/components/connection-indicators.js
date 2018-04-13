@@ -27,18 +27,20 @@ function genComponentConf() {
             ng-show="self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)">
                 <svg class="indicators__item__icon"
+                    title="Show latest message/request"
                     style="--local-primary:#F09F9F;"
                     ng-show="!self.unreadConnectedCount">
                         <use href="#ico36_message"></use>
                 </svg>
 
                 <svg style="--local-primary:var(--won-primary-color);"
+                     title="Show latest unread message/request"
                      ng-show="self.unreadConnectedCount"
                      class="indicators__item__icon">
                         <use href="#ico36_message"></use>
                 </svg>
 
-                <span class="indicators__item__caption" title="Number of chats with unread messages">
+                <span class="indicators__item__caption" title="Number of chats with unread messages/requests">
                     {{ self.unreadConnectedCount }}
                 </span>
         </a>
@@ -46,31 +48,6 @@ function genComponentConf() {
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use href="#ico36_message"></use>
-            </svg>
-             <span class="indicators__item__caption"></span>
-        </div>
-        <a
-            class="indicators__item clickable"
-            ng-show="self.latestIncomingRequestUri"
-            ng-click="self.setOpen(self.latestIncomingRequestUri)">
-                <svg class="indicators__item__icon"
-                    style="--local-primary:#F09F9F;"
-                    ng-show="!self.unreadRequestsCount">
-                        <use href="#ico36_incoming"></use>
-                </svg>
-                <svg style="--local-primary:var(--won-primary-color);"
-                    ng-show="self.unreadRequestsCount"
-                    class="indicators__item__icon">
-                        <use href="#ico36_incoming"></use>
-                </svg>
-                <span class="indicators__item__caption" title="Number of new requests">
-                    {{ self.unreadRequestsCount }}
-                </span>
-        </a>
-        <div class="indicators__item" ng-show="!self.latestIncomingRequestUri" title="No requests to this post">
-            <svg class="indicators__item__icon"
-                style="--local-primary:var(--won-disabled-color);">
-                    <use href="#ico36_incoming"></use>
             </svg>
              <span class="indicators__item__caption"></span>
         </div>
@@ -114,29 +91,23 @@ function genComponentConf() {
                 const allConnectionsByNeedUri = need && need.get("connections");
 
                 const matches = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
-                const requests = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.RequestReceived);
-                const connected = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn =>conn.get("state") === won.WON.Connected);
+                const connected = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") !== won.WON.Suggested && conn.get("state") !== won.WON.Closed);
 
                 const unreadMatches = matches && matches.filter(conn => conn.get("unread"));
-                const unreadRequests = requests && requests.filter(conn => conn.get("unread"));
                 const unreadConversations = connected && connected.filter(conn => conn.get("unread"));
 
                 const unreadMatchesCount = unreadMatches && unreadMatches.size;
-                const unreadRequestsCount = unreadRequests && unreadRequests.size;
                 const unreadConnectedCount = unreadConversations && unreadConversations.size;
 
                 const sortedUnreadMatches = sortByDate(unreadMatches);
-                const sortedUnreadRequests = sortByDate(unreadRequests);
                 const sortedUnreadConversations = sortByDate(unreadConversations);
 
                 return {
                     WON: won.WON,
                     need,
                     unreadConnectedCount: unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
-                    unreadRequestsCount: unreadRequestsCount > 0 ? unreadRequestsCount : undefined,
                     unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
                     latestConnectedUri: this.retrieveLatestUri(connected),
-                    latestIncomingRequestUri: this.retrieveLatestUri(requests),
                     latestMatchUri: this.retrieveLatestUri(matches),
                 }
             };

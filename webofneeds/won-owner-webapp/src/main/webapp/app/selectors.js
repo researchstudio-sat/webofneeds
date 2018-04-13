@@ -115,9 +115,7 @@ export const selectOpenConnectionUri = createSelector(
 export const selectOpenPostUri = createSelector(
     state => state,
     state => {
-        const encodedPostUri =
-            getIn(state, ['router', 'currentParams', 'postUri']) ||
-            getIn(state, ['router', 'currentParams', 'myUri']); //deprecated parameter
+        const encodedPostUri = getIn(state, ['router', 'currentParams', 'postUri']);
         return decodeUriComponentProperly(encodedPostUri);
     }
 );

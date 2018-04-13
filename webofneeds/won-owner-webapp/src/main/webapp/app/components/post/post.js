@@ -16,7 +16,6 @@ import {
 } from '../../utils.js';
 import won from '../../won-es6.js';
 import { actionCreators }  from '../../actions/actions.js';
-import openRequestModule from '../open-request.js';
 import connectionSelectionModule from '../connection-selection.js';
 import postInfoModule from '../post-info.js';
 import {
@@ -103,7 +102,6 @@ export default angular.module('won.owner.components.post', [
     //galleryModule,
     postMessagesModule,
     connectionSelectionModule,
-    openRequestModule,
     postInfoModule,
     ngAnimate,
 ])

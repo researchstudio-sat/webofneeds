@@ -19,82 +19,127 @@
   }
 }
 
+won-send-request,
 won-post-info {
-  @media (max-width: $responsivenessBreakPoint){
-    @include max-content-width($maxContentWidth, 0, 'post-info');
-    padding: 0.5rem;
-  }
-  @media (min-width: $responsivenessBreakPoint){
-    @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
-    padding: 2rem;
-  }
+  display: grid;
+  grid-template-areas: "header" "main" "footer";
+  grid-template-rows: min-content minmax(10rem, 1fr) min-content;
+  grid-row-gap: $gridRowGap;
   width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 
-  button {
-    width: 100%;
-  }
-
-  .post-info__heading {
+  .post-info__header {
+    display:flex;
+    grid-area: header;
     font-size: $normalFontSize;
-    font-weight: 700;
-  }
+    text-align: left;
+    width: 100%;
 
-  won-need-map,
-  button,
-  .post-info__details {
-    margin-bottom: 1rem;
-  }
-
-  .post-info__tags {
-    display: flex;
-    flex-wrap: wrap;
-
-    &__tag {
-      border-radius: 0.5rem;
-      background: $won-dark-purple;
-      color: white;
-      margin: 0.25rem 0.25rem 0.25rem 0;
-      padding: 0.25rem 0.5rem;
+    &__icon {
+      @include fixed-square($postIconSize);
     }
-  }
 
-  .post-info__carret {
-    @include fixed-square(1rem);
+    &__icon__small {
+      @include fixed-square(1.5rem);
+      padding-left: 0.5rem;
+    }
 
-    // visually center icon on line
-    position: relative;
-    top: 0.1em;
-  }
+    &__icon__small__contextmenu {
+      @include fixed-square(1.5rem);
+      //padding-left: 0.5rem;
+      position: relative;
+      top: -0.5rem;
+      right: -0.5rem;
+      float: right;
+    }
 
-  won-need-map{
-    display: block;
-    @include slideWithOpacityAnimation(.5s, linear, 20rem);
-    
-    .need-map__mapmount {
-      width: 100%;
-      height: 31rem;
+    .pm__header__contextmenu .content {
+      max-width: 10rem;
 
-      @media (max-width : $responsivenessBreakPoint) {
-        height: 15rem;
+      button {
+        margin-top: 0.5rem;
+        width: 100%;
       }
     }
   }
 
-  .post-info__inner {
+  .post-info__content {
+    grid-area: main;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+    border-top: $thinGrayBorder;
+    padding-top: 1rem;
+    overflow: auto;
 
-    .post-info__inner__left {
-      //TODO drop margin on break (so it's centered on slim screens
-      margin-right: 4rem;
-      margin-bottom: 2rem;
+    won-labelled-hr span {
+      background-color: white;
     }
-    .post-info__inner__right {
-      flex-grow: 1;
-      flex-basis: 15rem;
+
+    won-need-map{
+      display: block;
+      @include slideWithOpacityAnimation(.5s, linear, 20rem);
+
+      .need-map__mapmount {
+        width: 100%;
+        height: 31rem;
+
+        @media (max-width : $responsivenessBreakPoint) {
+          height: 15rem;
+        }
+      }
+    }
+
+    .post-info__tags {
+      display: flex;
+      flex-wrap: wrap;
+
+      &__tag {
+        border-radius: 0.5rem;
+        background: $won-dark-purple;
+        color: white;
+        margin: 0.25rem 0.25rem 0.25rem 0;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+    .post-info__carret {
+      @include fixed-square(1rem);
+
+      // visually center icon on line
+      position: relative;
+      top: 0.1em;
+    }
+
+    .post-info__heading {
+      font-size: $normalFontSize;
+      font-weight: 700;
+    }
+  }
+
+  .post-info__footer {
+    grid-area: footer;
+    border-top: $thinGrayBorder;
+    padding-top: 1rem;
+
+    &__labelledhr span {
+      background: white;
+    }
+
+    &__link {
+      &__text {
+        font-size: $smallFontSize;
+        padding-bottom: 0.5rem;
+      }
+      &__input {
+        width: 100%;
+      }
+    }
+
+    &__button {
+      width: 100%;
+      margin-top: 0.5rem;
     }
   }
 }

@@ -9,6 +9,7 @@ import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
 import postHeaderModule from './post-header.js';
+import labelledHrModule from './labelled-hr.js';
 
 import {
 } from '../won-label-utils.js'
@@ -58,7 +59,7 @@ function genComponentConf() {
     let template = `
         <div class="pm__header">
             <a class="clickable"
-               ng-click="self.router__stateGoCurrent({connectionUri : null})">
+               ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="pm__header__icon clickable">
                     <use href="#ico36_close"></use>
@@ -67,7 +68,8 @@ function genComponentConf() {
             <won-post-header
                 need-uri="self.theirNeed.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
-                hide-image="::true">
+                class="clickable"
+                hide-image="::false">
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
@@ -87,11 +89,11 @@ function genComponentConf() {
                   <button
                     class="won-button--outlined thin red"
                     ng-click="self.goToPost()">
-                      Go To Post
+                      Show Post Details
                   </button>
                   <button
                     class="won-button--filled thin red"
-                    ng-click="self.closeRequest()">
+                    ng-click="self.closeConnection()">
                       Close Connection
                   </button>
                 </div>
@@ -187,12 +189,13 @@ function genComponentConf() {
             	</div>
             </div>
         </div>
-        <div class="pm__footer">
+        <div class="pm__footer" ng-show="self.isConnected">
             <chat-textfield
                 placeholder="::'Your Message'"
                 on-input="::self.input(value)"
                 on-paste="::self.input(value)"
                 on-submit="::self.send()"
+                allow-empty-submit="false"
                 submit-button-label="::'Send'"
                 >
             </chat-textfield>
@@ -226,6 +229,30 @@ function genComponentConf() {
                  </button>
             </div>
         </div>
+        <div class="pm__footer" ng-show="self.isSentRequest">
+            Waiting for them to accept your chat request.
+        </div>
+
+        <div class="pm__footer" ng-show="self.isReceivedRequest">
+            <chat-textfield
+                placeholder="::'Reply Message (optional, in case of acceptance)'"
+                on-input="::self.input(value)"
+                on-paste="::self.input(value)"
+                on-submit="::self.openRequest()"
+                allow-empty-submit="true"
+                submit-button-label="::'Accept Chat'"
+                >
+            </chat-textfield>
+            <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
+            <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
+                Decline
+            </button>
+            <a target="_blank" href="{{self.connectionUri}}">
+                <svg class="rdflink__big clickable">
+                    <use href="#rdf_logo_1"></use>
+                </svg>
+            </a>
+        </div>
     `;
 
 
@@ -241,7 +268,7 @@ function genComponentConf() {
             this.showLoadingInfo = false;
             
             const self = this;
-            this.baseString = "/owner/"
+            this.baseString = "/owner/";
             this.declarations = clone(declarations);
             
             this.agreementHeadData = this.cloneDefaultData();
@@ -305,6 +332,9 @@ function genComponentConf() {
                     eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     chatMessages: sortedMessages,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
+                    isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
+                    isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
+                    isConnected: connection && connection.get('state') === won.WON.Connected,
                     debugmode: won.debugmode,
                     shouldShowRdf: state.get('showRdf'),
                     // if the connect-message is here, everything else should be as well
@@ -595,13 +625,17 @@ function genComponentConf() {
             }
         }
 
-        closeRequest(){
+        openRequest(message){
+            this.connections__open(this.connectionUri, this.chatMessage);
+        }
+
+        closeConnection(){
             this.connections__close(this.connection.get('uri'));
             this.router__stateGoCurrent({connectionUri: null});
         }
 
         goToPost() {
-            this.router__stateGoAbs('post', {postUri: this.connection.get('remoteNeedUri')});
+            this.router__stateGoCurrent({postUri: this.connection.get('remoteNeedUri')});
         }
     }
     Controller.$inject = serviceDependencies;
@@ -622,7 +656,8 @@ export default angular.module('won.owner.components.postMessages', [
     chatTextFieldSimpleModule,
     connectionMessageModule,
     connectionAgreementModule,
-    postHeaderModule
+    postHeaderModule,
+    labelledHrModule
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;

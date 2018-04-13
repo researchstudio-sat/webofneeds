@@ -7,19 +7,43 @@ won-connection-selection {
 won-connections-overview {
   display: block;
 
+  $greyBorder: $thinGrayBorder;
+  $invisibleBorder: 0.1rem solid $won-lighter-gray;
+
   .covw__own-need {
     display: flex;
     flex-direction: row;
     align-items: center;
 
-    padding: 0.5rem 0; // vert horiz
+    padding: 0.5rem;
 
     border-bottom: $thinGrayBorder;
 
     won-post-header {
       flex-grow: 1;
     }
+
+
+    &.selected {
+      border-top: $greyBorder;
+      border-left: $greyBorder;
+      border-bottom: $greyBorder;
+    }
+
+    &:hover, &.selected {
+      background-color: white;
+    }
   }
+
+  &:first-child .covw__own-need.selected {
+    //don't show border for first item to avoid duplicate borders with the title bar
+    border-top: 0;
+  }
+  &:not(:first-child) .covw__own-need.selected {
+    //don't show border for first item to avoid duplicate borders with the title bar
+    border-top: $greyBorder;
+  }
+
 
   .covw__unreadCount {
     color: $won-primary-color;

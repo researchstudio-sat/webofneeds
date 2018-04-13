@@ -124,7 +124,6 @@ export function connectionsOpen(connectionUri, textMessage) {
          });
          
         dispatch(actionCreators.router__stateGoCurrent({
-            postUri: optimisticEvent.getSenderNeed(),
             connectionType: won.WON.Connected,
             connectionUri: optimisticEvent.getSender(),
         }));

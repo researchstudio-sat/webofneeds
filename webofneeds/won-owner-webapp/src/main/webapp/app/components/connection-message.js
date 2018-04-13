@@ -8,9 +8,7 @@ import won from '../won-es6.js';
 import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
-import chatTextFieldModule from './chat-textfield.js';
 import labelledHrModule from './labelled-hr.js';
-import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import {
     relativeTime,
 } from '../won-label-utils.js'
@@ -47,8 +45,8 @@ function genComponentConf() {
             title="self.theirNeed.get('title')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
-            ng-click="self.router__stateGoAbs('post', {postUri: self.theirNeed.get('uri')})"
-            ng-show="!self.message.get('outgoingMessage')">
+            ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
+            ng-show="!self.message.get('outgoingMessage')"><!-- TODO: MAKE THIS LINK WORK FOR SPECIFIC POST.JS/HTML usage too if the view will still exist then -->
         </won-square-image>
         <div class="won-cm__center"
                 ng-class="{'won-cm__center--nondisplayable': !self.text}"
@@ -67,6 +65,7 @@ function genComponentConf() {
                          <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
 	                                ng-click="self.showDetail = !self.showDetail"
+	                                ng-if="self.allowProposals"
 	                                ng-show="!self.showDetail">
 	                            <use href="#ico16_arrow_down"></use>
 	                        </svg>
@@ -98,16 +97,16 @@ function genComponentConf() {
                         ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
                         ng-show="self.shouldShowRdf && self.contentGraphTrig"
                     >
-<div 
-    class="won-cm__center__trig" 
-    ng-show="self.contentGraphTrigPrefixes">
-<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
-<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
-</div>
-<div 
-    class="won-cm__center__trig">
-<code>{{ self.contentGraphTrig }}</code>
-</div>
+                        <div
+                            class="won-cm__center__trig"
+                            ng-show="self.contentGraphTrigPrefixes">
+                        <code ng-show="!self.showTrigPrefixes">@prefix ...</code>
+                        <code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
+                        </div>
+                        <div
+                            class="won-cm__center__trig">
+                        <code>{{ self.contentGraphTrig }}</code>
+                        </div>
                     </div>
 
                     <!--
@@ -223,6 +222,7 @@ function genComponentConf() {
                     contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
+                    allowProposals: connection && connection.get("state") === won.WON.Connected, //allow showing details only when the connection is already present
                 }
             };
 

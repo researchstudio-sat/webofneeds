@@ -3,8 +3,8 @@
     <won-overview-title-bar selection="self.selection" ng-if="!self.post"></won-overview-title-bar>
     <won-owner-title-bar selection="self.ownerSelection" ng-if="self.post"></won-owner-title-bar>
 </header>
-<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasConnections}">
-    <div class="opc__inner empty" ng-if="!self.hasConnections">
+<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasConnections && !self.hasOwnNeeds}">
+    <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
@@ -23,21 +23,24 @@
             </a>
         </div>
     </div>
-    <div class="oir__requests" ng-class="{'hidden': self.connection}">
+    <div class="oir__requests" ng-class="{'hidden': self.connection || self.selectedPost}">
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)",
+            on-selected-need="self.selectedNeed(needUri)",
             open="self.open">
         </won-connections-overview>
     </div>
-    <div class="post__contentside" ng-if="self.connection && self.connectionType !== self.WON.Closed">
-        <won-open-request ng-if="self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-open-request>
+    <div class="post__contentside" ng-if="!self.selectedPost && self.connection && self.connectionType !== self.WON.Closed">
         <won-send-request ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
-        <won-post-messages ng-if="self.connectionType === self.WON.Connected"></won-post-messages>
+        <won-post-messages ng-if="self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
     </div>
-    <div class="post__contentside post__contentside--empty" ng-if="self.hasConnections && (!self.connection || self.connectionType === self.WON.Closed)"
+    <div class="post__contentside" ng-if="self.selectedPost">
+        <won-post-info include-header="true"></won-post-info>
+    </div>
+    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && (self.hasConnections || self.hasOwnNeeds) && (!self.connection || self.connectionType === self.WON.Closed)"
                ng-class="{'hidden' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
             No Element selected
         </span>
-</div>
+    </div>
 </main>

@@ -3,6 +3,10 @@
 @import 'square-image';
 
 won-connection-message {
+    &.won-unread {
+        background-color: $won-unread;
+    }
+
     padding: 0.5rem 1rem;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: grid;
