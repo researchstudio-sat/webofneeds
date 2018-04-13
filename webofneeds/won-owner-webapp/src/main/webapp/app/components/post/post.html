@@ -15,8 +15,8 @@
 </header>
 <main class="ownerpostcontent">
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-post-info ng-if="self.post && !self.sendAdHocRequest" ng-show="!self.connectionType || !self.isOwnPost" include-header="false"></won-post-info>
-    <won-send-request include-header="false" ng-if="!self.isOwnPost && self.sendAdHocRequest"></won-send-request>
+    <won-post-info ng-if="self.post && self.isOwnPost" ng-show="!self.connectionType" include-header="false"></won-post-info>
+    <won-send-request include-header="false" ng-if="self.post && !self.isOwnPost"></won-send-request>
 
     <!-- No Connections: -->
     <div class="opc__inner empty" 

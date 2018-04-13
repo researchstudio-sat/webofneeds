@@ -99,11 +99,6 @@ function genComponentConf() {
             </div>
 
             <button class="post-info__footer__button won-button--filled red"
-                    ng-show="self.showRequestButton"
-                    ng-click="self.router__stateGoCurrent({sendAdHocRequest: true})">
-                    Chat
-            </button>
-            <button class="post-info__footer__button won-button--filled red"
                     ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
                     ng-click="self.reOpenPost()">
                     Reopen Post
