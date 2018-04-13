@@ -27,7 +27,7 @@ function genComponentConf() {
       <div
       class="conn__inner"
       ng-class="self.isOpen() ? 'selected' : ''">
-        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') !== self.WON.Connected">
+        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') === self.WON.Suggested">
         </won-connection-state>
         <won-post-header
           need-uri="self.theirNeed.get('uri')"
