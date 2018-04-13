@@ -22,7 +22,9 @@
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
   }
+
   @media (max-width: $responsivenessBreakPoint){
+    .post__contentside--empty.hidden,
     .oir__requests.hidden {
       display: none;
     }

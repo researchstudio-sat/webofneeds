@@ -8,6 +8,10 @@ won-connection-selection-item {
   display: block;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
 
+  &.won-unread {
+    background-color: $won-unread;
+  }
+
   .conn__icon {
     @include fixed-square(1rem);
   }
