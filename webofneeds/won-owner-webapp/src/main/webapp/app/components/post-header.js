@@ -24,7 +24,7 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <won-square-image
-        ng-class="{'bigger' : self.biggerImage}"
+        ng-class="{'bigger' : self.biggerImage, 'inactive' : self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         title="self.need.get('title')"
         uri="self.needUri"
@@ -61,6 +61,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.ph4dbg = this;
             this.labels = labels;
+            this.WON = won.WON;
             const selectFromState = (state) => {
                 const need = state.getIn(['needs', this.needUri]);
 

@@ -41,29 +41,35 @@ function genComponentConf() {
                     need-uri="need.get('uri')"
                     timestamp="'TODOlatestOfThatType'">
                 </won-post-header>
-                <won-connection-indicators on-selected-connection="self.selectConnection(connectionUri)" need-uri="need.get('uri')"></won-connection-indicators>
-                <svg
-                    style="--local-primary:var(--won-secondary-color);"
-                    class="covw__arrow clickable"
-                    ng-show="self.isOpen(need.get('uri')) && !self.isOpenByConnection(need.get('uri'))"
-                    ng-click="self.closeConnections(need.get('uri'))" >
-                        <use href="#ico16_arrow_up"></use>
-                </svg>
-                <svg
-                    style="--local-primary:var(--won-disabled-color);"
-                    class="covw__arrow"
-                    ng-show="self.isOpen(need.get('uri')) && self.isOpenByConnection(need.get('uri'))" >
-                        <use href="#ico16_arrow_up"></use>
-                </svg>
-                <svg style="--local-primary:var(--won-secondary-color);"
-                    class="covw__arrow clickable"
-                    ng-show="!self.isOpen(need.get('uri'))"
-                    ng-click="self.openConnections(need.get('uri'))" >
-                        <use href="#ico16_arrow_down"></use>
-                </svg>
+                <won-connection-indicators 
+                    ng-show="need.get('state') === self.WON.ActiveCompacted"
+                    on-selected-connection="self.selectConnection(connectionUri)" 
+                    need-uri="need.get('uri')">
+                </won-connection-indicators>
+                <div ng-style="{'visibility': self.showConnectionsDropdown(need) ? 'visible' : 'hidden'}">
+                    <svg
+                        style="--local-primary:var(--won-secondary-color);"
+                        class="covw__arrow clickable"
+                        ng-show="self.isOpen(need.get('uri')) && !self.isOpenByConnection(need.get('uri'))"
+                        ng-click="self.closeConnections(need.get('uri'))" >
+                            <use href="#ico16_arrow_up"></use>
+                    </svg>
+                    <svg
+                        style="--local-primary:var(--won-disabled-color);"
+                        class="covw__arrow"
+                        ng-show="self.isOpen(need.get('uri')) && self.isOpenByConnection(need.get('uri'))" >
+                            <use href="#ico16_arrow_up"></use>
+                    </svg>
+                    <svg style="--local-primary:var(--won-secondary-color);"
+                        class="covw__arrow clickable"
+                        ng-show="!self.isOpen(need.get('uri'))"
+                        ng-click="self.openConnections(need.get('uri'))" >
+                            <use href="#ico16_arrow_down"></use>
+                    </svg>
+                </div>
             </div>
             <won-connection-selection-item
-                ng-if="self.isOpen(need.get('uri'))"
+                ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
                 ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
                 on-selected-connection="self.selectConnection(connectionUri)"
                 connection-uri="conn.get('uri')"
@@ -76,23 +82,24 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
             this.open = open;
+            this.WON = won.WON;
             //this.labels = labels;
             window.co4dbg = this;
 
             const self = this;
             const selectFromState = (state)=> {
-                //Select all needs with at least one connection
-                const relevantOwnNeeds = selectAllOwnNeeds(state).filter(need => need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0);
+                const allOwnNeeds = selectAllOwnNeeds(state);
+
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
+                let sortedNeeds = self.sortNeeds(allOwnNeeds);
+
                 if(needUriImpliedInRoute) {
                     this.open[needUriImpliedInRoute] = true;
                 }
-
-                let sortedNeeds = sortByDate(relevantOwnNeeds);
 
                 return {
                     needUriImpliedInRoute,
@@ -122,6 +129,18 @@ function genComponentConf() {
 
         selectConnection(connectionUri) {
             this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
+        }
+
+        // sort needs by date and put closed needs at the end of the list
+        sortNeeds(allNeeds) {
+            openNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted));
+            closedNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.InactiveCompacted));
+
+            return openNeeds.concat(closedNeeds);
+        }
+
+        showConnectionsDropdown(need){
+            return need.get("state") === won.WON.ActiveCompacted && need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
         }
 
         getOpenConnectionsArraySorted(need){
