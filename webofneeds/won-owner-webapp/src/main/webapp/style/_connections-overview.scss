@@ -13,7 +13,7 @@ won-connections-overview {
   .covw__own-need {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
 
     padding: 0.5rem;
 
@@ -58,5 +58,8 @@ won-connections-overview {
 
   .covw__arrow {
     @include carretSized;
+    // results in a clickable area as large as indicators
+    // TODO: make the value less rigid
+    padding: 0.625em;
   }
 }
