@@ -281,28 +281,11 @@ function genComponentConf() {
                 	//filter proposals
                 	
                 	for(msg of msgSet) {
-                		/*if(!msg.get("isRelevant")) {
-                			console.log("Message is no longer relevant: " + msg);
-                			msgSet.delete(msg);
-                		}*/
-                		
                 		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
 	                		if(this.isOldAgreementMsg(msg)) {
-	                			//msgSet.delete(msg);
 	                			//TODO: optimization?
-	                			//isRelevant?
+	                			//isRelevant in state?
 	                			msg.hide = true;
-	                			/*
-	                			const payload = {
-	                	                messageUri: msg.get("uri"),
-	                	                connectionUri: this.connectionUri,
-	                	                needUri: this.ownNeed.get("uri"),
-	                	                relevant: false,
-                	            };
-                	        	//this.messages__markAsRelevant(payload);*/
-	                		} else {
-	                			//TODO: optimization?
-	                			//isRelevant?
 	                		}
                 		}
                 	}
