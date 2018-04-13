@@ -134,54 +134,62 @@ export function connectionsOpen(connectionUri, textMessage) {
 export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
     return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
 }
-async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
-    await ensureLoggedIn(dispatch, getState);
-	const state = getState();
-    const theirNeed = getIn(state, ['needs', theirNeedUri]);
-    const adHocDraft = generateResponseNeedTo(theirNeed);
-    const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-    const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-    const cnctMsg = buildConnectMessage({
-        ownNeedUri: needUri,
-        theirNeedUri: theirNeedUri,
-        ownNodeUri: nodeUri,
-        theirNodeUri: theirNeed.get("nodeUri"),
-        textMessage: textMessage,
-    });
-    
-    const optimisticEvent = await won.wonMessageFromJsonLd(cnctMsg.message);
-    
-    // connect action to be dispatched when the 
-    // ad hoc need has been created: 
-    const connectAction = {
-		type: actionTypes.needs.connect, 
-		payload: {
-            eventUri: cnctMsg.eventUri,
-            message: cnctMsg.message,
-            optimisticEvent: optimisticEvent,
-        }
-    }
-    
-    // register the connect action to be dispatched when 
-    // need creation is successful
-    dispatch({
-    	type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
-    	payload: {
-    		eventUri: eventUri,
-    		actionToDispatch: connectAction,
-    	}
-    })
-    
-    // create the new need
-    dispatch({
-        type: actionTypes.needs.create, // TODO custom action
-        payload: {eventUri, message, needUri, need: adHocDraft}
+function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
+    ensureLoggedIn(dispatch, getState)
+    .then(() => {
+        const state = getState();
+        const theirNeed = getIn(state, ['needs', theirNeedUri]);
+        const adHocDraft = generateResponseNeedTo(theirNeed);
+        const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
+        const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+        const cnctMsg = buildConnectMessage({
+            ownNeedUri: needUri,
+            theirNeedUri: theirNeedUri,
+            ownNodeUri: nodeUri,
+            theirNodeUri: theirNeed.get("nodeUri"),
+            textMessage: textMessage,
+        });
+        
+        won.wonMessageFromJsonLd(cnctMsg.message)
+        .then(optimisticEvent => {
+        
+            // connect action to be dispatched when the 
+            // ad hoc need has been created: 
+            const connectAction = {
+                type: actionTypes.needs.connect, 
+                payload: {
+                    eventUri: cnctMsg.eventUri,
+                    message: cnctMsg.message,
+                    optimisticEvent: optimisticEvent,
+                }
+            }
+            
+            // register the connect action to be dispatched when 
+            // need creation is successful
+            dispatch({
+                type: actionTypes.messages.dispatchActionOn.registerSuccessOwn, 
+                payload: {
+                    eventUri: eventUri,
+                    actionToDispatch: connectAction,
+                }
+            })
+            
+            // create the new need
+            dispatch({
+                type: actionTypes.needs.create, // TODO custom action
+                payload: {eventUri, message, needUri, need: adHocDraft}
+            });
+
+            //const dbgNeedUri = needUri;
+            //const dbgEventUri = eventUri;
+
+            //dispatch(actionCreators.router__stateGoAbs('feed'));
+            dispatch(actionCreators.router__stateGoCurrent({
+                postUri: needUri,
+            }));
+        });
     });
 
-    //dispatch(actionCreators.router__stateGoAbs('feed'));
-    dispatch(actionCreators.router__stateGoCurrent({
-        connectionUri: optimisticEvent.getSender(),
-    }));
 }
 
 async function messageGraphToEvent(eventUri, messageGraph) {
