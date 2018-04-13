@@ -2,32 +2,21 @@
 @import 'sizing-utils';
 @import 'animate';
 
-.post__sendrequest {
-  position: absolute;
-  z-index: 1010; //OTHERWISE LEAFLET MESSES UP THE OVERLAY
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  won-send-request {
-    background: white;
-    margin: 0 auto;
-    top: 15rem;
-    max-width: $maxContentWidth / 2;
-    position: relative;
-  }
-}
-
 won-send-request,
 won-post-info {
+  background: white;
   display: grid;
+  border-left: $thinGrayBorder;
+  border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax(10rem, 1fr) min-content;
   grid-row-gap: $gridRowGap;
   width: 100%;
+  max-width: $maxContentWidth;
   height: 100%;
   box-sizing: border-box;
+  padding: $gridRowGap;
 
   .post-info__header {
     display:flex;

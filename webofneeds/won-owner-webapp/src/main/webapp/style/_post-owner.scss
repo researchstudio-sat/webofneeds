@@ -3,9 +3,14 @@
 @import 'fonts';
 @import 'flex-layout';
 
+@media (max-width: $responsivenessBreakPoint){
+  .ownerpostcontent {
+    padding: 0;
+  }
+}
 
 .ownerpostcontent {
-  padding: 0 1rem 1rem 1rem;
+  padding: 0 1rem;
   box-sizing: border-box;
   @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
   @include empty-description('opc');
@@ -18,6 +23,7 @@
   }
 
   @media (max-width: $responsivenessBreakPoint){
+
     .owner__messages.hidden {
       display: none;
     }
@@ -29,7 +35,6 @@
   }
 
 }
-
 
 @import 'connection-selection-item-line';
 //@import 'open-conversation';
