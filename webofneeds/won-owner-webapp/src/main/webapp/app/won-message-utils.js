@@ -327,7 +327,6 @@ export function buildModificationMessage(uri, type, text) {
     return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
 }
 
-
 export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }

@@ -116,7 +116,7 @@ function genComponentConf() {
                             && !self.message.get('outgoingMessage')
                             && self.message.get('isAcceptMessage')
                             && !self.clicked"
-                            && self.message.get('isRelevant')>
+                            && self.isRelevant>
                         <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">
                         	Cancel
                        	</button>
@@ -125,9 +125,8 @@ function genComponentConf() {
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage')
                             && !self.message.get('isAcceptMessage')
-                            && !self.message.isAccepted
                             && !self.clicked
-                            && self.message.get('isRelevant')">
+                            && self.isRelevant ">
                         <button class="won-button--filled thin red" 
                         		ng-show="!self.message.get('outgoingMessage') && !self.clicked" 
     							ng-click="self.acceptProposal()">
@@ -149,7 +148,7 @@ function genComponentConf() {
                         ng-if="self.message.get('isProposeToCancel')
                             && !self.message.get('isAcceptMessage')
                             && !self.clicked
-                            && self.message.get('isRelevant')">
+                            && self.isRelevant">
                         <button class="won-button--filled thin red" 
                         		ng-show="!self.message.get('outgoingMessage')" 
                         		ng-click="self.acceptProposeToCancel()">
@@ -215,13 +214,12 @@ function genComponentConf() {
                     getIn(connection, ['messages', this.messageUri]) :
                     Immutable.Map();
 
-                
-                
                 return {
                     ownNeed,
                     theirNeed,
                     connection,
                     message,
+                    isRelevant: message.get('isRelevant')? !this.hideOption : false,
                     text: message.get('text'), 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
                     contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
@@ -269,7 +267,7 @@ function genComponentConf() {
         
         markAsRelevant(relevant){
         	const payload = {
-                    messageUri: this.message.get("uri"),
+                messageUri: this.message.get("uri"),
                 connectionUri: this.connectionUri,
                 needUri: this.ownNeed.get("uri"),
                 relevant: relevant,
@@ -283,7 +281,7 @@ function genComponentConf() {
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	const trimmedMsg = buildProposalMessage(uri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	//this.onUpdate();
+        	        	
         	this.onSendProposal({proposalUri: uri});
         }
         
@@ -293,10 +291,9 @@ function genComponentConf() {
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	//TODO: isAccepted = true;
-        	this.onUpdate();
         	
         	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.messageUri});
         }
         
         proposeToCancel() {
@@ -315,11 +312,9 @@ function genComponentConf() {
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.onUpdate({draft: this.messageUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.messageUri});
-        	
+
         	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.messageUri});
         }
         
         retractMessage() {
@@ -368,12 +363,14 @@ function genComponentConf() {
         scope: { 
             messageUri: '=',
             connectionUri: '=',
+            hideOption: '=',
             /*
              * Usage:
              *  on-update="::myCallback(draft)"
              */
             onUpdate: '&',
             onSendProposal: '&',
+            onRemoveData: '&',
         },
         template: template,
     }
