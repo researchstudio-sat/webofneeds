@@ -84,6 +84,8 @@
 
       .pm__header__contextmenu .content {
         max-width: 10rem;
+        position: absolute;
+        right: 0;
 
         button {
           margin-top: 0.5rem;

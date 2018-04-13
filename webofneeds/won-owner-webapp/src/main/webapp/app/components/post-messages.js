@@ -73,8 +73,8 @@ function genComponentConf() {
                 hide-image="::false">
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
-                style="--local-primary:#var(--won-secondary-color);" 
-                ng-show="!self.contextMenuOpen" 
+                style="--local-primary:#var(--won-secondary-color);"
+                ng-style="{'visibility': !self.contextMenuOpen}"
                 ng-click="self.contextMenuOpen = true">
                     <use href="#ico16_arrow_down"></use>
             </svg>
