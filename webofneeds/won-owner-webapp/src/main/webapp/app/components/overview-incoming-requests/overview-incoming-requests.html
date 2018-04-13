@@ -31,7 +31,7 @@
         </won-connections-overview>
     </div>
     <div class="post__contentside" ng-if="!self.selectedPost && self.connection && self.connectionType !== self.WON.Closed">
-        <won-send-request ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
+        <won-send-request include-header="true" ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
     </div>
     <div class="post__contentside" ng-if="self.selectedPost">
