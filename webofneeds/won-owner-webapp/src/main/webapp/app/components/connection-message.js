@@ -8,9 +8,7 @@ import won from '../won-es6.js';
 import jld from 'jsonld';
 import Immutable from 'immutable';
 import squareImageModule from './square-image.js';
-import chatTextFieldModule from './chat-textfield.js';
 import labelledHrModule from './labelled-hr.js';
-import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import {
     relativeTime,
 } from '../won-label-utils.js'
