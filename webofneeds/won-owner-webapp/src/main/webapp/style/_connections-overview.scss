@@ -13,7 +13,6 @@ won-connections-overview {
     align-items: center;
 
     padding: 0.5rem 0; // vert horiz
-    padding-right: 0.5rem;
 
     border-bottom: $thinGrayBorder;
 
@@ -35,5 +34,8 @@ won-connections-overview {
 
   .covw__arrow {
     @include carretSized;
+    // results in a clickable area as large as indicators
+    // TODO: make the value less rigid
+    padding: 0.625em;
   }
 }
