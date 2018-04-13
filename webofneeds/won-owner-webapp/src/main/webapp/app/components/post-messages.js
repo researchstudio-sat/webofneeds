@@ -140,6 +140,7 @@ function genComponentConf() {
                 ng-repeat="msg in self.chatMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
+                hide-option="msg.hide"
                 ng-class="{
                     'won-unread' : msg.get('newMessage'),
                     'won-not-relevant': !msg.get('isRelevant'),
@@ -208,7 +209,8 @@ function genComponentConf() {
 	            		src="generated/icon-sprite.svg#ico36_close"
 	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
 	            <div class="pm__content__agreement__title"> 
-	            		Loading the Agreement Data. Please be patient, because patience is a talent :)
+	            		<span class="ng-hide" ng-show="loading['value']">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!loading['value']">No Agreement Data found</span>
             	</div>
             </div>
     		<!-- Show if no Agrrement Data exists -->

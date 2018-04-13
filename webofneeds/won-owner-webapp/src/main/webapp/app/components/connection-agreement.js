@@ -46,12 +46,12 @@ function genComponentConf() {
             	{{ self.agreementNumber+1  }}: 
             	{{ self.message.get('text') }}<br />
             	<span class="subtitle" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Proposed to cancel</span>
-            	<!-- TODO: hide -->
+            	<!-- TODO: hide 
             	<div class="won-ca__content__text__subtext">
 	            	<code>StateUri: {{ self.stateUri }}</code><br />
 	            	<code>HeadUri:   {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}</code>
 	            	<code ng-show="self.cancelUri">CancelUri: {{ self.cancelUri }} </code>
-            	</div>
+            	</div>-->
             	
             </div>
             <div class="won-ca__content__carret">
