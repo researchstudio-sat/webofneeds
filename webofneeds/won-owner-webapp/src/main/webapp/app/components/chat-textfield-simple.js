@@ -30,15 +30,16 @@ function genComponentConf() {
             data-max-rows="4"
 
             class="wdt__text"
-            ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }"
+            ng-class="{'wdt__text--is-code': self.isCode, 'valid' : self.belowMaxLength(), 'invalid' : !self.belowMaxLength() }"
             tabindex="0"
-            placeholder="{{::self.placeholder}}"></textarea>
+            placeholder="{{self.placeholder}}"></textarea>
 
         <button
             class="wdt__submitbutton red"
-            ng-show="::self.submitButtonLabel"
-            ng-click="::self.submit()">
-            {{ ::(self.submitButtonLabel || 'Submit') }}
+            ng-show="self.submitButtonLabel"
+            ng-click="self.submit()"
+            ng-disabled="!self.valid()">
+            {{ (self.submitButtonLabel || 'Submit') }}
         </button>
 
         <div class="wdt__charcount" ng-show="self.maxChars">
@@ -99,11 +100,12 @@ function genComponentConf() {
             };
             this.onInput(payload);
             dispatchEvent(this.$element[0], 'input', payload);
+            this.$scope.$digest(); // trigger digest so button and counter update
         }
         submit() {
             const value = this.value();
             const valid = this.valid();
-            if(value && valid) {
+            if(value && value.length > 0 && valid) {
                 const txtEl = this.textField();
                 if(txtEl) {
                     txtEl.value = "";
@@ -118,8 +120,11 @@ function genComponentConf() {
         charactersLeft() {
             return this.maxChars - this.value().length;
         }
-        valid() {
+        belowMaxLength() {
             return !this.maxChars || this.charactersLeft() >= 0;
+        }
+        valid() {
+            return (allowEmptySubmit || this.value().length > 0) && this.belowMaxLength()
         }
         value() {
             const txtEl = this.textField();
@@ -150,6 +155,10 @@ function genComponentConf() {
             placeholder: '=', // NOTE: bound only once
             maxChars: '=',
             helpText: '=',
+
+            isCode: '=', // whether or not the text is code and e.g. should use monospace
+
+            allowEmptySubmit: '=',
 
             /*
              * Usage:

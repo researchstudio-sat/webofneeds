@@ -207,38 +207,17 @@ function genComponentConf() {
             </div>
         </div>
         <div class="pm__footer" ng-show="self.isConnected">
-            <chat-textfield
-                placeholder="::'Your Message'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.send()"
-                allow-empty-submit="false"
-                submit-button-label="::'Send'"
-                >
-            </chat-textfield>
-
-            <!--
-            TODO finish implementing and styling chat-textfield-simple and use that for both 
-            ways of writing messages instead.
-            -->
 
             <chat-textfield-simple
-                ng-show="self.shouldShowRdf"
-                class="pm__footer__rdfinput"
-                placeholder="::'Enter ttl...'"
-                submit-button-label="::'Send RDF'"
-                on-submit="::self.sendRdf(value)"
-                help-text="::self.rdfTextfieldHelpText"
+                class="pm__footer__chattexfield"
+                placeholder="self.shouldShowRdf? 'Enter ttl...' : 'Your message...'"
+                submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
+                on-submit="self.send(value, self.shouldShowRdf)"
+                help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
+                allow-empty-submit="::false"
             >
             </chat-textfield-simple>
-            <!--
 
-            <p ng-show="self.shouldShowRdf">
-                Expects valid turtle. &lt;{{ self.msguriPlaceholder }}&gt;
-                will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` 
-                for prefixes that will be added automatically.
-            </p>
-            -->
             <div class="pm__footer__agreement">
                 <!-- quick and dirty button to get agreements -->
                 <button class="won-button--filled thin black"
@@ -429,15 +408,15 @@ function genComponentConf() {
             return this._scrollContainer;
         }
 
-        input(userInput) {
-            this.chatMessage = userInput;
-        }
-
-        send() {
+        send(chatMessage, isTTL=false) {
         	this.showAgreementData = false;
-            const trimmedMsg = this.chatMessage.trim();
+            const trimmedMsg = chatMessage.trim(); 
             if(trimmedMsg) {
-               this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
+               this.connections__sendChatMessage(
+                   trimmedMsg, 
+                   this.connection.get('uri'),
+                   isTTL
+                );
             }
         }
        
@@ -627,16 +606,6 @@ function genComponentConf() {
         			stateUri: undefined,
         			headUri: undefined,
         	}
-        }
-
-        sendRdf(rdfString) {
-            if(rdfString) {
-                this.connections__sendChatMessage(
-                    rdfString, 
-                    this.connection.get('uri'), 
-                    isTTL=true
-                );
-            }
         }
 
         openRequest(message){
