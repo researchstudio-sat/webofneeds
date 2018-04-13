@@ -1130,7 +1130,6 @@ window.N34dbg = N3;
                         );
                     } 
                     const eventUriPrefix = prefixOfUri(this.getMessageUri());
-                    console.log('eventUriPrefix deleteme: ', eventUriPrefix);
                     const jsonldData = {
                         '@context': Object.assign(
                             { event: eventUriPrefix }, 
