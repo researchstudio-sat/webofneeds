@@ -69,7 +69,7 @@ function genComponentConf() {
                 </div>
             </div>
             <won-connection-selection-item
-                ng-if="self.isOpen(need.get('uri'))"
+                ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
                 ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
                 on-selected-connection="self.selectConnection(connectionUri)"
                 connection-uri="conn.get('uri')"
