@@ -33,22 +33,6 @@ function genComponentConf() {
                         <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : ' (no matching context specified)' }}</div>
                     </hgroup>
                 </div>
-                <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
-                    <button class="won-button--filled red">Quit Contact</button>
-                    <ul class="vtb__tabs">
-                        <li class="clickable"
-                            ng-class="self.selection == 0? 'vtb__tabs__selected' : ''"
-                            ng-click="self.selection = 0">
-                        <a ng-click="self.router__stateGoAbs('post', {ERROR: 'Messages tab not implemented yet'})">
-                            Messages
-                            <span class="vtb__tabs__unread">{{self.post.get('messages').length}}</span>
-                        </a></li>
-                        <li class="clickable" ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
-                        <a ng-click="self.router__stateGoAbs('postVisitor', {postUri: 'http://example.org/121337345'})">
-                            Post Info
-                        </a></li>
-                    </ul>
-                </div>
             </div>
         </nav>
     `;
@@ -65,8 +49,6 @@ function genComponentConf() {
                     postUri,
                     post,
                     labels,
-                    isWhatsAround: post && post.get("isWhatsAround"),
-                    hasConnectionWithOwnPost: false,
                 }
             };
             connect2Redux(selectFromState, actionCreators, [], this);
@@ -80,8 +62,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {selection: "=",
-                item: "="},
+        scope: {item: "="},
         template: template
     }
 }

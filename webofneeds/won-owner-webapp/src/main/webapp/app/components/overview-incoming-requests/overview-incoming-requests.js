@@ -4,6 +4,7 @@ import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar.js';
 import sendRequestModule from '../send-request.js';
 import postMessagesModule from '../post-messages.js';
+import postInfoModule from '../post-info.js';
 import connectionsOverviewModule from '../connections-overview.js';
 import {
     attach,
@@ -88,6 +89,7 @@ export default angular.module('won.owner.components.overviewIncomingRequests', [
         overviewTitleBarModule,
         sendRequestModule,
         postMessagesModule,
+        postInfoModule,
         connectionsOverviewModule,
     ])
     .controller('OverviewIncomingRequestsController', [...serviceDependencies,IncomingRequestsController])
