@@ -38,6 +38,7 @@ class ConnectionsController {
             const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
             const connection = need && need.getIn(["connections", connectionUri]);
+            const connectionType = need && connectionUri && need.getIn(["connections", connectionUri, 'state']);
 
             const connections = selectAllConnections(state);
             const ownNeeds = selectAllOwnNeeds(state);
@@ -46,6 +47,7 @@ class ConnectionsController {
                 WON: won.WON,
                 selectedPost,
                 connection,
+                connectionType,
                 hasConnections: connections && connections.size > 0,
                 hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
                 open,
