@@ -147,9 +147,8 @@ export function runMessagingAgent(redux) {
                      * and should be rather rare, we can redirect in the optimistic
                      * case (see connection-actions.js) and go back if it fails.
                      */
-                    redux.dispatch(actionCreators.router__stateGoAbs("post", {
+                    redux.dispatch(actionCreators.router__stateGoAbs("connections", {
                         postUri: message.getSenderNeed(),
-                        connectionType: won.WON.RequestReceived,
                         connectionUri: message.getSender(),
                     }));
                     return true;
