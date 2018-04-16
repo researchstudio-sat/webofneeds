@@ -1,0 +1,17 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+@import 'post-info';
+
+.postcontent {
+  padding: 0 1rem;
+  box-sizing: border-box;
+  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  @include empty-description('opc');
+  align-items: stretch;
+
+  @media (max-width: $responsivenessBreakPoint){
+    padding: 0;
+  }
+}

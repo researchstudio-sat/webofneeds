@@ -23,7 +23,7 @@ import {
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 
-class IncomingRequestsController {
+class ConnectionsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.WON = won.WON;
@@ -83,14 +83,14 @@ class IncomingRequestsController {
     }
 }
 
-IncomingRequestsController.$inject = [];
+ConnectionsController.$inject = [];
 
-export default angular.module('won.owner.components.overviewIncomingRequests', [
+export default angular.module('won.owner.components.connections', [
         overviewTitleBarModule,
         sendRequestModule,
         postMessagesModule,
         postInfoModule,
         connectionsOverviewModule,
     ])
-    .controller('OverviewIncomingRequestsController', [...serviceDependencies,IncomingRequestsController])
+    .controller('ConnectionsController', [...serviceDependencies, ConnectionsController])
     .name;

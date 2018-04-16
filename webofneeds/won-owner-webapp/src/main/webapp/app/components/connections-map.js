@@ -154,7 +154,7 @@ function genComponentConf() {
                 .on("click",
                     function() {
                         if(false && this.isWhatsAround){
-                            this.router__stateGoAbs('post', {postUri: need.get("uri")});
+                            this.router__stateGoAbs('connections', {postUri: need.get("uri")});
                         }else{
                             this.onSelectedConnection({connectionUri: conn.get("uri")})
                         }

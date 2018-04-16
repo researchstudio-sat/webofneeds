@@ -40,7 +40,7 @@ class Controller {
     }
 
     goToOwnPost() {
-        this.router__stateGoAbs('overviewIncomingRequests', {connectionUri: undefined, postUri: this.postUri});
+        this.router__stateGoAbs('connections', {connectionUri: undefined, postUri: this.postUri});
         //TODO: REDIRECT TO THE OVERVIEW INSTEAD OF POST-VIEW (this does not work yet as the postUri is not set yet during the time of the function execution
     }
 }

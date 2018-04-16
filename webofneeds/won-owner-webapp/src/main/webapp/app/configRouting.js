@@ -36,7 +36,6 @@ import {
  * AS WELL.
  */
 export const resetParams = Object.freeze({
-    connectionType: undefined,
     connectionUri: undefined,
     postUri: undefined,
     //sendAdHocRequest: undefined,
@@ -87,8 +86,8 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/landingpage?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
         { path: '/feed?privateId', component: 'feed' },
-        { path: '/overview/incoming-requests?privateId?postUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
-        { path: '/post/?privateId?postUri?connectionUri?connectionType', component: 'post', as: 'post' },
+        { path: '/connections?privateId?postUri?connectionUri', component: 'connections', as: 'connections' },
+        { path: '/post/?privateId?postUri', component: 'post', as: 'post' },
 
     ].forEach( ({path, component, as}) => {
 

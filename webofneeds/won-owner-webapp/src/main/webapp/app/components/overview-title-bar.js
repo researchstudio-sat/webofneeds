@@ -32,7 +32,7 @@ function genComponentConf() {
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 1}"
                         class="clickable">
-                        <a ng-click="self.router__stateGoResetParams('overviewIncomingRequests')"
+                        <a ng-click="self.router__stateGoResetParams('connections')"
                             ng-class="{'disabled' : !self.hasConnections && !self.hasNeeds}">
                             Chats
                             <span class="mtb__tabs__unread"> {{ self.nrOfUnreadConnections }}</span>
