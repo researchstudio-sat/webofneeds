@@ -220,6 +220,8 @@ export default function(allNeedsInState = initialState, action = {}) {
             return changeConnectionState(allNeedsInState,  action.payload.getReceiver(), won.WON.Closed);
         case actionTypes.messages.markAsRead:
             return markMessageAsRead(allNeedsInState, action.payload.messageUri, action.payload.connectionUri, action.payload.needUri);
+        case actionTypes.messages.markAsRelevant:
+        	return markMessageAsRelevant(allNeedsInState, action.payload.messageUri, action.payload.connectionUri, action.payload.needUri, action.payload.relevant);
         case actionTypes.connections.markAsRead:
             return markConnectionAsRead(allNeedsInState, action.payload.connectionUri, action.payload.needUri);
         case actionTypes.connections.markAsRated:
@@ -463,6 +465,19 @@ function changeConnectionState(state, connectionUri, newState) {
             .setIn([needUri, "connections", connectionUri, "unread"], true);
 }
 
+function markMessageAsRelevant(state, messageUri, connectionUri, needUri, relevant) {
+	 let need = state.get(needUri);
+	    let connection = need && need.getIn(["connections", connectionUri]);
+	    let message = connection && connection.getIn(["messages", messageUri]);
+
+	    if(!message) {
+	        console.error("no message with messageUri: <", messageUri,"> found within needUri: <", needUri, "> connectionUri: <", connectionUri, ">");
+	        return state;
+	    }
+
+	    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "isRelevant"], relevant);
+}
+
 function markMessageAsRead(state, messageUri, connectionUri, needUri) {
 
     let need = state.get(needUri);
@@ -642,6 +657,7 @@ function parseMessage(wonMessage, isNewMessage) {
             isProposeToCancel: wonMessage.isProposeToCancel(),
             isRejectMessage: wonMessage.isRejectMessage(),
             isRetractMessage: wonMessage.isRetractMessage(),
+            isRelevant: true,
             contentGraphTrig: {
                 prefixes: contentGraphTrigPrefixes,
                 body: contentGraphTrigBody,
