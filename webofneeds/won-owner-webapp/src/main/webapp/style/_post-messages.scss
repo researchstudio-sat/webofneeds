@@ -87,6 +87,7 @@
         position: absolute;
         right: 0;
 
+        a.rdflink,
         button {
           margin-top: 0.5rem;
           width: 100%;
@@ -141,10 +142,6 @@
           @include fixed-square(1.5rem);
         }
       }
-    }
-
-    .rdflink.withlabel {
-      padding-bottom: 0.3rem;
     }
   }
 }

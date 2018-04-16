@@ -86,16 +86,33 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
-                  <button
-                    class="won-button--outlined thin red"
-                    ng-click="self.goToPost()">
-                      Show Post Details
-                  </button>
-                  <button
-                    class="won-button--filled thin red"
-                    ng-click="self.closeConnection()">
-                      Close Connection
-                  </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-click="self.goToPost()">
+                        Show Post Details
+                    </button>
+                    <button
+                        class="won-button--filled thin red"
+                        ng-click="self.closeConnection()">
+                        Close Connection
+                    </button>
+                    <a class="rdflink withlabel clickable"
+                        target="_blank"
+                        href="{{self.connectionUri}}"
+                        ng-if="!self.isConnected">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">Show RDF</span>
+                    </a>
+                    <a class="rdflink withlabel clickable"
+                        ng-click="self.toggleRdfDisplay()"
+                        ng-if="self.isConnected">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -214,13 +231,6 @@ function genComponentConf() {
             >
             </chat-textfield-simple>
             <div class="pm__footer__agreement">
-                <a class="rdflink withlabel clickable"
-                   ng-click="self.toggleRdfDisplay()">
-                       <svg class="rdflink__small">
-                           <use href="#rdf_logo_1"></use>
-                       </svg>
-                      <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span>
-                </a>
                 <!-- quick and dirty button to get agreements -->
                 <button class="won-button--filled thin black"
                     ng-click="self.showAgreementDataField()"
@@ -247,11 +257,6 @@ function genComponentConf() {
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
-            <a target="_blank" href="{{self.connectionUri}}">
-                <svg class="rdflink__big clickable">
-                    <use href="#rdf_logo_1"></use>
-                </svg>
-            </a>
         </div>
     `;
 
