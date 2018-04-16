@@ -55,7 +55,7 @@ class Controller {
                 connectionOpen: !!connectionUri,
                 postUri,
                 post,
-                isOwnPost: post && post.get("ownNeed"),
+                isOwnPost: post && post.get("ownNeed"), //TODO: -> if isOwnPost then do a redirect to the chats view
                 connectionUri,
                 hasConnections,
                 sendAdHocRequest,

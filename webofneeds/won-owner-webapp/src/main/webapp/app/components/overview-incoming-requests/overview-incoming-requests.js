@@ -29,8 +29,7 @@ class IncomingRequestsController {
         this.resetParams = resetParams;
         this.open = {};
 
-        this.selection = 2;
-        this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
+        this.selection = 1;
 
         const selectFromState = (state)=>{
             const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));

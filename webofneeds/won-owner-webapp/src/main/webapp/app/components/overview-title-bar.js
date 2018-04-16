@@ -32,17 +32,8 @@ function genComponentConf() {
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 1}"
                         class="clickable">
-                        <a ng-click="self.router__stateGoResetParams('overviewPosts')"
-                            ng-class="{'disabled' : !self.hasNeeds}"
-                            class="clickable">
-                            Posts
-                            <span class="mtb__tabs__unread">{{ self.nrOfUnreadNeeds }}</span>
-                        </a>
-                    </li>
-                    <li ng-class="{'mtb__tabs__selected' : self.selection == 2}"
-                        class="clickable">
                         <a ng-click="self.router__stateGoResetParams('overviewIncomingRequests')"
-                            ng-class="{'disabled' : !self.hasConnections}">
+                            ng-class="{'disabled' : !self.hasConnections && !self.hasNeeds}">
                             Chats
                             <span class="mtb__tabs__unread"> {{ self.nrOfUnreadConnections }}</span>
                         </a>
@@ -71,15 +62,12 @@ function genComponentConf() {
                 const ownNeeds = selectAllOwnNeeds(state);
                 const allConnections = selectAllConnections(state);
 
-                const nrOfUnreadNeeds = ownNeeds && ownNeeds.filter(need => need.get("unread")).size;
-
                 const nonClosedConnections = allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed);
                 const nrOfUnreadConnections = nonClosedConnections && nonClosedConnections.filter(conn => conn.get("unread")).size;
 
                 return {
                     hasNeeds: ownNeeds && ownNeeds.size > 0,
                     hasConnections: allConnections && allConnections.filter(conn => conn.get("state") !== won.WON.Closed).size > 0,
-                    nrOfUnreadNeeds: nrOfUnreadNeeds > 0 ? nrOfUnreadNeeds : undefined,
                     nrOfUnreadConnections: nrOfUnreadConnections > 0 ? nrOfUnreadConnections : undefined,
                 };
             };

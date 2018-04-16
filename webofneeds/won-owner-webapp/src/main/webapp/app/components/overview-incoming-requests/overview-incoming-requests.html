@@ -1,7 +1,6 @@
 <header>
     <won-topnav></won-topnav>
-    <won-overview-title-bar selection="self.selection" ng-if="!self.post"></won-overview-title-bar>
-    <won-owner-title-bar selection="self.ownerSelection" ng-if="self.post"></won-owner-title-bar>
+    <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasConnections && !self.hasOwnNeeds}">
     <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
