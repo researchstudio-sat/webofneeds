@@ -2,7 +2,6 @@
 
 import angular from 'angular';
 import topNavModule from '../topnav.js';
-import overviewTitleBarModule from '../visitor-title-bar.js';
 import compareToModule from '../../directives/compareTo.js';
 import accordionModule from '../accordion.js';
 import flexGridModule from '../flexgrid.js';
@@ -136,7 +135,6 @@ class AboutController {
 }
 
 export default angular.module('won.owner.components.about', [
-    overviewTitleBarModule,
     accordionModule,
     topNavModule,
     flexGridModule,

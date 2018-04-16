@@ -39,7 +39,6 @@ import createNeedComponent from './components/create-need/create-need.js';
 import connectionsComponent from './components/connections/connections.js';
 import postComponent from './components/post/post.js';
 import landingPageComponent from './components/landingpage/landingpage.js';
-import feedComponent from './components/feed/feed.js';
 import aboutComponent from './components/about/about.js';
 import signupComponent from './components/signup/signup.js';
 
@@ -79,7 +78,6 @@ let app = angular.module('won.owner', [
     connectionsComponent,
     postComponent,
     landingPageComponent,
-    feedComponent,
     aboutComponent,
     signupComponent,
 
