@@ -69,7 +69,7 @@ export function stateGoDefault() {
         const appState = getState();
         if ( appState.get('initialLoadFinished') ) {
             if (appState.getIn(['user', 'loggedIn'])) {
-                return dispatch(actionCreators.router__stateGoResetParams('feed'));
+                return dispatch(actionCreators.router__stateGoResetParams('connections'));
             } else {
                 return dispatch(actionCreators.router__stateGoResetParams('landingpage'));
             }

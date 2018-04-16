@@ -179,7 +179,7 @@ export function accountLogin(credentials, options) {
             if(!options_.doRedirects) {
                 return;
             } else if (options_.redirectToFeed) {
-                return dispatch(actionCreators.router__stateGoResetParams("feed"))
+                return dispatch(actionCreators.router__stateGoResetParams('connections'))
             } else {
                 return checkAccessToCurrentRoute(dispatch, getState);
             }

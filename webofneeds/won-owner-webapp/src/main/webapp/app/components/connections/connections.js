@@ -1,7 +1,6 @@
 ;
 
 import angular from 'angular';
-import overviewTitleBarModule from '../overview-title-bar.js';
 import sendRequestModule from '../send-request.js';
 import postMessagesModule from '../post-messages.js';
 import postInfoModule from '../post-info.js';
@@ -29,8 +28,6 @@ class ConnectionsController {
         this.WON = won.WON;
         this.resetParams = resetParams;
         this.open = {};
-
-        this.selection = 1;
 
         const selectFromState = (state)=>{
             const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
@@ -86,7 +83,6 @@ class ConnectionsController {
 ConnectionsController.$inject = [];
 
 export default angular.module('won.owner.components.connections', [
-        overviewTitleBarModule,
         sendRequestModule,
         postMessagesModule,
         postInfoModule,

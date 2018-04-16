@@ -85,7 +85,6 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/signup?privateId', component: 'signup' },
         { path: '/landingpage?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
-        { path: '/feed?privateId', component: 'feed' },
         { path: '/connections?privateId?postUri?connectionUri', component: 'connections', as: 'connections' },
         { path: '/post/?privateId?postUri', component: 'post', as: 'post' },
 
@@ -214,12 +213,12 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
                 getIn(state, ['user', 'loggedIn']))
             {
                 //logged in -- re-initiate route-change
-                console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the feed");
+                console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the connections");
                 if(event) {
                     event.preventDefault()
                 } else {
                     dispatch(
-                        actionCreators.router__stateGoAbs('feed')
+                        actionCreators.router__stateGoAbs('connections')
                     )
                 }
             }

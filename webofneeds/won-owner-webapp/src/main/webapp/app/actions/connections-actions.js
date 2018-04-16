@@ -177,7 +177,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
         payload: {eventUri, message, needUri, need: adHocDraft}
     });
 
-    dispatch(actionCreators.router__stateGoAbs('feed'));
+    dispatch(actionCreators.router__stateGoAbs('connections'));
 }
 
 async function messageGraphToEvent(eventUri, messageGraph) {
