@@ -70,6 +70,7 @@ function genComponentConf() {
                     console.log("RATE BAD");
                     this.connections__close(this.connectionUri);
                     this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
+                    this.router__stateGoCurrent({connectionUri: null})
                     //TODO: ADD A BAD RATING, CLOSE MATCH
                     break;
             }
