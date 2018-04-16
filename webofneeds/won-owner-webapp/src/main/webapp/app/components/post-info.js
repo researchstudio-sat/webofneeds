@@ -154,7 +154,7 @@ function genComponentConf() {
                         post.get('creationDate')
                     ),
                     createdTimestamp: post && post.get('creationDate'),
-                    linkToPost: post && post.get('uri'), //TODO: MAKE SURE TO CREATE THE CORRET LINK
+                    linkToPost: post && new URL("/owner/#!/post/?postUri="+encodeURI(post.get('uri')), window.location.href).href,
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.includeHeader'], this);
