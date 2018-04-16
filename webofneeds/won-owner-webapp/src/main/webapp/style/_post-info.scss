@@ -18,6 +18,11 @@ won-post-info {
   box-sizing: border-box;
   padding: $gridRowGap;
 
+  @media (max-width : $responsivenessBreakPoint) {
+    border-left: none;
+    border-right: none;
+  }
+
   .post-info__header {
     display:flex;
     grid-area: header;
