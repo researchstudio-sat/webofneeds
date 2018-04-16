@@ -5,5 +5,6 @@
 </header>
 <main class="postcontent">
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-send-request include-header="false" ng-if="self.post"></won-send-request>
+    <won-send-request include-header="false" ng-if="self.post && !self.isOwnPost"></won-send-request>
+    <button ng-click="self.goToOwnPost()" ng-if="self.post && self.isOwnPost " class="won-button--filled red">GO TO POST VIEW TODO: AUTOMATICALLY DO THIS</button>
 </main>

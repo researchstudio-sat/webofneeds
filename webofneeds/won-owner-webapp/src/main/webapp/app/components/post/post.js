@@ -28,8 +28,10 @@ class Controller {
             const postUri = selectOpenPostUri(state);
             const post = state.getIn(["needs", postUri]);
 
+            const isOwnPost = post && post.get("ownNeed");
             return {
                 postUri,
+                isOwnPost: isOwnPost,
                 post,
                 won: won.WON,
             };
