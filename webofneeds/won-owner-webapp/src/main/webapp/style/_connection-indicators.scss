@@ -7,13 +7,6 @@ won-connection-indicators {
   display: flex;
   flex-direction: row;
 
-  @media (max-width: $responsivenessBreakPoint) {
-    padding-top: 0.5rem;
-    justify-content: space-between;
-    width: 75%;
-  }
-
-
   .indicators__item {
     display: flex;
     align-items: flex-start;
