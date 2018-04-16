@@ -119,8 +119,3 @@ export const selectOpenPostUri = createSelector(
         return decodeUriComponentProperly(encodedPostUri);
     }
 );
-
-export const displayingOverview = createSelector(
-    selectOpenPostUri,
-    postUri => !postUri //if there's a postUri, this is almost certainly a detail view
-);

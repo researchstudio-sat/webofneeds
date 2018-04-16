@@ -8,7 +8,6 @@ import { attach, decodeUriComponentProperly} from '../utils.js';
 import won from '../won-es6.js';
 import {
     selectOpenPostUri,
-    displayingOverview,
     selectAllConnections,
 } from '../selectors.js';
 import { actionCreators }  from '../actions/actions.js';
