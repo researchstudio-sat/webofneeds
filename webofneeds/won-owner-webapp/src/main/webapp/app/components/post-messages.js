@@ -232,16 +232,15 @@ function genComponentConf() {
             Waiting for them to accept your chat request.
         </div>
 
-        <div class="pm__footer" ng-show="self.isReceivedRequest">
-            <chat-textfield
-                placeholder="::'Reply Message (optional, in case of acceptance)'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.openRequest()"
-                allow-empty-submit="true"
+        <div class="pm__footer" ng-if="self.isReceivedRequest">
+            <chat-textfield-simple
+                class="pm__footer__chattexfield"
+                placeholder="::'Reply Message (optional)'"
+                on-submit="::self.openRequest(value)"
+                allow-empty-submit="::true"
                 submit-button-label="::'Accept Chat'"
-                >
-            </chat-textfield>
+            >
+            </chat-textfield-simple>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
@@ -610,7 +609,7 @@ function genComponentConf() {
         }
 
         openRequest(message){
-            this.connections__open(this.connectionUri, this.chatMessage);
+            this.connections__open(this.connectionUri, message);
         }
 
         closeConnection(){
