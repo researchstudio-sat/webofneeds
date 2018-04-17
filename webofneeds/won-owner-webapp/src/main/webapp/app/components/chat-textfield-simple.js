@@ -100,7 +100,16 @@ function genComponentConf() {
             };
             this.onInput(payload);
             dispatchEvent(this.$element[0], 'input', payload);
-            this.$scope.$digest(); // trigger digest so button and counter update
+
+            /* trigger digest so button and counter update
+             * delay is because submit triggers an input-event
+             * and is in a digest-cycle already. opposed to user-
+             * triggered input-events. dunno why the latter doesn't
+             * do that tho.
+             */
+            delay(0).then(() => 
+                this.$scope.$digest() 
+            )
         }
         submit() {
             const value = this.value();
