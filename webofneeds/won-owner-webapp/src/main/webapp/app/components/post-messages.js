@@ -4,7 +4,6 @@ import won from '../won-es6.js';
 import angular from 'angular';
 import jld from 'jsonld';
 import Immutable from 'immutable';
-import chatTextFieldModule from './chat-textfield.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
@@ -634,7 +633,6 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.postMessages', [
-    chatTextFieldModule,
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
     connectionMessageModule,
