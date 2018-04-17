@@ -44,8 +44,7 @@ function genComponentConf() {
                 timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
-            <!-- TODO: Implement a menu with all the necessary buttons -->
-            <!-- svg class="post-info__header__icon__small clickable"
+            <svg class="post-info__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
                 ng-show="!self.contextMenuOpen"
                 ng-click="self.contextMenuOpen = true">
@@ -60,13 +59,21 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
-                  <button
-                    class="won-button--filled thin red"
-                    ng-click="">
-                      DO POST ACTIONS
-                  </button>
+                    <button ng-if="self.connection && self.connection.get('isRated')"
+                        class="post-info__footer__button won-button--filled black"
+                        ng-click="self.closeConnection()">
+                            Remove This
+                    </button>
+                    <a class="rdflink withlabel clickable"
+                        target="_blank"
+                        href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">Show RDF</span>
+                    </a>
                 </div>
-            </div-->
+            </div>
         </div>
         <div class="post-info__content">
             <won-gallery ng-show="self.suggestedPost.get('hasImages')">
@@ -111,19 +118,14 @@ function genComponentConf() {
                 ng-if="!self.connection || self.connection.get('isRated')"
                 >
             </chat-textfield>
-            
-            <!-- TODO: move this button from footer to header -->
-            <!-- won-labelled-hr label="::'Or'" ng-if="self.connection && self.connection.get('isRated')" class="post-info__footer__labelledhr"></won-labelled-hr>
-            <button ng-if="self.connection && self.connection.get('isRated')"
-                class="post-info__footer__button won-button--filled black"
-                ng-click="self.closeConnection()">
-                    Remove This
-            </button -->
-            <a target="_blank"
-                href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
-                <svg class="rdflink__big clickable">
-                    <use href="#rdf_logo_1"></use>
-                </svg>
+            <a class="rdflink withlabel clickable"
+               ng-if="!self.includeHeader"
+               target="_blank"
+               href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+                    <span class="rdflink__text">Show RDF</span>
             </a>
         </div>
     `;
@@ -172,7 +174,7 @@ function genComponentConf() {
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
-                    linkToPost: suggestedPost && suggestedPost.get('uri'), //TODO: MAKE SURE TO CREATE THE CORRECT LINK
+                    linkToPost: suggestedPost && new URL("/owner/#!/post/?postUri="+encodeURI(suggestedPost.get('uri')), window.location.href).href,
                     friendlyTimestamp: suggestedPost && relativeTime(
                         selectLastUpdateTime(state),
                         suggestedPost.get('creationDate')
