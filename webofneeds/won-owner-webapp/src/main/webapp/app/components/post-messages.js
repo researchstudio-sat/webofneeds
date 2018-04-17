@@ -206,7 +206,7 @@ function genComponentConf() {
             	</div>
             </div>
         </div>
-        <div class="pm__footer" ng-show="self.isConnected">
+        <div class="pm__footer" ng-if="self.isConnected">
 
             <chat-textfield-simple
                 class="pm__footer__chattexfield"

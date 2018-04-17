@@ -105,7 +105,7 @@ function genComponentConf() {
         submit() {
             const value = this.value();
             const valid = this.valid();
-            if(value && value.length > 0 && valid) {
+            if(valid) {
                 const txtEl = this.textField();
                 if(txtEl) {
                     txtEl.value = "";
@@ -124,7 +124,7 @@ function genComponentConf() {
             return !this.maxChars || this.charactersLeft() >= 0;
         }
         valid() {
-            return (allowEmptySubmit || this.value().length > 0) && this.belowMaxLength()
+            return (this.allowEmptySubmit || this.value().length > 0) && this.belowMaxLength()
         }
         value() {
             const txtEl = this.textField();
@@ -158,7 +158,7 @@ function genComponentConf() {
 
             isCode: '=', // whether or not the text is code and e.g. should use monospace
 
-            allowEmptySubmit: '=',
+            allowEmptySubmit: '=', // allows submitting empty messages
 
             /*
              * Usage:
