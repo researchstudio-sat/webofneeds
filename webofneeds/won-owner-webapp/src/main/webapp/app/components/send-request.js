@@ -2,12 +2,12 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import chatTextFieldModule from './chat-textfield.js';
 import postHeaderModule from './post-header.js';
 import feedbackGridModule from './feedback-grid.js';
 import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
 import labelledHrModule from './labelled-hr.js';
+import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 
 import {
     selectOpenPostUri,
@@ -108,16 +108,16 @@ function genComponentConf() {
             <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
 
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
-            <chat-textfield
+
+            <chat-textfield-simple
                 placeholder="::'Request Message (optional)'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.sendRequest()"
-                allow-empty-submit="true"
+                on-submit="::self.sendRequest(value)"
+                allow-empty-submit="::true"
                 submit-button-label="::'Ask to Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
-                >
-            </chat-textfield>
+            >
+            </chat-textfield-simple>
+
             <a class="rdflink withlabel clickable"
                ng-if="!self.includeHeader"
                target="_blank"
@@ -185,13 +185,7 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, [], this);
         }
 
-        input(userInput) {
-            this.chatMessage = userInput;
-        }
-
-        sendRequest() {
-            message = this.chatMessage;
-
+        sendRequest(message) {
             if(!this.connection || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
                     //Close the connection if there was a present connection for a whatsaround need
@@ -239,7 +233,7 @@ export default angular.module('won.owner.components.sendRequest', [
     postHeaderModule,
     feedbackGridModule,
     labelledHrModule,
-    chatTextFieldModule,
+    chatTextFieldSimpleModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;
