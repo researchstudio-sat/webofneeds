@@ -7,6 +7,7 @@
 // tailpos in %
 .create-need-title {
   @include title-bar('cntb');
+  border-top: none;
 
   > .cntb__inner {
     > .cntb__inner__left {
@@ -20,10 +21,10 @@
   }
 
   @media (max-width: $responsivenessBreakPoint) {
-    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorderWidth, calc(50vw - 0.7rem));
+    @include speech-bubble-top($won-lighter-gray, $won-line-gray, 1rem, $thinBorderWidth, calc(50vw - 0.7rem));
   }
   @media (min-width: $responsivenessBreakPoint) {
-    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorderWidth, 50vw);
+    @include speech-bubble-top($won-lighter-gray, $won-line-gray, 1rem, $thinBorderWidth, 50vw);
   }
 }
 
