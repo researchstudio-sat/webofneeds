@@ -63,10 +63,10 @@ function genDirectiveConf() {
           const height = area.scrollHeight - offsets;
           
           const lines = clamp(Math.floor(height/lineHeight), minRows, maxRows);
-          if(height > lineHeight*maxRows) {
-            area.style.overflowY = 'scroll';
-          } else {
+          if(height < lineHeight * (maxRows + 1)) {
             area.style.overflowY = 'hidden';
+          } else {
+            area.style.overflowY = 'scroll';
           }
           area.style.height = lines * lineHeight + 'px';
 
