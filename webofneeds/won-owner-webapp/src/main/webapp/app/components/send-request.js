@@ -174,7 +174,7 @@ function genComponentConf() {
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
-                    linkToPost: suggestedPost && new URL("/owner/#!/post/?postUri="+encodeURI(suggestedPost.get('uri')), window.location.href).href,
+                    linkToPost: suggestedPost && new URL("/owner/#!post/?postUri="+encodeURI(suggestedPost.get('uri')), window.location.href).href,
                     friendlyTimestamp: suggestedPost && relativeTime(
                         selectLastUpdateTime(state),
                         suggestedPost.get('creationDate')
