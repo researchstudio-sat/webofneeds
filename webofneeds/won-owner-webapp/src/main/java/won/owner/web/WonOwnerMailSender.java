@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
-import won.protocol.model.ConnectionState;
 import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.utils.mail.WonMailSender;
@@ -28,8 +27,8 @@ public class WonOwnerMailSender {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private static final String OWNER_REMOTE_NEED_LINK = "/#!post/?postUri=";
-  private static final String OWNER_CONNECTION_LINK =  "/#!post/?postUri=%s&connectionUri=%s&connectionType=%s";
-  private static final String OWNER_LOCAL_NEED_LINK =  "/#!post/?postUri=";
+  private static final String OWNER_CONNECTION_LINK =  "/#!connections?connectionUri=%s";
+  private static final String OWNER_LOCAL_NEED_LINK =  "/#!connections?postUri=";
 
   private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
   private static final String SUBJECT_CONNECT = "New conversation request";
@@ -104,7 +103,7 @@ public class WonOwnerMailSender {
     }
 
     if (localConnection != null){
-      String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,localNeed, localConnection, ConnectionState.CONNECTED.getURI().toString());
+      String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK, localConnection);
       velocityContext.put("linkConnection", linkConnection);
     }
 

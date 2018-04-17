@@ -201,7 +201,7 @@ function genComponentConf() {
                 }
 
                 //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
-                this.router__stateGoResetParams('overviewIncomingRequests');
+                this.router__stateGoResetParams('connections');
             }else{
                 this.needs__connect(
                 		this.ownNeed.get("uri"), 

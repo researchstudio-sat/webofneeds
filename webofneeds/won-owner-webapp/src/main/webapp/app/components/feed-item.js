@@ -32,7 +32,7 @@ function genComponentConf() {
             ng-class="{'fi--withconn' : self.connectionsSize > 0}"
             href="{{ self.absHRef(
                 self.$state,
-                'post',
+                'connections',
                 { postUri: self.ownNeed.get('uri') }
             ) }}"
         >
@@ -124,7 +124,7 @@ function genComponentConf() {
 
         selectConnection(connectionUri) {
             this.markAsRead(connectionUri);
-            this.router__stateGoAbs('post', {connectionUri: connectionUri, postUri: this.ownNeed.get('uri'), connectionType: won.WON.Connected});
+            this.router__stateGoAbs('connections', {connectionUri: connectionUri, postUri: undefined});
         }
 
         markAsRead(connectionUri){

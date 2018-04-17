@@ -90,7 +90,6 @@ import won from './won.js';
     won.clearStore = function () {
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
-        window.store4dbg = privateData.store; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
@@ -955,70 +954,7 @@ import won from './won.js';
             .then(() => selectNeedData(needUri, privateData.store));
     };
 
-    window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
-/*
-        let query = `
-            prefix won: <http://purl.org/webofneeds/model#>
-            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            prefix dct: <http://purl.org/dc/terms/>
-            construct {
-                <${needUri}> ?b ?c.
-                ?c ?d ?e.
-                ?e ?f ?g.
-                ?g ?h ?i.
-                ?i ?j ?k.
-                ?k ?l ?m.
-
-            } where {
-                {
-                    <${needUri}> dct:created ?c.
-                    <${needUri}> ?b ?c.
-                } UNION {
-                     <${needUri}> won:isInState ?c.
-                     <${needUri}> ?b ?c.
-                } UNION {
-                     <${needUri}> won:hasFlag ?c.
-                     <${needUri}> ?b ?c.
-                }
-
-                UNION
-                {
-                    <${needUri}> won:hasConnections ?c.
-                    <${needUri}> ?b ?c.
-                    optional {?c ?d ?e.}
-                }
-
-                UNION
-                {
-                    <${needUri}> won:hasEventContainer ?c.
-                    <${needUri}> ?b ?c.
-                    optional {?c ?d ?e.}
-                }
-
-                UNION {
-                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
-                  ?c ?d ?e.
-                  ?e ?f ?g.
-                  ?g ?h ?i.
-                  ?i ?j ?k.
-                } UNION {
-                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
-                  ?c ?d ?e.
-                  ?e ?f ?g.
-                  ?g ?h ?i.
-                } UNION {
-                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
-                  ?c ?d ?e.
-                  ?e ?f ?g.
-                } UNION {
-                  <${needUri}> ?b ?c. filter (?b = won:is || ?b = won:seeks)
-                  ?c ?d ?e.
-                }  
-            }
-            `
-
-*/
         let propertyTree = {
             prefixes: {
                 "won" : "http://purl.org/webofneeds/model#",
@@ -1142,31 +1078,6 @@ import won from './won.js';
             ]
         };
 
-
-        /*for (let j = 0; j < 1; j++) {
-            let rep = 1
-            let start = performance.now();
-            for (let i = 0; i < rep; i++) {
-                store.execute(query, (success, resultGraph) => {
-               });
-            }
-            let time = performance.now() - start;
-            let format = new Intl.NumberFormat("en-US",{minimumFractionDigits:2, maximumFractionDigits:2, useGrouping:false})
-            let pad = '         ';
-            let needPad = '                                                                   ';
-
-            let timeStr = format.format(time);
-            let timePerNeedStr = format.format(time / rep);
-            console.log("executed sparql code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
-            start = performance.now();
-            for (let i = 0; i < rep; i++) {
-                let result = loadStarshapedGraph(store, needUri, propertyTree);
-            }
-            time = performance.now() - start;
-            timeStr = format.format(time);
-            timePerNeedStr = format.format(time / rep);
-            console.log("executed custom code for " + (needPad + needUri).slice(-needPad.length) + " (run " + j + ") " + rep + " times in " + (pad + timeStr).slice(-pad.length) + " millis (" + (pad + timePerNeedStr).slice(-pad.length) + " millis per query)");
-        }*/
         const needJsonLdP = 
             loadStarshapedGraph(store, needUri, propertyTree)
             .then(resultGraph => new Promise((resolve, reject) => {

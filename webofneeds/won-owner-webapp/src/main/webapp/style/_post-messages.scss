@@ -6,8 +6,6 @@
 @import 'animate';
 
 @media (max-width: $responsivenessBreakPoint) {
-  won-visitor-title-bar.hidden,
-  won-owner-title-bar.hidden,
   .post__listside.hidden,
   .post__contentside--empty.hidden{
     display: none; //hide the subheader when a conversation is open on a mobile device

@@ -36,9 +36,7 @@ import {
  * AS WELL.
  */
 export const resetParams = Object.freeze({
-    connectionType: undefined,
     connectionUri: undefined,
-    layout: undefined,
     postUri: undefined,
     //sendAdHocRequest: undefined,
     // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
@@ -88,10 +86,8 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/landingpage?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
         { path: '/feed?privateId', component: 'feed' },
-        { path: '/overview/matches?privateId?layout?connectionUri?sendAdHocRequest', component: 'overview-matches', as: 'overviewMatches' },
-        { path: '/overview/incoming-requests?privateId?postUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
-        { path: '/overview/posts?privateId', component: 'overview-posts', as: 'overviewPosts' },
-        { path: '/post/?privateId?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
+        { path: '/connections?privateId?postUri?connectionUri', component: 'connections', as: 'connections' },
+        { path: '/post/?privateId?postUri', component: 'post', as: 'post' },
 
     ].forEach( ({path, component, as}) => {
 

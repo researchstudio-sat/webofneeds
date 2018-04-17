@@ -36,12 +36,10 @@ import { actionCreators }  from './actions/actions.js';
 //-------- Components ---------
 import topnav from './components/topnav.js';
 import createNeedComponent from './components/create-need/create-need.js';
-import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests.js';
+import connectionsComponent from './components/connections/connections.js';
 import postComponent from './components/post/post.js';
 import landingPageComponent from './components/landingpage/landingpage.js';
-import overviewPostsComponent from './components/overview-posts/overview-posts.js';
 import feedComponent from './components/feed/feed.js';
-import overviewMatchesComponent from './components/overview-matches/overview-matches.js';
 import aboutComponent from './components/about/about.js';
 import signupComponent from './components/signup/signup.js';
 
@@ -78,12 +76,10 @@ let app = angular.module('won.owner', [
 
     //views
     createNeedComponent,
-    overviewIncomingRequestsComponent,
+    connectionsComponent,
     postComponent,
     landingPageComponent,
-    overviewPostsComponent,
     feedComponent,
-    overviewMatchesComponent,
     aboutComponent,
     signupComponent,
 

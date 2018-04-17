@@ -3,33 +3,29 @@
 @import 'fonts';
 @import 'flex-layout';
 
-.ownerpostcontent {
-  padding: 0 1rem;
-  box-sizing: border-box;
-  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
-  @include empty-description('opc');
-  align-items: stretch;
+@import 'connections-overview';
 
-  .oir__openrequest,
-  .owner__messages{
+
+.connectionscontent {
+  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  align-items: flex-start;
+
+  @include empty-description('opc');
+
+  &.empty {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .oir__requests{
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
   }
 
   @media (max-width: $responsivenessBreakPoint){
-    padding: 0;
-
-    .owner__messages.hidden {
+    .post__contentside--empty.hidden,
+    .oir__requests.hidden {
       display: none;
     }
   }
-
-  .owner__openconversation{
-    background: white;
-    border: $thinGrayBorder;
-  }
-
 }
-
-@import 'connection-selection-item-line';
-//@import 'open-conversation';
