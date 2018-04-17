@@ -398,11 +398,13 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
         const state = getState();
         const connectionUri = selectOpenConnectionUri(state);
         const needUri = selectOpenPostUri(state);
-        const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]);
+        const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]) || Immutable.List();
+
         // determine the oldest loaded event
         const sortedOwnEvents = events.valueSeq().sort( (event1, event2) => event1.get('date') - event2.get('date'));
         const oldestEvent = sortedOwnEvents.first();
-        const eventHashValue = oldestEvent
+
+        const eventHashValue = oldestEvent && oldestEvent
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
         dispatch({
