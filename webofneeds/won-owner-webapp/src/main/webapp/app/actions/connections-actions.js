@@ -8,6 +8,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
 import {
     selectOpenConnectionUri,
+    selectNeedByConnectionUri,
     selectOpenPostUri,
     selectRemoteEvents,
     selectConnection,
@@ -301,12 +302,13 @@ export function connectionsRate(connectionUri,rating) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showLatestMessages(connectionUri, numberOfEvents){
+export function showLatestMessages(connectionUriParam, numberOfEvents){
     return (dispatch, getState) => {
         const state = getState();
-        const connectionUri = selectOpenConnectionUri(state);
-        const needUri = selectOpenPostUri(state);
-        const connection = selectConnection(state, connectionUri);
+        const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+        const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const needUri = need && need.get("uri");
+        const connection = connectionUri && selectConnection(state, connectionUri);
         if (!connectionUri || !connection) return;
 
         const connectionMessages = connection.get('messages');
