@@ -164,6 +164,21 @@ function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
                 }
             }
             
+            // register a "stateGoCurrent" action to be dispatched messages-actions 
+            // after connectionUri is available
+            dispatch({
+                type: actionTypes.messages.dispatchActionOn.registerSuccessRemote,
+                payload: {
+                    eventUri: cnctMsg.eventUri,
+                    actionToDispatch: {
+                        effect: "stateGoCurrent",
+                        connectionUri: "responseEvent::receiverUri",
+                        postUri: theirNeed,
+                        needUri: needUri,
+                    } 
+                }
+            })
+
             // register the connect action to be dispatched when 
             // need creation is successful
             dispatch({

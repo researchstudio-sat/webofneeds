@@ -400,7 +400,16 @@ export function dispatchActionOnSuccessRemote(event) {
 		const toDispatchList = getState().getIn(['messages','dispatchOnSuccessRemote', event.getIsRemoteResponseTo()]);
 		if (toDispatchList){
 			toDispatchList.forEach( d => {
-				dispatch(d)
+                if (d.type){
+                    dispatch(d);
+                } else {
+                    // if an adHocConnection was successfully created, go to the correct connectionUri
+                    if (d.connectionUri === "responseEvent::receiverUri"){
+                        dispatch(actionCreators.router__stateGoCurrent({
+                            connectionUri: event.getReceiver(),
+                        }));
+                    }
+                }
 			})
 		}
 		//the reducer will delete the toDispatchList for successOwn and failureOwn
