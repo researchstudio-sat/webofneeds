@@ -221,7 +221,7 @@ function genComponentConf() {
 
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
-                placeholder="self.shouldShowRdf? 'Enter ttl...' : 'Your message...'"
+                placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
                 on-submit="self.send(value, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
