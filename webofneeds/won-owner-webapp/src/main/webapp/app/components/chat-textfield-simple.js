@@ -29,24 +29,24 @@ function genComponentConf() {
             data-min-rows="1"
             data-max-rows="4"
 
-            class="wdt__text"
-            ng-class="{'wdt__text--is-code': self.isCode, 'valid' : self.belowMaxLength(), 'invalid' : !self.belowMaxLength() }"
+            class="cts__text"
+            ng-class="{'cts__text--is-code': self.isCode, 'valid' : self.belowMaxLength(), 'invalid' : !self.belowMaxLength() }"
             tabindex="0"
             placeholder="{{self.placeholder}}"></textarea>
 
         <button
-            class="wdt__submitbutton red"
+            class="cts__submitbutton red"
             ng-show="self.submitButtonLabel"
             ng-click="self.submit()"
             ng-disabled="!self.valid()">
             {{ (self.submitButtonLabel || 'Submit') }}
         </button>
 
-        <div class="wdt__charcount" ng-show="self.maxChars">
+        <div class="cts__charcount" ng-show="self.maxChars">
             {{ self.charactersLeft() }} characters left
         </div>
 
-        <div class="wdt__helptext" ng-show="self.helpText">
+        <div class="cts__helptext" ng-show="self.helpText">
             {{ self.helpText }}
         </div>
     `;
@@ -147,7 +147,7 @@ function genComponentConf() {
         }
         textField() {
             if(!this._textField) {
-                this._textField = this.$element[0].querySelector('.wdt__text');
+                this._textField = this.$element[0].querySelector('.cts__text');
             }
             return this._textField;
         }
