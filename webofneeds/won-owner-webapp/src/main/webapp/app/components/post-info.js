@@ -56,14 +56,24 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                         </svg>
                     </div>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         target="_blank"
                         href="{{self.post.get('uri')}}">
                         <svg class="rdflink__small">
                             <use href="#rdf_logo_1"></use>
                         </svg>
-                        <span class="rdflink__text">Show RDF</span>
+                        <span>Show RDF</span>
                     </a>
+                    <button class="post-info__footer__button won-button--filled red"
+                        ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
+                        ng-click="self.reOpenPost()">
+                        Reopen Post
+                    </button>
+                    <button class="post-info__footer__button won-button--filled red"
+                        ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
+                        ng-click="self.closePost()">
+                        Close Post
+                    </button>
                 </div>
             </div>
         </div>
@@ -101,12 +111,12 @@ function genComponentConf() {
             </div>
 
             <button class="post-info__footer__button won-button--filled red"
-                    ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
+                    ng-if="!self.includeHeader && self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
                     ng-click="self.reOpenPost()">
                     Reopen Post
             </button>
             <button class="post-info__footer__button won-button--filled red"
-                    ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
+                    ng-if="!self.includeHeader && self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
                     ng-click="self.closePost()">
                     Close Post
             </button>

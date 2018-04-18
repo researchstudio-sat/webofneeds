@@ -89,28 +89,28 @@ function genComponentConf() {
                         ng-click="self.goToPost()">
                         Show Post Details
                     </button>
-                    <button
-                        class="won-button--filled thin red"
-                        ng-click="self.closeConnection()">
-                        Close Connection
-                    </button>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         target="_blank"
                         href="{{self.connectionUri}}"
                         ng-if="!self.isConnected">
                         <svg class="rdflink__small">
                             <use href="#rdf_logo_1"></use>
                         </svg>
-                        <span class="rdflink__text">Show RDF</span>
+                        <span>Show RDF</span>
                     </a>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         ng-click="self.toggleRdfDisplay()"
                         ng-if="self.isConnected">
                         <svg class="rdflink__small">
                             <use href="#rdf_logo_1"></use>
                         </svg>
-                        <span class="rdflink__text">{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
+                        <span>{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
                     </a>
+                    <button
+                        class="won-button--filled red"
+                        ng-click="self.closeConnection()">
+                        Close Connection
+                    </button>
                 </div>
             </div>
         </div>
