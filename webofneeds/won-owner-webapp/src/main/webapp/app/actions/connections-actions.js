@@ -194,14 +194,6 @@ function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
                 type: actionTypes.needs.create, // TODO custom action
                 payload: {eventUri, message, needUri, need: adHocDraft}
             });
-
-            //const dbgNeedUri = needUri;
-            //const dbgEventUri = eventUri;
-
-            //dispatch(actionCreators.router__stateGoAbs('feed'));
-            dispatch(actionCreators.router__stateGoCurrent({
-                postUri: needUri,
-            }));
         });
     });
 
