@@ -77,11 +77,10 @@ function genComponentConf() {
                     <use href="#ico16_arrow_down"></use>
             </svg>
             <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content">
+                <div class="content" ng-click="self.contextMenuOpen=false">
                     <div class="topline">
                       <svg class="pm__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;"
-                        ng-click="self.contextMenuOpen = false">
+                        style="--local-primary:black;">
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
