@@ -1,0 +1,12 @@
+@import 'speech-bubble';
+
+.create-need-title {
+    @media (max-width: $responsivenessBreakPoint) {
+        @include speech-bubble-top($won-lighter-gray, $won-line-gray, 1rem, $thinBorderWidth, calc(50vw - 0.7rem));
+    }
+    @media (min-width: $responsivenessBreakPoint) {
+        @include speech-bubble-top($won-lighter-gray, $won-line-gray, 1rem, $thinBorderWidth, 50vw);
+    }
+
+    overflow: visible;
+}

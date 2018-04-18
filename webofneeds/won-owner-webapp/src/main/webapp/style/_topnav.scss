@@ -10,7 +10,6 @@
 .topnav { //TODO split into single-purpose-classes
   background-color: white;
   @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
-  border-bottom: $thinBorderWidth solid $won-line-gray;
 
   > .topnav__inner {
     //@include tri-aligned('topnav__inner', 1rem);
