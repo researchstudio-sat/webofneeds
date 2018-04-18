@@ -30,7 +30,7 @@ function genComponentConf() {
             data-max-rows="4"
 
             class="cts__text"
-            ng-class="{'cts__text--is-code': self.isCode, 'valid' : self.belowMaxLength(), 'invalid' : !self.belowMaxLength() }"
+            ng-class="{'code': self.isCode, 'valid' : self.belowMaxLength(), 'invalid' : !self.belowMaxLength() }"
             tabindex="0"
             placeholder="{{self.placeholder}}"></textarea>
 

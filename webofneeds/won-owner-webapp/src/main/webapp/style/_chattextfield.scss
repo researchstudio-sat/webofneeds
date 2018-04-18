@@ -37,23 +37,13 @@ chat-textfield-simple {
     @extend .won-button--filled;
   }
 
-  @mixin padToHeight($fontSize, $lineHeightFactor, $borderWidth, $intendedHeight) {
-      font-size: $fontSize;
-      border-width: $borderWidth;
-
-      $heightOfALine: $fontSize * $lineHeightFactor;
-      $verticalPadding: ($intendedHeight - $heightOfALine) / 2 - $borderWidth;
-      padding-top: $verticalPadding;
-      padding-bottom: $verticalPadding;
-      padding: $verticalPadding (0.438 * $fontSize);
-  }
   textarea.cts__text {
+    /*
     border-style: solid;
     border-radius: 0.1rem;
 
     min-width: 0; // so a size is specified and break-word works
     word-break: break-word;
-
 
     &:focus {
       color: black;
@@ -66,6 +56,7 @@ chat-textfield-simple {
         border-color: $won-primary-color;
     }
 
+    /*
     &:not(.cts__text--is-code) {
       @include padToHeight($normalFontSize, 22/16, $thinBorderWidth, $formInputHeight);
     }
@@ -74,10 +65,50 @@ chat-textfield-simple {
       @include padToHeight($normalFontSize * 0.8, 22/16, $thinBorderWidth, $formInputHeight);
       font-family: $font-family-monospace;
     }
+    */
   }
 
   .cts__charcount,
   .cts__helptext {
     @include fine-print;
   }
+}
+
+@mixin padToHeight($fontSize, $lineHeightFactor, $borderWidth, $intendedHeight) {
+    font-size: $fontSize;
+    border-width: $borderWidth;
+
+    $heightOfALine: $fontSize * $lineHeightFactor;
+    $verticalPadding: ($intendedHeight - $heightOfALine) / 2 - $borderWidth;
+    padding-top: $verticalPadding;
+    padding-bottom: $verticalPadding;
+    padding: $verticalPadding (0.438 * $fontSize);
+}
+
+textarea {
+    border-style: solid;
+    border-radius: 0.1rem;
+
+    min-width: 0; // so a size is specified and break-word works
+    word-break: break-word;
+
+    &:focus {
+      color: black;
+    }
+
+    &.valid {
+        border-color: $won-line-gray;
+    }
+    &.invalid {
+        border-color: $won-primary-color;
+    }
+
+    &:not(.code) {
+      @include padToHeight($normalFontSize, 22/16, $thinBorderWidth, $formInputHeight);
+    }
+
+    &.code {
+      @include padToHeight($normalFontSize * 0.8, 22/16, $thinBorderWidth, $formInputHeight);
+      font-family: $font-family-monospace;
+    }
 }
