@@ -15,7 +15,8 @@ import {
 } from '../utils.js';
 
 import {
-    fetchDataForOwnedNeeds
+    fetchDataForOwnedNeeds,
+    buildRelevantMessage,
 } from '../won-message-utils.js';
 
 import {
@@ -282,6 +283,52 @@ function getConnectionData(event) {
         )
 }
 
+export function markAsRelevant(event) {
+	 return (dispatch, getState) => {
+
+		 //own State
+		 dispatch({
+			 type: actionTypes.messages.markAsRelevant,
+			 payload: event,
+		 });
+		 
+		 //remoteState
+		 const ownNeed = getState().getIn(["needs", event.needUri]);
+         const theirNeedUri = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "remoteNeedUri"]);
+         const theirNeed = getState().getIn(["needs", theirNeedUri]);
+         const theirConnectionUri = ownNeed.getIn(["connections", event.connectionUri, "remoteConnectionUri"]);
+		 const message = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "messages", event.messageUri]);
+         const msgToSet = message.get("remoteUri")? message.get("remoteUri") : event.messageUri;
+		 
+         buildRelevantMessage(msgToSet, event.connectionUri, event.needUri, theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, event.relevant)
+         .then( action => 
+         	dispatch({
+         		type: actionTypes.messages.send,
+         		payload: {
+         			eventUri: action.eventUri,
+         			message: action.message,
+         		}
+         	})
+         );   
+	 }
+}
+
+export function unsetRelevantMessageReceived(message, relevant) {
+	//TODO see whats in the message and load the rest
+	return (dispatch, getState) => {
+		 //own State
+		 const payload = {
+	        messageUri: message.isUnsetRelevantMessage(),
+	        connectionUri: message.getReceiver(),
+	        needUri: message.getReceiverNeed(),
+	        relevant: relevant,
+	    } 
+		 dispatch({
+			 type: actionTypes.messages.markAsRelevant,
+			 payload: payload,
+		 });
+	}
+}
 
 export function needMessageReceived(event) {
     return (dispatch, getState) => {
