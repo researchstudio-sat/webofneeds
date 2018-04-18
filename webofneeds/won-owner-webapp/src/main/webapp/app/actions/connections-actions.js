@@ -392,11 +392,12 @@ function getEvents(connectionUri, params) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showMoreMessages(connectionUri, numberOfEvents) {
+export function showMoreMessages(connectionUriParam, numberOfEvents) {
     return (dispatch, getState) => {
         const state = getState();
-        const connectionUri = selectOpenConnectionUri(state);
-        const needUri = selectOpenPostUri(state);
+        const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+        const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const needUri = need && need.get("uri");
         const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]) || Immutable.List();
 
         // determine the oldest loaded event
