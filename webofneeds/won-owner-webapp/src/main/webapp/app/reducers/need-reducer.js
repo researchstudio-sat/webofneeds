@@ -476,16 +476,16 @@ function changeConnectionState(state, connectionUri, newState) {
 }
 
 function markMessageAsRelevant(state, messageUri, connectionUri, needUri, relevant) {
-	 let need = state.get(needUri);
-	    let connection = need && need.getIn(["connections", connectionUri]);
-	    let message = connection && connection.getIn(["messages", messageUri]);
+	
+	let need = state.get(needUri);
+    let connection = need && need.getIn(["connections", connectionUri]);
+    let message = connection && connection.getIn(["messages", messageUri]);
 
-	    if(!message) {
-	        console.error("no message with messageUri: <", messageUri,"> found within needUri: <", needUri, "> connectionUri: <", connectionUri, ">");
-	        return state;
-	    }
-
-	    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "isRelevant"], relevant);
+    if(!message) {
+        console.error("no message with messageUri: <", messageUri,"> found within needUri: <", needUri, "> connectionUri: <", connectionUri, ">");
+        return state;
+    }
+    return state.setIn([needUri, "connections", connectionUri, "messages", messageUri, "isRelevant"], relevant);
 }
 
 function markMessageAsRead(state, messageUri, connectionUri, needUri) {

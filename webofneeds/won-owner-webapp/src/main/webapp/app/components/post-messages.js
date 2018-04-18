@@ -318,39 +318,21 @@ function genComponentConf() {
 
                 	// TODO: Optimization
                 	//filter proposals
-                	/*
                 	for(msg of msgSet) {
-                		if(!msg.get("isRelevant")) {
-                			console.log("Message is no longer relevant: " + msg);
-                			msgSet.delete(msg);
-                		}
-                		/*
                 		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
-	                		if(this.isOldAgreementMsg(msg)) {
-	                			//msgSet.delete(msg);
+	                		if(!msg.get("isRelevant") || this.isOldAgreementMsg(msg)) {
 	                			//TODO: optimization?
-	                			//isRelevant?
-	                			msg.hide = true;
-	                			/*
-	                			const payload = {
-	                	                messageUri: msg.get("uri"),
-	                	                connectionUri: this.connectionUri,
-	                	                needUri: this.ownNeed.get("uri"),
-	                	                relevant: false,
-                	            };
-                	        	//this.messages__markAsRelevant(payload);*/
-	                		} else {
-                                //TODO: optimization?
-                            }
-                        }
-                    }*/
-
-                    sortedMessages = Array.from(msgSet);
-                    sortedMessages.sort(function(a,b) {
-                        return a.get("date").getTime() - b.get("date").getTime();
-                    });
+	                			//isRelevant in state?
+	                			//msg.hide = true;
+	                		}
+                		}
+                	}
+                	
+                	sortedMessages = Array.from(msgSet);
+	            	sortedMessages.sort(function(a,b) {
+	                    return a.get("date").getTime() - b.get("date").getTime();
+	                });
                 }
-
                 if(this.reload && connection) {
                     this.getAgreementData(connection)
                     this.reload = false;
