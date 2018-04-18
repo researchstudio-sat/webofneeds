@@ -147,6 +147,9 @@ won-create-post {
     flex-direction: column;
     align-items: stretch;
 
+    .cp__ttl__helptext {
+      @include fine-print;
+    }
   }
 
   .cp__addDetail {
