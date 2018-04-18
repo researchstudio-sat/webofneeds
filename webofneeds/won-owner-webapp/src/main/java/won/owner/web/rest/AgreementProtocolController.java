@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.AgreementProtocolUris;
 import won.protocol.agreement.IncompleteConversationDataException;
+import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.WonConversationUtils;
@@ -47,6 +48,12 @@ public class AgreementProtocolController {
 				getAgreementProtocolState(connectionUri).getAgreementProtocolUris(), HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/getMessageEffects", method = RequestMethod.GET)
+	public ResponseEntity<Set<MessageEffect>> getMessageEffects(URI connectionUri, URI messageUri) {
+		Set<MessageEffect> uris = getAgreementProtocolState(connectionUri).getEffects(messageUri);
+		return new ResponseEntity<>(uris, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/getRetractedUris", method = RequestMethod.GET)
 	public ResponseEntity<Set<URI>> getRetractedUris(URI connectionUri) {
 		Set<URI> uris = getAgreementProtocolState(connectionUri).getRetractedUris();

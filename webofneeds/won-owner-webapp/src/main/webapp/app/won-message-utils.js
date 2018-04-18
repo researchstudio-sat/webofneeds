@@ -389,6 +389,7 @@ function fetchOwnedNeedUris() {
         )
 }
 
+
 // API call to get agreements data for a connection
 export function callAgreementsFetch(url) {
     return fetch(url, {

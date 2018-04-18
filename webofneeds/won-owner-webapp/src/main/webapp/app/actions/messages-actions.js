@@ -292,6 +292,7 @@ export function markAsRelevant(event) {
 			 payload: event,
 		 });
 		 
+		 /*
 		 //remoteState
 		 const ownNeed = getState().getIn(["needs", event.needUri]);
          const theirNeedUri = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "remoteNeedUri"]);
@@ -309,7 +310,7 @@ export function markAsRelevant(event) {
          			message: action.message,
          		}
          	})
-         );   
+         );*/
 	 }
 }
 
