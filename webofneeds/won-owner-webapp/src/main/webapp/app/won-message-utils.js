@@ -37,6 +37,28 @@ export function wellFormedPayload (payload) {
     return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
+export function buildRelevantMessage(msgToSet, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, relevant){
+     return new Promise((resolve, reject) => {
+        const buildMessage = function(envelopeData) {
+            var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomWonId();
+            var message = new won.MessageBuilder(won.WONMSG.connectionMessage)
+                .eventURI(eventUri)
+                .hasOwnerDirection()
+                .forEnvelopeData(envelopeData)
+                .hasSentTimestamp(new Date().getTime().toString())
+                .addUnsetRelevantMessage(msgToSet)
+                .build();
+            return {eventUri:eventUri,message:message};
+         };
+         
+         won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
+            .then(function(envelopeData){
+                resolve(buildMessage(envelopeData));
+            },
+            won.reportError("cannot open connection " + connectionUri)
+        );
+    });
+}
 
 export function buildRateMessage(msgToRateFor, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, rating){
     return new Promise((resolve, reject) => {
@@ -326,7 +348,6 @@ export function buildModificationMessage(uri, type, text) {
     const whM = "\n won:hasTextMessage ";
     return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
 }
-
 
 export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;

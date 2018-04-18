@@ -21,6 +21,7 @@ import {
     deepFreeze,
     clone,
     checkHttpStatus,
+    dispatchEvent,
 } from '../utils.js'
 import {
 	callAgreementsFetch,
@@ -42,6 +43,8 @@ const declarations = deepFreeze({
 	agreement: "agreement",
 	proposeToCancel: "proposeToCancel",	
 });
+
+const keySet = deepFreeze( new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"]));
 
 const defaultAgreementData = deepFreeze({
 		agreementUris: new Set(),
@@ -135,12 +138,16 @@ function genComponentConf() {
                 ng-repeat="msg in self.chatMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
+                hide-option="msg.hide"
                 ng-class="{
+                    'won-not-relevant': (!msg.get('isRelevant') || !!msg.hide),
                     'won-unread' : msg.get('unread'),
                     'won-cm--left' : !msg.get('outgoingMessage'),
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"
-                on-update="::self.showAgreementData = false">
+                on-update="self.showAgreementData = false"
+                on-send-proposal="[self.addProposal(proposalUri), self.showAgreementData = false]"
+                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
             </won-connection-message>
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
 	            <img class="pm__content__agreement__icon clickable"
@@ -149,8 +156,8 @@ function genComponentConf() {
             	<!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
-            		<span ng-show="self.loading"> (loading...)</span>
-            		<span ng-if="!self.loading"> (up-to-date)</span>
+            		<span ng-show="loading['value']"> (loading...)</span>
+            		<span ng-if="!loading['value']"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
@@ -170,7 +177,8 @@ function genComponentConf() {
 	                agreement-number="self.agreementStateData.agreementUris.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false;">
+	                on-update="[self.showAgreementData = false, self.filterMessages(draft)]"
+	                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
 	            </won-connection-agreement>
 	            <!-- /ProposeToCancel -->           	
             	<!-- PROPOSALS -->
@@ -178,8 +186,8 @@ function genComponentConf() {
             		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		Proposals
-    				<span ng-show="self.loading.pendingProposalUris"> (loading...)</span>
-            		<span ng-if="!self.loading.pendingProposalUris"> (up-to-date)</span>
+    				<span ng-show="loading['value']"> (loading...)</span>
+            		<span ng-if="!loading['value']"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
@@ -187,27 +195,20 @@ function genComponentConf() {
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.proposal"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false;">
+	                on-update="self.showAgreementData = false;"
+	                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
 	            </won-connection-agreement>
 	            <!-- /PROPOSALS -->
 	            
             </div>
             <!-- Loading Text -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.loading && self.showLoadingInfo && !self.agreementDataIsValid()">
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.showLoadingInfo && !self.agreementDataIsValid()">
 	            <img class="pm__content__agreement__icon clickable"
 	            		src="generated/icon-sprite.svg#ico36_close"
 	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
 	            <div class="pm__content__agreement__title"> 
-	            		Loading the Agreement Data. Please be patient, because patience is a talent :)
-            	</div>
-            </div>
-    		<!-- Show if no Agrrement Data exists -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.loading && self.showLoadingInfo && !self.agreementDataIsValid()">
-	            <img class="pm__content__agreement__icon clickable"
-	            		src="generated/icon-sprite.svg#ico36_close"
-	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
-	            <div class="pm__content__agreement__title"> 
-	            		No Agreement Data found
+	            		<span class="ng-hide" ng-show="loading['value']">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!loading['value']">No Agreement Data found</span>
             	</div>
             </div>
         </div>
@@ -266,15 +267,20 @@ function genComponentConf() {
             
             this.showLoadingInfo = false;
             
+            this.$scope.loading = {
+            		value: false,
+            }
+            
             const self = this;
             this.baseString = "/owner/";
             this.declarations = clone(declarations);
             
             this.agreementHeadData = this.cloneDefaultData();
-            this.agreementStateData = this.cloneDefaultSateData();
+            this.agreementStateData = this.cloneDefaultStateData();
+            this.agreementLoadingData = this.cloneDefaultStateData();
+
+            
             this.showAgreementData = false;
-           
-            this.loading = false;
             
             this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
                 `<${won.WONMSG.msguriPlaceholder}> will ` +
@@ -303,10 +309,10 @@ function genComponentConf() {
                 	//filter proposals
                 	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
-	                		if(this.isOldAgreementMsg(msg)) {
-	                			msgSet.delete(msg);
-	                		} else {
+	                		if(!msg.get("isRelevant") || this.isOldAgreementMsg(msg)) {
 	                			//TODO: optimization?
+	                			//isRelevant in state?
+	                			msg.hide = true;
 	                		}
                 		}
                 	}
@@ -343,20 +349,26 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, [], this);
 
             this.snapToBottom();
-
+            
             this.$scope.$watchGroup(
                 ['self.connection'],
                 () => this.ensureMessagesAreLoaded()
             );
+            
+            this.$scope.$watch('loading.value',
+            		() => delay(0).then(
+            		() => (
+	                    console.log("LOADING: " + this.$scope.loading.value)
+	                )) 
+            )
 
             this.$scope.$watch(
-                () => (this.chatMessages && this.chatMessages.length) || this.agreementHeadData, // trigger if there's messages added (or removed)
+                () => (this.chatMessages && this.chatMessages.length), // trigger if there's messages added (or removed)
                 () => delay(0).then(() =>
                     // scroll to bottom directly after rendering, if snapped
                     this.updateScrollposition()
                 )
             )
-            
         }
         
         ensureMessagesAreLoaded() {
@@ -424,7 +436,7 @@ function genComponentConf() {
                 );
             }
         }
-       
+        
         showAgreementDataField() {
         	this.getAgreementData();
         	this.showLoadingInfo = true;
@@ -438,36 +450,43 @@ function genComponentConf() {
         	}
         	return false;
         }
+               
+        addProposal(proposalUri) {
+        	//console.log("New ProposalURI: " + proposalUri);
+        	//TODO: Optimization
+        	//this.addAgreementDataToState(proposalUri, "pendingProposalUris");
+        }
         
         getAgreementData(connection) {
         	if(connection) {
         		this.connection = connection;
         	}
         	
-        	this.loading = true;
-        	this.agreementStateData = this.cloneDefaultSateData();
+        	this.$scope.loading.value = true;
+        	this.agreementLoadingData = this.cloneDefaultStateData();
         	this.getAgreementDataUris();        	
         }
-        
          
         getAgreementDataUris() {
         	var url = this.baseString + 'rest/agreement/getAgreementProtocolUris?connectionUri='+this.connection.get('uri');
         	callAgreementsFetch(url)
     		.then(response => {
     			this.agreementHeadData = this.transformDataToSet(response);
-    			var keySet = new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"])
+    			
     			for(key of keySet) {
     				if(this.agreementHeadData.hasOwnProperty(key)) {
 	    				for(data of this.agreementHeadData[key]) {
-	    					this.addAgreementDataToSate(data, key);
+	    					this.addAgreementDataToState(data, key);
         				}
     				}
     			}
-    			
-    			this.loading = false;
+    		}).then(response => {
+    			this.agreementStateData = this.agreementLoadingData;
+    			this.$scope.loading.value = false;
+    			this.snapToBottom();
     		}).catch(error => {
     				console.error('Error:', error);
-    				this.loading = false;
+    				this.$scope.loading.value = false;
     		})
         }
         
@@ -498,7 +517,7 @@ function genComponentConf() {
         	return tmpAgreementData;
         }
         
-        addAgreementDataToSate(eventUri, key, obj) {
+        addAgreementDataToState(eventUri, key, obj) {
             const ownNeedUri = this.ownNeed.get("uri");
             callAgreementEventFetch(ownNeedUri, eventUri)
 			.then(response => {
@@ -514,19 +533,54 @@ function genComponentConf() {
 							agreementObject = this.cloneDefaultAgreementObject();
 						}
                     	agreementObject.headUri = msg.getMessageUri();
-                        this.addAgreementDataToSate(msg.getRemoteMessageUri(), key, agreementObject);
+                        this.addAgreementDataToState(msg.getRemoteMessageUri(), key, agreementObject);
                     }else {
                     	if(!agreementObject) {
                     		agreementObject = this.cloneDefaultAgreementObject();
                     		agreementObject.headUri = msg.getMessageUri();
                     	}
                     	agreementObject.stateUri = msg.getMessageUri();
+                    	this.agreementLoadingData[key].add(agreementObject);
                     	
-                    	this.agreementStateData[key].add(agreementObject);
-                        this.messages__connectionMessageReceived(msg);     
+                    	//Dont load in state again!
+                    	var found = false;
+                    	for(i = 0; i < this.chatMessages.length; i++) {
+                    		if(agreementObject.stateUri === this.chatMessages[i].get("uri")) {
+                    			found = true;
+                    		}
+                    	}
+                    	if(!found) {
+                    		this.messages__connectionMessageReceived(msg);
+                    	}
                     }
                 })
 			})
+        }
+        
+        filterAgreementStateData(agreementObject, remove) {
+			for(key of keySet) {
+    			this.checkObject(this.agreementLoadingData[key], agreementObject, remove)
+			}
+        }
+        
+        checkObject(data, agreementObject, remove) {
+        	for(object of data) {
+        		if(object.stateUri === agreementObject.stateUri) {
+        			if(remove) {
+        				data.delete(object);
+        			}
+        			return true;
+        		}
+        	}
+        	return false;
+        }
+        
+        filterMessages(stateUri) {
+        	var object = {
+        			stateUri: stateUri,
+        			headUri: undefined,
+        	}
+        	this.filterAgreementStateData(object, true);
         }
         
         getCancelUri(agreementUri) {
@@ -551,22 +605,8 @@ function genComponentConf() {
         	return false;
         }
         
-        startLoading() {
-        	this.loading.proposal = true;
-        	this.loading.agreement = true;
-        	this.proposeToCancel = true;
-        }
-        
-       
-        isStillLoading(){
-        	if(!this.loading.proposal && !this.loading.agreement && !this.loading.proposeToCancel/* && !this.loading.acceptedProposalToCancel*/) {
-        		return false;
-        	}
-        	return true;
-        }
-        
         isOldAgreementMsg(msg) {
-        	var aD = this.agreementHeadData
+        	var aD = this.agreementHeadData;
         	if(aD.agreementUris.has(msg.get("uri")) ||
         			aD.agreementUris.has(msg.get("remoteUri")) ||
 	        		aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
@@ -575,6 +615,17 @@ function genComponentConf() {
 	        		aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
 	        		aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
 	        		aD.acceptedCancellationProposalUris.has(msg.get("remoteUri"))) {
+        		
+        		/*TODO: optimization
+        		if(msg.get("isRelevant")) {
+	        		const payload = {
+	                        messageUri: msg.get("uri"),
+	                        connectionUri: this.connectionUri,
+	                        needUri: this.ownNeed.get("uri"),
+	                        relevant: false,
+	                    };
+	                this.messages__markAsRelevant(payload);
+        		}*/
         		return true;
         	}
         	return false;
@@ -598,7 +649,7 @@ function genComponentConf() {
                 };
         }
         
-        cloneDefaultSateData() {
+        cloneDefaultStateData() {
         	return defaultStateData = {
         		pendingProposalUris: new Set(),
         		agreementUris: new Set(),
