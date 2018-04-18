@@ -1153,3 +1153,11 @@ export function sortByDate(elementsImm, selector, order) {
 
     return sortedElements;
 }
+
+export function clamp(value, lower, upper) {
+    if(lower > value)
+        return lower
+    if(upper < value)
+        return upper
+    return value
+}

@@ -13,7 +13,6 @@ import angular from 'angular';
 // import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
-// import Medium from 'medium.js';
 import {
     dispatchEvent,
     attach,
@@ -25,24 +24,31 @@ import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
 
 function genComponentConf() {
     let template = `
-        <div class="wdt__left">
-            <textarea 
-                class="wdt__text"
-                ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }"
-                won-textarea-autogrow 
-                style="resize: none; height: auto;" 
-                tabindex="0"
-                placeholder="{{::self.placeholder}}"></textarea>
-            <span class="wdt__charcount" ng-show="self.maxChars">
-                {{ self.charactersLeft() }} characters left
-            </span>
-        </div>
+        <textarea 
+            won-textarea-autogrow
+            data-min-rows="1"
+            data-max-rows="4"
+
+            class="wdt__text"
+            ng-class="{'wdt__text--is-code': self.isCode, 'valid' : self.belowMaxLength(), 'invalid' : !self.belowMaxLength() }"
+            tabindex="0"
+            placeholder="{{self.placeholder}}"></textarea>
+
         <button
             class="wdt__submitbutton red"
-            ng-show="::self.submitButtonLabel"
-            ng-click="::self.submit()">
-            {{ ::(self.submitButtonLabel || 'Send') }}
+            ng-show="self.submitButtonLabel"
+            ng-click="self.submit()"
+            ng-disabled="!self.valid()">
+            {{ (self.submitButtonLabel || 'Submit') }}
         </button>
+
+        <div class="wdt__charcount" ng-show="self.maxChars">
+            {{ self.charactersLeft() }} characters left
+        </div>
+
+        <div class="wdt__helptext" ng-show="self.helpText">
+            {{ self.helpText }}
+        </div>
     `;
 
     const serviceDependencies = ['$scope', '$element', /*'$ngRedux',/*injections as strings here*/];
@@ -74,6 +80,7 @@ function genComponentConf() {
         }
         keydown(e) {
             if(e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault(); // prevent a newline from being entered
                 this.submit();
                 return false;
             }
@@ -93,14 +100,25 @@ function genComponentConf() {
             };
             this.onInput(payload);
             dispatchEvent(this.$element[0], 'input', payload);
+
+            /* trigger digest so button and counter update
+             * delay is because submit triggers an input-event
+             * and is in a digest-cycle already. opposed to user-
+             * triggered input-events. dunno why the latter doesn't
+             * do that tho.
+             */
+            delay(0).then(() => 
+                this.$scope.$digest() 
+            )
         }
         submit() {
             const value = this.value();
             const valid = this.valid();
-            if(value && valid) {
+            if(valid) {
                 const txtEl = this.textField();
                 if(txtEl) {
                     txtEl.value = "";
+                    txtEl.dispatchEvent(new Event('input')); // dispatch input event so autoresizer notices value-change
                     txtEl.focus(); //refocus so people can keep writing
                 }
                 const payload = { value, valid };
@@ -111,8 +129,11 @@ function genComponentConf() {
         charactersLeft() {
             return this.maxChars - this.value().length;
         }
-        valid() {
+        belowMaxLength() {
             return !this.maxChars || this.charactersLeft() >= 0;
+        }
+        valid() {
+            return (this.allowEmptySubmit || this.value().length > 0) && this.belowMaxLength()
         }
         value() {
             const txtEl = this.textField();
@@ -142,6 +163,12 @@ function genComponentConf() {
         scope: {
             placeholder: '=', // NOTE: bound only once
             maxChars: '=',
+            helpText: '=',
+
+            isCode: '=', // whether or not the text is code and e.g. should use monospace
+
+            allowEmptySubmit: '=', // allows submitting empty messages
+
             /*
              * Usage:
              *  on-input="::myCallback(value, valid)"
