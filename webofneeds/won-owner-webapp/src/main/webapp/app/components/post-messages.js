@@ -306,10 +306,9 @@ function genComponentConf() {
                 	
                 	// TODO: Optimization
                 	//filter proposals
-                	
                 	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
-	                		if(this.isOldAgreementMsg(msg)) {
+	                		if(!msg.get("isRelevant") || this.isOldAgreementMsg(msg)) {
 	                			//TODO: optimization?
 	                			//isRelevant in state?
 	                			msg.hide = true;
@@ -615,6 +614,17 @@ function genComponentConf() {
 	        		aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
 	        		aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
 	        		aD.acceptedCancellationProposalUris.has(msg.get("remoteUri"))) {
+        		
+        		/*TODO: optimization
+        		if(msg.get("isRelevant")) {
+	        		const payload = {
+	                        messageUri: msg.get("uri"),
+	                        connectionUri: this.connectionUri,
+	                        needUri: this.ownNeed.get("uri"),
+	                        relevant: false,
+	                    };
+	                this.messages__markAsRelevant(payload);
+        		}*/
         		return true;
         	}
         	return false;

@@ -220,9 +220,12 @@ window.N34dbg = N3;
 
     won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
     won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
-
-    //won.WONMSG.isRelevant = won.WONMSG.baseUri + "isRelevant";
-    //won.WONMSG.isRelevantCompacted = won.WONMSG.prefix + ":isRelevant";
+    
+    won.WONMSG.unsetRelevantMessage = won.WONMSG.baseUri + "hasUnsetRelevantMessage";
+    won.WONMSG.unsetRelevantMessageCompacted = won.WONMSG.prefix + ":hasUnsetRelevantMessage";
+    won.WONMSG.isRelevant = won.WONMSG.baseUri + "isRelevant";
+    won.WONMSG.isRelevantCompacted = won.WONMSG.prefix + ":isRelevant";
+    
     
     won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
     won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
@@ -1300,10 +1303,16 @@ window.N34dbg = N3;
         	return !!this.getProperty("http://purl.org/webofneeds/modification#retracts");
         },
         
-        /*
+        
         isRelevant: function () {
             return !!this.getMessageType() === "http://purl.org/webofneeds/message#isRelevant";
-        },*/
+        },
+        
+        isUnsetRelevantMessage: function () {
+        	return this.getProperty("http://purl.org/webofneeds/message#hasUnsetRelevantMessage");
+        },
+        
+        
         
         isFromSystem: function () {
             let direction = this.getMessageDirection();
@@ -1763,6 +1772,16 @@ window.N34dbg = N3;
             this.getContentGraphNode()[predicate] = object;
             return this;
         },
+        
+        addUnsetRelevantMessage: function(messageUri){
+            this.getContentGraphNode()[won.WONMSG.unsetRelevantMessage] = {
+            	//Message uri to set unrelevant
+                "@id" : messageUri
+            }
+        
+            return this;
+        },
+        
         addRating: function(rating, connectionUri){
             this.getContentGraphNode()[won.WON.hasFeedback] = {
                 "@id" : "_:b0",
@@ -1775,6 +1794,7 @@ window.N34dbg = N3;
             };
             return this;
         },
+        
         build: function () {
             return this.data;
         }

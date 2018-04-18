@@ -69,7 +69,12 @@ export function runMessagingAgent(redux) {
         },
         function (message) {
             if(message.isFromExternal() && message.isConnectionMessage()) {
-                redux.dispatch(actionCreators.messages__connectionMessageReceived(message));
+            	if(message.isUnsetRelevantMessage()){
+            		//TODO: set relevant true/false
+            		redux.dispatch(actionCreators.messages__unsetRelevantMessageReceived(message, false));
+            	}else {
+                	redux.dispatch(actionCreators.messages__connectionMessageReceived(message));
+            	}
                 return true;
             }
             return false;
@@ -230,7 +235,7 @@ export function runMessagingAgent(redux) {
                 return true;
             }
             return false;
-        }
+        },
     ];
 
     // processors that are used for reacting to certain messages after they 
@@ -264,7 +269,6 @@ export function runMessagingAgent(redux) {
             }
             return false;
         },
-
     ]
 
     function onMessage(receivedMsg) {

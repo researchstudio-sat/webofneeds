@@ -115,8 +115,7 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const message = chatMessages && chatMessages.get(this.stateUri);
                 const remoteUri = message && !!message.get("remoteUri");
-                //const remoteUri = message && message.get("remoteUri");
-                
+
                 return {
                 	message: message,
                 	isOwn: !remoteUri,

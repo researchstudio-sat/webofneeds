@@ -225,7 +225,7 @@ function genComponentConf() {
                     contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
-                    allowProposals: connection && connection.get("state") === won.WON.Connected, //allow showing details only when the connection is already present
+                    allowProposals: connection && connection.get("state") === won.WON.Connected && message.get('text'), //allow showing details only when the connection is already present
                 }
             };
 
@@ -267,12 +267,12 @@ function genComponentConf() {
         
         markAsRelevant(relevant){
         	const payload = {
-                messageUri: this.message.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                relevant: relevant,
-            };
-        	
+    			 messageUri: this.message.get("uri"),
+                 connectionUri: this.connectionUri,
+                 needUri: this.ownNeed.get("uri"),
+                 relevant: relevant,
+        	}
+                	
         	this.messages__markAsRelevant(payload);
         }
         
@@ -287,7 +287,6 @@ function genComponentConf() {
         
         acceptProposal() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
@@ -308,7 +307,6 @@ function genComponentConf() {
         
         acceptProposeToCancel() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
