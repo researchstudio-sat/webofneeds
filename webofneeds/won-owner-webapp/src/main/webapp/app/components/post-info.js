@@ -59,8 +59,8 @@ function genComponentConf() {
                     <a class="won-button--outlined thin red"
                         target="_blank"
                         href="{{self.post.get('uri')}}">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
                         <span>Show RDF</span>
                     </a>
@@ -109,17 +109,6 @@ function genComponentConf() {
                 </p>
                 <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
             </div>
-
-            <button class="post-info__footer__button won-button--filled red"
-                    ng-if="!self.includeHeader && self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
-                    ng-click="self.reOpenPost()">
-                    Reopen Post
-            </button>
-            <button class="post-info__footer__button won-button--filled red"
-                    ng-if="!self.includeHeader && self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
-                    ng-click="self.closePost()">
-                    Close Post
-            </button>
         </div>
     `;
 

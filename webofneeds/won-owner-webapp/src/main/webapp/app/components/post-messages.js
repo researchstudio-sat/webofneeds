@@ -93,24 +93,30 @@ function genComponentConf() {
                         target="_blank"
                         href="{{self.connectionUri}}"
                         ng-if="!self.isConnected">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
                         <span>Show RDF</span>
                     </a>
                     <a class="won-button--outlined thin red"
                         ng-click="self.toggleRdfDisplay()"
                         ng-if="self.isConnected">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
                         <span>{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
                     </a>
                     <button
-                        ng-if="!self.isReceivedRequest"
+                        ng-if="self.isConnected"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
                         Close Connection
+                    </button>
+                    <button
+                        ng-if="self.isSentRequest"
+                        class="won-button--filled red"
+                        ng-click="self.closeConnection()">
+                        Cancel Request
                     </button>
                 </div>
             </div>

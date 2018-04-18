@@ -42,6 +42,11 @@
   text-align: center;
   border-radius: 0.19rem;
   cursor: pointer;
+
+  svg.won-button-icon {
+    @include fixed-square($normalFontSize);
+    margin-right: 0.5rem;
+  }
 }
 .won-button {
   @include won-button();
