@@ -4,6 +4,7 @@
 @import 'locationpicker';
 @import 'animate';
 @import 'sizing-utils';
+@import 'textfield';
 
 won-create-post {
 
@@ -140,6 +141,12 @@ won-create-post {
         width: 100%;
       }
     }
+  }
+  .cp__ttl {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
   }
 
   .cp__addDetail {
