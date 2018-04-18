@@ -24,13 +24,12 @@ const behindScenesLink = behindScenes.link("http://researchstudio-sat.github.io/
 
 const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
-const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
-    {imageSrc: 'generated/icon-sprite.svg#ico36_match', text: 'Get matches', detail: 'Based on the' +
-    ' information you provide, we will try to connect you with others'},
-    {imageSrc: 'generated/icon-sprite.svg#ico36_incoming', text: 'Request contact – or be contacted', detail: 'If you\'re interested,' +
-    ' make a contact request - or get one if your counterpart is faster than you' },
-    {imageSrc: 'generated/icon-sprite.svg#ico36_message', text: 'Interact and exchange', detail: 'You found someone' +
-    ' who has what you need, wants to meet or change something in your common environment? Go chat with them! '}];
+const workGrid = [
+        {svgSrc: '#ico36_description', text: 'Post your need anonymously', detail: 'Needs can be very personal, so privacy is important. You don\'t have to reveal your identity here.'},
+        {svgSrc: '#ico36_match', text: 'Get matches', detail: 'Based on the' + ' information you provide, we will try to connect you with others'},
+        {svgSrc: '#ico36_incoming', text: 'Request contact – or be contacted', detail: 'If you\'re interested,' + ' make a contact request - or get one if your counterpart is faster than you' },
+        {svgSrc: '#ico36_message', text: 'Interact and exchange', detail: 'You found someone' + ' who has what you need, wants to meet or change something in your common environment? Go chat with them! '}
+    ];
 
 const peopleGrid = ({theme}) => ([
         {imageSrc: `skin/${theme}/images/face1.png`, text: '"I have something to offer"'},

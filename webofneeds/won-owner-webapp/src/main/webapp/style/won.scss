@@ -62,7 +62,7 @@ body {
 @import 'login';
 @import 'need-tab-bar';
 @import 'main-tab-bar';
-@import 'create-need-title-bar';
+@import 'create-need';
 @import 'visitor-title-bar';
 @import 'settings-tab-bar';
 
@@ -106,6 +106,7 @@ section.ng-scope {
 header {
   flex: 0 0 auto;
   display: block;
+  border-bottom: $thinBorderWidth solid $won-line-gray;
 }
 
 main {

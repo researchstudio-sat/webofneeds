@@ -99,6 +99,9 @@ async function loadSkinConfig(themeName) {
         }
 
         // load config.json
-        return fetch(`skin/${themeName}/config.json`).then(resp => resp.json())
+        return fetch(`skin/${themeName}/config.json`).then(resp => resp.json()).then(config => {
+            document.title = config.title;
+            return config;
+        })
     }
-}
+}       
