@@ -48,7 +48,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a href="{{ self.resetParamsHRef(self.$state, self.loggedIn ? 'feed' : 'landingpage') }}"
+                    <a href="{{ self.resetParamsHRef(self.$state, self.loggedIn ? 'connections' : 'landingpage') }}"
                         class="topnav__button">
                             <img src="skin/{{self.themeName}}/images/logo.svg"
                                 class="topnav__button__icon">

@@ -81,7 +81,7 @@ body {
 @import 'login';
 @import 'need-tab-bar';
 @import 'main-tab-bar';
-@import 'create-need-title-bar';
+@import 'create-need';
 @import 'visitor-title-bar';
 @import 'settings-tab-bar';
 
@@ -125,6 +125,7 @@ section.ng-scope {
 header {
   flex: 0 0 auto;
   display: block;
+  border-bottom: $thinBorderWidth solid $won-line-gray;
 }
 
 main {
@@ -173,12 +174,9 @@ a {
 @import 'accordion';
 @import 'flexgrid';
 @import 'settings';
-@import 'overview-posts';
-@import 'overview-incoming-requests';
-@import 'feed';
-@import 'overview-matches';
+@import 'connections';
 @import 'feedback-grid';
-@import 'post-owner';
+@import 'post-visitor';
 @import 'connections-map';
 @import 'covering-dropdown';
 @import 'tab';

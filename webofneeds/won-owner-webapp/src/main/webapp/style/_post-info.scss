@@ -48,9 +48,10 @@ won-post-info {
       float: right;
     }
 
-    .pm__header__contextmenu .content {
+    .post-info__header__contextmenu .content {
       max-width: 10rem;
 
+      a.rdflink,
       button {
         margin-top: 0.5rem;
         width: 100%;

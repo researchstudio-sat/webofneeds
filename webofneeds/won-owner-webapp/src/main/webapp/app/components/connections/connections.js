@@ -1,9 +1,9 @@
 ;
 
 import angular from 'angular';
-import overviewTitleBarModule from '../overview-title-bar.js';
 import sendRequestModule from '../send-request.js';
 import postMessagesModule from '../post-messages.js';
+import postInfoModule from '../post-info.js';
 import connectionsOverviewModule from '../connections-overview.js';
 import {
     attach,
@@ -22,15 +22,12 @@ import {
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 
-class IncomingRequestsController {
+class ConnectionsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.WON = won.WON;
         this.resetParams = resetParams;
         this.open = {};
-
-        this.selection = 2;
-        this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
 
         const selectFromState = (state)=>{
             const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
@@ -83,13 +80,13 @@ class IncomingRequestsController {
     }
 }
 
-IncomingRequestsController.$inject = [];
+ConnectionsController.$inject = [];
 
-export default angular.module('won.owner.components.overviewIncomingRequests', [
-        overviewTitleBarModule,
+export default angular.module('won.owner.components.connections', [
         sendRequestModule,
         postMessagesModule,
+        postInfoModule,
         connectionsOverviewModule,
     ])
-    .controller('OverviewIncomingRequestsController', [...serviceDependencies,IncomingRequestsController])
+    .controller('ConnectionsController', [...serviceDependencies, ConnectionsController])
     .name;

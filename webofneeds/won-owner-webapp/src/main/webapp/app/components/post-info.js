@@ -42,7 +42,7 @@ function genComponentConf() {
                 hide-image="::false">
             </won-post-header>
             <!-- TODO: Implement a menu with all the necessary buttons -->
-            <!-- svg class="post-info__header__icon__small clickable"
+            <svg class="post-info__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
                 ng-show="!self.contextMenuOpen"
                 ng-click="self.contextMenuOpen = true">
@@ -51,19 +51,22 @@ function genComponentConf() {
             <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
                 <div class="content">
                     <div class="topline">
-                      <svg class="post-info__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;"
-                        ng-click="self.contextMenuOpen = false">
+                        <svg class="post-info__header__icon__small__contextmenu clickable"
+                            style="--local-primary:black;"
+                            ng-click="self.contextMenuOpen = false">
                             <use href="#ico16_arrow_up"></use>
-                      </svg>
+                        </svg>
                     </div>
-                  <button
-                    class="won-button--filled thin red"
-                    ng-click="">
-                      DO POST ACTIONS
-                  </button>
+                    <a class="rdflink withlabel clickable"
+                        target="_blank"
+                        href="{{self.post.get('uri')}}">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">Show RDF</span>
+                    </a>
                 </div>
-            </div-->
+            </div>
         </div>
         <div class="post-info__content">
             <won-gallery ng-show="self.post.get('hasImages')">
@@ -108,11 +111,6 @@ function genComponentConf() {
                     ng-click="self.closePost()">
                     Close Post
             </button>
-            <a target="_blank" href="{{self.post.get('uri')}}">
-                <svg class="rdflink__big clickable">
-                    <use href="#rdf_logo_1"></use>
-                </svg>
-            </a>
         </div>
     `;
 
@@ -154,7 +152,7 @@ function genComponentConf() {
                         post.get('creationDate')
                     ),
                     createdTimestamp: post && post.get('creationDate'),
-                    linkToPost: post && post.get('uri'), //TODO: MAKE SURE TO CREATE THE CORRET LINK
+                    linkToPost: post && new URL("/owner/#!post/?postUri="+encodeURI(post.get('uri')), window.location.href).href,
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.includeHeader'], this);

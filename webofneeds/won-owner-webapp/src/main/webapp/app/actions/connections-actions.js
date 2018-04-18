@@ -8,6 +8,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
 import {
     selectOpenConnectionUri,
+    selectNeedByConnectionUri,
     selectOpenPostUri,
     selectRemoteEvents,
     selectConnection,
@@ -124,7 +125,6 @@ export function connectionsOpen(connectionUri, textMessage) {
          });
          
         dispatch(actionCreators.router__stateGoCurrent({
-            connectionType: won.WON.Connected,
             connectionUri: optimisticEvent.getSender(),
         }));
     }
@@ -178,7 +178,7 @@ async function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
         payload: {eventUri, message, needUri, need: adHocDraft}
     });
 
-    dispatch(actionCreators.router__stateGoAbs('feed'));
+    dispatch(actionCreators.router__stateGoAbs('connections'));
 }
 
 async function messageGraphToEvent(eventUri, messageGraph) {
@@ -301,12 +301,13 @@ export function connectionsRate(connectionUri,rating) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showLatestMessages(connectionUri, numberOfEvents){
+export function showLatestMessages(connectionUriParam, numberOfEvents){
     return (dispatch, getState) => {
         const state = getState();
-        const connectionUri = selectOpenConnectionUri(state);
-        const needUri = selectOpenPostUri(state);
-        const connection = selectConnection(state, connectionUri);
+        const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+        const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const needUri = need && need.get("uri");
+        const connection = connectionUri && selectConnection(state, connectionUri);
         if (!connectionUri || !connection) return;
 
         const connectionMessages = connection.get('messages');
@@ -391,16 +392,19 @@ function getEvents(connectionUri, params) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showMoreMessages(connectionUri, numberOfEvents) {
+export function showMoreMessages(connectionUriParam, numberOfEvents) {
     return (dispatch, getState) => {
         const state = getState();
-        const connectionUri = selectOpenConnectionUri(state);
-        const needUri = selectOpenPostUri(state);
-        const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]);
+        const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+        const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const needUri = need && need.get("uri");
+        const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]) || Immutable.List();
+
         // determine the oldest loaded event
         const sortedOwnEvents = events.valueSeq().sort( (event1, event2) => event1.get('date') - event2.get('date'));
         const oldestEvent = sortedOwnEvents.first();
-        const eventHashValue = oldestEvent
+
+        const eventHashValue = oldestEvent && oldestEvent
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
         dispatch({

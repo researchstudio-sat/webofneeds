@@ -1,66 +1,10 @@
 <!-- TODO parametrize by selected tab -->
 <header>
     <won-topnav></won-topnav>
-    <won-owner-title-bar
-            selection="self.selection"
-            ng-if="self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
-    </won-owner-title-bar>
-    <won-visitor-title-bar
-            selection="::1"
-            item="self.post"
-            ng-if="!self.isOwnPost"
-            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.connectionIsOpen}">
-    </won-visitor-title-bar>
+    <won-visitor-title-bar item="self.post"></won-visitor-title-bar>
 </header>
-<main class="ownerpostcontent">
+<main class="postcontent">
     <!-- Post info view when there's no connection-state/-type selected -->
-    <won-post-info ng-if="self.post && self.isOwnPost" ng-show="!self.connectionType" include-header="false"></won-post-info>
     <won-send-request include-header="false" ng-if="self.post && !self.isOwnPost"></won-send-request>
-
-    <!-- No Connections: -->
-    <div class="opc__inner empty" 
-         ng-if="self.isOwnPost && self.connectionType && !self.hasConnections">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
-                <!-- TODO: decide which icon should be used here -->
-                <svg class="opc__empty__description__icon"
-                    style="--local-primary:var(--won-disabled-color);">
-                        <use href="#ico36_message"></use>
-                </svg>
-                <span class="opc__empty__description__text">Here you will see all chats, requests, and suggestions for your needs, but
-                    currently there are none. Check again later!
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <!-- left column for connection-typed tabs -->
-    <div class="post__listside"
-        ng-if="self.isOwnPost && self.connectionType && self.hasConnections"
-        ng-class="{'hidden' : self.connectionUri !== undefined}"
-    >
-        <!-- Chats -->
-        <won-connection-selection
-                class="owner__messages"
-                ng-if="self.hasConnections"
-                on-selected-connection="self.openConnection(connectionUri)"
-                >
-        </won-connection-selection>
-    </div>
- 
-    <!-- /left column -->
-
-    <!-- right column -->
-    <div class="post__contentside" ng-if="self.isOwnPost && self.post && self.connectionType && self.connectionOpen && self.hasConnections && self.actualConnectionType !== self.WON.Closed">
-        <won-post-messages ng-if="self.actualConnectionType === self.WON.Connected || self.actualConnectionType === self.WON.RequestReceived || self.actualConnectionType === self.WON.RequestSent"></won-post-messages>
-        <won-send-request include-header="true" ng-if="self.actualConnectionType === self.WON.Suggested"></won-send-request>
-    </div>
-    <div class="post__contentside post__contentside--empty" ng-if="self.isOwnPost && self.post && self.hasConnections && self.connectionType && (!self.connectionOpen || self.actualConnectionType === self.WON.Closed)"
-        ng-class="{'hidden' : self.connectionUri === undefined}">
-        <span class="post__contentside__description__text">
-            No Element selected
-        </span>
-    </div>
- 
+    <button ng-click="self.goToOwnPost()" ng-if="self.post && self.isOwnPost " class="won-button--filled red">GO TO POST VIEW TODO: AUTOMATICALLY DO THIS</button>
 </main>

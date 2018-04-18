@@ -126,9 +126,8 @@ export function successfulOpen(event){
             }
         });
 
-        dispatch(actionCreators.router__stateGoAbs("post", {
+        dispatch(actionCreators.router__stateGoAbs("connections", {
             postUri: event.getReceiverNeed(),
-            connectionType: won.WON.Connected,
             connectionUri: event.getReceiver(),
         }));
     }

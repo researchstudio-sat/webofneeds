@@ -4,7 +4,6 @@ import won from '../won-es6.js';
 import angular from 'angular';
 import jld from 'jsonld';
 import Immutable from 'immutable';
-import chatTextFieldModule from './chat-textfield.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
@@ -89,16 +88,33 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
-                  <button
-                    class="won-button--outlined thin red"
-                    ng-click="self.goToPost()">
-                      Show Post Details
-                  </button>
-                  <button
-                    class="won-button--filled thin red"
-                    ng-click="self.closeConnection()">
-                      Close Connection
-                  </button>
+                    <button
+                        class="won-button--outlined thin red"
+                        ng-click="self.goToPost()">
+                        Show Post Details
+                    </button>
+                    <button
+                        class="won-button--filled thin red"
+                        ng-click="self.closeConnection()">
+                        Close Connection
+                    </button>
+                    <a class="rdflink withlabel clickable"
+                        target="_blank"
+                        href="{{self.connectionUri}}"
+                        ng-if="!self.isConnected">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">Show RDF</span>
+                    </a>
+                    <a class="rdflink withlabel clickable"
+                        ng-click="self.toggleRdfDisplay()"
+                        ng-if="self.isConnected">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -190,38 +206,20 @@ function genComponentConf() {
             	</div>
             </div>
         </div>
-        <div class="pm__footer" ng-show="self.isConnected">
-            <chat-textfield
-                placeholder="::'Your Message'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.send()"
-                allow-empty-submit="false"
-                submit-button-label="::'Send'"
-                >
-            </chat-textfield>
-
-            <!--
-            TODO finish implementing and styling chat-textfield-simple and use that for both 
-            ways of writing messages instead.
-            -->
+        <div class="pm__footer" ng-if="self.isConnected">
 
             <chat-textfield-simple
-                class="pm__footer__rdfinput"
-                ng-show="self.shouldShowRdf"
-                placeholder="::self.rdftextfieldPlaceholder"
-                submit-button-label="::'Send RDF'"
-                on-submit="::self.sendRdf(value)"
+                class="pm__footer__chattexfield"
+                placeholder="self.shouldShowRdf? 'Enter ttl...' : 'Your message...'"
+                submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
+                on-submit="self.send(value, self.shouldShowRdf)"
+                help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
+                allow-empty-submit="::false"
+                is-code="self.shouldShowRdf? 'true' : ''"
             >
             </chat-textfield-simple>
+
             <div class="pm__footer__agreement">
-                <a class="rdflink withlabel clickable"
-                   ng-click="self.toggleRdfDisplay()">
-                       <svg class="rdflink__small">
-                           <use href="#rdf_logo_1"></use>
-                       </svg>
-                      <span class="rdflink__text">[{{self.shouldShowRdf? "HIDE" : "SHOW"}}]</span>
-                </a>
                 <!-- quick and dirty button to get agreements -->
                 <button class="won-button--filled thin black"
                     ng-click="self.showAgreementDataField()"
@@ -234,25 +232,19 @@ function genComponentConf() {
             Waiting for them to accept your chat request.
         </div>
 
-        <div class="pm__footer" ng-show="self.isReceivedRequest">
-            <chat-textfield
-                placeholder="::'Reply Message (optional, in case of acceptance)'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.openRequest()"
-                allow-empty-submit="true"
+        <div class="pm__footer" ng-if="self.isReceivedRequest">
+            <chat-textfield-simple
+                class="pm__footer__chattexfield"
+                placeholder="::'Reply Message (optional)'"
+                on-submit="::self.openRequest(value)"
+                allow-empty-submit="::true"
                 submit-button-label="::'Accept Chat'"
-                >
-            </chat-textfield>
+            >
+            </chat-textfield-simple>
             <won-labelled-hr label="::'Or'" class="pm__footer__labelledhr"></won-labelled-hr>
             <button class="pm__footer__button won-button--filled black" ng-click="self.closeConnection()">
                 Decline
             </button>
-            <a target="_blank" href="{{self.connectionUri}}">
-                <svg class="rdflink__big clickable">
-                    <use href="#rdf_logo_1"></use>
-                </svg>
-            </a>
         </div>
     `;
 
@@ -263,6 +255,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             
+
             
             this.reload = true;
             
@@ -283,12 +276,14 @@ function genComponentConf() {
             
             this.showAgreementData = false;
             
+            this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
+                `<${won.WONMSG.msguriPlaceholder}> will ` +
+                'be the uri generated for this message. See \`won.minimalTurtlePrefixes\` ' +
+                'for prefixes that will be added automatically. E.g.' +
+                `\`<${won.WONMSG.msguriPlaceholder}> won:hasTextMessage "hello world!". \``;
+            
+            
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
-            this.msguriPlaceholder = won.WONMSG.msguriPlaceholder;
-            this.rdftextfieldPlaceholder = "Expects valid turtle. <" +
-                won.WONMSG.msguriPlaceholder +
-                "> will be the uri generated for this message. See \`won.minimalTurtlePrefixes\` " +
-                "for prefixes that will be added automatically.";
 
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
@@ -424,15 +419,15 @@ function genComponentConf() {
             return this._scrollContainer;
         }
 
-        input(userInput) {
-            this.chatMessage = userInput;
-        }
-
-        send() {
+        send(chatMessage, isTTL=false) {
         	this.showAgreementData = false;
-            const trimmedMsg = this.chatMessage.trim();
+            const trimmedMsg = chatMessage.trim(); 
             if(trimmedMsg) {
-               this.connections__sendChatMessage(trimmedMsg, this.connection.get('uri'));
+               this.connections__sendChatMessage(
+                   trimmedMsg, 
+                   this.connection.get('uri'),
+                   isTTL
+                );
             }
         }
         
@@ -663,18 +658,8 @@ function genComponentConf() {
         	}
         }
 
-        sendRdf(rdfString) {
-            if(rdfString) {
-                this.connections__sendChatMessage(
-                    rdfString, 
-                    this.connection.get('uri'), 
-                    isTTL=true
-                );
-            }
-        }
-
         openRequest(message){
-            this.connections__open(this.connectionUri, this.chatMessage);
+            this.connections__open(this.connectionUri, message);
         }
 
         closeConnection(){
@@ -699,7 +684,6 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.postMessages', [
-    chatTextFieldModule,
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
     connectionMessageModule,

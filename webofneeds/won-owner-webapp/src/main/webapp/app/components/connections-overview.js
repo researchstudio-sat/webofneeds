@@ -8,9 +8,9 @@
 import won from '../won-es6.js';
 import angular from 'angular';
 import squareImageModule from './square-image.js';
-import connectionSelectionModule from './connection-selection.js';
 import postHeaderModule from './post-header.js';
 import connectionIndicatorsModule from './connection-indicators.js';
+import connectionSelectionItemModule from './connection-selection-item.js';
 
 import {
     labels,
@@ -179,7 +179,7 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.connectionsOverview', [
         squareImageModule,
-        connectionSelectionModule,
+        connectionSelectionItemModule,
         postHeaderModule,
         connectionIndicatorsModule,
 ])

@@ -2,12 +2,12 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import chatTextFieldModule from './chat-textfield.js';
 import postHeaderModule from './post-header.js';
 import feedbackGridModule from './feedback-grid.js';
 import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
 import labelledHrModule from './labelled-hr.js';
+import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 
 import {
     selectOpenPostUri,
@@ -44,8 +44,7 @@ function genComponentConf() {
                 timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
-            <!-- TODO: Implement a menu with all the necessary buttons -->
-            <!-- svg class="post-info__header__icon__small clickable"
+            <svg class="post-info__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
                 ng-show="!self.contextMenuOpen"
                 ng-click="self.contextMenuOpen = true">
@@ -60,13 +59,21 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
-                  <button
-                    class="won-button--filled thin red"
-                    ng-click="">
-                      DO POST ACTIONS
-                  </button>
+                    <button ng-if="self.connection && self.connection.get('isRated')"
+                        class="post-info__footer__button won-button--filled black"
+                        ng-click="self.closeConnection()">
+                            Remove This
+                    </button>
+                    <a class="rdflink withlabel clickable"
+                        target="_blank"
+                        href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+                        <svg class="rdflink__small">
+                            <use href="#rdf_logo_1"></use>
+                        </svg>
+                        <span class="rdflink__text">Show RDF</span>
+                    </a>
                 </div>
-            </div-->
+            </div>
         </div>
         <div class="post-info__content">
             <won-gallery ng-show="self.suggestedPost.get('hasImages')">
@@ -101,29 +108,24 @@ function genComponentConf() {
             <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
 
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
-            <chat-textfield
+
+            <chat-textfield-simple
                 placeholder="::'Request Message (optional)'"
-                on-input="::self.input(value)"
-                on-paste="::self.input(value)"
-                on-submit="::self.sendRequest()"
-                allow-empty-submit="true"
+                on-submit="::self.sendRequest(value)"
+                allow-empty-submit="::true"
                 submit-button-label="::'Ask to Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
-                >
-            </chat-textfield>
-            
-            <!-- TODO: move this button from footer to header -->
-            <!-- won-labelled-hr label="::'Or'" ng-if="self.connection && self.connection.get('isRated')" class="post-info__footer__labelledhr"></won-labelled-hr>
-            <button ng-if="self.connection && self.connection.get('isRated')"
-                class="post-info__footer__button won-button--filled black"
-                ng-click="self.closeConnection()">
-                    Remove This
-            </button -->
-            <a target="_blank"
-                href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
-                <svg class="rdflink__big clickable">
-                    <use href="#rdf_logo_1"></use>
-                </svg>
+            >
+            </chat-textfield-simple>
+
+            <a class="rdflink withlabel clickable"
+               ng-if="!self.includeHeader"
+               target="_blank"
+               href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+                    <span class="rdflink__text">Show RDF</span>
             </a>
         </div>
     `;
@@ -172,7 +174,7 @@ function genComponentConf() {
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     connectionUri,
                     postUriToConnectTo,
-                    linkToPost: suggestedPost && suggestedPost.get('uri'), //TODO: MAKE SURE TO CREATE THE CORRECT LINK
+                    linkToPost: suggestedPost && new URL("/owner/#!post/?postUri="+encodeURI(suggestedPost.get('uri')), window.location.href).href,
                     friendlyTimestamp: suggestedPost && relativeTime(
                         selectLastUpdateTime(state),
                         suggestedPost.get('creationDate')
@@ -183,13 +185,7 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, [], this);
         }
 
-        input(userInput) {
-            this.chatMessage = userInput;
-        }
-
-        sendRequest() {
-            message = this.chatMessage;
-
+        sendRequest(message) {
             if(!this.connection || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
                     //Close the connection if there was a present connection for a whatsaround need
@@ -201,7 +197,7 @@ function genComponentConf() {
                 }
 
                 //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
-                this.router__stateGoResetParams('overviewIncomingRequests');
+                this.router__stateGoResetParams('connections');
             }else{
                 this.needs__connect(
                 		this.ownNeed.get("uri"), 
@@ -237,7 +233,7 @@ export default angular.module('won.owner.components.sendRequest', [
     postHeaderModule,
     feedbackGridModule,
     labelledHrModule,
-    chatTextFieldModule,
+    chatTextFieldSimpleModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;

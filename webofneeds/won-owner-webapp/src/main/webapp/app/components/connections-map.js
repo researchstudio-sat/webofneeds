@@ -8,7 +8,6 @@ import { attach, decodeUriComponentProperly} from '../utils.js';
 import won from '../won-es6.js';
 import {
     selectOpenPostUri,
-    displayingOverview,
     selectAllConnections,
 } from '../selectors.js';
 import { actionCreators }  from '../actions/actions.js';
@@ -73,20 +72,12 @@ function genComponentConf() {
             );
 
             const selectFromState = (state) => {
-                const connectionTypeInParams = decodeUriComponentProperly(
-                    state.getIn(['router', 'currentParams', 'connectionType'])
-                );
-
-                const isOverview = displayingOverview(state);
 
                 const postUri = selectOpenPostUri(state);
                 const post = postUri && state.getIn(["needs", postUri]);
                 const isWhatsAround = post && post.get("isWhatsAround");
                 const postLocation = post && (post.get('is')? post.get('is').get('location') : post.get('seeks').get('location'));
-                const connectionType = connectionTypeInParams || this.connectionType;
-                const connections = isOverview ?
-                                        selectAllConnections(state).filter(conn => conn.get("state") === connectionType) :
-                                        post && post.get("connections").filter(conn => conn.get("state") === connectionType);
+                const connections = post && post.get("connections");
 
                 return {
                     post: post,
@@ -154,7 +145,7 @@ function genComponentConf() {
                 .on("click",
                     function() {
                         if(false && this.isWhatsAround){
-                            this.router__stateGoAbs('post', {postUri: need.get("uri")});
+                            this.router__stateGoAbs('connections', {postUri: need.get("uri")});
                         }else{
                             this.onSelectedConnection({connectionUri: conn.get("uri")})
                         }
@@ -174,7 +165,6 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         template: template,
         scope: {
-            connectionType: "=",
             onSelectedConnection: "&"
         }
     }
