@@ -283,12 +283,14 @@ function genComponentConf() {
             this.loading = false;
 
             this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
-            `<${won.WONMSG.msguriPlaceholder}> will ` +
-            'be the uri generated for this message. See \`won.minimalTurtlePrefixes\` ' +
-            'for prefixes that will be added automatically. E.g.' +
-            `\`<${won.WONMSG.msguriPlaceholder}> won:hasTextMessage "hello world!". \``;
-
-
+                `<${won.WONMSG.msguriPlaceholder}> will ` +
+                'be replaced by the uri generated for this message. ' +
+                'Use it, so your TTL can be found when parsing the messages. ' + 
+                'See \`won.minimalTurtlePrefixes\` ' +
+                'for prefixes that will be added automatically. E.g.' +
+                `\`<${won.WONMSG.msguriPlaceholder}> won:hasTextMessage "hello world!". \``;
+            
+            
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
 
             const selectFromState = state => {
