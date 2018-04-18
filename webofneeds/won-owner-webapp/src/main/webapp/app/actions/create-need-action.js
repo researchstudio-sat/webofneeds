@@ -46,7 +46,7 @@ export function needCreate(draft, nodeUri) {
         return ensureLoggedIn(dispatch, getState)
             .then(() => {
                 if (currentState === 'landingpage') {
-                    return dispatch(actionCreators.router__stateGoAbs('feed'))
+                    return dispatch(actionCreators.router__stateGoAbs('connections'))
                 } else if (currentState === 'createNeed') {
                     return dispatch(actionCreators.router__stateGoDefault())
                 }
