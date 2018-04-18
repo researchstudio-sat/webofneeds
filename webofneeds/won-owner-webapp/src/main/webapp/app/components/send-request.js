@@ -51,27 +51,26 @@ function genComponentConf() {
                     <use href="#ico16_arrow_down"></use>
             </svg>
             <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content">
+                <div class="content" ng-click="self.contextMenuOpen = false">
                     <div class="topline">
                       <svg class="post-info__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;"
-                        ng-click="self.contextMenuOpen = false">
+                        style="--local-primary:black;">
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
-                    <button ng-if="self.connection && self.connection.get('isRated')"
-                        class="post-info__footer__button won-button--filled black"
-                        ng-click="self.closeConnection()">
-                            Remove This
-                    </button>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         target="_blank"
                         href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
-                        <span class="rdflink__text">Show RDF</span>
+                        <span>Show RDF</span>
                     </a>
+                    <button ng-if="self.connection && self.connection.get('isRated')"
+                        class="won-button--filled red"
+                        ng-click="self.closeConnection()">
+                            Close Connection
+                    </button>
                 </div>
             </div>
         </div>
@@ -96,9 +95,16 @@ function genComponentConf() {
                 <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
             </div>
             </br>
+            <a class="rdflink clickable"
+               ng-if="!self.includeHeader"
+               target="_blank"
+               href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+            </a>
         </div>
         <div class="post-info__footer">
-
             <div class="post-info__footer__link" ng-if="self.suggestedPost.get('state') !== self.WON.InactiveCompacted">
                 <p class="post-info__footer__link__text">
                     Know someone who might also be interested in this posting? Consider sharing the link below in social media.
@@ -117,16 +123,6 @@ function genComponentConf() {
                 ng-if="!self.connection || self.connection.get('isRated')"
             >
             </chat-textfield-simple>
-
-            <a class="rdflink withlabel clickable"
-               ng-if="!self.includeHeader"
-               target="_blank"
-               href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
-                    <svg class="rdflink__small">
-                        <use href="#rdf_logo_1"></use>
-                    </svg>
-                    <span class="rdflink__text">Show RDF</span>
-            </a>
         </div>
     `;
 

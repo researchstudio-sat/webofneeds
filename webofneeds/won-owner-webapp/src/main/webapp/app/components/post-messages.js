@@ -77,11 +77,10 @@ function genComponentConf() {
                     <use href="#ico16_arrow_down"></use>
             </svg>
             <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content">
+                <div class="content" ng-click="self.contextMenuOpen=false">
                     <div class="topline">
                       <svg class="pm__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;"
-                        ng-click="self.contextMenuOpen = false">
+                        style="--local-primary:black;">
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
@@ -90,28 +89,35 @@ function genComponentConf() {
                         ng-click="self.goToPost()">
                         Show Post Details
                     </button>
-                    <button
-                        class="won-button--filled thin red"
-                        ng-click="self.closeConnection()">
-                        Close Connection
-                    </button>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         target="_blank"
                         href="{{self.connectionUri}}"
                         ng-if="!self.isConnected">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
-                        <span class="rdflink__text">Show RDF</span>
+                        <span>Show RDF</span>
                     </a>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         ng-click="self.toggleRdfDisplay()"
                         ng-if="self.isConnected">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
-                        <span class="rdflink__text">{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
+                        <span>{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
                     </a>
+                    <button
+                        ng-if="self.isConnected"
+                        class="won-button--filled red"
+                        ng-click="self.closeConnection()">
+                        Close Connection
+                    </button>
+                    <button
+                        ng-if="self.isSentRequest"
+                        class="won-button--filled red"
+                        ng-click="self.closeConnection()">
+                        Cancel Request
+                    </button>
                 </div>
             </div>
         </div>

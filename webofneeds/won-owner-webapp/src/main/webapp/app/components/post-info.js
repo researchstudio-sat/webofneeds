@@ -49,22 +49,31 @@ function genComponentConf() {
                     <use href="#ico16_arrow_down"></use>
             </svg>
             <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content">
+                <div class="content" ng-click="self.contextMenuOpen = false">
                     <div class="topline">
                         <svg class="post-info__header__icon__small__contextmenu clickable"
-                            style="--local-primary:black;"
-                            ng-click="self.contextMenuOpen = false">
+                            style="--local-primary:black;">
                             <use href="#ico16_arrow_up"></use>
                         </svg>
                     </div>
-                    <a class="rdflink withlabel clickable"
+                    <a class="won-button--outlined thin red"
                         target="_blank"
                         href="{{self.post.get('uri')}}">
-                        <svg class="rdflink__small">
-                            <use href="#rdf_logo_1"></use>
+                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+                            <use href="#ico36_rdf_logo"></use>
                         </svg>
-                        <span class="rdflink__text">Show RDF</span>
+                        <span>Show RDF</span>
                     </a>
+                    <button class="post-info__footer__button won-button--filled red"
+                        ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
+                        ng-click="self.reOpenPost()">
+                        Reopen Post
+                    </button>
+                    <button class="post-info__footer__button won-button--filled red"
+                        ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
+                        ng-click="self.closePost()">
+                        Close Post
+                    </button>
                 </div>
             </div>
         </div>
@@ -100,17 +109,6 @@ function genComponentConf() {
                 </p>
                 <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
             </div>
-
-            <button class="post-info__footer__button won-button--filled red"
-                    ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
-                    ng-click="self.reOpenPost()">
-                    Reopen Post
-            </button>
-            <button class="post-info__footer__button won-button--filled red"
-                    ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
-                    ng-click="self.closePost()">
-                    Close Post
-            </button>
         </div>
     `;
 

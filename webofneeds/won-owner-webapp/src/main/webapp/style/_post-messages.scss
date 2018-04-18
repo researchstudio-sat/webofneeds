@@ -83,14 +83,23 @@
       }
 
       .pm__header__contextmenu .content {
-        max-width: 10rem;
+        max-width: 15rem;
         position: absolute;
         right: 0;
 
-        a.rdflink,
+        a.won-button--outlined,
         button {
           margin-top: 0.5rem;
           width: 100%;
+          white-space: nowrap;
+        }
+
+        a.won-button--outlined{
+          cursor: pointer;
+          display: flex;
+          align-content: center;
+          align-items: center;
+          box-sizing: border-box;
         }
       }
     }
