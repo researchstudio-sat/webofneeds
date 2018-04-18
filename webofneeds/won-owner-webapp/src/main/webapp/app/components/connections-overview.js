@@ -52,14 +52,8 @@ function genComponentConf() {
                     <svg
                         style="--local-primary:var(--won-secondary-color);"
                         class="covw__arrow clickable"
-                        ng-show="self.isOpen(need.get('uri')) && !self.isOpenByConnection(need.get('uri'))"
+                        ng-show="self.isOpen(need.get('uri'))"
                         ng-click="self.closeConnections(need.get('uri'))" >
-                            <use href="#ico16_arrow_up"></use>
-                    </svg>
-                    <svg
-                        style="--local-primary:var(--won-disabled-color);"
-                        class="covw__arrow"
-                        ng-show="self.isOpen(need.get('uri')) && self.isOpenByConnection(need.get('uri'))" >
                             <use href="#ico16_arrow_up"></use>
                     </svg>
                     <svg style="--local-primary:var(--won-secondary-color);"
@@ -100,10 +94,6 @@ function genComponentConf() {
 
                 let sortedNeeds = self.sortNeeds(allOwnNeeds);
 
-                if(needUriImpliedInRoute) {
-                    this.open[needUriImpliedInRoute] = true;
-                }
-
                 return {
                     needUriInRoute,
                     needUriImpliedInRoute,
@@ -111,6 +101,15 @@ function genComponentConf() {
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
+
+            this.$scope.$watch(
+                'self.needUriImpliedInRoute',
+                (newValue, oldValue) => {
+                    if(newValue && !oldValue) {
+                        self.open[newValue] = true;
+                    }
+                }
+            )
         }
 
         openConnections(ownNeedUri) {
@@ -118,8 +117,9 @@ function genComponentConf() {
         }
 
         closeConnections(ownNeedUri) {
-            if(!this.isOpenByConnection(ownNeedUri)) {
-                this.open[ownNeedUri] = false;
+            this.open[ownNeedUri] = false;
+            if(this.isOpenByConnection(ownNeedUri)) {
+                this.router__stateGoCurrent({connectionUri: null});
             }
         }
 
