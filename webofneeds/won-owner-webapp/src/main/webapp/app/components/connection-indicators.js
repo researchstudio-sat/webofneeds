@@ -57,7 +57,7 @@ function genComponentConf() {
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="indicators__item__icon"
-                    style="--local-primary:#F09F9F;"
+                    style="--local-primary:var(--won-primary-color-light);"
                     ng-show="!self.unreadMatchesCount">
                         <use href="#ico36_match"></use>
                 </svg>
