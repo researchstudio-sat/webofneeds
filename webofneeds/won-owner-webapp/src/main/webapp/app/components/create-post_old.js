@@ -7,7 +7,6 @@ import angular from 'angular'
 import ngAnimate from 'angular-animate';
 
 import 'ng-redux';
-import createNeedTitleBarModule from './create-need-title-bar.js';
 import posttypeSelectModule from './posttype-select.js';
 import labelledHrModule from './labelled-hr.js';
 import needTextfieldModule from './need-textfield.js';
@@ -419,7 +418,6 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.createPost', [
-        createNeedTitleBarModule,
         posttypeSelectModule,
         labelledHrModule,
         imageDropzoneModule,
