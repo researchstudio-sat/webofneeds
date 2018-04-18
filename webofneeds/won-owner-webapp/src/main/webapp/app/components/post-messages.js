@@ -107,6 +107,7 @@ function genComponentConf() {
                         <span>{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
                     </a>
                     <button
+                        ng-if="!self.isReceivedRequest"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
                         Close Connection
