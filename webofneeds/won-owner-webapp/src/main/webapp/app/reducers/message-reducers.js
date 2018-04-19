@@ -67,12 +67,36 @@ export function messagesReducer(messages = initialState, action = {}) {
                 .set('reconnecting', false);
 
         case actionTypes.messages.dispatchActionOn.registerSuccessOwn: 
-        	const path = ['dispatchOnSuccessOwn', action.payload.eventUri];
-        	const toDispatchList = messages.getIn(path);
-        	if (!toDispatchList){
-        		return messages.setIn(path, [action.payload.actionToDispatch]);
+        	const pathSO = ['dispatchOnSuccessOwn', action.payload.eventUri];
+        	const toDispatchListSO = messages.getIn(pathSO);
+        	if (!toDispatchListSO){
+        		return messages.setIn(pathSO, [action.payload.actionToDispatch]);
         	} 
-        	return messages.updateIn(path, list => list.push(action.payload.actionToDispatch));
+            return messages.updateIn(pathSO, list => list.push(action.payload.actionToDispatch));
+            
+        case actionTypes.messages.dispatchActionOn.registerFailureOwn: 
+            const pathFO = ['dispatchOnFailureOwn', action.payload.eventUri];
+            const toDispatchListFO = messages.getIn(pathFO);
+            if (!toDispatchListFO){
+                return messages.setIn(pathFO, [action.payload.actionToDispatch]);
+            } 
+            return messages.updateIn(pathFO, list => list.push(action.payload.actionToDispatch));
+
+        case actionTypes.messages.dispatchActionOn.registerSuccessRemote: 
+            const pathSR = ['dispatchOnSuccessRemote', action.payload.eventUri];
+            const toDispatchListSR = messages.getIn(pathSR);
+            if (!toDispatchListSR){
+                return messages.setIn(pathSR, [action.payload.actionToDispatch]);
+            } 
+            return messages.updateIn(pathSR, list => list.push(action.payload.actionToDispatch));
+
+        case actionTypes.messages.dispatchActionOn.registerFailureRemote: 
+            const pathFR = ['dispatchOnFailureRemote', action.payload.eventUri];
+            const toDispatchListFR = messages.getIn(pathFR);
+            if (!toDispatchListFR){
+                return messages.setIn(pathFR, [action.payload.actionToDispatch]);
+            } 
+            return messages.updateIn(pathFR, list => list.push(action.payload.actionToDispatch));
 
         case actionTypes.messages.dispatchActionOn.failureOwn:
         case actionTypes.messages.dispatchActionOn.successOwn:
