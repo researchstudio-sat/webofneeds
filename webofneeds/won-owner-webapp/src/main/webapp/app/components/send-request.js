@@ -188,7 +188,7 @@ function genComponentConf() {
         sendRequest(message) {
             if(!this.connection || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
 
-                this.router__stateGoResetParams('overviewIncomingRequests');
+                this.router__stateGoResetParams('connections');
                 
                 if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
                     //Close the connection if there was a present connection for a whatsaround need
