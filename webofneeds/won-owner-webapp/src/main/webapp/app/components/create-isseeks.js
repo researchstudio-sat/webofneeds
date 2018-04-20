@@ -129,7 +129,8 @@ function genComponentConf() {
                     <textarea 
                         won-textarea-autogrow
                         class="cp__ttl__text won-txt won-txt--code"
-                        ng-keyup="::self.updateTTL()"
+                        ng-blur="::self.updateTTL()"
+                        ng-keyup="::self.updateTTLBuffered()"
                         placeholder="Enter TTL..."></textarea>
                     <div class="cp__ttl__helptext">
                         Expects valid turtle. 
@@ -300,6 +301,12 @@ function genComponentConf() {
             );
         }
 
+        updateTTLBuffered() {
+            if(this._ttlUpdateTimeoutId) {
+                clearTimeout(this._ttlUpdateTimeoutId);
+            }
+            this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
+        }
         updateTTL() {
             //await won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + $0.value)
             const ttlString = ((this.ttlInput() || {}).value || "");
