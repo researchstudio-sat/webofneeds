@@ -242,7 +242,7 @@ function genComponentConf() {
             return immutableTagSet.toJS();
         }
 
-        addTags(isSeeks) {
+        addTags() {
             this.draftObject.tags = this.mergeTags();
         }
         
