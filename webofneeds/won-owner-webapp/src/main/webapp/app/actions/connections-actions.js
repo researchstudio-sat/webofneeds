@@ -329,13 +329,12 @@ export function showLatestMessages(connectionUriParam, numberOfEvents){
         if (!connectionUri || !connection) return;
 
         const connectionMessages = connection.get('messages');
-        if (connection.get('loadingEvents') || !connectionMessages || connectionMessages.size > 0) return; // only start loading once. //TODO: PENDING IS CURRENTLY NOT IMPLEMENTED IN THE NEW STATE
+        if (connection.get('isLoading') || !connectionMessages || connectionMessages.size > 0) return; // only start loading once.
 
         dispatch({
             type: actionTypes.connections.showLatestMessages,
-            payload: Immutable.fromJS({connectionUri, pending: true}),
+            payload: Immutable.fromJS({connectionUri, isLoading: true}),
         });
-
 
         won.getWonMessagesOfConnection(
             connectionUri,
@@ -398,7 +397,6 @@ function getEvents(connectionUri, params) {
 }
 */
 
-
 /**
  * @param connectionUri
  * @param numberOfEvents
@@ -416,18 +414,21 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
         const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
         const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
         const needUri = need && need.get("uri");
-        const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]) || Immutable.List();
+        const connection = need && need.getIn(["connections", connectionUri]);
+        const connectionMessages = connection && connection.get("messages");
+
+        if (connection.get('isLoading')) return; // only start loading once.
 
         // determine the oldest loaded event
-        const sortedOwnEvents = events.valueSeq().sort( (event1, event2) => event1.get('date') - event2.get('date'));
-        const oldestEvent = sortedOwnEvents.first();
+        const sortedConnectionMessages = connectionMessages.valueSeq().sort( (msg1, msg2) => msg1.get('date') - msg2.get('date'));
+        const oldestMessage = sortedConnectionMessages.first();
 
-        const eventHashValue = oldestEvent && oldestEvent
+        const messageHashValue = oldestMessage && oldestMessage
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
         dispatch({
             type: actionTypes.connections.showMoreMessages,
-            payload: Immutable.fromJS({connectionUri, pending: true}),
+            payload: Immutable.fromJS({connectionUri, isLoading: true}),
         });
 
         won.getWonMessagesOfConnection(
@@ -436,7 +437,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
                 requesterWebId: needUri,
                 pagingSize: numOfEvts2pageSize(numberOfEvents),
                 deep: true,
-                resumebefore: eventHashValue,
+                resumebefore: messageHashValue,
             }
         ).then(events =>
             dispatch({

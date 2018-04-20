@@ -7,7 +7,7 @@ won-connection-message {
         background-color: $won-unread;
     }
 
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: grid;
     grid-template-areas: "icon content";
@@ -32,6 +32,16 @@ won-connection-message {
         & .won-cm__center__bubble {
             @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         }
+    }
+
+    &.won-not-relevant {
+        opacity: 0.35;
+        
+        .won-cm__center__bubble {
+                text-decoration: line-through;
+                text-decoration-color: black;               
+            }
+       
     }
 
     .won-cm__center {

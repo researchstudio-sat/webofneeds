@@ -122,12 +122,21 @@
 
     .pm__content {
       grid-area: main;
-      padding: 1rem 0;
+      padding: 0.5rem;
       background: white;
       border: $thinGrayBorder;
       overflow: auto;
       flex-grow: 1;
-      
+
+      &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
+      &__loadspinner {
+        width: 100%;
+        height: 3rem;
+        padding: .66em 2em;
+        text-align: center;
+        box-sizing: border-box;
+      }
+
       &__agreement {
         @include speech-bubble-bottom($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
         margin: 0 0.5rem;
@@ -141,6 +150,18 @@
           font-weight: 550;
           padding-left: 0.5rem;
           padding-right: 0.5rem;
+        }
+        
+        &__loading {
+          font-size: 0.85rem;
+          font-weight: 550;
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+          display: block;
+          
+          span.loaded {
+            display: none;
+          }
         }
     
         &__icon {
