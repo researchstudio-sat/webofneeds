@@ -129,6 +129,7 @@ function genComponentConf() {
                     <textarea 
                         won-textarea-autogrow
                         class="cp__ttl__text won-txt won-txt--code"
+                        ng-keyup="::self.updateTTL()"
                         placeholder="Enter TTL..."></textarea>
                     <div class="cp__ttl__helptext">
                         Expects valid turtle. 
@@ -143,6 +144,7 @@ function genComponentConf() {
                             documentation on the need-structure
                         </a>.
                     </div>
+                    <div class="cp__ttl__parse-error" ng-show="self.ttlParseError">{{self.ttlParseError}}</div>
                 </div>
             </div>
             <!-- /DETAILS -->
@@ -298,6 +300,19 @@ function genComponentConf() {
             );
         }
 
+        updateTTL() {
+            //await won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + $0.value)
+            const ttlString = ((this.ttlInput() || {}).value || "");
+            won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + ttlString)
+            .then(parsedJsonLd => {
+                this.$scope.$apply(() => this.ttlParseError = "");
+                return parsedJsonLd;
+            })
+            .catch(parseError => {
+                this.$scope.$apply(() => this.ttlParseError = parseError.message);
+            })
+        }
+
         locationIsSaved() {
             return this.details.has("location") && this.draftObject.location && this.draftObject.location.name;
         }
@@ -314,6 +329,15 @@ function genComponentConf() {
             return Array.from(set);
         }
 
+        ttlInputNg() {
+            return angular.element(this.ttlInput());
+        }
+        ttlInput() {
+            if(!this._ttlInput) {
+                this._ttlInput = this.$element[0].querySelector('.cp__ttl__text');
+            }
+            return this._ttlInput;
+        }
         tagsInputNg() {
             return angular.element(this.tagsInput());
         }
