@@ -214,6 +214,8 @@ function genComponentConf() {
                     getIn(connection, ['messages', this.messageUri]) :
                     Immutable.Map();
 
+                //const isLoading =
+                    
                 return {
                     ownNeed,
                     theirNeed,
@@ -227,6 +229,7 @@ function genComponentConf() {
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
                     allowProposals: connection && connection.get("state") === won.WON.Connected && message.get('text'), //allow showing details only when the connection is already present
+                    //isLoading: isLoading,
                 }
             };
 

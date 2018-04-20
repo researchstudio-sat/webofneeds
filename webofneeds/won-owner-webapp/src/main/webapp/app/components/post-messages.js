@@ -213,17 +213,6 @@ function genComponentConf() {
 	            		<span class="ng-hide" ng-show="!loading['value']">No Agreement Data found</span>
             	</div>
             </div>
-    		<!-- Show if no Agrrement Data exists -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.loading && self.showLoadingInfo && !self.agreementDataIsValid()">
-	            <img class="pm__content__agreement__icon clickable"
-	            		src="generated/icon-sprite.svg#ico36_close"
-	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
-	            <div class="pm__content__agreement__title">
-	            		No Agreement Data found
-	            		<span class="ng-hide" ng-show="loading">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!loading">No Agreement Data found</span>
-                </div>
-            </div>
         </div>
         <div class="pm__footer" ng-if="self.isConnected">
 
@@ -473,8 +462,6 @@ function genComponentConf() {
             }
 
         	this.$scope.loading = true;
-        	//this.setLoading(true);
-        	//this.loading["value"] = true;
         	this.agreementLoadingData = this.cloneDefaultStateData();
             this.getAgreementDataUris();
         }

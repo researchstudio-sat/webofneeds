@@ -190,7 +190,7 @@ const actionHierarchy = {
         markAsRead: INJ_DEFAULT,
         markAsRelevant: messages.markAsRelevant,
         unsetRelevantMessageReceived: messages.unsetRelevantMessageReceived,
-        connectionMessageReceived: INJ_DEFAULT,
+        connectionMessageReceived: messages.connectionMessageReceived,
         needMessageReceived: messages.needMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,

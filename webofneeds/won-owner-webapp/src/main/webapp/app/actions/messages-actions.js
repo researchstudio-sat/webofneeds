@@ -17,6 +17,7 @@ import {
 import {
     fetchDataForOwnedNeeds,
     buildRelevantMessage,
+	callAgreementsFetch,
 } from '../won-message-utils.js';
 
 import {
@@ -195,6 +196,77 @@ export function openMessageReceived(event) {
 	        });
 
 	    }
+}
+
+
+export function connectionMessageReceived(event) {
+	return (dispatch, getState) => {
+		const connectionUri = event.getReceiver();
+		const needUri = event.getReceiverNeed();
+		const messages = getState().getIn(['needs', needUri, 'connections', connectionUri, 'messages']);
+		const baseString = "/owner/";
+		
+     	var url = baseString + 'rest/agreement/getMessageEffects?connectionUri='+connectionUri+'&messageUri='+event.getMessageUri();
+     	callAgreementsFetch(url)
+ 		.then(response => {
+ 			console.log("response : ", response);
+ 			
+ 			for(effect of response) {
+ 				console.log("effect : ", effect);
+ 				 switch (effect.type) {
+                  	case "ACCEPTS":
+                  		console.log("ACCEPTS");
+                  		if(effect.accepts) {
+                  			let messageUri = effect.acceptedMessageUri;
+                  			if(messageUri) {
+                  				let uriSet = new Set();
+                  				for(message of Array.from(messages)) {
+                  					uriSet.add(message[0]);
+                  				}
+                  				if(!uriSet.has(messageUri)){
+                  					for(msg of Array.from(messages)) {
+                  						if(msg[1].get("remoteUri") === messageUri) {
+                  							messageUri = msg[1].get("uri");
+                  						}
+                  					}
+                  				}   	
+                  				dispatch({
+                	                type: actionTypes.messages.markAsRelevant,
+                	                payload: {
+                 		    			 messageUri: messageUri,
+                 		                 connectionUri: connectionUri,
+                 		                 needUri: needUri,
+                 		                 relevant: false,
+             		        		}
+                	            });
+                  			}
+                  		}
+                  		break;
+                  		
+                  	case "PROPOSES":
+                  		console.log("PROPOSES");
+                  		break;
+                  		
+                  	case "REJECTS":
+                  		console.log("REJECTS");
+                  		break;
+
+                     case "RETRACTS":
+                     	console.log("RETRACTS");
+                         break;
+
+                     default:
+                     	//return state;
+                     	break;
+ 				 }
+ 			}
+ 			
+ 			dispatch({
+                type: actionTypes.messages.connectionMessageReceived,
+                payload: event,
+            });
+ 		});
+	 }
 }
 
 export function connectMessageReceived(event) {
