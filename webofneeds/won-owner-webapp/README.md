@@ -117,6 +117,7 @@ $ngRedux.getState()
                     }
                     ...
                 },
+                isLoading: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                 unread: true|false, //whether or not this connection is new (or already seen if you will)
                 isRated: true|false, //whether or not this connection has been rated yet
                 remoteNeedUri: string, //corresponding remote Need identifier
