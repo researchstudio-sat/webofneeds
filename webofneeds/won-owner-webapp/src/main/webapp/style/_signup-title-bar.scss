@@ -1,0 +1,12 @@
+@import 'flex-layout';
+@import 'title-bar';
+
+.signup-title-bar {
+  @include title-bar('sutb');
+  > .sutb__inner {
+    > .sutb__inner__left {
+      @include flex-column;
+
+    }
+  }
+}
