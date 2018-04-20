@@ -28,6 +28,7 @@ class ConnectionsController {
         this.WON = won.WON;
         this.resetParams = resetParams;
         this.open = {};
+        this.showCreateView = false;
 
         const selectFromState = (state)=>{
             const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
@@ -77,6 +78,12 @@ class ConnectionsController {
 
             this.connections__markAsRead(payload);
         }
+    }
+
+    toggleCreate() {
+        this.showCreateView = !this.showCreateView;
+        // TODO: deselect selected connections
+        // TODO: toggle this when selecting a connection?
     }
 }
 

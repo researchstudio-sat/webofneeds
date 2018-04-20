@@ -17,6 +17,23 @@
     align-items: center;
   }
 
+  .oir__create-need{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding: 0.5rem;
+
+    background-color: white;
+    border-left: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
+  }
+
+  .oir__create-need__icon{
+    width: 3.5rem; // needed because svg default size is huge
+    height: 3.5rem;
+  }
+
   .oir__requests{
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
