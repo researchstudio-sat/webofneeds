@@ -7,7 +7,7 @@ won-connection-message {
         background-color: $won-unread;
     }
 
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0;
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
     display: grid;
     grid-template-areas: "icon content";
