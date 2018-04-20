@@ -1166,8 +1166,6 @@ const READ_URIS = "wonReadUris";
 export function markUriAsRead(uri) {
     //TODO: BETTER IMPL
     if(!isUriRead(uri)){
-        console.log("mark uri:", uri, " as read");
-
         let readUrisString = window.localStorage.getItem(READ_URIS);
         if(!readUrisString){
             readUrisString = JSON.stringify([uri]);
@@ -1177,7 +1175,6 @@ export function markUriAsRead(uri) {
                 readUriList.push(uri);
                 readUrisString = JSON.stringify(readUriList);
             }catch(e) {
-                console.error("readUris could not be parsed, resetting the item in localstorage");
                 resetUrisRead();
                 readUrisString = JSON.stringify([uri]);
             }
@@ -1196,16 +1193,13 @@ export function isUriRead(uri) {
 
         for(var i=0; i < readUriList.length; i++){
             if(readUriList[i] === uri) {
-                console.log("checking if uri: ", uri, " is read -> true");
                 return true;
             }
         }
     }
-    console.log("checking if uri: ", uri, " is read -> false");
     return false;
 }
 
 export function resetUrisRead() {
-    console.log("resetting read uris");
     window.localStorage.removeItem(READ_URIS);
 }
