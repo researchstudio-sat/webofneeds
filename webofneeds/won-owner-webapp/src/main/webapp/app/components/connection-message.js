@@ -194,8 +194,8 @@ function genComponentConf() {
 
             self.noTextPlaceholder = 
                         '«This message couldn\'t be displayed as it didn\'t contain text! ' +
-                        'Click on the \"RDF\"-logo at ' + 
-                        'the bottom of screen to see the \"raw\" message-data.»'
+                        'Click on the \"RDF\"-logo in ' +
+                        'the context-menu on the right side of the header to see the \"raw\" message-data.»'
 
             const selectFromState = state => {
                 /*
