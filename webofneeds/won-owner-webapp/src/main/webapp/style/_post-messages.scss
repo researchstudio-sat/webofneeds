@@ -37,6 +37,12 @@
       }
   }
 
+  &--create {
+    border-left: $thinGrayBorder;
+    border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
+  }
+
   display: flex;
   flex-grow:1;
   height: 100%;
