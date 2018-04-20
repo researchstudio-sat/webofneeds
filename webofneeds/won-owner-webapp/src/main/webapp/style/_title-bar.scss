@@ -33,6 +33,7 @@
 
   .#{$prefix}__title {
     font-size: $mediumFontSize;
+    padding: 0.1rem;
 
     @media (max-width: $responsivenessBreakPoint){
       font-size: $normalFontSize;
