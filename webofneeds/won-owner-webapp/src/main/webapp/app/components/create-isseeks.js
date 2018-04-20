@@ -234,7 +234,11 @@ function genComponentConf() {
 
 
         mergeTags() {
-            let detailTags = Immutable.Set(this.tagsString? this.tagsString.match(/#(\S+)/gi) : []).map(tag => tag.substr(1)).toJS();
+            let detailTags = Immutable.Set(
+                this.tagsString? this.tagsString.match(/#(\S+)/gi) : []
+            )
+            .map(tag => tag.substr(1))
+            .toJS();
 
             let combinedTags = this.tempTags? detailTags.concat(this.tempTags) : detailTags;
 
