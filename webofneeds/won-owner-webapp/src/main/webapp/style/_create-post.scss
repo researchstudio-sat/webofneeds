@@ -150,6 +150,12 @@ won-create-post {
     .cp__ttl__helptext {
       @include fine-print;
     }
+    .cp__ttl__parse-error {
+      white-space: pre-wrap;
+      color: $won-primary-color;
+      font-family: $font-family-monospace;
+      font-size: $smallFontSize;
+    }
   }
 
   .cp__addDetail {
