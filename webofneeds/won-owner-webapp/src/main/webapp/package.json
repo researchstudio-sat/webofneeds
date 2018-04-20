@@ -30,6 +30,7 @@
     "postinstall": "npm rebuild node-sass && jspm registry create bower jspm-bower-endpoint -y && jspm install",
     "build": "gulp build",
     "webpack": "webpack",
+    "webpack:watch": "webpack --watch",
     "watch": "gulp watch",
     "clean": "gulp clean"
   },
