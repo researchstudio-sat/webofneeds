@@ -12,7 +12,7 @@ import {
     selectOpenPostUri,
     selectRemoteEvents,
     selectConnection,
-} from '../selectors.js';
+    } from '../selectors.js';
 
 import {
     is,
@@ -22,20 +22,20 @@ import {
     jsonld2simpleFormat,
     cloneAsMutable,
     delay,
-} from '../utils.js';
+    } from '../utils.js';
 
 import {
-   makeParams,
-} from '../configRouting.js';
+    makeParams,
+    } from '../configRouting.js';
 
 import {
     ensureLoggedIn,
-} from './account-actions';
+    } from './account-actions';
 
 import {
     actionTypes,
     actionCreators,
-} from './actions.js';
+    } from './actions.js';
 
 import {
     buildCreateMessage,
@@ -45,50 +45,50 @@ import {
     buildRateMessage,
     buildConnectMessage,
     buildAdHocConnectMessage,
-} from '../won-message-utils.js';
+    } from '../won-message-utils.js';
 
 export function connectionsChatMessage(chatMessage, connectionUri, isTTL=false) {
-   return (dispatch, getState) => {
+    return (dispatch, getState) => {
 
-       const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-       const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-       const theirNeed = getState().getIn(["needs", theirNeedUri]);
-       const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+        const theirNeed = getState().getIn(["needs", theirNeedUri]);
+        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-       buildChatMessage({
-            chatMessage: chatMessage, 
+        buildChatMessage({
+            chatMessage: chatMessage,
             connectionUri,
-            ownNeedUri: ownNeed.get("uri"), 
+            ownNeedUri: ownNeed.get("uri"),
             theirNeedUri: theirNeedUri,
-            ownNodeUri: ownNeed.get("nodeUri"), 
-            theirNodeUri: theirNeed.get("nodeUri"), 
+            ownNodeUri: ownNeed.get("nodeUri"),
+            theirNodeUri: theirNeed.get("nodeUri"),
             theirConnectionUri,
             isTTL,
         })
-       .then(msgData =>
-            Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
-       .then(([optimisticEvent, jsonldMessage]) => {
-           // dispatch(actionCreators.messages__send(messageData));
-           dispatch({
-               type: actionTypes.connections.sendChatMessage,
-               payload: {
-                   eventUri: optimisticEvent.getMessageUri(),
-                   message: jsonldMessage,
-                   optimisticEvent,
-                }
+            .then(msgData =>
+                Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
+            .then(([optimisticEvent, jsonldMessage]) => {
+                // dispatch(actionCreators.messages__send(messageData));
+                dispatch({
+                    type: actionTypes.connections.sendChatMessage,
+                    payload: {
+                        eventUri: optimisticEvent.getMessageUri(),
+                        message: jsonldMessage,
+                        optimisticEvent,
+                    }
+                });
+            })
+            .catch(e => {
+                console.error('Error while processing chat message: ', e);
+                dispatch({
+                    type: actionTypes.connections.sendChatMessageFailed,
+                    payload: {
+                        error: e,
+                        message: e.message,
+                    }
+                });
             });
-       })
-       .catch(e => {
-           console.error('Error while processing chat message: ', e);
-           dispatch({
-               type: actionTypes.connections.sendChatMessageFailed,
-               payload: {
-                   error: e,
-                   message: e.message,
-                }
-            });
-       });
-   }
+    }
 }
 
 export function connectionsFetch(data) {
@@ -101,29 +101,29 @@ export function connectionsFetch(data) {
 }
 
 
-export function connectionsOpen(connectionUri, textMessage) {	
+export function connectionsOpen(connectionUri, textMessage) {
     return async (dispatch, getState) => {
-    	 const state = getState();
-         const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-         const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-         const theirNeed = getState().getIn(["needs", theirNeedUri]);
-         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+        const state = getState();
+        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
+        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
+        const theirNeed = getState().getIn(["needs", theirNeedUri]);
+        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
-         const openMsg = await buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
-         
-         const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
+        const openMsg = await buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
 
-         dispatch({
-             type: actionTypes.connections.open,
-             payload: {
-                 connectionUri,
-                 textMessage,
-                 eventUri: openMsg.eventUri,
-                 message: openMsg.message,
-                 optimisticEvent,
-             }
-         });
-         
+        const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
+
+        dispatch({
+            type: actionTypes.connections.open,
+            payload: {
+                connectionUri,
+                textMessage,
+                eventUri: openMsg.eventUri,
+                message: openMsg.message,
+                optimisticEvent,
+            }
+        });
+
         dispatch(actionCreators.router__stateGoCurrent({
             connectionUri: optimisticEvent.getSender(),
         }));
@@ -136,66 +136,66 @@ export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
 }
 function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     ensureLoggedIn(dispatch, getState)
-    .then(() => {
-        const state = getState();
-        const theirNeed = getIn(state, ['needs', theirNeedUri]);
-        const adHocDraft = generateResponseNeedTo(theirNeed);
-        const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-        const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
-        const cnctMsg = buildConnectMessage({
-            ownNeedUri: needUri,
-            theirNeedUri: theirNeedUri,
-            ownNodeUri: nodeUri,
-            theirNodeUri: theirNeed.get("nodeUri"),
-            textMessage: textMessage,
-        });
-        
-        won.wonMessageFromJsonLd(cnctMsg.message)
-        .then(optimisticEvent => {
-        
-            // connect action to be dispatched when the 
-            // ad hoc need has been created: 
-            const connectAction = {
-                type: actionTypes.needs.connect, 
-                payload: {
-                    eventUri: cnctMsg.eventUri,
-                    message: cnctMsg.message,
-                    optimisticEvent: optimisticEvent,
-                }
-            }
-            
-            // register a "stateGoCurrent" action to be dispatched messages-actions 
-            // after connectionUri is available
-            dispatch({
-                type: actionTypes.messages.dispatchActionOn.registerSuccessRemote,
-                payload: {
-                    eventUri: cnctMsg.eventUri,
-                    actionToDispatch: {
-                        effect: "stateGoCurrent",
-                        connectionUri: "responseEvent::receiverUri",
-                        postUri: theirNeed,
-                        needUri: needUri,
-                    } 
-                }
-            })
-
-            // register the connect action to be dispatched when 
-            // need creation is successful
-            dispatch({
-                type: actionTypes.messages.dispatchActionOn.registerSuccessOwn, 
-                payload: {
-                    eventUri: eventUri,
-                    actionToDispatch: connectAction,
-                }
-            })
-            
-            // create the new need
-            dispatch({
-                type: actionTypes.needs.create, // TODO custom action
-                payload: {eventUri, message, needUri, need: adHocDraft}
+        .then(() => {
+            const state = getState();
+            const theirNeed = getIn(state, ['needs', theirNeedUri]);
+            const adHocDraft = generateResponseNeedTo(theirNeed);
+            const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
+            const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+            const cnctMsg = buildConnectMessage({
+                ownNeedUri: needUri,
+                theirNeedUri: theirNeedUri,
+                ownNodeUri: nodeUri,
+                theirNodeUri: theirNeed.get("nodeUri"),
+                textMessage: textMessage,
             });
+
+            won.wonMessageFromJsonLd(cnctMsg.message)
+                .then(optimisticEvent => {
+
+                    // connect action to be dispatched when the
+                    // ad hoc need has been created:
+                    const connectAction = {
+                        type: actionTypes.needs.connect,
+                        payload: {
+                            eventUri: cnctMsg.eventUri,
+                            message: cnctMsg.message,
+                            optimisticEvent: optimisticEvent,
+                        }
+                    }
+
+                    // register a "stateGoCurrent" action to be dispatched messages-actions
+                    // after connectionUri is available
+                    dispatch({
+                        type: actionTypes.messages.dispatchActionOn.registerSuccessRemote,
+                        payload: {
+                            eventUri: cnctMsg.eventUri,
+                            actionToDispatch: {
+                                effect: "stateGoCurrent",
+                                connectionUri: "responseEvent::receiverUri",
+                                postUri: theirNeed,
+                                needUri: needUri,
+                            }
+                        }
+                    })
+
+                    // register the connect action to be dispatched when
+                    // need creation is successful
+                    dispatch({
+                        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+                        payload: {
+                            eventUri: eventUri,
+                            actionToDispatch: connectAction,
+                        }
+                    })
+
+                    // create the new need
+                    dispatch({
+                        type: actionTypes.needs.create, // TODO custom action
+                        payload: {eventUri, message, needUri, need: adHocDraft}
+                    });
+                });
         });
-    });
 
 }
 
@@ -249,16 +249,16 @@ export function connectionsClose(connectionUri) {
         const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
 
         buildCloseMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
-        .then(closeMessage => {
-            dispatch(actionCreators.messages__send({
-                eventUri: closeMessage.eventUri,
-                message: closeMessage.message
-            }));
-            dispatch({
-                type: actionTypes.connections.close,
-                payload: {connectionUri}
-            })
-        });
+            .then(closeMessage => {
+                dispatch(actionCreators.messages__send({
+                    eventUri: closeMessage.eventUri,
+                    message: closeMessage.message
+                }));
+                dispatch({
+                    type: actionTypes.connections.close,
+                    payload: {connectionUri}
+                })
+            });
     }
 }
 
@@ -304,7 +304,7 @@ export function connectionsRate(connectionUri,rating) {
                         message: action.message
                     })
                 )
-            );
+        );
     }
 }
 
@@ -329,13 +329,12 @@ export function showLatestMessages(connectionUriParam, numberOfEvents){
         if (!connectionUri || !connection) return;
 
         const connectionMessages = connection.get('messages');
-        if (connection.get('loadingEvents') || !connectionMessages || connectionMessages.size > 0) return; // only start loading once. //TODO: PENDING IS CURRENTLY NOT IMPLEMENTED IN THE NEW STATE
+        if (connection.get('isLoading') || !connectionMessages || connectionMessages.size > 0) return; // only start loading once.
 
         dispatch({
             type: actionTypes.connections.showLatestMessages,
-            payload: Immutable.fromJS({connectionUri, pending: true}),
+            payload: Immutable.fromJS({connectionUri, isLoading: true}),
         });
-
 
         won.getWonMessagesOfConnection(
             connectionUri,
@@ -345,25 +344,25 @@ export function showLatestMessages(connectionUriParam, numberOfEvents){
                 deep: true
             }
         )
-        .then(events =>
-            dispatch({
-                type: actionTypes.connections.showLatestMessages,
-                payload: Immutable.fromJS({
-                    connectionUri: connectionUri,
-                    events: events,
+            .then(events =>
+                dispatch({
+                    type: actionTypes.connections.showLatestMessages,
+                    payload: Immutable.fromJS({
+                        connectionUri: connectionUri,
+                        events: events,
+                    })
                 })
-            })
         )
-        .catch(error => {
-            console.error('Failed loading the latest events: ', error);
-            dispatch({
-                type: actionTypes.connections.showLatestMessages,
-                payload: Immutable.fromJS({
-                    connectionUri: connectionUri,
-                    error: error,
+            .catch(error => {
+                console.error('Failed loading the latest events: ', error);
+                dispatch({
+                    type: actionTypes.connections.showLatestMessages,
+                    payload: Immutable.fromJS({
+                        connectionUri: connectionUri,
+                        error: error,
+                    })
                 })
-            })
-        });
+            });
     }
 }
 
@@ -376,28 +375,27 @@ export function showLatestMessages(connectionUriParam, numberOfEvents){
  * @return {*}
  */
 /*
-function getEvents(connectionUri, params) {
-    const eventP = won
-        .getNode(connectionUri, params)
-        .then(cnct =>
-            won.getNode(cnct.hasEventContainer, params)
-        )
-        .then(eventContainer => is('Array', eventContainer.member) ?
-            eventContainer.member :
-            [eventContainer.member]
-        )
-        .then(eventUris => urisToLookupMap(
-            eventUris,
-            uri => won.getEvent(
-                uri,
-                { requesterWebId: params.requesterWebId }
-            )
-        ));
+ function getEvents(connectionUri, params) {
+ const eventP = won
+ .getNode(connectionUri, params)
+ .then(cnct =>
+ won.getNode(cnct.hasEventContainer, params)
+ )
+ .then(eventContainer => is('Array', eventContainer.member) ?
+ eventContainer.member :
+ [eventContainer.member]
+ )
+ .then(eventUris => urisToLookupMap(
+ eventUris,
+ uri => won.getEvent(
+ uri,
+ { requesterWebId: params.requesterWebId }
+ )
+ ));
 
-    return eventP;
-}
-*/
-
+ return eventP;
+ }
+ */
 
 /**
  * @param connectionUri
@@ -416,18 +414,21 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
         const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
         const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
         const needUri = need && need.get("uri");
-        const events = state.getIn(["needs", needUri, "connections", connectionUri, "messages"]) || Immutable.List();
+        const connection = need && need.getIn(["connections", connectionUri]);
+        const connectionMessages = connection && connection.get("messages");
+
+        if (connection.get('isLoading')) return; // only start loading once.
 
         // determine the oldest loaded event
-        const sortedOwnEvents = events.valueSeq().sort( (event1, event2) => event1.get('date') - event2.get('date'));
-        const oldestEvent = sortedOwnEvents.first();
+        const sortedConnectionMessages = connectionMessages.valueSeq().sort( (msg1, msg2) => msg1.get('date') - msg2.get('date'));
+        const oldestMessage = sortedConnectionMessages.first();
 
-        const eventHashValue = oldestEvent && oldestEvent
+        const messageHashValue = oldestMessage && oldestMessage
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
         dispatch({
             type: actionTypes.connections.showMoreMessages,
-            payload: Immutable.fromJS({connectionUri, pending: true}),
+            payload: Immutable.fromJS({connectionUri, isLoading: true}),
         });
 
         won.getWonMessagesOfConnection(
@@ -436,31 +437,31 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
                 requesterWebId: needUri,
                 pagingSize: numOfEvts2pageSize(numberOfEvents),
                 deep: true,
-                resumebefore: eventHashValue,
+                resumebefore: messageHashValue,
             }
         ).then(events =>
-            dispatch({
-                type: actionTypes.connections.showMoreMessages,
-                payload: Immutable.fromJS({
-                    connectionUri: connectionUri,
-                    events: events,
+                dispatch({
+                    type: actionTypes.connections.showMoreMessages,
+                    payload: Immutable.fromJS({
+                        connectionUri: connectionUri,
+                        events: events,
+                    })
                 })
-            })
         )
-        .catch(error => {
-            console.error('Failed loading more events: ', error);
-            dispatch({
-                type: actionTypes.connections.showMoreMessages,
-                payload: Immutable.fromJS({
-                    connectionUri: connectionUri,
-                    error: error,
+            .catch(error => {
+                console.error('Failed loading more events: ', error);
+                dispatch({
+                    type: actionTypes.connections.showMoreMessages,
+                    payload: Immutable.fromJS({
+                        connectionUri: connectionUri,
+                        error: error,
+                    })
                 })
-            })
-        });
+            });
     }
 }
 
 function numOfEvts2pageSize(numberOfEvents) {
-     // `*3*` to compensate for the *roughly* 2 additional success events per chat message
+    // `*3*` to compensate for the *roughly* 2 additional success events per chat message
     return numberOfEvents * 3;
 }
