@@ -125,15 +125,17 @@ function genComponentConf() {
             </div>
         </div>
         <div class="pm__content">
-            <img src="images/spinner/on_white.gif"
-                alt="Loading&hellip;"
-                ng-show="self.connection.get('loadingEvents')"
-                class="hspinner"/>
-            <a ng-show="self.eventsLoaded && !self.connection.get('loadingEvents') && !self.allLoaded"
-                ng-click="self.connections__showMoreMessages(self.connection.get('uri'), 5)"
-                href="">
-                    show more
-            </a>
+            <div class="pm__content__loadspinner"
+                ng-if="self.connection.get('isLoading')">
+                <img src="images/spinner/on_white.gif"
+                    alt="Loading&hellip;"
+                    class="hspinner"/>
+            </div>
+            <button class="pm__content__loadbutton won-button--outlined thin red"
+                ng-if="!self.connection.get('isLoading') && !self.allLoaded"
+                ng-click="self.loadPreviousMessages()">
+                Load previous messages
+            </button>
             <won-connection-message
                 ng-repeat="msg in self.chatMessages"
                 connection-uri="self.connectionUri"
@@ -333,7 +335,6 @@ function genComponentConf() {
                     theirNeed,
                     connectionUri,
                     connection,
-                    eventsLoaded: true, //TODO: CHECK IF MESSAGES ARE CURRENTLY LOADED
                     chatMessages: sortedMessages,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
@@ -374,14 +375,21 @@ function genComponentConf() {
         ensureMessagesAreLoaded() {
             delay(0).then(() => {
                 // make sure latest messages are loaded
-                if (
-                    this.connection &&
-                    !this.connection.get('loadingEvents')
-                    //&& !this.eventsLoaded
-                ) {
-                    this.connections__showLatestMessages(this.connection.get('uri'), 4);
+                const INITIAL_MESSAGECOUNT = 15;
+                if ( this.connection && !this.connection.get('isLoading') && !(this.allLoaded || this.connection.get('messages').size > 0)) {
+                    this.connections__showLatestMessages(this.connection.get('uri'), INITIAL_MESSAGECOUNT);
                 }
             })
+        }
+
+        loadPreviousMessages() {
+            delay(0).then(() => {
+                const MORE_MESSAGECOUNT = 5;
+                if ( this.connection && !this.connection.get('isLoading') ) {
+                    this.connections__showMoreMessages(this.connection.get('uri'), MORE_MESSAGECOUNT);
+                }
+            });
+
         }
 
         snapToBottom() {
