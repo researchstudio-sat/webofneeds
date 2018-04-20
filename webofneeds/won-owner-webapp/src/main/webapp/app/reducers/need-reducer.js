@@ -264,9 +264,22 @@ export default function(allNeedsInState = initialState, action = {}) {
 
         case actionTypes.connections.showLatestMessages:
         case actionTypes.connections.showMoreMessages:
-            var loadedEvents = action.payload.get('events');
-            if(loadedEvents){
-                allNeedsInState = addMessages(allNeedsInState, loadedEvents);
+            var isLoading = action.payload.get('isLoading');
+            var connectionUri = action.payload.get('connectionUri');
+
+            if(isLoading && connectionUri){
+                allNeedsInState = setConnectionLoading(allNeedsInState, connectionUri, true);
+            }
+
+            var loadedMessages = action.payload.get('events');
+            if(loadedMessages){
+                allNeedsInState = addMessages(allNeedsInState, loadedMessages);
+                allNeedsInState = setConnectionLoading(allNeedsInState, connectionUri, false);
+            }
+            const error = action.payload.get('error');
+
+            if(error && connectionUri){
+                allNeedsInState = setConnectionLoading(allNeedsInState, connectionUri, false);
             }
 
             return allNeedsInState;
@@ -462,9 +475,9 @@ function changeConnectionState(state, connectionUri, newState) {
 
 function markMessageAsRead(state, messageUri, connectionUri, needUri) {
 
-    let need = state.get(needUri);
-    let connection = need && need.getIn(["connections", connectionUri]);
-    let message = connection && connection.getIn(["messages", messageUri]);
+    const need = state.get(needUri);
+    const connection = need && need.getIn(["connections", connectionUri]);
+    const message = connection && connection.getIn(["messages", messageUri]);
 
     markUriAsRead(messageUri);
 
@@ -483,8 +496,8 @@ function markMessageAsRead(state, messageUri, connectionUri, needUri) {
 }
 
 function markConnectionAsRead(state, connectionUri, needUri) {
-    let need = state.get(needUri);
-    let connection = need && need.getIn(["connections", connectionUri]);
+    const need = state.get(needUri);
+    const connection = need && need.getIn(["connections", connectionUri]);
 
     markUriAsRead(connectionUri);
 
@@ -502,8 +515,21 @@ function markConnectionAsRead(state, connectionUri, needUri) {
     return state;
 }
 
+function setConnectionLoading(state, connectionUri, isLoading) {
+    const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+    const needUri = need && need.get("uri");
+    const connection = need && need.getIn(["connections", connectionUri]);
+
+    if(!connection) {
+        console.error("no connection with connectionUri: <", connectionUri,"> found within needUri: <", needUri, ">");
+        return state;
+    }
+
+    return state.setIn([needUri, "connections", connectionUri, "isLoading"], isLoading);
+}
+
 function markNeedAsRead(state, needUri) {
-    let need = state.get(needUri);
+    const need = state.get(needUri);
 
     if(!need) {
         console.error("no need with needUri: <", needUri, ">");
@@ -563,6 +589,7 @@ function parseConnection(jsonldConnection) {
             lastUpdateDate: undefined,
             unread: undefined,
             isRated: false,
+            isLoading: false,
         }
     };
 
