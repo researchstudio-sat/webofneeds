@@ -6,9 +6,12 @@ const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const glob = require('glob');
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = function(env, argv) {
     const mode = argv.mode || (argv.watch ? 'development': 'production');
+
+    const isLive = env && env.WON_DEPLOY_NODE_ENV == 'live'
 
     const extractSass = new MiniCssExtractPlugin({
         filename: "won.min.css"
@@ -86,17 +89,46 @@ module.exports = function(env, argv) {
                 },
                 {
                     test: /\.svg$/,
-                    loader: 'svg-sprite-loader',
-                    options: {
-                        extract: true,
-                        spriteFilename: 'icon-sprite.svg'
-                    }
+                    use: [{
+                        loader: 'svg-sprite-loader',
+                        options: {
+                            extract: true,
+                            spriteFilename: 'symbol/svg/sprite.symbol.svg'
+                        }
+                    },{
+                        loader: 'svgo-loader',
+                        options: {
+                        }
+                    }]
                 }
             ]
         },
         plugins: [
             extractSass,
-            new SpriteLoaderPlugin({ plainSprite: true })
+            new SpriteLoaderPlugin({ plainSprite: true }),
+            new CopyWebpackPlugin([
+                {
+                    context: path.resolve(path.dirname(require.resolve('leaflet/package.json')), 'dist', 'images'),
+                    from: '**/*',
+                    to: './images/'
+                }
+            ], {}),
+            new webpack.NormalModuleReplacementPlugin(
+                /config\.js$/,
+                function(resource) {
+                    if(path.resolve(resource.context, resource.request) == path.resolve(__dirname, 'app', 'config.js')) {
+                        resource.request = path.resolve(__dirname, 'config', `${isLive ? 'live' : 'default'}.js`);
+                    }
+                }
+            ),
+            new webpack.NormalModuleReplacementPlugin(
+                /utils\.js$/,
+                function(resource) {
+                    if(resource.context == path.resolve(__dirname, 'config')) {
+                       resource.request = path.resolve(__dirname, 'app', 'utils.js');
+                    }
+                }
+            )
         ],
         devtool: mode == 'development' ? 'eval-source-map' : false
     };

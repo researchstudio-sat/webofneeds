@@ -41,6 +41,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "bower": "1.8.2",
+    "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.11",
     "exports-loader": "^0.7.0",
     "glob": "^7.1.2",
@@ -61,6 +62,8 @@
     "rimraf": "2.4.4",
     "sass-loader": "^6.0.7",
     "svg-sprite-loader": "^3.7.3",
+    "svgo": "^1.0.5",
+    "svgo-loader": "^2.1.0",
     "uglifyjs-webpack-plugin": "^1.2.5",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.14"
