@@ -43,8 +43,8 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="post__contentside" ng-show="self.showCreateView">
-        <!-- TODO: needs a border -->
+    <div class="post__contentside post__contentside--create" ng-show="self.showCreateView">
+        <!-- TODO: redirect to new need after creation! -->
         <won-create-post></won-create-post>
     </div>
     <div class="post__contentside" ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed">
