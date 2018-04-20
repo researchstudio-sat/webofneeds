@@ -37,7 +37,8 @@ module.exports = function(env, argv) {
                                 }]
                             ],
                             plugins: [
-                                'transform-object-rest-spread'
+                                'transform-object-rest-spread',
+                                'transform-remove-strict-mode'
                             ]
                         }
                     }
