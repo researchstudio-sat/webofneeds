@@ -1161,3 +1161,52 @@ export function clamp(value, lower, upper) {
         return upper
     return value
 }
+
+const READ_URIS = "wonReadUris";
+
+export function markUriAsRead(uri) {
+    //TODO: BETTER IMPL
+    if(!isUriRead(uri)){
+        console.log("mark uri:", uri, " as read");
+
+        let readUrisString = window.localStorage.getItem(READ_URIS);
+        if(!readUrisString){
+            readUrisString = JSON.stringify([uri]);
+        }else{
+            try{
+                let readUriList = JSON.parse(readUrisString);
+                readUriList.push(uri);
+                readUrisString = JSON.stringify(readUriList);
+            }catch(e) {
+                console.error("readUris could not be parsed, resetting the item in localstorage");
+                resetUrisRead();
+                readUrisString = JSON.stringify([uri]);
+            }
+        }
+
+        window.localStorage.setItem(READ_URIS, readUrisString);
+    }
+}
+
+export function isUriRead(uri) {
+    //TODO: BETTER IMPL
+    let readUrisString = window.localStorage.getItem(READ_URIS);
+
+    if(readUrisString) {
+        let readUriList = JSON.parse(readUrisString);
+
+        for(var i=0; i < readUriList.length; i++){
+            if(readUriList[i] === uri) {
+                console.log("checking if uri: ", uri, " is read -> true");
+                return true;
+            }
+        }
+    }
+    console.log("checking if uri: ", uri, " is read -> false");
+    return false;
+}
+
+export function resetUrisRead() {
+    console.log("resetting read uris");
+    window.localStorage.removeItem(READ_URIS);
+}
