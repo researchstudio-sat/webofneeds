@@ -38,7 +38,7 @@
     }
 
     &.won-txt--code {
-      @include padToHeight($normalFontSize * 0.8, 22/16, $thinBorderWidth, $formInputHeight);
+      @include padToHeight($smallFontSize, 22/16, $thinBorderWidth, $formInputHeight);
       font-family: $font-family-monospace;
     }
 }
