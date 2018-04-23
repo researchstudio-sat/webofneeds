@@ -109,7 +109,7 @@ function genComponentConf() {
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
-                placeholder="::'Request Message (optional)'"
+                placeholder="::'Message (optional)'"
                 on-submit="::self.sendRequest(value)"
                 allow-empty-submit="::true"
                 submit-button-label="::'Ask to Chat'"

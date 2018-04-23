@@ -246,7 +246,7 @@ function genComponentConf() {
         <div class="pm__footer" ng-if="self.isReceivedRequest">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
-                placeholder="::'Reply Message (optional)'"
+                placeholder="::'Message (optional)'"
                 on-submit="::self.openRequest(value)"
                 allow-empty-submit="::true"
                 submit-button-label="::'Accept Chat'"
