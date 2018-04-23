@@ -22,6 +22,12 @@ won-connections-overview {
       flex-grow: 1;
     }
 
+    @media (max-width: $responsivenessBreakPoint) {
+      won-connection-indicators {
+        /*Hide the connection indicators in the mobile view to reduce problems regarding last element selection */
+        display: none;
+      }
+    }
 
     &.selected {
       border-top: $greyBorder;
