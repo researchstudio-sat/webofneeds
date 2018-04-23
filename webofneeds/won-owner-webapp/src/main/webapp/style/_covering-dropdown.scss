@@ -44,6 +44,20 @@ won-dropdown {
 
     background-color: white;
     border: 1px solid #cbd2d1;
+
+    a.won-button--outlined,
+    button {
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+
+    a.won-button--outlined{
+      cursor: pointer;
+      display: flex;
+      align-content: center;
+      align-items: center;
+      box-sizing: border-box;
+    }
   }
   &.dd-right-aligned-header {
     .dd__dropdown {

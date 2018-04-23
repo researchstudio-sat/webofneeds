@@ -73,6 +73,7 @@ function genComponentConf() {
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
+                ng-if="self.isConnected || self.isSentRequest"
                 ng-style="{'visibility': !self.contextMenuOpen}"
                 ng-click="self.contextMenuOpen = true">
                     <use href="#ico16_arrow_down"></use>
@@ -90,23 +91,6 @@ function genComponentConf() {
                         ng-click="self.goToPost()">
                         Show Post Details
                     </button>
-                    <a class="won-button--outlined thin red"
-                        target="_blank"
-                        href="{{self.connectionUri}}"
-                        ng-if="!self.isConnected">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>Show RDF</span>
-                    </a>
-                    <a class="won-button--outlined thin red"
-                        ng-click="self.toggleRdfDisplay()"
-                        ng-if="self.isConnected">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
-                    </a>
                     <button
                         ng-if="self.isConnected"
                         class="won-button--filled red"
@@ -224,6 +208,14 @@ function genComponentConf() {
 	            		No Agreement Data found
                 </div>
             </div>
+            <a class="rdflink clickable"
+               ng-if="self.shouldShowRdf"
+               target="_blank"
+               href="{{self.connection.get('uri')}}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+            </a>
         </div>
         <div class="pm__footer" ng-if="self.isConnected">
 

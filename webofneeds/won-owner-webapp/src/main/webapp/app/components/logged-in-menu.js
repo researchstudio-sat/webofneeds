@@ -15,9 +15,17 @@ function genComponentConf() {
 let template = `
     <a
         href="{{ self.absHRef(self.$state, 'about') }}"
-        class="topnav__button red">
+        class="won-button--outlined thin red">
             About
     </a>
+    <a class="won-button--outlined thin red"
+        ng-click="self.toggleRdfDisplay()">
+        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
+            <use href="#ico36_rdf_logo"></use>
+        </svg>
+        <span>{{self.shouldShowRdf? "Turn 'Under the Hood' Off" : "Turn 'Under the Hood' On"}}</span>
+    </a>
+    <hr/>
     <button
         class="won-button--filled lighterblue"
         style="width:100%"
@@ -40,6 +48,7 @@ let template = `
 
             const logout = (state) => ({
                 loggedIn: state.getIn(['user','loggedIn']),
+                shouldShowRdf: state.get('showRdf'),
                 email: state.getIn(['user','email'])
             });
 
