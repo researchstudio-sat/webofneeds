@@ -1204,3 +1204,35 @@ export function isUriRead(uri) {
 export function resetUrisRead() {
     window.localStorage.removeItem(READ_URIS);
 }
+
+/**
+ * Merges two arrays as if they were sets (by passing them through sets). Returns an array.
+ * @param {*} arr1 
+ * @param {*} arr2 
+ */
+export function mergeAsSet(arr1, arr2) {
+    if(!is('Array', arr1) || !is('Array', arr2)) {
+        throw new Error(
+            'utils.js: mergeAsSet expects two arrays but got \n\n' +
+            JSON.stringify(arr1) + '(' + arr1.toString() + ')' + 
+            '\n\n and \n\n' + 
+            JSON.stringify(arr2) + '(' + arr2.toString() + ')'
+        )
+    }
+    const res = new Set(arr1);
+    arr2.forEach(el => res.add(el));
+    return Array.from(res);
+}
+
+export function extractHashtags(str) {
+    if(!str) {
+        return []; 
+    }
+    if(!is('String', str)){
+        'utils.js: extractHashtags expects a string but got: ' + str;
+    }
+    const tags = (str.match(/#(\S+)/gi) || [])
+        .map(str => str.substr(1)); // remove leading `#`-character
+
+    return Array.from(new Set(tags)); // filter out duplicates and return
+}
