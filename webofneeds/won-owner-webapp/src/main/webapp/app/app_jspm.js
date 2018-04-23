@@ -16,6 +16,12 @@ import 'redux';
 import ngReduxModule from 'ng-redux';
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
+
+/* angular-ui-router-shim (release/stateEvents.js) used to enable legacy $stateChange* events in ui-router (see
+ * here for details: https://ui-router.github.io/guide/ng1/migrate-to-1_0#state-change-events)
+ * 
+ * delete at your own peril
+ */
 import uiRouterShimModule from 'angular-ui-router-shim';
 import {
     camel2Hyphen,

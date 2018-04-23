@@ -42,9 +42,13 @@ function genComponentConf() {
         <div class="ph__right__subtitle">
           <!--
           <span class="piu__header__title__subtitle__group" ng-show="{{self.need.get('group')}}">
-            <img
-              src="generated/icon-sprite.svg#ico36_group"
-              class="piu__header__title__subtitle__group__icon">
+            
+          <svg style="--local-primary:var(--won-primary-color);"
+            class="piu__header__title__subtitle__group__icon">
+              <use href="#ico36_group"></use>
+          </svg>
+
+
             {{self.need.get('group')}}
             <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
           </span>

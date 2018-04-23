@@ -146,10 +146,13 @@ function genComponentConf() {
                 on-update="::self.showAgreementData = false">
             </won-connection-message>
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
-	            <img class="pm__content__agreement__icon clickable"
-            		src="generated/icon-sprite.svg#ico36_close"
-            		ng-click="self.showAgreementData = !self.showAgreementData"/>
-            	<!-- Agreements-->
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="pm__content__agreement__icon clickable"
+                    ng-click="self.showAgreementData = !self.showAgreementData">
+                    <use href="#ico36_close"></use>
+                </svg>
+                
+                <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
             		<span ng-show="self.loading"> (loading...)</span>
@@ -197,19 +200,27 @@ function genComponentConf() {
             </div>
             <!-- Loading Text -->
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.loading && self.showLoadingInfo && !self.agreementDataIsValid()">
-	            <img class="pm__content__agreement__icon clickable"
-	            		src="generated/icon-sprite.svg#ico36_close"
-	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
-	            <div class="pm__content__agreement__title"> 
+                
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="pm__content__agreement__icon clickable"
+                    ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)">
+                    <use href="#ico36_close"></use>
+                </svg>
+                
+                <div class="pm__content__agreement__title"> 
 	            		Loading the Agreement Data. Please be patient, because patience is a talent :)
             	</div>
             </div>
     		<!-- Show if no Agrrement Data exists -->
             <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.loading && self.showLoadingInfo && !self.agreementDataIsValid()">
-	            <img class="pm__content__agreement__icon clickable"
-	            		src="generated/icon-sprite.svg#ico36_close"
-	            		ng-click="self.showAgreementData = !self.showAgreementData"/>
-	            <div class="pm__content__agreement__title">
+                
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="pm__content__agreement__icon clickable"
+                    ng-click="self.showAgreementData = !self.showAgreementData">
+                    <use href="#ico36_close"></use>
+                </svg>
+                
+                <div class="pm__content__agreement__title"> 
 	            		No Agreement Data found
                 </div>
             </div>
