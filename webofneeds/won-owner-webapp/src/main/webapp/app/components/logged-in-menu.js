@@ -23,7 +23,7 @@ let template = `
         <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
             <use href="#ico36_rdf_logo"></use>
         </svg>
-        <span>{{self.shouldShowRdf? "Turn 'Under the Hood' Off" : "Turn 'Under the Hood' On"}}</span>
+        <span>{{self.shouldShowRdf? "Hide raw data" : "Show raw RDF data"}}</span>
     </a>
     <hr/>
     <button
