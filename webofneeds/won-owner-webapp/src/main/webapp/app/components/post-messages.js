@@ -656,19 +656,19 @@ function genComponentConf() {
             };
         }
 
-        cloneDefaultSateData() {
+        cloneDefaultStateData() {
             return defaultStateData = {
                 pendingProposalUris: new Set(),
                 agreementUris: new Set(),
                 cancellationPendingAgreementUris: new Set(),
-            }
+            };
         }
 
         cloneDefaultAgreementObject() {
             return agreementObject = {
                 stateUri: undefined,
                 headUri: undefined,
-            }
+            };
         }
 
         openRequest(message){
