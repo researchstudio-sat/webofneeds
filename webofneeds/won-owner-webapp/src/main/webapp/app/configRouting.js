@@ -38,6 +38,7 @@ import {
 export const resetParams = Object.freeze({
     connectionUri: undefined,
     postUri: undefined,
+    showCreateView: undefined,
     //sendAdHocRequest: undefined,
     // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
 });
