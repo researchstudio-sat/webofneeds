@@ -85,7 +85,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/signup?privateId', component: 'signup' },
         { path: '/landingpage?privateId', component: 'landingpage' },
         { path: '/create-need/?privateId', component: 'create-need' },
-        { path: '/connections?privateId?postUri?connectionUri', component: 'connections', as: 'connections' },
+        { path: '/connections?privateId?postUri?connectionUri?showCreateView', component: 'connections', as: 'connections' },
         { path: '/post/?privateId?postUri', component: 'post', as: 'post' },
 
     ].forEach( ({path, component, as}) => {

@@ -28,6 +28,9 @@
       border-right: $thinGrayBorder;
       border-bottom: $thinGrayBorder;
 
+      // display message centered
+      justify-content: center;
+
       .post__contentside__description__text {
         display: flex;
         align-self: center;
@@ -48,7 +51,8 @@
   height: 100%;
   justify-content: center;
   align-content: center;
-  flex-direction: row;
+  flex-direction: column;
+  justify-content: flex-start;
 
   won-post-messages {
     border-left: $thinGrayBorder;

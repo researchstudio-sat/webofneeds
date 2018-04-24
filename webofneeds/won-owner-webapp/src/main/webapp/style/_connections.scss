@@ -17,6 +17,7 @@
     align-items: center;
   }
 
+  // TODO: more create need stuff to seperate component
   .oir__create-need{
     display: flex;
     flex-direction: row;
@@ -30,6 +31,11 @@
   }
 
   .oir__create-need__icon{
+    width: 3.5rem; // needed because svg default size is huge
+    height: 3.5rem;
+  }
+
+  .oir__close-create-need__icon{
     width: 3.5rem; // needed because svg default size is huge
     height: 3.5rem;
   }

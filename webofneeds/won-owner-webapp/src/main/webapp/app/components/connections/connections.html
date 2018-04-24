@@ -27,7 +27,7 @@
         <!-- TODO: move oir__create-need to own component -->
         <!-- TODO: make it visible whether this element is selected? -->
         <div class="oir__create-need clickable"
-            ng-click="self.toggleCreate()">
+            ng-click="self.setShowCreateView(true)">
             <svg class="oir__create-need__icon"
                 title="Create a new need"
                 style="--local-primary:var(--won-primary-color);">
@@ -44,6 +44,14 @@
 
     <!-- RIGHT SIDE -->
     <div class="post__contentside post__contentside--create" ng-show="self.showCreateView">
+        <!-- TODO: redirect to new need after creation! -->
+        <div class="clickable"
+            ng-click="self.setShowCreateView(undefined)">
+            <svg style="--local-primary:var(--won-primary-color);"
+                    class="oir__close-create-need__icon clickable">
+                <use href="#ico36_close"></use>
+            </svg>
+        </div>
         <won-create-post></won-create-post>
     </div>
     <div class="post__contentside" ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed">
