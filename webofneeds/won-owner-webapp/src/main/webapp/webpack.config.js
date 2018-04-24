@@ -18,9 +18,7 @@ module.exports = function(env, argv) {
     });
 
     return {
-        entry: {
-            main: ['./style/won.scss', 'babel-polyfill', './app/app_jspm.js'].concat(glob.sync('./images/**/*.svg'))
-        },
+        entry: './app/app_webpack.js',
         mode: mode,
         optimization: {
             minimizer: [
