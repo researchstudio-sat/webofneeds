@@ -101,7 +101,11 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
           resMsg.setSerializationFormat(Lang.TRIG);
           pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());
           return;
+        } else {
+        	log.warning("Message not processed; methodName is null");
         }
+      } else {
+    	  log.warning("Message not processed; needURI or wonNodeURI is null");
       }
     }
 
