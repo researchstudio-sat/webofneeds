@@ -126,7 +126,7 @@ function genComponentConf() {
                 hide-option="msg.hide"
                 ng-class="{
                     'won-unread' : msg.get('newMessage'),
-                    'won-not-relevant': !msg.get('isRelevant'),
+                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
                     'won-cm--left' : !msg.get('outgoingMessage'),
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"
@@ -144,8 +144,8 @@ function genComponentConf() {
                 <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
-            		<span ng-show="loading['value']"> (loading...)</span>
-            		<span ng-if="!loading['value']"> (up-to-date)</span>
+            		<span ng-show="self.isLoading"> (loading...)</span>
+            		<span ng-if="!self.isLoading"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
@@ -174,8 +174,8 @@ function genComponentConf() {
             		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		Proposals
-    				<span ng-show="loading['value']"> (loading...)</span>
-            		<span ng-if="!loading['value']"> (up-to-date)</span>
+    				<span ng-show="self.isLoading"> (loading...)</span>
+            		<span ng-if="!self.isLoading"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
@@ -199,8 +199,8 @@ function genComponentConf() {
                 </svg>
                 
                 <div class="pm__content__agreement__title"> 
-	            		<span class="ng-hide" ng-show="loading['value']">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!loading['value']">No Agreement Data found</span>
+	            		<span class="ng-hide" ng-show="self.isLoading">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!self.isLoading">No Agreement Data found</span>
             	</div>
             </div>
             <a class="rdflink clickable"
@@ -278,7 +278,7 @@ function genComponentConf() {
             
             this.showAgreementData = false;
 
-            this.loading = false;
+            
 
             this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
             `<${won.WONMSG.msguriPlaceholder}> will ` +
@@ -307,10 +307,19 @@ function genComponentConf() {
                 	//filter proposals
                 	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
-	                		if(!msg.get("isRelevant") || this.isOldAgreementMsg(msg)) {
+	                		if(msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
 	                			//TODO: optimization?
 	                			//isRelevant in state?
 	                			//msg.hide = true;
+	                			msg.hide = true;
+	                			this.messages__markAsRelevant(
+	                				payload = {
+                 		    			 messageUri: msg.get('uri'),
+                 		                 connectionUri: connectionUri,
+                 		                 needUri: ownNeed.get('uri'),
+                 		                 relevant: false,
+	                				}
+	                			)
 	                		}
                 		}
                 	}
@@ -331,6 +340,7 @@ function genComponentConf() {
                     connectionUri,
                     connection,
                     chatMessages: sortedMessages,
+                    isLoading: connection && connection.get('isLoading'),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
                     isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
@@ -351,13 +361,6 @@ function genComponentConf() {
                 () => this.ensureMessagesAreLoaded()
             );
             
-            this.$scope.$watch('loading.value',
-            		() => delay(0).then(
-            		() => (
-	                    console.log("LOADING: " + this.$scope.loading.value)
-	                )) 
-            )
-
             this.$scope.$watch(
                 () => (this.chatMessages && this.chatMessages.length), // trigger if there's messages added (or removed)
                 () => delay(0).then(() =>
@@ -459,7 +462,7 @@ function genComponentConf() {
                 this.connection = connection;
             }
 
-        	this.$scope.loading = true;
+        	this.isLoading = true;
         	this.agreementLoadingData = this.cloneDefaultStateData();
             this.getAgreementDataUris();
         }
@@ -478,15 +481,13 @@ function genComponentConf() {
                             }
                         }
                     }
-
-    			    this.loading = false;
                 }).then(response => {
     				this.agreementStateData = this.agreementLoadingData;
-    				this.$scope.loading = false;
+    				this.isLoading = false;
     				this.snapToBottom();
     		}).catch(error => {
     				console.error('Error:', error);
-    				this.$scope.loading = false;
+    				this.isLoading = false;
                 })
         }
 
@@ -605,20 +606,6 @@ function genComponentConf() {
                 }
             }
             return false;
-        }
-
-        startLoading() {
-        	this.loading.proposal = true;
-        	this.loading.agreement = true;
-        	this.proposeToCancel = true;
-        }
-
-
-        isStillLoading(){
-        	if(!this.loading.proposal && !this.loading.agreement && !this.loading.proposeToCancel/* && !this.loading.acceptedProposalToCancel*/) {
-        		return false;
-        	}
-        	return true;
         }
 
         isOldAgreementMsg(msg) {
