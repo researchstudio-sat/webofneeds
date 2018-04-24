@@ -28,11 +28,11 @@ class ConnectionsController {
         this.WON = won.WON;
         this.resetParams = resetParams;
         this.open = {};
-        this.showCreateView = false;
 
         const selectFromState = (state)=>{
             const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
             const selectedPost = selectedPostUri && state.getIn(["needs", selectedPostUri]);
+            const showCreateView = !!getIn(state, ['router', 'currentParams', 'showCreateView']);
             const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
             const connection = need && need.getIn(["connections", connectionUri]);
@@ -46,6 +46,7 @@ class ConnectionsController {
                 selectedPost,
                 connection,
                 connectionType,
+                showCreateView,
                 hasConnections: connections && connections.size > 0,
                 hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
                 open,
@@ -57,12 +58,13 @@ class ConnectionsController {
     }
 
     selectedNeed(needUri) {
-        this.router__stateGoCurrent({connectionUri: undefined, postUri: needUri}); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
+        this.showCreateView = false;
+        this.router__stateGoCurrent({connectionUri: undefined, postUri: needUri, showCreateView: undefined}); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
     }
 
     selectedConnection(connectionUri) {
         this.markAsRead(connectionUri);
-        this.router__stateGoCurrent({connectionUri, postUri: undefined});
+        this.router__stateGoCurrent({connectionUri, postUri: undefined, showCreateView: undefined});
     }
 
     markAsRead(connectionUri){
@@ -80,10 +82,8 @@ class ConnectionsController {
         }
     }
 
-    toggleCreate() {
-        this.showCreateView = !this.showCreateView;
-        // TODO: deselect selected connections
-        // TODO: toggle this when selecting a connection?
+    setShowCreateView(showCreate) {
+        this.router__stateGoCurrent({connectionUri: undefined, postUri: undefined, showCreateView: showCreate});
     }
 }
 
