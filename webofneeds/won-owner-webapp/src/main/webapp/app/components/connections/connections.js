@@ -1,6 +1,7 @@
 ;
 
 import angular from 'angular';
+import Immutable from 'immutable';
 import sendRequestModule from '../send-request.js';
 import postMessagesModule from '../post-messages.js';
 import postInfoModule from '../post-info.js';
