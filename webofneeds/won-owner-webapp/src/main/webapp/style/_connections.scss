@@ -13,8 +13,8 @@
   @include empty-description('opc');
 
   &.empty {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    //align-items: center;
   }
 
   // TODO: more create need stuff to seperate component

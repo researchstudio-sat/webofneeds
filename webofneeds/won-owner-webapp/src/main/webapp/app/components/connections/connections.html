@@ -2,7 +2,7 @@
     <won-topnav></won-topnav>
 </header>
 <main class="connectionscontent" ng-class="{'empty' : !self.hasConnections && !self.hasOwnNeeds}">
-    <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
+    <!-- <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
@@ -20,7 +20,7 @@
                 <span class="opc__empty__link__caption">Create a Need</span>
             </a>
         </div>
-    </div>
+    </div> -->
     
     <!-- LEFT SIDE -->
     <div class="oir__requests">
@@ -43,6 +43,13 @@
     </div>
 
     <!-- RIGHT SIDE -->
+    <!--  ng-if="!self.selectedPost && !self.showCreateView && (self.hasConnections || self.hasOwnNeeds) && (!self.connection || self.connectionType === self.WON.Closed)" -->
+    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && !self.connection && !self.showCreateView"
+        ng-class="{'hidden' : self.connectionUri === undefined}">
+        <span class="post__contentside__description__text">
+            No Element selected
+        </span>
+    </div>
     <div class="post__contentside post__contentside--create" ng-show="self.showCreateView">
         <!-- TODO: redirect to new need after creation! -->
         <div class="clickable"
@@ -60,11 +67,5 @@
     </div>
     <div class="post__contentside" ng-if="self.selectedPost && !self.showCreateView">
         <won-post-info include-header="true"></won-post-info>
-    </div>
-    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && !self.showCreateView && (self.hasConnections || self.hasOwnNeeds) && (!self.connection || self.connectionType === self.WON.Closed)"
-               ng-class="{'hidden' : self.connectionUri === undefined}">
-        <span class="post__contentside__description__text">
-            No Element selected
-        </span>
     </div>
 </main>
