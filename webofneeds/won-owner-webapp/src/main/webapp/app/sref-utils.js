@@ -8,6 +8,7 @@ import {
 } from './utils.js';
 
 import {
+    defaultRoute,
     makeParams,
     resetParams,
     resetParamsImm,
@@ -100,4 +101,8 @@ export function onlyConstParams() {
  */
 export function resetParamsHRef($state, toRouterState) {
     return $state.href(toRouterState, onlyConstParams());
+}
+
+export function defaultRouteHRef($state) {
+    return resetParamsHRef($state, defaultRoute);
 }
