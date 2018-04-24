@@ -1,4 +1,4 @@
-# Build WON in Eclipse:
+# Build WoN in Eclipse:
 
 ### Eclipse:
 
