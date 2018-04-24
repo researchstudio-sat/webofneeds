@@ -41,7 +41,6 @@ import { actionCreators }  from './actions/actions.js';
 
 //-------- Components ---------
 import topnav from './components/topnav.js';
-import createNeedComponent from './components/create-need/create-need.js';
 import connectionsComponent from './components/connections/connections.js';
 import postComponent from './components/post/post.js';
 import landingPageComponent from './components/landingpage/landingpage.js';
@@ -80,7 +79,6 @@ let app = angular.module('won.owner', [
     topnav,
 
     //views
-    createNeedComponent,
     connectionsComponent,
     postComponent,
     landingPageComponent,
