@@ -2,7 +2,7 @@
     <won-topnav></won-topnav>
 </header>
 <main class="connectionscontent" ng-class="{'empty' : !self.hasConnections && !self.hasOwnNeeds}">
-    <!-- <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
+    <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
         <div class="opc__empty">
             <div class="opc__empty__description">
                 <svg class="opc__empty__description__icon"
@@ -20,15 +20,15 @@
                 <span class="opc__empty__link__caption">Create a Need</span>
             </a>
         </div>
-    </div> -->
+    </div>
     
     <!-- LEFT SIDE -->
     <div class="oir__requests">
-        <!-- TODO: move oir__create-need to own component -->
+        <!-- TODO: move oir__create-post to own component -->
         <!-- TODO: make it visible whether this element is selected? -->
-        <div class="oir__create-need clickable"
+        <div class="oir__create-post clickable"
             ng-click="self.setShowCreateView(true)">
-            <svg class="oir__create-need__icon"
+            <svg class="oir__create-post__icon"
                 title="Create a new need"
                 style="--local-primary:var(--won-primary-color);">
                     <use href="#ico36_plus"></use>
@@ -48,7 +48,7 @@
         <div class="clickable"
             ng-click="self.setShowCreateView(undefined)">
             <svg style="--local-primary:var(--won-primary-color);"
-                    class="oir__close-create-need__icon clickable">
+                    class="oir__close-create-post__icon clickable">
                 <use href="#ico36_close"></use>
             </svg>
         </div>
