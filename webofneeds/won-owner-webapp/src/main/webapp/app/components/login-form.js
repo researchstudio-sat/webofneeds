@@ -45,15 +45,15 @@ function genLoginConf() {
                 class="won-button--filled lighterblue"
                 ng-disabled="loginForm.$invalid">
                 <!--ng-click="::self.login(self.email, self.password)">-->
-                    Sign in
+                    Sign In
             </button>
             <input
                 id="remember-me"
                 ng-model="self.rememberMe"
-                type="checkbox"/> remember me
+                type="checkbox"/> Remember me
         </form>
         <div class="wl__register">
-            No Account yet?
+            No account yet?
             <a href="{{ self.absHRef(self.$state, 'signup') }}">
                 Sign up
             </a>

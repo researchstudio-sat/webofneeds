@@ -44,6 +44,7 @@ function genComponentConf() {
             <!-- TODO: Implement a menu with all the necessary buttons -->
             <svg class="post-info__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
+                ng-if="self.post.get('ownNeed')"
                 ng-show="!self.contextMenuOpen"
                 ng-click="self.contextMenuOpen = true">
                     <use href="#ico16_arrow_down"></use>
@@ -56,14 +57,6 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                         </svg>
                     </div>
-                    <a class="won-button--outlined thin red"
-                        target="_blank"
-                        href="{{self.post.get('uri')}}">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>Show RDF</span>
-                    </a>
                     <button class="post-info__footer__button won-button--filled red"
                         ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
                         ng-click="self.reOpenPost()">
@@ -98,6 +91,14 @@ function genComponentConf() {
                 <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
             </div>
             </br>
+            <a class="rdflink clickable"
+               ng-if="self.shouldShowRdf"
+               target="_blank"
+               href="{{self.post.get('uri')}}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+            </a>
         </div>
         <div class="post-info__footer">
             <div class="post-info__footer__link" ng-if="self.post.get('state') !== self.WON.InactiveCompacted">
@@ -150,6 +151,7 @@ function genComponentConf() {
                         post.get('creationDate')
                     ),
                     createdTimestamp: post && post.get('creationDate'),
+                    shouldShowRdf: state.get('showRdf'),
                     linkToPost: post && new URL("/owner/#!post/?postUri="+encodeURI(post.get('uri')), window.location.href).href,
                 }
             };

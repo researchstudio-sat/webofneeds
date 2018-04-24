@@ -80,6 +80,7 @@ input[type=email] {
 
 .clickable {
   cursor: pointer;
+  user-select: none;
 }
 
 .hspinner {
@@ -134,6 +135,10 @@ a {
     //color: darken($won-primary-color, 30%);
     color: $won-secondary-color-light;
   }
+}
+
+svg {
+  user-select: none;
 }
 
 @import 'gallery';

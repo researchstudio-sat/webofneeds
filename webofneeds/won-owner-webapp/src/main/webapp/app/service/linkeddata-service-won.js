@@ -30,7 +30,7 @@ import {
 } from '../utils.js';
 
 import rdfstore from 'rdfstore-js';
-import jld from 'jsonld';
+import jsonld from 'jsonld';
 import won from './won.js';
 
 (function(){
@@ -1335,7 +1335,7 @@ import won from './won.js';
         const context = frame['@context']? clone(frame['@context']) : {}; //TODO
         context.useNativeTypes = true; //do some of the parsing from strings to numbers
 
-        const jsonLdP = jld.promises
+        const jsonLdP = jsonld.promises
             .fromRDF(jsonldjsQuads, context)
             .then(complexJsonLd => {
                 //the framing algorithm expects an js-object with an `@graph`-property
@@ -1344,7 +1344,7 @@ import won from './won.js';
                     {'@graph': complexJsonLd};
 
                 //console.log('complexJsonLd_: ', complexJsonLd_);
-                return jld.promises.frame(complexJsonLd_, frame);
+                return jsonld.promises.frame(complexJsonLd_, frame);
             })
             .then(framed => {
                 //console.log('framed: ', framed);
@@ -2344,7 +2344,7 @@ function groupByGraphs(jsonldData, addDefaultContext=true) {
         }
     }
 
-    const seperatedGraphsP = jld.promises
+    const seperatedGraphsP = jsonld.promises
     .flatten(jsonldData) // flattening groups by graph as a side-effect
     .then(flattenedData => {
         return Promise.all(flattenedData.map(graph => cleanUpGraph(graph)))

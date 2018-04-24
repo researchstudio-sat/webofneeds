@@ -84,7 +84,7 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state)=> {
-                const allOwnNeeds = selectAllOwnNeeds(state);
+                const allOwnNeeds = selectAllOwnNeeds(state).filter(post => !(post.get("isWhatsAround") && post.get("state") === won.WON.InactiveCompacted)); //FILTER ALL CLOSED WHATS AROUNDS
 
                 const routerParams = selectRouterParams(state);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);

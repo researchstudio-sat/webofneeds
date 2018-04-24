@@ -47,6 +47,7 @@ function genComponentConf() {
             <svg class="post-info__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
                 ng-show="!self.contextMenuOpen"
+                ng-if="self.connection && self.connection.get('isRated')"
                 ng-click="self.contextMenuOpen = true">
                     <use href="#ico16_arrow_down"></use>
             </svg>
@@ -58,14 +59,6 @@ function genComponentConf() {
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
-                    <a class="won-button--outlined thin red"
-                        target="_blank"
-                        href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>Show RDF</span>
-                    </a>
                     <button ng-if="self.connection && self.connection.get('isRated')"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
@@ -96,7 +89,7 @@ function genComponentConf() {
             </div>
             </br>
             <a class="rdflink clickable"
-               ng-if="!self.includeHeader"
+               ng-if="self.shouldShowRdf"
                target="_blank"
                href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
                     <svg class="rdflink__small">
@@ -116,7 +109,7 @@ function genComponentConf() {
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
-                placeholder="::'Request Message (optional)'"
+                placeholder="::'Message (optional)'"
                 on-submit="::self.sendRequest(value)"
                 allow-empty-submit="::true"
                 submit-button-label="::'Ask to Chat'"
@@ -175,6 +168,7 @@ function genComponentConf() {
                         selectLastUpdateTime(state),
                         suggestedPost.get('creationDate')
                     ),
+                    shouldShowRdf: state.get('showRdf'),
                     createdTimestamp: suggestedPost && suggestedPost.get('creationDate'),
                 }
             };

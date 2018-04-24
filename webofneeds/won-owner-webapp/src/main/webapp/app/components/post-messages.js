@@ -73,17 +73,17 @@ function genComponentConf() {
                 hide-image="::true">
             </won-post-header>
             <svg class="pm__header__icon__small clickable"
-                style="--local-primary:#CCD2D2;" 
-                ng-show="!self.contextMenuOpen" 
+                style="--local-primary:#var(--won-secondary-color);"
+                ng-if="self.isConnected || self.isSentRequest"
+                ng-style="{'visibility': !self.contextMenuOpen}"
                 ng-click="self.contextMenuOpen = true">
                     <use href="#ico16_arrow_down"></use>
             </svg>
             <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content">
+                <div class="content" ng-click="self.contextMenuOpen=false">
                     <div class="topline">
                       <svg class="pm__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;"
-                        ng-click="self.contextMenuOpen = false">
+                        style="--local-primary:black;">
                             <use href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
@@ -92,23 +92,6 @@ function genComponentConf() {
                         ng-click="self.goToPost()">
                         Show Post Details
                     </button>
-                    <a class="won-button--outlined thin red"
-                        target="_blank"
-                        href="{{self.connectionUri}}"
-                        ng-if="!self.isConnected">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>Show RDF</span>
-                    </a>
-                    <a class="won-button--outlined thin red"
-                        ng-click="self.toggleRdfDisplay()"
-                        ng-if="self.isConnected">
-                        <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_rdf_logo"></use>
-                        </svg>
-                        <span>{{self.shouldShowRdf? "Hide RDF" : "Show RDF"}}</span>
-                    </a>
                     <button
                         ng-if="self.isConnected"
                         class="won-button--filled red"
@@ -152,10 +135,13 @@ function genComponentConf() {
                 on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
             </won-connection-message>
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
-	            <img class="pm__content__agreement__icon clickable"
-            		src="generated/icon-sprite.svg#ico36_close"
-            		ng-click="self.showAgreementData = !self.showAgreementData"/>
-            	<!-- Agreements-->
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="pm__content__agreement__icon clickable"
+                    ng-click="self.showAgreementData = !self.showAgreementData">
+                    <use href="#ico36_close"></use>
+                </svg>
+                
+                <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
             		<span ng-show="loading['value']"> (loading...)</span>
@@ -205,14 +191,26 @@ function genComponentConf() {
             </div>
             <!-- Loading Text -->
             <div class="pm__content__agreement" ng-if="self.showAgreementData && self.showLoadingInfo && !self.agreementDataIsValid()">
-	            <img class="pm__content__agreement__icon clickable"
-	            		src="generated/icon-sprite.svg#ico36_close"
-	            		ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)"/>
-	            <div class="pm__content__agreement__title"> 
+                
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="pm__content__agreement__icon clickable"
+                    ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)">
+                    <use href="#ico36_close"></use>
+                </svg>
+                
+                <div class="pm__content__agreement__title"> 
 	            		<span class="ng-hide" ng-show="loading['value']">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
 	            		<span class="ng-hide" ng-show="!loading['value']">No Agreement Data found</span>
             	</div>
             </div>
+            <a class="rdflink clickable"
+               ng-if="self.shouldShowRdf"
+               target="_blank"
+               href="{{self.connection.get('uri')}}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+            </a>
         </div>
         <div class="pm__footer" ng-if="self.isConnected">
 
@@ -243,7 +241,7 @@ function genComponentConf() {
         <div class="pm__footer" ng-if="self.isReceivedRequest">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
-                placeholder="::'Reply Message (optional)'"
+                placeholder="::'Message (optional)'"
                 on-submit="::self.openRequest(value)"
                 allow-empty-submit="::true"
                 submit-button-label="::'Accept Chat'"
