@@ -49,11 +49,12 @@ export function needCreate(draft, nodeUri) {
             })
             .then(() => {
                 const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-                return dispatch({
+                dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri, need: draft}
                 })
 
+                dispatch(actionCreators.router__stateGoAbs("connections", {postUri: needUri, showCreateView: undefined}));
             });
     }
 }
