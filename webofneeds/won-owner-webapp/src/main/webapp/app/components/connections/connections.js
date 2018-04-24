@@ -13,7 +13,6 @@ import { actionCreators }  from '../../actions/actions.js';
 import {
     selectNeedByConnectionUri,
     selectAllOwnNeeds,
-    selectAllConnections
 } from '../../selectors.js';
 import {
     resetParams,
