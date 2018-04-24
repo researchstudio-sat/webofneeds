@@ -38,7 +38,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private static final String MSG_HEADER_METHODNAME_NEEDACTIVATED = "needActivated";
   private static final String MSG_HEADER_METHODNAME_NEEDDEACTIVATED = "needDeactivated";
   private static final String MSG_HEADER_WON_NODE_URI = "wonNodeURI";
-  private static final String MSG_HEADER_NEED_URI = "needUri";
+  private static final String MSG_HEADER_NEED_URI = "needURI";
   private final String endpoint;
   private ActorRef pubSubMediator;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);

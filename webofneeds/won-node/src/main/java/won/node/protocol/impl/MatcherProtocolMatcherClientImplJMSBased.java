@@ -54,7 +54,7 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
   public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
   {
       Map headerMap = new HashMap<String, String>();
-      headerMap.put("needUri", needURI.toString());
+      headerMap.put("needURI", needURI.toString());
       headerMap.put("methodName", "needCreated");
       headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
       messagingService.sendInOnlyMessage(null,headerMap,WonMessageEncoder.encode(wonMessage, Lang.TRIG),"seda:MatcherProtocolOut");
