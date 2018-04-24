@@ -3,13 +3,14 @@
 @import 'fonts';
 @import 'flex-layout';
 @import 'square-image';
+@import 'speech-bubble';
 
 won-connection-selection-item {
   display: block;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
 
   &.won-unread {
-    background-color: $won-unread;
+    background-color: $won-unread; //TODO: CHANGE THE UNREAD APPEARANCE BECAUSE THE "invisible border" is off for unread elements
   }
 
   .conn__icon {
@@ -32,18 +33,12 @@ won-connection-selection-item {
     margin-left: 0.5rem;
   }
 
-  $greyBorder: $thinGrayBorder;
-  $invisibleBorder: 0.1rem solid $won-lighter-gray;
+  $invisibleBorder: 0.0625rem solid white;
 
   .conn__inner.selected {
-    border-top: $greyBorder;
-    border-left: $greyBorder;
-    border-bottom: $greyBorder;
-
-    /*
-    box-sizing: border-box;
-    width: calc(100% + 0.1rem);
-    border-right-color: white; */
+    @include speech-bubble-right(white, $won-line-gray, 0.625rem, $thinBorderWidth, 1.5rem);
+    border-top: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
   }
 
   &:first-child .conn__inner.selected {
@@ -52,7 +47,16 @@ won-connection-selection-item {
   }
   &:not(:first-child) .conn__inner.selected {
     //don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $greyBorder;
+    border-top: $thinGrayBorder;
+  }
+
+  &:last-child .conn__inner.selected {
+    //don't show border for first item to avoid duplicate borders with the title bar
+    border-bottom: $invisibleBorder;
+  }
+  &:not(:last-child) .conn__inner.selected {
+    //don't show border for first item to avoid duplicate borders with the title bar
+    border-bottom: $thinGrayBorder;
   }
 
   .conn__inner {
@@ -62,7 +66,8 @@ won-connection-selection-item {
     align-self: stretch;
     padding: 0.5rem;
 
-    border: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
+    border-top: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
+    border-bottom: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
 
     &:hover, &.selected {
       background-color: white;
