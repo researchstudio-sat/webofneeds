@@ -38,8 +38,14 @@ class ConnectionsController {
             const connection = need && need.getIn(["connections", connectionUri]);
             const connectionType = need && connectionUri && need.getIn(["connections", connectionUri, 'state']);
 
-            const connections = selectAllConnections(state);
-            const ownNeeds = selectAllOwnNeeds(state);
+            const ownNeeds = selectAllOwnNeeds(state).filter(post => !(post.get("isWhatsAround") && post.get("state") === won.WON.InactiveCompacted));
+
+            let connections = Immutable.Map();
+
+            ownNeeds && ownNeeds.map(function(need){
+                connections = connections.merge(need.get("connections"));
+            });
+
 
             return {
                 WON: won.WON,
