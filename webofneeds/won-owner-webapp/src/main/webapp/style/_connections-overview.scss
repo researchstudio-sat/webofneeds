@@ -1,70 +1,68 @@
 @import 'won-config';
 @import 'post-header';
+@import 'connection-header';
 @import 'connection-indicators';
 @import 'connection-selection-item-line';
+@import 'speech-bubble';
 
 won-connections-overview {
   display: block;
+  margin: 0;
 
-  $greyBorder: $thinGrayBorder;
-  $invisibleBorder: 0.1rem solid $won-lighter-gray;
+  .co__item {
+    background-color: $won-light-gray;
 
-  .covw__own-need {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    &--withconn {
+      margin-bottom: 0.5rem;
 
-    padding: 0.5rem;
-
-    border-bottom: $thinGrayBorder;
-
-    won-post-header {
-      flex-grow: 1;
-    }
-
-    @media (max-width: $responsivenessBreakPoint) {
-      won-connection-indicators {
-        /*Hide the connection indicators in the mobile view to reduce problems regarding last element selection */
-        display: none;
+      .co__item__need {
+        border-bottom: $thinGrayBorder;
       }
     }
 
-    &.selected {
-      border-top: $greyBorder;
-      border-left: $greyBorder;
-      border-bottom: $greyBorder;
+    &:first-child {
+      border-top: none;
     }
 
-    &:hover, &.selected {
-      background-color: white;
+    border: $thinGrayBorder;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      border-left: none;
+      border-right: none;
     }
-  }
 
-  &:first-child .covw__own-need.selected {
-    //don't show border for first item to avoid duplicate borders with the title bar
-    border-top: 0;
-  }
-  &:not(:first-child) .covw__own-need.selected {
-    //don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $greyBorder;
-  }
+    &__need {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
 
+      padding: 0.5rem;
 
-  .covw__unreadCount {
-    color: $won-primary-color;
-    margin: 0 0.25rem; /*vert horiz*/
-  }
+      won-post-header {
+        flex-grow: 1;
+      }
 
-  won-connection-selection-item {
-    &:last-child {
-      margin-bottom: 2rem;
+      &:hover, &.selected {
+
+      }
+
+      @media (min-width: $responsivenessBreakPoint){
+        &.selected {
+          @include speech-bubble-right(white, $won-line-gray, 0.625rem, $thinBorderWidth, 1.5rem);
+        }
+      }
+
+      &__arrow {
+        @include carretSized;
+        // results in a clickable area as large as indicators
+        // TODO: make the value less rigid
+        padding: 0.625em;
+      }
     }
-  }
 
-  .covw__arrow {
-    @include carretSized;
-    // results in a clickable area as large as indicators
-    // TODO: make the value less rigid
-    padding: 0.625em;
+    &__connections {
+      background: white;
+      @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorderWidth, 5rem);
+    }
   }
 }

@@ -34,8 +34,9 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <div ng-repeat="need in self.sortedNeeds">
-            <div class="covw__own-need"
+        <div ng-repeat="need in self.sortedNeeds" class="co__item"
+            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
+            <div class="co__item__need"
                 ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
                 <won-post-header
                     need-uri="need.get('uri')"
@@ -51,26 +52,29 @@ function genComponentConf() {
                 <div ng-style="{'visibility': self.showConnectionsDropdown(need) ? 'visible' : 'hidden'}">
                     <svg
                         style="--local-primary:var(--won-secondary-color);"
-                        class="covw__arrow clickable"
+                        class="co__item__need__arrow clickable"
                         ng-show="self.isOpen(need.get('uri'))"
                         ng-click="self.closeConnections(need.get('uri'))" >
                             <use href="#ico16_arrow_up"></use>
                     </svg>
                     <svg style="--local-primary:var(--won-secondary-color);"
-                        class="covw__arrow clickable"
+                        class="co__item__need__arrow clickable"
                         ng-show="!self.isOpen(need.get('uri'))"
                         ng-click="self.openConnections(need.get('uri'))" >
                             <use href="#ico16_arrow_down"></use>
                     </svg>
                 </div>
             </div>
-            <won-connection-selection-item
-                ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)"
-                ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
-                on-selected-connection="self.selectConnection(connectionUri)"
-                connection-uri="conn.get('uri')"
-                ng-class="{'won-unread': conn.get('unread')}">
-            </won-connection-selection-item>
+            <div
+                class="co__item__connections"
+                ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)">
+                <won-connection-selection-item
+                    ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
+                    on-selected-connection="self.selectConnection(connectionUri)"
+                    connection-uri="conn.get('uri')"
+                    ng-class="{'won-unread': conn.get('unread')}">
+                </won-connection-selection-item>
+            </div>
         </div>
     `;
 
@@ -162,7 +166,6 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         scope: {
             open: "=",
-            //connectionType: "=",
             /*
              * Usage:
              *  on-selected-connection="myCallback(connectionUri)"
