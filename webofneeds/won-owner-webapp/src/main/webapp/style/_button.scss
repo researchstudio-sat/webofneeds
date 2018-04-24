@@ -43,6 +43,7 @@
   border-radius: 0.19rem;
   cursor: pointer;
   white-space: nowrap;
+  user-select: none;
 
   svg.won-button-icon {
     @include fixed-square($normalFontSize);
