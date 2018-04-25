@@ -15,10 +15,9 @@ import { actionCreators }  from '../actions/actions.js';
 import {
     selectOpenConnectionUri,
     selectNeedByConnectionUri,
-    selectAllTheirNeeds
 } from '../selectors.js';
 
-import postHeaderModule from './post-header.js';
+import connectionHeaderModule from './connection-header.js';
 import connectionStateModule from './connection-state.js';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -29,8 +28,8 @@ function genComponentConf() {
       ng-class="self.isOpen() ? 'selected' : ''">
         <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') === self.WON.Suggested">
         </won-connection-state>
-        <won-post-header
-          need-uri="self.theirNeed.get('uri')"
+        <won-connection-header
+          connection-uri="self.connectionUri"
           timestamp="self.lastUpdateTimestamp"
           ng-click="self.setOpen()"
           class="clickable">
@@ -53,7 +52,6 @@ function genComponentConf() {
             const selectFromState = (state)=> {
                 const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
-                const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 const allMessages = connection && connection.get("messages");
                 const unreadMessages = allMessages && allMessages.filter(msg => msg.get("unread"));
@@ -65,7 +63,6 @@ function genComponentConf() {
                     connectionUri: connection && connection.get("uri"),
                     openConnectionUri: selectOpenConnectionUri(state),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
-                    theirNeed,
                     unreadMessagesCount: unreadMessages && unreadMessages.size > 0 ? unreadMessages.size : undefined,
                 }
             };
@@ -99,7 +96,7 @@ function genComponentConf() {
     }
 }
 export default angular.module('won.owner.components.connectionSelectionItem', [
-        postHeaderModule,
+        connectionHeaderModule,
         connectionStateModule,
     ])
     .directive('wonConnectionSelectionItem', genComponentConf)

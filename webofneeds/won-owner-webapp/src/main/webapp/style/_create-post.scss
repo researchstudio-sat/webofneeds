@@ -4,6 +4,7 @@
 @import 'locationpicker';
 @import 'animate';
 @import 'sizing-utils';
+@import 'textfield';
 
 won-create-post {
 
@@ -141,6 +142,21 @@ won-create-post {
       }
     }
   }
+  .cp__ttl {
+    display: grid;
+    grid-gap: 1rem;
+
+    .cp__ttl__helptext {
+      @include fine-print;
+    }
+    .cp__ttl__parse-error {
+      white-space: pre-wrap;
+      color: $won-primary-color;
+      font-family: $font-family-monospace;
+      font-size: $smallFontSize;
+      //@include appearAnimation(0.5s, linear);
+    }
+  }
 
   .cp__addDetail {
     //border-top: $thinBorderWidth solid $won-line-gray;
@@ -213,7 +229,7 @@ won-create-post {
     box-sizing: border-box;
     font-size: $mediumFontSize;
     font-weight: 400;
-    padding-bottom: 1rem;
+    &:not(.ttl) { padding-bottom: 1rem; } // ttl uses grid and grid-gap
     background-position: 0 0.15rem;
     background-size: 2rem;
     background-repeat: no-repeat;

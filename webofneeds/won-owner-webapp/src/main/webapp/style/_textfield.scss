@@ -1,0 +1,44 @@
+
+
+/**
+ * Pads a textfield so it has the $intendedHeight. Note, that for growing
+ * textareas this only holds at the start, tho ^^
+ */
+@mixin padToHeight($fontSize, $lineHeightFactor, $borderWidth, $intendedHeight) {
+    font-size: $fontSize;
+    border-width: $borderWidth;
+
+    $heightOfALine: $fontSize * $lineHeightFactor;
+    $verticalPadding: ($intendedHeight - $heightOfALine) / 2 - $borderWidth;
+    padding-top: $verticalPadding;
+    padding-bottom: $verticalPadding;
+    padding: $verticalPadding (0.438 * $fontSize);
+}
+
+.won-txt {
+    border-style: solid;
+    border-radius: 0.1rem;
+
+    min-width: 0; // so a size is specified and break-word works
+    word-break: break-word;
+
+    &:focus {
+      color: black;
+    }
+
+    &.won-txt--valid {
+        border-color: $won-line-gray;
+    }
+    &.won-txt--invalid {
+        border-color: $won-primary-color;
+    }
+
+    &:not(.won-txt--code) {
+      @include padToHeight($normalFontSize, 22/16, $thinBorderWidth, $formInputHeight);
+    }
+
+    &.won-txt--code {
+      @include padToHeight($smallFontSize, 22/16, $thinBorderWidth, $formInputHeight);
+      font-family: $font-family-monospace;
+    }
+}

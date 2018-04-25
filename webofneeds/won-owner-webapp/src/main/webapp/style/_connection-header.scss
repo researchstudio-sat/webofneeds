@@ -1,0 +1,58 @@
+@import 'sizing-utils';
+@import 'square-image';
+
+won-connection-header {
+  color: black;
+  flex-grow: 1;
+  //padding: 0.5rem;
+
+  display: flex;
+  flex-direction: row;
+
+  @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+
+  won-square-image .image{
+    border: $thinBorderWidth solid $won-light-gray;
+  }
+
+  .ch__right {
+    flex-grow: 1;
+
+    &__topline {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      &__title {
+        font-weight: 400;
+      }
+
+      &__date {
+        font-size: $smallFontSize;
+        color: $won-subtitle-gray;
+      }
+    }
+
+    &__subtitle {
+      color: $won-subtitle-gray;
+      display: flex;
+      flex-direction: row;
+      font-size: $smallFontSize;
+
+      &__group {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+
+        &__dash {
+          padding: 0 0.25rem;
+        }
+
+        &__icon {
+          padding-right: 0.25rem;
+          @include fixed-square(0.75rem);
+        }
+      }
+    }
+  }
+}
