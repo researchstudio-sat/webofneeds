@@ -11,6 +11,7 @@ import squareImageModule from './square-image.js';
 import postHeaderModule from './post-header.js';
 import connectionIndicatorsModule from './connection-indicators.js';
 import connectionSelectionItemModule from './connection-selection-item.js';
+import createPostItemModule from './create-post-item.js';
 
 import {
     labels,
@@ -34,15 +35,7 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <div class="oir__create-post clickable"
-            ng-click="self.selectCreate()">
-            <svg class="oir__create-post__icon"
-                title="Create a new need"
-                style="--local-primary:var(--won-primary-color);">
-                    <use href="#ico36_plus"></use>
-            </svg>
-            Create New Need
-        </div>
+        <won-create-post-item></won-create-post-item>
         <div ng-repeat="need in self.sortedNeeds" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
             <div class="co__item__need"
@@ -151,10 +144,6 @@ function genComponentConf() {
             this.onSelectedNeed({needUri}); //trigger callback with scope-object
         }
 
-        selectCreate() {
-            this.onSelectedCreate(); // trigger callback with scope-object
-        }
-
         // sort needs by date and put closed needs at the end of the list
         sortNeeds(allNeeds) {
             openNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted));
@@ -185,7 +174,6 @@ function genComponentConf() {
              */
             onSelectedConnection: "&",
             onSelectedNeed: "&",
-            onSelectedCreate: "&",
         },
         template: template
     }
@@ -199,6 +187,7 @@ export default angular.module('won.owner.components.connectionsOverview', [
         connectionSelectionItemModule,
         postHeaderModule,
         connectionIndicatorsModule,
+        createPostItemModule,
 ])
     .directive('wonConnectionsOverview', genComponentConf)
     .name;

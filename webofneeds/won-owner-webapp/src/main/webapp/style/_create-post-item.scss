@@ -1,0 +1,18 @@
+@import 'won-config';
+
+.cpi__item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding: 0.5rem;
+
+    background-color: white;
+    border-left: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
+
+    .cpi__icon{
+        width: 3.5rem; // needed because svg default size is huge
+        height: 3.5rem;
+      }
+  }
