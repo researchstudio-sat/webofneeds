@@ -44,7 +44,7 @@ function genComponentConf() {
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: 
-            	{{ self.message.get('text') }}<br />
+            	{{ self.text }}<br />
             	<span class="subtitle" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Proposed to cancel</span>
             	<!-- TODO: hide 
             	<div class="won-ca__content__text__subtext">
@@ -115,9 +115,29 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const message = chatMessages && chatMessages.get(this.stateUri);
                 const remoteUri = message && !!message.get("remoteUri");
-
+                let text = message && message.get("text");
+                
+                if(message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
+                	const clauses = message.get("clauses");
+                	//TODO: delete me
+                	//console.log("clauses: " + clauses);
+                	
+                	//TODO: Array from proposedMessages
+                	//now just one message proposed at a time
+                	if(chatMessages && chatMessages.get(clauses)) {
+                		text = chatMessages.get(clauses).get("text");
+                	} else {
+                		for(msg of Array.from(chatMessages)) {
+                			if(msg[1].get("remoteUri") === clauses) {
+                				text = msg[1].get("text");
+                			}
+                		}
+                	}		
+                }
+                
                 return {
                 	message: message,
+                	text: text,
                 	isOwn: !remoteUri,
                 	ownNeed: ownNeed,
                 }

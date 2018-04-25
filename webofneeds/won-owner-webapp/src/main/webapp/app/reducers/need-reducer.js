@@ -679,6 +679,8 @@ function parseMessage(wonMessage) {
             outgoingMessage: wonMessage.isFromOwner(),
             unread: !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
             connectMessage: wonMessage.isConnectMessage(),
+            //TODO: add all different types
+            clauses: wonMessage.isProposeMessage()? wonMessage.getProposedMessages() : wonMessage.getProposedToCancelMessages(),
             isProposeMessage: wonMessage.isProposeMessage(),
             isAcceptMessage: wonMessage.isAcceptMessage(),
             isProposeToCancel: wonMessage.isProposeToCancel(),

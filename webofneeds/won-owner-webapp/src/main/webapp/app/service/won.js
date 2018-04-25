@@ -1280,6 +1280,17 @@ window.N34dbg = N3;
         },
         
         
+        getProposedMessages: function () {
+        	return this.getProperty("http://purl.org/webofneeds/agreement#proposes");
+        },
+        
+        getAcceptedMessages: function () {
+        	return this.getProperty("http://purl.org/webofneeds/agreement#accepts");
+        },
+        getProposedToCancelMessages: function () {
+        	return this.getProperty("http://purl.org/webofneeds/agreement#proposesToCancel");
+        },
+        
         isProposeMessage: function () {
         	return !!this.getProperty("http://purl.org/webofneeds/agreement#proposes");
         },

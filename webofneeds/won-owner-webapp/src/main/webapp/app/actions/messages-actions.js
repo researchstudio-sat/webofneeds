@@ -218,33 +218,19 @@ export function connectionMessageReceived(event) {
                   		console.log("ACCEPTS");
                   		if(effect.accepts) {
                   			let messageUri = effect.acceptedMessageUri;
-                  			if(messageUri) {
-                  				let uriSet = new Set();
-                  				for(message of Array.from(messages)) {
-                  					uriSet.add(message[0]);
-                  				}
-                  				if(!uriSet.has(messageUri)){
-                  					for(msg of Array.from(messages)) {
-                  						if(msg[1].get("remoteUri") === messageUri) {
-                  							messageUri = msg[1].get("uri");
-                  						}
-                  					}
-                  				}   	
-                  				dispatch({
-                	                type: actionTypes.messages.markAsRelevant,
-                	                payload: {
-                 		    			 messageUri: messageUri,
-                 		                 connectionUri: connectionUri,
-                 		                 needUri: needUri,
-                 		                 relevant: false,
-             		        		}
-                	            });
-                  			}
+                  			setToUnrelevant(messages, messageUri, needUri, connectionUri);
                   		}
                   		break;
                   		
                   	case "PROPOSES":
                   		console.log("PROPOSES");
+                  		/*
+                  		/if(effect.proposalType === "CANCELS") {
+                  			for(i = 0; i < effect.proposesToCancel.length; i++) {
+                  				let messageUri = effect.proposesToCancel[i];
+                      			setToUnrelevant(messages, messageUri, needUri, connectionUri);
+                  			}
+                  		}*/
                   		break;
                   		
                   	case "REJECTS":
@@ -267,6 +253,33 @@ export function connectionMessageReceived(event) {
             });
  		});
 	 }
+}
+
+function setToUnrelevant(messages, messageUri, needUri, connectionUri) {
+	return (dispatch, getState) => {
+		if(messageUri) {
+			let uriSet = new Set();
+			for(message of Array.from(messages)) {
+				uriSet.add(message[0]);
+			}
+			if(!uriSet.has(messageUri)){
+				for(msg of Array.from(messages)) {
+					if(msg[1].get("remoteUri") === messageUri) {
+						messageUri = msg[1].get("uri");
+					}
+				}
+			}   	
+			dispatch({
+		        type: actionTypes.messages.markAsRelevant,
+		        payload: {
+		    			 messageUri: messageUri,
+		                 connectionUri: connectionUri,
+		                 needUri: needUri,
+		                 relevant: false,
+	 			}
+			});
+		}
+	}
 }
 
 export function connectMessageReceived(event) {

@@ -209,12 +209,30 @@ function genComponentConf() {
                 
                 const ownNeed = this.connectionUri && selectNeedByConnectionUri(state, this.connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+                const chatMessages = connection && connection.get("messages");
                 const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
                 const message = connection && this.messageUri ? 
-                    getIn(connection, ['messages', this.messageUri]) :
+                    getIn(connection, ["messages", this.messageUri]) :
                     Immutable.Map();
 
-                //const isLoading =
+                let text = message && message.get("text");
+                if(message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
+                	const clauses = message.get("clauses");
+                	//TODO: delete me
+                	//console.log("clauses: " + clauses);
+                	
+                	//TODO: Array from proposedMessages
+                	//now just one message proposed at a time
+                	if(chatMessages && chatMessages.get(clauses)) {
+                		text = chatMessages.get(clauses).get("text");
+                	} else {
+                		for(msg of Array.from(chatMessages)) {
+                			if(msg[1].get("remoteUri") === clauses) {
+                				text = msg[1].get("text");
+                			}
+                		}
+                	}		
+                }
                     
                 return {
                     ownNeed,
@@ -222,7 +240,7 @@ function genComponentConf() {
                     connection,
                     message,
                     isRelevant: message.get('isRelevant')? !this.hideOption : false,
-                    text: message.get('text'), 
+                    text: text, 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
                     contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
                     contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
