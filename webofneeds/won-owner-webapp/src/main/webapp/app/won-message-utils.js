@@ -183,11 +183,9 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
                 .hasSentTimestamp(new Date().getTime().toString());
             
 
- 
-            const graphPayload_ = getIn(graphPayload, [0, '@graph']);
-            if(graphPayload_) {
-                wonMessageBuilder.mergeIntoContentGraph(graphPayload_);
-            } else if (chatMessage) {
+            if(isTTL && graphPayload) {
+                wonMessageBuilder.mergeIntoContentGraph(graphPayload);
+            } else if (!isTTL && chatMessage) {
                 //add the chatMessage as normal text message 
                 wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
             } else {
