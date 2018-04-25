@@ -28,7 +28,7 @@ import {
 } from '../utils.js'
 import jsonld from 'jsonld';
 
-import N3 from '../../scripts/N3/n3-browserify.js';
+import N3 from 'n3';
 window.N34dbg = N3;
 
    var won = {};
@@ -989,12 +989,12 @@ window.N34dbg = N3;
             return Promise.reject(msg);
         }
         const quadString = await jsonld.promises.toRDF(jsonldData, {format: 'application/nquads'})
-        const quads = await won.n3Parse(quadString, {format: 'application/n-quads'});
+        const {quads, prefixes} = await won.n3Parse(quadString, {format: 'application/n-quads'});
         
-        const prefixes = addDefaultContext ?
+        const prefixes_ = addDefaultContext ?
             Object.assign(clone(won.defaultContext), jsonldData['@context']) :
             jsonldData['@context'];
-        const trig = await won.n3Write(quads, { format: 'application/trig', prefixes});
+        const trig = await won.n3Write(quads, { format: 'application/trig', prefixes: prefixes_});
 
         return trig;
     }
@@ -1002,16 +1002,27 @@ window.N34dbg = N3;
 
     /**
      * An wrapper for N3's writer that returns a promise
-     * @param {*} triples list of triples, each with "subject", "predicate", 
-     *   "object" and optionally "graph"
+     * @param {*} quads list of quads following the rdfjs interface (http://rdf.js.org/)
+     *   e.g.:
+     * ```
+     *  [ Quad {
+     *      graph: DefaultGraph {id: ""}
+     *      object: NamedNode {id: "http://example.org/cartoons#Cat"}
+     *      predicate: NamedNode {id: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"}
+     *      subject: NamedNode {id: "http://example.org/cartoons#Tom"}
+     * }, Quad {...}, ...]
+     * ```
+     * See here for ways to create them using N3: https://www.npmjs.com/package/n3#creating-triplesquads
      * @param {*} writerArgs the arguments for intializing the writer. 
      *   e.g. `{format: 'application/trig'}`. See the writer-documentation 
      *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
      */
-    won.n3Write = async function (triples, writerArgs) {
+    won.n3Write = async function (quads, writerArgs) {
+        const { namedNode, literal, defaultGraph, quad } = N3.DataFactory;
         const writer = N3.Writer(writerArgs);
         return new Promise((resolve, reject) => {
-            triples.forEach(t => writer.addTriple(t))
+            //quads.forEach(t => writer.addQuad(t))
+            writer.addQuads(quads);
             writer.end((error, result) => {
                 if(error) reject(error);
                 else resolve(result)
@@ -1032,15 +1043,15 @@ window.N34dbg = N3;
             N3.Parser(parserArgs) : 
             N3.Parser();
         return new Promise((resolve, reject) => {
-            let triples = [];
-            parser.parse( rdf, (error, triple, prefixes) => {
+            let quads = [];
+            parser.parse( rdf, (error, quad, prefixes) => {
                 if(error) {
                     reject(error);
-                } else if (triple) {
-                    triples.push(triple);
+                } else if (quad) {
+                    quads.push(quad);
                 } else {
-                    // all triples collected
-                    resolve(triples, prefixes);
+                    // all quads collected
+                    resolve({quads, prefixes});
                 }
             })
         });
@@ -1049,13 +1060,13 @@ window.N34dbg = N3;
     won.ttlToJsonLd = async function(ttl) {
         const tryConversion = async () => {
 
-            const triples = await won.n3Parse(ttl);
-            const graphUri = 'ignoredgraphuri:placeholder';
+            const {quads, prefixes} = await won.n3Parse(ttl);
+            const placeholderGraphUri = 'ignoredgraphuri:placeholder';
 
-            const quadObjs = clone(triples); 
-            quadObjs.forEach(t => { t.graph = graphUri }); // add graph-uri to make the triples into quads
+            // overwrite empty graphUri (ttl is just triples) with placeholder string
+            quads.forEach(t => { t.graph.id = placeholderGraphUri }); 
 
-            const quadString = await won.n3Write(quadObjs, { format: 'application/n-quads' });
+            const quadString = await won.n3Write(quads, { format: 'application/n-quads' });
 
             const parsedJsonld = await jsonld.promises.fromRDF(quadString, {format: 'application/nquads'});
 
