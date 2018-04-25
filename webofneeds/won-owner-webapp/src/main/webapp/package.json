@@ -10,7 +10,7 @@
     "angular-ui-router": "1.0.3",
     "geopoint": "1.0.1",
     "immutable": "3.7.5",
-    "jsonld": "0.4.12",
+    "jsonld": "1.0.1",
     "leaflet": "0.7.7",
     "loadcss": "0.0.2",
     "medium.js": "1.0.1",
