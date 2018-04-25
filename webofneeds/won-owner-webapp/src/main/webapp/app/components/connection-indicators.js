@@ -78,7 +78,7 @@ function genComponentConf() {
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <span class="mobile__indicator" ng-show="!self.unreadCountSum">{{ self.unreadCountSum }}</span>
+        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.unreadCountSum }}</span>
     `;
 
     class Controller {
