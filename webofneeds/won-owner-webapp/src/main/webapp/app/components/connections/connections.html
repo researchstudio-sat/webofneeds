@@ -23,9 +23,8 @@
     </div> -->
     
     <!-- LEFT SIDE -->
-    <div class="oir__requests">
+    <div class="oir__requests" ng-class="{'hidden': self.connection || self.selectedPost || self.showCreateView}">
         <!-- TODO: move oir__create-post to own component -->
-        <!-- TODO: make it visible whether this element is selected? -->
         <div class="oir__create-post clickable"
             ng-click="self.setShowCreateView(true)">
             <svg class="oir__create-post__icon"
@@ -50,8 +49,7 @@
             No Element selected
         </span>
     </div>
-    <div class="post__contentside post__contentside--create" ng-show="self.showCreateView">
-        <!-- TODO: redirect to new need after creation! -->
+    <div class="post__contentside post__contentside--create" ng-if="self.showCreateView">
         <div class="clickable"
             ng-click="self.setShowCreateView(undefined)">
             <svg style="--local-primary:var(--won-primary-color);"
