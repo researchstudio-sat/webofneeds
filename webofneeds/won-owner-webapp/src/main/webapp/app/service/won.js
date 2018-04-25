@@ -964,7 +964,7 @@ window.N34dbg = N3;
     won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD){
         //console.log("converting this JSON-LD to WonMessage", wonMessageAsJsonLD)
         const expandedJsonLd  = await jsonld.promises.expand(wonMessageAsJsonLD);
-        const wonMessage = await new WonMessage(expandedJsonLd);
+        const wonMessage = new WonMessage(expandedJsonLd);
         await wonMessage.frameInPromise()
         await wonMessage.generateContentGraphTrig(); 
         return wonMessage;
