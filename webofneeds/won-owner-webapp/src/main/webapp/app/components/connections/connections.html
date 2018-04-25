@@ -60,10 +60,10 @@
         <won-create-post></won-create-post>
     </div>
     <div class="post__contentside" ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed">
-        <won-send-request include-header="true" ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
+        <won-send-request include-header="::true" ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
     </div>
     <div class="post__contentside" ng-if="self.selectedPost && !self.showCreateView">
-        <won-post-info include-header="true"></won-post-info>
+        <won-post-info include-header="::true"></won-post-info>
     </div>
 </main>
