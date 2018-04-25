@@ -17,11 +17,6 @@
     //align-items: center;
   }
 
-  .oir__close-create-post__icon{
-    width: 3.5rem; // needed because svg default size is huge
-    height: 3.5rem;
-  }
-
   .oir__requests{
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
