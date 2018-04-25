@@ -100,12 +100,13 @@ function genComponentConf() {
                         <div
                             class="won-cm__center__trig"
                             ng-show="self.contentGraphTrigPrefixes">
-                        <code ng-show="!self.showTrigPrefixes">@prefix ...</code>
-                        <code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
+<!-- no intendation here, so it renders correctly -->
+<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
+<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
                         </div>
-                        <div
-                            class="won-cm__center__trig">
-                        <code>{{ self.contentGraphTrig }}</code>
+                        <div class="won-cm__center__trig">
+<!-- no intendation here, so it renders correctly -->
+<code>{{ self.contentGraphTrig }}</code>
                         </div>
                     </div>
 
