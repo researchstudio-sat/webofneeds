@@ -19,24 +19,20 @@
     <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && !self.connection && !self.showCreateView"
         ng-class="{'hide-in-responsive' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
-            Here you will see all chats, requests, and suggestions for your needs if you click on them on the left side.
+            No element selected
         </span>
     </div>
-    <div class="post__contentside post__contentside--create" ng-if="self.showCreateView">
-        <div class="clickable"
-            ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
-            <svg style="--local-primary:var(--won-primary-color);"
-                    class="oir__close-create-post__icon clickable">
-                <use href="#ico36_close"></use>
-            </svg>
-        </div>
+    <!-- <div class="post__contentside post__contentside--create" ng-if="self.showCreateView">
+        
         <won-create-post></won-create-post>
+    </div> -->
+    <div class="post__contentside" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)"> <!-- ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed" -->
+        <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection"></won-create-post>
+        <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Suggested"></won-send-request>
+        <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
+        <won-post-info include-header="true" ng-if="self.selectedPost && !self.showCreateView"></won-post-info>
     </div>
-    <div class="post__contentside" ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed">
-        <won-send-request include-header="true" ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
-        <won-post-messages ng-if="self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
-    </div>
-    <div class="post__contentside" ng-if="self.selectedPost && !self.showCreateView">
+    <!-- <div class="post__contentside" ng-if="self.selectedPost && !self.showCreateView">
         <won-post-info include-header="true"></won-post-info>
-    </div>
+    </div> -->
 </main>
