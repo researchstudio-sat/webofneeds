@@ -18,6 +18,18 @@ won-post-info {
   box-sizing: border-box;
   padding: $gridRowGap;
 
+  &.won-post-info--noheader,
+  &.won-send-request--noheader {
+    grid-template-areas: "main" "footer";
+    grid-template-rows: minmax(10rem, 1fr) min-content;
+
+    .post-info__content {
+      border-top: none;
+      padding-top: 0;
+    }
+  }
+
+
   @media (max-width : $responsivenessBreakPoint) {
     border-left: none;
     border-right: none;
@@ -131,16 +143,6 @@ won-post-info {
 
     &__labelledhr span {
       background: white;
-    }
-
-    &__link {
-      &__text {
-        font-size: $smallFontSize;
-        padding-bottom: 0.5rem;
-      }
-      &__input {
-        width: 100%;
-      }
     }
 
     &__button {
