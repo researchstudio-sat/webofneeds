@@ -1,18 +1,27 @@
 @import 'won-config';
 
-.cpi__item{
+.cpi__card{
     display: flex;
     flex-direction: row;
     align-items: center;
-
-    padding: 0.5rem;
-
+    //padding: 0.5rem;
     background-color: white;
-    border-left: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
+    border-right: $thinGrayBorder;
 
-    .cpi__icon{
-        width: 3.5rem; // needed because svg default size is huge
-        height: 3.5rem;
-      }
-  }
+    .cpi__item{
+        flex: 1;
+        display: flex; // needed for text positioning
+        align-items: center;
+        border-left: $thinGrayBorder;
+        // TODO: change background-color when selected
+
+        &__icon{
+            width: 3.5rem; // needed because svg default size is huge
+            height: 3.5rem;
+        }
+
+        &__text{
+            font-weight: 400;
+        }
+    }
+}
