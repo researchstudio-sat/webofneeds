@@ -88,6 +88,15 @@ function genComponentConf() {
 
             -->
 
+            <!-- TODO: move this next to title? -->
+            <div class="clickable"
+                ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
+                <svg style="--local-primary:var(--won-primary-color);"
+                        class="oir__close-create-post__icon clickable">
+                    <use href="#ico36_close"></use>
+                </svg>
+            </div>
+
             <div class="cp__fallback-whatsaround"
                  ng-if="self.needType !== 'post' && self.needType !== 'search'">
                 <button type="submit"

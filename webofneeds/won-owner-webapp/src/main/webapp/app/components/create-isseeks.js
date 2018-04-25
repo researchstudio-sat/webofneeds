@@ -237,7 +237,9 @@ function genComponentConf() {
                     && (this.draftObject.title.length < this.characterLimit);  
         }
         checkDropDown(){
-            return this.isOpen;
+            // TODO: remove this function completely - now only set to true for testing purposes
+            return true;
+            //return this.isOpen;
         }       
         toggleDropDown(){
             if(this.isOpen){
