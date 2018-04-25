@@ -1,6 +1,7 @@
 ;
 
 import angular from 'angular';
+import Immutable from 'immutable';
 import sendRequestModule from '../send-request.js';
 import postMessagesModule from '../post-messages.js';
 import postInfoModule from '../post-info.js';
@@ -13,7 +14,6 @@ import { actionCreators }  from '../../actions/actions.js';
 import {
     selectNeedByConnectionUri,
     selectAllOwnNeeds,
-    selectAllConnections
 } from '../../selectors.js';
 import {
     resetParams,
@@ -37,8 +37,14 @@ class ConnectionsController {
             const connection = need && need.getIn(["connections", connectionUri]);
             const connectionType = need && connectionUri && need.getIn(["connections", connectionUri, 'state']);
 
-            const connections = selectAllConnections(state);
-            const ownNeeds = selectAllOwnNeeds(state);
+            const ownNeeds = selectAllOwnNeeds(state).filter(post => !(post.get("isWhatsAround") && post.get("state") === won.WON.InactiveCompacted));
+
+            let connections = Immutable.Map();
+
+            ownNeeds && ownNeeds.map(function(need){
+                connections = connections.merge(need.get("connections"));
+            });
+
 
             return {
                 WON: won.WON,
