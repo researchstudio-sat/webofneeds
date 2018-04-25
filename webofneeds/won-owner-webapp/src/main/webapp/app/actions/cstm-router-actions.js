@@ -14,6 +14,7 @@ import {
 } from './actions.js';
 
 import {
+    defaultRoute,
     makeParams,
     resetParams,
     resetParamsImm,
@@ -66,14 +67,7 @@ export function stateGoResetParams(state) {
 
 export function stateGoDefault() {
     return (dispatch, getState) => {
-        const appState = getState();
-        if ( appState.get('initialLoadFinished') ) {
-            if (appState.getIn(['user', 'loggedIn'])) {
-                return dispatch(actionCreators.router__stateGoResetParams('connections'));
-            } else {
-                return dispatch(actionCreators.router__stateGoResetParams('landingpage'));
-            }
-        }
+        return dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
     }
 }
 

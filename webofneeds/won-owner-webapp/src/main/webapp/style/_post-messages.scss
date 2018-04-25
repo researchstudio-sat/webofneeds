@@ -28,6 +28,9 @@
       border-right: $thinGrayBorder;
       border-bottom: $thinGrayBorder;
 
+      // display message centered
+      flex-direction: column;
+
       .post__contentside__description__text {
         display: flex;
         align-self: center;
@@ -35,6 +38,12 @@
         color: var(--won-dark-gray);
         font-size: $bigFontSize;
       }
+  }
+
+  &--create {
+    border-left: $thinGrayBorder;
+    border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
   }
 
   display: flex;
