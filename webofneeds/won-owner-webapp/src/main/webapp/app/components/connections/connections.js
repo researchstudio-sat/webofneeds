@@ -73,6 +73,10 @@ class ConnectionsController {
         this.router__stateGoCurrent({connectionUri, postUri: undefined, showCreateView: undefined});
     }
 
+    selectedCreate() {
+        this.router__stateGoCurrent({connectionUri: undefined, postUri: undefined, showCreateView: true});
+    }
+
     markAsRead(connectionUri){
         const need = selectNeedByConnectionUri(this.$ngRedux.getState(), connectionUri);
         const connections = need && need.get("connections");
@@ -86,10 +90,6 @@ class ConnectionsController {
 
             this.connections__markAsRead(payload);
         }
-    }
-
-    setShowCreateView(showCreate) {
-        this.router__stateGoCurrent({connectionUri: undefined, postUri: undefined, showCreateView: showCreate});
     }
 }
 

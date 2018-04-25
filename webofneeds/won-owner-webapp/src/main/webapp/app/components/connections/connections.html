@@ -23,20 +23,13 @@
     </div> -->
     
     <!-- LEFT SIDE -->
-    <div class="oir__requests" ng-class="{'hidden': self.connection || self.selectedPost || self.showCreateView}">
+    <div class="oir__requests" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView}">
         <!-- TODO: move oir__create-post to own component -->
-        <div class="oir__create-post clickable"
-            ng-click="self.setShowCreateView(true)">
-            <svg class="oir__create-post__icon"
-                title="Create a new need"
-                style="--local-primary:var(--won-primary-color);">
-                    <use href="#ico36_plus"></use>
-            </svg>
-            Create New Need
-        </div>
+        
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)",
             on-selected-need="self.selectedNeed(needUri)",
+            on-selected-create="self.selectedCreate()",
             open="self.open">
         </won-connections-overview>
     </div>
@@ -44,14 +37,14 @@
     <!-- RIGHT SIDE -->
     <!--  ng-if="!self.selectedPost && !self.showCreateView && (self.hasConnections || self.hasOwnNeeds) && (!self.connection || self.connectionType === self.WON.Closed)" -->
     <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && !self.connection && !self.showCreateView"
-        ng-class="{'hidden' : self.connectionUri === undefined}">
+        ng-class="{'hide-in-responsive' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
             No Element selected
         </span>
     </div>
     <div class="post__contentside post__contentside--create" ng-if="self.showCreateView">
         <div class="clickable"
-            ng-click="self.setShowCreateView(undefined)">
+            ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
             <svg style="--local-primary:var(--won-primary-color);"
                     class="oir__close-create-post__icon clickable">
                 <use href="#ico36_close"></use>

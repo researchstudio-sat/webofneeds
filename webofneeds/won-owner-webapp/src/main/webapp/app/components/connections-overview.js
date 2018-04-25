@@ -34,6 +34,15 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
+        <div class="oir__create-post clickable"
+            ng-click="self.selectCreate()">
+            <svg class="oir__create-post__icon"
+                title="Create a new need"
+                style="--local-primary:var(--won-primary-color);">
+                    <use href="#ico36_plus"></use>
+            </svg>
+            Create New Need
+        </div>
         <div ng-repeat="need in self.sortedNeeds" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
             <div class="co__item__need"
@@ -142,6 +151,10 @@ function genComponentConf() {
             this.onSelectedNeed({needUri}); //trigger callback with scope-object
         }
 
+        selectCreate() {
+            this.onSelectedCreate(); // trigger callback with scope-object
+        }
+
         // sort needs by date and put closed needs at the end of the list
         sortNeeds(allNeeds) {
             openNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted));
@@ -172,6 +185,7 @@ function genComponentConf() {
              */
             onSelectedConnection: "&",
             onSelectedNeed: "&",
+            onSelectedCreate: "&",
         },
         template: template
     }

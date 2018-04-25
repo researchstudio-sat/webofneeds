@@ -6,8 +6,8 @@
 @import 'animate';
 
 @media (max-width: $responsivenessBreakPoint) {
-  .post__listside.hidden,
-  .post__contentside--empty.hidden{
+  .post__listside.hide-in-responsive,
+  .post__contentside--empty.hide-in-responsive{
     display: none; //hide the subheader when a conversation is open on a mobile device
   }
 }

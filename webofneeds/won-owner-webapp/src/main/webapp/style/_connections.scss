@@ -46,8 +46,8 @@
   }
 
   @media (max-width: $responsivenessBreakPoint){
-    .post__contentside--empty.hidden,
-    .oir__requests.hidden {
+    .post__contentside--empty.hide-in-responsive,
+    .oir__requests.hide-in-responsive {
       display: none;
     }
   }
