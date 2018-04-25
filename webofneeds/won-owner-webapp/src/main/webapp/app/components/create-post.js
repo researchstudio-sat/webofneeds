@@ -61,6 +61,7 @@ const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections a
 function genComponentConf() {
     const template = `
         <div class="cp__inner">
+            <!-- Don't show old view
             <button type="submit"
                     class="won-button--filled red"
                     ng-click="::self.createWhatsAround()">
@@ -71,10 +72,10 @@ function genComponentConf() {
                     Retrieving What's Around&nbsp;&hellip;
                 </span>
             </button>
-            
+                        
             <won-labelled-hr label="::' or create a specific '" style="margin-top: 2rem; margin-bottom: 2rem;" ></won-labelled-hr>
-           
-           <div class="cp__title">Post</div>
+
+            <div class="cp__title">Post</div>
             <div class="cp__addDetail">
 
     			<won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
@@ -84,6 +85,41 @@ function genComponentConf() {
     			<won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
     			
     		</div>
+
+            -->
+
+            <div class="cp__fallback-whatsaround"
+                 ng-if="self.needType !== 'post' && self.needType !== 'search'">
+                <button type="submit"
+                        class="won-button--filled red"
+                        ng-click="::self.createWhatsAround()">
+                    <span ng-show="!self.pendingPublishing">
+                        See What's Around
+                    </span>
+                    <span ng-show="self.pendingPublishing">
+                        Retrieving What's Around&nbsp;&hellip;
+                    </span>
+                </button>
+            </div>
+            
+            <div class="cp__main-post" ng-if="self.needType === 'post'">
+                <div class="cp__title">Post</div>
+                <div class="cp__addDetail">
+                    <won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
+                </div>
+            </div>
+            <div class="cp__details-post" ng-if="self.openDetailsPost"></div>
+
+
+            <div class="cp__main-search" ng-if="self.needType === 'search'">
+                <div class="cp__title">Search</div>
+                <div class="cp__addDetail">
+                    <won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
+                </div>
+            </div>
+            <div class="cp__details-search" ng-if="self.openDetailsSearch"></div>
+           
+           
     		
 	       	<won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
 	       	
@@ -143,7 +179,8 @@ function genComponentConf() {
             const selectFromState = (state) => {
  
             	return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")) 
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+                    needType: getIn(state, ['router', 'currentParams', 'showCreateView'])
                 }
             };
             
