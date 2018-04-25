@@ -61,61 +61,6 @@ const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections a
 function genComponentConf() {
     const template = `
         <div class="cp__inner">
-            <!-- TODO: check if we need this and delete unneeded stuff
-            <button type="submit"
-                    class="won-button--filled red"
-                    ng-click="::self.createWhatsAround()">
-                <span ng-show="!self.pendingPublishing">
-                    See What's Around
-                </span>
-                <span ng-show="self.pendingPublishing">
-                    Retrieving What's Around&nbsp;&hellip;
-                </span>
-            </button>
-                        
-            <won-labelled-hr label="::' or create a specific '" style="margin-top: 2rem; margin-bottom: 2rem;" ></won-labelled-hr>
-
-            <div class="cp__title">Post</div>
-            <div class="cp__addDetail">
-
-    			<won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
-    			
-    			<won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr> 
-    			
-    			<won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
-    			
-            </div>
-            
-            <won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-	       	
-	       	<div class="cp__detail" ng-if="self.isValid()">
-		       	<div class="cp__header context">
-		       		<span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
-		       	</div>
-			    <div class="cp__taglist">
-			          <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
-			    </div>
-			    <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
-	    		<div class="cp__textfield_instruction">
-						<span>use whitespace to separate context names</span>
-					</div>
-            </div>
-            
-            <won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-	       	
-	       	<button type="submit" class="won-button--filled red cp__publish"
-                    ng-if="self.isValid()"
-                    ng-click="::self.publish()">
-                <span ng-show="!self.pendingPublishing">
-                    Publish
-                </span>
-                <span ng-show="self.pendingPublishing">
-                    Publishing&nbsp;&hellip;
-                </span>
-            </button>
-
-            -->
-
             <!-- TODO: move this close button next to title? -->
             <div class="clickable"
                 ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
@@ -141,26 +86,20 @@ function genComponentConf() {
                 </button>
             </div>
             
-            <div class="cp__main-post" ng-if="self.needType === 'post'">
+            <div ng-if="self.needType === 'post'">
                 <div class="cp__title">Post</div>
                 <div class="cp__addDetail">
                     <won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
                 </div>
             </div>
-            <div class="cp__details-post" ng-if="self.openDetailsPost">
-                <!-- TODO: decide on whether to put stuff like an additional search window or something for adding contexts here -->
-            </div>
-
-
-            <div class="cp__main-search" ng-if="self.needType === 'search'">
+            <div ng-if="self.needType === 'search'">
                 <div class="cp__title">Search</div>
                 <div class="cp__addDetail">
                     <won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
                 </div>
             </div>
-            <div class="cp__details-search" ng-if="self.openDetailsSearch">
-                <!-- TODO: decide on whether to put stuff like an additional description window or something for adding contexts here -->
-            </div>
+
+            <!-- TODO: decide on whether to re-add stuff like an additional search/description window or something for adding contexts -->
 	       	
             <won-labelled-hr label="::'done?'" class="cp__labelledhr"></won-labelled-hr>
           	       	
@@ -175,6 +114,23 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
+
+        <!-- TODO: decide what to do with this 
+        <won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+           
+        <div class="cp__detail" ng-if="self.isValid()">
+            <div class="cp__header context">
+                <span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
+            </div>
+            <div class="cp__taglist">
+                <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
+            </div>
+            <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
+            <div class="cp__textfield_instruction">
+                <span>use whitespace to separate context names</span>
+            </div>
+        </div>
+        -->
     `;
     
     class Controller {

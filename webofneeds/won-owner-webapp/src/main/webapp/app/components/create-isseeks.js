@@ -45,27 +45,6 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' 
 
 function genComponentConf() {
     const template = `
-    <!--
-        <div class="cp__header addDetail clickable" 
-            ng-click="self.toggleDropDown()" 
-            ng-class="{'closedDetail': !self.checkDropDown()}">
-        
-            <svg class="cp__circleicon" ng-show="!self.checkDropDown()">
-                <use href="#ico36_plus_circle"></use>
-            </svg>
-            <svg class="cp__circleicon" ng-show="self.checkDropDown()">
-                <use href="#ico36_close_circle"></use>
-            </svg>
-            <span ng-show="!self.checkDropDown()">
-                Add 
-            </span>
-            <span class="hover" ng-show="self.checkDropDown()">
-                Remove
-            </span>
-            {{::self.isOrSeeks}}
-            <span class="opt">(allows others to find your post)</span>
-        </div>
-    -->
         <div class="cp__detail__items" >
             <!-- TEXTBOX -->
             <div class="cp__mandatory-rest">
@@ -237,25 +216,7 @@ function genComponentConf() {
             // Using actionCreators like this means that every action defined there is available in the template.
             connect2Redux(selectFromState, actionCreators, [], this);
         }
-    
-        isValid(){
-            return (this.draftObject) 
-                    && (this.draftObject.title)
-                    && (this.draftObject.title.length < this.characterLimit);  
-        }
-        checkDropDown(){
-            // TODO: remove this function completely - now only set to true for testing purposes
-            return true;
-            //return this.isOpen;
-        }       
-        toggleDropDown(){
-            if(this.isOpen){
-                this.reset();
-                this.updateDraft();         	
-            }
-            this.isOpen = !this.isOpen;
-            
-        }
+
         reset(){
             this.draftObject = clone(emptyDraft);
             this.details = new Set(); // remove all detail-cards

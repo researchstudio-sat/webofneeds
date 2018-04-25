@@ -5,8 +5,6 @@
     
     <!-- LEFT SIDE -->
     <div class="oir__requests" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView}">
-        <!-- TODO: move oir__create-post to own component -->
-        
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)",
             on-selected-need="self.selectedNeed(needUri)",
@@ -22,17 +20,10 @@
             No element selected
         </span>
     </div>
-    <!-- <div class="post__contentside post__contentside--create" ng-if="self.showCreateView">
-        
-        <won-create-post></won-create-post>
-    </div> -->
     <div class="post__contentside" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)"> <!-- ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed" -->
         <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection"></won-create-post>
         <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
         <won-post-info include-header="true" ng-if="self.selectedPost && !self.showCreateView"></won-post-info>
     </div>
-    <!-- <div class="post__contentside" ng-if="self.selectedPost && !self.showCreateView">
-        <won-post-info include-header="true"></won-post-info>
-    </div> -->
 </main>
