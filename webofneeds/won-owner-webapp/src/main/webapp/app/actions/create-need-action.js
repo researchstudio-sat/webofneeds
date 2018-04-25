@@ -54,7 +54,7 @@ export function needCreate(draft, nodeUri) {
                     payload: {eventUri, message, needUri, need: draft}
                 })
 
-                dispatch(actionCreators.router__stateGoAbs("connections", {postUri: needUri, showCreateView: undefined}));
+                dispatch(actionCreators.router__stateGoAbs("connections", {postUri: undefined, showCreateView: undefined, connectionUri: undefined}));
             });
     }
 }
