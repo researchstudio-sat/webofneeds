@@ -14,9 +14,6 @@ import {
     getRandomString,
 } from './utils.js';
 
-import N3 from '../scripts/N3/n3-browserify.js';
-window.N34dbg = N3;
-
 import jsonld from 'jsonld';
 window.jsonld4dbg = jsonld;
 
