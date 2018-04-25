@@ -45,6 +45,7 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' 
 
 function genComponentConf() {
     const template = `
+    <!--
         <div class="cp__header addDetail clickable" 
             ng-click="self.toggleDropDown()" 
             ng-class="{'closedDetail': !self.checkDropDown()}">
@@ -64,18 +65,77 @@ function genComponentConf() {
             {{::self.isOrSeeks}}
             <span class="opt">(allows others to find your post)</span>
         </div>
-        <div class="cp__detail__items" ng-if="self.checkDropDown()" >
-            <div class="cp__mandatory-rest ng-if="self.checkDropDown()">
+    -->
+        <div class="cp__detail__items" >
+            <!-- TEXTBOX -->
+            <div class="cp__mandatory-rest">
                 <won-image-dropzone on-image-picked="::self.pickImage(image)">
                 </won-image-dropzone>
                 <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
             </div>
-            <div class="cp__textfield_instruction" ng-if="self.checkDropDown()">
+            <div class="cp__textfield_instruction">
                 <span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
             </div>
+            <!-- /TEXTBOX/ -->
             
+            <!-- DETAILS Picker -->
+            <div class="cp__addDetail">
+                <div class="cp__header detailPicker clickable" 
+                    ng-click="self.toggleDetail()" 
+                    ng-class="{'closedDetailPicker': !self.showDetail}">
+                        <!-- TODO: remove hover effect? does not work well on mobile -->
+                        <span class="nonHover">Add more detail</span>
+                        <span class="hover" ng-if="!self.showDetail">Open more detail</span>
+                        <span class="hover" ng-if="self.showDetail">Close more detail</span>
+                        <svg class="cp__carret" ng-show="!self.showDetail">
+                            <use href="#ico16_arrow_down"></use>
+                        </svg>
+                        <svg class="cp__carret" ng-show="self.showDetail">
+                            <use href="#ico16_arrow_up"></use>
+                        </svg>
+                </div>
+                <div class="cp__detail__items" ng-if="self.showDetail" >
+                    <div class="cp__detail__items__item location" 
+                        ng-click="!self.details.has('location') && self.details.add('location')"
+                        ng-class="{'picked' : self.details.has('location')}">
+                            <svg class="cp__circleicon" ng-show="!self.details.has('location')">
+                                <use href="#ico36_location_circle"></use>
+                            </svg>
+                            <svg class="cp__circleicon" ng-show="self.details.has('location')">
+                                <use href="#ico36_added_circle"></use>
+                            </svg>
+                            Address or Location
+                        </div>   
+                    <div class="cp__detail__items__item tags"
+                        ng-click="!self.details.has('tags') && self.details.add('tags')"
+                        ng-class="{'picked' : self.details.has('tags')}">
+                            <svg class="cp__circleicon" ng-show="!self.details.has('tags')">
+                                <use href="#ico36_tags_circle"></use>
+                            </svg>
+                            <svg class="cp__circleicon" ng-show="self.details.has('tags')">
+                                <use href="#ico36_added_circle"></use>
+                            </svg>
+                            Tags
+                    </div>
+                    
+
+                    <div class="cp__detail__items__item ttl"
+                        ng-click="!self.details.has('ttl') && self.details.add('ttl')"
+                        ng-class="{'picked' : self.details.has('ttl')}">
+                            <svg class="cp__circleicon" ng-show="!self.details.has('ttl')">
+                                <use href="#ico36_rdf_logo_circle"></use>
+                            </svg>
+                            <svg class="cp__circleicon" ng-show="self.details.has('ttl')">
+                                <use href="#ico36_added_circle"></use>
+                            </svg>
+                            Turtle (TTL)
+                    </div>
+                </div>
+            </div>
+            <!-- /DETAIL Picker/ -->
+
             <!-- DETAILS -->
-            <div class="cp__details" ng-repeat="detail in self.getArrayFromSet(self.details) track by $index" ng-if="self.isValid()">
+            <div class="cp__details" ng-repeat="detail in self.getArrayFromSet(self.details) track by $index"">
                 <div class="cp__location"  ng-if="detail === 'location'">
                     <div class="cp__header location" ng-click="self.details.delete('location') && self.updateDraft()">
                         <svg class="cp__circleicon nonHover">
@@ -148,61 +208,8 @@ function genComponentConf() {
                     <div class="cp__ttl__parse-error" ng-show="self.ttlParseError">{{self.ttlParseError}}</div>
                 </div>
             </div>
-            <!-- /DETAILS -->
-            <!-- DETAILS Picker -->
-            <div class="cp__addDetail" ng-if="self.isValid()">
-                <div class="cp__header detailPicker clickable" 
-                    ng-click="self.toggleDetail()" 
-                    ng-class="{'closedDetailPicker': !self.showDetail}">
-                        <span class="nonHover">Add more detail</span>
-                        <span class="hover" ng-if="!self.showDetail">Open more detail</span>
-                        <span class="hover" ng-if="self.showDetail">Close more detail</span>
-                        <svg class="cp__carret" ng-show="!self.showDetail">
-                            <use href="#ico16_arrow_down"></use>
-                        </svg>
-                        <svg class="cp__carret" ng-show="self.showDetail">
-                            <use href="#ico16_arrow_up"></use>
-                        </svg>
-                </div>
-                <div class="cp__detail__items" ng-if="self.showDetail" >
-                    <div class="cp__detail__items__item location" 
-                        ng-click="!self.details.has('location') && self.details.add('location')"
-                        ng-class="{'picked' : self.details.has('location')}">
-                            <svg class="cp__circleicon" ng-show="!self.details.has('location')">
-                                <use href="#ico36_location_circle"></use>
-                            </svg>
-                            <svg class="cp__circleicon" ng-show="self.details.has('location')">
-                                <use href="#ico36_added_circle"></use>
-                            </svg>
-                            Address or Location
-                        </div>   
-                    <div class="cp__detail__items__item tags"
-                        ng-click="!self.details.has('tags') && self.details.add('tags')"
-                        ng-class="{'picked' : self.details.has('tags')}">
-                            <svg class="cp__circleicon" ng-show="!self.details.has('tags')">
-                                <use href="#ico36_tags_circle"></use>
-                            </svg>
-                            <svg class="cp__circleicon" ng-show="self.details.has('tags')">
-                                <use href="#ico36_added_circle"></use>
-                            </svg>
-                            Tags
-                    </div>
-                    
+            <!-- /DETAILS/ -->
 
-                    <div class="cp__detail__items__item ttl"
-                        ng-click="!self.details.has('ttl') && self.details.add('ttl')"
-                        ng-class="{'picked' : self.details.has('ttl')}">
-                            <svg class="cp__circleicon" ng-show="!self.details.has('ttl')">
-                                <use href="#ico36_rdf_logo_circle"></use>
-                            </svg>
-                            <svg class="cp__circleicon" ng-show="self.details.has('ttl')">
-                                <use href="#ico36_added_circle"></use>
-                            </svg>
-                            Turtle (TTL)
-                    </div>
-                </div>
-            </div>
-            <!-- /DETAIL Picker/ -->
         </div>
 `;
     
