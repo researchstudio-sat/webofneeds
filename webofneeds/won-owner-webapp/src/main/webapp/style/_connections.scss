@@ -12,11 +12,6 @@
 
   @include empty-description('opc');
 
-  &.empty {
-    flex-direction: row;
-    //align-items: center;
-  }
-
   .oir__requests{
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
