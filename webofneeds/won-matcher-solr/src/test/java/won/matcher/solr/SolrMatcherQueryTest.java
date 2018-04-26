@@ -2,7 +2,6 @@ package won.matcher.solr;
 
 import com.github.jsonldjava.core.JsonLdError;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -47,7 +46,7 @@ public class SolrMatcherQueryTest {
                 String query = needQuery.createQuery();
                 System.out.println("execute query: " + query);
 
-                SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new BasicNeedQueryFactory(ds).createQuery());
+                SolrDocumentList docs = queryExecutor.executeNeedQuery(query, 20, null, new BasicNeedQueryFactory(ds).createQuery());
                 SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
                 System.out.println("Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: " + ((matchedDocs != null) ? matchedDocs.size() : 0));
                 if (docs == null) {
