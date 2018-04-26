@@ -60,50 +60,25 @@ const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections a
 
 function genComponentConf() {
     const template = `
-        <div class="cp__inner">
-            <!-- TODO: move this close button next to title? -->
-            <div class="clickable"
+        <div class="cp__header">
+            <a class="clickable"
                 ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
-                        class="cp__icon clickable">
+                    class="cp__header__icon">
                     <use href="#ico36_close"></use>
                 </svg>
-            </div>
-
-            <!-- TODO: move whatsaround functionality somewhere else. 
-                Current use is as a fallback in case there is an unexpected Uri parameter 
-            -->
-            <div ng-if="self.needType !== 'post' && self.needType !== 'search'">
-                <button type="submit"
-                        class="won-button--filled red"
-                        ng-click="::self.createWhatsAround()">
-                    <span ng-show="!self.pendingPublishing">
-                        See What's Around
-                    </span>
-                    <span ng-show="self.pendingPublishing">
-                        Retrieving What's Around&nbsp;&hellip;
-                    </span>
-                </button>
-            </div>
-            
-            <div ng-if="self.needType === 'post'">
-                <div class="cp__title">Post</div>
-                <div class="cp__addDetail">
-                    <won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
-                </div>
-            </div>
-            <div ng-if="self.needType === 'search'">
-                <div class="cp__title">Search</div>
-                <div class="cp__addDetail">
-                    <won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
-                </div>
-            </div>
-
+            </a>
+            <span class="cp__header__title" ng-if="self.isPost">Post</span>
+            <span class="cp__header__title" ng-if="self.isSearch">Search</span>
+        </div>
+        <div class="cp__content">
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
             <!-- TODO: decide on whether to re-add stuff like an additional search/description window or something for adding contexts -->
-	       	
-            <won-labelled-hr label="::'done?'" class="cp__labelledhr"></won-labelled-hr>
-          	       	
-	       	<button type="submit" class="won-button--filled red cp__publish"
+        </div>
+        <div class="cp__footer">
+            <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
+            <button type="submit" class="won-button--filled red cp__footer__publish"
                     ng-disabled="!self.isValid()"
                     ng-click="::self.publish()">
                 <span ng-show="!self.pendingPublishing">
@@ -114,12 +89,27 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
-
+        <!-- TODO: move whatsaround functionality somewhere else. i commented out the following code snippet because the fallback ng-if-clause has turned into an oxymoron
+            Excluded due to #1632 https://github.com/researchstudio-sat/webofneeds/issues/1632
+        -->
+        <!--div ng-if="!self.isPost && !self.isSearch">
+            <button type="submit"
+                    class="won-button--filled red"
+                    ng-click="::self.createWhatsAround()">
+                <span ng-show="!self.pendingPublishing">
+                    See What's Around
+                </span>
+                <span ng-show="self.pendingPublishing">
+                    Retrieving What's Around&nbsp;&hellip;
+                </span>
+            </button>
+        </div-->
         <!-- Excluded due to #1627 https://github.com/researchstudio-sat/webofneeds/issues/1627
-        <won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-           
+        Be aware that the styling of these elements is not valid anymore
+        <won-labelled-hr label="::'add context?'" class="cp__footer__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
+
         <div class="cp__detail" ng-if="self.isValid()">
-            <div class="cp__header context">
+            <div class="cp__detail__header context">
                 <span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
             </div>
             <div class="cp__taglist">
@@ -136,6 +126,9 @@ function genComponentConf() {
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
             attach(this, serviceDependencies, arguments);
+
+            this.SEARCH = "search";
+            this.POST = "post";
 
             //TODO debug; deleteme
             window.cnc = this;
@@ -159,10 +152,15 @@ function genComponentConf() {
             this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
             
             const selectFromState = (state) => {
- 
+                const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
+                const isSearch = showCreateView === this.SEARCH;
+                const isPost = showCreateView && !isSearch;
+
             	return {
                     existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
-                    needType: getIn(state, ['router', 'currentParams', 'showCreateView'])
+                    showCreateView,
+                    isSearch,
+                    isPost
                 }
             };
             
