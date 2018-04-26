@@ -211,10 +211,11 @@ function genComponentConf() {
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
-               href="{{self.connection.get('uri')}}">
+               href="{{ self.connection.get('uri') }}">
                     <svg class="rdflink__small">
                         <use href="#rdf_logo_1"></use>
                     </svg>
+                    <span class="rdflink__label">Connection</span>
             </a>
         </div>
         <div class="pm__footer" ng-if="self.isConnected">

@@ -99,6 +99,7 @@ function genComponentConf() {
                     <svg class="rdflink__small">
                         <use href="#rdf_logo_1"></use>
                     </svg>
+                    <span class="rdflink__label">Post</span>
             </a>
         </div>
         <div class="post-info__footer">
