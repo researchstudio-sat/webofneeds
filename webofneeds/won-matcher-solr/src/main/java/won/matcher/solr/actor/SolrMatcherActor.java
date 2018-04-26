@@ -200,6 +200,11 @@ public class SolrMatcherActor extends UntypedActor {
         }
         if (!needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
 
+            // hints for WhatsAround Needs should not have the keywords from title, description, tags etc.
+            // this can prevent to actually find WhatsAround needs.
+            // Instead create a WhatsAround query (query without keywords, just location) to find other WhatsAround needs
+            queryString = (new WhatsAroundQueryFactory(dataset)).createQuery();
+
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
             SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
