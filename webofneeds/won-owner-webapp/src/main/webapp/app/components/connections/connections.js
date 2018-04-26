@@ -64,7 +64,6 @@ class ConnectionsController {
     }
 
     selectedNeed(needUri) {
-        this.showCreateView = undefined;
         this.router__stateGoCurrent({connectionUri: undefined, postUri: needUri, showCreateView: undefined}); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
     }
 
