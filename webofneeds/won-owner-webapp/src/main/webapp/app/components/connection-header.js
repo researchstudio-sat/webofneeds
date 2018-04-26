@@ -29,7 +29,7 @@ function genComponentConf() {
         ng-class="{'bigger' : self.biggerImage, 'inactive' : self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         title="self.need.get('title')"
-        uri="self.needUri"
+        uri="self.need.get('uri')"
         ng-show="!self.hideImage">
       </won-square-image>
       <div class="ch__right">

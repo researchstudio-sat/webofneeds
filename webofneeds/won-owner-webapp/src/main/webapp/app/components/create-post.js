@@ -60,7 +60,39 @@ const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections a
 
 function genComponentConf() {
     const template = `
-        <div class="cp__inner">
+        <div class="cp__header">
+            <a class="clickable"
+                ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="cp__header__icon">
+                    <use href="#ico36_close"></use>
+                </svg>
+            </a>
+            <span class="cp__header__title" ng-if="self.isPost">Post</span>
+            <span class="cp__header__title" ng-if="self.isSearch">Search</span>
+        </div>
+        <div class="cp__content">
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
+            <!-- TODO: decide on whether to re-add stuff like an additional search/description window or something for adding contexts -->
+        </div>
+        <div class="cp__footer">
+            <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
+            <button type="submit" class="won-button--filled red cp__footer__publish"
+                    ng-disabled="!self.isValid()"
+                    ng-click="::self.publish()">
+                <span ng-show="!self.pendingPublishing">
+                    Publish
+                </span>
+                <span ng-show="self.pendingPublishing">
+                    Publishing&nbsp;&hellip;
+                </span>
+            </button>
+        </div>
+        <!-- TODO: move whatsaround functionality somewhere else. i commented out the following code snippet because the fallback ng-if-clause has turned into an oxymoron
+            Excluded due to #1632 https://github.com/researchstudio-sat/webofneeds/issues/1632
+        -->
+        <!--div ng-if="!self.isPost && !self.isSearch">
             <button type="submit"
                     class="won-button--filled red"
                     ng-click="::self.createWhatsAround()">
@@ -71,53 +103,32 @@ function genComponentConf() {
                     Retrieving What's Around&nbsp;&hellip;
                 </span>
             </button>
-            
-            <won-labelled-hr label="::' or create a specific '" style="margin-top: 2rem; margin-bottom: 2rem;" ></won-labelled-hr>
-           
-           <div class="cp__title">Post</div>
-            <div class="cp__addDetail">
+        </div-->
+        <!-- Excluded due to #1627 https://github.com/researchstudio-sat/webofneeds/issues/1627
+        Be aware that the styling of these elements is not valid anymore
+        <won-labelled-hr label="::'add context?'" class="cp__footer__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
 
-    			<won-create-isseeks is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
-    			
-    			<won-labelled-hr label="::' + '" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr> 
-    			
-    			<won-create-isseeks is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
-    			
-    		</div>
-    		
-	       	<won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-	       	
-	       	<div class="cp__detail" ng-if="self.isValid()">
-		       	<div class="cp__header context">
-		       		<span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
-		       	</div>
-			    <div class="cp__taglist">
-			          <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
-			    </div>
-			    <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
-	    		<div class="cp__textfield_instruction">
-						<span>use whitespace to separate context names</span>
-					</div>
-    		</div>
-	       	
-	       	<won-labelled-hr label="::'done?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-	       	
-	       	<button type="submit" class="won-button--filled red cp__publish"
-                    ng-if="self.isValid()"
-                    ng-click="::self.publish()">
-                <span ng-show="!self.pendingPublishing">
-                    Publish
-                </span>
-                <span ng-show="self.pendingPublishing">
-                    Publishing&nbsp;&hellip;
-                </span>
-            </button>
+        <div class="cp__detail" ng-if="self.isValid()">
+            <div class="cp__detail__header context">
+                <span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
+            </div>
+            <div class="cp__taglist">
+                <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
+            </div>
+            <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
+            <div class="cp__textfield_instruction">
+                <span>use whitespace to separate context names</span>
+            </div>
         </div>
+        -->
     `;
     
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
             attach(this, serviceDependencies, arguments);
+
+            this.SEARCH = "search";
+            this.POST = "post";
 
             //TODO debug; deleteme
             window.cnc = this;
@@ -141,9 +152,15 @@ function genComponentConf() {
             this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
             
             const selectFromState = (state) => {
- 
+                const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
+                const isSearch = showCreateView === this.SEARCH;
+                const isPost = showCreateView && !isSearch;
+
             	return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")) 
+                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
+                    showCreateView,
+                    isSearch,
+                    isPost
                 }
             };
             

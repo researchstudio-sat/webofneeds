@@ -12,6 +12,7 @@ import squareImageModule from './square-image.js';
 import postHeaderModule from './post-header.js';
 import connectionIndicatorsModule from './connection-indicators.js';
 import connectionSelectionItemModule from './connection-selection-item.js';
+import createPostItemModule from './create-post-item.js';
 
 import {
     labels,
@@ -20,6 +21,7 @@ import {
 import {
     attach,
     sortByDate,
+    getIn,
 } from '../utils.js';
 import {
     connect2Redux,
@@ -35,6 +37,7 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
+        <won-create-post-item ng-class="{'selected' : self.showCreateView}"></won-create-post-item>
         <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
             <div class="co__item__need"
@@ -122,6 +125,7 @@ function genComponentConf() {
 
                 const routerParams = selectRouterParams(state);
                 const showClosed = routerParams && routerParams['showClosed'];
+                const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needUriInRoute = routerParams && decodeURIComponent(routerParams['postUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
@@ -132,6 +136,7 @@ function genComponentConf() {
 
                 return {
                     showClosed,
+                    showCreateView,
                     needUriInRoute,
                     needUriImpliedInRoute,
                     sortedOpenNeeds,
@@ -217,6 +222,7 @@ export default angular.module('won.owner.components.connectionsOverview', [
         postHeaderModule,
         connectionIndicatorsModule,
         ngAnimate,
+        createPostItemModule,
 ])
     .directive('wonConnectionsOverview', genComponentConf)
     .name;

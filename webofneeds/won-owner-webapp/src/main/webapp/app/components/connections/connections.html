@@ -1,39 +1,10 @@
 <header>
     <won-topnav></won-topnav>
 </header>
-<main class="connectionscontent" ng-class="{'empty' : !self.hasConnections && !self.hasOwnNeeds}">
-    <!-- <div class="opc__inner empty" ng-if="!self.hasConnections && !self.hasOwnNeeds">
-        <div class="opc__empty">
-            <div class="opc__empty__description">
-                <svg class="opc__empty__description__icon"
-                    style="--local-primary:var(--won-disabled-color);">
-                        <use href="#ico36_incoming"></use>
-                </svg>
-                <span class="opc__empty__description__text">Here you will see all chats, requests, and suggestions for your needs, but
-                    currently there are none. Check again later!</span>
-            </div>
-            <a ng-click="self.router__stateGoResetParams('createNeed')" class="opc__empty__link clickable">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="opc__empty__link__icon">
-                        <use href="#ico36_plus"></use>
-                </svg>
-                <span class="opc__empty__link__caption">Create a Need</span>
-            </a>
-        </div>
-    </div> -->
+<main class="connectionscontent">
     
     <!-- LEFT SIDE -->
-    <div class="oir__requests" ng-class="{'hidden': self.connection || self.selectedPost || self.showCreateView}">
-        <!-- TODO: move oir__create-post to own component -->
-        <div class="oir__create-post clickable"
-            ng-click="self.setShowCreateView(true)">
-            <svg class="oir__create-post__icon"
-                title="Create a new need"
-                style="--local-primary:var(--won-primary-color);">
-                    <use href="#ico36_plus"></use>
-            </svg>
-            Create New Need
-        </div>
+    <div class="oir__requests" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView}">
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)",
             on-selected-need="self.selectedNeed(needUri)",
@@ -42,28 +13,15 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <!--  ng-if="!self.selectedPost && !self.showCreateView && (self.hasConnections || self.hasOwnNeeds) && (!self.connection || self.connectionType === self.WON.Closed)" -->
-    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && !self.connection && !self.showCreateView"
-        ng-class="{'hidden' : self.connectionUri === undefined}">
+    <div class="post__contentside post__contentside--empty hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.showCreateView">
         <span class="post__contentside__description__text">
-            No Element selected
+            No element selected
         </span>
     </div>
-    <div class="post__contentside post__contentside--create" ng-if="self.showCreateView">
-        <div class="clickable"
-            ng-click="self.setShowCreateView(undefined)">
-            <svg style="--local-primary:var(--won-primary-color);"
-                    class="oir__close-create-post__icon clickable">
-                <use href="#ico36_close"></use>
-            </svg>
-        </div>
-        <won-create-post></won-create-post>
-    </div>
-    <div class="post__contentside" ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed">
-        <won-send-request include-header="::true" ng-if="self.connectionType === self.WON.Suggested"></won-send-request>
-        <won-post-messages ng-if="self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
-    </div>
-    <div class="post__contentside" ng-if="self.selectedPost && !self.showCreateView">
-        <won-post-info include-header="::true"></won-post-info>
+    <div class="post__contentside" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
+        <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection"></won-create-post>
+        <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Suggested"></won-send-request>
+        <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>
+        <won-post-info include-header="true" ng-if="self.selectedPost && !self.showCreateView"></won-post-info>
     </div>
 </main>

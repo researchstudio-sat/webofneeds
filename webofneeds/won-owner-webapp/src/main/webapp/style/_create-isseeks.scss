@@ -1,0 +1,269 @@
+@import 'won-config';
+@import 'text';
+@import 'needtextfield';
+@import 'locationpicker';
+@import 'animate';
+@import 'sizing-utils';
+@import 'textfield';
+
+won-create-isseeks {
+  display: flex;
+  flex-direction: column;
+
+  .cis__mandatory-rest {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    @include appearAnimation(0.5s, linear);
+
+    & need-textfield {
+      flex-grow: 1;
+      flex-basis: 10rem;
+
+      .medium_title {
+        font-weight: 700;
+        padding-bottom: 1rem;
+      }
+
+      p:last-of-type { //this is so that the padding is not present if there is only a single paragraph namely the .medium_title
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  .cis__textfield_instruction {
+    color: $won-line-gray;
+  }
+
+  .cis__addDetail {
+    //border-top: $thinBorderWidth solid $won-line-gray;
+    padding: 0 0 0 0;
+    @include appearAnimation(0.5s, linear);
+
+    .cis__detail__items {
+      @include slideWithOpacityAnimation(.5s, linear, 20rem);
+
+      .cis__detail__items__item {
+        display: flex;
+        font-size: $normalFontSize;
+        padding: .5rem 0;
+        cursor: pointer;
+
+        color: black;
+        --local-primary: black; // for the svg-icons
+        &:hover {
+          color: $won-primary-color;
+          --local-primary: $won-primary-color; // for the svg-icons
+        }
+
+        &.picked {
+          color: $won-line-gray;
+          --local-primary: $won-line-gray; // for the svg-icons
+          cursor: default;
+
+          &:hover {
+            color: $won-line-gray;
+            --local-primary: $won-line-gray; // for the svg-icons
+            cursor: default;
+          }
+        }
+      }
+    }
+  }
+
+  .cis__details {
+    @include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
+
+    border-top: $thinBorderWidth solid $won-line-gray;
+    padding: 0.5rem 0;
+
+    color: black;
+    --local-primary: black; // for the svg-icons
+    .cis__header:hover {
+      color: $won-primary-color;
+      --local-primary: $won-primary-color; // for the svg-icons
+    }
+
+    .cis__tags {
+      .cis__taglist{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+
+        .cis__taglist__tag {
+          border-radius: 0.5rem;
+          background: $won-dark-purple;
+          color: white;
+          margin: 0.25rem 0.25rem 0.25rem 0;
+          padding: 0.25rem 0.5rem;
+        }
+      }
+      .cis__tags__input {
+        border-width: $thinBorderWidth;
+        border-style: solid;
+        border-radius: 0.1rem;
+        background-color: white;
+
+
+        font-size: $normalFontSize;
+        min-height: $formInputHeight;
+
+        $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+        padding: $verticalPadding 0.438rem;
+
+        box-sizing: border-box;
+
+        min-width: 0; // so a size is specified and break-word works
+        word-wrap: break-word;
+
+        border-color: $won-line-gray;
+
+        width: 100%;
+      }
+    }
+
+    .cis__ttl {
+      display: grid;
+      grid-gap: 1rem;
+
+      .cis__ttl__helptext {
+        @include fine-print;
+      }
+      .cis__ttl__parse-error {
+        white-space: pre-wrap;
+        color: $won-primary-color;
+        font-family: $font-family-monospace;
+        font-size: $smallFontSize;
+        //@include appearAnimation(0.5s, linear);
+      }
+    }
+  }
+
+  .cis__circleicon {
+    @include fixed-square(2rem);
+  }
+
+  .cis__addDetail__header {
+    display: flex;
+    font-size: $mediumFontSize;
+    font-weight: 400;
+    &:not(.ttl) { padding-bottom: 1rem; } // ttl uses grid and grid-gap
+
+    span {
+      padding-left: 0.5rem;
+    }
+
+    svg.hover,
+    span.hover {
+      display: none;
+    }
+
+    svg.nonHover,
+    span.nonHover {
+      display: inline;
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      svg.hover,
+      span.hover {
+        display: inline;
+      }
+
+      span.nonHover,
+      svg.nonHover {
+        display: none;
+      }
+    }
+
+    &.location,
+    &.tags {
+      font-size: $normalFontSize+.25rem;
+    }
+
+    &.detailPicker {
+      font-size: $normalFontSize+.25rem;
+      padding: .5rem 0;
+      color: $won-primary-color;
+      --local-primary: $won-primary-color; // for the svg-icons
+
+      &:hover {
+        color: black;
+        --local-primary: black; // for the svg-icons
+      }
+    }
+
+    .cis__addDetail__header__carret {
+      @include fixed-square(1rem);
+
+      // visually center icon on line
+      position: relative;
+      top: 0.1em;
+    }
+  }
+
+  //Currently not displayed style might be incorrect
+  won-image-dropzone {
+    $borderSize: 5.66rem;
+    $padding: 1rem;
+    @include fixed-square($borderSize);
+    display: block;
+
+    %wid__dropzone {
+
+      box-sizing: border-box;;
+      height: 100%;
+      width: 100%;
+
+      position: relative; //to allow children to use pos:absolute
+
+      overflow: hidden; // to crop the `fill`ing image
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      /* the preview is set via js:
+       * background-image: url({{self.imageDataUrl}});
+       */
+
+      input {
+        filter: alpha(opacity=0);
+        opacity: 0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+
+      & .wid__dropzone__default-bg,
+      & .wid__dropzone__preview-img {
+        @extend %center--absolute;
+        pointer-events: none;
+      }
+    }
+
+    .wid__dropzone--empty {
+      @extend %wid__dropzone;
+
+      border: $boldBorderWidth dashed $won-line-gray;
+      border-radius: $boldBorderWidth;
+
+      background-color: white;
+
+      .wid__dropzone__default-bg {
+        @include max-square($borderSize - 2 * $padding - 2 * $boldBorderWidth);
+      }
+    }
+
+    .wid__dropzone--filled {
+      @extend %wid__dropzone;
+
+      border: $thinBorderWidth solid $won-line-gray;
+
+      .wid__dropzone__default-bg {
+        display: none;
+      }
+    }
+  }
+}

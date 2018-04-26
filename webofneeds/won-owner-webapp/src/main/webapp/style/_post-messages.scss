@@ -5,28 +5,24 @@
 @import 'connection-agreement';
 @import 'animate';
 
-@media (max-width: $responsivenessBreakPoint) {
-  .post__listside.hidden,
-  .post__contentside--empty.hidden{
-    display: none; //hide the subheader when a conversation is open on a mobile device
-  }
-}
-.post__listside {
-  width: 100%;
-  max-width: $maxContentWidth / 2;
-}
-
 .post__contentside {
+  border-left: $thinGrayBorder;
+  border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
+  background: white;
   width: 100%;
   max-width: ($maxContentWidth / 2);
   //margin-ri: 0.5rem;
 
   box-sizing: border-box;
 
+  @media (max-width : $responsivenessBreakPoint) {
+    border-left: none;
+    border-right: none;
+  }
+
   &--empty {
-      border-left: $thinGrayBorder;
-      border-right: $thinGrayBorder;
-      border-bottom: $thinGrayBorder;
+      background: $won-lighter-gray;
 
       // display message centered
       flex-direction: column;
@@ -40,12 +36,6 @@
       }
   }
 
-  &--create {
-    border-left: $thinGrayBorder;
-    border-right: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-  }
-
   display: flex;
   flex-grow:1;
   height: 100%;
@@ -54,10 +44,6 @@
   flex-direction: row;
 
   won-post-messages {
-    border-left: $thinGrayBorder;
-    border-right: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-    background: white;
     display: grid;
     grid-template-areas: "header" "main" "footer";
     grid-template-rows: min-content minmax(10rem, 1fr) min-content;
