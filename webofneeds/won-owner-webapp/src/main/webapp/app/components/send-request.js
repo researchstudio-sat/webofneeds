@@ -6,6 +6,7 @@ import postHeaderModule from './post-header.js';
 import feedbackGridModule from './feedback-grid.js';
 import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
+import postShareLinkModule from './post-share-link.js';
 import labelledHrModule from './labelled-hr.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 
@@ -98,12 +99,10 @@ function genComponentConf() {
             </a>
         </div>
         <div class="post-info__footer">
-            <div class="post-info__footer__link" ng-if="self.suggestedPost.get('state') !== self.WON.InactiveCompacted">
-                <p class="post-info__footer__link__text">
-                    Know someone who might also be interested in this posting? Consider sharing the link below in social media.
-                </p>
-                <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
-            </div>
+            <won-post-share-link
+                ng-if="self.suggestedPost.get('state') !== self.WON.InactiveCompacted"
+                post-uri="self.suggestedPost && self.suggestedPost.get('uri')">
+            </won-post-share-link>
             <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
 
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
@@ -161,9 +160,7 @@ function genComponentConf() {
                     }: undefined,
                     suggestedPost,
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
-                    connectionUri,
                     postUriToConnectTo,
-                    linkToPost: suggestedPost && new URL("/owner/#!post/?postUri="+encodeURI(suggestedPost.get('uri')), window.location.href).href,
                     friendlyTimestamp: suggestedPost && relativeTime(
                         selectLastUpdateTime(state),
                         suggestedPost.get('creationDate')
@@ -213,7 +210,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            includeHeader: '='
+            includeHeader: '=' //only read once
         },
         template: template
     }
@@ -226,6 +223,7 @@ export default angular.module('won.owner.components.sendRequest', [
     feedbackGridModule,
     labelledHrModule,
     chatTextFieldSimpleModule,
+    postShareLinkModule
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;

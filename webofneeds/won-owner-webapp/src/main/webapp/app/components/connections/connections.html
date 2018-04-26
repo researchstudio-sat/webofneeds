@@ -1,7 +1,7 @@
 <header>
     <won-topnav></won-topnav>
 </header>
-<main class="connectionscontent" ng-class="{'empty' : !self.hasConnections && !self.hasOwnNeeds}">
+<main class="connectionscontent">
     
     <!-- LEFT SIDE -->
     <div class="oir__requests" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView}">
@@ -13,14 +13,13 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <!--  ng-if="!self.selectedPost && !self.showCreateView && (self.hasConnections || self.hasOwnNeeds) && (!self.connection || self.connectionType === self.WON.Closed)" -->
-    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && !self.connection && !self.showCreateView"
+    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.showCreateView"
         ng-class="{'hide-in-responsive' : self.connectionUri === undefined}">
         <span class="post__contentside__description__text">
             No element selected
         </span>
     </div>
-    <div class="post__contentside" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)"> <!-- ng-if="!self.selectedPost && !self.showCreateView && self.connection && self.connectionType !== self.WON.Closed" -->
+    <div class="post__contentside" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
         <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection"></won-create-post>
         <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent"></won-post-messages>

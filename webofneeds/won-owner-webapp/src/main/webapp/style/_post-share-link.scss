@@ -1,0 +1,21 @@
+@import 'won-config';
+@import 'animate';
+
+won-post-share-link {
+  .psl__info,
+  .psl__text {
+    font-size: $smallFontSize;
+  }
+
+  .psl__text {
+    padding-bottom: 0.5rem;
+  }
+
+  .psl__info {
+    padding-top: 0.5rem;
+  }
+
+  .psl__link {
+    width: 100%;
+  }
+}
