@@ -137,7 +137,7 @@ public class SolrMatcherActor extends UntypedActor {
 
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 1 (without NoHintForCounterpart)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHints(),null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
@@ -173,7 +173,7 @@ public class SolrMatcherActor extends UntypedActor {
 
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 2 (without NoHintForSelf, excluding WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(), null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, perform knee detection)
@@ -207,7 +207,7 @@ public class SolrMatcherActor extends UntypedActor {
 
             // execute the query
             log.info("query Solr endpoint {} for need {} and need list 3 (without NoHintForSelf that are only WhatsAround needs)", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, null, filterQueries.toArray(new String[filterQueries.size()]));
+            SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHintsForCounterparts(), null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
                 // generate hints for matched needs (suppress hints for current need, only generate hints for matched needs, do not perform knee detection)
