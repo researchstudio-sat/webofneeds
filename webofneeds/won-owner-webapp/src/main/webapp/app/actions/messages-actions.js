@@ -114,24 +114,6 @@ export function successfulCloseConnection(event) {
     }
 }
 
-//TODO move redirect elsewhere (e.g. to click-handler) then remove
-export function successfulOpen(event){
-    return (dispatch, getState) => {
-        const state = getState();
-        dispatch({
-            type: actionTypes.messages.open.successOwn,
-            payload: {
-                event,
-            }
-        });
-
-        dispatch(actionCreators.router__stateGoAbs("connections", {
-            postUri: event.getReceiverNeed(),
-            connectionUri: event.getReceiver(),
-        }));
-    }
-}
-
 export function successfulCreate(event) {
     return (dispatch) => {
         //const state = getState();
