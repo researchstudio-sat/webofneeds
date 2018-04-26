@@ -115,7 +115,7 @@ function genComponentConf() {
             </button>
         </div>
 
-        <!-- TODO: decide what to do with this 
+        <!-- Excluded due to #1627 https://github.com/researchstudio-sat/webofneeds/issues/1627
         <won-labelled-hr label="::'add context?'" class="cp__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
            
         <div class="cp__detail" ng-if="self.isValid()">
