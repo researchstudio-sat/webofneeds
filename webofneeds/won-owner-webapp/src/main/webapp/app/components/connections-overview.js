@@ -7,6 +7,7 @@
 
 import won from '../won-es6.js';
 import angular from 'angular';
+import ngAnimate from 'angular-animate';
 import squareImageModule from './square-image.js';
 import postHeaderModule from './post-header.js';
 import connectionIndicatorsModule from './connection-indicators.js';
@@ -34,7 +35,7 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <div ng-repeat="need in self.sortedNeeds" class="co__item"
+        <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
             <div class="co__item__need"
                 ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
@@ -44,8 +45,7 @@ function genComponentConf() {
                     ng-click="self.selectNeed(need.get('uri'))"
                     class="clickable">
                 </won-post-header>
-                <won-connection-indicators 
-                    ng-show="need.get('state') === self.WON.ActiveCompacted"
+                <won-connection-indicators
                     on-selected-connection="self.selectConnection(connectionUri)" 
                     need-uri="need.get('uri')">
                 </won-connection-indicators>
@@ -76,6 +76,33 @@ function genComponentConf() {
                 </won-connection-selection-item>
             </div>
         </div>
+        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosed}" ng-if="self.closedNeedsSize > 0" ng-click="self.toggleClosedNeeds()">
+            <span class="co__separator__text">Closed Posts ({{ self.closedNeedsSize }})</span>
+            <svg
+                style="--local-primary:var(--won-secondary-color);"
+                class="co__separator__arrow"
+                ng-show="self.showClosed">
+                <use href="#ico16_arrow_up"></use>
+            </svg>
+            <svg style="--local-primary:var(--won-secondary-color);"
+                class="co__separator__arrow"
+                ng-show="!self.showClosed">
+                <use href="#ico16_arrow_down"></use>
+            </svg>
+        </div>
+        <div class="co__closedNeeds" ng-if="self.showClosed && self.closedNeedsSize > 0">
+            <div ng-repeat="need in self.sortedClosedNeeds" class="co__item">
+                <div class="co__item__need"
+                    ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
+                    <won-post-header
+                        need-uri="need.get('uri')"
+                        timestamp="'TODOlatestOfThatType'"
+                        ng-click="self.selectNeed(need.get('uri'))"
+                        class="clickable">
+                    </won-post-header>
+                </div>
+            </div>
+        </div>
     `;
 
     class Controller {
@@ -88,20 +115,28 @@ function genComponentConf() {
 
             const self = this;
             const selectFromState = (state)=> {
-                const allOwnNeeds = selectAllOwnNeeds(state).filter(post => !(post.get("isWhatsAround") && post.get("state") === won.WON.InactiveCompacted)); //FILTER ALL CLOSED WHATS AROUNDS
+                const allOwnNeeds = selectAllOwnNeeds(state); //FILTER ALL CLOSED WHATS AROUNDS
+
+                const openNeeds = allOwnNeeds && allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted);
+                const closedNeeds = allOwnNeeds && allOwnNeeds.filter(post => post.get("state") === won.WON.InactiveCompacted && !post.get("isWhatsAround")); //Filter whatsAround needs automatically
 
                 const routerParams = selectRouterParams(state);
+                const showClosed = routerParams && routerParams['showClosed'];
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needUriInRoute = routerParams && decodeURIComponent(routerParams['postUri']);
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
-                let sortedNeeds = self.sortNeeds(allOwnNeeds);
+                let sortedOpenNeeds = sortByDate(openNeeds);
+                let sortedClosedNeeds = sortByDate(closedNeeds);
 
                 return {
+                    showClosed,
                     needUriInRoute,
                     needUriImpliedInRoute,
-                    sortedNeeds: sortedNeeds,
+                    sortedOpenNeeds,
+                    sortedClosedNeeds,
+                    closedNeedsSize: closedNeeds && closedNeeds.size > 0 ? closedNeeds.size : undefined,
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
@@ -142,20 +177,16 @@ function genComponentConf() {
             this.onSelectedNeed({needUri}); //trigger callback with scope-object
         }
 
-        // sort needs by date and put closed needs at the end of the list
-        sortNeeds(allNeeds) {
-            openNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted));
-            closedNeeds = sortByDate(allNeeds.filter(post => post.get("state") === won.WON.InactiveCompacted));
-
-            return openNeeds.concat(closedNeeds);
-        }
-
         showConnectionsDropdown(need){
             return need.get("state") === won.WON.ActiveCompacted && need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
         }
 
         getOpenConnectionsArraySorted(need){
             return sortByDate(need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed));
+        }
+
+        toggleClosedNeeds() {
+            this.router__stateGoCurrent({showClosed: (this.showClosed ? undefined : true)});
         }
     }
     Controller.$inject = serviceDependencies;
@@ -185,6 +216,7 @@ export default angular.module('won.owner.components.connectionsOverview', [
         connectionSelectionItemModule,
         postHeaderModule,
         connectionIndicatorsModule,
+        ngAnimate,
 ])
     .directive('wonConnectionsOverview', genComponentConf)
     .name;
