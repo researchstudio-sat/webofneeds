@@ -11,41 +11,48 @@ import { connect2Redux } from '../won-utils.js';
 const serviceDependencies = ['$scope', '$ngRedux'];
 function genComponentConf() {
     let template = `
-        <div class="cpi__card">
-            <div class="cpi__item clickable"
-                ng-click="self.selectCreate('search')">
-                <svg class="cpi__item__icon"
-                    title="Create a new search"
-                    style="--local-primary:var(--won-primary-color);">
-                        <use href="#ico36_search"></use>
-                </svg>
-                <div class="cpi__item__text">
-                    Search
-                </div>
-            </div>
-            <div class="cpi__item clickable"
-                ng-click="self.selectCreate('post')">
-                <svg class="cpi__item__icon"
-                    title="Create a new post"
-                    style="--local-primary:var(--won-primary-color);">
-                        <use href="#ico36_plus"></use>
-                </svg>
-                <div class="cpi__item__text">
-                    Post
-                </div>
+        <div class="cpi__item clickable"
+            ng-click="self.selectCreate(self.SEARCH)"
+            ng-class="{'selected': self.isSearch}">
+            <svg class="cpi__item__icon"
+                title="Create a new search"
+                style="--local-primary:var(--won-primary-color);">
+                    <use href="#ico36_search"></use>
+            </svg>
+            <div class="cpi__item__text">
+                Search
             </div>
         </div>
-        `;
+        <div class="cpi__item clickable"
+            ng-click="self.selectCreate(self.POST)"
+            ng-class="{'selected': self.isPost}">
+            <svg class="cpi__item__icon"
+                title="Create a new post"
+                style="--local-primary:var(--won-primary-color);">
+                    <use href="#ico36_plus"></use>
+            </svg>
+            <div class="cpi__item__text">
+                Post
+            </div>
+        </div>
+    `;
 
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
 
+            this.SEARCH = "search";
+            this.POST = "post";
             const self = this;
+
             const selectFromState = (state) => {
                 const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
+                const isSearch = showCreateView === this.SEARCH;
+                const isPost = showCreateView && !isSearch;
 
                 return {
+                    isSearch,
+                    isPost,
                     showCreateView,
                 }
             };
