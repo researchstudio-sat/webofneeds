@@ -11,6 +11,9 @@ won-connections-overview {
 
   .co__item {
     background-color: $won-light-gray;
+    border-left: $thinGrayBorder;
+    border-right: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
 
     &--withconn {
       margin-bottom: 0.5rem;
@@ -19,13 +22,6 @@ won-connections-overview {
         border-bottom: $thinGrayBorder;
       }
     }
-
-    &:first-child {
-      border-top: none;
-    }
-
-    border: $thinGrayBorder;
-
     @media (max-width: $responsivenessBreakPoint) {
       border-left: none;
       border-right: none;

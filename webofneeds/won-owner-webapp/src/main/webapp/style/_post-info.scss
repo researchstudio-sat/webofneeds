@@ -4,11 +4,7 @@
 
 won-send-request,
 won-post-info {
-  background: white;
   display: grid;
-  border-left: $thinGrayBorder;
-  border-right: $thinGrayBorder;
-  border-bottom: $thinGrayBorder;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax(10rem, 1fr) min-content;
   grid-row-gap: $gridRowGap;
@@ -27,12 +23,6 @@ won-post-info {
       border-top: none;
       padding-top: 0;
     }
-  }
-
-
-  @media (max-width : $responsivenessBreakPoint) {
-    border-left: none;
-    border-right: none;
   }
 
   .post-info__header {

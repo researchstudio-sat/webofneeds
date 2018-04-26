@@ -4,334 +4,58 @@
 @import 'locationpicker';
 @import 'animate';
 @import 'sizing-utils';
+@import 'textfield';
+@import 'create-isseeks';
 
 won-create-post {
-
+  display: grid;
+  grid-template-areas: "header" "main" "footer";
+  grid-template-rows: min-content minmax(10rem, 1fr) min-content;
+  grid-row-gap: $gridRowGap;
   width: 100%;
-  display: block;
-
-  & > .cp__inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-
-    padding: $minContentPadding;
-
-    max-width: $maxContentWidth / 2;
-
-    // center
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  hr {
-    border: 0;
-    /*border-top: $thinBorderWidth solid $won-line-gray;*/
-    width: 100%;
-  }
-
-  .cp__labelledhr,
-  .cp__publish {
-    @include appearAnimation(0.5s, linear);
-  }
-
-  //$createPostMaxContentWidth: $maxContentWidth / 2;
-  //@media (max-width: $responsivenessBreakPoint){
-  //  @include max-content-width($createPostMaxContentWidth, 0, 'cp');
-  //}
-  //@media (min-width: $responsivenessBreakPoint){
-  //  @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
-  //}
-
-
-  .cp__icon {
-    @include fixed-square($bigiconSize);
-  }
-
-
-
-  won-posttype-select {
-    margin-bottom: $minContentPadding;
-  }
-
-  .cp__mandatory-rest {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-
-    @include appearAnimation(0.5s, linear);
-
-    won-image-dropzone {
-      display: none; //removed for the time being (as long as the picture upload/save is not implemented)
-      margin-right: $minContentPadding;
-      margin-bottom: $minContentPadding;
-    }
-    & need-textfield {
-      flex-grow: 1;
-      flex-basis: 10rem;
-
-      .medium_title {
-        font-weight: 700;
-        padding-bottom: 1rem;
-      }
-
-      p:last-of-type { //this is so that the padding is not present if there is only a single paragraph namely the .medium_title
-        padding-bottom: 0;
-      }
-    }
-  }
-  
-  .cp__textfield_instruction {
-    color: $won-line-gray;
-	@include appearAnimation(0.5s, linear);
-  }
-
-  .cp__details {
-    @include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
-
-    border-top: $thinBorderWidth solid $won-line-gray;
-    margin: 1.5rem 1.5rem;
-    padding: 0.5rem 0;
-
-
-    color: black;
-    --local-primary: black; // for the svg-icons
-    .cp__header:hover {
-      color: $won-primary-color;
-      --local-primary: $won-primary-color; // for the svg-icons
-    }
-
-    .cp__tags {
-      .cp__taglist{
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 0.5rem;
-
-        .cp__taglist__tag {
-          border-radius: 0.5rem;
-          background: $won-dark-purple;
-          color: white;
-          margin: 0.25rem 0.25rem 0.25rem 0;
-          padding: 0.25rem 0.5rem;
-        }
-      }
-      .cp__tags__input {
-        border-width: $thinBorderWidth;
-        border-style: solid;
-        border-radius: 0.1rem;
-        background-color: white;
-
-
-        font-size: $normalFontSize;
-        min-height: $formInputHeight;
-
-        $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
-        padding: $verticalPadding 0.438rem;
-
-        box-sizing: border-box;
-
-        min-width: 0; // so a size is specified and break-word works
-        word-wrap: break-word;
-
-        border-color: $won-line-gray;
-
-        width: 100%;
-      }
-    }
-  }
-
-  .cp__addDetail {
-    //border-top: $thinBorderWidth solid $won-line-gray;
-    padding: 0 0 0 0;
-    @include appearAnimation(0.5s, linear);
-
-    .cp__detail__items {
-      @include slideWithOpacityAnimation(.5s, linear, 20rem);
-
-      .cp__detail__items__item {
-        font-size: $normalFontSize;
-        margin: 0 1.5rem;
-        padding: .5rem .5rem .5rem 2.5rem;
-        background-position: 0 .15rem;
-        background-size: 2rem;
-        background-repeat: no-repeat;
-        cursor: pointer;
-
-        color: black;
-        --local-primary: black; // for the svg-icons
-        &:hover {
-          color: $won-primary-color;
-          --local-primary: $won-primary-color; // for the svg-icons
-        }
-
-        &.picked {
-          color: $won-line-gray;
-          --local-primary: $won-line-gray; // for the svg-icons
-          cursor: default;
-
-          &:hover {
-            color: $won-line-gray;
-            --local-primary: $won-line-gray; // for the svg-icons
-            cursor: default;
-          }
-        }
-      }
-    }
-  }
-
-  .cp__title {
-    width: 100%;
-    color: $won-subtitle-gray;
-    @extend %center--absolute;
-    margin: 1.5rem 1rem -1.5rem -1.5rem;
-    text-align: center;
-    position: relative;
-    font-size: $mediumFontSize;
-    font-weight: 400;
-    padding: 0 0 1rem 2.5rem;
-  }
-
-  .cp__carret {
-    @include fixed-square(1rem);
-
-    // visually center icon on line
-    position: relative;
-    top: 0.1em;
-  }
-  .cp__circleicon {
-    @include fixed-square(2rem);
-
-    // visually center icon on line
-    position: relative;
-    top: 0.3em;
-  }
+  max-width: $maxContentWidth;
+  height: 100%;
+  box-sizing: border-box;
+  padding: $gridRowGap;
 
   .cp__header {
+    display:flex;
+    grid-area: header;
+    font-size: $normalFontSize;
+    text-align: left;
     width: 100%;
-    box-sizing: border-box;
-    font-size: $mediumFontSize;
-    font-weight: 400;
-    padding-bottom: 1rem;
-    background-position: 0 0.15rem;
-    background-size: 2rem;
-    background-repeat: no-repeat;
 
-
-    span.alternate {
-           
-    }
-    span.opt {
+    &__title {
       color: $won-subtitle-gray;
-      font-size: $smallFontSize;
-      padding: .5rem .5rem .5rem .5rem;   
+      font-size: $mediumFontSize;
+      font-weight: 400;
     }
 
-    span.hover {
-      display: none;
-    }
-
-    span.nonHover {
-      display: inline;
-    }
-    
-   &:hover {
-      cursor: pointer;
-
-      span.hover {
-        display: inline;
-      }
-
-      span.nonHover {
-        display: none;
-      }
-    }
-
-    &.tags {
-      font-size: $normalFontSize+.25rem;
-    }
-
-    &.location {
-      font-size: $normalFontSize+.25rem;
-    }
-
-    &.addDetail, &.detailPicker {
-      color: $won-primary-color;
-      --local-primary: $won-primary-color; // for the svg-icons
-
-      &:hover {
-        color: black;
-        --local-primary: black; // for the svg-icons
-      }
-    }
-       
-    &.detailPicker {
-      font-size: $normalFontSize+.25rem;
-      margin: 0 1rem;
-      padding: .25rem .5rem .5rem 1.6rem;
-      
+    &__icon {
+      @include fixed-square($bigiconSize);
     }
   }
-}
 
-won-image-dropzone {
-  $borderSize: 5.66rem;
-  $padding: 1rem;
-  @include fixed-square($borderSize);
-  display: block;
+  .cp__content {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    border-top: $thinGrayBorder;
+    padding-top: 1rem;
+    overflow: auto;
+  }
 
-  %wid__dropzone {
+  .cp__footer {
+    grid-area: footer;
 
-    box-sizing: border-box;;
-    height: 100%;
-    width: 100%;
+    won-labelled-hr span {
+      background-color: white;
+    }
 
-    position: relative; //to allow children to use pos:absolute
-
-    overflow: hidden; // to crop the `fill`ing image
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    /* the preview is set via js:
-     * background-image: url({{self.imageDataUrl}});
-     */
-
-    input {
-      filter: alpha(opacity=0);
-      opacity: 0;
-      height: 100%;
+    .cp__footer__publish {
       width: 100%;
-      position: absolute;
-    }
-
-    & .wid__dropzone__default-bg,
-    & .wid__dropzone__preview-img {
-      @extend %center--absolute;
-      pointer-events: none;
-    }
-  }
-
-  .wid__dropzone--empty {
-    @extend %wid__dropzone;
-
-    border: $boldBorderWidth dashed $won-line-gray;
-    border-radius: $boldBorderWidth;
-
-    background-color: white;
-
-    .wid__dropzone__default-bg {
-      @include max-square($borderSize - 2 * $padding - 2 * $boldBorderWidth);
-    }
-  }
-
-  .wid__dropzone--filled {
-    @extend %wid__dropzone;
-
-    border: $thinBorderWidth solid $won-line-gray;
-
-    .wid__dropzone__default-bg {
-      display: none;
+      margin-top: 1rem;
     }
   }
 }

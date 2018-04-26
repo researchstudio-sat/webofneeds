@@ -146,6 +146,7 @@ svg {
 @import 'post-messages';
 @import 'post-content';
 @import 'create-post';
+@import 'create-post-item';
 
 //TODO in topnav, make create-button black when the dialog is open
 //TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
