@@ -13,8 +13,7 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="post__contentside post__contentside--empty" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.showCreateView"
-        ng-class="{'hide-in-responsive' : self.connectionUri === undefined}">
+    <div class="post__contentside post__contentside--empty hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.showCreateView">
         <span class="post__contentside__description__text">
             No element selected
         </span>
