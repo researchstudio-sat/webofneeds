@@ -1,5 +1,6 @@
 @import 'won';
 @import 'button';
+@import 'textfield';
 
 
 chat-textfield-simple {
@@ -32,43 +33,8 @@ chat-textfield-simple {
     grid-column: 1 / span 2;
   }
 
-
   .cts__submitbutton {
     @extend .won-button--filled;
-  }
-
-  textarea.cts__text {
-    border-style: solid;
-    border-width: $thinBorderWidth;
-    border-radius: 0.1rem;
-    &.valid {
-        border-color: $won-line-gray;
-    }
-    &.invalid {
-        border-color: $won-primary-color;
-    }
-
-    &.cts__text--is-code {
-      font-size: 0.8rem;
-      font-family: $font-family-monospace;
-    }
-  }
-
-  textarea.cts__text {
-    //$padding: 0.3rem;
-    //padding: $padding;
-    font-size: $normalFontSize;
-
-    $lineHeight: $normalFontSize * 22/16; /* of one line of text */
-    $verticalPadding: ($formInputHeight - $lineHeight) / 2 - $thinBorderWidth;
-    padding: $verticalPadding 0.438rem;
-
-    min-width: 0; // so a size is specified and break-word works
-    word-break: break-word;
-
-    &:focus {
-      color: black;
-    }
   }
 
   .cts__charcount,
