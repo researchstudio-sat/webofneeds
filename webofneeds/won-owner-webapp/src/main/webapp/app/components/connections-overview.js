@@ -20,6 +20,7 @@ import {
 import {
     attach,
     sortByDate,
+    getIn,
 } from '../utils.js';
 import {
     connect2Redux,
@@ -35,7 +36,7 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <won-create-post-item></won-create-post-item>
+        <won-create-post-item ng-class="{'selected' : self.showCreateView}"></won-create-post-item>
         <div ng-repeat="need in self.sortedNeeds" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
             <div class="co__item__need"
@@ -98,9 +99,12 @@ function genComponentConf() {
                 const needImpliedInRoute = connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
                 const needUriImpliedInRoute = needImpliedInRoute && needImpliedInRoute.get("uri");
 
+                const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
+
                 let sortedNeeds = self.sortNeeds(allOwnNeeds);
 
                 return {
+                    showCreateView,
                     needUriInRoute,
                     needUriImpliedInRoute,
                     sortedNeeds: sortedNeeds,
