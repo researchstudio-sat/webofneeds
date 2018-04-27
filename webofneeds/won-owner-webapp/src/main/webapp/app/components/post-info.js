@@ -10,6 +10,7 @@ import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
 import postHeaderModule from './post-header.js';
 import postShareLinkModule from './post-share-link.js';
+import labelledHrModule from './labelled-hr.js';
 
 import { attach, } from '../utils.js';
 import won from '../won-es6.js';
@@ -82,16 +83,9 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
-            <!-- IS Part -->
-            <div ng-show="self.isPart">
-                <won-post-is-info is-part="::self.isPart"></won-post-is-info>
-            </div>
-            </br>
-            <!-- SEEKS Part -->
-            <div ng-show="self.seeksPart">
-                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
-            </div>
-            </br>
+            <won-post-is-info is-part="::self.isPart" ng-if="self.isPart"></won-post-is-info>
+            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart"></won-labelled-hr>
+            <won-post-seeks-info seeks-part="::self.seeksPart" ng-if="self.seeksPart"></won-post-seeks-info>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
@@ -189,7 +183,8 @@ export default angular.module('won.owner.components.postInfo', [
 		postIsInfoModule,
 		postSeeksInfoModule,
         postHeaderModule,
-        postShareLinkModule
+        postShareLinkModule,
+        labelledHrModule
 	])
     .directive('wonPostInfo', genComponentConf)
     .name;
