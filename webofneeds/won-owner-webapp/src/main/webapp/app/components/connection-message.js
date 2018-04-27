@@ -61,7 +61,7 @@ function genComponentConf() {
                     <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
                 	<span ng-show="self.message.get('isAcceptMessage')"><h3>Accept</h3></span>
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
-                	<!--<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>-->
+                	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
                         {{ self.text? self.text : self.noTextPlaceholder }}
                          <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
@@ -81,13 +81,11 @@ function genComponentConf() {
                         		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
                         		ng-show="self.showDetail">Propose <span ng-show="self.clicked">(again)</span>
                         </button>
-                        <!--
                         <button class="won-button--filled thin black"
                         		ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
                         		ng-show="self.showDetail && self.message.get('outgoingMessage')">
                         		Retract
                         </button>
-                        -->
                     </span>
 
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
@@ -132,17 +130,16 @@ function genComponentConf() {
     							ng-click="self.acceptProposal()">
     						Accept
     					</button>
-    					<!--
                         <button class="won-button--filled thin black"
     							ng-show="!self.message.get('outgoingMessage')"
     							ng-click="self.rejectMessage()">
     						Reject
     					</button>
     					<button class="won-button--filled thin black"
+    							ng-show="self.message.get('outgoingMessage')"
     							ng-click="self.retractMessage()">
     						Retract
     					</button>
-    					-->
                     </div>
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeToCancel')
@@ -154,7 +151,7 @@ function genComponentConf() {
                         		ng-click="self.acceptProposeToCancel()">
                         	Accept
                         </button>
-                        <!-- <button class="won-button--filled thin black" ng-click="self.rejectMessage()">Reject</button> -->
+                        <button class="won-button--filled thin black" ng-click="self.rejectMessage()">Reject</button>
                     </div>
             </div>
             <div
@@ -347,17 +344,21 @@ function genComponentConf() {
         retractMessage() {
         	this.clicked = true;
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
-        	const trimmedMsg = buildModificationMessage(uri, "retracts", this.message.get("text"));
+        	const trimmedMsg = buildModificationMessage(uri, "retracts", ("Retract: " + this.text));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate();
+        	
+        	this.markAsRelevant(false);
+        	//this.onUpdate();
         }
         
         rejectMessage() {
         	this.clicked = true;
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
-        	const trimmedMsg = buildProposalMessage(uri, "rejects",  this.message.get("text"));
+        	const trimmedMsg = buildProposalMessage(uri, "rejects",  this.text);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate();  
+        	
+        	this.markAsRelevant(false);
+        	//this.onUpdate();  
         }
 
         rdfToString(jsonld){

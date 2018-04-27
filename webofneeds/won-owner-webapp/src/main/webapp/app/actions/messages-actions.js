@@ -228,7 +228,19 @@ export function connectionMessageReceived(event) {
 
                      case "RETRACTS":
                      	console.log("RETRACTS");
-                         break;
+                     	if(effect.retracts) {
+	              			let messageUri = getEventUri(messages, effect.retractedMessageUri);
+	              			dispatch({
+	            		        type: actionTypes.messages.markAsRelevant,
+	            		        payload: {
+	            		    			 messageUri: messageUri,
+	            		                 connectionUri: connectionUri,
+	            		                 needUri: needUri,
+	            		                 relevant: false,
+	            	 			}
+	            			});
+	              		}
+	              		break;
 
                      default:
                      	//return state;

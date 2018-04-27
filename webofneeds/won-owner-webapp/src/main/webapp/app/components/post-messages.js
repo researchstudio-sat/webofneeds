@@ -325,7 +325,20 @@ function genComponentConf() {
 	                				}
 	                			)
 	                		}
-                		}
+                		} else if(this.agreementHeadData.retractedMessageUris.size) {
+                			//TODO: filter out retracted messages faster
+                			if(msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
+                				msg.hide = true;
+	                			this.messages__markAsRelevant(
+	                				payload = {
+                 		    			 messageUri: msg.get('uri'),
+                 		                 connectionUri: connectionUri,
+                 		                 needUri: ownNeed.get('uri'),
+                 		                 relevant: false,
+	                				}
+	                			)
+                			}
+                		}               		
                 	}
                 	
                 	sortedMessages = Array.from(msgSet);
@@ -625,7 +638,11 @@ function genComponentConf() {
                 aD.cancelledAgreementUris.has(msg.get("uri")) ||
                 aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
                 aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
-                aD.acceptedCancellationProposalUris.has(msg.get("remoteUri"))) {
+                aD.acceptedCancellationProposalUris.has(msg.get("remoteUri")) ||
+                aD.retractedMessageUris.has(msg.get("uri")) ||
+                aD.retractedMessageUris.has(msg.get("remoteUri")) ||
+                aD.rejectedMessageUris.has(msg.get("uri")) ||
+                aD.rejectedMessageUris.has(msg.get("remoteUri"))) {
                 return true;
             }
             return false;
