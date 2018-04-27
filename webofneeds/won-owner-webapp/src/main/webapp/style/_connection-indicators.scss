@@ -11,7 +11,11 @@ won-connection-indicators {
     display: flex;
     align-items: flex-start;
     flex-direction: row;
-    padding-right: 1em;
+    padding-right: 0.75em;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
 
     &__icon {
       @include fixed-square($bigiconSize);
@@ -19,8 +23,8 @@ won-connection-indicators {
 
     &__caption {
       line-height: $bigiconSize;
-      padding-left: 0.5em;
-      min-width: 0.5rem;
+      padding-left: 0.25em;
+      min-width: 2rem;
       color: black;
     }
   }

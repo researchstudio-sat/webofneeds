@@ -41,7 +41,7 @@ function genComponentConf() {
                 </svg>
 
                 <span class="indicators__item__caption" title="Number of chats with unread messages/requests">
-                    {{ self.unreadConnectedCount }}
+                    {{ self.getCountLimited(self.unreadConnectedCount)}}
                 </span>
         </a>
         <div class="indicators__item" ng-show="!self.latestConnectedUri" title="No chats in this post">
@@ -68,7 +68,7 @@ function genComponentConf() {
                         <use href="#ico36_match"></use>
                 </svg>
                 <span class="indicators__item__caption" title="Number of new matches">
-                    {{ self.unreadMatchesCount }}
+                    {{ self.getCountLimited(self.unreadMatchesCount) }}
                 </span>
         </a>
         <div class="indicators__item" ng-show="!self.latestMatchUri" title="No matches for this post">
@@ -145,6 +145,10 @@ function genComponentConf() {
         setOpen(connectionUri) {
             this.onSelectedConnection({connectionUri: connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
+        }
+
+        getLimitedCount(count , threshold = 10, exceededString = "9+") {
+            return count < threshold ? count : exceededString;
         }
     }
     Controller.$inject = serviceDependencies;
