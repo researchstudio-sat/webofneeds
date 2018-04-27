@@ -109,8 +109,12 @@ const reducers = {
     },
     showClosedNeeds: (isShowingClosed = false, action = {}) => {
         switch(action.type) {
-            case actionTypes.toggleClosedNeeds:
+            case actionTypes.toggleClosedNeedsDisplay:
                 return !isShowingClosed;
+            case actionTypes.hideClosedNeedsDisplay:
+                return false;
+            case actionTypes.showClosedNeedsDisplay:
+                return true;
             default:
                 return isShowingClosed;
         }

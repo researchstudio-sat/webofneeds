@@ -232,7 +232,9 @@ const actionHierarchy = {
     reconnectSuccess: INJ_DEFAULT,
 
     toggleRdfDisplay: INJ_DEFAULT,
-    toggleClosedNeeds: INJ_DEFAULT,
+    toggleClosedNeedsDisplay: INJ_DEFAULT,
+    hideClosedNeedsDisplay: INJ_DEFAULT,
+    showClosedNeedsDisplay: INJ_DEFAULT,
 
     toasts: {
         delete: INJ_DEFAULT,
