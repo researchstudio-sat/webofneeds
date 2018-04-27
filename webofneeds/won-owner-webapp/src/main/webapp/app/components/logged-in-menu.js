@@ -12,7 +12,9 @@ import {
 import * as srefUtils from '../sref-utils.js';
 
 function genComponentConf() {
-let template = `
+    let template = `
+    <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.email }}">{{ self.email }}</span>
+    <hr class="show-in-responsive"/>
     <a
         href="{{ self.absHRef(self.$state, 'about') }}"
         class="won-button--outlined thin red">
