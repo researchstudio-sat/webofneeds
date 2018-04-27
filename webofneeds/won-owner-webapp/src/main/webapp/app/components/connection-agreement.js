@@ -44,13 +44,14 @@ function genComponentConf() {
         <div class="won-ca__content">
             <div class="won-ca__content__text">
             	{{ self.agreementNumber+1  }}: 
-            	{{ self.message.get('text') }}<br />
+            	{{ self.text }}<br />
             	<span class="subtitle" ng-show="self.checkDeclaration(self.declarations.proposeToCancel)">Proposed to cancel</span>
+            	<!-- TODO: hide 
             	<div class="won-ca__content__text__subtext">
 	            	<code>StateUri: {{ self.stateUri }}</code><br />
 	            	<code>HeadUri:   {{ self.isOwn? self.message.get("uri") : self.message.get("remoteUri") }}</code>
 	            	<code ng-show="self.cancelUri">CancelUri: {{ self.cancelUri }} </code>
-            	</div>
+            	</div>-->
             	
             </div>
             <div class="won-ca__content__carret">
@@ -79,7 +80,7 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
             		 Accept
             	</button>
-            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && !self.ownCancel">
+            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && self.ownCancel">
         			You proposed this
         			<!-- <button class="won-button--filled thin black"
             			ng-click="self.retractMessage()"
@@ -114,12 +115,23 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const message = chatMessages && chatMessages.get(this.stateUri);
                 const remoteUri = message && !!message.get("remoteUri");
-                //const remoteUri = message && message.get("remoteUri");
+                let text = undefined;
+                
+                if(chatMessages && message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
+                	const clauses = message.get("clauses");
+                	//TODO: delete me
+                	//console.log("clauses: " + clauses);
+                	
+                	//TODO: Array from clauses
+                	//now just one message proposed at a time
+                	text = this.getClausesText(chatMessages, message, clauses);
+                }
                 
                 return {
                 	message: message,
+                	text: text? text : message? message.get("text") : undefined,
                 	isOwn: !remoteUri,
-                	//isOwn: (this.stateUri == remoteUri)? true : false,
+                	ownNeed: ownNeed,
                 }
             };
 
@@ -127,14 +139,44 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.stateUri'], this);
         }
         
+        getClausesText(chatMessages, message, clausesUri) {
+        	for(msg of Array.from(chatMessages)) {
+    			if(msg[1].get("uri") === clausesUri || msg[1].get("remoteUri") === clausesUri) {
+    				//Get through the caluses "chain" and add the original text
+    				if(!msg[1].get("clauses")) {
+    					return msg[1].get("text");
+    				} else {
+    					//TODO: Mutliple clauses
+    					return this.getClausesText(chatMessages, msg, msg[1].get("clauses"));
+    				}
+    				
+    			}
+        	}
+        }
+
+        markAsRelevant(relevant, uri) {
+        	
+        	if(!uri) {
+        		uri = this.message.get("uri");
+        	}
+        	const payload = {
+                messageUri: uri,
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                relevant: relevant,
+            };
+            	
+        	this.messages__markAsRelevant(payload);
+        }
+        
         acceptProposal() {
         	this.clicked = true;
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
-
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+
+        	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.stateUri});
         }
       
         proposeToCancel() {
@@ -145,7 +187,6 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
         }
         
         acceptProposeToCancel() {
@@ -158,8 +199,9 @@ function genComponentConf() {
         	const msg = ("Accepted propose to cancel agreement: " + uri);
         	const trimmedMsg = buildProposalMessage(uri, "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        	
+        	this.markAsRelevant(false, uri);
+        	this.onRemoveData({proposalUri: this.sateUri});
         }
         
         retractMessage() {
@@ -204,6 +246,7 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         scope: {
         	stateUri: "=",
+        	headUri: "=",
         	cancelUri: "=",
         	ownCancel: "=",
         	agreementNumber: '=',
@@ -215,6 +258,7 @@ function genComponentConf() {
              *  on-update="::myCallback(draft)"
              */
             onUpdate: '&',
+            onRemoveData: '&',
         },
         template: template,
     }

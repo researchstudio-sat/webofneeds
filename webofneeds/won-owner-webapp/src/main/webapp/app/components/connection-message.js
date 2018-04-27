@@ -21,6 +21,7 @@ import {
     get,
     getIn,
     deepFreeze,
+    dispatchEvent,
 } from '../utils.js'
 import {
 	buildProposalMessage,
@@ -114,17 +115,20 @@ function genComponentConf() {
                         ng-if="!self.message.get('isProposeMessage')
                             && !self.message.get('outgoingMessage')
                             && self.message.get('isAcceptMessage')
-                            && !self.clicked">
-                        <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">Cancel</button>
+                            && !self.clicked"
+                            && self.isRelevant>
+                        <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">
+                        	Cancel
+                       	</button>
                     </div>
                     -->
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeMessage')
                             && !self.message.get('isAcceptMessage')
-                            && !self.message.isAccepted
-                            && !self.clicked">
+                            && !self.clicked
+                            && self.isRelevant ">
                         <button class="won-button--filled thin red" 
-                        		ng-show="!self.message.get('outgoingMessage')" 
+                        		ng-show="!self.message.get('outgoingMessage') && !self.clicked" 
     							ng-click="self.acceptProposal()">
     						Accept
     					</button>
@@ -143,7 +147,8 @@ function genComponentConf() {
                     <div class="won-cm__center__button" 
                         ng-if="self.message.get('isProposeToCancel')
                             && !self.message.get('isAcceptMessage')
-                            && !self.clicked">
+                            && !self.clicked
+                            && self.isRelevant">
                         <button class="won-button--filled thin red" 
                         		ng-show="!self.message.get('outgoingMessage')" 
                         		ng-click="self.acceptProposeToCancel()">
@@ -204,25 +209,37 @@ function genComponentConf() {
                 
                 const ownNeed = this.connectionUri && selectNeedByConnectionUri(state, this.connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+                const chatMessages = connection && connection.get("messages");
                 const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
                 const message = connection && this.messageUri ? 
-                    getIn(connection, ['messages', this.messageUri]) :
+                    getIn(connection, ["messages", this.messageUri]) :
                     Immutable.Map();
 
-                
-                
+                let text = undefined;
+                if(chatMessages && message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
+                	const clauses = message.get("clauses");
+                	//TODO: delete me
+                	//console.log("clauses: " + clauses);
+                	
+                	//TODO: Array from clauses
+                	//now just one message proposed at a time
+                	text = this.getClausesText(chatMessages, message, clauses);
+                }
+                    
                 return {
                     ownNeed,
                     theirNeed,
                     connection,
                     message,
-                    text: message.get('text'), 
+                    isRelevant: message.get('isRelevant')? !this.hideOption : false,
+                    text: text? text : message? message.get("text") : undefined, 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
                     contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
                     contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     shouldShowRdf: state.get('showRdf'),
-                    allowProposals: connection && connection.get("state") === won.WON.Connected, //allow showing details only when the connection is already present
+                    allowProposals: connection && connection.get("state") === won.WON.Connected && message.get('text'), //allow showing details only when the connection is already present
+                    //isLoading: isLoading,
                 }
             };
 
@@ -245,6 +262,21 @@ function genComponentConf() {
             )
             */
         }
+        
+        getClausesText(chatMessages, message, clausesUri) {
+        	for(msg of Array.from(chatMessages)) {
+    			if(msg[1].get("uri") === clausesUri || msg[1].get("remoteUri") === clausesUri) {
+    				//Get through the caluses "chain" and add the original text
+    				if(!msg[1].get("clauses")) {
+    					return msg[1].get("text");
+    				} else {
+    					//TODO: Mutliple clauses
+    					return this.getClausesText(chatMessages, msg, msg[1].get("clauses"));
+    				}
+    				
+    			}
+        	}
+        }
 
         markAsRead(){
             if(this.message && this.message.get("unread")){
@@ -262,22 +294,34 @@ function genComponentConf() {
             }
         }
         
+        markAsRelevant(relevant){
+        	const payload = {
+    			 messageUri: this.message.get("uri"),
+                 connectionUri: this.connectionUri,
+                 needUri: this.ownNeed.get("uri"),
+                 relevant: relevant,
+        	}
+                	
+        	this.messages__markAsRelevant(payload);
+        }
+        
         sendProposal(){
         	this.clicked = true;
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	const trimmedMsg = buildProposalMessage(uri, "proposes", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	this.onUpdate();
+        	        	
+        	this.onSendProposal({proposalUri: uri});
         }
         
         acceptProposal() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	//TODO: isAccepted = true;
-        	this.onUpdate();
+        	
+        	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.messageUri});
         }
         
         proposeToCancel() {
@@ -292,12 +336,12 @@ function genComponentConf() {
         
         acceptProposeToCancel() {
         	this.clicked = true;
-        	//const trimmedMsg = this.buildProposalMessage(this.message.get("remoteUri"), "accepts", this.message.get("text"));
         	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
         	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	//TODO: isAccepted = true;
-        	this.onUpdate();
+
+        	this.markAsRelevant(false);
+        	this.onRemoveData({proposalUri: this.messageUri});
         }
         
         retractMessage() {
@@ -313,9 +357,7 @@ function genComponentConf() {
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	const trimmedMsg = buildProposalMessage(uri, "rejects",  this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.onUpdate();
-            
+        	this.onUpdate();  
         }
 
         rdfToString(jsonld){
@@ -348,11 +390,14 @@ function genComponentConf() {
         scope: { 
             messageUri: '=',
             connectionUri: '=',
+            hideOption: '=',
             /*
              * Usage:
              *  on-update="::myCallback(draft)"
              */
             onUpdate: '&',
+            onSendProposal: '&',
+            onRemoveData: '&',
         },
         template: template,
     }

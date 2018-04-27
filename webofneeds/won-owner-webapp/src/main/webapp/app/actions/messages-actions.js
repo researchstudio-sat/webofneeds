@@ -15,7 +15,9 @@ import {
 } from '../utils.js';
 
 import {
-    fetchDataForOwnedNeeds
+    fetchDataForOwnedNeeds,
+    buildRelevantMessage,
+	callAgreementsFetch,
 } from '../won-message-utils.js';
 
 import {
@@ -196,6 +198,88 @@ export function openMessageReceived(event) {
 	    }
 }
 
+
+export function connectionMessageReceived(event) {
+	return (dispatch, getState) => {
+		const connectionUri = event.getReceiver();
+		const needUri = event.getReceiverNeed();
+		const messages = getState().getIn(['needs', needUri, 'connections', connectionUri, 'messages']);
+		const baseString = "/owner/";
+		
+     	var url = baseString + 'rest/agreement/getMessageEffects?connectionUri='+connectionUri+'&messageUri='+event.getMessageUri();
+     	callAgreementsFetch(url)
+ 		.then(response => {
+ 			console.log("response : ", response);
+ 			
+ 			for(effect of response) {
+ 				console.log("effect : ", effect);
+ 				 switch (effect.type) {
+                  	case "ACCEPTS":
+                  		console.log("ACCEPTS");
+                  		if(effect.accepts) {;
+                  			let messageUri = getEventUri(messages, effect.acceptedMessageUri);
+                  			dispatch({
+                		        type: actionTypes.messages.markAsRelevant,
+                		        payload: {
+                		    			 messageUri: messageUri,
+                		                 connectionUri: connectionUri,
+                		                 needUri: needUri,
+                		                 relevant: false,
+                	 			}
+                			});
+                  		}
+                  		break;
+                  		
+                  	case "PROPOSES":
+                  		console.log("PROPOSES");
+                  		/*
+                  		/if(effect.proposalType === "CANCELS") {
+                  			for(i = 0; i < effect.proposesToCancel.length; i++) {
+                  				let messageUri = effect.proposesToCancel[i];
+                      			setToUnrelevant(messages, messageUri, needUri, connectionUri);
+                  			}
+                  		}*/
+                  		break;
+                  		
+                  	case "REJECTS":
+                  		console.log("REJECTS");
+                  		break;
+
+                     case "RETRACTS":
+                     	console.log("RETRACTS");
+                         break;
+
+                     default:
+                     	//return state;
+                     	break;
+ 				 }
+ 			}
+ 			
+ 			dispatch({
+                type: actionTypes.messages.connectionMessageReceived,
+                payload: event,
+            });
+ 		});
+	 }
+}
+
+function getEventUri(messages, messageUri) {
+	if(messageUri) {
+		let uriSet = new Set();
+		for(message of Array.from(messages)) {
+			uriSet.add(message[0]);
+		}
+		if(!uriSet.has(messageUri)){
+			for(msg of Array.from(messages)) {
+				if(msg[1].get("remoteUri") === messageUri) {
+					messageUri = msg[1].get("uri");
+				}
+			}
+		}   		
+	}
+	return messageUri
+}
+
 export function connectMessageReceived(event) {
     return (dispatch, getState) => {
 
@@ -282,6 +366,64 @@ function getConnectionData(event) {
         )
 }
 
+
+export function markAsRelevant(event) {
+	 return (dispatch, getState) => {
+
+		 const messages = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "messages"]);
+		 const messageUri = getEventUri(messages, event.messageUri);
+		 
+		 const payload = {
+    			 messageUri: messageUri,
+                 connectionUri: event.connectionUri,
+                 needUri: event.needUri,
+                 relevant: event.relevant,
+        }
+		 
+		 //own State
+		 dispatch({
+			 type: actionTypes.messages.markAsRelevant,
+			 payload: payload,
+		 });
+		 
+		 /*
+		 //remoteState
+		 const ownNeed = getState().getIn(["needs", event.needUri]);
+         const theirNeedUri = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "remoteNeedUri"]);
+         const theirNeed = getState().getIn(["needs", theirNeedUri]);
+         const theirConnectionUri = ownNeed.getIn(["connections", event.connectionUri, "remoteConnectionUri"]);
+		 const message = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "messages", event.messageUri]);
+         const msgToSet = message.get("remoteUri")? message.get("remoteUri") : event.messageUri;
+		 
+         buildRelevantMessage(msgToSet, event.connectionUri, event.needUri, theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, event.relevant)
+         .then( action => 
+         	dispatch({
+         		type: actionTypes.messages.send,
+         		payload: {
+         			eventUri: action.eventUri,
+         			message: action.message,
+         		}
+         	})
+         );*/
+	 }
+}
+
+export function unsetRelevantMessageReceived(message, relevant) {
+	//TODO see whats in the message and load the rest
+	return (dispatch, getState) => {
+		 //own State
+		 const payload = {
+	        messageUri: message.isUnsetRelevantMessage(),
+	        connectionUri: message.getReceiver(),
+	        needUri: message.getReceiverNeed(),
+	        relevant: relevant,
+	    } 
+		 dispatch({
+			 type: actionTypes.messages.markAsRelevant,
+			 payload: payload,
+		 });
+	}
+}
 
 export function needMessageReceived(event) {
     return (dispatch, getState) => {

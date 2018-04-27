@@ -34,6 +34,16 @@ won-connection-message {
         }
     }
 
+    &.won-not-relevant {
+        opacity: 0.35;
+        
+        .won-cm__center__bubble {
+                text-decoration: line-through;
+                text-decoration-color: black;               
+            }
+       
+    }
+
     .won-cm__center {
         grid-area: content;
         font-size: $smallFontSize;
