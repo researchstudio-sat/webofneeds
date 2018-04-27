@@ -84,12 +84,12 @@ function genComponentConf() {
             <svg
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
-                ng-show="self.showClosedNeeds">
+                ng-if="self.showClosedNeeds">
                 <use href="#ico16_arrow_up"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
-                ng-show="!self.showClosedNeeds">
+                ng-if="!self.showClosedNeeds">
                 <use href="#ico16_arrow_down"></use>
             </svg>
         </div>
