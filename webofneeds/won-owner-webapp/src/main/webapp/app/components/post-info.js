@@ -84,7 +84,7 @@ function genComponentConf() {
                 {{ self.friendlyTimestamp }}
             </p>
             <won-post-is-info is-part="::self.isPart" ng-if="self.isPart"></won-post-is-info>
-            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart"></won-labelled-hr>
+            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
             <won-post-seeks-info seeks-part="::self.seeksPart" ng-if="self.seeksPart"></won-post-seeks-info>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
