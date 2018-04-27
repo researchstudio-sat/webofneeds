@@ -8,7 +8,7 @@
   &.ng-leave.ng-leave-active {
     opacity: 0;
     max-height: 0;
-    overflow-y: hidden;
+    overflow: hidden;
     margin: 0;
     padding: 0;
   }
@@ -17,6 +17,7 @@
   &.ng-enter.ng-enter-active {
     opacity: 1;
     max-height: $maxHeight;
+    overflow: hidden;
     margin: $margin 0;
     padding: $padding 0;
   }
