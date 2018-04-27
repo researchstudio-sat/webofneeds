@@ -79,21 +79,21 @@ function genComponentConf() {
                 </won-connection-selection-item>
             </div>
         </div>
-        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosed}" ng-if="self.closedNeedsSize > 0" ng-click="self.toggleClosedNeeds()">
+        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.closedNeedsSize > 0" ng-click="self.toggleClosedNeeds()">
             <span class="co__separator__text">Closed Posts ({{ self.closedNeedsSize }})</span>
             <svg
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
-                ng-show="self.showClosed">
+                ng-show="self.showClosedNeeds">
                 <use href="#ico16_arrow_up"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
-                ng-show="!self.showClosed">
+                ng-show="!self.showClosedNeeds">
                 <use href="#ico16_arrow_down"></use>
             </svg>
         </div>
-        <div class="co__closedNeeds" ng-if="self.showClosed && self.closedNeedsSize > 0">
+        <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
             <div ng-repeat="need in self.sortedClosedNeeds" class="co__item">
                 <div class="co__item__need"
                     ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
@@ -124,7 +124,6 @@ function genComponentConf() {
                 const closedNeeds = allOwnNeeds && allOwnNeeds.filter(post => post.get("state") === won.WON.InactiveCompacted && !post.get("isWhatsAround")); //Filter whatsAround needs automatically
 
                 const routerParams = selectRouterParams(state);
-                const showClosed = routerParams && routerParams['showClosed'];
                 const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
                 const connUriInRoute = routerParams && decodeURIComponent(routerParams['connectionUri']);
                 const needUriInRoute = routerParams && decodeURIComponent(routerParams['postUri']);
@@ -135,7 +134,7 @@ function genComponentConf() {
                 let sortedClosedNeeds = sortByDate(closedNeeds);
 
                 return {
-                    showClosed,
+                    showClosedNeeds: state.get('showClosedNeeds'),
                     showCreateView,
                     needUriInRoute,
                     needUriImpliedInRoute,
@@ -188,10 +187,6 @@ function genComponentConf() {
 
         getOpenConnectionsArraySorted(need){
             return sortByDate(need.get('connections').filter(conn => conn.get('state') !== won.WON.Closed));
-        }
-
-        toggleClosedNeeds() {
-            this.router__stateGoCurrent({showClosed: (this.showClosed ? undefined : true)});
         }
     }
     Controller.$inject = serviceDependencies;
