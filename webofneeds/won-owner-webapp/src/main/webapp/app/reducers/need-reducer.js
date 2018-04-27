@@ -156,6 +156,7 @@ export default function(allNeedsInState = initialState, action = {}) {
                             outgoingMessage: true,
                             unread: true,
                             connectMessage: true,
+                            isRelevant: true,
                         }
                     }
                 });

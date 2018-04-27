@@ -84,7 +84,7 @@ function genComponentConf() {
 
             connect2Redux(
                 selectFromState, actionCreators,
-                ['self.needUri', 'self.timestamp'],
+                ['self.connectionUri', 'self.timestamp'],
                 this
             );
         }
