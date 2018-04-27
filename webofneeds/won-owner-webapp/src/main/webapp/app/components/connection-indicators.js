@@ -78,7 +78,7 @@ function genComponentConf() {
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.unreadCountSum }}</span>
+        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
     `;
 
     class Controller {
@@ -147,7 +147,7 @@ function genComponentConf() {
             //TODO either publish a dom-event as well; or directly call the route-change
         }
 
-        getLimitedCount(count , threshold = 10, exceededString = "9+") {
+        getCountLimited(count , threshold = 10, exceededString = "9+") {
             return count < threshold ? count : exceededString;
         }
     }
