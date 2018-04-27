@@ -147,8 +147,8 @@ function genComponentConf() {
             //TODO either publish a dom-event as well; or directly call the route-change
         }
 
-        getCountLimited(count , threshold = 10, exceededString = "9+") {
-            return count < threshold ? count : exceededString;
+        getCountLimited(count , threshold = 100) {
+            return count < threshold ? count : (threshold-1)+"+";
         }
     }
     Controller.$inject = serviceDependencies;
