@@ -11,6 +11,6 @@ import java.io.IOException;
  */
 public interface SolrMatcherQueryExecutor
 {
-  SolrDocumentList executeNeedQuery(String queryString, SolrParams params, String... filterQueries)
+  SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params, String... filterQueries)
     throws IOException, SolrServerException;
 }

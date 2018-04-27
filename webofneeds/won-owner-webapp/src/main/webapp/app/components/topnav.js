@@ -48,7 +48,7 @@ function genTopnavConf() {
 
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a href="{{ self.resetParamsHRef(self.$state, self.loggedIn ? 'connections' : 'landingpage') }}"
+                    <a href="{{ self.defaultRouteHRef(self.$state) }}"
                         class="topnav__button">
                             <img src="skin/{{self.themeName}}/images/logo.svg"
                                 class="topnav__button__icon">
@@ -57,16 +57,7 @@ function genTopnavConf() {
                             </span>
                     </a>
                 </div>
-                <div class="topnav__inner__center">
-                    <a href="{{ self.resetParamsHRef(self.$state, 'createNeed') }}"
-                       class="topnav__button"
-                       ng-show="self.loggedIn"> <!-- need creation possible via landingpage while not logged in -->
-                        <svg class="topnav__button__icon logo" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_plus"></use>
-                        </svg>
-                        <span class="topnav__button__caption">New Post</span>
-                    </a>
-                </div>
+                <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
 

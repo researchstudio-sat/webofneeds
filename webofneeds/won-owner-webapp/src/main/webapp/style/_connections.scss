@@ -12,19 +12,14 @@
 
   @include empty-description('opc');
 
-  &.empty {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .oir__requests{
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
   }
 
   @media (max-width: $responsivenessBreakPoint){
-    .post__contentside--empty.hidden,
-    .oir__requests.hidden {
+    .post__contentside--empty.hide-in-responsive,
+    .oir__requests.hide-in-responsive {
       display: none;
     }
   }

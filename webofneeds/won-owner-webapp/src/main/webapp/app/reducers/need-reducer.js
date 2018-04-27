@@ -8,10 +8,12 @@ import won from '../won-es6.js';
 import {
     msStringToDate,
     getIn,
+} from '../utils.js';
+import {
     isUriRead,
     markUriAsRead,
     resetUrisRead,
-    } from '../utils.js';
+} from '../won-localstorage.js';
 
 const initialState = Immutable.fromJS({
 });

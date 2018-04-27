@@ -28,6 +28,9 @@ public class SolrMatcherConfig
   @Value("${matcher.solr.query.maxHints}")
   private int maxHints;
 
+  @Value("${matcher.solr.query.maxHintsForCounterparts}")
+  private int maxHintsForCounterparts;
+
   @Value("${matcher.solr.index.commit}")
   private boolean commitIndexedNeedImmediately;
 
@@ -51,6 +54,10 @@ public class SolrMatcherConfig
   public int getMaxHints() {
     return maxHints;
   }
+
+    public int getMaxHintsForCounterparts() {
+        return maxHintsForCounterparts;
+    }
 
   public boolean isCommitIndexedNeedImmediately() {
     return commitIndexedNeedImmediately;

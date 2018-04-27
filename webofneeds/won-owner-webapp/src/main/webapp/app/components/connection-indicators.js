@@ -78,6 +78,7 @@ function genComponentConf() {
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
+        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.unreadCountSum }}</span>
     `;
 
     class Controller {
@@ -102,9 +103,12 @@ function genComponentConf() {
                 const sortedUnreadMatches = sortByDate(unreadMatches);
                 const sortedUnreadConversations = sortByDate(unreadConversations);
 
+                const unreadCountSum = unreadConnectedCount + unreadMatchesCount;
+
                 return {
                     WON: won.WON,
                     need,
+                    unreadCountSum: unreadCountSum > 0 ? unreadCountSum: undefined,
                     unreadConnectedCount: unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
                     unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
                     latestConnectedUri: this.retrieveLatestUri(connected),

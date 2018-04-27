@@ -45,19 +45,16 @@ export function needCreate(draft, nodeUri) {
 
         return ensureLoggedIn(dispatch, getState)
             .then(() => {
-                if (currentState === 'landingpage') {
-                    return dispatch(actionCreators.router__stateGoAbs('connections'))
-                } else if (currentState === 'createNeed') {
-                    return dispatch(actionCreators.router__stateGoDefault())
-                }
+                return dispatch(actionCreators.router__stateGoDefault());
             })
             .then(() => {
                 const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-                return dispatch({
+                dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri, need: draft}
                 })
 
+                dispatch(actionCreators.router__stateGoAbs("connections", {postUri: undefined, showCreateView: undefined, connectionUri: undefined}));
             });
     }
 }

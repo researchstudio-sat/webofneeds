@@ -38,6 +38,7 @@ import {
 export const resetParams = Object.freeze({
     connectionUri: undefined,
     postUri: undefined,
+    showCreateView: undefined,
     //sendAdHocRequest: undefined,
     // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
 });
@@ -53,6 +54,11 @@ export const constantParams = [
     'privateId',
 ];
 
+/**
+ * Default Route
+ */
+export const defaultRoute = 'connections';
+
 
 /**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
@@ -65,7 +71,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
 
         //let updatedRoute =  $location.replace()
         //    .path('/landingpage') // change route to landingpage
-        $location.path('/landingpage') // change route to landingpage
+        $location.path(`/${defaultRoute}`) // change route to connections overview as default
 
         const origParams = $location.search();
         if(origParams) {
@@ -84,8 +90,7 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
         { path: '/about?privateId', component: 'about' },
         { path: '/signup?privateId', component: 'signup' },
         { path: '/landingpage?privateId', component: 'landingpage' },
-        { path: '/create-need/?privateId', component: 'create-need' },
-        { path: '/connections?privateId?postUri?connectionUri', component: 'connections', as: 'connections' },
+        { path: '/connections?privateId?postUri?connectionUri?showCreateView', component: 'connections', as: 'connections' },
         { path: '/post/?privateId?postUri', component: 'post', as: 'post' },
 
     ].forEach( ({path, component, as}) => {
@@ -169,7 +174,7 @@ function back(hasPreviousState, $ngRedux) {
                         // while this promise evaluated
     } else {
         $ngRedux.dispatch(
-            actionCreators.router__stateGoResetParams('landingpage')
+            actionCreators.router__stateGoResetParams(defaultRoute)
         );
 
     }
@@ -207,26 +212,27 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
             );
             break;
 
-        case 'landingpage': //Route the 'landingpage' view at all times
-            if(
-                state.get('initialLoadFinished') &&  // no access control while still loading
-                getIn(state, ['user', 'loggedIn']))
-            {
-                //logged in -- re-initiate route-change
-                console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the connections");
-                if(event) {
-                    event.preventDefault()
-                } else {
-                    dispatch(
-                        actionCreators.router__stateGoAbs('connections')
-                    )
-                }
-            }
-            break;
+        case defaultRoute: //Route the 'default' view at all times
+            // if(
+            //     state.get('initialLoadFinished') &&  // no access control while still loading
+            //     getIn(state, ['user', 'loggedIn']))
+            // {
+            //     //logged in -- re-initiate route-change
+            //     console.log("Admiral Ackbar mentioned that this would be a trap, so we will link you to the connections");
+            //     if(event) {
+            //         event.preventDefault()
+            //     } else {
+            //         dispatch(
+            //             actionCreators.router__stateGoAbs(defaultRoute)
+            //         )
+            //     }
+            // }
+            // break;
+            return; // default route should be always accessible
 
         case 'signup':
         case 'about':
-        case 'createNeed':
+        case 'connections':
             return; // can always access this page.
 
         default: //FOR ALL OTHER ROUTES
@@ -238,9 +244,9 @@ export function accessControl({event, toState, toParams, fromState, fromParams, 
                     if(event) {
                         event.preventDefault();
                     } else {
-                        // this is a check with a route that's already fixed, redirect to landing page instead.
+                        // this is a check with a route that's already fixed, redirect to defaultRoute instead.
                         dispatch(
-                            actionCreators.router__stateGoResetParams('landingpage')
+                            actionCreators.router__stateGoResetParams(defaultRoute)
                         )
                     }
 

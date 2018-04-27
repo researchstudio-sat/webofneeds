@@ -21,7 +21,7 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <div class="cs__state" title="{{self.labels.connectionState[self.type]}}">
+        <div class="cs__state" title="{{self.labels.connectionState[self.state]}}">
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.Suggested">
                  <use href="#ico36_match"></use>
             </svg>

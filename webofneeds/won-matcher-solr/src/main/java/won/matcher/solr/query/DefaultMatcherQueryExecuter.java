@@ -37,7 +37,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
     }
 
     @Override
-    public SolrDocumentList executeNeedQuery(String queryString, SolrParams params, String... filterQueries)
+    public SolrDocumentList executeNeedQuery(String queryString, int maxHints, SolrParams params, String... filterQueries)
             throws IOException, SolrServerException {
 
         if (queryString == null) {
@@ -49,7 +49,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor {
         log.debug("use query: {} with filters {}", queryString, filterQueries);
         query.setQuery(queryString);
         query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, HintBuilder.HAS_FLAG_SOLR_FIELD, MatchingContextQueryFactory.MATCHING_CONTEXT_SOLR_FIELD);
-        query.setRows(config.getMaxHints());
+        query.setRows(maxHints);
 
         if (filterQueries != null) {
             query.setFilterQueries(filterQueries);

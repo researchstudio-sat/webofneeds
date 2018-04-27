@@ -4,7 +4,6 @@ import com.github.jsonldjava.core.JsonLdError;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -203,7 +202,7 @@ public class SolrMatcherEvaluation
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
     SolrDocumentList docs = queryExecutor.executeNeedQuery(
-      needQuery.createQuery(), null, new BasicNeedQueryFactory(need).createQuery());
+      needQuery.createQuery(), 20 ,null, new BasicNeedQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 

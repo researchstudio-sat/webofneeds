@@ -1,6 +1,7 @@
 ;
 
 import angular from 'angular';
+import Immutable from 'immutable';
 import sendRequestModule from '../send-request.js';
 import postMessagesModule from '../post-messages.js';
 import postInfoModule from '../post-info.js';
@@ -13,7 +14,6 @@ import { actionCreators }  from '../../actions/actions.js';
 import {
     selectNeedByConnectionUri,
     selectAllOwnNeeds,
-    selectAllConnections
 } from '../../selectors.js';
 import {
     resetParams,
@@ -32,19 +32,27 @@ class ConnectionsController {
         const selectFromState = (state)=>{
             const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
             const selectedPost = selectedPostUri && state.getIn(["needs", selectedPostUri]);
+            const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
             const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
             const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
             const connection = need && need.getIn(["connections", connectionUri]);
             const connectionType = need && connectionUri && need.getIn(["connections", connectionUri, 'state']);
 
-            const connections = selectAllConnections(state);
-            const ownNeeds = selectAllOwnNeeds(state);
+            const ownNeeds = selectAllOwnNeeds(state).filter(post => !(post.get("isWhatsAround") && post.get("state") === won.WON.InactiveCompacted));
+
+            let connections = Immutable.Map();
+
+            ownNeeds && ownNeeds.map(function(need){
+                connections = connections.merge(need.get("connections"));
+            });
+
 
             return {
                 WON: won.WON,
                 selectedPost,
                 connection,
                 connectionType,
+                showCreateView,
                 hasConnections: connections && connections.size > 0,
                 hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
                 open,
@@ -56,12 +64,12 @@ class ConnectionsController {
     }
 
     selectedNeed(needUri) {
-        this.router__stateGoCurrent({connectionUri: undefined, postUri: needUri}); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
+        this.router__stateGoCurrent({connectionUri: undefined, postUri: needUri, showCreateView: undefined}); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
     }
 
     selectedConnection(connectionUri) {
         this.markAsRead(connectionUri);
-        this.router__stateGoCurrent({connectionUri, postUri: undefined});
+        this.router__stateGoCurrent({connectionUri, postUri: undefined, showCreateView: undefined});
     }
 
     markAsRead(connectionUri){

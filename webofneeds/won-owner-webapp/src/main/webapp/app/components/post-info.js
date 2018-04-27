@@ -9,6 +9,7 @@ import angular from 'angular';
 import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
 import postHeaderModule from './post-header.js';
+import postShareLinkModule from './post-share-link.js';
 
 import { attach, } from '../utils.js';
 import won from '../won-es6.js';
@@ -101,15 +102,10 @@ function genComponentConf() {
             </a>
         </div>
         <div class="post-info__footer">
-            <div class="post-info__footer__link" ng-if="self.post.get('state') !== self.WON.InactiveCompacted">
-                <p class="post-info__footer__link__text" ng-if="self.post.get('connections').size == 0 && self.post.get('ownNeed')">
-                    Your posting has no connections yet. Consider sharing the link below in social media, or wait for matchers to connect you with others.
-                </p>
-                <p class="post-info__footer__link__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('ownNeed')) || !self.post.get('ownNeed')">
-                    Know someone who might also be interested in this posting? Consider sharing the link below in social media.
-                </p>
-                <input class="post-info__footer__link__input" value="{{self.linkToPost}}" disabled type="text">
-            </div>
+            <won-post-share-link
+                ng-if="self.post.get('state') !== self.WON.InactiveCompacted"
+                post-uri="self.post.get('uri')">
+            </won-post-share-link>
         </div>
     `;
 
@@ -119,7 +115,7 @@ function genComponentConf() {
 
             this.is = 'is';
             this.seeks = 'seeks';
-           
+
             const selectFromState = (state) => {
                 const postUri = selectOpenPostUri(state);
                 const post = state.getIn(["needs", postUri]);
@@ -152,7 +148,6 @@ function genComponentConf() {
                     ),
                     createdTimestamp: post && post.get('creationDate'),
                     shouldShowRdf: state.get('showRdf'),
-                    linkToPost: post && new URL("/owner/#!post/?postUri="+encodeURI(post.get('uri')), window.location.href).href,
                 }
             };
             connect2Redux(selectFromState, actionCreators, ['self.includeHeader'], this);
@@ -162,6 +157,10 @@ function genComponentConf() {
             if(this.post.get("ownNeed")){
                 console.log("CLOSING THE POST: "+this.post.get('uri'));
                 this.needs__close(this.post.get('uri'));
+		    
+	    	if(this.post.get("isWhatsAround")) {
+		    this.router__stateGoCurrent({postUri : null})
+		}
             }
         }
 
@@ -189,7 +188,8 @@ return {
 export default angular.module('won.owner.components.postInfo', [ 
 		postIsInfoModule,
 		postSeeksInfoModule,
-        postHeaderModule
+        postHeaderModule,
+        postShareLinkModule
 	])
     .directive('wonPostInfo', genComponentConf)
     .name;

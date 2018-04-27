@@ -217,7 +217,7 @@ function genComponentConf() {
 
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
-                placeholder="self.shouldShowRdf? 'Enter ttl...' : 'Your message...'"
+                placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
                 on-submit="self.send(value, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
@@ -282,12 +282,14 @@ function genComponentConf() {
             
 
             this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
-            `<${won.WONMSG.msguriPlaceholder}> will ` +
-            'be the uri generated for this message. See \`won.minimalTurtlePrefixes\` ' +
-            'for prefixes that will be added automatically. E.g.' +
-            `\`<${won.WONMSG.msguriPlaceholder}> won:hasTextMessage "hello world!". \``;
-
-
+                `<${won.WONMSG.msguriPlaceholder}> will ` +
+                'be replaced by the uri generated for this message. ' +
+                'Use it, so your TTL can be found when parsing the messages. ' + 
+                'See \`won.minimalTurtlePrefixes\` ' +
+                'for prefixes that will be added automatically. E.g.' +
+                `\`<${won.WONMSG.msguriPlaceholder}> won:hasTextMessage "hello world!". \``;
+            
+            
             this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
 
             const selectFromState = state => {
