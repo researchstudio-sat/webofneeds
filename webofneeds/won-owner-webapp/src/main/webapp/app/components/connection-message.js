@@ -215,23 +215,15 @@ function genComponentConf() {
                     getIn(connection, ["messages", this.messageUri]) :
                     Immutable.Map();
 
-                let text = message && message.get("text");
-                if(message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
+                let text = undefined;
+                if(chatMessages && message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
                 	const clauses = message.get("clauses");
                 	//TODO: delete me
                 	//console.log("clauses: " + clauses);
                 	
-                	//TODO: Array from proposedMessages
+                	//TODO: Array from clauses
                 	//now just one message proposed at a time
-                	if(chatMessages && chatMessages.get(clauses)) {
-                		text = chatMessages.get(clauses).get("text");
-                	} else {
-                		for(msg of Array.from(chatMessages)) {
-                			if(msg[1].get("remoteUri") === clauses) {
-                				text = msg[1].get("text");
-                			}
-                		}
-                	}		
+                	text = this.getClausesText(chatMessages, message, clauses);
                 }
                     
                 return {
@@ -240,7 +232,7 @@ function genComponentConf() {
                     connection,
                     message,
                     isRelevant: message.get('isRelevant')? !this.hideOption : false,
-                    text: text, 
+                    text: text? text : message? message.get("text") : undefined, 
                     contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
                     contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
                     contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
@@ -269,6 +261,21 @@ function genComponentConf() {
                 }
             )
             */
+        }
+        
+        getClausesText(chatMessages, message, clausesUri) {
+        	for(msg of Array.from(chatMessages)) {
+    			if(msg[1].get("uri") === clausesUri || msg[1].get("remoteUri") === clausesUri) {
+    				//Get through the caluses "chain" and add the original text
+    				if(!msg[1].get("clauses")) {
+    					return msg[1].get("text");
+    				} else {
+    					//TODO: Mutliple clauses
+    					return this.getClausesText(chatMessages, msg, msg[1].get("clauses"));
+    				}
+    				
+    			}
+        	}
         }
 
         markAsRead(){

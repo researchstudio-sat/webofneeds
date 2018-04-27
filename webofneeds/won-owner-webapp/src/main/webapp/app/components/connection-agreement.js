@@ -80,7 +80,7 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
             		 Accept
             	</button>
-            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && !self.ownCancel">
+            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && self.ownCancel">
         			You proposed this
         			<!-- <button class="won-button--filled thin black"
             			ng-click="self.retractMessage()"
@@ -115,29 +115,21 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const message = chatMessages && chatMessages.get(this.stateUri);
                 const remoteUri = message && !!message.get("remoteUri");
-                let text = message && message.get("text");
+                let text = undefined;
                 
-                if(message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
+                if(chatMessages && message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
                 	const clauses = message.get("clauses");
                 	//TODO: delete me
                 	//console.log("clauses: " + clauses);
                 	
-                	//TODO: Array from proposedMessages
+                	//TODO: Array from clauses
                 	//now just one message proposed at a time
-                	if(chatMessages && chatMessages.get(clauses)) {
-                		text = chatMessages.get(clauses).get("text");
-                	} else {
-                		for(msg of Array.from(chatMessages)) {
-                			if(msg[1].get("remoteUri") === clauses) {
-                				text = msg[1].get("text");
-                			}
-                		}
-                	}		
+                	text = this.getClausesText(chatMessages, message, clauses);
                 }
                 
                 return {
                 	message: message,
-                	text: text,
+                	text: text? text : message? message.get("text") : undefined,
                 	isOwn: !remoteUri,
                 	ownNeed: ownNeed,
                 }
@@ -147,10 +139,28 @@ function genComponentConf() {
             connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.stateUri'], this);
         }
         
+        getClausesText(chatMessages, message, clausesUri) {
+        	for(msg of Array.from(chatMessages)) {
+    			if(msg[1].get("uri") === clausesUri || msg[1].get("remoteUri") === clausesUri) {
+    				//Get through the caluses "chain" and add the original text
+    				if(!msg[1].get("clauses")) {
+    					return msg[1].get("text");
+    				} else {
+    					//TODO: Mutliple clauses
+    					return this.getClausesText(chatMessages, msg, msg[1].get("clauses"));
+    				}
+    				
+    			}
+        	}
+        }
 
-        markAsRelevant(relevant){
+        markAsRelevant(relevant, uri) {
+        	
+        	if(!uri) {
+        		uri = this.message.get("uri");
+        	}
         	const payload = {
-                messageUri: this.message.get("uri"),
+                messageUri: uri,
                 connectionUri: this.connectionUri,
                 needUri: this.ownNeed.get("uri"),
                 relevant: relevant,
@@ -190,7 +200,7 @@ function genComponentConf() {
         	const trimmedMsg = buildProposalMessage(uri, "accepts", msg);
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
-        	this.markAsRelevant(false);
+        	this.markAsRelevant(false, uri);
         	this.onRemoveData({proposalUri: this.sateUri});
         }
         
@@ -236,6 +246,7 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         scope: {
         	stateUri: "=",
+        	headUri: "=",
         	cancelUri: "=",
         	ownCancel: "=",
         	agreementNumber: '=',

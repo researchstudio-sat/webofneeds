@@ -216,9 +216,17 @@ export function connectionMessageReceived(event) {
  				 switch (effect.type) {
                   	case "ACCEPTS":
                   		console.log("ACCEPTS");
-                  		if(effect.accepts) {
-                  			let messageUri = effect.acceptedMessageUri;
-                  			setToUnrelevant(messages, messageUri, needUri, connectionUri);
+                  		if(effect.accepts) {;
+                  			let messageUri = getEventUri(messages, effect.acceptedMessageUri);
+                  			dispatch({
+                		        type: actionTypes.messages.markAsRelevant,
+                		        payload: {
+                		    			 messageUri: messageUri,
+                		                 connectionUri: connectionUri,
+                		                 needUri: needUri,
+                		                 relevant: false,
+                	 			}
+                			});
                   		}
                   		break;
                   		
@@ -255,31 +263,21 @@ export function connectionMessageReceived(event) {
 	 }
 }
 
-function setToUnrelevant(messages, messageUri, needUri, connectionUri) {
-	return (dispatch, getState) => {
-		if(messageUri) {
-			let uriSet = new Set();
-			for(message of Array.from(messages)) {
-				uriSet.add(message[0]);
-			}
-			if(!uriSet.has(messageUri)){
-				for(msg of Array.from(messages)) {
-					if(msg[1].get("remoteUri") === messageUri) {
-						messageUri = msg[1].get("uri");
-					}
-				}
-			}   	
-			dispatch({
-		        type: actionTypes.messages.markAsRelevant,
-		        payload: {
-		    			 messageUri: messageUri,
-		                 connectionUri: connectionUri,
-		                 needUri: needUri,
-		                 relevant: false,
-	 			}
-			});
+function getEventUri(messages, messageUri) {
+	if(messageUri) {
+		let uriSet = new Set();
+		for(message of Array.from(messages)) {
+			uriSet.add(message[0]);
 		}
+		if(!uriSet.has(messageUri)){
+			for(msg of Array.from(messages)) {
+				if(msg[1].get("remoteUri") === messageUri) {
+					messageUri = msg[1].get("uri");
+				}
+			}
+		}   		
 	}
+	return messageUri
 }
 
 export function connectMessageReceived(event) {
@@ -368,13 +366,24 @@ function getConnectionData(event) {
         )
 }
 
+
 export function markAsRelevant(event) {
 	 return (dispatch, getState) => {
 
+		 const messages = getState().getIn(["needs", event.needUri, "connections", event.connectionUri, "messages"]);
+		 const messageUri = getEventUri(messages, event.messageUri);
+		 
+		 const payload = {
+    			 messageUri: messageUri,
+                 connectionUri: event.connectionUri,
+                 needUri: event.needUri,
+                 relevant: event.relevant,
+        }
+		 
 		 //own State
 		 dispatch({
 			 type: actionTypes.messages.markAsRelevant,
-			 payload: event,
+			 payload: payload,
 		 });
 		 
 		 /*

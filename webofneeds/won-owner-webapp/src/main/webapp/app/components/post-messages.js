@@ -159,7 +159,8 @@ function genComponentConf() {
 	            <!-- ProposeToCancel -->
 	            <won-connection-agreement
 	            	ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
-	                state-Uri="proposeToCancel.stateUri"
+	                state-uri="proposeToCancel.stateUri"
+	                head-uri="proposeToCancel.headUri"
 	                cancel-uri="self.getCancelUri(proposeToCancel.headUri)"
 	                own-cancel="self.checkOwnCancel(proposeToCancel.headUri)"
 	                agreement-number="self.agreementStateData.agreementUris.size + $index"
@@ -544,7 +545,7 @@ function genComponentConf() {
                     	agreementObject.stateUri = msg.getMessageUri();
                     	this.agreementLoadingData[key].add(agreementObject);
                     	
-                    	//Dont load in state agein!
+                    	//Dont load in state again!
                     	var found = false;
                     	for(i = 0; i < this.chatMessages.length; i++) {
                     		if(agreementObject.stateUri === this.chatMessages[i].get("uri")) {
