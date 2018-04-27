@@ -61,4 +61,12 @@ won-connections-overview {
       @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorderWidth, 5rem);
     }
   }
+
+  .co__loadspinner {
+    width: 100%;
+    height: 3rem;
+    padding: .66em 2em;
+    text-align: center;
+    box-sizing: border-box;
+  }
 }
