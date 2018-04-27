@@ -5,7 +5,7 @@
 @import 'post-info';
 
 .postcontent {
-  padding: 0 1rem;
+  padding: 0;
   box-sizing: border-box;
   align-items: stretch;
   max-width: $maxContentWidth;
@@ -17,7 +17,6 @@
   margin: 0 auto;
 
   @media (max-width: $responsivenessBreakPoint){
-    padding: 0;
     border-left: none;
     border-right: none;
   }
