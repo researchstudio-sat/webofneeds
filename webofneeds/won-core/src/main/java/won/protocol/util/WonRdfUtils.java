@@ -888,6 +888,11 @@ public class WonRdfUtils
       return URI.create(findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_WON_NODE).asResource().getURI());
     }
+    
+    public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
+        return URI.create(findOnePropertyFromResource(
+          dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
+      }
 
     public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
       return URI.create(findOnePropertyFromResource(
