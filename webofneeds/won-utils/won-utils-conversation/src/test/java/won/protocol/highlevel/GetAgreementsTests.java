@@ -401,16 +401,7 @@ public class GetAgreementsTests {
 				expectedOutputFolder + "one-agreement-proposaltocancel-retracted.trig");
 		test(input, expectedOutput);
 	}
-
-	// This retracts a proposaltocancel before the accept message
-	@Test
-	public void retractProposalTocancelBeforeAccept() throws IOException {
-		Dataset input = loadDataset(inputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
-		Dataset expectedOutput = loadDataset(
-				expectedOutputFolder + "one-agreement-proposaltocancel-retracted-b4-accept.trig");
-		test(input, expectedOutput);
-	}
-
+	
 	@Test
 	public void oneProposalRejectedBeforeAccept() throws IOException {
 		Dataset input = loadDataset(inputFolder + "one-proposal-rejected-before-accept.trig");
