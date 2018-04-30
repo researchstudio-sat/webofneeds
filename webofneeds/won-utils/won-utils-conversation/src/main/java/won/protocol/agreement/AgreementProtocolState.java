@@ -645,12 +645,12 @@ public class AgreementProtocolState {
 					
 					.forEach(other -> {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("{} retracts {}: valid", msg.getMessageURI(), other.getMessageURI());
+                            logger.debug("{} retracts {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
                         }
                         boolean changedSomething = false;
                         changedSomething = removeContentGraphs(conversation, other) || changedSomething;
                         retractedUris.add(other.getMessageURI());
-                        if (other.isProposesMessage()) {
+                        if (other.isProposesMessage() || other.isProposesToCancelMessage()) {
                             changedSomething = retractProposal(other.getMessageURI()) || changedSomething;
                         }
                         if (changedSomething) {
@@ -668,7 +668,7 @@ public class AgreementProtocolState {
 				msg.getRejectsRefs()
 					.stream()
 					.filter(other -> msg != other)
-					.filter(other -> other.isProposesMessage())
+					.filter(other -> other.isProposesMessage() || other.isProposesToCancelMessage())
 					.filter(other -> other.isHeadOfDeliveryChain())
 					.filter(other -> ! other.getSenderNeedURI().equals(msg.getSenderNeedURI()))
 					.filter(other -> msg.isMessageOnPathToRoot(other))
@@ -679,7 +679,7 @@ public class AgreementProtocolState {
 					})
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} rejects {}: valid", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} rejects {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
 						boolean changedSomething = rejectProposal(other.getMessageURI());
 						if (changedSomething) {
@@ -700,7 +700,7 @@ public class AgreementProtocolState {
 				.filter(other -> msg.isMessageOnPathToRoot(other))
 				.forEach(other -> {
 					if (logger.isDebugEnabled()) {
-						logger.debug("{} proposes {}: valid", msg.getMessageURI(), other.getMessageURI());
+						logger.debug("{} proposes {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 					}
 					boolean changedSomething =  propose(conversationDataset, other.getContentGraphs(), proposalContent);
 					if (changedSomething) {
@@ -730,7 +730,7 @@ public class AgreementProtocolState {
 					})
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} accepts {}: valid", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} accepts {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
 						boolean changedSomething = acceptProposal(other.getMessageURI());
 						if (changedSomething) { 
@@ -752,7 +752,7 @@ public class AgreementProtocolState {
 					.filter(toCancel -> msg.isMessageOnPathToRoot(toCancel))
 					.forEach(other -> {
 						if (logger.isDebugEnabled()) {
-							logger.debug("{} proposesToCancel {}: valid", msg.getMessageURI(), other.getMessageURI());
+							logger.debug("{} proposesToCancel {}: valid, computing effects", msg.getMessageURI(), other.getMessageURI());
 						}
 					cancellationProposals.add(new StatementImpl(
 							cancellationProposals.getResource(msg.getMessageURI().toString()),
@@ -763,6 +763,9 @@ public class AgreementProtocolState {
 				});
 			}
 			msg.setEffects(effectsBuilder.build());
+			if (logger.isDebugEnabled() && ! msg.getEffects().isEmpty()) {
+				logger.debug("Effects of message {} : {}", msg.getMessageURI(), msg.getEffects());
+			}
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("messages in the order they were processed:");

@@ -638,6 +638,32 @@ public class ConversationMessage implements Comparable<ConversationMessage>{
 	private Object messageUriOrNullString(ConversationMessage message) {
 		return message != null? message.getMessageURI():"null";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((messageURI == null) ? 0 : messageURI.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConversationMessage other = (ConversationMessage) obj;
+		if (messageURI == null) {
+			if (other.messageURI != null)
+				return false;
+		} else if (!messageURI.equals(other.messageURI))
+			return false;
+		return true;
+	}
+	
 	
 	
 }
