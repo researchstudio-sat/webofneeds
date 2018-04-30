@@ -24,6 +24,14 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' 
 
 function genComponentConf() {
     const template = `
+            <h2 class="post-info__heading"
+                ng-show="self.isPart.is.get('title')">
+                Title
+            </h2>
+            <p class="post-info__details"
+                ng-show="self.isPart.is.get('title')">
+                {{ self.isPart.is.get('title')}}
+            </p>
            	<h2 class="post-info__heading"
                 ng-show="self.isPart.is.get('description')">
                 Description

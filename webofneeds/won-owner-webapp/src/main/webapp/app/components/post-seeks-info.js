@@ -24,8 +24,7 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' 
 
 function genComponentConf() {
     const template = `
-        	<won-labelled-hr label="::'Search'" class="cp__labelledhr"></won-labelled-hr>
-           	<h2 class="post-info__heading"
+        	<h2 class="post-info__heading"
                 ng-show="self.seeksPart.seeks.get('title')">
                 Title
             </h2>
