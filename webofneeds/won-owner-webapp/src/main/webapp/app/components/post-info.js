@@ -157,10 +157,7 @@ function genComponentConf() {
             if(this.post.get("ownNeed")){
                 console.log("CLOSING THE POST: "+this.post.get('uri'));
                 this.needs__close(this.post.get('uri'));
-		    
-	    	if(this.post.get("isWhatsAround")) {
-		    this.router__stateGoCurrent({postUri : null})
-		}
+		        this.router__stateGoCurrent({postUri : null})
             }
         }
 
