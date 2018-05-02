@@ -80,14 +80,14 @@ function genComponentConf() {
             	</button>
             	<button class="won-button--filled thin black"
             		ng-click="self.rejectMessage()"
-            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.isOwn">
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
             		Reject
             	</button>
             	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && (self.isOwn || self.ownCancel)">
         			You proposed this
         			<button class="won-button--filled thin black"
             			ng-click="self.retractMessage()"
-            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
+            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && (self.isOwn || self.ownCancel)">
     					Retract
             		</button>
         		</span>
@@ -210,7 +210,7 @@ function genComponentConf() {
         retractMessage() {
         	this.clicked = true;
         	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const trimmedMsg = buildModificationMessage(uri, "retracts", this.message.get("text"));
+        	const trimmedMsg = buildModificationMessage(uri, "retracts", ("Retract: " + this.text));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	
@@ -220,8 +220,8 @@ function genComponentConf() {
         
         rejectMessage() {
         	this.clicked = true;
-        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const trimmedMsg = buildProposalMessage(uri, "rejects", this.message.get("text"));
+        	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
+        	const trimmedMsg = buildProposalMessage(uri, "rejects",  ("Rejects: " + this.text));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.markAsRelevant(false);

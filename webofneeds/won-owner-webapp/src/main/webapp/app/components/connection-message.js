@@ -363,7 +363,7 @@ function genComponentConf() {
         rejectMessage() {
         	this.clicked = true;
         	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
-        	const trimmedMsg = buildProposalMessage(uri, "rejects",  this.text);
+        	const trimmedMsg = buildProposalMessage(uri, "rejects",  ("Reject: " + this.text));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.markAsRelevant(false);
