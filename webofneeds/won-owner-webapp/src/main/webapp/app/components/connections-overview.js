@@ -56,13 +56,13 @@ function genComponentConf() {
                     <svg
                         style="--local-primary:var(--won-secondary-color);"
                         class="co__item__need__arrow clickable"
-                        ng-show="self.isOpen(need.get('uri'))"
+                        ng-if="self.isOpen(need.get('uri'))"
                         ng-click="self.closeConnections(need.get('uri'))" >
                             <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                     <svg style="--local-primary:var(--won-secondary-color);"
                         class="co__item__need__arrow clickable"
-                        ng-show="!self.isOpen(need.get('uri'))"
+                        ng-if="!self.isOpen(need.get('uri'))"
                         ng-click="self.openConnections(need.get('uri'))" >
                             <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
