@@ -153,7 +153,7 @@ function genComponentConf() {
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false;">
+	                on-update="self.showAgreementData = false">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
@@ -500,7 +500,26 @@ function genComponentConf() {
                             }
                         }
                     }
+                    
+                    //Remove all retracted/rejected messages
+                    if(this.agreementHeadData["rejectedMessageUris"] || this.agreementHeadData["retractedMessageUris"]) {
+                    	let removalSet = new Set([...this.agreementHeadData["rejectedMessageUris"], ...this.agreementHeadData["retractedMessageUris"]]);
+                    	
+                    	for(uri of removalSet) {
+	                    	//for(key of keySet) {
+                    		var key = "pendingProposalUris";
+                            for(obj of this.agreementStateData[key]) {
+	                    		if(obj.stateUri === uri || obj.headUri === uri) {
+	                            	console.log("Message " + uri + " was removed");
+	                            	this.agreementStateData[key].delete(obj);
+	                    		}
+                            }
+	                        
+                    	}
+                    }
+                    
                 }).then(() => {
+                	//this.agreementStateData = this.agreementLoadingData;
     				this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
     				this.snapToBottom();
         		}).catch(error => {
@@ -573,6 +592,8 @@ function genComponentConf() {
                     		this.messages__connectionMessageReceived(msg);
                     	}
                     	this.agreementStateData = this.agreementLoadingData;
+                    	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
+                    	this.snapToBottom();
                     }
                     
                     

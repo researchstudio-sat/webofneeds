@@ -62,6 +62,7 @@ function genComponentConf() {
                 	<span ng-show="self.message.get('isAcceptMessage')"><h3>Accept</h3></span>
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
                 	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
+                	<span ng-show="self.message.get('isRejectMessage')"><h3>Reject</h3></span>
                         {{ self.text? self.text : self.noTextPlaceholder }}
                          <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
@@ -357,7 +358,7 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.markAsRelevant(false);
-        	//this.onUpdate();
+        	this.onUpdate();
         }
         
         rejectMessage() {
@@ -367,7 +368,7 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.markAsRelevant(false);
-        	//this.onUpdate();  
+        	this.onUpdate();  
         }
 
         rdfToString(jsonld){
@@ -378,7 +379,8 @@ function genComponentConf() {
         	return !(this.message.get('isProposeMessage') ||
 					this.message.get('isAcceptMessage') || 
 					this.message.get('isProposeToCancel') ||
-					this.message.get('isRetractMessage'));
+					this.message.get('isRetractMessage') ||
+					this.message.get('isRejectMessage'));
         }
 
         encodeParam(param) {
