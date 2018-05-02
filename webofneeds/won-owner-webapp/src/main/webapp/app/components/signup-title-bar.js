@@ -13,7 +13,7 @@ function genComponentConf() {
                 <a class="sutb__inner__left clickable" ng-click="self.back()">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="sutb__icon">
-                        <use href="#ico27_close"></use>
+                        <use xlink:href="#ico27_close" href="#ico27_close"></use>
                 </svg>
                 </a>
                 <h1 class="sutb__inner__center sutb__title">Sign Up</div>

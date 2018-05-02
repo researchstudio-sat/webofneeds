@@ -33,7 +33,7 @@ function genComponentConf() {
             <a class="ac__button clickable">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="ac__button__icon">
-                        <use href="#ico36_close_circle"></use>
+                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                 </svg>
                 <span class="ac__button__caption">Remove this account</span>
             </a>

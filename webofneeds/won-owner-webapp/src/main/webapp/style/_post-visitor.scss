@@ -5,13 +5,19 @@
 @import 'post-info';
 
 .postcontent {
-  padding: 0 1rem;
+  padding: 0;
   box-sizing: border-box;
-  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
-  @include empty-description('opc');
   align-items: stretch;
+  max-width: $maxContentWidth;
+  border-left: $thinGrayBorder;
+  border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
+  background: white;
+  width: 100%;
+  margin: 0 auto;
 
   @media (max-width: $responsivenessBreakPoint){
-    padding: 0;
+    border-left: none;
+    border-right: none;
   }
 }

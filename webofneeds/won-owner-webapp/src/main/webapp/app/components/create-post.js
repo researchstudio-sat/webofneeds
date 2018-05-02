@@ -65,7 +65,7 @@ function genComponentConf() {
                 ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="cp__header__icon">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <span class="cp__header__title" ng-if="self.isPost">Post</span>

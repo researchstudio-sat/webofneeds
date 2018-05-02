@@ -47,7 +47,7 @@ function genComponentConf() {
             
           <svg style="--local-primary:var(--won-primary-color);"
             class="piu__header__title__subtitle__group__icon">
-              <use href="#ico36_group"></use>
+              <use xlink:href="#ico36_group" href="#ico36_group"></use>
           </svg>
 
 
@@ -84,7 +84,7 @@ function genComponentConf() {
 
             connect2Redux(
                 selectFromState, actionCreators,
-                ['self.needUri', 'self.timestamp'],
+                ['self.connectionUri', 'self.timestamp'],
                 this
             );
         }

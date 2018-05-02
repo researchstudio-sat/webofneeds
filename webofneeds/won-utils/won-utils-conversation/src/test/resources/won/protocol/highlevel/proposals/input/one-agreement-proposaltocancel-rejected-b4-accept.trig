@@ -314,7 +314,8 @@
 <https://localhost:8443/won/resource/event/1tr3o22co1907d6b6n7s#content-nrkb> {
     event:1tr3o22co1907d6b6n7s
             won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." ;
-            agr:accepts  event:8863100035920837000 .
+            agr:rejects event:8863100035920837000 .
+
 }
 
 <https://localhost:8443/won/resource/event/4ongmje7w2v03mp7ztex#envelope-ccku-sig> {
@@ -8558,8 +8559,7 @@
 
 <https://localhost:8443/won/resource/event/6834006177130613000#content> {
     event:6834006177130613000
-            won:hasTextMessage  "validate" ;
-            mod:retracts event:8863100035920837000 .
+            won:hasTextMessage  "validate" .
 }
 
 <https://localhost:8443/won/resource/event/5iw37ggk8ccrcxxf8f8c#envelope-aj2y> {
@@ -8711,7 +8711,8 @@
 
 <https://localhost:8443/won/resource/event/i3k0giied2bgp0p44h7u#content-73q8> {
     event:i3k0giied2bgp0p44h7u
-            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while." .
+            won:hasTextMessage  "Ok, I'm going to validate the data in our connection. This may take a while.";
+            agr:accepts  event:8863100035920837000 . 
 }
 
 <https://localhost:8443/won/resource/event/c6ldwevakufr94hrcn97#envelope-q0nj> {

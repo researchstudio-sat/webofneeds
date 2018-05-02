@@ -156,6 +156,7 @@ export default function(allNeedsInState = initialState, action = {}) {
                             outgoingMessage: true,
                             unread: true,
                             connectMessage: true,
+                            isRelevant: true,
                         }
                     }
                 });
@@ -231,7 +232,8 @@ export default function(allNeedsInState = initialState, action = {}) {
             return markConnectionAsRead(allNeedsInState, action.payload.connectionUri, action.payload.needUri);
         case actionTypes.connections.markAsRated:
             return markConnectionAsRated(allNeedsInState, action.payload.connectionUri);
-
+        case actionTypes.connections.setLoading:
+        	return setConnectionLoading(allNeedsInState, action.payload.connectionUri, action.payload.isLoading);
         // NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
             // ADD RECEIVED CHAT MESSAGES

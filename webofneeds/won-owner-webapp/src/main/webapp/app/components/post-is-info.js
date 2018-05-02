@@ -24,6 +24,14 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' 
 
 function genComponentConf() {
     const template = `
+            <h2 class="post-info__heading"
+                ng-show="self.isPart.is.get('title')">
+                Title
+            </h2>
+            <p class="post-info__details"
+                ng-show="self.isPart.is.get('title')">
+                {{ self.isPart.is.get('title')}}
+            </p>
            	<h2 class="post-info__heading"
                 ng-show="self.isPart.is.get('description')">
                 Description
@@ -50,13 +58,13 @@ function genComponentConf() {
                 ng-show="self.isPart.address"  ng-click="self.toggleMap()">
                 {{ self.isPart.address }}
 				<svg class="post-info__carret">
-                  <use href="#ico-filter_map"></use>
+                  <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
                 </svg>
 				<svg class="post-info__carret" ng-show="!self.showMap">
-	               <use href="#ico16_arrow_down"></use>
+	               <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
 	            </svg>
                 <svg class="post-info__carret" ng-show="self.showMap">
-                   <use href="#ico16_arrow_up"></use>
+                   <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
             </p>                
             <won-need-map 

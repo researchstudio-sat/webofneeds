@@ -64,7 +64,7 @@ function genComponentConf() {
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="pm__header__icon clickable">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <won-post-header
@@ -77,14 +77,14 @@ function genComponentConf() {
                 ng-if="self.isConnected || self.isSentRequest"
                 ng-style="{'visibility': !self.contextMenuOpen}"
                 ng-click="self.contextMenuOpen = true">
-                    <use href="#ico16_arrow_down"></use>
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
             <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
                 <div class="content" ng-click="self.contextMenuOpen=false">
                     <div class="topline">
                       <svg class="pm__header__icon__small__contextmenu clickable"
                         style="--local-primary:black;">
-                            <use href="#ico16_arrow_up"></use>
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
                     <button
@@ -138,14 +138,14 @@ function genComponentConf() {
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="pm__content__agreement__icon clickable"
                     ng-click="self.showAgreementData = !self.showAgreementData">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
                 
                 <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
-            		<span ng-show="self.isLoading"> (loading...)</span>
-            		<span ng-if="!self.isLoading"> (up-to-date)</span>
+            		<span ng-show="self.connection.get('isLoading')"> (loading...)</span>
+            		<span ng-if="!self.connection.get('isLoading')"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
@@ -175,8 +175,8 @@ function genComponentConf() {
             		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		Proposals
-    				<span ng-show="self.isLoading"> (loading...)</span>
-            		<span ng-if="!self.isLoading"> (up-to-date)</span>
+    				<span ng-show="self.connection.get('isLoading')"> (loading...)</span>
+            		<span ng-if="!self.connection.get('isLoading')"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
@@ -196,21 +196,22 @@ function genComponentConf() {
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="pm__content__agreement__icon clickable"
                     ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
                 
                 <div class="pm__content__agreement__title"> 
-	            		<span class="ng-hide" ng-show="self.isLoading">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!self.isLoading">No Agreement Data found</span>
+	            		<span class="ng-hide" ng-show="self.connection.get('isLoading')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!self.connection.get('isLoading')">No Agreement Data found</span>
             	</div>
             </div>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
-               href="{{self.connection.get('uri')}}">
+               href="{{ self.connection.get('uri') }}">
                     <svg class="rdflink__small">
-                        <use href="#rdf_logo_1"></use>
+                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
+                    <span class="rdflink__label">Connection</span>
             </a>
         </div>
         <div class="pm__footer" ng-if="self.isConnected">
@@ -463,9 +464,11 @@ function genComponentConf() {
         getAgreementData(connection) {
             if(connection) {
                 this.connection = connection;
+            }else {
+	          	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: true});
             }
-
-        	this.isLoading = true;
+          
+        	
         	this.agreementLoadingData = this.cloneDefaultStateData();
             this.getAgreementDataUris();
         }
@@ -480,17 +483,16 @@ function genComponentConf() {
                     for(key of keySet) {
                         if(this.agreementHeadData.hasOwnProperty(key)) {
                             for(data of this.agreementHeadData[key]) {
-	    					this.addAgreementDataToSate(data, key);
+                            	this.addAgreementDataToSate(data, key);
                             }
                         }
                     }
-                }).then(response => {
-    				this.agreementStateData = this.agreementLoadingData;
-    				this.isLoading = false;
+                }).then(() => {
+    				this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
     				this.snapToBottom();
-    		}).catch(error => {
+        		}).catch(error => {
     				console.error('Error:', error);
-    				this.isLoading = false;
+    				this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
                 })
         }
 
@@ -523,7 +525,7 @@ function genComponentConf() {
 
         addAgreementDataToSate(eventUri, key, obj) {
             const ownNeedUri = this.ownNeed.get("uri");
-            callAgreementEventFetch(ownNeedUri, eventUri)
+            return callAgreementEventFetch(ownNeedUri, eventUri)
             .then(response => {
                 won.wonMessageFromJsonLd(response)
                 .then(msg => {
@@ -557,7 +559,10 @@ function genComponentConf() {
                     	if(!found) {
                     		this.messages__connectionMessageReceived(msg);
                     	}
+                    	this.agreementStateData = this.agreementLoadingData;
                     }
+                    
+                    
                 })
             })
         }

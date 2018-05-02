@@ -7,6 +7,7 @@ const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const glob = require('glob');
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = function(env, argv) {
     const mode = argv.mode || (argv.watch ? 'development': 'production');
@@ -18,9 +19,7 @@ module.exports = function(env, argv) {
     });
 
     return {
-        entry: {
-            main: ['./style/won.scss', 'babel-polyfill', './app/app_jspm.js'].concat(glob.sync('./images/**/*.svg'))
-        },
+        entry: './app/app_webpack.js',
         mode: mode,
         optimization: {
             minimizer: [
@@ -128,7 +127,8 @@ module.exports = function(env, argv) {
                        resource.request = path.resolve(__dirname, 'app', 'utils.js');
                     }
                 }
-            )
+            ),
+            new LiveReloadPlugin()
         ],
         devtool: mode == 'development' ? 'eval-source-map' : false
     };

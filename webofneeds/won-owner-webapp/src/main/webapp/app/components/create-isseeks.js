@@ -67,10 +67,10 @@ function genComponentConf() {
                     <span class="hover" ng-if="!self.showDetail">Open more detail</span>
                     <span class="hover" ng-if="self.showDetail">Close more detail</span>
                     <svg class="cis__addDetail__header__carret" ng-show="!self.showDetail">
-                        <use href="#ico16_arrow_down"></use>
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
                     <svg class="cis__addDetail__header__carret" ng-show="self.showDetail">
-                        <use href="#ico16_arrow_up"></use>
+                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
             </div>
             <div class="cis__detail__items" ng-if="self.showDetail" >
@@ -78,10 +78,10 @@ function genComponentConf() {
                     ng-click="!self.details.has('location') && self.details.add('location')"
                     ng-class="{'picked' : self.details.has('location')}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('location')">
-                            <use href="#ico36_location_circle"></use>
+                            <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                         </svg>
                         <svg class="cis__circleicon" ng-show="self.details.has('location')">
-                            <use href="#ico36_added_circle"></use>
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Address or Location</span>
                     </div>
@@ -89,10 +89,10 @@ function genComponentConf() {
                     ng-click="!self.details.has('tags') && self.details.add('tags')"
                     ng-class="{'picked' : self.details.has('tags')}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('tags')">
-                            <use href="#ico36_tags_circle"></use>
+                            <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
                         </svg>
                         <svg class="cis__circleicon" ng-show="self.details.has('tags')">
-                            <use href="#ico36_added_circle"></use>
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Tags</span>
                 </div>
@@ -102,10 +102,10 @@ function genComponentConf() {
                     ng-click="!self.details.has('ttl') && self.details.add('ttl')"
                     ng-class="{'picked' : self.details.has('ttl')}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
-                            <use href="#ico36_rdf_logo_circle"></use>
+                            <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
                         </svg>
                         <svg class="cis__circleicon" ng-show="self.details.has('ttl')">
-                            <use href="#ico36_added_circle"></use>
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Turtle (TTL)</span>
                 </div-->
@@ -118,10 +118,10 @@ function genComponentConf() {
             <div class="cis__location"  ng-if="detail === 'location'">
                 <div class="cis__addDetail__header location" ng-click="self.details.delete('location') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
-                        <use href="#ico36_location_circle"></use>
+                        <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                     </svg>
                     <svg class="cis__circleicon hover">
-                        <use href="#ico36_close_circle"></use>
+                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                     </svg>
                     <span class="nonHover">Location</span>
                     <span class="hover">Remove Location</span>
@@ -136,10 +136,10 @@ function genComponentConf() {
              <div class="cis__tags" ng-if="detail === 'tags'">
                 <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
-                        <use href="#ico36_tags_circle"></use>
+                        <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
                     </svg>
                     <svg class="cis__circleicon hover">
-                        <use href="#ico36_close_circle"></use>
+                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                     </svg>
                     <span class="nonHover">Tags</span>
                     <span class="hover">Remove Tags</span>
@@ -157,10 +157,10 @@ function genComponentConf() {
             <!-- div class="cis__ttl" ng-if="detail === 'ttl'">
                 <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
-                        <use href="#ico36_rdf_logo_circle"></use>
+                        <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
                     </svg>
                     <svg class="cis__circleicon hover">
-                        <use href="#ico36_close_circle"></use>
+                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                     </svg>
                     <span class="nonHover">Turtle (TTL)</span>
                     <span class="hover">Remove Turtle (TTL)</span>

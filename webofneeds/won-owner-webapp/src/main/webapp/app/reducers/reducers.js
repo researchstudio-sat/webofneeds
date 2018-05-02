@@ -107,8 +107,18 @@ const reducers = {
                 return isShowingRdf;
         }
     },
-
-
+    showClosedNeeds: (isShowingClosed = false, action = {}) => {
+        switch(action.type) {
+            case actionTypes.toggleClosedNeedsDisplay:
+                return !isShowingClosed;
+            case actionTypes.hideClosedNeedsDisplay:
+                return false;
+            case actionTypes.showClosedNeedsDisplay:
+                return true;
+            default:
+                return isShowingClosed;
+        }
+    },
 
     //config: createReducer(
     config: (config = Immutable.fromJS({theme: {name: 'current'}}), action = {}) => {

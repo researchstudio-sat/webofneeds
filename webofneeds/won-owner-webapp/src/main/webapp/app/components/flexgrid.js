@@ -26,12 +26,12 @@ function genComponentConf() {
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="fgi__arrow"
                         ng-show="item.detail !== undefined && $index === self.selectedIdx">
-                            <use href="#ico16_arrow_up"></use>
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="fgi__arrow"
                         ng-show="item.detail !== undefined && $index !== self.selectedIdx">
-                            <use href="#ico16_arrow_down"></use>
+                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
                 </div>
                 <span class="fgi__additionaltext" ng-show="item.detail !== undefined && $index === self.selectedIdx">{{item.detail}}</span>

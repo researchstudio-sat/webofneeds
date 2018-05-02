@@ -10,6 +10,7 @@ import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
 import postHeaderModule from './post-header.js';
 import postShareLinkModule from './post-share-link.js';
+import labelledHrModule from './labelled-hr.js';
 
 import { attach, } from '../utils.js';
 import won from '../won-es6.js';
@@ -34,7 +35,7 @@ function genComponentConf() {
                ng-click="self.router__stateGoCurrent({postUri : null})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="post-info__header__icon clickable">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <won-post-header
@@ -48,14 +49,14 @@ function genComponentConf() {
                 ng-if="self.post.get('ownNeed')"
                 ng-show="!self.contextMenuOpen"
                 ng-click="self.contextMenuOpen = true">
-                    <use href="#ico16_arrow_down"></use>
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
             <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
                 <div class="content" ng-click="self.contextMenuOpen = false">
                     <div class="topline">
                         <svg class="post-info__header__icon__small__contextmenu clickable"
                             style="--local-primary:black;">
-                            <use href="#ico16_arrow_up"></use>
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                         </svg>
                     </div>
                     <button class="post-info__footer__button won-button--filled red"
@@ -82,23 +83,17 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
-            <!-- IS Part -->
-            <div ng-show="self.isPart">
-                <won-post-is-info is-part="::self.isPart"></won-post-is-info>
-            </div>
-            </br>
-            <!-- SEEKS Part -->
-            <div ng-show="self.seeksPart">
-                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
-            </div>
-            </br>
+            <won-post-is-info is-part="::self.isPart" ng-if="self.isPart"></won-post-is-info>
+            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
+            <won-post-seeks-info seeks-part="::self.seeksPart" ng-if="self.seeksPart"></won-post-seeks-info>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
                href="{{self.post.get('uri')}}">
                     <svg class="rdflink__small">
-                        <use href="#rdf_logo_1"></use>
+                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
+                    <span class="rdflink__label">Post</span>
             </a>
         </div>
         <div class="post-info__footer">
@@ -157,10 +152,7 @@ function genComponentConf() {
             if(this.post.get("ownNeed")){
                 console.log("CLOSING THE POST: "+this.post.get('uri'));
                 this.needs__close(this.post.get('uri'));
-		    
-	    	if(this.post.get("isWhatsAround")) {
-		    this.router__stateGoCurrent({postUri : null})
-		}
+		        this.router__stateGoCurrent({postUri : null})
             }
         }
 
@@ -189,7 +181,8 @@ export default angular.module('won.owner.components.postInfo', [
 		postIsInfoModule,
 		postSeeksInfoModule,
         postHeaderModule,
-        postShareLinkModule
+        postShareLinkModule,
+        labelledHrModule
 	])
     .directive('wonPostInfo', genComponentConf)
     .name;

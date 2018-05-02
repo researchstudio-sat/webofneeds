@@ -37,7 +37,7 @@ function genComponentConf() {
                ng-click="self.router__stateGoCurrent({connectionUri : undefined, sendAdHocRequest: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="post-info__header__icon clickable">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <won-post-header
@@ -50,14 +50,14 @@ function genComponentConf() {
                 ng-show="!self.contextMenuOpen"
                 ng-if="self.connection && self.connection.get('isRated')"
                 ng-click="self.contextMenuOpen = true">
-                    <use href="#ico16_arrow_down"></use>
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
             <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
                 <div class="content" ng-click="self.contextMenuOpen = false">
                     <div class="topline">
                       <svg class="post-info__header__icon__small__contextmenu clickable"
                         style="--local-primary:black;">
-                            <use href="#ico16_arrow_up"></use>
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                       </svg>
                     </div>
                     <button ng-if="self.connection && self.connection.get('isRated')"
@@ -90,12 +90,22 @@ function genComponentConf() {
             </div>
             </br>
             <a class="rdflink clickable"
+               ng-if="self.shouldShowRdf && self.connection"
+               target="_blank"
+               href="{{ self.connectionUri }}">
+                    <svg class="rdflink__small">
+                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
+                    </svg>
+                    <span class="rdflink__label">Connection</span>
+            </a>
+            <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
-               href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+               href="{{ self.postUriToConnectTo }}">
                     <svg class="rdflink__small">
-                        <use href="#rdf_logo_1"></use>
+                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
+                    <span class="rdflink__label">Post</span>
             </a>
         </div>
         <div class="post-info__footer">

@@ -69,12 +69,7 @@ export function runMessagingAgent(redux) {
         },
         function (message) {
             if(message.isFromExternal() && message.isConnectionMessage()) {
-            	if(message.isUnsetRelevantMessage()){
-            		//TODO: set relevant true/false
-            		redux.dispatch(actionCreators.messages__unsetRelevantMessageReceived(message, false));
-            	}else {
-                	redux.dispatch(actionCreators.messages__connectionMessageReceived(message));
-            	}
+	         	redux.dispatch(actionCreators.messages__connectionMessageReceived(message));
                 return true;
             }
             return false;

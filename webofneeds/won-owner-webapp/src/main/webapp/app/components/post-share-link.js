@@ -18,12 +18,12 @@ function genComponentConf() {
                 style="--local-primary:var(--won-secondary-color);"
                 class="psl__separator__arrow"
                 ng-if="self.showShare">
-                <use href="#ico16_arrow_up"></use>
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="psl__separator__arrow"
                 ng-if="!self.showShare">
-                <use href="#ico16_arrow_down"></use>
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
         </div>
         <div class="psl__content" ng-if="self.showShare">

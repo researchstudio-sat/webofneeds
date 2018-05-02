@@ -12,7 +12,9 @@ import {
 import * as srefUtils from '../sref-utils.js';
 
 function genComponentConf() {
-let template = `
+    let template = `
+    <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.email }}">{{ self.email }}</span>
+    <hr class="show-in-responsive"/>
     <a
         href="{{ self.absHRef(self.$state, 'about') }}"
         class="won-button--outlined thin red">
@@ -21,7 +23,7 @@ let template = `
     <a class="won-button--outlined thin red"
         ng-click="self.toggleRdfDisplay()">
         <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-            <use href="#ico36_rdf_logo"></use>
+            <use xlink:href="#ico36_rdf_logo" href="#ico36_rdf_logo"></use>
         </svg>
         <span>{{self.shouldShowRdf? "Hide raw data" : "Show raw RDF data"}}</span>
     </a>
