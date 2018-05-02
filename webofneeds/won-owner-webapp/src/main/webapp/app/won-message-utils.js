@@ -254,13 +254,13 @@ export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNod
  *    needUri: string
  * }}
  */
-export function buildCreateMessage(needData, wonNodeUri) {
+export async function buildCreateMessage(needData, wonNodeUri) {
     //Check for is and seeks
     /*
     if(!needData.type || !needData.title)
         throw new Error('Tried to create post without type or title. ', needData);
     */
-    
+
     const publishedContentUri = wonNodeUri + '/need/' + getRandomWonId();
 
     const imgs = needData.images;
@@ -285,10 +285,12 @@ export function buildCreateMessage(needData, wonNodeUri) {
         location: getIn(needDataIsOrSeeks, ['location']),
         whatsAround: needDataIsOrSeeks.whatsAround,
         noHints: needDataIsOrSeeks.noHints,
+
+        ttl: needDataIsOrSeeks.ttl,
     })
      
     
-    let contentRdf = won.buildNeedRdf({ 
+    let contentRdf = await won.buildNeedRdf({ 
            is: (needData.is? prepareContentNodeData(needData.is) : undefined),
            seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
         });

@@ -87,7 +87,7 @@ import won from './won.js';
      * //TODO mandatory but specify later:
      * contentId, e.g. 'http://localhost:8080/won/resource/event/1997814854983652400#content-need';
      */
-    won.buildNeedRdf = function(args){
+    won.buildNeedRdf = async function(args){
 
         if(!args.is && !args.seeks) {
             throw new Exception("Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " + args);
@@ -207,6 +207,8 @@ import won from './won.js';
             //, <if _hasModalities> {... (see directly below) } </if>
             args.is? buildContentNode((isWhatsAround? '_:needContent' : '_:isNeedContent'), args.is, true) : {},
             args.seeks? (isWhatsAround? {} : (buildContentNode('_:seeksNeedContent', args.seeks, false))) : {},
+            ...(args.is && args.is.ttl? await won.ttlToJsonLd(args.is.ttl) : []),
+            ...(args.seeks && args.seeks.ttl? await won.ttlToJsonLd(args.seeks.ttl) : []),
         ];
         return {
             '@graph': graph,
