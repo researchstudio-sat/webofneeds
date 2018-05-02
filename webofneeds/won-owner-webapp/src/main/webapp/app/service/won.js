@@ -1063,10 +1063,18 @@ window.N34dbg = N3;
         });
     }
 
-    won.ttlToJsonLd = async function(ttl) {
-        const tryConversion = async () => {
+    /**
+     * 
+     * @param {string} ttl 
+     * @param {boolean} prependWonPrefixes 
+     */
+    won.ttlToJsonLd = async function(ttl, prependWonPrefixes=true) {
+        const ttl_ = prependWonPrefixes? 
+            won.minimalTurtlePrefixes + '\n' + ttl : 
+            ttl;
 
-            const {quads, prefixes} = await won.n3Parse(ttl);
+        const tryConversion = async () => {
+            const {quads, prefixes} = await won.n3Parse(ttl_);
             const placeholderGraphUri = 'ignoredgraphuri:placeholder';
 
             // overwrite empty graphUri (ttl is just triples) with placeholder string
@@ -1080,7 +1088,7 @@ window.N34dbg = N3;
         }
         return tryConversion()
             .catch(e => {
-                e.message = "error while parsing the following turtle:\n\n" + ttl + "\n\n----\n\n" + e.message;
+                e.message = "error while parsing the following turtle:\n\n" + ttl_ + "\n\n----\n\n" + e.message;
                 throw e;
             })
     }
