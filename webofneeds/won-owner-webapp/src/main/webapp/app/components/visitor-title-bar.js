@@ -18,12 +18,7 @@ function genComponentConf() {
         <nav class="visitor-title-bar">
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
-                    <a ng-click="self.back()" class="clickable">
-                        <svg class="vtb__icon" style="--local-primary:var(--won-primary-color);">
-                            <use href="#ico36_backarrow"></use>
-                        </svg>
-                    </a>
-                    <won-square-image 
+                    <won-square-image
                         title="self.post.get('title')"
                         src="self.post.get('titleImgSrc')"
                         uri="self.post.get('uri')">

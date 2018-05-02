@@ -2,20 +2,52 @@
 @import 'animate';
 
 won-post-share-link {
-  .psl__info,
-  .psl__text {
-    font-size: $smallFontSize;
+  .psl__separator {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+
+    color: $won-line-gray;
+
+    &--open {
+      transition: border-bottom-width linear .1s;
+      border-bottom: $thinGrayBorder;
+      color: $won-primary-color;
+
+      &:hover {
+        color: $won-line-gray;
+      }
+    }
+
+    &:hover {
+      color: $won-primary-color;
+    }
+
+    &__arrow {
+      @include carretSized;
+      padding: 0.625em;
+    }
   }
 
-  .psl__text {
-    padding-bottom: 0.5rem;
-  }
+  .psl__content {
+    @include slideWithOpacityAnimation(.5s, linear, 5rem, 0, 0);
 
-  .psl__info {
-    padding-top: 0.5rem;
-  }
+    .psl__info,
+    .psl__text {
+      font-size: $smallFontSize;
+    }
 
-  .psl__link {
-    width: 100%;
+    .psl__text {
+      padding: 0.5rem 0;
+    }
+
+    .psl__info {
+      padding-top: 0.5rem;
+    }
+
+    .psl__link {
+      width: 100%;
+    }
   }
 }

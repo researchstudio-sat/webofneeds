@@ -4,6 +4,7 @@
 @import 'connection-indicators';
 @import 'connection-selection-item-line';
 @import 'speech-bubble';
+@import 'animate';
 
 won-connections-overview {
   display: block;
@@ -59,6 +60,7 @@ won-connections-overview {
     &__connections {
       background: white;
       @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorderWidth, 5rem);
+      @include slideWithOpacityAnimation(.5s, linear, 250rem, 0, 0);
     }
   }
 
@@ -68,5 +70,39 @@ won-connections-overview {
     padding: .66em 2em;
     text-align: center;
     box-sizing: border-box;
+  }
+  
+  .co__separator {
+    margin-top: 1.5rem;
+    padding: 0 .5rem;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+
+    color: $won-line-gray;
+
+    &--open {
+      transition: border-bottom-width linear .1s;
+      border-bottom: $thinGrayBorder;
+      color: $won-primary-color;
+
+      &:hover {
+        color: $won-line-gray;
+      }
+    }
+
+    &:hover {
+      color: $won-primary-color;
+    }
+
+    &__arrow {
+      @include carretSized;
+      padding: 0.625em;
+    }
+  }
+
+  .co__closedNeeds {
+    @include slideWithOpacityAnimation(.5s, linear, 250rem, 0, 0);
   }
 }

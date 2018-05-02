@@ -12,15 +12,31 @@ import {
 const serviceDependencies = ['$scope', '$ngRedux', '$element'];
 function genComponentConf() {
     let template = `
-        <p class="psl__text" ng-if="self.post.get('connections').size == 0 && self.post.get('ownNeed')">
-            Your posting has no connections yet. Consider sharing the link below in social media, or wait for matchers to connect you with others.
-        </p>
-        <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('ownNeed')) || !self.post.get('ownNeed')">
-            Know someone who might also be interested in this posting? Consider sharing the link below in social media.
-        </p>
-        <input class="psl__link" value="{{self.linkToPost}}" readonly type="text" ng-click="self.selectLink()">
-        <p class="psl__info" ng-if="!self.isCopied">Click the Link above to copy it to the clipboard.</p>
-        <p class="psl__info" ng-if="self.isCopied">Link copied to the clipboard.</p>
+        <div class="psl__separator clickable" ng-class="{'psl__separator--open' : self.showShare}" ng-click="self.showShare = !self.showShare">
+            <span class="psl__separator__text">Share</span>
+            <svg
+                style="--local-primary:var(--won-secondary-color);"
+                class="psl__separator__arrow"
+                ng-show="self.showShare">
+                <use href="#ico16_arrow_up"></use>
+            </svg>
+            <svg style="--local-primary:var(--won-secondary-color);"
+                class="psl__separator__arrow"
+                ng-show="!self.showShare">
+                <use href="#ico16_arrow_down"></use>
+            </svg>
+        </div>
+        <div class="psl__content" ng-if="self.showShare">
+            <p class="psl__text" ng-if="self.post.get('connections').size == 0 && self.post.get('ownNeed')">
+                Your posting has no connections yet. Consider sharing the link below in social media, or wait for matchers to connect you with others.
+            </p>
+            <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('ownNeed')) || !self.post.get('ownNeed')">
+                Know someone who might also be interested in this posting? Consider sharing the link below in social media.
+            </p>
+            <input class="psl__link" value="{{self.linkToPost}}" readonly type="text" ng-click="self.selectLink()">
+            <p class="psl__info" ng-if="!self.isCopied">Click the Link above to copy it to the clipboard.</p>
+            <p class="psl__info" ng-if="self.isCopied">Link copied to the clipboard.</p>
+        </div>
     `;
 
     class Controller {

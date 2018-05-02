@@ -90,12 +90,22 @@ function genComponentConf() {
             </div>
             </br>
             <a class="rdflink clickable"
-               ng-if="self.shouldShowRdf"
+               ng-if="self.shouldShowRdf && self.connection"
                target="_blank"
-               href="{{!self.connection ? self.postUriToConnectTo : self.connectionUri}}">
+               href="{{ self.connectionUri }}">
                     <svg class="rdflink__small">
                         <use href="#rdf_logo_1"></use>
                     </svg>
+                    <span class="rdflink__label">Connection</span>
+            </a>
+            <a class="rdflink clickable"
+               ng-if="self.shouldShowRdf"
+               target="_blank"
+               href="{{ self.postUriToConnectTo }}">
+                    <svg class="rdflink__small">
+                        <use href="#rdf_logo_1"></use>
+                    </svg>
+                    <span class="rdflink__label">Post</span>
             </a>
         </div>
         <div class="post-info__footer">

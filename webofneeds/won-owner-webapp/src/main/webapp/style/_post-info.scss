@@ -85,6 +85,11 @@ won-post-info {
       background-color: white;
     }
 
+    won-post-is-info,
+    won-post-seeks-info {
+      padding: 1rem 0;
+    }
+
     won-need-map{
       display: block;
       @include slideWithOpacityAnimation(.5s, linear, 20rem);
@@ -129,7 +134,7 @@ won-post-info {
   .post-info__footer {
     grid-area: footer;
     border-top: $thinGrayBorder;
-    padding-top: 1rem;
+    padding-top: 0.5rem;
 
     &__labelledhr span {
       background: white;

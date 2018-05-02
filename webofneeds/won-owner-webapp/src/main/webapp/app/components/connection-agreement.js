@@ -68,13 +68,11 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Accept
             	</button>
-            	<!--
-            	<button class="won-button--filled thin black"
+            	<!--<button class="won-button--filled thin black"
             		ng-click="self.rejectMessage()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Reject
-            	</button>
-            	-->
+            	</button>-->
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposeToCancel()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
@@ -82,11 +80,11 @@ function genComponentConf() {
             	</button>
             	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && self.ownCancel">
         			You proposed this
-        			<!-- <button class="won-button--filled thin black"
-            			ng-click="self.retractMessage()"
-            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
-    					Retract
-            		</button> -->
+	    			<!--<button class="won-button--filled thin black"
+	            			ng-click="self.retractMessage()"
+	            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
+	    					Retract
+	    			</button>-->
         		</span>
         	</div>
         </div>
@@ -207,8 +205,7 @@ function genComponentConf() {
         retractMessage() {
         	this.clicked = true;
         	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const msg = ("Retract: " + uri);
-        	const trimmedMsg = buildModificationMessage(uri, "retracts", msg);
+        	const trimmedMsg = buildModificationMessage(uri, "retracts", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.onUpdate({draft: this.stateUri});
@@ -218,8 +215,7 @@ function genComponentConf() {
         rejectMessage() {
         	this.clicked = true;
         	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const msg = ("Reject message : " + uri);
-        	const trimmedMsg = buildProposalMessage(uri, "rejects", msg);
+        	const trimmedMsg = buildProposalMessage(uri, "rejects", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.onUpdate({draft: this.stateUri});

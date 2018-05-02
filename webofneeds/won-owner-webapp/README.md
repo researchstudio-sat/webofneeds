@@ -159,7 +159,9 @@ $ngRedux.getState()
     prevState: {...}
   },
   toasts: {...},
-  user: {...}
+  user: {...},
+  showRdf: true|false, //flag that is true if rawData mode is on (enables rdf view and rdf links) (default is false)
+  showClosedNeeds: true|false, //flag whether the drawer of the closedNeeds is open or closed (default is false)
 }
 */
 ```
