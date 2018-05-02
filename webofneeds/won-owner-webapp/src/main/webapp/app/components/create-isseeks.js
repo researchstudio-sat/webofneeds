@@ -280,6 +280,9 @@ function genComponentConf() {
         updateTTL() {
             //await won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + $0.value)
             const ttlString = ((this.ttlInput() || {}).value || "");
+
+            this.draftObject.ttl = ttlString;
+
             won.ttlToJsonLd(ttlString)
             .then(parsedJsonLd => {
                 this.$scope.$apply(() => this.ttlParseError = "");
