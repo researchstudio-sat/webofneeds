@@ -151,7 +151,16 @@ function genComponentConf() {
                         		ng-click="self.acceptProposeToCancel()">
                         	Accept
                         </button>
-                        <button class="won-button--filled thin black" ng-click="self.rejectMessage()">Reject</button>
+                        <button class="won-button--filled thin black"
+                        		ng-show="!self.message.get('outgoingMessage')"
+    							ng-click="self.rejectMessage()">
+    						Reject
+    					</button>
+    					<button class="won-button--filled thin black"
+                        		ng-show="self.message.get('outgoingMessage')"
+    							ng-click="self.retractMessage()">
+    						Retract
+    					</button>
                     </div>
             </div>
             <div

@@ -68,23 +68,28 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Accept
             	</button>
-            	<!--<button class="won-button--filled thin black"
+            	<button class="won-button--filled thin black"
             		ng-click="self.rejectMessage()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposal) && !self.isOwn">
             		 Reject
-            	</button>-->
+            	</button>
             	<button class="won-button--filled thin red"
             		ng-click="self.acceptProposeToCancel()"
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
             		 Accept
             	</button>
-            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && self.isOwn && self.ownCancel">
+            	<button class="won-button--filled thin black"
+            		ng-click="self.rejectMessage()"
+            		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.isOwn">
+            		Reject
+            	</button>
+            	<span ng-show="self.showDetail && !self.checkDeclaration(self.declarations.agreement)  && (self.isOwn || self.ownCancel)">
         			You proposed this
-	    			<!--<button class="won-button--filled thin black"
-	            			ng-click="self.retractMessage()"
-	            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
-	    					Retract
-	    			</button>-->
+        			<button class="won-button--filled thin black"
+            			ng-click="self.retractMessage()"
+            			ng-show="self.showDetail && (self.checkDeclaration(self.declarations.proposal) || self.checkDeclaration(self.declarations.proposeToCancel)) && self.isOwn">
+    					Retract
+            		</button>
         		</span>
         	</div>
         </div>
@@ -208,8 +213,9 @@ function genComponentConf() {
         	const trimmedMsg = buildModificationMessage(uri, "retracts", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
-        	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        	
+        	this.markAsRelevant(false);
+        	this.onUpdate();
         }
         
         rejectMessage() {
@@ -218,8 +224,8 @@ function genComponentConf() {
         	const trimmedMsg = buildProposalMessage(uri, "rejects", this.message.get("text"));
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
-        	this.onUpdate({draft: this.stateUri});
-        	dispatchEvent(this.$element[0], 'update', {draft: this.stateUri});
+        	this.markAsRelevant(false);
+        	this.onUpdate();
         }
         
         checkDeclaration(declaration) {
