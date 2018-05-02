@@ -98,8 +98,7 @@ function genComponentConf() {
                         <span>Tags</span>
                 </div>
 
-                <!-- TTL Will be excluded until further notice-->
-                <!--div class="cis__detail__items__item ttl"
+                <div class="cis__detail__items__item ttl"
                     ng-click="self.toggleOpenDetail('ttl')"
                     ng-class="{'picked' : self.openDetail === 'ttl'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
@@ -109,7 +108,7 @@ function genComponentConf() {
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Turtle (TTL)</span>
-                </div-->
+                </div>
             </div>
         </div>
         <!-- /DETAIL Picker/ -->
@@ -153,8 +152,7 @@ function genComponentConf() {
                  />
             </div>
 
-            <!-- TTL Will be excluded until further notice-->
-            <!-- div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
+            <div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
                 <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
@@ -185,7 +183,7 @@ function genComponentConf() {
                     </a>.
                 </div>
                 <div class="cis__ttl__parse-error" ng-show="self.ttlParseError">{{self.ttlParseError}}</div>
-            </div-->
+            </div>
         </div>
         <!-- /DETAILS/ -->
 `;
