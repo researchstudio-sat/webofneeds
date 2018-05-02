@@ -68,8 +68,7 @@ function genComponentConf() {
                     </svg>
                 </div>
             </div>
-            <div
-                class="co__item__connections"
+            <div class="co__item__connections"
                 ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)">
                 <won-connection-selection-item
                     ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
@@ -106,6 +105,12 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
+        <div class="co__loadspinner"
+            ng-if="self.isLoading">
+            <img src="images/spinner/on_white.gif"
+                alt="Loading&hellip;"
+                class="hspinner"/>
+        </div>
     `;
 
     class Controller {
@@ -134,6 +139,7 @@ function genComponentConf() {
                 let sortedClosedNeeds = sortByDate(closedNeeds);
 
                 return {
+                    isLoading: !state.get('initialLoadFinished'),
                     showClosedNeeds: state.get('showClosedNeeds'),
                     showCreateView,
                     needUriInRoute,
