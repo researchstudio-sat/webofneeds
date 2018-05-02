@@ -92,7 +92,9 @@ let app = angular.module('won.owner', [
 
 ]);
 
-app.config([ '$ngReduxProvider', configRedux ]);
+/* create store, register middlewares, set up redux-devtool-support, etc */
+configRedux(app);
+
 app.filter('filterByNeedState', function(){
     return function(needs,state){
         var filtered =[];
