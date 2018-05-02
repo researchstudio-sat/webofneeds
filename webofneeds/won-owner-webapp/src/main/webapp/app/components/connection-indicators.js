@@ -148,7 +148,10 @@ function genComponentConf() {
         }
 
         getCountLimited(count , threshold = 100) {
-            return (count < threshold) ? count : ((threshold-1)+"+");
+            if(!!count && (threshold < count)){
+                return (threshold-1)+"+";
+            }
+            return count;
         }
     }
     Controller.$inject = serviceDependencies;
