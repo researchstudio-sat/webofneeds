@@ -18,6 +18,8 @@ import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
+import org.apache.jena.query.Dataset;
+
 /**
  * Created by fsuda on 17.05.2017.
  */
@@ -34,17 +36,17 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
 
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = ctx.getEventBus();
-
-        final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+        final URI needUri = deactivateNeedCommandEvent.getNeedUri();
+        Dataset needRDF = ctx.getLinkedDataSource().getDataForResource(needUri);
+        final URI wonNodeUri = WonRdfUtils.ConnectionUtils.getWonNodeURIFromNeed(needRDF, needUri);
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
-        final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-        WonMessage deactivateNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri);
+        WonMessage deactivateNeedMessage = createWonMessage(wonNodeInformationService, needUri, wonNodeUri);
 
         EventListener successCallback = new EventListener() {
             @Override
             public void onEvent(Event event) throws Exception {
-                logger.debug("need creation successful, new need URI is {}", needURI);
-                bus.publish(new DeactivateNeedCommandSuccessEvent(needURI,deactivateNeedCommandEvent));
+                logger.debug("need creation successful, new need URI is {}", needUri);
+                bus.publish(new DeactivateNeedCommandSuccessEvent(needUri,deactivateNeedCommandEvent));
 
             }
         };
@@ -53,8 +55,8 @@ public class ExecuteDeactivateNeedCommandAction extends BaseEventBotAction {
             @Override
             public void onEvent(Event event) throws Exception {
                 String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                bus.publish(new DeactivateNeedCommandFailureEvent(needURI, deactivateNeedCommandEvent, textMessage));
+                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needUri, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                bus.publish(new DeactivateNeedCommandFailureEvent(needUri, deactivateNeedCommandEvent, textMessage));
             }
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(deactivateNeedMessage, successCallback, failureCallback, ctx);
