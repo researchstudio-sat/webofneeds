@@ -55,7 +55,7 @@ function genComponentConf() {
                     <span class="fi__description__subtitle__group" ng-show="self.ownNeed.group">
                         <svg style="--local-primary:var(--won-primary-color);"
                             class="fi__description__subtitle__group__icon">
-                                <use href="#ico36_group"></use>
+                                <use xlink:href="#ico36_group" href="#ico36_group"></use>
                         </svg>
                         {{self.ownNeed.group}}
                         <span class="fi__description__subtitle__group__dash"> &ndash; </span>

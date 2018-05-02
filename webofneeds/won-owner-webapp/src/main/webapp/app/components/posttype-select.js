@@ -26,10 +26,10 @@ function genComponentConf() {
                     <svg style="--local-primary:var(--won-primary-color);"
                         ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
                         class="ts__option__help-btn clickable">
-                            <use href="#ico36_help"></use>
+                            <use xlink:href="#ico36_help" href="#ico36_help"></use>
                     </svg>
                     <svg class="ts__option__carret" style="--local-primary:black;">
-                        <use href="#ico16_arrow_down"></use>
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
                     <div class="ts__option__help"
                          ng-show="self.isHelpVisible($index)"> {{o.helpText}} </div>

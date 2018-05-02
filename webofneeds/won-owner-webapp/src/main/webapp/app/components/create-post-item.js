@@ -17,7 +17,7 @@ function genComponentConf() {
             <svg class="cpi__item__icon"
                 title="Create a new search"
                 style="--local-primary:var(--won-primary-color);">
-                    <use href="#ico36_search"></use>
+                    <use xlink:href="#ico36_search" href="#ico36_search"></use>
             </svg>
             <div class="cpi__item__text">
                 Search
@@ -29,7 +29,7 @@ function genComponentConf() {
             <svg class="cpi__item__icon"
                 title="Create a new post"
                 style="--local-primary:var(--won-primary-color);">
-                    <use href="#ico36_plus"></use>
+                    <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
             </svg>
             <div class="cpi__item__text">
                 Post

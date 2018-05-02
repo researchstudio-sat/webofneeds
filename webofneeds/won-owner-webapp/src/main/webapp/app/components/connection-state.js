@@ -23,34 +23,34 @@ function genComponentConf() {
     let template = `
         <div class="cs__state" title="{{self.labels.connectionState[self.state]}}">
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.Suggested">
-                 <use href="#ico36_match"></use>
+                 <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.RequestSent">
-                 <use href="#ico36_outgoing"></use>
+                 <use xlink:href="#ico36_outgoing" href="#ico36_outgoing"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.RequestReceived">
-                 <use href="#ico36_incoming"></use>
+                 <use xlink:href="#ico36_incoming" href="#ico36_incoming"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.Connected">
-                 <use href="#ico36_message"></use>
+                 <use xlink:href="#ico36_message" href="#ico36_message"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.Closed">
-                 <use href="#ico36_close_circle"></use>
+                 <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.Suggested">
-                 <use href="#ico36_match"></use>
+                 <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.RequestSent">
-                 <use href="#ico36_outgoing"></use>
+                 <use xlink:href="#ico36_outgoing" href="#ico36_outgoing"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.RequestReceived">
-                 <use href="#ico36_incoming"></use>
+                 <use xlink:href="#ico36_incoming" href="#ico36_incoming"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.Connected">
-                 <use href="#ico36_message"></use>
+                 <use xlink:href="#ico36_message" href="#ico36_message"></use>
             </svg>
             <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.Closed">
-                 <use href="#ico36_close_circle"></use>
+                 <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
             </svg>
         </div>
     `;

@@ -68,7 +68,7 @@ function genComponentConf() {
 	                                ng-click="self.showDetail = !self.showDetail"
 	                                ng-if="self.allowProposals"
 	                                ng-show="!self.showDetail">
-	                            <use href="#ico16_arrow_down"></use>
+	                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
 	                        </svg>
 	                        <span class="won-cm__center__carret clickable"
 	                            ng-click="self.showDetail = !self.showDetail"
@@ -171,14 +171,14 @@ function genComponentConf() {
                 target="_blank"
                 href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
                     <svg class="rdflink__small clickable">
-                            <use href="#rdf_logo_2"></use>
+                            <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
             </a>
             <a ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
                 target="_blank"
                 href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
                     <svg class="rdflink__small clickable">
-                        <use href="#rdf_logo_2"></use>
+                        <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
             </a>
         </div>

@@ -20,7 +20,7 @@ function genComponentConf() {
                 <a class="astb__inner__left" ng-click="self.back()">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="astb__icon">
-                            <use href="#ico36_backarrow"></use>
+                            <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                     </svg>
                 </a>
                 <div class="astb__inner__center">

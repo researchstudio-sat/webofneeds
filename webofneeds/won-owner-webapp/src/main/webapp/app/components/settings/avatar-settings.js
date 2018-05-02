@@ -8,7 +8,7 @@ function genComponentConf() {
             <div class="noavatars" ng-show="!self.items">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="avataricon">
-                        <use href="#ico36_person"></use>
+                        <use xlink:href="#ico36_person" href="#ico36_person"></use>
                 </svg>
                 <div class="title">You don't use any avatars yet</div>
                 <div class="description">While WON is anonymous, avatars are only used for communication with in groups. Introduction text thea explains the general concept. Mi, offici dolut quid maximaio dolupta dis intotatquam fuga. Ut acero venest as solore minctemporia cus est, volore ne im qui volorem ipiciuscium velibus ciendusto distibustrum asin repe re laborerum ent, sam con es eaque endempos apienimet fuga.</div>
@@ -16,7 +16,7 @@ function genComponentConf() {
                 <a class="ac__button clickable">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="ac__button__icon">
-                        <use href="#ico36_plus"></use>
+                        <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
                 </svg>
                     <span class="ac__button__caption">Create new Avatar</span>
                 </a>
@@ -26,7 +26,7 @@ function genComponentConf() {
                 <a class="ac__button clickable">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="ac__button__icon">
-                        <use href="#ico36_plus"></use>
+                        <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
                 </svg>
                     <span class="ac__button__caption">Create new Avatar</span>
                 </a>
@@ -42,11 +42,11 @@ function genComponentConf() {
                             <a class="avatar__header__button clickable" ng-click="item.open = true">
                                 <svg style="--local-primary:var(--won-primary-color);"
                                     class="avatar__header__button__iconsmall">
-                                        <use href="#ico36_person"></use>
+                                        <use xlink:href="#ico36_person" href="#ico36_person"></use>
                                 </svg>
                                 <svg style="--local-primary:var(--won-primary-color);"
                                     class="avatar__header__button__carret">
-                                        <use href="#ico16_arrow_down"></use>
+                                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                                 </svg>
                             </a>
                         </div>
@@ -83,7 +83,7 @@ function genComponentConf() {
                         <a class="ac__button clickable">
                             <svg style="--local-primary:var(--won-primary-color);"
                                 class="ac__button__icon">
-                                    <use href="#ico36_close_circle"></use>
+                                    <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                             </svg>
                             <span class="ac__button__caption">Remove this avatar</span>
                         </a>

@@ -22,7 +22,7 @@ function genComponentConf() {
           class="pc__text"
           ng-show="self.need.getIn(['location', 's:name'])">
             <svg class="pc__icon" style="--local-primary:#939598;">
-                <use href="#ico16_indicator_location"></use>
+                <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
             </svg>
             <span>{{ self.need.getIn(['location', 's:name']) }}</span>
         </div>
@@ -38,7 +38,7 @@ function genComponentConf() {
         <!--
         <div class="pc__datetime">
           <svg class="pc__icon" style="--local-primary:#939598;">
-              <use href="#ico16_indicator_time"></use>
+              <use xlink:href="#ico16_indicator_time" href="#ico16_indicator_time"></use>
           </svg>
           <span>Available until 5th May</span>
         </div>
@@ -46,7 +46,7 @@ function genComponentConf() {
         <div class="pc__text"
           ng-show="!!self.need.get('description')">
           <svg class="pc__icon" style="--local-primary:#939598;">
-              <use href="#ico16_indicator_description"></use>
+              <use xlink:href="#ico16_indicator_description" href="#ico16_indicator_description"></use>
           </svg>
           <span>
             {{ self.need.get('description') }}
@@ -55,7 +55,7 @@ function genComponentConf() {
         <div class="pc__text"
           ng-show="!!self.need.get('location')">
           <svg class="pc__icon" style="--local-primary:#939598;">
-              <use href="#ico16_indicator_location"></use>
+              <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
           </svg>
           <span>
             {{ self.need.getIn(['location','address']) }}
@@ -64,7 +64,7 @@ function genComponentConf() {
         <div class="pc__text"
           ng-show="!!self.textMessage">
           <svg class="pc__icon" style="--local-primary:#939598;">
-              <use href="#ico16_indicator_message"></use>
+              <use xlink:href="#ico16_indicator_message" href="#ico16_indicator_message"></use>
           </svg>
           <span>
             {{ self.textMessage }}
