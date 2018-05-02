@@ -10,12 +10,12 @@ function genComponentConf() {
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="arrow clickable"
                     ng-show="$index !== self.selectedIdx">
-                        <use href="#ico16_arrow_down"></use>
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                 </svg>
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="arrow clickable"
                     ng-show="$index === self.selectedIdx">
-                        <use href="#ico16_arrow_up"></use>
+                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
                 <div class="detail" ng-show="$index === self.selectedIdx && item.unsafeHtmlEnabled" ng-bind-html="item.detail"></div>
                 <div class="detail" ng-show="$index === self.selectedIdx && !item.unsafeHtmlEnabled">{{item.detail}}</div>         

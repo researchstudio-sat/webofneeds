@@ -43,7 +43,7 @@ function genComponentConf() {
                         <a class="ac__button clickable">
                             <svg style="--local-primary:var(--won-primary-color);"
                                 class="ac__button__icon">
-                                    <use href="#ico36_close_circle"></use>
+                                    <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                             </svg>
                             <span class="ac__button__caption">Remove</span>
                         </a>
@@ -53,7 +53,7 @@ function genComponentConf() {
                 <a class="ac__button clickable">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="ac__button__icon">
-                            <use href="#ico36_plus"></use>
+                            <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
                     </svg>
                     <span class="ac__button__caption">Add new default address</span>
                 </a>
@@ -61,14 +61,14 @@ function genComponentConf() {
             <div class="noaddresses" ng-show="!self.items">
                 <svg class="noaddresses__icon"
                     style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_location_circle"></use>
+                        <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                 </svg>
                 <div class="title">You don't use any addresses yet</div>
                 <div class="description">You can specify your default adress to be at hand when posting needs. Adresses can be set individually on create posts page as well.</div>
                 <a class="ac__button clickable">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="ac__button__icon">
-                            <use href="#ico36_plus"></use>
+                            <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
                     </svg>
                     <span class="ac__button__caption">Add new default address</span>
                 </a>

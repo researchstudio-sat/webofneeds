@@ -58,13 +58,13 @@ function genComponentConf() {
                         class="co__item__need__arrow clickable"
                         ng-show="self.isOpen(need.get('uri'))"
                         ng-click="self.closeConnections(need.get('uri'))" >
-                            <use href="#ico16_arrow_up"></use>
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                     <svg style="--local-primary:var(--won-secondary-color);"
                         class="co__item__need__arrow clickable"
                         ng-show="!self.isOpen(need.get('uri'))"
                         ng-click="self.openConnections(need.get('uri'))" >
-                            <use href="#ico16_arrow_down"></use>
+                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
                 </div>
             </div>
@@ -85,12 +85,12 @@ function genComponentConf() {
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
                 ng-if="self.showClosedNeeds">
-                <use href="#ico16_arrow_up"></use>
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
                 ng-if="!self.showClosedNeeds">
-                <use href="#ico16_arrow_down"></use>
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
         </div>
         <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">

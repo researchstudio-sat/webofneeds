@@ -14,32 +14,32 @@ function genComponentConf() {
             <a class="feedback clickable" ng-click="self.rateMatch(0); self.router__stateGoCurrent({connectionUri : self.connectionUri})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="feedback__icon unselected">
-                        <use href="#ico36_feedback_good"></use>
+                        <use xlink:href="#ico36_feedback_good" href="#ico36_feedback_good"></use>
                 </svg>
                 <svg style="--local-primary:white;"
                     class="feedback__icon selected">
-                        <use href="#ico36_feedback_good"></use>
+                        <use xlink:href="#ico36_feedback_good" href="#ico36_feedback_good"></use>
                 </svg>
                 <span class="feedback__text">Good match - connect!</span>
             </a>
             <!--div class="feedback" ng-click="self.rateMatch(1)">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="feedback__icon unselected">
-                        <use href="#ico36_feedback_ok"></use>
+                        <use xlink:href="#ico36_feedback_ok" href="#ico36_feedback_ok"></use>
                 </svg>
                 <svg style="--local-primary:white;"
                      class="feedback__icon selected">
-                        <use href="#ico36_feedback_ok"></use>
+                        <use xlink:href="#ico36_feedback_ok" href="#ico36_feedback_ok"></use>
                 </svg>
                 <span class="feedback__text">OK - request conversation</span>
             </div-->
             <div class="feedback clickable" ng-click="self.rateMatch(2)">
                 <svg class="feedback__icon unselected" style="--local-primary:black;">
-                    <use href="#ico36_feedback_notatall"></use>
+                    <use xlink:href="#ico36_feedback_notatall" href="#ico36_feedback_notatall"></use>
                 </svg>
                 <svg style="--local-primary:white;"
                     class="feedback__icon selected">
-                        <use href="#ico36_feedback_notatall"></use>
+                        <use xlink:href="#ico36_feedback_notatall" href="#ico36_feedback_notatall"></use>
                 </svg>
                 <span class="feedback__text">Bad match - remove!</span>
             </div>

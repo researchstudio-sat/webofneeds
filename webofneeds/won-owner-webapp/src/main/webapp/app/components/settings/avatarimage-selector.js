@@ -10,10 +10,10 @@ function genLoginConf() {
         <a class="avatarimage__header__button clickable" ng-click="self.open = false">
             <svg style="--local-primary:var(--won-primary-color);"
                 class="avatarimage__header__button__iconsmall">
-                    <use href="#ico36_person"></use>
+                    <use xlink:href="#ico36_person" href="#ico36_person"></use>
             </svg>
             <svg class="avatarimage__header__button__carret" style="--local-primary:black;">
-                <use href="#ico16_arrow_up"></use>
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
 
         </a>
@@ -21,39 +21,39 @@ function genLoginConf() {
     <div class="avatarimage__grid">
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
         <svg style="--local-primary:var(--won-primary-color);"
             class="avatarimage__grid__item clickable">
-                <use href="#ico36_person"></use>
+                <use xlink:href="#ico36_person" href="#ico36_person"></use>
         </svg>
     </div>
     <div class="avatarimage__footer">
