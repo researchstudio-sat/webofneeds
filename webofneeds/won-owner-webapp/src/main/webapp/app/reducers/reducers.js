@@ -84,21 +84,6 @@ const reducers = {
             getIn(action, ['payload', 'initialLoadFinished'])
         ),
 
-    loginVisible: (visible = false, action = {}) => {
-        switch (action.type) {
-            case actionTypes.showLogin:
-                return true;
-
-            case actionTypes.hideLogin:
-            case actionTypes.login:
-            case actionTypes.logout:
-                return false;
-
-            default:
-                return visible;
-        }
-    },
-
     showRdf: (isShowingRdf = false, action = {}) => {
         switch(action.type) {
             case actionTypes.toggleRdfDisplay:
@@ -117,6 +102,22 @@ const reducers = {
                 return true;
             default:
                 return isShowingClosed;
+        }
+    },
+
+    showMainMenu: (isShowingMainMenu = false, action = {}) => {
+        switch(action.type) {
+            case actionTypes.loginFailed:
+            case actionTypes.showMainMenuDisplay:
+                return true;
+
+            case actionTypes.logout:
+            case actionTypes.toggleRdfDisplay:
+            case actionTypes.login:
+            case actionTypes.hideMainMenuDisplay:
+                return false;
+            default:
+                return isShowingMainMenu;
         }
     },
 
