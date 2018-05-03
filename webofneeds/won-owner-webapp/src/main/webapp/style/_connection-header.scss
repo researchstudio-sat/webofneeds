@@ -44,6 +44,8 @@ won-connection-header {
         grid-area: date;
         font-size: $smallFontSize;
         color: $won-subtitle-gray;
+        white-space: nowrap;
+        padding-left: 0.5rem;
       }
     }
 
