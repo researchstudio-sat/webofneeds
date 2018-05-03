@@ -8,7 +8,7 @@ won-connection-header {
 
   display: grid;
   grid-template-areas: "icon main";
-  grid-template-column: min-content 1fr;
+  grid-template-columns: min-content 1fr;
 
   @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
@@ -30,7 +30,7 @@ won-connection-header {
       grid-area: topline;
       display: grid;
       grid-template-areas: "title date";
-      grid-template-column: 1fr min-content;
+      grid-template-columns: 1fr min-content;
 
       &__title {
         grid-area: title;
@@ -69,4 +69,5 @@ won-connection-header {
         }
       }
     }
+  }
 }
