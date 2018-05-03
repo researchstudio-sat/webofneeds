@@ -44,7 +44,6 @@ function genLoginConf() {
             <button
                 class="won-button--filled lighterblue"
                 ng-disabled="loginForm.$invalid">
-                <!--ng-click="::self.login(self.email, self.password)">-->
                     Sign In
             </button>
             <input
@@ -54,7 +53,7 @@ function genLoginConf() {
         </form>
         <div class="wl__register">
             No account yet?
-            <a href="{{ self.absHRef(self.$state, 'signup') }}">
+            <a href="{{ self.absHRef(self.$state, 'signup') }}" ng-click="self.hideMainMenuDisplay()">
                 Sign up
             </a>
         </div>`;
@@ -73,7 +72,6 @@ function genLoginConf() {
             this.rememberMe = false;
 
             const login = (state) => ({
-                loginVisible: state.get('loginVisible'),
                 loggedIn: state.getIn(['user','loggedIn']),
                 loginError: state.getIn(['user','loginError'])
             });
