@@ -34,7 +34,7 @@ function genComponentConf() {
       </won-square-image>
       <div class="ch__right">
         <div class="ch__right__topline">
-          <div class="ch__right__topline__title">
+          <div class="ch__right__topline__title" title="{{ self.need.get('title') }}">
             {{ self.need.get('title') }}
           </div>
           <div class="ch__right__topline__date">
@@ -74,6 +74,7 @@ function genComponentConf() {
                 const need = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 return {
+                    ownNeed,
                     need,
                     friendlyTimestamp: need && relativeTime(
                         selectLastUpdateTime(state),

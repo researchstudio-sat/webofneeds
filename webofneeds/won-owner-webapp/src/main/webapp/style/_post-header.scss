@@ -6,34 +6,49 @@ won-post-header {
   flex-grow: 1;
   //padding: 0.5rem;
 
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-areas: "icon main";
+  grid-template-column: min-content 1fr;
 
   @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
-  won-square-image .image{
-    border: $thinBorderWidth solid $won-light-gray;
+  won-square-image {
+    grid-area: icon;
+
+    .image{
+      border: $thinBorderWidth solid $won-light-gray;
+    }
   }
 
   .ph__right {
-    flex-grow: 1;
+    grid-area: main;
+
+    display: grid;
+    grid-template-areas: "topline" "subtitle";
 
     &__topline {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
+      grid-area: topline;
+      display: grid;
+      grid-template-areas: "title date";
+      grid-template-column: 1fr min-content;
 
       &__title {
+        grid-area: title;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
         font-weight: 400;
       }
 
       &__date {
+        grid-area: date;
         font-size: $smallFontSize;
         color: $won-subtitle-gray;
       }
     }
 
     &__subtitle {
+      grid-area: subtitle;
       color: $won-subtitle-gray;
       display: flex;
       flex-direction: row;
