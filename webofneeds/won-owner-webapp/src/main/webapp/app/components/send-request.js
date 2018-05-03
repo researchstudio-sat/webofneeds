@@ -2,7 +2,7 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import postHeaderModule from './post-header.js';
+import connectionHeaderModule from './connection-header.js';
 import feedbackGridModule from './feedback-grid.js';
 import postSeeksInfoModule from './post-seeks-info.js';
 import postIsInfoModule from './post-is-info.js';
@@ -41,12 +41,33 @@ function genComponentConf() {
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
-            <won-post-header
-                need-uri="self.postUriToConnectTo"
-                timestamp="self.createdTimestamp"
+            <won-connection-header
+                connection-uri="self.connection.get('uri')"
+                timestamp="self.connection.get('lastUpdateDate')"
                 hide-image="::false">
-            </won-post-header>
-            <won-connection-context-dropdown ng-if="self.connection && self.connection.get('isRated')"></won-connection-context-dropdown>
+            </won-connection-header>
+            <svg class="post-info__header__icon__small clickable"
+                style="--local-primary:#var(--won-secondary-color);"
+                ng-show="!self.contextMenuOpen"
+                ng-if="self.connection && self.connection.get('isRated')"
+                ng-click="self.contextMenuOpen = true">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+            </svg>
+            <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
+                <div class="content" ng-click="self.contextMenuOpen = false">
+                    <div class="topline">
+                      <svg class="post-info__header__icon__small__contextmenu clickable"
+                        style="--local-primary:black;">
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                      </svg>
+                    </div>
+                    <button ng-if="self.connection && self.connection.get('isRated')"
+                        class="won-button--filled red"
+                        ng-click="self.closeConnection()">
+                            Close Connection
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="post-info__content">
             <won-gallery ng-show="self.suggestedPost.get('hasImages')">
@@ -204,7 +225,7 @@ function genComponentConf() {
 export default angular.module('won.owner.components.sendRequest', [
     postIsInfoModule,
     postSeeksInfoModule,
-    postHeaderModule,
+    connectionHeaderModule,
     feedbackGridModule,
     labelledHrModule,
     chatTextFieldSimpleModule,
