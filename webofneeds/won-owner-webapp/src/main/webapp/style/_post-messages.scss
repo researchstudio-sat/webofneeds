@@ -67,36 +67,6 @@
         @include fixed-square(1.5rem);
         padding-left: 0.5rem;
       }
-
-      &__icon__small__contextmenu {
-        @include fixed-square(1.5rem);
-        //padding-left: 0.5rem;
-        position: relative;
-        top: -0.5rem;
-        right: -0.5rem;
-        float: right;
-      }
-
-      .pm__header__contextmenu .content {
-        max-width: 15rem;
-        position: absolute;
-        right: 0;
-
-        a.won-button--outlined,
-        button {
-          margin-top: 0.5rem;
-          width: 100%;
-          white-space: nowrap;
-        }
-
-        a.won-button--outlined{
-          cursor: pointer;
-          display: flex;
-          align-content: center;
-          align-items: center;
-          box-sizing: border-box;
-        }
-      }
     }
 
     .pm__footer {

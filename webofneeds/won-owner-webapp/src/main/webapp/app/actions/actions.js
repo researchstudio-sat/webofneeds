@@ -216,8 +216,6 @@ const actionHierarchy = {
         
         waitingForAnswer: INJ_DEFAULT,
     },
-    hideLogin: INJ_DEFAULT,
-    showLogin: INJ_DEFAULT,
     //anonymousLogin: anonAccountLogin,
     loginStarted: INJ_DEFAULT,
     login: accountLogin, //loginSuccess
@@ -237,6 +235,9 @@ const actionHierarchy = {
     toggleClosedNeedsDisplay: INJ_DEFAULT,
     hideClosedNeedsDisplay: INJ_DEFAULT,
     showClosedNeedsDisplay: INJ_DEFAULT,
+
+    showMainMenuDisplay: INJ_DEFAULT,
+    hideMainMenuDisplay: INJ_DEFAULT,
 
     toasts: {
         delete: INJ_DEFAULT,

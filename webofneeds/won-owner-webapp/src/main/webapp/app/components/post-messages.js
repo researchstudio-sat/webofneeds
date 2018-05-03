@@ -9,6 +9,7 @@ import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
 import connectionHeaderModule from './connection-header.js';
 import labelledHrModule from './labelled-hr.js';
+import connectionContextDropdownModule from './connection-context-dropdown.js';
 
 import {
     } from '../won-label-utils.js'
@@ -215,7 +216,6 @@ function genComponentConf() {
             </a>
         </div>
         <div class="pm__footer" ng-if="self.isConnected">
-
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
@@ -371,7 +371,7 @@ function genComponentConf() {
                         // scroll to bottom directly after rendering, if snapped
                         this.updateScrollposition()
                 )
-            )
+            );
         }
 
         ensureMessagesAreLoaded() {
@@ -671,10 +671,6 @@ function genComponentConf() {
         closeConnection(){
             this.connections__close(this.connection.get('uri'));
             this.router__stateGoCurrent({connectionUri: null});
-        }
-
-        goToPost() {
-            this.router__stateGoCurrent({postUri: this.connection.get('remoteNeedUri')});
         }
     }
     Controller.$inject = serviceDependencies;

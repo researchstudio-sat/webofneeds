@@ -9,6 +9,7 @@ import postIsInfoModule from './post-is-info.js';
 import postShareLinkModule from './post-share-link.js';
 import labelledHrModule from './labelled-hr.js';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
+import connectionContextDropdownModule from './connection-context-dropdown.js';
 
 import {
     selectOpenPostUri,
@@ -27,7 +28,7 @@ import {
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 
 function genComponentConf() {
@@ -206,11 +207,6 @@ function genComponentConf() {
                 this.router__stateGoCurrent({connectionUri: this.connectionUri})
             }
         }
-
-        closeConnection(){
-            this.connections__close(this.connectionUri);
-            this.router__stateGoCurrent({connectionUri: null});
-        }
     }
     Controller.$inject = serviceDependencies;
 
@@ -233,7 +229,8 @@ export default angular.module('won.owner.components.sendRequest', [
     feedbackGridModule,
     labelledHrModule,
     chatTextFieldSimpleModule,
-    postShareLinkModule
+    postShareLinkModule,
+    connectionContextDropdownModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;

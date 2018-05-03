@@ -11,6 +11,7 @@ import postIsInfoModule from './post-is-info.js';
 import postHeaderModule from './post-header.js';
 import postShareLinkModule from './post-share-link.js';
 import labelledHrModule from './labelled-hr.js';
+import postContextDropdownModule from './post-context-dropdown.js';
 
 import { attach, } from '../utils.js';
 import won from '../won-es6.js';
@@ -43,34 +44,7 @@ function genComponentConf() {
                 timestamp="self.createdTimestamp"
                 hide-image="::false">
             </won-post-header>
-            <!-- TODO: Implement a menu with all the necessary buttons -->
-            <svg class="post-info__header__icon__small clickable"
-                style="--local-primary:#var(--won-secondary-color);"
-                ng-if="self.post.get('ownNeed')"
-                ng-show="!self.contextMenuOpen"
-                ng-click="self.contextMenuOpen = true">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-            </svg>
-            <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content" ng-click="self.contextMenuOpen = false">
-                    <div class="topline">
-                        <svg class="post-info__header__icon__small__contextmenu clickable"
-                            style="--local-primary:black;">
-                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                        </svg>
-                    </div>
-                    <button class="post-info__footer__button won-button--filled red"
-                        ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.InactiveCompacted"
-                        ng-click="self.reOpenPost()">
-                        Reopen Post
-                    </button>
-                    <button class="post-info__footer__button won-button--filled red"
-                        ng-if="self.post.get('ownNeed') && self.post.get('state') === self.WON.ActiveCompacted"
-                        ng-click="self.closePost()">
-                        Close Post
-                    </button>
-                </div>
-            </div>
+            <won-post-context-dropdown ng-if="self.post.get('ownNeed')"></won-post-context-dropdown>
         </div>
         <div class="post-info__content">
             <won-gallery ng-show="self.post.get('hasImages')">
@@ -147,34 +121,19 @@ function genComponentConf() {
             };
             connect2Redux(selectFromState, actionCreators, ['self.includeHeader'], this);
         }
-
-        closePost() {
-            if(this.post.get("ownNeed")){
-                console.log("CLOSING THE POST: "+this.post.get('uri'));
-                this.needs__close(this.post.get('uri'));
-		        this.router__stateGoCurrent({postUri : null})
-            }
-        }
-
-        reOpenPost() {
-            if(this.post.get("ownNeed")){
-                console.log("RE-OPENING THE POST: "+this.post.get('uri'));
-                this.needs__reopen(this.post.get('uri'));
-            }
-        }
-}
-    
-Controller.$inject = serviceDependencies;
-return {
-    restrict: 'E',
-    controller: Controller,
-    controllerAs: 'self',
-    bindToController: true, //scope-bindings -> ctrl
-    template: template,
-    scope: {
-        includeHeader: "="
     }
-}
+
+    Controller.$inject = serviceDependencies;
+    return {
+        restrict: 'E',
+        controller: Controller,
+        controllerAs: 'self',
+        bindToController: true, //scope-bindings -> ctrl
+        template: template,
+        scope: {
+            includeHeader: "="
+        }
+    }
 }
 
 export default angular.module('won.owner.components.postInfo', [ 
@@ -182,7 +141,8 @@ export default angular.module('won.owner.components.postInfo', [
 		postSeeksInfoModule,
         postHeaderModule,
         postShareLinkModule,
-        labelledHrModule
+        labelledHrModule,
+        postContextDropdownModule,
 	])
     .directive('wonPostInfo', genComponentConf)
     .name;

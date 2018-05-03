@@ -45,7 +45,6 @@ function genTopnavConf() {
 
 
         <nav class="topnav">
-
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a href="{{ self.defaultRouteHRef(self.$state) }}"
@@ -63,8 +62,7 @@ function genTopnavConf() {
 
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__signupbtn"
-                                ng-show="!self.open">
+                                class="topnav__signupbtn">
                                     Sign up
                             </a>
                         </li>
@@ -78,25 +76,6 @@ function genTopnavConf() {
                 </div>
             </div>
         </nav>
-
-
-        <nav class="loginOverlay" ng-show="self.open && !self.loggedIn">
-            <div class="lo__inner">
-                <div class="lo__inner__right">
-                    <won-login open="self.open"></won-login>
-                </div>
-            </div>
-        </nav>
-
-
-        <nav class="loginOverlay" ng-show="self.open && self.loggedIn">
-            <div class="lo__inner">
-                <div class="lo__inner__right">
-                    <won-logout open="self.open"></won-logout>
-                </div>
-            </div>
-        </nav>
-
 
         <div class="topnav__toasts">
             <div class="topnav__toasts__element" 
@@ -163,8 +142,6 @@ function genTopnavConf() {
                 appTitle: getIn(state, ['config', 'theme', 'title']),
                 adminEmail: getIn(state, ['config', 'theme', 'adminEmail']),
                 WON: won.WON,
-                loginVisible: state.get('loginVisible'),
-                open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")
                 loggedIn: state.getIn(['user', 'loggedIn']),
                 email: state.getIn(['user','email']),
                 toastsArray: state.getIn(['toasts']).toArray(),
@@ -173,10 +150,6 @@ function genTopnavConf() {
             });
 
             connect2Redux(selectFromState, actionCreators, [], this);
-        }
-
-        showLogin() {
-            this.open = true;
         }
     }
     Controller.$inject = serviceDependencies;

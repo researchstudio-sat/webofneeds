@@ -17,7 +17,8 @@ function genComponentConf() {
     <hr class="show-in-responsive"/>
     <a
         href="{{ self.absHRef(self.$state, 'about') }}"
-        class="won-button--outlined thin red">
+        class="won-button--outlined thin red"
+        ng-click="self.hideMainMenuDisplay()">
             About
     </a>
     <a class="won-button--outlined thin red"
