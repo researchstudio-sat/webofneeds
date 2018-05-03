@@ -42,6 +42,7 @@ System.config({
     "rdfstore-js": "scripts/rdfstore-js/rdf_store.js",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
     "redux": "npm:redux@3.7.2",
+    "redux-devtools-extension": "npm:redux-devtools-extension@2.13.2",
     "redux-immutablejs": "npm:redux-immutablejs@0.0.8",
     "redux-thunk": "npm:redux-thunk@1.0.0",
     "redux-ui-router": "npm:redux-ui-router@0.7.2",
@@ -231,6 +232,10 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "stream-browserify": "npm:stream-browserify@1.0.0",
       "string_decoder": "npm:string_decoder@0.10.31"
+    },
+    "npm:redux-devtools-extension@2.13.2": {
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "redux": "npm:redux@3.7.2"
     },
     "npm:redux-immutablejs@0.0.8": {
       "immutable": "npm:immutable@3.7.5",

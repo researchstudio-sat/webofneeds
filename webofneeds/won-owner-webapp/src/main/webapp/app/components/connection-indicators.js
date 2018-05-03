@@ -30,24 +30,24 @@ function genComponentConf() {
                     title="Show latest message/request"
                     style="--local-primary:#F09F9F;"
                     ng-show="!self.unreadConnectedCount">
-                        <use href="#ico36_message"></use>
+                        <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
 
                 <svg style="--local-primary:var(--won-primary-color);"
                      title="Show latest unread message/request"
                      ng-show="self.unreadConnectedCount"
                      class="indicators__item__icon">
-                        <use href="#ico36_message"></use>
+                        <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
 
                 <span class="indicators__item__caption" title="Number of chats with unread messages/requests">
-                    {{ self.unreadConnectedCount }}
+                    {{ self.getCountLimited(self.unreadConnectedCount)}}
                 </span>
         </a>
         <div class="indicators__item" ng-show="!self.latestConnectedUri" title="No chats in this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
-                    <use href="#ico36_message"></use>
+                    <use xlink:href="#ico36_message" href="#ico36_message"></use>
             </svg>
              <span class="indicators__item__caption"></span>
         </div>
@@ -59,26 +59,26 @@ function genComponentConf() {
                 <svg class="indicators__item__icon"
                     style="--local-primary:var(--won-primary-color-light);"
                     ng-show="!self.unreadMatchesCount">
-                        <use href="#ico36_match"></use>
+                        <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
 
                 <svg style="--local-primary:var(--won-primary-color);"
                     ng-show="self.unreadMatchesCount"
                     class="indicators__item__icon">
-                        <use href="#ico36_match"></use>
+                        <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
                 <span class="indicators__item__caption" title="Number of new matches">
-                    {{ self.unreadMatchesCount }}
+                    {{ self.getCountLimited(self.unreadMatchesCount) }}
                 </span>
         </a>
         <div class="indicators__item" ng-show="!self.latestMatchUri" title="No matches for this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
-                    <use href="#ico36_match"></use>
+                    <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.unreadCountSum }}</span>
+        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
     `;
 
     class Controller {
@@ -145,6 +145,13 @@ function genComponentConf() {
         setOpen(connectionUri) {
             this.onSelectedConnection({connectionUri: connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
+        }
+
+        getCountLimited(count , threshold = 100) {
+            if(!!count && (threshold < count)){
+                return (threshold-1)+"+";
+            }
+            return count;
         }
     }
     Controller.$inject = serviceDependencies;

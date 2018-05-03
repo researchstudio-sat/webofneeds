@@ -56,20 +56,19 @@ function genComponentConf() {
                     <svg
                         style="--local-primary:var(--won-secondary-color);"
                         class="co__item__need__arrow clickable"
-                        ng-show="self.isOpen(need.get('uri'))"
+                        ng-if="self.isOpen(need.get('uri'))"
                         ng-click="self.closeConnections(need.get('uri'))" >
-                            <use href="#ico16_arrow_up"></use>
+                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                     <svg style="--local-primary:var(--won-secondary-color);"
                         class="co__item__need__arrow clickable"
-                        ng-show="!self.isOpen(need.get('uri'))"
+                        ng-if="!self.isOpen(need.get('uri'))"
                         ng-click="self.openConnections(need.get('uri'))" >
-                            <use href="#ico16_arrow_down"></use>
+                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
                 </div>
             </div>
-            <div
-                class="co__item__connections"
+            <div class="co__item__connections"
                 ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)">
                 <won-connection-selection-item
                     ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
@@ -85,12 +84,12 @@ function genComponentConf() {
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
                 ng-if="self.showClosedNeeds">
-                <use href="#ico16_arrow_up"></use>
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
                 ng-if="!self.showClosedNeeds">
-                <use href="#ico16_arrow_down"></use>
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
         </div>
         <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
@@ -105,6 +104,12 @@ function genComponentConf() {
                     </won-post-header>
                 </div>
             </div>
+        </div>
+        <div class="co__loadspinner"
+            ng-if="self.isLoading">
+            <img src="images/spinner/on_white.gif"
+                alt="Loading&hellip;"
+                class="hspinner"/>
         </div>
     `;
 
@@ -134,6 +139,7 @@ function genComponentConf() {
                 let sortedClosedNeeds = sortByDate(closedNeeds);
 
                 return {
+                    isLoading: !state.get('initialLoadFinished'),
                     showClosedNeeds: state.get('showClosedNeeds'),
                     showCreateView,
                     needUriInRoute,

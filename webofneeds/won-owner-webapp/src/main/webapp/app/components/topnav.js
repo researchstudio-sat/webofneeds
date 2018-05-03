@@ -24,7 +24,7 @@ function genTopnavConf() {
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon" style="--local-primary:white;">
-                <use href="#ico16_indicator_warning"></use>
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
             </svg>
             <span class="si__text">
                 Lost connection &ndash; make sure your internet-connection
@@ -88,19 +88,19 @@ function genTopnavConf() {
                 <svg class="topnav__toasts__element__icon"
                     ng-show="toast.get('type') === self.WON.infoToast"
                     style="--local-primary:#CCD2D2">
-                        <use href="#ico16_indicator_info"></use>
+                        <use xlink:href="#ico16_indicator_info" href="#ico16_indicator_info"></use>
                 </svg>
 
                 <svg class="topnav__toasts__element__icon"
                     ng-show="toast.get('type') === self.WON.warnToast"
                     style="--local-primary:#CCD2D2">
-                        <use href="#ico16_indicator_warning"></use>
+                        <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
                 </svg>
 
                 <svg class="topnav__toasts__element__icon"
                     ng-show="toast.get('type') === self.WON.errorToast"
                     style="--local-primary:#CCD2D2">
-                        <use href="#ico16_indicator_error"></use>
+                        <use xlink:href="#ico16_indicator_error" href="#ico16_indicator_error"></use>
                 </svg>
 
                 <div class="topnav__toasts__element__text">
@@ -121,7 +121,7 @@ function genTopnavConf() {
                 <svg class="topnav__toasts__element__close clickable"
                     ng-click="self.toasts__delete(toast)"
                     style="--local-primary:var(--won-primary-color);">
-                        <use href="#ico27_close"></use>
+                        <use xlink:href="#ico27_close" href="#ico27_close"></use>
                 </svg>
 
             </div>

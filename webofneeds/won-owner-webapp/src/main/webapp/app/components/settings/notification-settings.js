@@ -37,7 +37,7 @@ function genComponentConf() {
                         <a class="ac__button clickable">
                             <svg style="--local-primary:var(--won-primary-color);"
                                 class="ac__button__icon" >
-                                    <use href="#ico36_close_circle"></use>
+                                    <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                             </svg>
                             <span class="ac__button__caption">Remove</span>
                         </a>
@@ -47,7 +47,7 @@ function genComponentConf() {
                 <a class="ac__button clickable">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="ac__button__icon">
-                            <use href="#ico36_plus"></use>
+                            <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
                     </svg>
                     <span class="ac__button__caption">Add new notification settings</span>
                 </a>
@@ -55,14 +55,14 @@ function genComponentConf() {
             <div class="nonotifications" ng-show="!self.items">
                 <svg class="nonotifications__icon"
                     style="--local-primary:#CCD2D2;">
-                        <use href="#ico36_notification_circle"></use>
+                        <use xlink:href="#ico36_notification_circle" href="#ico36_notification_circle"></use>
                 </svg>
                 <div class="title">You don't use Notification settings yet</div>
                 <div class="description">You can specify your default Notifications to be at hand when posting needs. Notifications can be set individually on create posts page as well.</div>
                 <a class="ac__button clickable">
                     <svg style="--local-primary:var(--won-primary-color);"
                         class="ac__button__icon">
-                            <use href="#ico36_plus"></use>
+                            <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
                     </svg>
                     <span class="ac__button__caption">Add new notification settings</span>
                 </a>

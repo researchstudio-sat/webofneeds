@@ -65,7 +65,7 @@ function genComponentConf() {
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="pm__header__icon clickable">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <won-post-header
@@ -106,7 +106,7 @@ function genComponentConf() {
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="pm__content__agreement__icon clickable"
                     ng-click="self.showAgreementData = !self.showAgreementData">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
                 
                 <!-- Agreements-->
@@ -164,7 +164,7 @@ function genComponentConf() {
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="pm__content__agreement__icon clickable"
                     ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)">
-                    <use href="#ico36_close"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
                 
                 <div class="pm__content__agreement__title"> 
@@ -177,7 +177,7 @@ function genComponentConf() {
                target="_blank"
                href="{{ self.connection.get('uri') }}">
                     <svg class="rdflink__small">
-                        <use href="#rdf_logo_1"></use>
+                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
                     <span class="rdflink__label">Connection</span>
             </a>

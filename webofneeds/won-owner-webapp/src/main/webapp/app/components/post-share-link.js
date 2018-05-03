@@ -14,16 +14,15 @@ function genComponentConf() {
     let template = `
         <div class="psl__separator clickable" ng-class="{'psl__separator--open' : self.showShare}" ng-click="self.showShare = !self.showShare">
             <span class="psl__separator__text">Share</span>
-            <svg
-                style="--local-primary:var(--won-secondary-color);"
+            <svg style="--local-primary:var(--won-secondary-color);"
                 class="psl__separator__arrow"
-                ng-show="self.showShare">
-                <use href="#ico16_arrow_down"></use>
+                ng-if="self.showShare">
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
             <svg style="--local-primary:var(--won-secondary-color);"
                 class="psl__separator__arrow"
-                ng-show="!self.showShare">
-                <use href="#ico16_arrow_up"></use>
+                ng-if="!self.showShare">
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
         </div>
         <div class="psl__content" ng-if="self.showShare">

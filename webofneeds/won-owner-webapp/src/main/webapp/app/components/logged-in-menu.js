@@ -24,7 +24,7 @@ function genComponentConf() {
     <a class="won-button--outlined thin red"
         ng-click="self.toggleRdfDisplay()">
         <svg class="won-button-icon" style="--local-primary:var(--won-primary-color);">
-            <use href="#ico36_rdf_logo"></use>
+            <use xlink:href="#ico36_rdf_logo" href="#ico36_rdf_logo"></use>
         </svg>
         <span>{{self.shouldShowRdf? "Hide raw data" : "Show raw RDF data"}}</span>
     </a>

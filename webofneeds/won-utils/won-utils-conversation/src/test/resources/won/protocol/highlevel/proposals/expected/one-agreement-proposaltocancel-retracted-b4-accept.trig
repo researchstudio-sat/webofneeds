@@ -1,0 +1,9 @@
+<https://localhost:8443/won/resource/event/1107469913331435500> {
+    <https://localhost:8443/won/resource/event/6149800720990867000>
+            <http://purl.org/webofneeds/model#hasFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasRemoteFacet>
+                    <http://purl.org/webofneeds/model#OwnerFacet> ;
+            <http://purl.org/webofneeds/model#hasTextMessage>
+                    "Hello, debugbot!" .
+}

@@ -58,13 +58,13 @@ function genComponentConf() {
                 ng-show="self.seeksPart.address"  ng-click="self.toggleMap()">
                 {{ self.seeksPart.address }}
                 <svg class="post-info__carret">
-                  <use href="#ico-filter_map"></use>
+                  <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
                 </svg>
 				<svg class="post-info__carret" ng-show="!self.showMap">
-	               <use href="#ico16_arrow_down"></use>
+	               <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
 	            </svg>
                 <svg class="post-info__carret" ng-show="self.showMap">
-                   <use href="#ico16_arrow_up"></use>
+                   <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
             </p>                
             <won-need-map 
