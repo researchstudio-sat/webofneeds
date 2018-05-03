@@ -12,22 +12,22 @@ import {
     connect2Redux,
 } from '../won-utils.js';
 
-const serviceDependencies = ['$scope', '$ngRedux'];
+const serviceDependencies = ['$scope', '$ngRedux', '$element'];
 function genComponentConf() {
     let template = `
       <div
         ng-transclude="header"
         class="dd__open-button clickable"
-        ng-class="{ 'dd--closed' : !self.ddOpen }"
-        ng-click="self.ddOpen = true;"
+        ng-class="{ 'dd--closed' : !self.showMainMenu }"
+        ng-click="self.showMainMenuDisplay()"
       >
       </div>
-      <div class="dd__dropdown" ng-show="self.ddOpen">
+      <div class="dd__dropdown" ng-show="self.showMainMenu">
         <div
           ng-transclude="header"
           class="dd__close-button clickable"
-          ng-class="{ 'dd--open' : self.ddOpen }"
-          ng-click="self.ddOpen = false;"
+          ng-class="{ 'dd--open' : self.showMainMenu }"
+          ng-click="self.hideMainMenuDisplay()"
         >
         </div>
         <div
@@ -36,19 +36,33 @@ function genComponentConf() {
          >
          </div>
       </div>
-    `
+    `;
 
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            //Object.assign(this, srefUtils); // bind srefUtils to scope
-            //this.labels = labels;
-            window.covdd4dbg = this;
-
             const self = this;
 
-            //const selectFromState = (state) => { }
-            //connect2Redux(selectFromState, actionCreators, ['self.needUri'], this);
+            const selectFromState = (state) => ({
+                showMainMenu: state.get('showMainMenu'),
+            });
+
+            connect2Redux(selectFromState, actionCreators, [], this);
+
+
+            this.$scope.$on('$destroy', () => {
+                angular.element(window.document).unbind('click');
+            });
+
+            angular.element(window.document).bind('click',
+                    event => {
+                        var clickedElement = event.target;
+                        //hide MainMenu if click was outside of the component and menu was open
+                        if(this.showMainMenu && !this.$element[0].contains(clickedElement)){
+                            this.hideMainMenuDisplay();
+                        }
+                    }
+            );
         }
     }
     Controller.$inject = serviceDependencies;
