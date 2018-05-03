@@ -111,17 +111,3 @@ won-login-form {
     }
   }
 }
-
-.loginOverlay {
-  width: 100%;
-  @include max-content-width($maxContentWidthLoginOverlay, 0rem, 'lo');
-  position: absolute;
-  z-index: 100;
-
-  > .lo__inner {
-    @include flex-row;
-    justify-content: flex-end;
-
-    position: relative; //to allow absolute on *__center
-  }
-}
