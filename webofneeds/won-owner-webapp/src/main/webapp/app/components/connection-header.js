@@ -56,7 +56,7 @@ function genComponentConf() {
           </span>
           -->
           <span class="ch__right__subtitle__type">
-            {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : ' (no matching context specified)' }}
+            {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
           </span>
         </div>
       </div>
@@ -74,6 +74,7 @@ function genComponentConf() {
                 const need = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 return {
+                    connection,
                     ownNeed,
                     need,
                     friendlyTimestamp: need && relativeTime(
@@ -88,6 +89,14 @@ function genComponentConf() {
                 ['self.connectionUri', 'self.timestamp'],
                 this
             );
+        }
+
+        getTextForConnectionState(state){
+            let stateText = this.labels.connectionState[state];
+            if (!stateText) {
+                stateText = "unknown connection state";
+            }
+            return stateText;
         }
     }
     Controller.$inject = serviceDependencies;
