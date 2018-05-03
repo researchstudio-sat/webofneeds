@@ -7,7 +7,7 @@ import Immutable from 'immutable';
 import chatTextFieldSimpleModule from './chat-textfield-simple.js';
 import connectionMessageModule from './connection-message.js';
 import connectionAgreementModule from './connection-agreement.js';
-import postHeaderModule from './post-header.js';
+import connectionHeaderModule from './connection-header.js';
 import labelledHrModule from './labelled-hr.js';
 
 import {
@@ -67,11 +67,11 @@ function genComponentConf() {
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
-            <won-post-header
-                need-uri="self.theirNeed.get('uri')"
+            <won-connection-header
+                connection-uri="self.connection.get('uri')"
                 timestamp="self.lastUpdateTimestamp"
-                hide-image="::true">
-            </won-post-header>
+                hide-image="::false">
+            </won-connection-header>
             <svg class="pm__header__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
                 ng-if="self.isConnected || self.isSentRequest"
@@ -694,7 +694,7 @@ export default angular.module('won.owner.components.postMessages', [
     chatTextFieldSimpleModule,
     connectionMessageModule,
     connectionAgreementModule,
-    postHeaderModule,
+    connectionHeaderModule,
     labelledHrModule
 ])
     .directive('wonPostMessages', genComponentConf)
