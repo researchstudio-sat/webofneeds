@@ -11,6 +11,7 @@ import {
     reverseSearchNominatim,
     nominatim2draftLocation,
     leafletBounds,
+    delay,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
@@ -66,9 +67,12 @@ function genComponentConf() {
             this.map = initLeaflet(this.mapMount());
             this.map.on('click', e => onMapClick(e, this));
             
-           	this.determineCurrentLocation();
-            
             window.lp4dbg = this;
+
+            // needs to happen after constructor finishes, otherwise
+            // the component's callbacks won't be registered.
+           	delay(0).then(() => this.determineCurrentLocation());
+            
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
@@ -121,7 +125,8 @@ function genComponentConf() {
         }
         selectedLocation(location) {
 
-            // TODO: add location detail in isseeks
+            //add location detail in isseeks - only used for hide/show
+            // TODO: move this back to isseeks and use draft status to determine?
             this.addLocation();
 
             this.resetSearchResults(); // picked one, can hide the rest if they were there
@@ -153,7 +158,20 @@ function genComponentConf() {
             }
         }
         determineCurrentLocation() {
-            if ("geolocation" in navigator) {
+            // if a location is saved, zoom in on saved location
+            if(this.locationIsSaved() && this.initialLocation) {
+                const lat = this.initialLocation.lat;
+                const lng = this.initialLocation.lng;
+                const zoom = 13;
+
+                this.map.setZoom(zoom);
+                this.map.panTo([lat, lng]);
+
+                this.textfield().value = this.initialLocation.name;
+                this.placeMarkers([this.initialLocation]);
+            }
+            // else, try to zoom in on current location
+            else if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     currentLocation => {
 
@@ -206,6 +224,7 @@ function genComponentConf() {
             addLocation: "&",
             onDraftChange: "&",
             locationIsSaved: "&",
+            initialLocation: "=",
         },
         template: template
     }
