@@ -203,12 +203,11 @@ function genComponentConf() {
         	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
         	
         	this.markAsRelevant(false, uri);
-        	this.onRemoveData({proposalUri: this.sateUri});
+        	this.onRemoveData({proposalUri: uri});
         }
         
         retractMessage() {
         	this.clicked = true;
-        	//const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
         	var uri = this.cancelUri;
         	if(!uri) {
         		uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
@@ -222,7 +221,6 @@ function genComponentConf() {
         
         rejectMessage() {
         	this.clicked = true;
-        	//const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
         	var uri = this.cancelUri;
         	if(!uri) {
         		uri = this.message.get("remoteUri");

@@ -153,7 +153,8 @@ function genComponentConf() {
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false">
+	                on-update="self.showAgreementData = false"
+	                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
@@ -418,6 +419,8 @@ function genComponentConf() {
             if(this._snapBottom) {
                 this.scrollToBottom();
             }
+            //new message income
+            //this.showAgreementData = false;
         }
         scrollToBottom() {
             this._programmaticallyScrolling = true;
@@ -489,6 +492,7 @@ function genComponentConf() {
 
         getAgreementDataUris() {
             var url = this.baseString + 'rest/agreement/getAgreementProtocolUris?connectionUri='+this.connection.get('uri');
+            var hasChanged = false;
             callAgreementsFetch(url)
                 .then(response => {
                     this.agreementHeadData = this.transformDataToSet(response);
@@ -497,6 +501,7 @@ function genComponentConf() {
                         if(this.agreementHeadData.hasOwnProperty(key)) {
                             for(data of this.agreementHeadData[key]) {
                             	this.addAgreementDataToSate(data, key);
+                            	hasChanged = true;
                             }
                         }
                     }
@@ -512,6 +517,7 @@ function genComponentConf() {
 	                    		if(obj.stateUri === uri || obj.headUri === uri) {
 	                            	console.log("Message " + uri + " was removed");
 	                            	this.agreementStateData[key].delete(obj);
+	                            	hasChanged = true;
 	                    		}
                             }
 	                        
@@ -519,9 +525,10 @@ function genComponentConf() {
                     }
                     
                 }).then(() => {
-                	//this.agreementStateData = this.agreementLoadingData;
-    				this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
-    				this.snapToBottom();
+                	if(!hasChanged) {
+                		this.agreementStateData = this.agreementLoadingData;
+                		this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
+                	}
         		}).catch(error => {
     				console.error('Error:', error);
     				this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
@@ -593,39 +600,39 @@ function genComponentConf() {
                     	}
                     	this.agreementStateData = this.agreementLoadingData;
                     	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
-                    	this.snapToBottom();
-                    }
-                    
-                    
+                    }  
                 })
             })
         }
 
-        filterAgreementStateData(agreementObject, remove) {
+        filterAgreementStateData(agreementObject, del) {
         	for(key of keySet) {
-    			this.checkObject(this.agreementStateData[key], agreementObject, remove)
+    			this.checkObject(key, agreementObject, del)
 			}
         }
         
-        checkObject(data, agreementObject, remove) {
-        	for(object of data) {
+        checkObject(key, agreementObject, del) {
+        	for(object of this.agreementStateData[key]) {
         		if(object.stateUri === agreementObject.stateUri) {
-        			if(remove) {
-        				data.delete(object);
+        			if(del.value) {
+        				this.agreementStateData[key].delete(object);
         			}
         			return true;
         		}
         	}
-        	
         	return false;
         }
         
         filterMessages(stateUri) {
         	var object = {
-        			stateUri: stateUri,
-        			headUri: undefined,
+    			stateUri: stateUri,
+    			headUri: undefined,
         	}
-        	this.filterAgreementStateData(object, true);
+        	
+        	var del = {
+    			value: true,
+        	}
+        	this.filterAgreementStateData(object, del);
         }
         
         getCancelUri(agreementUri) {
