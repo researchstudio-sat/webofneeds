@@ -58,12 +58,6 @@ export const pageLoadAction = () => (dispatch, getState) => {
     checkLoginStatus()
     /* handle data, dispatch actions */
     .then(data => {
-        if(data.username.endsWith('@matchat.org')) {
-            // session-cookie is from privateId-session, but there's no privateId in the url-bar => logout to have consistent state again
-            return logout().then(() =>
-                loadingWhileSignedOut(dispatch, getState)
-            );
-        }
         return loadingWhileSignedIn(dispatch, getState, data.username)
     })
     .catch(error => {
