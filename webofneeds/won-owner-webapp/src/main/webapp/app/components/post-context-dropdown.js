@@ -70,20 +70,20 @@ function genComponentConf() {
             };
             connect2Redux(selectFromState, actionCreators, [], this);
 
-            this.$scope.$on('$destroy', () => {
-                angular.element(window.document).unbind('click');
-            });
-
-            angular.element(window.document).bind('click',
-                    event => {
-                    var clickedElement = event.target;
-                    //hide MainMenu if click was outside of the component and menu was open
-                    if(this.contextMenuOpen && !this.$element[0].contains(clickedElement)){
-                        this.contextMenuOpen = false;
-                        this.$scope.$apply();
-                    }
+            const callback = (event) => {
+                const clickedElement = event.target;
+                //hide MainMenu if click was outside of the component and menu was open
+                if(this.contextMenuOpen && !this.$element[0].contains(clickedElement)){
+                    this.contextMenuOpen = false;
+                    this.$scope.$apply();
                 }
-            );
+            };
+
+            this.$scope.$on('$destroy', () => {
+                window.document.removeEventListener('click', callback);
+            });
+            
+            window.document.addEventListener('click', callback);
         }
 
         closePost() {
