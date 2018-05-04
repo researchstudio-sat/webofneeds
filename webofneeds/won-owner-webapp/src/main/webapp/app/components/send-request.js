@@ -41,6 +41,11 @@ function genComponentConf() {
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
+            <won-connection-header
+                connection-uri="self.connection.get('uri')"
+                timestamp="self.connection.get('lastUpdateDate')"
+                hide-image="::false">
+            </won-connection-header>
             <won-connection-context-dropdown ng-if="self.connection && self.connection.get('isRated')"></won-connection-context-dropdown>
         </div>
         <div class="post-info__content">

@@ -2,6 +2,7 @@
 @import 'post-header';
 @import 'connection-header';
 @import 'connection-indicators';
+@import 'extended-connection-indicators';
 @import 'connection-selection-item-line';
 @import 'speech-bubble';
 @import 'animate';
@@ -27,14 +28,65 @@ won-connections-overview {
     }
 
     &__need {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-
+      display: grid;
+      grid-row-gap: 0.5rem;
       padding: 0.5rem;
 
-      won-post-header {
-        flex-grow: 1;
+      &__header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        won-post-header {
+          flex-grow: 1;
+        }
+
+        won-connection-indicators {
+          padding-left: 0.5rem;
+          @include appearAnimation(.25s);
+        }
+
+        &__carret{
+          // results in a clickable area as large as indicators
+          // TODO: make the value less rigid
+          padding: 0.625em;
+          &__icon {
+            @include carretSized;
+          }
+        }
+      }
+
+      &__detail {
+        display: grid;
+        border-top: $thinGrayBorder;
+        padding-top: 0.5rem;
+
+        @media (min-width: $responsivenessBreakPoint){
+          grid-column-gap: 0.5rem;
+          grid-template-areas: "indicators actions";
+          grid-template-rows: min-content 1fr;
+        }
+
+        @media (max-width: $responsivenessBreakPoint){
+          grid-row-gap: 0.5rem;
+          grid-template-areas: "indicators" "actions";
+        }
+
+        @include slideWithOpacityAnimation(.25s, linear, 4rem, 0.5rem 0 0 0);
+
+        &__actions {
+          grid-area: actions;
+
+          &__button {
+            width: 100%;
+            padding: 0.66em;
+            font-size: $smallFontSize;
+          }
+        }
+
+        &__indicators {
+          grid-area: indicators;
+        }
       }
 
       &:hover, &.selected {
@@ -46,19 +98,12 @@ won-connections-overview {
           @include speech-bubble-right(white, $won-line-gray, 0.625rem, $thinBorderWidth, 1.5rem);
         }
       }
-
-      &__arrow {
-        @include carretSized;
-        // results in a clickable area as large as indicators
-        // TODO: make the value less rigid
-        padding: 0.625em;
-      }
     }
 
     &__connections {
       background: white;
       @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorderWidth, 5rem);
-      @include slideWithOpacityAnimation(.5s, linear, 250rem, 0, 0);
+      @include slideWithOpacityAnimation(.5s, linear, 250rem);
     }
   }
 
@@ -101,6 +146,6 @@ won-connections-overview {
   }
 
   .co__closedNeeds {
-    @include slideWithOpacityAnimation(.5s, linear, 250rem, 0, 0);
+    @include slideWithOpacityAnimation(.5s, linear, 250rem);
   }
 }

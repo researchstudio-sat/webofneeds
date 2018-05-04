@@ -6,31 +6,32 @@
 won-connection-indicators {
   display: flex;
   flex-direction: row;
-  padding-left: 0.5rem;
 
   .indicators__item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     flex-direction: row;
-    padding-right: 0.75em;
+    padding-right: 0.5em;
 
     &:last-of-type {
       padding-right: 0;
     }
 
     &__icon {
-      @include fixed-square($bigiconSize);
+      @include fixed-square($iconSize);
     }
 
     &__caption {
-      line-height: $bigiconSize;
+      line-height: $iconSize;
+      font-size: $smallFontSize;
       padding-left: 0.25em;
       min-width: 2rem;
       color: black;
     }
   }
   .mobile__indicator{
-    line-height: $bigiconSize;
+    line-height: $iconSize;
+    font-size: $smallFontSize;
     padding-left: 0.5em;
     min-width: 0.5rem;
     color: black;
