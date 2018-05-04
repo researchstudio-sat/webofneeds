@@ -271,7 +271,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     }
 
     //if type === create -> use needBuilder as well
-    const prepareContentNodeData = (needDataIsOrSeeks) => ({
+    const prepareContentNodeData = async (needDataIsOrSeeks) => ({
         type : won.toCompacted(needDataIsOrSeeks.type), //mandatory
         title: needDataIsOrSeeks.title, //mandatory
         description: needDataIsOrSeeks.description,
@@ -286,13 +286,13 @@ export async function buildCreateMessage(needData, wonNodeUri) {
         whatsAround: needDataIsOrSeeks.whatsAround,
         noHints: needDataIsOrSeeks.noHints,
 
-        ttl: needDataIsOrSeeks.ttl,
+        arbitraryJsonLd: needDataIsOrSeeks.ttl? await won.ttlToJsonLd(needDataIsOrSeeks.ttl) : [],
     })
      
     
-    let contentRdf = await won.buildNeedRdf({ 
-           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
-           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
+    let contentRdf = won.buildNeedRdf({ 
+           is: (needData.is? await prepareContentNodeData(needData.is) : undefined),
+           seeks: (needData.seeks? await prepareContentNodeData(needData.seeks) : undefined),
         });
     
    

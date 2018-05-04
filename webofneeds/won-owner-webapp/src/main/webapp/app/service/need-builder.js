@@ -66,6 +66,9 @@ import won from './won.js';
      *
      *    // the URIs where attachments can be found / will be published
      *    args.attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf']
+     * 
+     *    // the triples will be put in the graph that's build here anyway, so there's no need to pass graph-uri
+     *    args.arbitraryJsonLdGraph = [{ '@id': 'http://example.org/.../1234', 'dc:title': 'hi}, {...}, {...}]
      *
      *    args.recurInfinite =
      *    args.recursIn =
@@ -87,7 +90,7 @@ import won from './won.js';
      * //TODO mandatory but specify later:
      * contentId, e.g. 'http://localhost:8080/won/resource/event/1997814854983652400#content-need';
      */
-    won.buildNeedRdf = async function(args){
+    won.buildNeedRdf = function(args){
 
         if(!args.is && !args.seeks) {
             throw new Exception("Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " + args);
@@ -207,8 +210,8 @@ import won from './won.js';
             //, <if _hasModalities> {... (see directly below) } </if>
             args.is? buildContentNode((isWhatsAround? '_:needContent' : '_:isNeedContent'), args.is, true) : {},
             args.seeks? (isWhatsAround? {} : (buildContentNode('_:seeksNeedContent', args.seeks, false))) : {},
-            ...(args.is && args.is.ttl? await won.ttlToJsonLd(args.is.ttl) : []),
-            ...(args.seeks && args.seeks.ttl? await won.ttlToJsonLd(args.seeks.ttl) : []),
+            ...(args.is && args.is.arbitraryJsonLd? args.is.arbitraryJsonLd : []),
+            ...(args.seeks && args.seeks.arbitraryJsonLd? args.seeks.arbitraryJsonLd : []),
         ];
         return {
             '@graph': graph,
