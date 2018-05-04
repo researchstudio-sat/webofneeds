@@ -49,6 +49,8 @@ won-create-isseeks {
       padding: .5rem 0;
 
       .cis__detail__items__item {
+        display: flex;
+        align-items: center;
         min-width: .5rem;
         margin: .3rem;
         font-size: $normalFontSize;
@@ -77,8 +79,8 @@ won-create-isseeks {
         }
 
         &.added {
-          // TODO: show added state in a way that doesn't conflict with picked
-          color: green;
+          // TODO: show added state in some way
+          // right now this is done by changing the icon
         }
       }
     }
@@ -155,7 +157,8 @@ won-create-isseeks {
   }
 
   .cis__circleicon {
-    @include fixed-square(2rem);
+    @include fixed-height(2rem);
+    @include fixed-width(2.5rem);
   }
 
   .cis__addDetail__header {
