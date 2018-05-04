@@ -146,6 +146,6 @@ module.exports = function(env, argv) {
             WatchTimePlugin,
             new LiveReloadPlugin()
         ],
-        devtool: mode == 'development' ? 'eval-source-map' : false
+        devtool: mode == 'development' ? 'source-map' : false
     };
 };
