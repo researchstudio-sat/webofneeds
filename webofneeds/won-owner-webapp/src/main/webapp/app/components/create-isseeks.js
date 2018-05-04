@@ -62,10 +62,7 @@ function genComponentConf() {
             <div class="cis__addDetail__header detailPicker clickable"
                 ng-click="self.toggleDetail()"
                 ng-class="{'closedDetailPicker': !self.showDetail}">
-                    <!-- TODO: remove hover effect? does not work well on mobile -->
-                    <span class="nonHover">Add more detail</span>
-                    <span class="hover" ng-if="!self.showDetail">Open more detail</span>
-                    <span class="hover" ng-if="self.showDetail">Close more detail</span>
+                    <span>Add more detail</span>
                     <svg class="cis__addDetail__header__carret" ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
