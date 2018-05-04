@@ -171,12 +171,13 @@ function genComponentConf() {
                     placeholder="Enter TTL..."></textarea>
                 <div class="cis__ttl__helptext">
                     Expects valid turtle.
-                    <{{::self.won.WONMSG.msguriPlaceholder}}> will
-                    be replaced by the URI generated for this part (i.e. is/description or seeks/searches)
-                    of the need. Use the URI, so your TTL can be found when parsing the need.
-                    See \`won.minimalTurtlePrefixes\`
+                    <code><{{::self.won.WONMSG.uriPlaceholder.is}}></code> and
+                    <code><{{::self.won.WONMSG.uriPlaceholder.seeks}}></code> and
+                    will be replaced by the URI generated for this part (i.e. is/description 
+                    or seeks/searches) of the need. Use the URI, so your TTL can be found 
+                    when parsing the need. See <code>won.minimalTurtlePrefixes</code>
                     for prefixes that will be added automatically. E.g.
-                    \`<{{::self.won.WONMSG.msguriPlaceholder}}> dc:title "hello world!". \`
+                    <code><{{::self.won.WONMSG.uriPlaceholder.is}}> dc:title "hello world!".</code>
                     For more information see the
                     <a href="https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/need-structure.md">
                         documentation on the need-structure

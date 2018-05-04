@@ -314,14 +314,14 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
 
 export function buildProposalMessage(uri, type, text) {
-    const msgP = won.WONMSG.msguriPlaceholder;
+    const msgP = won.WONMSG.uriPlaceholder.event;
     const sc = "http://purl.org/webofneeds/agreement#"+type;
     const whM = "\n won:hasTextMessage ";
     return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
 }
 
 export function buildModificationMessage(uri, type, text) {
-    const msgP = won.WONMSG.msguriPlaceholder;
+    const msgP = won.WONMSG.uriPlaceholder.event;
     const sc = "http://purl.org/webofneeds/modification#"+type;
     const whM = "\n won:hasTextMessage ";
     return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";

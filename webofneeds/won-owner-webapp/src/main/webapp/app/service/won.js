@@ -340,7 +340,11 @@ window.N34dbg = N3;
     };
 
     //UTILS
-    won.WONMSG.msguriPlaceholder= "this:messageuri";
+    won.WONMSG.uriPlaceholder = Object.freeze({
+        event: "this:eventuri",
+        is: "this:placeholderForIsUri",
+        seeks: "this:placeholderForSeeksUri",
+    });
 
     /**
      * Returns the "compacted" alternative of the value (e.g.
@@ -813,17 +817,17 @@ window.N34dbg = N3;
      */
     won.addMessageGraph = function (builder, graphURIs, messageType) {
         let graphs = builder.data['@graph'];
-        let unsetMessageGraphUri = won.WONMSG.msguriPlaceholder+"#data";
+        let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event+"#data";
         //create the message graph, containing the message type
         var messageGraph = {
             "@graph": [
                 {
-                    "@id":won.WONMSG.msguriPlaceholder,
+                    "@id":won.WONMSG.uriPlaceholder.event,
                     "msg:hasMessageType": {'@id':messageType}
                 },
                 {   "@id": unsetMessageGraphUri,
                     "@type": "msg:EnvelopeGraph",
-                    "rdfg:subGraphOf" : {"@id":won.WONMSG.msguriPlaceholder}
+                    "rdfg:subGraphOf" : {"@id":won.WONMSG.uriPlaceholder.event}
                 }
             ],
             "@id": unsetMessageGraphUri
@@ -844,7 +848,7 @@ window.N34dbg = N3;
         hashFragement = hashFragement || 'graph1';
         return {"@graph": [
                     {
-                        "@id": won.WONMSG.msguriPlaceholder + "#" + hashFragement,
+                        "@id": won.WONMSG.uriPlaceholder.event + "#" + hashFragement,
                         "@graph": []
                     }
                 ]
@@ -1658,7 +1662,7 @@ window.N34dbg = N3;
             }
         }
         this.messageGraph = null;
-        this.eventUriValue = won.WONMSG.msguriPlaceholder;
+        this.eventUriValue = won.WONMSG.uriPlaceholder.event;
         won.addMessageGraph(this, graphNames , messageType);
     };
 
