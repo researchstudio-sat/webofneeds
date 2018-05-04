@@ -85,7 +85,8 @@ won-create-isseeks {
   }
 
   .cis__details {
-    @include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem 0, 0.75rem 0);
+    //@include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
+    @include slideWithOpacityAnimation(.5s, linear, 20rem);
 
     border-top: $thinBorderWidth solid $won-line-gray;
     padding: 0.5rem 0;
