@@ -296,13 +296,8 @@ function reactToPrivateIdChanges(fromPrivateId, toPrivateId, dispatch, getState)
         return Promise.resolve();
     }
 
-    if(fromPrivateId && !toPrivateId) {
-        //privateId was removed, log out
-        return accountLogout({doRedirects: false})(dispatch, getState);
-        //dispatch(actionCreators.logout());
-
     // v--- do any login-actions only when privateId is added after initialPageLoad. The latter should handle any necessary logins itself.
-    } else if (state.get('initialLoadFinished')) {
+    if (state.get('initialLoadFinished')) {
         if(fromPrivateId !== toPrivateId) { // privateId has changed or was added
             const credentials = {privateId: toPrivateId};
             const options = {doRedirects: false};

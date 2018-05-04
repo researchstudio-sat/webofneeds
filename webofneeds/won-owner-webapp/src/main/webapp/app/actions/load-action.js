@@ -42,8 +42,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
     * initial page-load-speed.
     * TODO fetch config data here as well
     */
-
-    const privateId = getParameterByName('privateId'); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
+    const privateId = getParameterByName('privateId') || localStorage.getItem('privateId'); // as this is one of the first action-creators to be executed, we need to get the param directly from the url-bar instead of `state.getIn(['router','currentParams','privateId'])`
     if(privateId) {
         /*
          * we don't have a valid session. however the url might contain `privateId`, which means
@@ -105,6 +104,8 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
             payload: { loginError: 'invalid privateId', credentials: { privateId }}
         });
         throw e;
+    }).then(() => {
+        dispatch(stateGoCurrent({privateId}));
     });
     //dispatch(actionCreators.login(email, password));
     //return; // the login action should fetch the required data, so we're done here.

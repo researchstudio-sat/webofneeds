@@ -231,6 +231,11 @@ export function accountLogin(credentials, options) {
         .then(() => {
             _loginInProcessFor = undefined;
         })
+        .then(() => {
+            if(credentials.privateId) {
+                localStorage.setItem('privateId', credentials.privateId);
+            }
+        })
     }
 }
 
@@ -247,6 +252,9 @@ export function accountLogout(options) {
         doRedirects: true,
         ...options,
     };
+
+    localStorage.removeItem('privateId');
+
     return (dispatch, getState) => {
         const state = getState();
 
