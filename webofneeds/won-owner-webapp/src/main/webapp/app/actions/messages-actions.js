@@ -213,22 +213,39 @@ export function connectionMessageReceived(event) {
                   		
                   	case "PROPOSES":
                   		console.log("PROPOSES");
-                  		/*
-                  		/if(effect.proposalType === "CANCELS") {
-                  			for(i = 0; i < effect.proposesToCancel.length; i++) {
-                  				let messageUri = effect.proposesToCancel[i];
-                      			setToUnrelevant(messages, messageUri, needUri, connectionUri);
-                  			}
-                  		}*/
                   		break;
                   		
                   	case "REJECTS":
                   		console.log("REJECTS");
+                     	if(effect.rejects) {
+	              			let messageUri = getEventUri(messages, effect.rejectedMessageUri);
+	              			dispatch({
+	            		        type: actionTypes.messages.markAsRelevant,
+	            		        payload: {
+	            		    			 messageUri: messageUri,
+	            		                 connectionUri: connectionUri,
+	            		                 needUri: needUri,
+	            		                 relevant: false,
+	            	 			}
+	            			});
+	              		}
                   		break;
 
                      case "RETRACTS":
                      	console.log("RETRACTS");
-                         break;
+                     	if(effect.retracts) {
+	              			let messageUri = getEventUri(messages, effect.retractedMessageUri);
+	              			dispatch({
+	            		        type: actionTypes.messages.markAsRelevant,
+	            		        payload: {
+	            		    			 messageUri: messageUri,
+	            		                 connectionUri: connectionUri,
+	            		                 needUri: needUri,
+	            		                 relevant: false,
+	            	 			}
+	            			});
+	              		}
+	              		break;
 
                      default:
                      	//return state;
