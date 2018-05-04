@@ -31,7 +31,7 @@ won-post-share-link {
   }
 
   .psl__content {
-    @include slideWithOpacityAnimation(.5s, linear, 5rem, 0, 0);
+    @include slideWithOpacityAnimation(.5s, linear, 5rem);
 
     .psl__info,
     .psl__text {

@@ -1,0 +1,31 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-extended-connection-indicators {
+  display: flex;
+  flex-direction: row;
+
+  .extendedindicators__item {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding-right: 0.75em;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+
+    &__icon {
+      @include fixed-square($iconSize);
+    }
+
+    &__caption {
+      font-size: $smallFontSize;
+      line-height: $iconSize;
+      padding-left: 0.25em;
+      color: black;
+    }
+  }
+}

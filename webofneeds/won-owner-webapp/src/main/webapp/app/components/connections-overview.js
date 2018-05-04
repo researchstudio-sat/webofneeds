@@ -11,6 +11,7 @@ import ngAnimate from 'angular-animate';
 import squareImageModule from './square-image.js';
 import postHeaderModule from './post-header.js';
 import connectionIndicatorsModule from './connection-indicators.js';
+import extendedConnectionIndicatorsModule from './extended-connection-indicators.js';
 import connectionSelectionItemModule from './connection-selection-item.js';
 import createPostItemModule from './create-post-item.js';
 
@@ -39,37 +40,51 @@ function genComponentConf() {
     let template = `
         <won-create-post-item ng-class="{'selected' : self.showCreateView}"></won-create-post-item>
         <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
-            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)}">
-            <div class="co__item__need"
-                ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
-                <won-post-header
-                    need-uri="need.get('uri')"
-                    timestamp="'TODOlatestOfThatType'"
-                    ng-click="self.selectNeed(need.get('uri'))"
-                    class="clickable">
-                </won-post-header>
-                <won-connection-indicators
-                    on-selected-connection="self.selectConnection(connectionUri)" 
-                    need-uri="need.get('uri')">
-                </won-connection-indicators>
-                <div ng-style="{'visibility': self.showConnectionsDropdown(need) ? 'visible' : 'hidden'}">
-                    <svg
-                        style="--local-primary:var(--won-secondary-color);"
-                        class="co__item__need__arrow clickable"
-                        ng-if="self.isOpen(need.get('uri'))"
-                        ng-click="self.closeConnections(need.get('uri'))" >
-                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                    </svg>
-                    <svg style="--local-primary:var(--won-secondary-color);"
-                        class="co__item__need__arrow clickable"
-                        ng-if="!self.isOpen(need.get('uri'))"
-                        ng-click="self.openConnections(need.get('uri'))" >
-                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                    </svg>
+            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenConnections(need)}">
+            <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
+                <div class="co__item__need__header">
+                    <won-post-header
+                        need-uri="need.get('uri')"
+                        timestamp="'TODOlatestOfThatType'"
+                        ng-click="self.toggleDetails(need.get('uri'))"
+                        class="clickable">
+                    </won-post-header>
+                    <won-connection-indicators
+                        on-selected-connection="self.selectConnection(connectionUri)"
+                        need-uri="need.get('uri')"
+                        ng-if="!self.isOpen(need.get('uri'))">
+                    </won-connection-indicators>
+                    <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))">
+                        <svg
+                            style="--local-primary:var(--won-secondary-color);"
+                            class="co__item__need__header__carret__icon clickable"
+                            ng-if="self.isOpen(need.get('uri'))">
+                                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                        </svg>
+                        <svg style="--local-primary:var(--won-secondary-color);"
+                            class="co__item__need__header__carret__icon clickable"
+                            ng-if="!self.isOpen(need.get('uri'))">
+                                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                        </svg>
+                    </div>
+                </div>
+                <div class="co__item__need__detail" ng-if="self.isOpen(need.get('uri'))">
+                    <won-extended-connection-indicators
+                        class="co__item__need__detail__indicators"
+                        on-selected-connection="self.selectConnection(connectionUri)"
+                        need-uri="need.get('uri')">
+                    </won-extended-connection-indicators>
+                    <div class="co__item__need__detail__actions">
+                        <button
+                            class="co__item__need__detail__actions__button won-button--outlined thin red"
+                            ng-click="self.selectNeed(need.get('uri'))">
+                            Show Post Details
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && self.showConnectionsDropdown(need)">
+                ng-if="self.isOpen(need.get('uri')) && self.hasOpenConnections(need)">
                 <won-connection-selection-item
                     ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
                     on-selected-connection="self.selectConnection(connectionUri)"
@@ -94,14 +109,42 @@ function genComponentConf() {
         </div>
         <div class="co__closedNeeds" ng-if="self.showClosedNeeds && self.closedNeedsSize > 0">
             <div ng-repeat="need in self.sortedClosedNeeds" class="co__item">
-                <div class="co__item__need"
-                    ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
-                    <won-post-header
-                        need-uri="need.get('uri')"
-                        timestamp="'TODOlatestOfThatType'"
-                        ng-click="self.selectNeed(need.get('uri'))"
-                        class="clickable">
-                    </won-post-header>
+                <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
+                    <div class="co__item__need__header">
+                        <won-post-header
+                            need-uri="need.get('uri')"
+                            timestamp="'TODOlatestOfThatType'"
+                            ng-click="self.toggleDetails(need.get('uri'))"
+                            class="clickable">
+                        </won-post-header>
+                        <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))">
+                            <svg
+                                style="--local-primary:var(--won-secondary-color);"
+                                class="co__item__need__header__carret__icon clickable"
+                                ng-if="self.isOpen(need.get('uri'))">
+                                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                            </svg>
+                            <svg style="--local-primary:var(--won-secondary-color);"
+                                class="co__item__need__header__carret__icon clickable"
+                                ng-if="!self.isOpen(need.get('uri'))">
+                                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="co__item__need__detail" ng-if="self.isOpen(need.get('uri'))">
+                        <won-extended-connection-indicators
+                            class="co__item__need__detail__indicators"
+                            on-selected-connection="self.selectConnection(connectionUri)"
+                            need-uri="need.get('uri')">
+                        </won-extended-connection-indicators>
+                        <div class="co__item__need__detail__actions">
+                            <button
+                                class="co__item__need__detail__actions__button won-button--outlined thin red"
+                                ng-click="self.selectNeed(need.get('uri'))">
+                                Show Post Details
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -161,14 +204,14 @@ function genComponentConf() {
             )
         }
 
-        openConnections(ownNeedUri) {
-            this.open[ownNeedUri] = true;
-        }
-
-        closeConnections(ownNeedUri) {
-            this.open[ownNeedUri] = false;
-            if(this.isOpenByConnection(ownNeedUri)) {
-                this.router__stateGoCurrent({connectionUri: null});
+        toggleDetails(ownNeedUri) {
+            if(this.isOpen(ownNeedUri)){
+                this.open[ownNeedUri] = false;
+                if(this.isOpenByConnection(ownNeedUri)) {
+                    this.router__stateGoCurrent({connectionUri: null});
+                }
+            }else{
+                this.open[ownNeedUri] = true;
             }
         }
 
@@ -187,7 +230,7 @@ function genComponentConf() {
             this.onSelectedNeed({needUri}); //trigger callback with scope-object
         }
 
-        showConnectionsDropdown(need){
+        hasOpenConnections(need){
             return need.get("state") === won.WON.ActiveCompacted && need.get("connections").filter(conn => conn.get("state") !== won.WON.Closed).size > 0;
         }
 
@@ -222,6 +265,7 @@ export default angular.module('won.owner.components.connectionsOverview', [
         connectionSelectionItemModule,
         postHeaderModule,
         connectionIndicatorsModule,
+        extendedConnectionIndicatorsModule,
         ngAnimate,
         createPostItemModule,
 ])
