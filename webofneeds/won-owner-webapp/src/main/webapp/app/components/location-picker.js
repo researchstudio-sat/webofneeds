@@ -120,6 +120,10 @@ function genComponentConf() {
             this.placeMarkers([]);
         }
         selectedLocation(location) {
+
+            // TODO: add location detail in isseeks
+            this.addLocation();
+
             this.resetSearchResults(); // picked one, can hide the rest if they were there
 
             let draft = {location};
@@ -199,6 +203,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
+            addLocation: "&",
             onDraftChange: "&",
             locationIsSaved: "&",
         },

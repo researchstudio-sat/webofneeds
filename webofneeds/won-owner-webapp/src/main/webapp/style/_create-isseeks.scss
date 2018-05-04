@@ -43,30 +43,42 @@ won-create-isseeks {
 
     .cis__detail__items {
       @include slideWithOpacityAnimation(.5s, linear, 20rem);
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      padding: .5rem 0;
 
       .cis__detail__items__item {
-        display: flex;
+        min-width: .5rem;
+        margin: .3rem;
         font-size: $normalFontSize;
-        padding: .5rem 0;
+        //padding: .5rem 0;
         cursor: pointer;
 
         color: black;
         --local-primary: black; // for the svg-icons
-        &:hover {
-          color: $won-primary-color;
-          --local-primary: $won-primary-color; // for the svg-icons
-        }
+        // &:hover {
+        //   color: $won-primary-color;
+        //   --local-primary: $won-primary-color; // for the svg-icons
+        // }
 
         &.picked {
-          color: $won-line-gray;
-          --local-primary: $won-line-gray; // for the svg-icons
+          //color: $won-line-gray;
+          //--local-primary: $won-line-gray; // for the svg-icons
+          color: $won-primary-color;
+          --local-primary: $won-primary-color;
           cursor: default;
 
-          &:hover {
-            color: $won-line-gray;
-            --local-primary: $won-line-gray; // for the svg-icons
-            cursor: default;
-          }
+          // &:hover {
+          //   color: $won-line-gray;
+          //   --local-primary: $won-line-gray; // for the svg-icons
+          //   cursor: default;
+          // }
+        }
+
+        &.added {
+          // TODO: show added state in a way that doesn't conflict with picked
+          color: green;
         }
       }
     }

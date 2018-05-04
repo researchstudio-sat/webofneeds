@@ -197,7 +197,7 @@ function genComponentConf() {
 
             this.characterLimit = postTitleCharacterLimit;
            
-            this.isOpen = false;
+            this.openDetail = undefined;
             
             this.reset();
             
@@ -264,6 +264,10 @@ function genComponentConf() {
                 (this.textAreaTags || []), 
                 extractHashtags(tagsInputString)
             );
+            
+            if(tagsInputString && !this.details.has("tags")){ 
+                this.details.add("tags");
+            }
         }
 
         updateTTLBuffered() {
@@ -285,6 +289,19 @@ function genComponentConf() {
             })
         }
 
+        addLocation() {
+            if(!this.details.has("location")){ 
+                this.details.add("location");
+            }
+        }
+
+        removeLocation() {
+            if(this.details.has("location")){
+                this.details.delete("location");
+                this.draftObject.location = undefined;
+            }
+        }
+
         locationIsSaved() {
             return this.details.has("location") && this.draftObject.location && this.draftObject.location.name;
         }
@@ -295,6 +312,15 @@ function genComponentConf() {
 
         toggleDetail(){
             this.showDetail = !this.showDetail;
+        }
+
+        toggleOpenDetail(detail){
+            // open clicked detail
+            if(this.openDetail === detail) {
+                this.openDetail = undefined;
+            } else {
+                this.openDetail = detail;
+            }
         }
         
         getArrayFromSet(set){
