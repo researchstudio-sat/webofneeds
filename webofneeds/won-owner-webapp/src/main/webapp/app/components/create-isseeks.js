@@ -123,21 +123,15 @@ function genComponentConf() {
 
             <!-- LOCATION -->
             <div class="cis__location"  ng-if="self.openDetail === 'location'">
-                <div class="cis__addDetail__header location" ng-click="self.details.delete('location') && self.updateDraft()">
-                    <svg class="cis__circleicon nonHover">
+                <div class="cis__addDetail__header location">
+                    <svg class="cis__circleicon">
                         <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                     </svg>
-                    <svg class="cis__circleicon hover">
-                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
-                    </svg>
-                    <span class="nonHover">Location</span>
-                    <span class="hover">Remove Location</span>
+                    <span>Location</span>
                 </div>
-                <won-location-picker id="seeksPicker"
-                    add-location="::self.addLocation()"
+                <won-location-picker class="seeksPicker"
                     initial-location="::self.draftObject.location"
-                    on-draft-change="::self.setDraft(draft)"
-                    location-is-saved="::self.locationIsSaved()">
+                    on-location-picked="::self.updateLocation(location)">
                 </won-location-picker>
             </div>
 
@@ -300,27 +294,23 @@ function genComponentConf() {
                 this.$scope.$apply(() => this.ttlParseError = parseError.message);
             })
 
-            // TODO: check if this works as intended
             if(ttlString && !this.details.has("ttl")){
                 this.details.add("ttl");
             }
         }
 
-        addLocation() {
-            if(!this.details.has("location")){ 
-                this.details.add("location");
-            }
-        }
-
-        removeLocation() {
-            if(this.details.has("location")){
+        updateLocation(location) {
+            if(!location && this.details.has("location")){
                 this.details.delete("location");
                 this.draftObject.location = undefined;
+            } else {
+                if(!this.details.has("location")) {
+                    this.details.add("location");
+                }
+                this.draftObject.location = location;
             }
-        }
 
-        locationIsSaved() {
-            return this.details.has("location") && this.draftObject.location && this.draftObject.location.name;
+            this.updateDraft();
         }
 
         pickImage(image) {

@@ -26,10 +26,21 @@ import {
 const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
+        <!-- SELECTED LOCATION -->
+        <div class="lp__selected" ng-show="self.locationIsSaved">
+            <svg class="lp__selected__icon clickable" 
+                 style="--local-primary:var(--won-primary-color);"
+                 ng-click="self.resetLocation()">
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
+            <span> {{self.pickedLocation.name}} </span>
+        </div>
+        <!-- LOCATION SEARCH BOX -->
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
+        <!-- LIST OF SUGGESTED LOCATIONS -->
         <ol>
             <li ng-show="
-                !self.locationIsSaved() && self.currentLocation &&
+                !self.locationIsSaved && self.currentLocation &&
                 (
                     !self.lastSearchedFor ||
                     ([self.currentLocation] | filter:self.lastSearchedFor).length > 0
@@ -41,7 +52,7 @@ function genComponentConf() {
                 </a>
                 (current)
             </li>
-            <!--li ng-show="!self.locationIsSaved()"
+            <!--li ng-show="!self.locationIsSaved"
                 ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
                     <a href=""
                         ng-click="self.selectedLocation(previousLocation)"
@@ -66,6 +77,9 @@ function genComponentConf() {
 
             this.map = initLeaflet(this.mapMount());
             this.map.on('click', e => onMapClick(e, this));
+
+            this.locationIsSaved = !!this.initialLocation;
+            this.pickedLocation = this.initialLocation;
             
             window.lp4dbg = this;
 
@@ -102,12 +116,8 @@ function genComponentConf() {
         }
 
         placeMarkers(locations) {
-            if(this.markers) {
-                //remove previously placed markers
-                for(let m of this.markers) {
-                    this.map.removeLayer(m);
-                }
-            }
+            
+            this.removeMarkers();
 
             this.markers = locations.map(location =>
                 L.marker([location.lat, location.lng])
@@ -118,28 +128,42 @@ function genComponentConf() {
                 this.map.addLayer(m);
             }
         }
+
+        removeMarkers() {
+            if(this.markers) {
+                //remove previously placed markers
+                for(let m of this.markers) {
+                    this.map.removeLayer(m);
+                }
+            }
+        }
+
         resetSearchResults() {
             this.searchResults = undefined;
             this.lastSearchedFor = undefined;
             this.placeMarkers([]);
         }
+
+        resetLocation() {
+            this.onLocationPicked(undefined);
+            this.locationIsSaved = false;
+            this.removeMarkers();
+        }
+
         selectedLocation(location) {
 
-            //add location detail in isseeks - only used for hide/show
-            // TODO: move this back to isseeks and use draft status to determine?
-            this.addLocation();
+            // callback to update location in isseeks
+            this.onLocationPicked(location);
+            this.locationIsSaved = true;
+            this.pickedLocation = location;
 
             this.resetSearchResults(); // picked one, can hide the rest if they were there
-
-            let draft = {location};
-            this.onDraftChange({draft});
-
-            this.textfield().value = location.name; // use textfield to display result
 
             this.placeMarkers([location]);
             this.map.fitBounds(leafletBounds(location), { animate: true });
             this.markers[0].openPopup();
         }
+
         doneTyping() {
             const text = this.textfield().value;
 
@@ -157,18 +181,19 @@ function genComponentConf() {
                 });
             }
         }
+
         determineCurrentLocation() {
             // if a location is saved, zoom in on saved location
-            if(this.locationIsSaved() && this.initialLocation) {
-                const lat = this.initialLocation.lat;
-                const lng = this.initialLocation.lng;
+            if(this.locationIsSaved && this.pickedLocation) {
+                const lat = this.pickedLocation.lat;
+                const lng = this.pickedLocation.lng;
                 const zoom = 13;
 
                 this.map.setZoom(zoom);
                 this.map.panTo([lat, lng]);
 
-                this.textfield().value = this.initialLocation.name;
-                this.placeMarkers([this.initialLocation]);
+                //this.textfield().value = this.pickedLocation.name;
+                this.placeMarkers([this.pickedLocation]);
             }
             // else, try to zoom in on current location
             else if ("geolocation" in navigator) {
@@ -221,9 +246,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            addLocation: "&",
-            onDraftChange: "&",
-            locationIsSaved: "&",
+            onLocationPicked: "&",
             initialLocation: "=",
         },
         template: template

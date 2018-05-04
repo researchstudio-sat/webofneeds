@@ -3,6 +3,15 @@
 
 won-location-picker {
 
+  .lp__selected {
+    display: flex;
+    align-items: center;
+    
+    .lp__selected__icon {
+      @include fixed-square(2rem);
+    }
+  }
+
   .lp__searchbox {
     border-width: $thinBorderWidth;
     border-style: solid;
