@@ -71,9 +71,12 @@ function genComponentConf() {
                     </svg>
             </div>
             <div class="cis__detail__items" ng-if="self.showDetail" >
+
+                <!-- LOCATION PICKER -->
                 <div class="cis__detail__items__item location"
-                    ng-click="!self.details.has('location') && self.details.add('location')"
-                    ng-class="{'picked' : self.details.has('location')}">
+                    ng-click="self.toggleOpenDetail('location')"
+                    ng-class="{'picked' : self.openDetail === 'location'}"
+                    ng-class="{'added' : self.details.has('location')}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('location')">
                             <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                         </svg>
@@ -81,10 +84,13 @@ function genComponentConf() {
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Address or Location</span>
-                    </div>
+                </div>
+
+                <!-- TAGS PICKER -->
                 <div class="cis__detail__items__item tags"
-                    ng-click="!self.details.has('tags') && self.details.add('tags')"
-                    ng-class="{'picked' : self.details.has('tags')}">
+                    ng-click="self.toggleOpenDetail('tags')"
+                    ng-class="{'picked' : self.openDetail === 'tags'}"
+                    ng-class="{'added' : self.details.has('tags')}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('tags')">
                             <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
                         </svg>
@@ -96,8 +102,9 @@ function genComponentConf() {
 
                 <!-- TTL Will be excluded until further notice-->
                 <!--div class="cis__detail__items__item ttl"
-                    ng-click="!self.details.has('ttl') && self.details.add('ttl')"
-                    ng-class="{'picked' : self.details.has('ttl')}">
+                    ng-click="self.toggleOpenDetail('ttl')"
+                    ng-class="{'picked' : self.openDetail === 'ttl'}"
+                    ng-class="{'added' : self.details.has('ttl')}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
                             <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
                         </svg>
@@ -111,8 +118,11 @@ function genComponentConf() {
         <!-- /DETAIL Picker/ -->
 
         <!-- DETAILS -->
-        <div class="cis__details" ng-repeat="detail in self.getArrayFromSet(self.details) track by $index"">
-            <div class="cis__location"  ng-if="detail === 'location'">
+        <!-- TODO: move details into the div opened by the detail picker? -->
+        <div class="cis__details" ng-if="self.showDetail">
+
+            <!-- LOCATION -->
+            <div class="cis__location"  ng-if="self.openDetail === 'location'">
                 <div class="cis__addDetail__header location" ng-click="self.details.delete('location') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
@@ -124,13 +134,15 @@ function genComponentConf() {
                     <span class="hover">Remove Location</span>
                 </div>
                 <won-location-picker id="seeksPicker"
+                    add-location="::self.addLocation()"
+                    initial-location="::self.draftObject.location"
                     on-draft-change="::self.setDraft(draft)"
                     location-is-saved="::self.locationIsSaved()">
                 </won-location-picker>
             </div>
 
             <!-- TAGS -->
-             <div class="cis__tags" ng-if="detail === 'tags'">
+             <div class="cis__tags" ng-if="self.openDetail === 'tags'">
                 <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
@@ -151,7 +163,7 @@ function genComponentConf() {
             </div>
 
             <!-- TTL Will be excluded until further notice-->
-            <!-- div class="cis__ttl" ng-if="detail === 'ttl'">
+            <!-- div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
                 <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
@@ -287,6 +299,11 @@ function genComponentConf() {
             .catch(parseError => {
                 this.$scope.$apply(() => this.ttlParseError = parseError.message);
             })
+
+            // TODO: check if this works as intended
+            if(ttlString && !this.details.has("ttl")){
+                this.details.add("ttl");
+            }
         }
 
         addLocation() {
