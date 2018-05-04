@@ -41,33 +41,7 @@ function genComponentConf() {
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
-            <won-connection-header
-                connection-uri="self.connection.get('uri')"
-                timestamp="self.connection.get('lastUpdateDate')"
-                hide-image="::false">
-            </won-connection-header>
-            <svg class="post-info__header__icon__small clickable"
-                style="--local-primary:#var(--won-secondary-color);"
-                ng-show="!self.contextMenuOpen"
-                ng-if="self.connection && self.connection.get('isRated')"
-                ng-click="self.contextMenuOpen = true">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-            </svg>
-            <div class="post-info__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content" ng-click="self.contextMenuOpen = false">
-                    <div class="topline">
-                      <svg class="post-info__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;">
-                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                      </svg>
-                    </div>
-                    <button ng-if="self.connection && self.connection.get('isRated')"
-                        class="won-button--filled red"
-                        ng-click="self.closeConnection()">
-                            Close Connection
-                    </button>
-                </div>
-            </div>
+            <won-connection-context-dropdown ng-if="self.connection && self.connection.get('isRated')"></won-connection-context-dropdown>
         </div>
         <div class="post-info__content">
             <won-gallery ng-show="self.suggestedPost.get('hasImages')">

@@ -73,40 +73,7 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
-            <svg class="pm__header__icon__small clickable"
-                style="--local-primary:#var(--won-secondary-color);"
-                ng-if="self.isConnected || self.isSentRequest"
-                ng-style="{'visibility': !self.contextMenuOpen}"
-                ng-click="self.contextMenuOpen = true">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-            </svg>
-            <div class="pm__header__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content" ng-click="self.contextMenuOpen=false">
-                    <div class="topline">
-                      <svg class="pm__header__icon__small__contextmenu clickable"
-                        style="--local-primary:black;">
-                            <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                      </svg>
-                    </div>
-                    <button
-                        class="won-button--outlined thin red"
-                        ng-click="self.goToPost()">
-                        Show Post Details
-                    </button>
-                    <button
-                        ng-if="self.isConnected"
-                        class="won-button--filled red"
-                        ng-click="self.closeConnection()">
-                        Close Connection
-                    </button>
-                    <button
-                        ng-if="self.isSentRequest"
-                        class="won-button--filled red"
-                        ng-click="self.closeConnection()">
-                        Cancel Request
-                    </button>
-                </div>
-            </div>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest"></won-connection-context-dropdown>
         </div>
         <div class="pm__content">
             <div class="pm__content__loadspinner"
@@ -691,7 +658,8 @@ export default angular.module('won.owner.components.postMessages', [
     connectionMessageModule,
     connectionAgreementModule,
     connectionHeaderModule,
-    labelledHrModule
+    labelledHrModule,
+    connectionContextDropdownModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
