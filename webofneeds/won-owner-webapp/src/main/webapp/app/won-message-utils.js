@@ -161,7 +161,7 @@ export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, thei
 export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
 
     let jsonldGraphPayloadP = isTTL?
-        won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
+        won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + chatMessage) :
         Promise.resolve();
 
     const envelopeDataP = won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)

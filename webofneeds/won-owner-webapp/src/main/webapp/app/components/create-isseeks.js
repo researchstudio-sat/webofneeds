@@ -175,7 +175,7 @@ function genComponentConf() {
                     <code><{{::self.won.WONMSG.uriPlaceholder.seeks}}></code> and
                     will be replaced by the URI generated for this part (i.e. is/description 
                     or seeks/searches) of the need. Use the URI, so your TTL can be found 
-                    when parsing the need. See <code>won.minimalTurtlePrefixes</code>
+                    when parsing the need. See <code>won.defaultTurtlePrefixes</code>
                     for prefixes that will be added automatically. E.g.
                     <code><{{::self.won.WONMSG.uriPlaceholder.is}}> dc:title "hello world!".</code>
                     For more information see the
@@ -279,7 +279,7 @@ function genComponentConf() {
             this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
         }
         updateTTL() {
-            //await won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + $0.value)
+            //await won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + $0.value)
             const ttlString = ((this.ttlInput() || {}).value || "");
 
             this.draftObject.ttl = ttlString;

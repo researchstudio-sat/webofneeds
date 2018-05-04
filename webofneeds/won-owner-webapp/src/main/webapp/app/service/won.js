@@ -1074,7 +1074,7 @@ window.N34dbg = N3;
      */
     won.ttlToJsonLd = async function(ttl, prependWonPrefixes=true) {
         const ttl_ = prependWonPrefixes? 
-            won.minimalTurtlePrefixes + '\n' + ttl : 
+            won.defaultTurtlePrefixes + '\n' + ttl : 
             ttl;
 
         const tryConversion = async () => {
