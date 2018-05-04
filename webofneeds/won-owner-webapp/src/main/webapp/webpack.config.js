@@ -18,6 +18,21 @@ module.exports = function(env, argv) {
         filename: "won.min.css"
     });
 
+    //TODO: When `webpack-watch-time-plugin` is updated for newer versions of webpack switch to that.
+    const WatchTimePlugin = { apply: (compiler) => {
+        const RED = '\033[0;31m'
+        const GREEN = '\033[0;32m'
+        const NC = '\033[0m'
+
+        compiler.hooks.watchRun.tap('TimePrinter', () => {
+            const time = new Date();
+            console.log(
+                `_____________\n`,
+                `${GREEN}${time.getHours()}:${RED}${("0" + time.getMinutes()).slice(-2)}:${("0" + time.getSeconds()).slice(-2)} ${GREEN}⇩${NC}`
+            );
+        });
+    }};
+
     return {
         entry: './app/app_webpack.js',
         mode: mode,
@@ -128,6 +143,7 @@ module.exports = function(env, argv) {
                     }
                 }
             ),
+            WatchTimePlugin,
             new LiveReloadPlugin()
         ],
         devtool: mode == 'development' ? 'eval-source-map' : false
