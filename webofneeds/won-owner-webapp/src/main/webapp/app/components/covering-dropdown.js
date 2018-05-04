@@ -49,20 +49,19 @@ function genComponentConf() {
 
             connect2Redux(selectFromState, actionCreators, [], this);
 
+            const callback = (event) => {
+                const clickedElement = event.target;
+                //hide MainMenu if click was outside of the component and menu was open
+                if(this.showMainMenu && !this.$element[0].contains(clickedElement)) {
+                    this.hideMainMenuDisplay();
+                }
+            };
 
             this.$scope.$on('$destroy', () => {
-                angular.element(window.document).unbind('click');
+                window.document.removeEventListener('click', callback);
             });
-
-            angular.element(window.document).bind('click',
-                    event => {
-                        var clickedElement = event.target;
-                        //hide MainMenu if click was outside of the component and menu was open
-                        if(this.showMainMenu && !this.$element[0].contains(clickedElement)){
-                            this.hideMainMenuDisplay();
-                        }
-                    }
-            );
+            
+            window.document.addEventListener('click', callback);
         }
     }
     Controller.$inject = serviceDependencies;
