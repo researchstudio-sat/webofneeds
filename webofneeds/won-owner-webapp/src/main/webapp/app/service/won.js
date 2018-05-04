@@ -342,9 +342,13 @@ window.N34dbg = N3;
     //UTILS
     won.WONMSG.uriPlaceholder = Object.freeze({
         event: "this:eventuri",
-        is: "this:placeholderForIsUri",
-        seeks: "this:placeholderForSeeksUri",
     });
+
+    won.WON.contentNodeBlankUri = Object.freeze({
+        is: '_:isNeedContent',
+        seeks: '_:seeksNeedContent',
+        whatsAround: '_:needContent',
+    })
 
     /**
      * Returns the "compacted" alternative of the value (e.g.

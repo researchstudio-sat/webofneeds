@@ -192,11 +192,11 @@ import won from './won.js';
 
         var isContentUri, seeksContentUri;
         if(isWhatsAround) {
-            isContentUri = '_:needContent';
-            seeksContentUri = '_:needContent';
+            isContentUri = won.WON.contentNodeBlankUri.whatsAround;
+            seeksContentUri = won.WON.contentNodeBlankUri.whatsAround;
         } else {
-            isContentUri = args.is? '_:isNeedContent' : undefined;
-            seeksContentUri = args.seeks? '_:seeksNeedContent' : undefined;
+            isContentUri = args.is? won.WON.contentNodeBlankUri.is : undefined;
+            seeksContentUri = args.seeks? won.WON.contentNodeBlankUri.seeks : undefined;
         }
         var graph = [
             {
