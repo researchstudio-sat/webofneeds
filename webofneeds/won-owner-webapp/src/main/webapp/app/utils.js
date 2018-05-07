@@ -1193,3 +1193,32 @@ export function extractHashtags(str) {
 
     return Array.from(new Set(tags)); // filter out duplicates and return
 }
+
+export function generateHexColor(text) {
+    var hash = 0;
+
+    if(text){
+        for (var i = 0; i < text.length; i++) {
+            hash = text.charCodeAt(i) + ((hash << 5) - hash);
+        }
+    }
+
+    var c = (hash & 0x00FFFFFF)
+        .toString(16);
+
+    return "#"+("00000".substring(0, 6 - c.length) + c);
+}
+
+export function generateTitleCharacter(title) {
+    if(title) {
+        try {
+            return title.charAt(0).toUpperCase();
+        } catch (err) {
+            //for resilience purposes, since we can't be sure whether a need is a string or anything else
+            console.warn("Title Character could not be retrieved from: ", title);
+            return "?";
+        }
+    } else {
+        return "?";
+    }
+}
