@@ -1,9 +1,10 @@
 @import 'sizing-utils';
 
-@mixin square-image($size, $margin-top: 0, $margin-right: 0, $margin-bottom: 0, $margin-left: 0) {
+@mixin square-image($size, $margin: 0) {
   won-square-image {
     display: block;
     user-select: none;
+    margin: $margin;
 
     &.inactive {
       -webkit-filter: grayscale(100%);
@@ -11,7 +12,6 @@
     }
 
     & .image {
-      margin: $margin-top $margin-right $margin-bottom $margin-left;
       display: flex;
       align-items: center;
       justify-content: center;

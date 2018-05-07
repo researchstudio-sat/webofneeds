@@ -10,7 +10,7 @@ won-post-header {
   grid-template-areas: "icon main";
   grid-template-columns: min-content 1fr;
 
-  @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+  @include square-image($postIconSize, 0 0.5rem 0 0);
 
   won-square-image {
     grid-area: icon;

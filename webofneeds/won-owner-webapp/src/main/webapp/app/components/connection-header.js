@@ -25,17 +25,28 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-      <won-square-image
-        ng-class="{'bigger' : self.biggerImage, 'inactive' : self.need.get('state') === self.WON.InactiveCompacted}"
-        src="self.need.get('TODO')"
-        title="self.need.get('title')"
-        uri="self.need.get('uri')"
-        ng-show="!self.hideImage">
-      </won-square-image>
+      <div class="ch__icon">
+          <won-square-image
+            class="ch__icon__ownneed"
+            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.ownNeed.get('state') === self.WON.InactiveCompacted}"
+            src="self.ownNeed.get('TODO')"
+            title="self.ownNeed.get('title')"
+            uri="self.ownNeed.get('uri')"
+            ng-show="!self.hideImage">
+          </won-square-image>
+          <won-square-image
+            class="ch__icon__theirneed"
+            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
+            src="self.theirNeed.get('TODO')"
+            title="self.theirNeed.get('title')"
+            uri="self.theirNeed.get('uri')"
+            ng-show="!self.hideImage">
+          </won-square-image>
+      </div>
       <div class="ch__right">
         <div class="ch__right__topline">
-          <div class="ch__right__topline__title" title="{{ self.need.get('title') }}">
-            {{ self.need.get('title') }}
+          <div class="ch__right__topline__title" title="{{ self.theirNeed.get('title') }}">
+            {{ self.theirNeed.get('title') }}
           </div>
           <div class="ch__right__topline__date">
             {{ self.friendlyTimestamp }}
@@ -43,15 +54,13 @@ function genComponentConf() {
         </div>
         <div class="ch__right__subtitle">
           <!--
-          <span class="piu__header__title__subtitle__group" ng-show="{{self.need.get('group')}}">
-            
+          <span class="piu__header__title__subtitle__group" ng-show="{{self.theirNeed.get('group')}}">
+
           <svg style="--local-primary:var(--won-primary-color);"
             class="piu__header__title__subtitle__group__icon">
               <use xlink:href="#ico36_group" href="#ico36_group"></use>
           </svg>
-
-
-            {{self.need.get('group')}}
+            {{self.theirNeed.get('group')}}
             <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
           </span>
           -->
@@ -71,15 +80,15 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
                 const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
-                const need = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
+                const theirNeed = connection && selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
 
                 return {
                     connection,
                     ownNeed,
-                    need,
-                    friendlyTimestamp: need && relativeTime(
+                    theirNeed,
+                    friendlyTimestamp: theirNeed && relativeTime(
                         selectLastUpdateTime(state),
-                        this.timestamp || need.get('lastUpdateDate')
+                        this.timestamp || theirNeed.get('lastUpdateDate')
                     ),
                 }
             };

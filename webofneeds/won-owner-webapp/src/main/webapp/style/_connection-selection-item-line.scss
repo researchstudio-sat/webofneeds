@@ -21,7 +21,7 @@ won-connection-selection-item {
     position: absolute;
     left: 0.25rem;
     top: 0.25rem;
-    z-index: 1;
+    z-index: 10;
 
     svg {
       @include fixed-square(1.5rem);
