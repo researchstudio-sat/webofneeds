@@ -28,7 +28,8 @@ won-connection-header {
 
     .ch__icon__theirneed {
       z-index: 2;
-      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      clip-path: polygon(100% 0, 100% 100%, 0 100%); //this polygon cuts diagonally
+      //clip-path: polygon(80% 0, 100% 0, 100% 100%, 20% 100%); //this polygon leaves some "padding" before cutting
     }
   }
 
