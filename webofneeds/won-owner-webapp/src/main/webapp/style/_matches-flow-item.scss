@@ -81,7 +81,7 @@ won-matches-flow-item {
     justify-content: space-between;
     padding: 0.5rem;
     min-height: 3rem;
-    @include square-image($feedIconSize, 0, 0, 0, 0.5rem);
+    @include square-image($feedIconSize, 0 0 0 0.5rem);
 
     &:hover {
       .mfi__match__description__title {

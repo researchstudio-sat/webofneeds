@@ -34,10 +34,10 @@
       margin: 1rem 0;
 
       @media (max-width: $responsivenessBreakPoint){
-        @include square-image($postIconSize, 0, 0, 0, 0);
+        @include square-image($postIconSize);
       }
       @media (min-width: $responsivenessBreakPoint){
-        @include square-image(4.7rem, 0, 1rem, 0, 1rem);
+        @include square-image(4.7rem, 0 1rem);
       }
     }
 
