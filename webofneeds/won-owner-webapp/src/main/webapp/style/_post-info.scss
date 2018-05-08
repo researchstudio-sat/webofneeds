@@ -1,6 +1,7 @@
 @import 'won-config';
 @import 'sizing-utils';
 @import 'animate';
+@import 'responsiveness-utils';
 
 won-send-request,
 won-post-info {
@@ -32,14 +33,10 @@ won-post-info {
     font-size: $normalFontSize;
     text-align: left;
     min-width: 0;
+    align-items: center;
 
-    &__icon {
-      @include fixed-square($postIconSize);
-    }
-
-    &__icon__small {
-      @include fixed-square(1.5rem);
-      padding-left: 0.5rem;
+    &__back__icon {
+      @include fixed-square($backIconSize);
     }
   }
 

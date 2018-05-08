@@ -61,11 +61,11 @@ const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections a
 function genComponentConf() {
     const template = `
         <div class="cp__header">
-            <a class="clickable"
+            <a class="cp__header__back clickable show-in-responsive"
                 ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__icon">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                    class="cp__header__back__icon">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
             <span class="cp__header__title" ng-if="self.isPost">Post</span>
