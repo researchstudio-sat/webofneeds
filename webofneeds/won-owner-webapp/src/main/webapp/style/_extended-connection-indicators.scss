@@ -12,6 +12,7 @@ won-extended-connection-indicators {
     align-items: center;
     flex-direction: row;
     padding-right: 0.75em;
+    min-width: 0;
 
     &:last-of-type {
       padding-right: 0;
@@ -26,6 +27,7 @@ won-extended-connection-indicators {
       line-height: $iconSize;
       padding-left: 0.25em;
       color: black;
+      white-space: nowrap;
     }
   }
 }
