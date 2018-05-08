@@ -32,11 +32,11 @@ function genComponentConf() {
 
     let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
-            <a class="clickable"
+            <a class="post-info__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({postUri : null})">
                 <svg style="--local-primary:var(--won-primary-color);"
-                     class="post-info__header__icon clickable">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                     class="post-info__header__back__icon clickable">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
             <won-post-header

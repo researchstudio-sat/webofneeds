@@ -16,6 +16,9 @@ import { actionCreators }  from '../actions/actions.js';
 import {
     connect2Redux,
 } from '../won-utils.js';
+import {
+    selectNeedByConnectionUri,
+} from '../selectors.js';
 
 import * as srefUtils from '../sref-utils.js';
 
@@ -44,14 +47,14 @@ function genTopnavConf() {
         </div>
 
 
-        <nav class="topnav">
+        <nav class="topnav" ng-class="{'hide-in-responsive': self.connectionOrPostDetailOpen}">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a href="{{ self.defaultRouteHRef(self.$state) }}"
                         class="topnav__button">
                             <img src="skin/{{self.themeName}}/images/logo.svg"
                                 class="topnav__button__icon">
-                            <span class="topnav__page-title topnav__button__caption">
+                            <span class="topnav__page-title topnav__button__caption hide-in-responsive">
                                 {{ self.appTitle }}
                             </span>
                     </a>
@@ -62,7 +65,7 @@ function genTopnavConf() {
 
                         <li ng-show="!self.loggedIn">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__signupbtn">
+                                class="topnav__signupbtn hide-in-responsive">
                                     Sign up
                             </a>
                         </li>
@@ -137,17 +140,26 @@ function genTopnavConf() {
 
             window.tnc4dbg = this;
 
-            const selectFromState = (state) => ({
-                themeName: getIn(state, ['config', 'theme', 'name']),
-                appTitle: getIn(state, ['config', 'theme', 'title']),
-                adminEmail: getIn(state, ['config', 'theme', 'adminEmail']),
-                WON: won.WON,
-                loggedIn: state.getIn(['user', 'loggedIn']),
-                email: state.getIn(['user','email']),
-                toastsArray: state.getIn(['toasts']).toArray(),
-                connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
-                reconnecting: state.getIn(['messages', 'reconnecting']),
-            });
+            const selectFromState = (state) => {
+                const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
+                const selectedPost = selectedPostUri && state.getIn(["needs", selectedPostUri]);
+                const selectedConnectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
+                const need = selectedConnectionUri && selectNeedByConnectionUri(state, selectedConnectionUri);
+                const selectedConnection = need && need.getIn(["connections", selectedConnectionUri]);
+
+                return {
+                    themeName: getIn(state, ['config', 'theme', 'name']),
+                    appTitle: getIn(state, ['config', 'theme', 'title']),
+                    adminEmail: getIn(state, ['config', 'theme', 'adminEmail']),
+                    WON: won.WON,
+                    loggedIn: state.getIn(['user', 'loggedIn']),
+                    email: state.getIn(['user','email']),
+                    connectionOrPostDetailOpen: selectedConnection || selectedPost,
+                    toastsArray: state.getIn(['toasts']).toArray(),
+                    connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
+                    reconnecting: state.getIn(['messages', 'reconnecting']),
+                };
+            };
 
             connect2Redux(selectFromState, actionCreators, [], this);
         }

@@ -4,6 +4,7 @@
 @import 'connection-message';
 @import 'connection-agreement';
 @import 'animate';
+@import 'responsiveness-utils';
 
 .post__contentside {
   border-left: $thinGrayBorder;
@@ -58,14 +59,10 @@
       font-size: $normalFontSize;
       text-align: left;
       width: 100%;
+      align-items: center;
 
-      &__icon {
-        @include fixed-square($postIconSize);
-      }
-
-      &__icon__small {
-        @include fixed-square(1.5rem);
-        padding-left: 0.5rem;
+      &__back__icon {
+        @include fixed-square($backIconSize);
       }
     }
 

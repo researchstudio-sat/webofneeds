@@ -61,11 +61,11 @@ const defaultAgreementData = deepFreeze({
 function genComponentConf() {
     let template = `
         <div class="pm__header">
-            <a class="clickable"
+            <a class="pm__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
-                     class="pm__header__icon clickable">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                     class="pm__header__back__icon clickable">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
             <won-connection-header
