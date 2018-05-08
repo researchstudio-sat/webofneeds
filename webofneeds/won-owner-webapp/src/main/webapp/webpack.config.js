@@ -39,7 +39,8 @@ module.exports = function(env, argv) {
         optimization: {
             minimizer: [
                 new UglifyJsPlugin({
-                    parallel: true
+                    parallel: true,
+                    sourceMap: true
                   }),
                 new OptimizeCSSAssetsPlugin({})
             ]
@@ -146,6 +147,6 @@ module.exports = function(env, argv) {
             WatchTimePlugin,
             new LiveReloadPlugin()
         ],
-        devtool: mode == 'development' ? 'source-map' : false
+        devtool: 'source-map'
     };
 };

@@ -252,10 +252,13 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>gulp-install</id>
+                        <id>npm-build</id>
                         <goals>
-                            <goal>gulp</goal>
+                            <goal>npm</goal>
                         </goals>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>npm-run-clean</id>
@@ -406,7 +409,7 @@
                                 <phase>none</phase>
                             </execution>
                             <execution>
-                                <id>gulp-install</id>
+                                <id>npm-build</id>
                                 <phase>none</phase>
                             </execution>
                             <execution>
