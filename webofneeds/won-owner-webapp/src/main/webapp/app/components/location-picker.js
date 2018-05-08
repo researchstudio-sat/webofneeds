@@ -26,8 +26,11 @@ import {
 const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
+        <!-- LOCATION SEARCH BOX -->
+        <input type="text" class="lp__searchbox" placeholder="Search for location"/>
+
         <!-- SELECTED LOCATION -->
-        <div class="lp__selected" ng-show="self.locationIsSaved">
+        <div class="lp__selected" ng-if="self.locationIsSaved">
             <svg class="lp__selected__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
                  ng-click="self.resetLocation()">
@@ -35,11 +38,10 @@ function genComponentConf() {
             </svg>
             <span> {{self.pickedLocation.name}} </span>
         </div>
-        <!-- LOCATION SEARCH BOX -->
-        <input type="text" class="lp__searchbox" placeholder="Search for location"/>
+
         <!-- LIST OF SUGGESTED LOCATIONS -->
         <ol>
-            <li ng-show="
+            <li ng-if="
                 !self.locationIsSaved && self.currentLocation &&
                 (
                     !self.lastSearchedFor ||
@@ -52,7 +54,7 @@ function genComponentConf() {
                 </a>
                 (current)
             </li>
-            <!--li ng-show="!self.locationIsSaved"
+            <!--li ng-if="!self.locationIsSaved"
                 ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
                     <a href=""
                         ng-click="self.selectedLocation(previousLocation)"
@@ -186,7 +188,13 @@ function genComponentConf() {
 
         determineCurrentLocation() {
             // if a location is saved, zoom in on saved location
-            if(this.locationIsSaved && this.pickedLocation) {
+            if(this.initialLocation) {
+
+                // NOTE: I don't know why, but this is needed to properly update the view on load
+                delay(0).then(() => this.$scope.$apply( () => {} ));
+                this.locationIsSaved = true;
+                this.pickedLocation = this.initialLocation;
+
                 const lat = this.pickedLocation.lat;
                 const lng = this.pickedLocation.lng;
                 const zoom = 13;
