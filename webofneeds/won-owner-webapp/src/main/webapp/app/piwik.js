@@ -6,7 +6,7 @@ import {
    getIn,
 } from './utils.js';
 
-import config from './config.js';
+import config from 'config';
 
 
 // ------- INIT  --------------------

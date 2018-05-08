@@ -9,7 +9,7 @@ import 'ng-redux';
 import won from '../won-es6.js';
 import {
     postTitleCharacterLimit,
-} from '../config.js';
+} from 'config';
 import needTextfieldModule from './need-textfield.js';
 import imageDropzoneModule from './image-dropzone.js';
 import locationPickerModule from './location-picker.js';

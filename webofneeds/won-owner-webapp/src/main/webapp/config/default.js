@@ -1,6 +1,6 @@
 import {
     deepFreeze,
-} from './utils.js';
+} from '../app/utils.js';
 
 export default deepFreeze({
     piwik : { baseUrl : '' },
