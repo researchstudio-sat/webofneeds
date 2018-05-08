@@ -8,7 +8,7 @@ won-connection-agreement {
     //padding-top: 0.5rem;
     //padding-left: 0.5rem;
     //padding-right: 0.5rem;
-    @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+    @include square-image($postIconSize, 0 0.5rem 0 0);
     display: flex;
     
     

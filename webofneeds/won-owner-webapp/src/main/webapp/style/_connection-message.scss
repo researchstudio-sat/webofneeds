@@ -8,7 +8,7 @@ won-connection-message {
     }
 
     padding: 0.5rem 0;
-    @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+    @include square-image($postIconSize, 0 0.5rem 0 0);
     display: grid;
     grid-template-areas: "icon content";
     grid-template-columns: min-content minmax(min-content, max-content);

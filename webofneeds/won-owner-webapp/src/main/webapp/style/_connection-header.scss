@@ -9,14 +9,27 @@ won-connection-header {
   display: grid;
   grid-template-areas: "icon main";
   grid-template-columns: min-content 1fr;
+  grid-column-gap: 0.5rem;
 
-  @include square-image($postIconSize, 0, 0.5rem, 0, 0);
-
-  won-square-image {
+  .ch__icon {
     grid-area: icon;
+    width: $postIconSize;
 
-    .image{
-      border: $thinBorderWidth solid $won-light-gray;
+    @include square-image($postIconSize);
+
+    .ch__icon__ownneed,
+    .ch__icon__theirneed {
+      position: absolute;
+    }
+
+    .ch__icon__ownneed{
+      z-index: 1;
+    }
+
+    .ch__icon__theirneed {
+      z-index: 2;
+      clip-path: polygon(100% 0, 100% 100%, 0 100%); //this polygon cuts diagonally
+      //clip-path: polygon(80% 0, 100% 0, 100% 100%, 20% 100%); //this polygon leaves some "padding" before cutting
     }
   }
 
