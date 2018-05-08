@@ -26,11 +26,12 @@ won-post-info {
   }
 
   .post-info__header {
-    display:flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     grid-area: header;
     font-size: $normalFontSize;
     text-align: left;
-    width: 100%;
+    min-width: 0;
 
     &__icon {
       @include fixed-square($postIconSize);

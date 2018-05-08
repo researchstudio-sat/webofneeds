@@ -3,14 +3,15 @@
 
 won-post-header {
   color: black;
-  flex-grow: 1;
   //padding: 0.5rem;
 
   display: grid;
   grid-template-areas: "icon main";
   grid-template-columns: min-content 1fr;
+  grid-column-gap: 0.5rem;
+  min-width: 0;
 
-  @include square-image($postIconSize, 0 0.5rem 0 0);
+  @include square-image($postIconSize);
 
   won-square-image {
     grid-area: icon;
@@ -22,15 +23,16 @@ won-post-header {
 
   .ph__right {
     grid-area: main;
-
     display: grid;
     grid-template-areas: "topline" "subtitle";
+    min-width: 0;
 
     &__topline {
       grid-area: topline;
       display: grid;
       grid-template-areas: "title date";
       grid-template-columns: 1fr min-content;
+      min-width: 0;
 
       &__title {
         grid-area: title;
@@ -38,6 +40,7 @@ won-post-header {
         text-overflow: ellipsis;
         overflow: hidden;
         font-weight: 400;
+        min-width: 0;
       }
 
       &__date {
@@ -46,6 +49,7 @@ won-post-header {
         color: $won-subtitle-gray;
         white-space: nowrap;
         padding-left: 0.5rem;
+        min-width: 0;
       }
     }
 
@@ -55,6 +59,7 @@ won-post-header {
       display: flex;
       flex-direction: row;
       font-size: $smallFontSize;
+      min-width: 0;
 
       &__group {
         display: flex;

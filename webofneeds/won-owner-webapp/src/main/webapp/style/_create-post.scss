@@ -19,11 +19,12 @@ won-create-post {
   padding: $gridRowGap;
 
   .cp__header {
-    display:flex;
     grid-area: header;
+    display: grid;
+    grid-template-columns: auto 1fr;
     font-size: $normalFontSize;
     text-align: left;
-    width: 100%;
+    min-width: 0;
 
     &__title {
       color: $won-subtitle-gray;

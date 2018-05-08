@@ -3,13 +3,13 @@
 
 won-connection-header {
   color: black;
-  flex-grow: 1;
   //padding: 0.5rem;
 
   display: grid;
   grid-template-areas: "icon main";
   grid-template-columns: min-content 1fr;
   grid-column-gap: 0.5rem;
+  min-width: 0;
 
   .ch__icon {
     grid-area: icon;
@@ -35,15 +35,16 @@ won-connection-header {
 
   .ch__right {
     grid-area: main;
-
     display: grid;
     grid-template-areas: "topline" "subtitle";
+    min-width: 0;
 
     &__topline {
       grid-area: topline;
       display: grid;
       grid-template-areas: "title date";
       grid-template-columns: 1fr min-content;
+      min-width: 0;
 
       &__title {
         grid-area: title;
@@ -51,6 +52,7 @@ won-connection-header {
         text-overflow: ellipsis;
         overflow: hidden;
         font-weight: 400;
+        min-width: 0;
       }
 
       &__date {
@@ -59,6 +61,7 @@ won-connection-header {
         color: $won-subtitle-gray;
         white-space: nowrap;
         padding-left: 0.5rem;
+        min-width: 0;
       }
     }
 
@@ -68,6 +71,7 @@ won-connection-header {
       display: flex;
       flex-direction: row;
       font-size: $smallFontSize;
+      min-width: 0;
 
       &__group {
         display: flex;
