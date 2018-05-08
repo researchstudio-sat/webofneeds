@@ -38,8 +38,11 @@ function genComponentConf() {
                      class="extendedindicators__item__icon">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
-                <span class="extendedindicators__item__caption">
-                    {{ self.connectedCount }} Chats/Requests - {{ self.unreadConnectedCount }} unread
+                <span class="extendedindicators__item__caption" ng-if="self.unreadConnectedCount != 0">
+                    {{ self.connectedCount }} Chats - {{ self.unreadConnectedCount }} unread
+                </span>
+                <span class="extendedindicators__item__caption" ng-if="self.unreadConnectedCount == 0">
+                    {{ self.connectedCount }} Chats
                 </span>
         </a>
         <div class="extendedindicators__item" ng-show="!self.latestConnectedUri">
@@ -65,8 +68,11 @@ function genComponentConf() {
                     class="extendedindicators__item__icon">
                         <use xlink:href="#ico36_match" href="#ico36_match"></use>
                 </svg>
-                <span class="extendedindicators__item__caption">
-                    {{ self.matchesCount }} Matches - {{ self.unreadMatchesCount }} unread
+                <span class="extendedindicators__item__caption" ng-if="self.unreadMatchesCount != 0">
+                    {{ self.matchesCount }} Matches - {{ self.unreadMatchesCount }} new
+                </span>
+                <span class="extendedindicators__item__caption" ng-if="self.unreadMatchesCount == 0">
+                    {{ self.matchesCount }} Matches
                 </span>
         </a>
         <div class="extendedindicators__item" ng-show="!self.latestMatchUri">
