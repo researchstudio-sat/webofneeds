@@ -4,6 +4,7 @@
 @import 'flex-layout';
 
 @import 'connections-overview';
+@import 'responsiveness-utils';
 
 
 .connectionscontent {
@@ -15,12 +16,5 @@
   .oir__requests{
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
-  }
-
-  @media (max-width: $responsivenessBreakPoint){
-    .post__contentside--empty.hide-in-responsive,
-    .oir__requests.hide-in-responsive {
-      display: none;
-    }
   }
 }

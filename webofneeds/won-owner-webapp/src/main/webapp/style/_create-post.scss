@@ -6,6 +6,7 @@
 @import 'sizing-utils';
 @import 'textfield';
 @import 'create-isseeks';
+@import 'responsiveness-utils';
 
 won-create-post {
   display: grid;
@@ -24,6 +25,7 @@ won-create-post {
     font-size: $normalFontSize;
     text-align: left;
     width: 100%;
+    align-items: center;
 
     &__title {
       color: $won-subtitle-gray;
@@ -31,8 +33,8 @@ won-create-post {
       font-weight: 400;
     }
 
-    &__icon {
-      @include fixed-square($bigiconSize);
+    &__back__icon {
+      @include fixed-square($backIconSize);
     }
   }
 
