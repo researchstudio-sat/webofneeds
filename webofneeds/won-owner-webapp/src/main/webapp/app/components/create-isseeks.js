@@ -62,10 +62,7 @@ function genComponentConf() {
             <div class="cis__addDetail__header detailPicker clickable"
                 ng-click="self.toggleDetail()"
                 ng-class="{'closedDetailPicker': !self.showDetail}">
-                    <!-- TODO: remove hover effect? does not work well on mobile -->
-                    <span class="nonHover">Add more detail</span>
-                    <span class="hover" ng-if="!self.showDetail">Open more detail</span>
-                    <span class="hover" ng-if="self.showDetail">Close more detail</span>
+                    <span>Add more detail</span>
                     <svg class="cis__addDetail__header__carret" ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
@@ -74,9 +71,11 @@ function genComponentConf() {
                     </svg>
             </div>
             <div class="cis__detail__items" ng-if="self.showDetail" >
+
+                <!-- LOCATION PICKER -->
                 <div class="cis__detail__items__item location"
-                    ng-click="!self.details.has('location') && self.details.add('location')"
-                    ng-class="{'picked' : self.details.has('location')}">
+                    ng-click="self.toggleOpenDetail('location')"
+                    ng-class="{'picked' : self.openDetail === 'location'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('location')">
                             <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                         </svg>
@@ -84,10 +83,12 @@ function genComponentConf() {
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Address or Location</span>
-                    </div>
+                </div>
+
+                <!-- TAGS PICKER -->
                 <div class="cis__detail__items__item tags"
-                    ng-click="!self.details.has('tags') && self.details.add('tags')"
-                    ng-class="{'picked' : self.details.has('tags')}">
+                    ng-click="self.toggleOpenDetail('tags')"
+                    ng-class="{'picked' : self.openDetail === 'tags'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('tags')">
                             <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
                         </svg>
@@ -99,8 +100,8 @@ function genComponentConf() {
 
                 <!-- TTL Will be excluded until further notice-->
                 <!--div class="cis__detail__items__item ttl"
-                    ng-click="!self.details.has('ttl') && self.details.add('ttl')"
-                    ng-class="{'picked' : self.details.has('ttl')}">
+                    ng-click="self.toggleOpenDetail('ttl')"
+                    ng-class="{'picked' : self.openDetail === 'ttl'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
                             <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
                         </svg>
@@ -114,26 +115,25 @@ function genComponentConf() {
         <!-- /DETAIL Picker/ -->
 
         <!-- DETAILS -->
-        <div class="cis__details" ng-repeat="detail in self.getArrayFromSet(self.details) track by $index"">
-            <div class="cis__location"  ng-if="detail === 'location'">
-                <div class="cis__addDetail__header location" ng-click="self.details.delete('location') && self.updateDraft()">
-                    <svg class="cis__circleicon nonHover">
+        <!-- TODO: move details into the div opened by the detail picker? -->
+        <div class="cis__details" ng-if="self.showDetail">
+
+            <!-- LOCATION -->
+            <div class="cis__location"  ng-if="self.openDetail === 'location'">
+                <div class="cis__addDetail__header location">
+                    <svg class="cis__circleicon">
                         <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                     </svg>
-                    <svg class="cis__circleicon hover">
-                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
-                    </svg>
-                    <span class="nonHover">Location</span>
-                    <span class="hover">Remove Location</span>
+                    <span>Location</span>
                 </div>
-                <won-location-picker id="seeksPicker"
-                    on-draft-change="::self.setDraft(draft)"
-                    location-is-saved="::self.locationIsSaved()">
+                <won-location-picker class="seeksPicker"
+                    initial-location="::self.draftObject.location"
+                    on-location-picked="::self.updateLocation(location)">
                 </won-location-picker>
             </div>
 
             <!-- TAGS -->
-             <div class="cis__tags" ng-if="detail === 'tags'">
+             <div class="cis__tags" ng-if="self.openDetail === 'tags'">
                 <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
@@ -154,7 +154,7 @@ function genComponentConf() {
             </div>
 
             <!-- TTL Will be excluded until further notice-->
-            <!-- div class="cis__ttl" ng-if="detail === 'ttl'">
+            <!-- div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
                 <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
@@ -200,7 +200,7 @@ function genComponentConf() {
 
             this.characterLimit = postTitleCharacterLimit;
            
-            this.isOpen = false;
+            this.openDetail = undefined;
             
             this.reset();
             
@@ -267,6 +267,10 @@ function genComponentConf() {
                 (this.textAreaTags || []), 
                 extractHashtags(tagsInputString)
             );
+            
+            if(tagsInputString && !this.details.has("tags")){ 
+                this.details.add("tags");
+            }
         }
 
         updateTTLBuffered() {
@@ -286,10 +290,24 @@ function genComponentConf() {
             .catch(parseError => {
                 this.$scope.$apply(() => this.ttlParseError = parseError.message);
             })
+
+            if(ttlString && !this.details.has("ttl")){
+                this.details.add("ttl");
+            }
         }
 
-        locationIsSaved() {
-            return this.details.has("location") && this.draftObject.location && this.draftObject.location.name;
+        updateLocation(location) {
+            if(!location && this.details.has("location")){
+                this.details.delete("location");
+                this.draftObject.location = undefined;
+            } else {
+                if(!this.details.has("location")) {
+                    this.details.add("location");
+                }
+                this.draftObject.location = location;
+            }
+
+            this.updateDraft();
         }
 
         pickImage(image) {
@@ -298,6 +316,15 @@ function genComponentConf() {
 
         toggleDetail(){
             this.showDetail = !this.showDetail;
+        }
+
+        toggleOpenDetail(detail){
+            // open clicked detail
+            if(this.openDetail === detail) {
+                this.openDetail = undefined;
+            } else {
+                this.openDetail = detail;
+            }
         }
         
         getArrayFromSet(set){

@@ -11,6 +11,7 @@ import {
     reverseSearchNominatim,
     nominatim2draftLocation,
     leafletBounds,
+    delay,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
@@ -25,10 +26,23 @@ import {
 const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
+        <!-- LOCATION SEARCH BOX -->
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
+
+        <!-- SELECTED LOCATION -->
+        <div class="lp__selected" ng-if="self.locationIsSaved">
+            <svg class="lp__selected__icon clickable" 
+                 style="--local-primary:var(--won-primary-color);"
+                 ng-click="self.resetLocation()">
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
+            <span> {{self.pickedLocation.name}} </span>
+        </div>
+
+        <!-- LIST OF SUGGESTED LOCATIONS -->
         <ol>
-            <li ng-show="
-                !self.locationIsSaved() && self.currentLocation &&
+            <li ng-if="
+                !self.locationIsSaved && self.currentLocation &&
                 (
                     !self.lastSearchedFor ||
                     ([self.currentLocation] | filter:self.lastSearchedFor).length > 0
@@ -40,7 +54,7 @@ function genComponentConf() {
                 </a>
                 (current)
             </li>
-            <!--li ng-show="!self.locationIsSaved()"
+            <!--li ng-if="!self.locationIsSaved"
                 ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
                     <a href=""
                         ng-click="self.selectedLocation(previousLocation)"
@@ -65,10 +79,16 @@ function genComponentConf() {
 
             this.map = initLeaflet(this.mapMount());
             this.map.on('click', e => onMapClick(e, this));
-            
-           	this.determineCurrentLocation();
+
+            this.locationIsSaved = !!this.initialLocation;
+            this.pickedLocation = this.initialLocation;
             
             window.lp4dbg = this;
+
+            // needs to happen after constructor finishes, otherwise
+            // the component's callbacks won't be registered.
+           	delay(0).then(() => this.determineCurrentLocation());
+            
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
@@ -98,12 +118,8 @@ function genComponentConf() {
         }
 
         placeMarkers(locations) {
-            if(this.markers) {
-                //remove previously placed markers
-                for(let m of this.markers) {
-                    this.map.removeLayer(m);
-                }
-            }
+            
+            this.removeMarkers();
 
             this.markers = locations.map(location =>
                 L.marker([location.lat, location.lng])
@@ -114,23 +130,44 @@ function genComponentConf() {
                 this.map.addLayer(m);
             }
         }
+
+        removeMarkers() {
+            if(this.markers) {
+                //remove previously placed markers
+                for(let m of this.markers) {
+                    this.map.removeLayer(m);
+                }
+            }
+        }
+
         resetSearchResults() {
             this.searchResults = undefined;
             this.lastSearchedFor = undefined;
             this.placeMarkers([]);
         }
+
+        resetLocation() {
+            this.locationIsSaved = false;
+            this.pickedLocation = undefined;
+            this.removeMarkers();
+            
+            this.onLocationPicked({location: undefined});
+        }
+
         selectedLocation(location) {
+
+            // callback to update location in isseeks
+            this.onLocationPicked({location: location});
+            this.locationIsSaved = true;
+            this.pickedLocation = location;
+
             this.resetSearchResults(); // picked one, can hide the rest if they were there
-
-            let draft = {location};
-            this.onDraftChange({draft});
-
-            this.textfield().value = location.name; // use textfield to display result
 
             this.placeMarkers([location]);
             this.map.fitBounds(leafletBounds(location), { animate: true });
             this.markers[0].openPopup();
         }
+
         doneTyping() {
             const text = this.textfield().value;
 
@@ -148,8 +185,27 @@ function genComponentConf() {
                 });
             }
         }
+
         determineCurrentLocation() {
-            if ("geolocation" in navigator) {
+            // if a location is saved, zoom in on saved location
+            if(this.initialLocation) {
+
+                // constructor may not be done in time, so set values here again.
+                this.locationIsSaved = true;
+                this.pickedLocation = this.initialLocation;
+
+                const lat = this.pickedLocation.lat;
+                const lng = this.pickedLocation.lng;
+                const zoom = 13;
+
+                this.map.setZoom(zoom);
+                this.map.panTo([lat, lng]);
+
+                //this.textfield().value = this.pickedLocation.name;
+                this.placeMarkers([this.pickedLocation]);
+            }
+            // else, try to zoom in on current location
+            else if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     currentLocation => {
 
@@ -180,6 +236,8 @@ function genComponentConf() {
 
             }
 
+            this.$scope.$apply();
+
         }
 
         textfieldNg() { return this.domCache.ng('.lp__searchbox'); }
@@ -199,8 +257,8 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            onDraftChange: "&",
-            locationIsSaved: "&",
+            onLocationPicked: "&",
+            initialLocation: "=",
         },
         template: template
     }
