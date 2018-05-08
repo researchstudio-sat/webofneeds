@@ -27,15 +27,30 @@ won-post-info {
   }
 
   .post-info__header {
-    display:flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "header_back header_title header_context";
     grid-area: header;
     font-size: $normalFontSize;
     text-align: left;
-    width: 100%;
+    min-width: 0;
     align-items: center;
 
-    &__back__icon {
-      @include fixed-square($backIconSize);
+    &__back {
+      grid-area: header_back;
+      &__icon {
+        @include fixed-square($backIconSize);
+      }
+    }
+
+    won-post-header,
+    won-connection-header {
+      grid-area: header_title;
+    }
+
+    won-post-context-dropdown,
+    won-connection-context-dropdown {
+      grid-area: header_context;
     }
   }
 
@@ -47,6 +62,7 @@ won-post-info {
     border-top: $thinGrayBorder;
     padding-top: 1rem;
     overflow: auto;
+    word-wrap: break-word;
 
     won-labelled-hr span {
       background-color: white;

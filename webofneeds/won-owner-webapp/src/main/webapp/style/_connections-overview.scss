@@ -33,13 +33,9 @@ won-connections-overview {
       padding: 0.5rem;
 
       &__header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        won-post-header {
-          flex-grow: 1;
-        }
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        min-width: 0;
 
         won-connection-indicators {
           padding-left: 0.5rem;

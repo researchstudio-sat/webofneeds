@@ -20,21 +20,28 @@ won-create-post {
   padding: $gridRowGap;
 
   .cp__header {
-    display:flex;
     grid-area: header;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "header_back header_title";
     font-size: $normalFontSize;
     text-align: left;
-    width: 100%;
+    min-width: 0;
     align-items: center;
 
+
     &__title {
+      grid-area: header_title;
       color: $won-subtitle-gray;
       font-size: $mediumFontSize;
       font-weight: 400;
     }
 
-    &__back__icon {
-      @include fixed-square($backIconSize);
+    &__back {
+      grid-area: header_back;
+      &__icon {
+        @include fixed-square($backIconSize);
+      }
     }
   }
 
