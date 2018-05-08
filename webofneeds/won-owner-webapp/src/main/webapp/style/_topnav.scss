@@ -84,12 +84,10 @@
 
   .topnav__page-title {
     font-weight: 700;
-    @include hide-in-responsive;
   }
 
   .topnav__signupbtn {
     @include won-button--filled(white, $won-secondary-color-lighter);
-    @include hide-in-responsive;
     @extend .topnav__button;
   }
 
