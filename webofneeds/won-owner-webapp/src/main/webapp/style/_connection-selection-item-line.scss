@@ -60,10 +60,7 @@ won-connection-selection-item {
   }
 
   .conn__inner {
-    display: flex;
-    flex-grow: 1;
-    justify-content: space-between;
-    align-self: stretch;
+    display: block;
     padding: 0.5rem;
 
     border-top: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
