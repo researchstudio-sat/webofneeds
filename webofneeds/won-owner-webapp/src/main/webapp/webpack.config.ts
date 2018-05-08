@@ -1,28 +1,25 @@
-const path = require('path');
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const sassImporter = require('node-sass-import-once');
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const glob = require('glob');
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const LiveReloadPlugin = require('webpack-livereload-plugin');
+import * as path from 'path';
+import {Configuration} from 'webpack';
+import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import * as SassImporter from 'node-sass-import-once';
+import * as UglifyJsPlugin from 'uglifyjs-webpack-plugin';
+import * as OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
+import * as SpriteLoaderPlugin from 'svg-sprite-loader/plugin';
+import * as CopyWebpackPlugin from 'copy-webpack-plugin';
+import * as LiveReloadPlugin from 'webpack-livereload-plugin';
 
-module.exports = function(env, argv) {
-    const mode = argv.mode || (argv.watch ? 'development': 'production');
+export default config;
 
-    const isLive = env && env.WON_DEPLOY_NODE_ENV == 'live'
+function config(env, argv): Configuration {
+    const mode: 'development' | 'production' = argv.mode || (argv.watch ? 'development' : 'production');
 
-    const extractSass = new MiniCssExtractPlugin({
-        filename: "won.min.css"
-    });
+    const isLive: boolean = env && env.WON_DEPLOY_NODE_ENV == 'live';
 
     //TODO: When `webpack-watch-time-plugin` is updated for newer versions of webpack switch to that.
     const WatchTimePlugin = { apply: (compiler) => {
-        const RED = '\033[0;31m'
-        const GREEN = '\033[0;32m'
-        const NC = '\033[0m'
+        const RED = '\x1B[0;31m'
+        const GREEN = '\x1B[0;32m'
+        const NC = '\x1B[0m'
 
         compiler.hooks.watchRun.tap('TimePrinter', () => {
             const time = new Date();
@@ -42,7 +39,7 @@ module.exports = function(env, argv) {
                     parallel: true,
                     sourceMap: true
                   }),
-                new OptimizeCSSAssetsPlugin({})
+                new OptimizeCSSAssetsPlugin()
             ]
         },
         output: {
@@ -99,7 +96,7 @@ module.exports = function(env, argv) {
                         loader: "sass-loader",
                         options: {
                             sourceMap: mode == 'development',
-                            importer: sassImporter
+                            importer: SassImporter
                         }
                     }]
                 },
@@ -120,7 +117,9 @@ module.exports = function(env, argv) {
             ]
         },
         plugins: [
-            extractSass,
+            new MiniCssExtractPlugin({
+                filename: "won.min.css"
+            }),
             new SpriteLoaderPlugin({ plainSprite: true }),
             new CopyWebpackPlugin([
                 {
@@ -129,8 +128,9 @@ module.exports = function(env, argv) {
                     to: './images/'
                 }
             ], {}),
-            new LiveReloadPlugin()
+            new LiveReloadPlugin(),
+            WatchTimePlugin
         ],
         devtool: 'source-map'
     };
-};
+}
