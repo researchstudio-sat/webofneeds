@@ -15,7 +15,7 @@ import locationPickerModule from './location-picker.js';
 import createIsseeksModule from './create-isseeks.js';
 import {
 	postTitleCharacterLimit,
-} from '../config.js';
+} from 'config';
 import {
 	getIn,
     attach,

@@ -53,7 +53,8 @@ module.exports = function(env, argv) {
             alias: {
                 'fetch': 'whatwg-fetch',
                 'rdfstore-js$': path.resolve(__dirname, 'scripts/rdfstore-js/rdf_store.js'),
-                'angular-ui-router-shim$': require.resolve('angular-ui-router/release/stateEvents.js')
+                'angular-ui-router-shim$': require.resolve('angular-ui-router/release/stateEvents.js'),
+                'config$': path.resolve(__dirname, 'config', `${isLive ? 'live' : 'default'}.js`)
             }
         },
         module: {
@@ -128,23 +129,6 @@ module.exports = function(env, argv) {
                     to: './images/'
                 }
             ], {}),
-            new webpack.NormalModuleReplacementPlugin(
-                /config\.js$/,
-                function(resource) {
-                    if(path.resolve(resource.context, resource.request) == path.resolve(__dirname, 'app', 'config.js')) {
-                        resource.request = path.resolve(__dirname, 'config', `${isLive ? 'live' : 'default'}.js`);
-                    }
-                }
-            ),
-            new webpack.NormalModuleReplacementPlugin(
-                /utils\.js$/,
-                function(resource) {
-                    if(resource.context == path.resolve(__dirname, 'config')) {
-                       resource.request = path.resolve(__dirname, 'app', 'utils.js');
-                    }
-                }
-            ),
-            WatchTimePlugin,
             new LiveReloadPlugin()
         ],
         devtool: 'source-map'
