@@ -190,8 +190,7 @@ function genComponentConf() {
             // if a location is saved, zoom in on saved location
             if(this.initialLocation) {
 
-                // NOTE: I don't know why, but this is needed to properly update the view on load
-                delay(0).then(() => this.$scope.$apply( () => {} ));
+                // constructor may not be done in time, so set values here again.
                 this.locationIsSaved = true;
                 this.pickedLocation = this.initialLocation;
 
@@ -236,6 +235,8 @@ function genComponentConf() {
                     });
 
             }
+
+            this.$scope.$apply();
 
         }
 
