@@ -75,8 +75,7 @@ function genComponentConf() {
                 <!-- LOCATION PICKER -->
                 <div class="cis__detail__items__item location"
                     ng-click="self.toggleOpenDetail('location')"
-                    ng-class="{'picked' : self.openDetail === 'location'}"
-                    ng-class="{'added' : self.details.has('location')}">
+                    ng-class="{'picked' : self.openDetail === 'location'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('location')">
                             <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                         </svg>
@@ -89,8 +88,7 @@ function genComponentConf() {
                 <!-- TAGS PICKER -->
                 <div class="cis__detail__items__item tags"
                     ng-click="self.toggleOpenDetail('tags')"
-                    ng-class="{'picked' : self.openDetail === 'tags'}"
-                    ng-class="{'added' : self.details.has('tags')}">
+                    ng-class="{'picked' : self.openDetail === 'tags'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('tags')">
                             <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
                         </svg>
@@ -103,8 +101,7 @@ function genComponentConf() {
                 <!-- TTL Will be excluded until further notice-->
                 <!--div class="cis__detail__items__item ttl"
                     ng-click="self.toggleOpenDetail('ttl')"
-                    ng-class="{'picked' : self.openDetail === 'ttl'}"
-                    ng-class="{'added' : self.details.has('ttl')}">
+                    ng-class="{'picked' : self.openDetail === 'ttl'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
                             <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
                         </svg>
