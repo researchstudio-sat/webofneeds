@@ -1,7 +1,5 @@
 // contains colors and other global variables
 
-$responsivenessBreakPoint: 35rem;
-
 // colors
 
 $won-primary-color: var(--won-primary-color);
@@ -64,3 +62,5 @@ $maxContentWidth: 70rem;
 
 // use this to leave a consistent amount of space towards the edge of the viewport
 $minContentPadding: 1rem;
+
+$responsivenessBreakPoint: $maxContentWidth / 2;
