@@ -145,15 +145,17 @@ function genComponentConf() {
         }
 
         resetLocation() {
-            this.onLocationPicked(undefined);
             this.locationIsSaved = false;
+            this.pickedLocation = undefined;
             this.removeMarkers();
+            
+            this.onLocationPicked({location: undefined});
         }
 
         selectedLocation(location) {
 
             // callback to update location in isseeks
-            this.onLocationPicked(location);
+            this.onLocationPicked({location: location});
             this.locationIsSaved = true;
             this.pickedLocation = location;
 
