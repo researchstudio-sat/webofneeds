@@ -60,7 +60,7 @@ won-connections-overview {
         @media (min-width: $responsivenessBreakPoint){
           grid-column-gap: 0.5rem;
           grid-template-areas: "indicators actions";
-          grid-template-rows: min-content 1fr;
+          grid-template-columns: 1fr min-content;
         }
 
         @media (max-width: $responsivenessBreakPoint){
