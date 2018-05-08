@@ -48,6 +48,7 @@ won-post-info {
     border-top: $thinGrayBorder;
     padding-top: 1rem;
     overflow: auto;
+    word-wrap: break-word;
 
     won-labelled-hr span {
       background-color: white;
