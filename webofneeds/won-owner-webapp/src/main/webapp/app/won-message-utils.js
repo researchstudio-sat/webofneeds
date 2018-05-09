@@ -161,7 +161,7 @@ export function buildConnectMessage({ ownNeedUri, theirNeedUri, ownNodeUri, thei
 export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri, isTTL}) {
 
     let jsonldGraphPayloadP = isTTL?
-        won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + chatMessage) :
+        won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + chatMessage) :
         Promise.resolve();
 
     const envelopeDataP = won.getEnvelopeDataforConnection(connectionUri, ownNeedUri, theirNeedUri, ownNodeUri, theirNodeUri, theirConnectionUri)
@@ -183,11 +183,9 @@ export function buildChatMessage({chatMessage, connectionUri, ownNeedUri, theirN
                 .hasSentTimestamp(new Date().getTime().toString());
             
 
- 
-            const graphPayload_ = getIn(graphPayload, [0, '@graph']);
-            if(graphPayload_) {
-                wonMessageBuilder.mergeIntoContentGraph(graphPayload_);
-            } else if (chatMessage) {
+            if(isTTL && graphPayload) {
+                wonMessageBuilder.mergeIntoContentGraph(graphPayload);
+            } else if (!isTTL && chatMessage) {
                 //add the chatMessage as normal text message 
                 wonMessageBuilder.addContentGraphData(won.WON.hasTextMessage, chatMessage)    
             } else {
@@ -256,13 +254,13 @@ export function buildOpenMessage(connectionUri, ownNeedUri, theirNeedUri, ownNod
  *    needUri: string
  * }}
  */
-export function buildCreateMessage(needData, wonNodeUri) {
+export async function buildCreateMessage(needData, wonNodeUri) {
     //Check for is and seeks
     /*
     if(!needData.type || !needData.title)
         throw new Error('Tried to create post without type or title. ', needData);
     */
-    
+
     const publishedContentUri = wonNodeUri + '/need/' + getRandomWonId();
 
     const imgs = needData.images;
@@ -273,7 +271,7 @@ export function buildCreateMessage(needData, wonNodeUri) {
     }
 
     //if type === create -> use needBuilder as well
-    const prepareContentNodeData = (needDataIsOrSeeks) => ({
+    const prepareContentNodeData = async (needDataIsOrSeeks) => ({
         type : won.toCompacted(needDataIsOrSeeks.type), //mandatory
         title: needDataIsOrSeeks.title, //mandatory
         description: needDataIsOrSeeks.description,
@@ -287,12 +285,14 @@ export function buildCreateMessage(needData, wonNodeUri) {
         location: getIn(needDataIsOrSeeks, ['location']),
         whatsAround: needDataIsOrSeeks.whatsAround,
         noHints: needDataIsOrSeeks.noHints,
+
+        arbitraryJsonLd: needDataIsOrSeeks.ttl? await won.ttlToJsonLd(needDataIsOrSeeks.ttl) : [],
     })
      
     
     let contentRdf = won.buildNeedRdf({ 
-           is: (needData.is? prepareContentNodeData(needData.is) : undefined),
-           seeks: (needData.seeks? prepareContentNodeData(needData.seeks) : undefined),
+           is: (needData.is? await prepareContentNodeData(needData.is) : undefined),
+           seeks: (needData.seeks? await prepareContentNodeData(needData.seeks) : undefined),
         });
     
    
@@ -314,14 +314,14 @@ export function buildCreateMessage(needData, wonNodeUri) {
 
 
 export function buildProposalMessage(uri, type, text) {
-    const msgP = won.WONMSG.msguriPlaceholder;
+    const msgP = won.WONMSG.uriPlaceholder.event;
     const sc = "http://purl.org/webofneeds/agreement#"+type;
     const whM = "\n won:hasTextMessage ";
     return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";
 }
 
 export function buildModificationMessage(uri, type, text) {
-    const msgP = won.WONMSG.msguriPlaceholder;
+    const msgP = won.WONMSG.uriPlaceholder.event;
     const sc = "http://purl.org/webofneeds/modification#"+type;
     const whM = "\n won:hasTextMessage ";
     return "<"+msgP+"> <"+sc+"> <"+uri+">;"+whM+" '''"+text.replace(/'/g, "///'")+"'''.";

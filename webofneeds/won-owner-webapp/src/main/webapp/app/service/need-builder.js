@@ -66,6 +66,9 @@ import won from './won.js';
      *
      *    // the URIs where attachments can be found / will be published
      *    args.attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf']
+     * 
+     *    // the triples will be put in the graph that's build here anyway, so there's no need to pass graph-uri
+     *    args.arbitraryJsonLdGraph = [{ '@id': 'http://example.org/.../1234', 'dc:title': 'hi}, {...}, {...}]
      *
      *    args.recurInfinite =
      *    args.recursIn =
@@ -186,12 +189,21 @@ import won from './won.js';
         var isWhatsAround = args.is? args.is.whatsAround : args.seeks.whatsAround;
         var noHints = args.is? args.is.noHints : args.seeks.noHints;
         var matchingContext = args.is? args.is.matchingContext : args.seeks.matchingContext;
+
+        var isContentUri, seeksContentUri;
+        if(isWhatsAround) {
+            isContentUri = won.WON.contentNodeBlankUri.whatsAround;
+            seeksContentUri = won.WON.contentNodeBlankUri.whatsAround;
+        } else {
+            isContentUri = args.is? won.WON.contentNodeBlankUri.is : undefined;
+            seeksContentUri = args.seeks? won.WON.contentNodeBlankUri.seeks : undefined;
+        }
         var graph = [
             {
                 '@id': args.is?  args.is.publishedContentUri :  args.seeks.publishedContentUri,
                 '@type': 'won:Need',
-                'won:is': isWhatsAround? { '@id': '_:needContent' } : (args.is? { '@id': '_:isNeedContent' } : undefined),
-                'won:seeks': isWhatsAround? { '@id': '_:needContent' } : (args.seeks? { '@id': '_:seeksNeedContent' } : undefined),
+                'won:is': isContentUri? { '@id': isContentUri } : undefined,
+                'won:seeks': seeksContentUri? { '@id': seeksContentUri } : undefined,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
                 'won:hasFlag': new Set([
                     won.debugmode? "won:UsedForTesting" : undefined,
@@ -205,8 +217,10 @@ import won from './won.js';
                 'won:hasMatchingContext': matchingContext? matchingContext : undefined,
             },
             //, <if _hasModalities> {... (see directly below) } </if>
-            args.is? buildContentNode((isWhatsAround? '_:needContent' : '_:isNeedContent'), args.is, true) : {},
-            args.seeks? (isWhatsAround? {} : (buildContentNode('_:seeksNeedContent', args.seeks, false))) : {},
+            args.is? buildContentNode(isContentUri, args.is, true) : {},
+            args.seeks && !isWhatsAround? buildContentNode(seeksContentUri, args.seeks, false) : {},
+            ...(args.is && args.is.arbitraryJsonLd? args.is.arbitraryJsonLd : []),
+            ...(args.seeks && args.seeks.arbitraryJsonLd? args.seeks.arbitraryJsonLd : []),
         ];
         return {
             '@graph': graph,

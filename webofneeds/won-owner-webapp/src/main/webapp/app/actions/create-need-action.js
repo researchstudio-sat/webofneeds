@@ -47,8 +47,8 @@ export function needCreate(draft, nodeUri) {
             .then(() => {
                 return dispatch(actionCreators.router__stateGoDefault());
             })
-            .then(() => {
-                const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
+            .then(async () => {
+                const { message, eventUri, needUri } = await buildCreateMessage(draft, nodeUri);
                 dispatch({
                     type: actionTypes.needs.create,
                     payload: {eventUri, message, needUri, need: draft}

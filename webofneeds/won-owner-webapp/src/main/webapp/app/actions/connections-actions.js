@@ -136,12 +136,12 @@ export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
 }
 function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     ensureLoggedIn(dispatch, getState)
-        .then(() => {
+        .then(async () => {
             const state = getState();
             const theirNeed = getIn(state, ['needs', theirNeedUri]);
             const adHocDraft = generateResponseNeedTo(theirNeed);
             const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-            const { message, eventUri, needUri } = buildCreateMessage(adHocDraft, nodeUri);
+            const { message, eventUri, needUri } = await buildCreateMessage(adHocDraft, nodeUri);
             const cnctMsg = buildConnectMessage({
                 ownNeedUri: needUri,
                 theirNeedUri: theirNeedUri,

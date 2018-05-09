@@ -6,7 +6,6 @@ import { repeatVar } from '../utils.js';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils.js';
-import { buildCreateMessage } from '../won-message-utils.js';
 import won from '../won-es6.js';
 
 const initialState = Immutable.fromJS({loggedIn: false});

@@ -98,8 +98,7 @@ function genComponentConf() {
                         <span>Tags</span>
                 </div>
 
-                <!-- TTL Will be excluded until further notice-->
-                <!--div class="cis__detail__items__item ttl"
+                <div class="cis__detail__items__item ttl"
                     ng-click="self.toggleOpenDetail('ttl')"
                     ng-class="{'picked' : self.openDetail === 'ttl'}">
                         <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
@@ -109,7 +108,7 @@ function genComponentConf() {
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Turtle (TTL)</span>
-                </div-->
+                </div>
             </div>
         </div>
         <!-- /DETAIL Picker/ -->
@@ -153,8 +152,7 @@ function genComponentConf() {
                  />
             </div>
 
-            <!-- TTL Will be excluded until further notice-->
-            <!-- div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
+            <div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
                 <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
@@ -173,19 +171,20 @@ function genComponentConf() {
                     placeholder="Enter TTL..."></textarea>
                 <div class="cis__ttl__helptext">
                     Expects valid turtle.
-                    <{{::self.won.WONMSG.msguriPlaceholder}}> will
-                    be replaced by the URI generated for this part (i.e. is/description or seeks/searches)
-                    of the need. Use the URI, so your TTL can be found when parsing the need.
-                    See \`won.minimalTurtlePrefixes\`
+                    <code><{{::self.won.WON.contentNodeBlankUri.is}}></code> and
+                    <code><{{::self.won.WON.contentNodeBlankUri.seeks}}></code> and
+                    will be replaced by the URI generated for this part (i.e. is/description 
+                    or seeks/searches) of the need. Use the URI, so your TTL can be found 
+                    when parsing the need. See <code>won.defaultTurtlePrefixes</code>
                     for prefixes that will be added automatically. E.g.
-                    \`<{{::self.won.WONMSG.msguriPlaceholder}}> dc:title "hello world!". \`
+                    <code><{{::self.won.WON.contentNodeBlankUri.is}}> dc:description "hello world!".</code>
                     For more information see the
                     <a href="https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/need-structure.md">
                         documentation on the need-structure
                     </a>.
                 </div>
                 <div class="cis__ttl__parse-error" ng-show="self.ttlParseError">{{self.ttlParseError}}</div>
-            </div-->
+            </div>
         </div>
         <!-- /DETAILS/ -->
 `;
@@ -280,9 +279,12 @@ function genComponentConf() {
             this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
         }
         updateTTL() {
-            //await won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + $0.value)
+            //await won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + $0.value)
             const ttlString = ((this.ttlInput() || {}).value || "");
-            won.ttlToJsonLd(won.minimalTurtlePrefixes + '\n' + ttlString)
+
+            this.draftObject.ttl = ttlString;
+
+            won.ttlToJsonLd(ttlString)
             .then(parsedJsonLd => {
                 this.$scope.$apply(() => this.ttlParseError = "");
                 return parsedJsonLd;
