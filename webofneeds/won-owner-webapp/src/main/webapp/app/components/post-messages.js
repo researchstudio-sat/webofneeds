@@ -242,7 +242,7 @@ function genComponentConf() {
             this.declarations = clone(declarations);
 
             this.agreementHeadData = this.cloneDefaultData();
-            this.agreementStateData = this.cloneDefaultStateData();
+            //this.agreementStateData = this.cloneDefaultStateData();
             this.agreementLoadingData = this.cloneDefaultStateData();
 
             
@@ -314,9 +314,9 @@ function genComponentConf() {
 	                    return a.get("date").getTime() - b.get("date").getTime();
 	                });
                 }
-                if(this.reload && connection) {
-                    this.getAgreementData(connection)
-                    this.reload = false;
+                if(this.reload && connection && ownNeed) {
+                    //this.getAgreementData(connection, ownNeed)
+                	this.reload = false;
                 }
 
                 return {
@@ -325,6 +325,7 @@ function genComponentConf() {
                     connectionUri,
                     connection,
                     chatMessages: sortedMessages,
+                    agreementStateData: connection.get('agreementData'),
                     isLoading: connection && connection.get('isLoading'),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
@@ -438,22 +439,28 @@ function genComponentConf() {
 
         agreementDataIsValid() {
             var aD = this.agreementStateData;
-            if(aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size) {
+            if(aD && (aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size)) {
                 return true;
             }
             return false;
         }
 
-        getAgreementData(connection) {
-            if(connection) {
+        getAgreementData(connection, ownNeed) {
+            if(connection && ownNeed) {
                 this.connection = connection;
+                this.ownNeed = ownNeed;
             }else {
 	          	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: true});
             }
           
         	
         	this.agreementLoadingData = this.cloneDefaultStateData();
-            this.getAgreementDataUris();
+            if(!this.agreementStateData) {
+            	this.agreementStateData = this.cloneDefaultStateData()
+            }
+            //this.connections__updateAgreementData(this.ownNeed.get("uri"), this.connection.get("uri"), this.agreementStateData);
+
+        	this.getAgreementDataUris();
         }
 
 
@@ -480,20 +487,25 @@ function genComponentConf() {
                     	for(uri of removalSet) {
 	                    	//for(key of keySet) {
                     		var key = "pendingProposalUris";
-                            for(obj of this.agreementStateData[key]) {
+                    		var data = this.agreementStateData;
+                            for(obj of data[key]) {
 	                    		if(obj.stateUri === uri || obj.headUri === uri) {
 	                            	console.log("Message " + uri + " was removed");
-	                            	this.agreementStateData[key].delete(obj);
+	                            	//Update State!
+	                            	data[key].delete(obj);
+	                            	//this.agreementStateData[key].delete(obj);
 	                            	hasChanged = true;
 	                    		}
                             }
 	                        
                     	}
-                    }
-                    
+                    	if(hasChanged) {
+                    		this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: data});
+                    	}
+                    } 
                 }).then(() => {
                 	if(!hasChanged) {
-                		this.agreementStateData = this.agreementLoadingData;
+                		//this.agreementStateData = this.agreementLoadingData;
                 		this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
                 	}
         		}).catch(error => {
@@ -565,8 +577,12 @@ function genComponentConf() {
                     	if(!found) {
                     		this.messages__connectionMessageReceived(msg);
                     	}
-                    	this.agreementStateData = this.agreementLoadingData;
-                    	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
+                    	//this.agreementStateData = this.agreementLoadingData;
+                    	
+                    	//TODO: Add agreementStateData to State!
+                    	this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: this.agreementLoadingData});
+                    	
+                    	//this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
                     }  
                 })
             })
@@ -579,10 +595,13 @@ function genComponentConf() {
         }
         
         checkObject(key, agreementObject, del) {
-        	for(object of this.agreementStateData[key]) {
+        	var data = this.agreementStateData
+        	for(object of data[key]) {
         		if(object.stateUri === agreementObject.stateUri) {
         			if(del.value) {
-        				this.agreementStateData[key].delete(object);
+        				data[key].delete(object);
+        				this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: data});
+                    	
         			}
         			return true;
         		}

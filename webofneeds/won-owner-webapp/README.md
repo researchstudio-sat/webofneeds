@@ -116,6 +116,11 @@ $ngRedux.getState()
                     }
                     ...
                 },
+                agreementData: { //contains agreementData that is necessary to display for the user
+                    agreementUris: Set(), //agreementUris with the current state uris of the connection
+                    cancellationPendingAgreementUris: Set(), ///proposeToCancelUris with the current state uris of the connection
+                    pendingProposalUris: Set(), //pendingProposalUris with the current state uris of the connection
+                },
                 isLoading: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                 unread: true|false, //whether or not this connection is new (or already seen if you will)
                 isRated: true|false, //whether or not this connection has been rated yet
