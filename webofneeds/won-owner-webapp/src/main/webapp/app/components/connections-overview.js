@@ -146,7 +146,7 @@ function genComponentConf() {
                         </won-extended-connection-indicators>
                         <div class="co__item__need__detail__actions">
                             <button
-                                ng-if="need.get('uri') === self.needUriInRoute"
+                                ng-if="need.get('uri') !== self.needUriInRoute"
                                 class="co__item__need__detail__actions__button won-button--outlined thin red"
                                 ng-click="self.selectNeed(need.get('uri'))">
                                 Show Post Details
