@@ -47,7 +47,7 @@ function genComponentConf() {
                         ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
-                        Close Connection
+                        Remove Connection
                     </button>
                     <button
                         ng-if="self.isSentRequest"

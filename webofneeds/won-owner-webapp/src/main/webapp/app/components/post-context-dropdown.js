@@ -44,7 +44,7 @@ function genComponentConf() {
                     <button class="won-button--filled red"
                         ng-if="self.isOwnPost && self.isActive"
                         ng-click="self.closePost()">
-                        Close Post
+                        Archive Post
                     </button>
                 </div>
             </div>

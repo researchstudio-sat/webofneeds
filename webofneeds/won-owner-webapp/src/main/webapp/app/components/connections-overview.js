@@ -101,7 +101,7 @@ function genComponentConf() {
             </div>
         </div>
         <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.closedNeedsSize > 0" ng-click="self.toggleClosedNeedsDisplay()">
-            <span class="co__separator__text">Closed Posts ({{ self.closedNeedsSize }})</span>
+            <span class="co__separator__text">Archived Posts ({{ self.closedNeedsSize }})</span>
             <svg
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
