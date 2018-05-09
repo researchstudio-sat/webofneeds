@@ -27,48 +27,43 @@ const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
         <!-- LOCATION SEARCH BOX -->
-        <input type="text" class="lp__searchbox" placeholder="Search for location"/>
-
-        <!-- SELECTED LOCATION -->
-        <div class="lp__selected" ng-if="self.locationIsSaved">
-            <svg class="lp__selected__icon clickable" 
+        <!-- TODO: add result, delete if box is completely empty -->
+        <div class="lp__searchbox">
+            <input type="text" class="lp__searchbox__inner" id="lp__searchbox__inner" placeholder="Search for location"/>
+            <svg class="lp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
+                 ng-if="self.locationIsSaved"
                  ng-click="self.resetLocation()">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
-            <span> {{self.pickedLocation.name}} </span>
         </div>
 
         <!-- LIST OF SUGGESTED LOCATIONS -->
-        <ol>
-            <li ng-if="
-                !self.locationIsSaved && self.currentLocation &&
-                (
-                    !self.lastSearchedFor ||
-                    ([self.currentLocation] | filter:self.lastSearchedFor).length > 0
-                )
-            ">
-                <a href=""
+        <ul class="lp__searchresults">
+            <!-- CURRENT GEOLOCATION -->
+            <li class="lp__searchresult" 
+                ng-if="!self.locationIsSaved && self.currentLocation">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-line-gray);">
+                    <!-- TODO: create and use a more appropriate icon here -->
+                    <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
+                </svg>
+                <a class="lp__searchresult__text" href=""
                     ng-click="self.selectedLocation(self.currentLocation)"
                     ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
                 </a>
                 (current)
             </li>
-            <!--li ng-if="!self.locationIsSaved"
-                ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
-                    <a href=""
-                        ng-click="self.selectedLocation(previousLocation)"
-                        ng-bind-html="self.highlight(previousLocation.name, self.lastSearchedFor)">
-                    </a>
-                    (previous)
-            </li-->
-            <li ng-repeat="result in self.searchResults">
+            <li class="lp__searchresult" 
+                ng-repeat="result in self.searchResults">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-line-gray);">
+                    <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
+                </svg>
                 <a href=""
                     ng-click="self.selectedLocation(result)"
                     ng-bind-html="self.highlight(result.name, self.lastSearchedFor)">
                 </a>
             </li>
-        </ol>
+        </ul>
         <div class="lp__mapmount" id="lp__mapmount"></div>
             `;
 
@@ -92,7 +87,7 @@ function genComponentConf() {
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
-                this.textfieldNg(), 1000
+                this.textfieldNg(), 100
             );
         }
 
@@ -150,6 +145,7 @@ function genComponentConf() {
             this.locationIsSaved = false;
             this.pickedLocation = undefined;
             this.removeMarkers();
+            this.textfield().value = "";
             
             this.onLocationPicked({location: undefined});
         }
@@ -162,6 +158,7 @@ function genComponentConf() {
             this.pickedLocation = location;
 
             this.resetSearchResults(); // picked one, can hide the rest if they were there
+            this.textfield().value = location.name;
 
             this.placeMarkers([location]);
             this.map.fitBounds(leafletBounds(location), { animate: true });
@@ -172,7 +169,7 @@ function genComponentConf() {
             const text = this.textfield().value;
 
             if(!text) {
-                this.$scope.$apply(() => { this.resetSearchResults(); });
+                this.$scope.$apply(() => { this.resetLocation(); });
             } else {
                 searchNominatim(text).then( searchResults => {
                     const parsedResults = scrubSearchResults(searchResults, text);
@@ -201,7 +198,7 @@ function genComponentConf() {
                 this.map.setZoom(zoom);
                 this.map.panTo([lat, lng]);
 
-                //this.textfield().value = this.pickedLocation.name;
+                this.textfield().value = this.pickedLocation.name;
                 this.placeMarkers([this.pickedLocation]);
             }
             // else, try to zoom in on current location
@@ -240,9 +237,9 @@ function genComponentConf() {
 
         }
 
-        textfieldNg() { return this.domCache.ng('.lp__searchbox'); }
+        textfieldNg() { return this.domCache.ng('#lp__searchbox__inner'); }
 
-        textfield() { return this.domCache.dom('.lp__searchbox'); }
+        textfield() { return this.domCache.dom('#lp__searchbox__inner'); }
 
         mapMountNg() { return this.domCache.ng('.lp__mapmount'); }
 

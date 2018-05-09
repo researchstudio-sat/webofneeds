@@ -3,42 +3,95 @@
 
 won-location-picker {
 
-  .lp__selected {
-    display: flex;
-    align-items: center;
-    
-    .lp__selected__icon {
-      @include fixed-square(2rem);
-    }
+  // remove X rendered by IE and Edge as we have our own clear button
+  ::-ms-clear {
+    width : 0;
+    height: 0;
   }
 
   .lp__searchbox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
     border-width: $thinBorderWidth;
     border-style: solid;
     border-radius: 0.1rem;
-    background-color: white;
-
-
-    font-size: $normalFontSize;
-    min-height: $formInputHeight;
-
-    $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
-    padding: $verticalPadding 0.438rem;
-
-    box-sizing: border-box;
-
-    min-width: 0; // so a size is specified and break-word works
-    word-wrap: break-word;
-
     border-color: $won-line-gray;
 
-    width: 100%;
+    background-color: white;
+    
+    .lp__searchbox__inner {
+      font-size: $normalFontSize;
+      min-height: $formInputHeight;
+  
+      $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+      padding: $verticalPadding 0.438rem;
+  
+      box-sizing: border-box;
+      min-width: 0; // so a size is specified and break-word works
+      word-wrap: break-word;
+
+      width: 100%;
+      border-style: none;
+    }
+
+    // remove X rendered by IE and Edge as we have our own clear button
+    .lp__searchbox__inner::-ms-clear {
+      width : 0;
+      height: 0;
+    }
+
+    .lp__searchbox__icon {
+      @include fixed-square(2.5rem);
+    }
+  }
+
+  // show search results when search box is focused
+  .lp__searchbox:focus-within + .lp__searchresults {
+    display: block;
+  }
+  
+  // needed to make search results actually clickable
+  .lp__searchresults:hover {
+    display: block;
+  }
+
+  .lp__searchresults{
+    display: none;
+
+    position: absolute;
+    z-index: 1;
+    background-color: white;
+    border-style: solid;
+    border-width: $thinBorderWidth;
+    border-color: $won-line-gray;
+
+    list-style-type: none; 
+
+    .lp__searchresult {
+      display: flex;
+      align-items: center;
+
+      padding: 1rem .5rem;
+      font-size: $normalFontSize;
+
+      .lp__searchresult__text{
+        padding: 0 .5rem;
+      }
+
+      .lp__searchresult__icon{
+        @include fixed-square(1.5rem);
+      }
+    }
   }
 
   .lp__mapmount {
     width: 100%;
     height: 31rem;
+    z-index: 0;
+    margin-top: .5rem;
 
     @media (max-width : $responsivenessBreakPoint) {
       height: 15rem;
