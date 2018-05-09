@@ -46,7 +46,6 @@ bin/setenv.*
 /webofneeds/won-matcher-webapp/overlays
 /webofneeds/won-owner-webapp/src/main/webapp/node
 /webofneeds/won-owner-webapp/src/main/webapp/node_modules
-/webofneeds/won-owner-webapp/src/main/webapp/package-lock.json
 /webofneeds/won-owner-webapp/src/main/webapp/yarn.lock
 /webofneeds/won-owner-webapp/src/main/webapp/yarn-error.log
 /webofneeds/won-owner-webapp/src/main/webapp/.tern-project

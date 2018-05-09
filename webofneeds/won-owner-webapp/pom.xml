@@ -240,8 +240,8 @@
                         <!-- optional: default phase is "generate-resources" -->
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v7.1.0</nodeVersion>
-                            <npmVersion>4.4.4</npmVersion>
+                            <nodeVersion>v10.1.0</nodeVersion>
+                            <npmVersion>6.0.1-next.0</npmVersion>
                         </configuration>
                     </execution>
                     <execution>
