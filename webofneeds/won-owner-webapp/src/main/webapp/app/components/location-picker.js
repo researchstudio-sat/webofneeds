@@ -52,7 +52,7 @@ function genComponentConf() {
             </li>
             <!-- PREVIOUS LOCATION -->
             <li class="lp__searchresult" 
-                ng-if="!self.locationIsSaved && self.previousLocation && (self.previousLocation !== self.currentLocation)">
+                ng-if="!self.locationIsSaved && self.previousLocation && (self.previousLocation.name !== self.currentLocation.name)">
                 <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
                     <!-- TODO: create and use a more appropriate icon here -->
                     <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
