@@ -42,20 +42,18 @@ function genComponentConf() {
             <!-- CURRENT GEOLOCATION -->
             <li class="lp__searchresult" 
                 ng-if="!self.locationIsSaved && self.currentLocation">
-                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-line-gray);">
-                    <!-- TODO: create and use a more appropriate icon here -->
-                    <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
+                    <use xlink:href="#ico16_indicator_location" href="#ico36_location_current"></use>
                 </svg>
                 <a class="lp__searchresult__text" href=""
                     ng-click="self.selectedLocation(self.currentLocation)"
                     ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
                 </a>
-                (geolocation)
             </li>
             <!-- PREVIOUS LOCATION -->
             <li class="lp__searchresult" 
                 ng-if="!self.locationIsSaved && self.previousLocation && (self.previousLocation !== self.currentLocation)">
-                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-line-gray);">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
                     <!-- TODO: create and use a more appropriate icon here -->
                     <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
                 </svg>
@@ -68,7 +66,7 @@ function genComponentConf() {
             <!-- SEARCH RESULTS -->
             <li class="lp__searchresult" 
                 ng-repeat="result in self.searchResults">
-                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-line-gray);">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
                     <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
                 </svg>
                 <a class="lp__searchresult__text" href=""
