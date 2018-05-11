@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "webpack",
+    "postinstall": "npm rebuild",
     "watch": "webpack --watch",
     "webpack": "echo Deprecated: This command has been moved to `npm run build` && exit 1",
     "webpack:watch": "echo Deprecated: This command has been moved to `npm run watch` && exit 1",
