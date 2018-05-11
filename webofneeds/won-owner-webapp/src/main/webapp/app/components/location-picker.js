@@ -12,6 +12,7 @@ import {
     nominatim2draftLocation,
     leafletBounds,
     delay,
+    getIn,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
@@ -38,10 +39,13 @@ function genComponentConf() {
         </div>
 
         <!-- LIST OF SUGGESTED LOCATIONS -->
-        <ul class="lp__searchresults">
+        <ul class="lp__searchresults" ng-class="{ 
+            'lp__searchresults--filled': self.showResultDropDown(), 
+            'lp__searchresults--empty': !self.showResultDropDown() 
+        }">
             <!-- CURRENT GEOLOCATION -->
             <li class="lp__searchresult" 
-                ng-if="!self.locationIsSaved && self.currentLocation">
+                ng-if="self.showCurrentLocationResult()">
                 <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
                     <use xlink:href="#ico16_indicator_location" href="#ico36_location_current"></use>
                 </svg>
@@ -52,7 +56,7 @@ function genComponentConf() {
             </li>
             <!-- PREVIOUS LOCATION -->
             <li class="lp__searchresult" 
-                ng-if="!self.locationIsSaved && self.previousLocation && (self.previousLocation.name !== self.currentLocation.name)">
+                ng-if="self.showPrevLocationResult()">
                 <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
                     <!-- TODO: create and use a more appropriate icon here -->
                     <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
@@ -260,6 +264,22 @@ function genComponentConf() {
             }
 
             this.$scope.$apply();
+        }
+
+        showCurrentLocationResult() {
+            return !this.locationIsSaved && this.currentLocation;
+        }
+
+        showPrevLocationResult() {
+            return !this.locationIsSaved && this.previousLocation && (
+                getIn(this, ['previousLocation', 'name']) !== getIn(this, ['currentLocation','name'])
+            );
+        }
+
+        showResultDropDown() {
+            return (this.searchResults && this.searchResults.length > 0)  || 
+                this.showPrevLocationResult() || 
+                this.showCurrentLocationResult();
         }
 
         textfieldNg() { return this.domCache.ng('#lp__searchbox__inner'); }

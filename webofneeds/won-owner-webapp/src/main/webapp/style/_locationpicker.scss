@@ -1,5 +1,6 @@
 @import 'won';
 @import '../node_modules/leaflet/dist/leaflet.css';
+@import 'border-utils';
 
 won-location-picker {
 
@@ -61,7 +62,13 @@ won-location-picker {
   }
 
   .lp__searchresults{
-    display: none;
+
+    display: none; 
+    border: none;
+
+    &.lp__searchresults--filled {
+      @include thin-border;
+    }
 
     width: 90%;
     box-sizing: border-box;
@@ -69,9 +76,6 @@ won-location-picker {
     position: absolute;
     z-index: 1;
     background-color: white;
-    border-style: solid;
-    border-width: $thinBorderWidth;
-    border-color: $won-line-gray;
 
     list-style-type: none; 
 
