@@ -37,11 +37,7 @@ function config(env, argv): Configuration {
             minimizer: [
                 new UglifyJsPlugin({
                     parallel: true,
-                    sourceMap: true,
-                    uglifyOptions: {
-                        //Needed because of n3 issue https://github.com/rdfjs/N3.js/issues/135
-                        keep_fnames: true
-                    }
+                    sourceMap: true
                   }),
                 new OptimizeCSSAssetsPlugin()
             ]
