@@ -5,8 +5,8 @@
 1.  Open `webofneeds\webofneeds\won-owner-webapp\src\main\webapp\images\won-icons\` and pick an existing SVG icon with the correct size.
 2.  Copy the SVG file and rename it, e.g. to `ico16__new_icon.svg`.
 3.  Open the new SVG file with e.g. InkScape.
-4.  Change all colors to something searchable, e.g. #ff11ff 
-5.  Create the new SVG icon on top of the old icon using a different searchable color, e.g. #eeee11, using the old icon as a size and style reference.
+4.  Change all colors to something searchable, e.g. `#ff11ff`
+5.  Create the new SVG icon on top of the old icon using a different searchable color, e.g. `#eeee11`, using the old icon as a size and style reference.
 6.  Continue with Step 6 below.
 
 
