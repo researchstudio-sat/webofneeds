@@ -118,12 +118,11 @@ function genComponentConf() {
         <div class="cis__details" ng-if="self.showDetail">
 
             <!-- LOCATION -->
-            <div class="cis__location"  ng-if="self.openDetail === 'location'">
-                <won-location-picker class="seeksPicker"
-                    initial-location="::self.draftObject.location"
-                    on-location-picked="::self.updateLocation(location)">
-                </won-location-picker>
-            </div>
+            <won-location-picker 
+                ng-if="self.openDetail === 'location'"
+                initial-location="::self.draftObject.location"
+                on-location-picked="::self.updateLocation(location)">
+            </won-location-picker>
 
             <!-- TAGS -->
              <div class="cis__tags" ng-if="self.openDetail === 'tags'">
