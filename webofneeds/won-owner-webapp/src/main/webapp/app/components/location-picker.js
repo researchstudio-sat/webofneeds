@@ -100,7 +100,7 @@ function genComponentConf() {
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
-                this.textfieldNg(), 100
+                this.textfieldNg(), 300
             );
         }
 
@@ -190,6 +190,8 @@ function genComponentConf() {
             if(!text) {
                 this.$scope.$apply(() => { this.resetSearchResults(); });
             } else {
+                // TODO: sort results by distance/relevance/???
+                // TODO: limit amount of shown results
                 searchNominatim(text).then( searchResults => {
                     const parsedResults = scrubSearchResults(searchResults, text);
                     this.$scope.$apply(() => {
