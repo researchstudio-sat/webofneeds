@@ -299,7 +299,7 @@ function genComponentConf() {
             if(!location && this.details.has("location")){
                 this.details.delete("location");
                 this.draftObject.location = undefined;
-            } else {
+            } else if(location){
                 if(!this.details.has("location")) {
                     this.details.add("location");
                 }
