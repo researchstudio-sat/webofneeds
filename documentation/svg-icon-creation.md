@@ -21,7 +21,7 @@
 7.  Save the new icon as optimized SVG using `Save as...`.
 8.  Open the new SVG file in an Editor (e.g. Visual Studio Code).
 
-** NOTE: if you use VS Code, you can install the `XML Tools` Plugin and auto-format the file with `Shift + Alt + F` for easier editing.**
+**NOTE: if you use VS Code, you can install the `XML Tools` Plugin and auto-format the file with `Shift + Alt + F` for easier editing.**
 
 9.  Search and replace the color value used for creating the new icon, e.g. `#eeee11` with `var(--local-primary)`. Elements that use the color value of the old SVG icon, e.g. `#ff11ff` can be deleted.s
 10.  Save and add the file to the git repository.
