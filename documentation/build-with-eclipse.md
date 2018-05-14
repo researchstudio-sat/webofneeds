@@ -19,6 +19,7 @@
     *  Open Window → Preferences → General → Keys and select the scheme "Intellij Idea".
 11. Change "spaces for tabs" settings: Window >> Preferences >> General >> Editors >> Text Editors >> Check "Insert spaces for tabs"
 12. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check 'skip-tests'
+13. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
 ### Tomcat integration:
 

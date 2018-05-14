@@ -3,29 +3,21 @@
 
 ### Setting up Frontend Development Environment for Windows (AngularJS)
 
+#### Installing Node
+
 1. Goto <http://nodejs.org/download/> and download the NodeJS version you need.<br>
 2. install NodeJS<br>
 3. make sure that NodeJS is correctly installed by opening a Windows Command Console and typing `node -v` then enter. If it didn't work, check whether or not your node-directory are in your system-path-variable<br>
-4. Windows users need to install msygit(http://msysgit.github.io/) with the right option. see the bower installation instruction for the right option. Windows users will also need to run `npm install -g windows-build-tools` (otherwise building sass might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet) 
-5. the maven install task will download and install bower and jspm for you that in turn will be used to install the owner-apps dependencies. However maven isn't yet configured to run `jspm install` as there's no easy integration via maven-frontend as with npm.
 
-Tip: if you get the error "err Registry bower not found", you need to execute the following two commands:
-```
-cd webofneeds/won-owner-webapp/src/main/webapp/
-./node_modules/.bin/jspm registry create bower jspm-bower-endpoint
-```
-If that fails with the follwing error:
-```
-err  Registry handler jspm-bower-endpoint not installed.
-```
-Then you first need to install jspm-bower-endpoint:
-```
-npm install jspm-bower-endpoint
-```
+#### Installing Windows Build Tools on Windows
 
-Tip: if the owner webapp is missing a lot of js files (look into the browser's js console and network tools), jspm didn't download the js dependencies.
-Go to `webofneeds/webofneeds/won-owner-webapp/src/main/webapp` and run `node_modules/jspm/jspm.js install`
+Windows users will need to run `npm install -g windows-build-tools` (otherwise building `node-sass` and `rdf-canonize` might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet)
 
+If your Windows User does not have admin permissions, installing `windows-build-tools` with an admin user will unfortunately install them only for that user. (Further info at https://github.com/researchstudio-sat/webofneeds/pull/1743) The Visual Studio build tools are installed correctly however, so you only need to fix your Python installation.
+
+1. Go to https://www.python.org/downloads/ and download and install Python 2.7 (Python 3 will not work!)
+2. Locate your Python installation (your `python.exe`), we will call this path `$PATH_TO_PYTHON_EXE`
+3. Run `npm config set python $PATH_TO_PYTHON_EXE` to update the python location
 
 <!--
 ### Building with IntelliJ
