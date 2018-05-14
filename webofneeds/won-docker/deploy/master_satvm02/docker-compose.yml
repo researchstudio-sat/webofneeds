@@ -1,42 +1,57 @@
 version: '2'
 services:
 
-  # create self-signed server certificate for owner and wonnode 1
-  gencert1:
+  # owner server self-signed certificate for communication with wonnode
+  gencertownerblue:
     build: ../../image/gencert
     image: webofneeds/gencert:master
     environment:
-      - "CN=satvm02.researchstudio.at"
-      - "PASS=pass:$won_certificate_passwd"
+      - "CN=ownerblue.master.matchat.org"
+      - "PASS=file:/usr/local/certs/out/won_certificate_passwd_file"
+      - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
     volumes:
-      - $base_folder/won-server-certs1:/usr/local/certs/out/
+      - $base_folder/won-server-certsownerblue:/usr/local/certs/out/
+      - $base_folder/openssl.conf:/usr/local/openssl.conf
 
-  # portsgres need databases for owner and wonnode 1
-  postgres1:
+  # owner server self-signed certificate for communication with wonnode
+  gencertownergreen:
+    build: ../../image/gencert
+    image: webofneeds/gencert:master
+    environment:
+      - "CN=ownergreen.master.matchat.org"
+      - "PASS=file:/usr/local/certs/out/won_certificate_passwd_file"
+      - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
+    volumes:
+      - $base_folder/won-server-certsownergreen:/usr/local/certs/out/
+      - $base_folder/openssl.conf:/usr/local/openssl.conf
+
+  # portsgres need databases for owner and wonnode blue
+  postgresblue:
     image: webofneeds/postgres:master
     build: ../../image/postgres
     environment:
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      - $base_folder/postgres1/data/pgdata:/var/lib/postgresql/data/pgdata
+      - $base_folder/postgresblue/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
 
-  # wonnode 1 => https://satvm02.researchstudio.at:8888/won
-  wonnode1:
+  # wonnode blue => https://nodeblue.master.matchat.org/won
+  wonnodeblue:
     build: ../../image/wonnode
     image: webofneeds/wonnode:master
     environment:
-      - "uri.host=satvm02.researchstudio.at"
+      - "uri.host=nodeblue.master.machat.org"
       - "http.port=8888"
+      - "uri.prefix=https://nodeblue.master.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5432/won_node"
       - "db.ddl.strategy=validate"
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "activemq.broker.port=61616"
+      - "activemq.broker.port=61612"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62916,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9016 -Dcom.sun.management.jmxremote.authenticate=false
@@ -44,25 +59,29 @@ services:
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
     ports:
       - "8888:8443"
-      - "61616:61616"
+      - "61622:61612"
       - "62916:62916"
       - "9016:9016"
     volumes:
-      - $base_folder/won-server-certs1:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/wonnode1:/usr/local/tomcat/won/client-certs/
+      - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
+      - $base_folder/won-client-certs/wonnodeblue:/usr/local/tomcat/won/client-certs/
     depends_on:
-      - postgres1
-      - gencert1
+      - postgresblue
 
-  # owner 1 => https://satvm02.researchstudio.at:8081/owner
-  owner1:
+  # owner blue => https://ownerblue.master.matchat.org/owner
+  ownerblue:
     build: ../../image/owner
     image: webofneeds/owner:master
     environment:
-      - "node.default.host=satvm02.researchstudio.at"
-      - "uri.host=satvm02.researchstudio.at"
+      - "node.default.host=nodeblue.master.machat.org"
+      - "uri.host=ownerblue.master.machat.org"
       - "http.port=8081"
-      - "node.default.http.port=8888"
+      - "node.default.http.port=443"
+      - "uri.prefix=https://ownerblue.master.matchat.org"
+      - "uri.prefix.node.default=https://nodeblue.master.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5432/won_owner"
       - "db.ddl.strategy=validate"
@@ -82,56 +101,33 @@ services:
       - "62917:62917"
       - "9017:9017"
     volumes:
-      - $base_folder/won-server-certs1:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/owner1:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-server-certsblue:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/ownerblue:/usr/local/tomcat/won/client-certs/
     depends_on:
-      - wonnode1
-      - postgres1
-      - gencert1
+      - wonnodeblue
+      - postgresblue
+      - gencertownerblue
 
-  # create self-signed server certificate for for owner and wonnode 2
-  gencert2:
-      build: ../../image/gencert
-      image: webofneeds/gencert:master
-      environment:
-        - "CN=satvm02.researchstudio.at"
-        - "PASS=pass:$won_certificate_passwd"
-      volumes:
-        - $base_folder/won-server-certs2:/usr/local/certs/out/
-
-  # nginx proxy server for owner and wonnode 2
-  nginx:
-    image: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-      - "61617:61617"
-    volumes:
-      - $base_folder/nginx-master.conf:/etc/nginx/nginx.conf
-      - $base_folder/won-server-certs2:/etc/nginx/won-server-certs/
-    depends_on:
-      - gencert2
-
-  # portsgres need databases for owner and wonnode 2
-  postgres2:
+  # portsgres need databases for owner and wonnode green
+  postgresgreen:
     image: webofneeds/postgres:master
     build: ../../image/postgres
     environment:
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      - $base_folder/postgres2/data/pgdata:/var/lib/postgresql/data/pgdata
+      - $base_folder/postgresgreen/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5433:5432"
 
-  # wonnode 2 (proxied by nginx) => https://satvm02.researchstudio.at/won
-  wonnode2:
+  # wonnode green (proxied by nginx) => https://nodegreen.master.matchat.org/won
+  wonnodegreen:
     build: ../../image/wonnode
     image: webofneeds/wonnode:master
     environment:
-      - "uri.host=satvm02.researchstudio.at"
+      - "uri.host=nodegreen.master.matchat.org"
       - "http.port=8889"
-      - "uri.prefix=https://satvm02.researchstudio.at/won"
+      - "uri.prefix=https://nodegreen.master.matchat.org/won"
       - "client.authentication.behind.proxy=true"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5433/won_node"
@@ -139,7 +135,7 @@ services:
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "activemq.broker.port=61617"
+      - "activemq.broker.port=61611"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62918,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9018 -Dcom.sun.management.jmxremote.authenticate=false
@@ -147,28 +143,29 @@ services:
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
     ports:
       - "8889:8443"
-      - "61618:61617"
+      - "61621:61611"
       - "62918:62918"
       - "9018:9018"
     volumes:
-      - $base_folder/won-server-certs2:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/wonnode2:/usr/local/tomcat/won/client-certs/
+      - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
+      - $base_folder/won-client-certs/wonnodegreen:/usr/local/tomcat/won/client-certs/
     depends_on:
-      - nginx
-      - postgres2
-      - gencert2
+      - postgresgreen
 
-   # owner 2 (proxied by nginx) => https://satvm02.researchstudio.at/owner
-  owner2:
+   # owner green (proxied by nginx) => https://ownergreen.master.matchat.org/owner
+  ownergreen:
     build: ../../image/owner
     image: webofneeds/owner:master
     environment:
-      - "node.default.host=satvm02.researchstudio.at"
-      - "uri.host=satvm02.researchstudio.at"
+      - "node.default.host=nodegreen.master.matchat.org"
+      - "uri.host=ownergreen.master.matchat.org"
       - "http.port=8082"
       - "node.default.http.port=443"
-      - "uri.prefix=https://satvm02.researchstudio.at"
-      - "uri.prefix.node.default=https://satvm02.researchstudio.at/won"
+      - "uri.prefix=https://ownergreen.master.matchat.org"
+      - "uri.prefix.node.default=https://nodegreen.master.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5433/won_owner"
       - "db.ddl.strategy=validate"
@@ -188,13 +185,12 @@ services:
       - "62919:62919"
       - "9019:9019"
     volumes:
-      - $base_folder/won-server-certs2:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/owner2:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-server-certsgreen:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/ownergreen:/usr/local/tomcat/won/client-certs/
     depends_on:
-      - nginx
-      - wonnode2
-      - postgres2
-      - gencert2
+      - wonnodegreen
+      - postgresgreen
+      - gencertownergreen
 
   # mongodb for persistent debug bot
   mongodb:
@@ -209,15 +205,15 @@ services:
     volumes:
       - $base_folder/mongodb/data/db:/data/db
 
-  # debug bot used to test need communication, connect to wonnodes 1 and 2
+  # debug bot used to test need communication, connect to wonnodes blue and green
   debug_bot:
     build: ../../image/bots
     image: webofneeds/bots:master
     environment:
-      - "node.default.host=satvm02.researchstudio.at"
-      - "node.default.http.port=8888"
-      - "uri.prefix.owner=https://satvm02.researchstudio.at/debug_bot"  # set this for the trust store alias
-      - "won.node.uris=https://satvm02.researchstudio.at:8888/won/resource https://satvm02.researchstudio.at/won/resource"
+      - "node.default.host=nodeblue.master.matchat.org"
+      - "node.default.http.port=443"
+      - "uri.prefix.owner=https://master.matchat.org/debug_bot"  # set this for the trust store alias
+      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=$mongo_db_passwd"
@@ -226,18 +222,18 @@ services:
       - "botContext.mongodb.database=master_bot"
     depends_on:
       - mongodb
-      - wonnode1
-      - wonnode2
+      - wonnodeblue
+      - wonnodegreen
 
   mail_bot:
     build: ../../image/bots
     image: webofneeds/bots:int
     environment:
       - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
-      - "node.default.host=satvm02.researchstudio.at"
-      - "node.default.http.port=8888"
-      - "uri.prefix.owner=https://satvm02.researchstudio.at/mail_bot"  # set this for the trust store alias
-      - "won.node.uris=https://satvm02.researchstudio.at:8888/won/resource https://satvm02.researchstudio.at/won/resource"
+      - "node.default.host=nodeblue.master.matchat.org"
+      - "node.default.http.port=443"
+      - "uri.prefix.owner=https://master.matchat.org/mail_bot"  # set this for the trust store alias
+      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=$mongo_db_passwd"
@@ -254,8 +250,8 @@ services:
       - "mailbot.email.smtp.port=587"
     depends_on:
       - mongodb
-      - wonnode1
-      - wonnode2
+      - wonnodeblue
+      - wonnodegreen
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
@@ -271,10 +267,10 @@ services:
     image: webofneeds/matcher_service:master
     environment:
       - "node.host=satvm02.researchstudio.at"
-      - "matcher.uri=https://satvm02.researchstudio.at/matcher_service" # set this for the trust store alias
+      - "matcher.uri=https://master.matchat.org/matcher_service" # set this for the trust store alias
       - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
       - "uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/bigdata/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://satvm02.researchstudio.at:8888/won/resource,https://satvm02.researchstudio.at/won/resource"
+      - "wonNodeController.wonNode.crawl=https://nodeblue.master.matchat.org/won/resource,https://nodegreen.master.matchat.org/won/resource"
       - "cluster.local.port=2551"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62920,server=y,suspend=n
@@ -289,8 +285,8 @@ services:
       - $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/
     depends_on:
       - bigdata
-      - wonnode1
-      - wonnode2
+      - wonnodeblue
+      - wonnodegreen
 
   # solr server as a need index
   solr:
