@@ -12,7 +12,22 @@ import {
 const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
-        <input type="text" id="tp__textbox" placeholder="#"/>
+        <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
+            <svg class="cis__circleicon">
+                <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
+            </svg>
+        </div>
+        <div class="cis__taglist">
+            <span class="cis__taglist__tag" ng-repeat="tag in self.tags">#{{tag}}</span>
+        </div>
+        <input class="tp__input"
+            placeholder="e.g. #couch #free" type="text"
+            ng-keyup="::self.updateTags()"
+        />
+
+
+
+        <input type="text" class="tp__textbox" placeholder="e.g. #couch #free"/>
             `;
 
     class Controller {
@@ -39,9 +54,9 @@ function genComponentConf() {
         }
 
         
-        textfieldNg() { return this.domCache.ng('#tp__textbox'); }
+        textfieldNg() { return this.domCache.ng('.tp__input'); }
 
-        textfield() { return this.domCache.dom('#tp__textbox'); }
+        textfield() { return this.domCache.dom('.tp__input'); }
     }
     Controller.$inject = serviceDependencies;
 

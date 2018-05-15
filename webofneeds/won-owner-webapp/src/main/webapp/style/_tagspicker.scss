@@ -1,0 +1,43 @@
+@import 'won';
+
+won-tags-picker{
+
+    .tp__input {
+        border-width: $thinBorderWidth;
+        border-style: solid;
+        border-radius: 0.1rem;
+        background-color: white;
+
+
+        font-size: $normalFontSize;
+        min-height: $formInputHeight;
+
+        $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+        padding: $verticalPadding 0.438rem;
+
+        box-sizing: border-box;
+
+        min-width: 0; // so a size is specified and break-word works
+        word-wrap: break-word;
+
+        border-color: $won-line-gray;
+
+        width: 100%;
+    }
+
+    .tp__tagslist {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+
+        .__taglist__tag {
+          border-radius: 0.5rem;
+          background: $won-primary-color;
+          color: white;
+          margin: 0.25rem 0.25rem 0.25rem 0;
+          padding: 0.25rem 0.5rem;
+        }
+    }
+
+}

@@ -166,7 +166,10 @@ function genComponentConf() {
                     ng-keyup="::self.updateTags()"
                  />
             </div>
+            <!-- won-tags-picker ng-show="self.openDetail === 'tags'">
+            </won-tags-picker -->
 
+            <!-- TTL -->
             <div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
                 <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
