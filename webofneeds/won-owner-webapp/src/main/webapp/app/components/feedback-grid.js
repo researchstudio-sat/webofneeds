@@ -1,16 +1,12 @@
-;
+import angular from "angular";
+import "ng-redux";
+import { attach } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
 
-import angular from 'angular';
-import 'ng-redux';
-import { attach } from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
-    let template = `
+  let template = `
             <a class="feedback clickable" ng-click="self.rateMatch(0); self.router__stateGoCurrent({connectionUri : self.connectionUri})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="feedback__icon unselected">
@@ -45,50 +41,47 @@ function genComponentConf() {
             </div>
         `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            const selectFromState = (state) => ({});
-            connect2Redux(selectFromState, actionCreators, [], this);
-        }
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      const selectFromState = state => ({});
+      connect2Redux(selectFromState, actionCreators, [], this);
+    }
 
-        rateMatch(rating) {
-
-
-            switch(rating) {
-                case 0:
-                    console.log("RATE GOOD");
-                    this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
-                    this.connections__markAsRated({connectionUri: this.connectionUri});
-                    break;
-                /*case 1:
+    rateMatch(rating) {
+      switch (rating) {
+        case 0:
+          console.log("RATE GOOD");
+          this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
+          this.connections__markAsRated({ connectionUri: this.connectionUri });
+          break;
+        /*case 1:
                     //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE
                     console.log("RATE OK");
                     this.connections__rate(this.item, 1);
                     break;*/
-                case 2:
-                    console.log("RATE BAD");
-                    this.connections__close(this.connectionUri);
-                    this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
-                    this.router__stateGoCurrent({connectionUri: null})
-                    //TODO: ADD A BAD RATING, CLOSE MATCH
-                    break;
-            }
-        }
+        case 2:
+          console.log("RATE BAD");
+          this.connections__close(this.connectionUri);
+          this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
+          this.router__stateGoCurrent({ connectionUri: null });
+          //TODO: ADD A BAD RATING, CLOSE MATCH
+          break;
+      }
     }
-    Controller.$inject = serviceDependencies;
+  }
+  Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: { connectionUri: "=" },
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { connectionUri: "=" },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.feedbackGrid', [])
-    .directive('wonFeedbackGrid', genComponentConf)
-    .name;
-
+export default angular
+  .module("won.owner.components.feedbackGrid", [])
+  .directive("wonFeedbackGrid", genComponentConf).name;

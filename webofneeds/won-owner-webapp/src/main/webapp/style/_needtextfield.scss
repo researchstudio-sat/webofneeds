@@ -1,5 +1,5 @@
-@import 'won';
-@import 'won-config';
+@import "won";
+@import "won-config";
 
 need-textfield {
   display: flex;
@@ -26,13 +26,17 @@ need-textfield {
   .wdt__text {
     align-self: stretch;
 
-    &.valid { .Medium {
+    &.valid {
+      .Medium {
         border-color: $won-line-gray;
-    }}
+      }
+    }
 
-    &.invalid { .Medium {
+    &.invalid {
+      .Medium {
         border-color: $won-primary-color;
-    }}
+      }
+    }
 
     .Medium {
       border-width: $thinBorderWidth;
@@ -41,17 +45,19 @@ need-textfield {
       background-color: white;
     }
 
-    & .Medium, & .Medium-placeholder {
+    & .Medium,
+    & .Medium-placeholder {
       //$padding: 0.3rem;
       //padding: $padding;
 
       font-size: $normalFontSize;
       $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
+        $thinBorderWidth;
 
       padding: $verticalPadding 1rem;
-	  min-height: $formInputHeight + $realFontHeight;
-	  
+      min-height: $formInputHeight + $realFontHeight;
+
       box-sizing: border-box;
 
       min-width: 0; // so a size is specified and break-word works

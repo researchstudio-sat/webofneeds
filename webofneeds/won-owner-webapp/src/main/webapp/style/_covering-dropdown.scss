@@ -1,4 +1,4 @@
-@import 'won-config';
+@import "won-config";
 
 won-dropdown {
   display: block;
@@ -40,7 +40,6 @@ won-dropdown {
     //border: 1px solid transparent; // to align
   }
 
-
   .dd__close-button {
     display: flex;
     flex-direction: column;
@@ -51,7 +50,6 @@ won-dropdown {
       align-items: flex-end; //right-aligned
     }
   }
-
 
   $dropdownPadding: 1rem;
   > .dd__dropdown {
@@ -74,7 +72,7 @@ won-dropdown {
       width: 100%;
     }
 
-    a.won-button--outlined{
+    a.won-button--outlined {
       cursor: pointer;
       display: flex;
       align-content: center;
@@ -85,8 +83,9 @@ won-dropdown {
   &.dd-right-aligned-header {
     .dd__dropdown {
       left: auto;
-      right: calc(-1px - #{$dropdownPadding}); // offset border *and* left padding
+      right: calc(
+        -1px - #{$dropdownPadding}
+      ); // offset border *and* left padding
     }
   }
 }
-

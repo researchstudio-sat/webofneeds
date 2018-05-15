@@ -16,7 +16,6 @@ e.g. 2.5rem -> 1rem
   @return $number / stripUnit($number);
 }
 
-
 /* adapted from http://www.antimath.info/css/sass-sqrt-function/ */
 @function sqrt($r) {
   $x0: 1;

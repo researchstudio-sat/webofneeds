@@ -1,5 +1,3 @@
-
-
 // TODO ALTERNATIVE: export-syntax
 // Taken from: http://4waisenkinder.de/blog/2014/03/06/import-once-in-sass-the-foundation-way/
 // We use this to prevent styles from being loaded multiple times for compenents that rely on other components.
@@ -13,8 +11,6 @@ $modules: () !default;
     @content;
   }
 }
-
-
 
 // TODO ALTERNATIVE: 'include-guard'
 // http://davidwalsh.name/future-sass (search for import-once, ~50% of document)
@@ -33,6 +29,5 @@ $imported-once-files: ();
   // ...declare stuff that will only be imported once...
 }
 */
-
 
 // TODO ALTERNATIVE: node-sass-import-once

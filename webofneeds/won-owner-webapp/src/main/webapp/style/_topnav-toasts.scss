@@ -1,4 +1,4 @@
-@import 'won-config';
+@import "won-config";
 
 won-topnav {
   .topnav__toasts {
@@ -19,7 +19,7 @@ won-topnav {
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-start; // = top
-      
+
       &__icon {
         @include fixed-square($toastIconSize);
       }

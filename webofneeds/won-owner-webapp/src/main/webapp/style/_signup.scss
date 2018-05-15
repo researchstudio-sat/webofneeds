@@ -1,12 +1,12 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'signup-title-bar';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "signup-title-bar";
 
 .signup {
   font-weight: 300;
 
-  @include max-content-width($maxContentWidth / 2, $minContentPadding, 'su');
+  @include max-content-width($maxContentWidth / 2, $minContentPadding, "su");
 
   .su__inner {
     padding-top: 3rem;
@@ -31,7 +31,7 @@
     align-items: stretch;
     flex-wrap: wrap;
 
-    .block{
+    .block {
       padding-bottom: 1rem;
     }
 
@@ -68,9 +68,9 @@
       }
     }
 
-    input[type=text],
-    input[type=password],
-    input[type=email] {
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
       margin: 1rem 0;
       width: 100%;
     }

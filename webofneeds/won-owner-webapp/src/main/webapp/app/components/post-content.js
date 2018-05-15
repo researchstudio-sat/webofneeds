@@ -4,20 +4,16 @@
  * Created by ksinger on 10.04.2017.
  */
 
-import angular from 'angular';
-import 'ng-redux';
-import extendedGalleryModule from '../components/extended-gallery.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    attach,
-} from '../utils.js'
-import {
-    connect2Redux,
-} from '../won-utils.js'
+import angular from "angular";
+import "ng-redux";
+import extendedGalleryModule from "../components/extended-gallery.js";
+import { actionCreators } from "../actions/actions.js";
+import { attach } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
 
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
-    let template = `
+  let template = `
         <div
           class="pc__text"
           ng-show="self.need.getIn(['location', 's:name'])">
@@ -72,50 +68,48 @@ function genComponentConf() {
         </div>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            window.pc4dbg = this;
-            const selectFromState = (state) => {
-                return {
-                    need: state.getIn(['needs', this.needUri]),
-                }
-            };
-            /*
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      window.pc4dbg = this;
+      const selectFromState = state => {
+        return {
+          need: state.getIn(["needs", this.needUri]),
+        };
+      };
+      /*
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
             */
-            connect2Redux(selectFromState, actionCreators, ['self.needUri'], this);
-        }
+      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
     }
-    Controller.$inject = serviceDependencies;
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            needUri: '=',
-            /**
-             * one of:
-             * - "fullpage" (NOT_YET_IMPLEMENTED) (used in post-info page)
-             * - "medium" (NOT_YET_IMPLEMENTED) (used in incoming/outgoing requests and matches-tiles)
-             * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
-             */
-            //size: '=',
+  }
+  Controller.$inject = serviceDependencies;
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      needUri: "=",
+      /**
+       * one of:
+       * - "fullpage" (NOT_YET_IMPLEMENTED) (used in post-info page)
+       * - "medium" (NOT_YET_IMPLEMENTED) (used in incoming/outgoing requests and matches-tiles)
+       * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
+       */
+      //size: '=',
 
-            /**
-             * Additional text-message that is shown. Use this e.g. when displaying
-             * an incoming request.
-             */
-            textMessage: '=',
-        },
-        template: template
-    }
+      /**
+       * Additional text-message that is shown. Use this e.g. when displaying
+       * an incoming request.
+       */
+      textMessage: "=",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.postContent', [
-    extendedGalleryModule,
-])
-    .directive('wonPostContent', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.postContent", [extendedGalleryModule])
+  .directive("wonPostContent", genComponentConf).name;

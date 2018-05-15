@@ -1,39 +1,42 @@
-@import 'won-config';
-@import 'speech-bubble';
+@import "won-config";
+@import "speech-bubble";
 
 won-create-post-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  //padding: 0.5rem;
+  background-color: white;
+  border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
+
+  @media (min-width: $responsivenessBreakPoint) {
+    &.selected {
+      @include speech-bubble-right(
+        white,
+        $won-line-gray,
+        0.625rem,
+        $thinBorderWidth,
+        1.5rem
+      );
+    }
+  }
+  .cpi__item {
+    flex: 1;
     display: flex;
-    flex-direction: row;
+    // needed for text positioning
     align-items: center;
-    //padding: 0.5rem;
-    background-color: white;
-    border-right: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-
-    @media (min-width: $responsivenessBreakPoint){
-      &.selected {
-        @include speech-bubble-right(white, $won-line-gray, 0.625rem, $thinBorderWidth, 1.5rem);
-      }
+    border-left: $thinGrayBorder;
+    :hover,
+    &.selected {
+      // TODO: SET CORRECT BACKGROUND COLOR
     }
-
-    .cpi__item{
-        flex: 1;
-        display: flex; // needed for text positioning
-        align-items: center;
-        border-left: $thinGrayBorder;
-
-        :hover,
-        &.selected {
-          //TODO: SET CORRECT BACKGROUND COLOR
-        }
-
-        &__icon{
-            width: 3.5rem; // needed because svg default size is huge
-            height: 3.5rem;
-        }
-
-        &__text{
-            font-weight: 400;
-        }
+    &__icon {
+      width: 3.5rem; // needed because svg default size is huge
+      height: 3.5rem;
     }
+    &__text {
+      font-weight: 400;
+    }
+  }
 }

@@ -1,10 +1,8 @@
-;
-
-import angular from 'angular';
-import labelledHrModule from './labelled-hr.js';
+import angular from "angular";
+import labelledHrModule from "./labelled-hr.js";
 
 function genComponentConf() {
-    let template = `
+  let template = `
             <div class="flexgrid__item" ng-repeat="item in self.items">
                 <div class="fgi__block" ng-class="{'clickable' : item.detail !== undefined}" ng-click="self.openElement($index)">
                     <img class="fgi__image" 
@@ -38,31 +36,28 @@ function genComponentConf() {
             </div>
     `;
 
-    class Controller {
-        constructor() { }
+  class Controller {
+    constructor() {}
 
-        openElement(index) {
-            if(index === this.selectedIdx){
-                this.selectedIdx = undefined;
-            }else{
-                this.selectedIdx = index;
-            }
-        }
+    openElement(index) {
+      if (index === this.selectedIdx) {
+        this.selectedIdx = undefined;
+      } else {
+        this.selectedIdx = index;
+      }
     }
+  }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {items: '='},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { items: "=" },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.flexgrid', [
-    labelledHrModule
-])
-    .directive('wonFlexGrid', genComponentConf)
-    .name;
-
+export default angular
+  .module("won.owner.components.flexgrid", [labelledHrModule])
+  .directive("wonFlexGrid", genComponentConf).name;

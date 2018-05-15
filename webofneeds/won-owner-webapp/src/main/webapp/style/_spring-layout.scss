@@ -13,9 +13,10 @@
     flex-grow: 0;
     flex-shrink: 1;
     flex-basis: auto;
-    align-self: auto
+    align-self: auto;
   }
-  & > .spring { //TODO test class. delete it. inserting elements just for stying should be done via pseude-elements
+  & > .spring {
+    //TODO test class. delete it. inserting elements just for stying should be done via pseude-elements
     content: "";
     min-width: 1px; //keep it from collapsing
     min-height: 1px; //keep it from collapsing
@@ -23,7 +24,7 @@
     flex-grow: 10;
     flex-shrink: 1;
     flex-basis: auto;
-    align-self: auto
+    align-self: auto;
   }
 
   & > .spring-before::before {
@@ -36,7 +37,7 @@
     flex-grow: 10;
     flex-shrink: 1;
     flex-basis: auto;
-    align-self: auto
+    align-self: auto;
   }
 }
 

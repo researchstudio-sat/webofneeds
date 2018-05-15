@@ -2,26 +2,19 @@
  * Component for rendering the connection indicators as an svg images, with unread count and select handle on the latest (possibly unread) connnectionuri
  * Created by fsuda on 10.04.2017.
  */
-import angular from 'angular';
-import won from '../won-es6.js';
-import 'ng-redux';
-import { labels, } from '../won-label-utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    selectAllOwnNeeds,
-} from '../selectors.js';
+import angular from "angular";
+import won from "../won-es6.js";
+import "ng-redux";
+import { labels } from "../won-label-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { selectAllOwnNeeds } from "../selectors.js";
 
-import {
-    attach,
-    sortByDate,
-} from '../utils.js'
-import {
-    connect2Redux,
-} from '../won-utils.js'
+import { attach, sortByDate } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
 
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
-    let template = `
+  let template = `
         <a
             class="indicators__item clickable"
             ng-show="self.latestConnectedUri"
@@ -81,94 +74,110 @@ function genComponentConf() {
         <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            this.labels = labels;
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      this.labels = labels;
 
-            const selectFromState = (state) => {
-                const ownNeeds = selectAllOwnNeeds(state);
-                const need = ownNeeds && ownNeeds.get(this.needUri);
-                const allConnectionsByNeedUri = need && need.get("connections");
+      const selectFromState = state => {
+        const ownNeeds = selectAllOwnNeeds(state);
+        const need = ownNeeds && ownNeeds.get(this.needUri);
+        const allConnectionsByNeedUri = need && need.get("connections");
 
-                const matches = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
-                const connected = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") !== won.WON.Suggested && conn.get("state") !== won.WON.Closed);
+        const matches =
+          allConnectionsByNeedUri &&
+          allConnectionsByNeedUri.filter(
+            conn => conn.get("state") === won.WON.Suggested,
+          );
+        const connected =
+          allConnectionsByNeedUri &&
+          allConnectionsByNeedUri.filter(
+            conn =>
+              conn.get("state") !== won.WON.Suggested &&
+              conn.get("state") !== won.WON.Closed,
+          );
 
-                const unreadMatches = matches && matches.filter(conn => conn.get("unread"));
-                const unreadConversations = connected && connected.filter(conn => conn.get("unread"));
+        const unreadMatches =
+          matches && matches.filter(conn => conn.get("unread"));
+        const unreadConversations =
+          connected && connected.filter(conn => conn.get("unread"));
 
-                const unreadMatchesCount = unreadMatches && unreadMatches.size;
-                const unreadConnectedCount = unreadConversations && unreadConversations.size;
+        const unreadMatchesCount = unreadMatches && unreadMatches.size;
+        const unreadConnectedCount =
+          unreadConversations && unreadConversations.size;
 
-                const sortedUnreadMatches = sortByDate(unreadMatches);
-                const sortedUnreadConversations = sortByDate(unreadConversations);
+        const sortedUnreadMatches = sortByDate(unreadMatches);
+        const sortedUnreadConversations = sortByDate(unreadConversations);
 
-                const unreadCountSum = unreadConnectedCount + unreadMatchesCount;
+        const unreadCountSum = unreadConnectedCount + unreadMatchesCount;
 
-                return {
-                    WON: won.WON,
-                    need,
-                    unreadCountSum: unreadCountSum > 0 ? unreadCountSum: undefined,
-                    unreadConnectedCount: unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
-                    unreadMatchesCount: unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
-                    latestConnectedUri: this.retrieveLatestUri(connected),
-                    latestMatchUri: this.retrieveLatestUri(matches),
-                }
-            };
+        return {
+          WON: won.WON,
+          need,
+          unreadCountSum: unreadCountSum > 0 ? unreadCountSum : undefined,
+          unreadConnectedCount:
+            unreadConnectedCount > 0 ? unreadConnectedCount : undefined,
+          unreadMatchesCount:
+            unreadMatchesCount > 0 ? unreadMatchesCount : undefined,
+          latestConnectedUri: this.retrieveLatestUri(connected),
+          latestMatchUri: this.retrieveLatestUri(matches),
+        };
+      };
 
-            connect2Redux(
-                selectFromState, actionCreators,
-                ['self.needUri'],
-                this
-            );
-        }
-
-        /**
-         * This method returns either the latest unread uri of the given connection elements, or the latest uri of a read connection, if nothing is found undefined is returned
-         * @param elements connection elements to retrieve the latest uri from
-         * @returns {*}
-         */
-        retrieveLatestUri(elements) {
-            const unreadElements = elements && elements.filter(conn => conn.get("unread"));
-
-            const sortedUnreadElements = sortByDate(unreadElements);
-            const unreadUri = sortedUnreadElements && sortedUnreadElements[0] && sortedUnreadElements[0].get("uri");
-
-            if(unreadUri){
-                return unreadUri;
-            }else{
-                const sortedElements = sortByDate(elements);
-                return sortedElements && sortedElements[0] && sortedElements[0].get("uri");
-            }
-        }
-
-        setOpen(connectionUri) {
-            this.onSelectedConnection({connectionUri: connectionUri}); //trigger callback with scope-object
-            //TODO either publish a dom-event as well; or directly call the route-change
-        }
-
-        getCountLimited(count , threshold = 100) {
-            if(!!count && (threshold < count)){
-                return (threshold-1)+"+";
-            }
-            return count;
-        }
+      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
     }
-    Controller.$inject = serviceDependencies;
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            needUri: '=',
-            onSelectedConnection: "&",
-        },
-        template: template
+
+    /**
+     * This method returns either the latest unread uri of the given connection elements, or the latest uri of a read connection, if nothing is found undefined is returned
+     * @param elements connection elements to retrieve the latest uri from
+     * @returns {*}
+     */
+    retrieveLatestUri(elements) {
+      const unreadElements =
+        elements && elements.filter(conn => conn.get("unread"));
+
+      const sortedUnreadElements = sortByDate(unreadElements);
+      const unreadUri =
+        sortedUnreadElements &&
+        sortedUnreadElements[0] &&
+        sortedUnreadElements[0].get("uri");
+
+      if (unreadUri) {
+        return unreadUri;
+      } else {
+        const sortedElements = sortByDate(elements);
+        return (
+          sortedElements && sortedElements[0] && sortedElements[0].get("uri")
+        );
+      }
     }
+
+    setOpen(connectionUri) {
+      this.onSelectedConnection({ connectionUri: connectionUri }); //trigger callback with scope-object
+      //TODO either publish a dom-event as well; or directly call the route-change
+    }
+
+    getCountLimited(count, threshold = 100) {
+      if (!!count && threshold < count) {
+        return threshold - 1 + "+";
+      }
+      return count;
+    }
+  }
+  Controller.$inject = serviceDependencies;
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      needUri: "=",
+      onSelectedConnection: "&",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.connectionIndicators', [
-])
-    .directive('wonConnectionIndicators', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.connectionIndicators", [])
+  .directive("wonConnectionIndicators", genComponentConf).name;

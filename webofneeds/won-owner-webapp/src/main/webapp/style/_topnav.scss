@@ -1,15 +1,16 @@
-@import 'won-config';
-@import 'tri-aligned';
-@import 'flex-layout';
-@import 'sizing-utils';
-@import 'slidein';
-@import 'topnav-toasts';
-@import 'button';
-@import 'responsiveness-utils';
+@import "won-config";
+@import "tri-aligned";
+@import "flex-layout";
+@import "sizing-utils";
+@import "slidein";
+@import "topnav-toasts";
+@import "button";
+@import "responsiveness-utils";
 
-.topnav { //TODO split into single-purpose-classes
+.topnav {
+  //TODO split into single-purpose-classes
   background-color: white;
-  @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
+  @include max-content-width($maxContentWidth, $minContentPadding, "topnav");
 
   > .topnav__inner {
     //@include tri-aligned('topnav__inner', 1rem);
@@ -19,13 +20,14 @@
 
     > .topnav__inner__left {
       margin-right: 1rem;
-      .topnav__button__icon { margin-right: 0.5rem; }
-
+      .topnav__button__icon {
+        margin-right: 0.5rem;
+      }
     }
     > .topnav__inner__center {
       // so the create-need-speechbubble-triangle centers correctly
       // on the icon (when the caption isn't visible)
-      @extend  %center--absolute;
+      @extend %center--absolute;
     }
     > .topnav__inner__right {
       margin-left: 1rem;
@@ -41,7 +43,6 @@
   a:visited:not(.topnav__signupbtn) {
     color: $won-primary-color;
   }
-
 
   & .topnav__carret {
     // with svg-included margins
@@ -90,7 +91,4 @@
     @include won-button--filled(white, $won-secondary-color-lighter);
     @extend .topnav__button;
   }
-
 }
-
-

@@ -1,20 +1,18 @@
-@import 'won-config';
-@import 'flex-layout';
-@import 'title-bar';
-@import 'sizing-utils';
-@import 'square-image';
+@import "won-config";
+@import "flex-layout";
+@import "title-bar";
+@import "sizing-utils";
+@import "square-image";
 
 @mixin need-tab-bar($prefix) {
   @include title-bar($prefix);
 
   .#{$prefix}__titles__type {
-    color: #A7A7A7;
+    color: #a7a7a7;
     font-size: 0.8rem;
   }
 
-
   > .#{$prefix}__inner {
-
     // #{$prefix} isn't using the tri-aligned that it inherits
     // via the `@include title-bar` as there's no
     // centered element
@@ -33,10 +31,10 @@
 
       margin: 1rem 0;
 
-      @media (max-width: $responsivenessBreakPoint){
+      @media (max-width: $responsivenessBreakPoint) {
         @include square-image($postIconSize);
       }
-      @media (min-width: $responsivenessBreakPoint){
+      @media (min-width: $responsivenessBreakPoint) {
         @include square-image(4.7rem, 0 1rem);
       }
     }
@@ -46,7 +44,6 @@
       // or make won-tabs a parametrized mixin?
       flex-grow: 1;
       margin-top: 1rem;
-
 
       display: flex;
       flex-direction: column;
@@ -79,7 +76,6 @@
 
         > .#{$prefix}__tabs {
           align-self: stretch;
-
         }
       }
     }
@@ -87,5 +83,5 @@
 }
 
 .need-tab-bar {
-  @include need-tab-bar('ntb');
+  @include need-tab-bar("ntb");
 }

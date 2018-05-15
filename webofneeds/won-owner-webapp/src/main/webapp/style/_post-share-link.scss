@@ -1,5 +1,5 @@
-@import 'won-config';
-@import 'animate';
+@import "won-config";
+@import "animate";
 
 won-post-share-link {
   .psl__separator {
@@ -11,7 +11,7 @@ won-post-share-link {
     color: $won-line-gray;
 
     &--open {
-      transition: border-bottom-width linear .1s;
+      transition: border-bottom-width linear 0.1s;
       border-bottom: $thinGrayBorder;
       color: $won-primary-color;
 
@@ -31,7 +31,7 @@ won-post-share-link {
   }
 
   .psl__content {
-    @include slideWithOpacityAnimation(.5s, linear, 5rem);
+    @include slideWithOpacityAnimation(0.5s, linear, 5rem);
 
     .psl__info,
     .psl__text {

@@ -1,4 +1,4 @@
-@import 'won-config';
+@import "won-config";
 
 won-labelled-hr {
   display: block;
@@ -18,21 +18,20 @@ won-labelled-hr {
 
     text-align: center;
     vertical-align: middle;
-    
+
     @include fine-print;
-    
-        
-     &__text {
-       padding: 0 0.3rem;
-       background: $won-lighter-gray;
-     }
-     &__carret {
-       @include fixed-square(1rem);
-       background-color: $won-light-gray;
-       // visually center icon on line
-       position: relative;
-       padding: 0 0.3rem;
-       top: 0.1em;
+
+    &__text {
+      padding: 0 0.3rem;
+      background: $won-lighter-gray;
+    }
+    &__carret {
+      @include fixed-square(1rem);
+      background-color: $won-light-gray;
+      // visually center icon on line
+      position: relative;
+      padding: 0 0.3rem;
+      top: 0.1em;
     }
   }
 }

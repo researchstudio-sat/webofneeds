@@ -1,4 +1,10 @@
-@mixin slideWithOpacityAnimation($duration: 1.0s, $type: linear, $maxHeight: 9999rem, $padding: 0, $margin: 0) {
+@mixin slideWithOpacityAnimation(
+  $duration: 1s,
+  $type: linear,
+  $maxHeight: 9999rem,
+  $padding: 0,
+  $margin: 0
+) {
   &.ng-enter,
   &.ng-leave {
     transition: all $type $duration;
@@ -23,7 +29,7 @@
   }
 }
 
-@mixin appearAnimation($duration: 1.0s, $type: linear) {
+@mixin appearAnimation($duration: 1s, $type: linear) {
   &.ng-enter,
   &.ng-leave {
     transition: all $type $duration;

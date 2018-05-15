@@ -1,20 +1,13 @@
 /**
  * Created by ksinger on 20.08.2015.
  */
-;
-
-import angular from 'angular';
-import {
-    attach,
-    getIn,
-} from '../utils.js';
-import { actionCreators } from '../actions/actions.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
+import angular from "angular";
+import { attach, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <nav class="settings-tab-bar" ng-cloak ng-show="{{true}}">
             <div class="astb__inner">
                 <a class="astb__inner__left" ng-click="self.back()">
@@ -40,39 +33,43 @@ function genComponentConf() {
         </nav>
     `;
 
-    const serviceDependencies = ['$ngRedux', '$scope'/*injections as strings here*/];
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
+  const serviceDependencies = [
+    "$ngRedux",
+    "$scope" /*injections as strings here*/,
+  ];
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
 
-            const selectFromState = (state) => ({
-                routerState: getIn(state, ['router','currentState','name']),
-            });
-            connect2Redux(selectFromState, actionCreators, [], this);
-
-        }
-        back() { window.history.back() }
-
-        select(selectedTab) {
-            console.log("selection: "+selectedTab);
-            this.selection = selectedTab;
-            console.log("selection: "+this.selection);
-        }
+      const selectFromState = state => ({
+        routerState: getIn(state, ["router", "currentState", "name"]),
+      });
+      connect2Redux(selectFromState, actionCreators, [], this);
     }
-    Controller.$inject = serviceDependencies;
-
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {selection: "=",
-                avatarcount: "="},
-        template: template
+    back() {
+      window.history.back();
     }
+
+    select(selectedTab) {
+      console.log("selection: " + selectedTab);
+      this.selection = selectedTab;
+      console.log("selection: " + this.selection);
+    }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      selection: "=",
+      avatarcount: "=",
+    },
+    template: template,
+  };
 }
-export default angular.module('won.owner.components.settingsTitleBar', [
-
-    ])
-    .directive('wonSettingsTitleBar', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.settingsTitleBar", [])
+  .directive("wonSettingsTitleBar", genComponentConf).name;

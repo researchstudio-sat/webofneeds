@@ -1,29 +1,26 @@
 /**
  * Created by maxstolze on 19.02.2018.
  */
-;
+import angular from "angular";
 
-import angular from 'angular';
+import "ng-redux";
+import won from "../won-es6.js";
+import needMapModule from "./need-map.js";
 
-import 'ng-redux';
-import won from '../won-es6.js';
-import needMapModule from './need-map.js';
-
-import {
-    attach,
-} from '../utils.js';
-import { actionCreators } from '../actions/actions.js';
-import Immutable from 'immutable';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-
+import { attach } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import Immutable from "immutable";
+import { connect2Redux } from "../won-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' /*injections as strings here*/];
+const serviceDependencies = [
+  "$ngRedux",
+  "$scope",
+  "$element" /*, '$routeParams' /*injections as strings here*/,
+];
 
 function genComponentConf() {
-    const template = `
+  const template = `
             <h2 class="post-info__heading"
                 ng-show="self.isPart.is.get('title')">
                 Title
@@ -73,51 +70,44 @@ function genComponentConf() {
                 ng-if="self.isPart.location && self.showMap">
             </won-need-map>
     	`;
-    
-    class Controller {
-        constructor(/* arguments <- serviceDependencies */) {
-            attach(this, serviceDependencies, arguments);
 
-            //TODO debug; deleteme
-            window.cis4dbg = this;
+  class Controller {
+    constructor(/* arguments <- serviceDependencies */) {
+      attach(this, serviceDependencies, arguments);
 
-            this.showMap = false;
-          
-            
-            const selectFromState = (state) => {
- 
-                return {
-                   
-                }
-            };
-            
-            
-            // Using actionCreators like this means that every action defined there is available in the template.
-            connect2Redux(selectFromState, actionCreators, [], this);
-        }
-        
-        toggleMap() {
-        	this.showMap = !this.showMap;
-        }
+      //TODO debug; deleteme
+      window.cis4dbg = this;
+
+      this.showMap = false;
+
+      const selectFromState = state => {
+        return {};
+      };
+
+      // Using actionCreators like this means that every action defined there is available in the template.
+      connect2Redux(selectFromState, actionCreators, [], this);
     }
-     
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            isPart: '=',
-        },
-        template: template,
+    toggleMap() {
+      this.showMap = !this.showMap;
     }
+  }
+
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      isPart: "=",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.postIsInfo', [
-		needMapModule,
-    ])
-    .directive('wonPostIsInfo', genComponentConf)
-    //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
-.name;
+export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+angular
+  .module("won.owner.components.postIsInfo", [needMapModule])
+  .directive("wonPostIsInfo", genComponentConf).name;

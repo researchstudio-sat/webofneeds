@@ -44,7 +44,8 @@ $thinDarkBorder: $thinBorderWidth solid $won-dark-gray;
 
 $gridRowGap: 0.5rem;
 
-@mixin carretSized { //the small down-arrow
+@mixin carretSized {
+  //the small down-arrow
   /*
   // without svg-included margins
   @include fixed-height(0.5rem);
@@ -53,7 +54,6 @@ $gridRowGap: 0.5rem;
 
   // with svg-included margins
   @include fixed-square(1rem);
-
 }
 
 // should be used as max-width on all root-elements so the app has some

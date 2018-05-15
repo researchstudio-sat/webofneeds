@@ -1,7 +1,7 @@
-import 'babel-polyfill';
+import "babel-polyfill";
 
-import './app_jspm';
+import "./app_jspm";
 
-require.context('../images/won-icons', false, /\.svg$/);
+require.context("../images/won-icons", false, /\.svg$/);
 
-import '../style/won.scss';
+import "../style/won.scss";

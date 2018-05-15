@@ -2,8 +2,8 @@
  * Any styles purely defining different typographic classes
  */
 
-@import 'won-config';
-@import 'fonts';
+@import "won-config";
+@import "fonts";
 
 @mixin default-font {
   font-family: $font-family-sans-serif;

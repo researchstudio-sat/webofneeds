@@ -2,11 +2,10 @@
  * Created by ksinger on 28.08.2015.
  */
 
-;
-import angular from 'angular';
+import angular from "angular";
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <div class="won-gallery__selected">
             <img src="images/furniture_big.jpg" alt="a table"/>
         </div>
@@ -33,14 +32,14 @@ function genComponentConf() {
                 class="won-gallery__forward">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
             </svg>
-        </div>`
+        </div>`;
 
-    return {
-        restrict: 'E',
-        template: template
-    }
+  return {
+    restrict: "E",
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.gallery', [])
-    .directive('wonGallery', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.gallery", [])
+  .directive("wonGallery", genComponentConf).name;

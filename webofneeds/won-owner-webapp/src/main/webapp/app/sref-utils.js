@@ -2,19 +2,16 @@
  * Created by ksinger on 21.08.2017.
  */
 
-import {
-    getParameterByName,
-    getParameters,
-} from './utils.js';
+import { getParameterByName, getParameters } from "./utils.js";
 
 import {
-    defaultRoute,
-    makeParams,
-    resetParams,
-    resetParamsImm,
-    constantParams,
-    addConstParams,
-} from './configRouting.js';
+  defaultRoute,
+  makeParams,
+  resetParams,
+  resetParamsImm,
+  constantParams,
+  addConstParams,
+} from "./configRouting.js";
 
 /**
  * e.g. `absSRef('post', {postUri: 'http://...'})` + pre-existing private Id =>
@@ -28,12 +25,12 @@ import {
  *                   the right cursor by default (i.e. it is a regular link)
  */
 export function absSRef(toRouterState, queryParams) {
-    //const currentParams = getParameters();
-    //const paramsWithConst = addConstParams(resetParamsImm.merge(queryParams), currentParams);
-    const paramsWithConst = absParams(queryParams);
-    const paramsString = JSON.stringify(paramsWithConst);
-    const srefString = toRouterState + '(' + paramsString + ')';
-    return srefString;
+  //const currentParams = getParameters();
+  //const paramsWithConst = addConstParams(resetParamsImm.merge(queryParams), currentParams);
+  const paramsWithConst = absParams(queryParams);
+  const paramsString = JSON.stringify(paramsWithConst);
+  const srefString = toRouterState + "(" + paramsString + ")";
+  return srefString;
 }
 
 /**
@@ -45,9 +42,12 @@ export function absSRef(toRouterState, queryParams) {
  * @returns {*}
  */
 export function absParams(queryParams) {
-    const currentParams = getParameters();
-    const paramsWithConst = addConstParams(resetParamsImm.merge(queryParams), currentParams);
-    return paramsWithConst;
+  const currentParams = getParameters();
+  const paramsWithConst = addConstParams(
+    resetParamsImm.merge(queryParams),
+    currentParams,
+  );
+  return paramsWithConst;
 }
 
 /**
@@ -60,7 +60,7 @@ export function absParams(queryParams) {
  * @returns {*}
  */
 export function absHRef($state, toRouterState, queryParams) {
-    return $state.href(toRouterState, absParams(queryParams));
+  return $state.href(toRouterState, absParams(queryParams));
 }
 
 /**
@@ -74,11 +74,9 @@ export function absHRef($state, toRouterState, queryParams) {
  *                   the right cursor by default (i.e. it is a regular link)
  */
 export function resetParamsSRef(toRouterState) {
-    const paramsString = JSON.stringify(
-        onlyConstParams()
-    );
-    const srefString = toRouterState + '(' + paramsString + ')';
-    return srefString;
+  const paramsString = JSON.stringify(onlyConstParams());
+  const srefString = toRouterState + "(" + paramsString + ")";
+  return srefString;
 }
 
 /**
@@ -88,8 +86,8 @@ export function resetParamsSRef(toRouterState) {
  * @returns {*}
  */
 export function onlyConstParams() {
-    const currentParams = getParameters();
-    return addConstParams(resetParamsImm, currentParams)
+  const currentParams = getParameters();
+  return addConstParams(resetParamsImm, currentParams);
 }
 
 /**
@@ -100,9 +98,9 @@ export function onlyConstParams() {
  * @returns {*}
  */
 export function resetParamsHRef($state, toRouterState) {
-    return $state.href(toRouterState, onlyConstParams());
+  return $state.href(toRouterState, onlyConstParams());
 }
 
 export function defaultRouteHRef($state) {
-    return resetParamsHRef($state, defaultRoute);
+  return resetParamsHRef($state, defaultRoute);
 }

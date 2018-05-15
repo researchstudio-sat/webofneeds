@@ -2,7 +2,7 @@
  * Use this when you want to want to align an item centered
  * and at optionally another to the right and/or left.
  */
-@mixin tri-aligned($prefix: 'tri', $minMargin: 0) {
+@mixin tri-aligned($prefix: "tri", $minMargin: 0) {
   display: flex;
   & > .#{$prefix} {
     &__left {
