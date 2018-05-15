@@ -1,6 +1,6 @@
 {
-    "title": "UKI-Line",
-    "adminEmail": "office@uki.or.at",
-    "imprintTemplate": "imprint.html",
-    "defaultContext": ["uki"]
+  "title": "UKI-Line",
+  "adminEmail": "office@uki.or.at",
+  "imprintTemplate": "imprint.html",
+  "defaultContext": ["uki"]
 }
