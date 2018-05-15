@@ -61,6 +61,12 @@ won-post-header {
       font-size: $smallFontSize;
       min-width: 0;
 
+      &__type {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
       &__group {
         display: flex;
         align-items: center;
