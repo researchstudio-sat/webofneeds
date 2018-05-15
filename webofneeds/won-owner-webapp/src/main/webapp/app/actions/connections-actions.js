@@ -345,7 +345,6 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
                         	console.log("Message " + uri + " was removed");
                         	//Update State!
                         	data[key].delete(obj);
-                        	//this.agreementStateData[key].delete(obj);
                         	hasChanged = true;
                 		}
                     }
@@ -363,7 +362,6 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
             
         }).then(() => {
         	if(!hasChanged) {
-        		//this.agreementStateData = this.agreementLoadingData;
         		dispatch({
     				type: actionCreators.connections__setLoading,
                    	 payload: {
@@ -434,11 +432,7 @@ export function addAgreementDataToSate(dispatch, chatMessages, ownNeedUri, conne
             			msg: msg,
                           
             		})
-            		//this.messages__connectionMessageReceived(msg);
             	}
-            	//this.agreementStateData = this.agreementLoadingData;
-            	
-            	//TODO: Add agreementStateData to State!
             	 dispatch({
         			 type: actionCreators.connections__updateAgreementData,
                 	 payload: {
@@ -446,9 +440,6 @@ export function addAgreementDataToSate(dispatch, chatMessages, ownNeedUri, conne
             			 agreementData: agreementData,
         			 }
                  })
-            	//this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: this.agreementLoadingData});
-            	
-            	//this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
             }  
         })
     })
