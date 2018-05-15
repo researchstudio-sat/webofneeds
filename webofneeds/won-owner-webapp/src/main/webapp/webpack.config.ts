@@ -7,6 +7,7 @@ import * as OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import * as SpriteLoaderPlugin from 'svg-sprite-loader/plugin';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as LiveReloadPlugin from 'webpack-livereload-plugin';
+import * as PrettierPlugin from 'prettier-webpack-plugin';
 
 export default config;
 
@@ -129,6 +130,9 @@ function config(env, argv): Configuration {
                 }
             ], {}),
             new LiveReloadPlugin(),
+            new PrettierPlugin({
+                trailingComma: 'all',
+            }),
             WatchTimePlugin
         ],
         devtool: 'source-map'

@@ -56,6 +56,8 @@
     "node-sass": "^4.9.0",
     "node-sass-import-once": "1.2.0",
     "optimize-css-assets-webpack-plugin": "^4.0.0",
+    "prettier": "^1.12.1",
+    "prettier-webpack-plugin": "^1.0.0",
     "rimraf": "2.4.4",
     "sass-loader": "^6.0.7",
     "svg-sprite-loader": "^3.7.3",
