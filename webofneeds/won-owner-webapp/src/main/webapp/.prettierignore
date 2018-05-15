@@ -1,4 +1,4 @@
-.vscode/
+/.vscode/
 fonts/
 generated/
 images/
@@ -6,3 +6,5 @@ node/
 node_modules/
 old/
 WEB-INF/
+scripts/
+*.html
