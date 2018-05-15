@@ -234,6 +234,11 @@ export default function(allNeedsInState = initialState, action = {}) {
             return markConnectionAsRated(allNeedsInState, action.payload.connectionUri);
         case actionTypes.connections.setLoading:
         	return setConnectionLoading(allNeedsInState, action.payload.connectionUri, action.payload.isLoading);
+        	
+        case actionTypes.connections.updateAgreementData:
+        	return updateAgreementStateData(allNeedsInState, action.payload.connectionUri, action.payload.agreementData);
+        case actionTypes.connections.showAgreementData:
+        	return setShowAgreementData(allNeedsInState, action.payload.connectionUri, action.payload.showAgreementData);
         // NEW MESSAGE STATE UPDATES
         case actionTypes.messages.connectionMessageReceived:
             // ADD RECEIVED CHAT MESSAGES
@@ -455,6 +460,34 @@ function addMessages(state, wonMessages) {
     return state;
 }
 
+function updateAgreementStateData(state, connectionUri, agreementData) {
+	const need = selectNeedByConnectionUri(state, connectionUri);
+    
+	if(!need || !agreementData) {
+        console.error("no need found for connectionUri", connectionUri);
+        return state;
+    }
+
+    const needUri = need.get("uri");
+    
+    return state
+    		.setIn([needUri, "connections", connectionUri, "agreementData"], agreementData)
+    		.setIn([needUri, "connections", connectionUri, "isLoading"], false);
+}
+
+function setShowAgreementData(state, connectionUri, showAgreementData) {
+	const need = selectNeedByConnectionUri(state, connectionUri);
+    
+	if(!need) {
+        console.error("no need found for connectionUri", connectionUri);
+        return state;
+    }
+
+    const needUri = need.get("uri");
+    
+    return state.setIn([needUri, "connections", connectionUri, "showAgreementData"], showAgreementData)
+}
+
 
 function setIfNew(state, path, obj){
     return state.update(path, val => val ?
@@ -602,6 +635,7 @@ function parseConnection(jsonldConnection) {
             uri: undefined,
             state: undefined,
             messages: Immutable.Map(),
+            agreementData:  undefined,
             remoteNeedUri: undefined,
             remoteConnectionUri: undefined,
             creationDate: undefined,
@@ -609,6 +643,7 @@ function parseConnection(jsonldConnection) {
             unread: undefined,
             isRated: false,
             isLoading: false,
+            showAgreementData: false,
         }
     };
 

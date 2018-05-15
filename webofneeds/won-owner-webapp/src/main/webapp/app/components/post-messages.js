@@ -98,16 +98,23 @@ function genComponentConf() {
                     'won-cm--left' : !msg.get('outgoingMessage'),
                     'won-cm--right' : msg.get('outgoingMessage')
                 }"
-                on-update="self.showAgreementData = false"
-                on-send-proposal="[self.addProposal(proposalUri), self.showAgreementData = false]"
-                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
+                on-update="self.setShowAgreementData(false)"
+                on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.agreementDataIsValid()">           	
+            <div class="pm__content__agreement" ng-if="self.showAgreementData">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="pm__content__agreement__icon clickable"
-                    ng-click="self.showAgreementData = !self.showAgreementData">
+                    ng-click="self.setShowAgreementData(false) && (self.showLoadingInfo = false)"">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
+                
+                <!-- Loading Text -->
+                <div class="pm__content__agreement__title" ng-if="self.showLoadingInfo  && !self.agreementDataIsValid()"> 
+	            		<span class="ng-hide" ng-show="self.connection.get('isLoading')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!self.connection.get('isLoading')">No Agreement Data found</span>
+            	</div>
+	            <!-- /LoadingText -->
                 
                 <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
@@ -121,8 +128,8 @@ function genComponentConf() {
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.agreement"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false"
-	                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
+	                on-update="self.setShowAgreementData(false)"
+	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
 	            </won-connection-agreement>
 	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
@@ -135,8 +142,8 @@ function genComponentConf() {
 	                agreement-number="self.agreementStateData.agreementUris.size + $index"
 	                agreement-declaration="self.declarations.proposeToCancel"
 	                connection-uri="self.connectionUri"
-	                on-update="[self.showAgreementData = false, self.filterMessages(draft)]"
-	                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
+	                on-update="[self.setShowAgreementData(false), self.filterMessages(draft)]"
+	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
 	            </won-connection-agreement>
 	            <!-- /ProposeToCancel -->           	
             	<!-- PROPOSALS -->
@@ -153,26 +160,13 @@ function genComponentConf() {
 	                agreement-number="$index"
 	                agreement-declaration="self.declarations.proposal"
 	                connection-uri="self.connectionUri"
-	                on-update="self.showAgreementData = false;"
-	                on-remove-data="[self.filterMessages(proposalUri), self.showAgreementData = false]">
+	                on-update="self.setShowAgreementData(false);"
+	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
 	            </won-connection-agreement>
 	            <!-- /PROPOSALS -->
 	            
             </div>
-            <!-- Loading Text -->
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && self.showLoadingInfo && !self.agreementDataIsValid()">
-                
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="pm__content__agreement__icon clickable"
-                    ng-click="(self.showAgreementData = !self.showAgreementData) && (self.showLoadingInfo = !self.showLoadingInfo)">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
-                </svg>
-                
-                <div class="pm__content__agreement__title"> 
-	            		<span class="ng-hide" ng-show="self.connection.get('isLoading')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!self.connection.get('isLoading')">No Agreement Data found</span>
-            	</div>
-            </div>
+            
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
@@ -242,11 +236,11 @@ function genComponentConf() {
             this.declarations = clone(declarations);
 
             this.agreementHeadData = this.cloneDefaultData();
-            this.agreementStateData = this.cloneDefaultStateData();
+            //this.agreementStateData = this.cloneDefaultStateData();
             this.agreementLoadingData = this.cloneDefaultStateData();
 
             
-            this.showAgreementData = false;
+            //this.showAgreementData = false;
 
             
 
@@ -270,19 +264,22 @@ function genComponentConf() {
                 const chatMessages = connection && connection.get("messages");
                 const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
 
+                
+                let agreementStateData = connection && connection.get('agreementData');
+                
+                if(agreementStateData && !agreementStateData.agreementUris) {
+                	agreementStateData = this.cloneDefaultStateData();
+                }
+                
                 //Filter already accepted proposals
                 let sortedMessages = chatMessages && chatMessages.toArray();
                 if(sortedMessages) {
                     var msgSet = new Set(sortedMessages);
 
                 	// TODO: Optimization
-                	//filter proposals
                 	for(msg of msgSet) {
                 		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
 	                		if(msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-	                			//TODO: optimization?
-	                			//isRelevant in state?
-	                			//msg.hide = true;
 	                			msg.hide = true;
 	                			this.messages__markAsRelevant(
 	                				payload = {
@@ -315,8 +312,8 @@ function genComponentConf() {
 	                });
                 }
                 if(this.reload && connection) {
-                    this.getAgreementData(connection)
-                    this.reload = false;
+                    this.getAgreementData(connection, ownNeed)
+                	this.reload = false;
                 }
 
                 return {
@@ -324,8 +321,10 @@ function genComponentConf() {
                     theirNeed,
                     connectionUri,
                     connection,
+                    agreementStateData,
                     chatMessages: sortedMessages,
                     isLoading: connection && connection.get('isLoading'),
+                    showAgreementData: connection && connection.get('showAgreementData'),
                     lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
                     isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
                     isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
@@ -386,8 +385,6 @@ function genComponentConf() {
             if(this._snapBottom) {
                 this.scrollToBottom();
             }
-            //new message income
-            //this.showAgreementData = false;
         }
         scrollToBottom() {
             this._programmaticallyScrolling = true;
@@ -419,7 +416,7 @@ function genComponentConf() {
         }
 
         send(chatMessage, isTTL=false) {
-            this.showAgreementData = false;
+        	this.setShowAgreementData(false);;
             const trimmedMsg = chatMessage.trim();
             if(trimmedMsg) {
                 this.connections__sendChatMessage(
@@ -433,12 +430,16 @@ function genComponentConf() {
         showAgreementDataField() {
             this.getAgreementData();
             this.showLoadingInfo = true;
-            this.showAgreementData = true;
+            this.setShowAgreementData(true);
+        }
+        
+        setShowAgreementData(value) {
+        	this.connections__showAgreementData(payload = {connectionUri: this.connectionUri, showAgreementData: value});
         }
 
         agreementDataIsValid() {
             var aD = this.agreementStateData;
-            if(aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size) {
+            if(aD && (aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size)) {
                 return true;
             }
             return false;
@@ -453,7 +454,11 @@ function genComponentConf() {
           
         	
         	this.agreementLoadingData = this.cloneDefaultStateData();
-            this.getAgreementDataUris();
+            if(!this.agreementStateData) {
+            	this.agreementStateData = this.cloneDefaultStateData()
+            }
+           
+        	this.getAgreementDataUris();
         }
 
 
@@ -472,28 +477,32 @@ function genComponentConf() {
                             }
                         }
                     }
-                    
+                    //no data found for keyset: no relevant agreementData to show in GUI - clean state data
+                    if(!hasChanged) {
+                    	this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: this.cloneDefaultStateData()});
+                    }
                     //Remove all retracted/rejected messages
-                    if(this.agreementHeadData["rejectedMessageUris"] || this.agreementHeadData["retractedMessageUris"]) {
+                    else if(this.agreementStateData && (this.agreementHeadData["rejectedMessageUris"] || this.agreementHeadData["retractedMessageUris"])) {
                     	let removalSet = new Set([...this.agreementHeadData["rejectedMessageUris"], ...this.agreementHeadData["retractedMessageUris"]]);
                     	
                     	for(uri of removalSet) {
-	                    	//for(key of keySet) {
                     		var key = "pendingProposalUris";
-                            for(obj of this.agreementStateData[key]) {
+                    		var data = this.agreementStateData;
+                            for(obj of data[key]) {
 	                    		if(obj.stateUri === uri || obj.headUri === uri) {
 	                            	console.log("Message " + uri + " was removed");
-	                            	this.agreementStateData[key].delete(obj);
+	                            	data[key].delete(obj);
 	                            	hasChanged = true;
 	                    		}
-                            }
-	                        
+                            }      
                     	}
-                    }
-                    
+                    	if(hasChanged) {
+                    		this.agreementStateData = this.cloneDefaultStateData()
+                    		this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: data});
+                    	}
+                    } 
                 }).then(() => {
                 	if(!hasChanged) {
-                		this.agreementStateData = this.agreementLoadingData;
                 		this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
                 	}
         		}).catch(error => {
@@ -565,8 +574,9 @@ function genComponentConf() {
                     	if(!found) {
                     		this.messages__connectionMessageReceived(msg);
                     	}
-                    	this.agreementStateData = this.agreementLoadingData;
-                    	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
+                    	
+                    	//Update agreementData in State 
+                    	this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: this.agreementLoadingData});
                     }  
                 })
             })
@@ -579,10 +589,12 @@ function genComponentConf() {
         }
         
         checkObject(key, agreementObject, del) {
-        	for(object of this.agreementStateData[key]) {
+        	var data = this.agreementStateData
+        	for(object of data[key]) {
         		if(object.stateUri === agreementObject.stateUri) {
         			if(del.value) {
-        				this.agreementStateData[key].delete(object);
+        				data[key].delete(object);
+        				this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: data});
         			}
         			return true;
         		}
@@ -644,6 +656,9 @@ function genComponentConf() {
         }
 
         getArrayFromSet(set) {
+        	if(!set) {
+        		set = new Set();
+        	}
             return Array.from(set);
         }
 

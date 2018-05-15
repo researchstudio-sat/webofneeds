@@ -191,28 +191,32 @@ export function connectionMessageReceived(event) {
      	callAgreementsFetch(url)
  		.then(response => {
  			console.log("response : ", response);
- 			
+ 			let change = false;
  			for(effect of response) {
  				console.log("effect : ", effect);
  				 switch (effect.type) {
                   	case "ACCEPTS":
                   		console.log("ACCEPTS");
-                  		if(effect.accepts) {;
+                  		if(effect.accepts) {
                   			let messageUri = getEventUri(messages, effect.acceptedMessageUri);
                   			dispatch({
                 		        type: actionTypes.messages.markAsRelevant,
                 		        payload: {
-                		    			 messageUri: messageUri,
-                		                 connectionUri: connectionUri,
-                		                 needUri: needUri,
-                		                 relevant: false,
+            		    			 messageUri: messageUri,
+            		                 connectionUri: connectionUri,
+            		                 needUri: needUri,
+            		                 relevant: false,
                 	 			}
                 			});
+                  			change = true;
                   		}
                   		break;
                   		
                   	case "PROPOSES":
                   		console.log("PROPOSES");
+                  		if(effect.proposes) {
+                  			change = true;
+                  		}
                   		break;
                   		
                   	case "REJECTS":
@@ -222,12 +226,13 @@ export function connectionMessageReceived(event) {
 	              			dispatch({
 	            		        type: actionTypes.messages.markAsRelevant,
 	            		        payload: {
-	            		    			 messageUri: messageUri,
-	            		                 connectionUri: connectionUri,
-	            		                 needUri: needUri,
-	            		                 relevant: false,
+            		    			 messageUri: messageUri,
+            		                 connectionUri: connectionUri,
+            		                 needUri: needUri,
+            		                 relevant: false,
 	            	 			}
 	            			});
+	              			change = true;
 	              		}
                   		break;
 
@@ -238,19 +243,29 @@ export function connectionMessageReceived(event) {
 	              			dispatch({
 	            		        type: actionTypes.messages.markAsRelevant,
 	            		        payload: {
-	            		    			 messageUri: messageUri,
-	            		                 connectionUri: connectionUri,
-	            		                 needUri: needUri,
-	            		                 relevant: false,
+            		    			 messageUri: messageUri,
+            		                 connectionUri: connectionUri,
+            		                 needUri: needUri,
+            		                 relevant: false,
 	            	 			}
 	            			});
 	              		}
+                     	change = true;
 	              		break;
 
                      default:
-                     	//return state;
                      	break;
  				 }
+ 			}
+ 			
+ 			if(change) {
+ 				dispatch({
+    		        type: actionTypes.connections.showAgreementData,
+    		        payload: {
+		        		connectionUri: connectionUri,
+		                showAgreementData: false,
+    	 			}
+    			});
  			}
  			
  			dispatch({
