@@ -23,12 +23,11 @@ function genComponentConf() {
     let template = `
             <svg class="cdd__icon__small clickable"
                 style="--local-primary:#var(--won-secondary-color);"
-                ng-show="!self.contextMenuOpen"
                 ng-click="self.contextMenuOpen = true">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
             </svg>
-            <div class="cdd__contextmenu contextmenu" ng-show="self.contextMenuOpen">
-                <div class="content" ng-click="self.contextMenuOpen = false">
+            <div class="cdd__contextmenu" ng-show="self.contextMenuOpen">
+                <div class="cdd__contextmenu__content" ng-click="self.contextMenuOpen = false">
                     <div class="topline">
                         <svg class="cdd__icon__small__contextmenu clickable"
                             style="--local-primary:black;">
