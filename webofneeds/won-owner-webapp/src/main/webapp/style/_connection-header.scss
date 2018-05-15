@@ -1,5 +1,5 @@
-@import 'sizing-utils';
-@import 'square-image';
+@import "sizing-utils";
+@import "square-image";
 
 won-connection-header {
   color: black;
@@ -22,14 +22,18 @@ won-connection-header {
       position: absolute;
     }
 
-    .ch__icon__ownneed{
+    .ch__icon__ownneed {
       z-index: 1;
     }
 
     .ch__icon__theirneed {
       z-index: 2;
       //clip-path: polygon(100% 0, 100% 100%, 0 100%); //this polygon cuts diagonally
-      clip-path: polygon(105% -5%,105% 105%,-5% 105%); //this polygon cuts diagonally with a little "padding" to reduce artifact due to clipping
+      clip-path: polygon(
+        105% -5%,
+        105% 105%,
+        -5% 105%
+      ); //this polygon cuts diagonally with a little "padding" to reduce artifact due to clipping
       //clip-path: polygon(80% 0, 100% 0, 100% 100%, 20% 100%); //this polygon leaves some "padding" before cutting
     }
   }

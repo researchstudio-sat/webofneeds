@@ -1,8 +1,8 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
-@import 'post-header';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+@import "post-header";
 
 won-matches-flow-item {
   display: inline-block;
@@ -12,7 +12,7 @@ won-matches-flow-item {
   background: $won-light-gray;
   width: 16.25rem;
 
-  @media (max-width: $responsivenessBreakPoint){
+  @media (max-width: $responsivenessBreakPoint) {
     width: 100%;
   }
 
@@ -26,7 +26,13 @@ won-matches-flow-item {
       font-size: $smallFontSize;
     }
 
-    @include speech-bubble-bottom($won-light-gray, $won-line-gray, 0.625rem, $thinBorderWidth, 50%);
+    @include speech-bubble-bottom(
+      $won-light-gray,
+      $won-line-gray,
+      0.625rem,
+      $thinBorderWidth,
+      50%
+    );
   }
 
   .mfi__gallery {
@@ -98,7 +104,7 @@ won-matches-flow-item {
       flex-direction: column;
       font-size: $smallFontSize;
 
-      &__title{
+      &__title {
         font-weight: 700;
       }
 
@@ -112,4 +118,3 @@ won-matches-flow-item {
     border-top: $thinGrayBorder;
   }
 }
-

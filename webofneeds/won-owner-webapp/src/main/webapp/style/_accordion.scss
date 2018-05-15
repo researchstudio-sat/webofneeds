@@ -1,4 +1,4 @@
-@import 'won-config';
+@import "won-config";
 
 won-accordion {
   display: block;
@@ -12,12 +12,12 @@ won-accordion {
     border-spacing: 0.5rem;
     border-top: $thinGrayBorder;
 
-    .header{
+    .header {
       display: table-cell;
       width: 100%;
     }
 
-    .detail{
+    .detail {
       display: table-row;
     }
 

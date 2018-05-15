@@ -1,10 +1,10 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
 
 .settingscontent {
-  @include max-content-width($maxContentWidth, $minContentPadding, 'ac');
+  @include max-content-width($maxContentWidth, $minContentPadding, "ac");
 
   background: white;
 
@@ -12,12 +12,12 @@
     font-weight: 300;
     text-align: left;
 
-    &.withoutPadding{
+    &.withoutPadding {
       padding-bottom: 0;
     }
   }
 
-  .subtitle{
+  .subtitle {
     text-align: left;
     font-size: $smallFontSize;
     color: $won-subtitle-gray;
@@ -29,7 +29,7 @@
       border-right: $thinGrayBorder;
     }
 
-    .flexbuttons{
+    .flexbuttons {
       padding: 1rem 0;
       border-bottom: $thinGrayBorder;
     }
@@ -54,7 +54,7 @@
         padding-bottom: 1rem;
       }
 
-      .title{
+      .title {
         font-weight: 300;
         max-width: 30rem;
         text-align: center;
@@ -79,7 +79,7 @@
     display: block;
     padding: 1rem 0;
 
-    @media (max-width: 45rem){
+    @media (max-width: 45rem) {
       .flexrow {
         flex-direction: column;
       }
@@ -115,7 +115,6 @@
     justify-content: flex-start;
     padding: 0 0 1rem 0;
 
-
     .inputside {
       display: flex;
       flex-direction: column;
@@ -143,7 +142,7 @@
     flex-direction: row;
     justify-content: space-between;
 
-    @media (max-width: 45rem){
+    @media (max-width: 45rem) {
       flex-direction: column;
     }
   }
@@ -183,11 +182,11 @@
     .flexbuttons {
       width: 100%;
 
-      &.top{
+      &.top {
         padding: 0 0 0.5rem 0;
         justify-content: flex-start;
       }
-      &.bottom{
+      &.bottom {
         padding: 1rem 0;
         justify-content: flex-end;
       }
@@ -227,10 +226,10 @@
         }
 
         &:nth-child(odd) {
-          > div{
+          > div {
             border-right: $thinGrayBorder;
 
-            @media (max-width: 58rem){
+            @media (max-width: 58rem) {
               border-right: 0;
             }
           }
@@ -257,7 +256,7 @@
               align-items: flex-end;
               border: $thinGrayBorder;
 
-              &__button{
+              &__button {
                 text-decoration: none;
                 display: flex;
                 align-items: center;
@@ -308,7 +307,7 @@
           padding-bottom: 1rem;
           justify-content: space-between;
 
-          &__name{
+          &__name {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -318,7 +317,7 @@
             }
           }
 
-          &__button{
+          &__button {
             text-decoration: none;
             display: flex;
             align-items: center;

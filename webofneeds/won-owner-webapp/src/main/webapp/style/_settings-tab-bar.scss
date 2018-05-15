@@ -1,8 +1,8 @@
-@import 'flex-layout';
-@import 'title-bar';
+@import "flex-layout";
+@import "title-bar";
 
 .settings-tab-bar {
-  @include title-bar('astb');
+  @include title-bar("astb");
 
   > .astb__inner {
     > .astb__inner__left {

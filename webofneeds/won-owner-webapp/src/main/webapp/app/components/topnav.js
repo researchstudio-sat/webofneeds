@@ -1,29 +1,21 @@
 /**
  * Created by ksinger on 20.08.2015.
  */
-;
-import won from '../won-es6.js';
-import angular from 'angular';
+import won from "../won-es6.js";
+import angular from "angular";
 //import loginComponent from './login.js';
 //import logoutComponent from './logout.js';
-import dropdownModule from './covering-dropdown.js';
-import accountMenuModule from './account-menu.js';
-import { 
-    attach,
-    getIn,
- } from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-import {
-    selectNeedByConnectionUri,
-} from '../selectors.js';
+import dropdownModule from "./covering-dropdown.js";
+import accountMenuModule from "./account-menu.js";
+import { attach, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
+import { selectNeedByConnectionUri } from "../selectors.js";
 
-import * as srefUtils from '../sref-utils.js';
+import * as srefUtils from "../sref-utils.js";
 
 function genTopnavConf() {
-    let template = `
+  let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon" style="--local-primary:white;">
@@ -131,58 +123,70 @@ function genTopnavConf() {
         </div>
     `;
 
-    const serviceDependencies = ['$ngRedux', '$scope', '$sanitize', '$state', /*injections as strings here*/];
+  const serviceDependencies = [
+    "$ngRedux",
+    "$scope",
+    "$sanitize",
+    "$state" /*injections as strings here*/,
+  ];
 
-    class Controller {
-        constructor(/* arguments <- serviceDependencies */){
-            attach(this, serviceDependencies, arguments);
-            Object.assign(this, srefUtils); // bind srefUtils to scope
+  class Controller {
+    constructor(/* arguments <- serviceDependencies */) {
+      attach(this, serviceDependencies, arguments);
+      Object.assign(this, srefUtils); // bind srefUtils to scope
 
-            window.tnc4dbg = this;
+      window.tnc4dbg = this;
 
-            const selectFromState = (state) => {
-                const selectedPostUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'postUri']));
-                const selectedPost = selectedPostUri && state.getIn(["needs", selectedPostUri]);
-                const selectedConnectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
-                const need = selectedConnectionUri && selectNeedByConnectionUri(state, selectedConnectionUri);
-                const selectedConnection = need && need.getIn(["connections", selectedConnectionUri]);
+      const selectFromState = state => {
+        const selectedPostUri = decodeURIComponent(
+          getIn(state, ["router", "currentParams", "postUri"]),
+        );
+        const selectedPost =
+          selectedPostUri && state.getIn(["needs", selectedPostUri]);
+        const selectedConnectionUri = decodeURIComponent(
+          getIn(state, ["router", "currentParams", "connectionUri"]),
+        );
+        const need =
+          selectedConnectionUri &&
+          selectNeedByConnectionUri(state, selectedConnectionUri);
+        const selectedConnection =
+          need && need.getIn(["connections", selectedConnectionUri]);
 
-                return {
-                    themeName: getIn(state, ['config', 'theme', 'name']),
-                    appTitle: getIn(state, ['config', 'theme', 'title']),
-                    adminEmail: getIn(state, ['config', 'theme', 'adminEmail']),
-                    WON: won.WON,
-                    loggedIn: state.getIn(['user', 'loggedIn']),
-                    email: state.getIn(['user','email']),
-                    connectionOrPostDetailOpen: selectedConnection || selectedPost,
-                    toastsArray: state.getIn(['toasts']).toArray(),
-                    connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
-                    reconnecting: state.getIn(['messages', 'reconnecting']),
-                };
-            };
+        return {
+          themeName: getIn(state, ["config", "theme", "name"]),
+          appTitle: getIn(state, ["config", "theme", "title"]),
+          adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
+          WON: won.WON,
+          loggedIn: state.getIn(["user", "loggedIn"]),
+          email: state.getIn(["user", "email"]),
+          connectionOrPostDetailOpen: selectedConnection || selectedPost,
+          toastsArray: state.getIn(["toasts"]).toArray(),
+          connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
+          reconnecting: state.getIn(["messages", "reconnecting"]),
+        };
+      };
 
-            connect2Redux(selectFromState, actionCreators, [], this);
-        }
+      connect2Redux(selectFromState, actionCreators, [], this);
     }
-    Controller.$inject = serviceDependencies;
+  }
+  Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        scope: {},//isolate scope to allow usage within other controllers/components
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        template: template
-    }
+  return {
+    restrict: "E",
+    scope: {}, //isolate scope to allow usage within other controllers/components
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.topnav', [
-        'ngSanitize',
-        //loginComponent,
-        //logoutComponent,
-        dropdownModule,
-        accountMenuModule,
-    ])
-    .directive('wonTopnav', genTopnavConf)
-    .name;
-
+export default angular
+  .module("won.owner.components.topnav", [
+    "ngSanitize",
+    //loginComponent,
+    //logoutComponent,
+    dropdownModule,
+    accountMenuModule,
+  ])
+  .directive("wonTopnav", genTopnavConf).name;

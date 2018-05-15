@@ -1,22 +1,15 @@
 /**
  * Created by ksinger on 01.09.2017.
  */
-;
-import angular from 'angular';
-import {
-    attach,
-    delay,
-    dispatchEvent,
-} from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
+import angular from "angular";
+import { attach, delay, dispatchEvent } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
 
-import * as srefUtils from '../sref-utils.js';
+import * as srefUtils from "../sref-utils.js";
 
 function genLoginConf() {
-    let template = `
+  let template = `
         <form ng-submit="::self.login({email: self.email, password: self.password, rememberMe: self.rememberMe}, {redirectToFeed: false})"
             id="loginForm"
             class="loginForm"
@@ -58,52 +51,60 @@ function genLoginConf() {
             </a>
         </div>`;
 
-    const serviceDependencies = ['$ngRedux', '$scope', '$element', '$state' /*'$routeParams' /*injections as strings here*/];
+  const serviceDependencies = [
+    "$ngRedux",
+    "$scope",
+    "$element",
+    "$state" /*'$routeParams' /*injections as strings here*/,
+  ];
 
-    class Controller {
-        constructor(/* arguments <- serviceDependencies */){
-            attach(this, serviceDependencies, arguments);
-            Object.assign(this, srefUtils); // bind srefUtils to scope
+  class Controller {
+    constructor(/* arguments <- serviceDependencies */) {
+      attach(this, serviceDependencies, arguments);
+      Object.assign(this, srefUtils); // bind srefUtils to scope
 
-            window.lic4dbg = this;
+      window.lic4dbg = this;
 
-            this.email = "";
-            this.password = "";
-            this.rememberMe = false;
+      this.email = "";
+      this.password = "";
+      this.rememberMe = false;
 
-            const login = (state) => ({
-                loggedIn: state.getIn(['user','loggedIn']),
-                loginError: state.getIn(['user','loginError'])
-            });
+      const login = state => ({
+        loggedIn: state.getIn(["user", "loggedIn"]),
+        loginError: state.getIn(["user", "loginError"]),
+      });
 
-            connect2Redux(login, actionCreators, [], this);
-        }
-
-        formKeyUp(event) {
-            this.typedAtLoginCredentials();
-            if(event.keyCode == 13) {
-                this.login({
-                    email: this.email,
-                    password: this.password,
-                    rememberMe: this.rememberMe,
-                }, {
-                    redirectToFeed: false
-                });
-            }
-        }
+      connect2Redux(login, actionCreators, [], this);
     }
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {},
-        template: template
+    formKeyUp(event) {
+      this.typedAtLoginCredentials();
+      if (event.keyCode == 13) {
+        this.login(
+          {
+            email: this.email,
+            password: this.password,
+            rememberMe: this.rememberMe,
+          },
+          {
+            redirectToFeed: false,
+          },
+        );
+      }
     }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {},
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.loginForm', [])
-    .directive('wonLoginForm', genLoginConf)
-    .name;
+export default angular
+  .module("won.owner.components.loginForm", [])
+  .directive("wonLoginForm", genLoginConf).name;

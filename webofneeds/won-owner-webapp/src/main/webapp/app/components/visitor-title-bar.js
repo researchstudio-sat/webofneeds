@@ -1,20 +1,16 @@
 /**
  * Created by ksinger on 20.08.2015.
  */
-;
+import angular from "angular";
+import { attach } from "../utils.js";
+import { labels } from "../won-label-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import { selectOpenPostUri } from "../selectors.js";
+import { actionCreators } from "../actions/actions.js";
 
-import angular from 'angular';
-import { attach, } from '../utils.js';
-import { labels } from '../won-label-utils.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-import { selectOpenPostUri } from '../selectors.js';
-import { actionCreators }  from '../actions/actions.js';
-
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
-    let template = `
+  let template = `
         <nav class="visitor-title-bar">
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
@@ -32,36 +28,38 @@ function genComponentConf() {
         </nav>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            this.labels = labels;
-            window.vtb4dbg = this;
-            const selectFromState = state => {
-                const postUri = selectOpenPostUri(state);
-                const post = state.getIn(["needs", postUri]);
-                return {
-                    postUri,
-                    post,
-                    labels,
-                }
-            };
-            connect2Redux(selectFromState, actionCreators, [], this);
-        }
-        back() { window.history.back() }
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      this.labels = labels;
+      window.vtb4dbg = this;
+      const selectFromState = state => {
+        const postUri = selectOpenPostUri(state);
+        const post = state.getIn(["needs", postUri]);
+        return {
+          postUri,
+          post,
+          labels,
+        };
+      };
+      connect2Redux(selectFromState, actionCreators, [], this);
     }
-    Controller.$inject = serviceDependencies;
+    back() {
+      window.history.back();
+    }
+  }
+  Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "="},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { item: "=" },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.visitorTitleBar', [])
-    .directive('wonVisitorTitleBar', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.visitorTitleBar", [])
+  .directive("wonVisitorTitleBar", genComponentConf).name;

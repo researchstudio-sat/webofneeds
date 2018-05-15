@@ -1,12 +1,12 @@
-@import 'won-config';
-@import 'text';
-@import 'needtextfield';
-@import 'locationpicker';
-@import 'animate';
-@import 'sizing-utils';
-@import 'textfield';
-@import 'create-isseeks';
-@import 'responsiveness-utils';
+@import "won-config";
+@import "text";
+@import "needtextfield";
+@import "locationpicker";
+@import "animate";
+@import "sizing-utils";
+@import "textfield";
+@import "create-isseeks";
+@import "responsiveness-utils";
 
 won-create-post {
   display: grid;
@@ -28,7 +28,6 @@ won-create-post {
     text-align: left;
     min-width: 0;
     align-items: center;
-
 
     &__title {
       grid-area: header_title;

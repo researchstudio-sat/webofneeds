@@ -2,447 +2,578 @@
  * Created by ksinger on 19.02.2016.
  */
 
-import  won from '../won-es6.js';
-import Immutable from 'immutable';
-import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
+import won from "../won-es6.js";
+import Immutable from "immutable";
+import jsonld from "jsonld"; //import *after* the rdfstore to shadow its custom jsonld
 
 import {
-    selectOpenConnectionUri,
-    selectNeedByConnectionUri,
-    selectOpenPostUri,
-    selectRemoteEvents,
-    selectConnection,
-    } from '../selectors.js';
+  selectOpenConnectionUri,
+  selectNeedByConnectionUri,
+  selectOpenPostUri,
+  selectRemoteEvents,
+  selectConnection,
+} from "../selectors.js";
 
 import {
-    is,
-    urisToLookupMap,
-    getIn,
-    get,
-    jsonld2simpleFormat,
-    cloneAsMutable,
-    deepFreeze,
-    delay,
-    } from '../utils.js';
+  is,
+  urisToLookupMap,
+  getIn,
+  get,
+  jsonld2simpleFormat,
+  cloneAsMutable,
+  deepFreeze,
+  delay,
+} from "../utils.js";
+
+import { makeParams } from "../configRouting.js";
+
+import { ensureLoggedIn } from "./account-actions";
+
+import { actionTypes, actionCreators } from "./actions.js";
 
 import {
-    makeParams,
-    } from '../configRouting.js';
+  buildCreateMessage,
+  buildOpenMessage,
+  buildCloseMessage,
+  buildChatMessage,
+  buildRateMessage,
+  buildConnectMessage,
+  buildAdHocConnectMessage,
+  callAgreementsFetch,
+  callAgreementEventFetch,
+} from "../won-message-utils.js";
 
-import {
-    ensureLoggedIn,
-    } from './account-actions';
-
-import {
-    actionTypes,
-    actionCreators,
-    } from './actions.js';
-
-import {
-    buildCreateMessage,
-    buildOpenMessage,
-    buildCloseMessage,
-    buildChatMessage,
-    buildRateMessage,
-    buildConnectMessage,
-    buildAdHocConnectMessage,
-    callAgreementsFetch,
-    callAgreementEventFetch,
-    } from '../won-message-utils.js';
-
-const keySet = deepFreeze( new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"]));
+const keySet = deepFreeze(
+  new Set([
+    "agreementUris",
+    "pendingProposalUris",
+    "cancellationPendingAgreementUris",
+  ]),
+);
 const baseString = deepFreeze("/owner/");
 
-export function connectionsChatMessage(chatMessage, connectionUri, isTTL=false) {
-    return (dispatch, getState) => {
+export function connectionsChatMessage(
+  chatMessage,
+  connectionUri,
+  isTTL = false,
+) {
+  return (dispatch, getState) => {
+    const ownNeed = getState()
+      .get("needs")
+      .filter(need => need.getIn(["connections", connectionUri]))
+      .first();
+    const theirNeedUri = getState().getIn([
+      "needs",
+      ownNeed.get("uri"),
+      "connections",
+      connectionUri,
+      "remoteNeedUri",
+    ]);
+    const theirNeed = getState().getIn(["needs", theirNeedUri]);
+    const theirConnectionUri = ownNeed.getIn([
+      "connections",
+      connectionUri,
+      "remoteConnectionUri",
+    ]);
 
-        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn(["needs", theirNeedUri]);
-        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
-
-        buildChatMessage({
-            chatMessage: chatMessage,
-            connectionUri,
-            ownNeedUri: ownNeed.get("uri"),
-            theirNeedUri: theirNeedUri,
-            ownNodeUri: ownNeed.get("nodeUri"),
-            theirNodeUri: theirNeed.get("nodeUri"),
-            theirConnectionUri,
-            isTTL,
-        })
-            .then(msgData =>
-                Promise.all([won.wonMessageFromJsonLd(msgData.message), msgData.message]))
-            .then(([optimisticEvent, jsonldMessage]) => {
-                // dispatch(actionCreators.messages__send(messageData));
-                dispatch({
-                    type: actionTypes.connections.sendChatMessage,
-                    payload: {
-                        eventUri: optimisticEvent.getMessageUri(),
-                        message: jsonldMessage,
-                        optimisticEvent,
-                    }
-                });
-            })
-            .catch(e => {
-                console.error('Error while processing chat message: ', e);
-                dispatch({
-                    type: actionTypes.connections.sendChatMessageFailed,
-                    payload: {
-                        error: e,
-                        message: e.message,
-                    }
-                });
-            });
-    }
+    buildChatMessage({
+      chatMessage: chatMessage,
+      connectionUri,
+      ownNeedUri: ownNeed.get("uri"),
+      theirNeedUri: theirNeedUri,
+      ownNodeUri: ownNeed.get("nodeUri"),
+      theirNodeUri: theirNeed.get("nodeUri"),
+      theirConnectionUri,
+      isTTL,
+    })
+      .then(msgData =>
+        Promise.all([
+          won.wonMessageFromJsonLd(msgData.message),
+          msgData.message,
+        ]),
+      )
+      .then(([optimisticEvent, jsonldMessage]) => {
+        // dispatch(actionCreators.messages__send(messageData));
+        dispatch({
+          type: actionTypes.connections.sendChatMessage,
+          payload: {
+            eventUri: optimisticEvent.getMessageUri(),
+            message: jsonldMessage,
+            optimisticEvent,
+          },
+        });
+      })
+      .catch(e => {
+        console.error("Error while processing chat message: ", e);
+        dispatch({
+          type: actionTypes.connections.sendChatMessageFailed,
+          payload: {
+            error: e,
+            message: e.message,
+          },
+        });
+      });
+  };
 }
 
 export function connectionsFetch(data) {
-    return dispatch=> {
-        const allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
-        allConnectionsPromise.then(function (connections) {
-            dispatch(actionCreators.needs__connectionsReceived({needUri: data.needUri, connections: connections}));
-        })
-    }
+  return dispatch => {
+    const allConnectionsPromise = won.executeCrawlableQuery(
+      won.queries["getAllConnectionUrisOfNeed"],
+      data.needUri,
+    );
+    allConnectionsPromise.then(function(connections) {
+      dispatch(
+        actionCreators.needs__connectionsReceived({
+          needUri: data.needUri,
+          connections: connections,
+        }),
+      );
+    });
+  };
 }
-
 
 export function connectionsOpen(connectionUri, textMessage) {
-    return async (dispatch, getState) => {
-        const state = getState();
-        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn(["needs", theirNeedUri]);
-        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
+  return async (dispatch, getState) => {
+    const state = getState();
+    const ownNeed = getState()
+      .get("needs")
+      .filter(need => need.getIn(["connections", connectionUri]))
+      .first();
+    const theirNeedUri = getState().getIn([
+      "needs",
+      ownNeed.get("uri"),
+      "connections",
+      connectionUri,
+      "remoteNeedUri",
+    ]);
+    const theirNeed = getState().getIn(["needs", theirNeedUri]);
+    const theirConnectionUri = ownNeed.getIn([
+      "connections",
+      connectionUri,
+      "remoteConnectionUri",
+    ]);
 
-        const openMsg = await buildOpenMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, textMessage);
+    const openMsg = await buildOpenMessage(
+      connectionUri,
+      ownNeed.get("uri"),
+      theirNeedUri,
+      ownNeed.get("nodeUri"),
+      theirNeed.get("nodeUri"),
+      theirConnectionUri,
+      textMessage,
+    );
 
-        const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
+    const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
 
-        dispatch({
-            type: actionTypes.connections.open,
-            payload: {
-                connectionUri,
-                textMessage,
-                eventUri: openMsg.eventUri,
-                message: openMsg.message,
-                optimisticEvent,
-            }
-        });
+    dispatch({
+      type: actionTypes.connections.open,
+      payload: {
+        connectionUri,
+        textMessage,
+        eventUri: openMsg.eventUri,
+        message: openMsg.message,
+        optimisticEvent,
+      },
+    });
 
-        dispatch(actionCreators.router__stateGoCurrent({
-            connectionUri: optimisticEvent.getSender(),
-        }));
-    }
+    dispatch(
+      actionCreators.router__stateGoCurrent({
+        connectionUri: optimisticEvent.getSender(),
+      }),
+    );
+  };
 }
-
 
 export function connectionsConnectAdHoc(theirNeedUri, textMessage) {
-    return (dispatch, getState) => connectAdHoc(theirNeedUri, textMessage, dispatch, getState) // moved to separate function to make transpilation work properly
+  return (dispatch, getState) =>
+    connectAdHoc(theirNeedUri, textMessage, dispatch, getState); // moved to separate function to make transpilation work properly
 }
 function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
-    ensureLoggedIn(dispatch, getState)
-        .then(async () => {
-            const state = getState();
-            const theirNeed = getIn(state, ['needs', theirNeedUri]);
-            const adHocDraft = generateResponseNeedTo(theirNeed);
-            const nodeUri = getIn(state, ['config', 'defaultNodeUri']);
-            const { message, eventUri, needUri } = await buildCreateMessage(adHocDraft, nodeUri);
-            const cnctMsg = buildConnectMessage({
-                ownNeedUri: needUri,
-                theirNeedUri: theirNeedUri,
-                ownNodeUri: nodeUri,
-                theirNodeUri: theirNeed.get("nodeUri"),
-                textMessage: textMessage,
-            });
+  ensureLoggedIn(dispatch, getState).then(async () => {
+    const state = getState();
+    const theirNeed = getIn(state, ["needs", theirNeedUri]);
+    const adHocDraft = generateResponseNeedTo(theirNeed);
+    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const { message, eventUri, needUri } = await buildCreateMessage(
+      adHocDraft,
+      nodeUri,
+    );
+    const cnctMsg = buildConnectMessage({
+      ownNeedUri: needUri,
+      theirNeedUri: theirNeedUri,
+      ownNodeUri: nodeUri,
+      theirNodeUri: theirNeed.get("nodeUri"),
+      textMessage: textMessage,
+    });
 
-            won.wonMessageFromJsonLd(cnctMsg.message)
-                .then(optimisticEvent => {
+    won.wonMessageFromJsonLd(cnctMsg.message).then(optimisticEvent => {
+      // connect action to be dispatched when the
+      // ad hoc need has been created:
+      const connectAction = {
+        type: actionTypes.needs.connect,
+        payload: {
+          eventUri: cnctMsg.eventUri,
+          message: cnctMsg.message,
+          optimisticEvent: optimisticEvent,
+        },
+      };
 
-                    // connect action to be dispatched when the
-                    // ad hoc need has been created:
-                    const connectAction = {
-                        type: actionTypes.needs.connect,
-                        payload: {
-                            eventUri: cnctMsg.eventUri,
-                            message: cnctMsg.message,
-                            optimisticEvent: optimisticEvent,
-                        }
-                    }
+      // register a "stateGoCurrent" action to be dispatched messages-actions
+      // after connectionUri is available
+      dispatch({
+        type: actionTypes.messages.dispatchActionOn.registerSuccessRemote,
+        payload: {
+          eventUri: cnctMsg.eventUri,
+          actionToDispatch: {
+            effect: "stateGoCurrent",
+            connectionUri: "responseEvent::receiverUri",
+            postUri: theirNeed,
+            needUri: needUri,
+          },
+        },
+      });
 
-                    // register a "stateGoCurrent" action to be dispatched messages-actions
-                    // after connectionUri is available
-                    dispatch({
-                        type: actionTypes.messages.dispatchActionOn.registerSuccessRemote,
-                        payload: {
-                            eventUri: cnctMsg.eventUri,
-                            actionToDispatch: {
-                                effect: "stateGoCurrent",
-                                connectionUri: "responseEvent::receiverUri",
-                                postUri: theirNeed,
-                                needUri: needUri,
-                            }
-                        }
-                    })
+      // register the connect action to be dispatched when
+      // need creation is successful
+      dispatch({
+        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
+        payload: {
+          eventUri: eventUri,
+          actionToDispatch: connectAction,
+        },
+      });
 
-                    // register the connect action to be dispatched when
-                    // need creation is successful
-                    dispatch({
-                        type: actionTypes.messages.dispatchActionOn.registerSuccessOwn,
-                        payload: {
-                            eventUri: eventUri,
-                            actionToDispatch: connectAction,
-                        }
-                    })
-
-                    // create the new need
-                    dispatch({
-                        type: actionTypes.needs.create, // TODO custom action
-                        payload: {eventUri, message, needUri, need: adHocDraft}
-                    });
-                });
-        });
-
+      // create the new need
+      dispatch({
+        type: actionTypes.needs.create, // TODO custom action
+        payload: { eventUri, message, needUri, need: adHocDraft },
+      });
+    });
+  });
 }
 
 async function messageGraphToEvent(eventUri, messageGraph) {
+  const framed = await jsonld.promises.frame(messageGraph, {
+    "@id": eventUri,
+    "@context": messageGraph["@context"],
+  });
 
-    const framed = await jsonld.promises.frame(
-        messageGraph,
-        {
-            '@id': eventUri,
-            '@context': messageGraph['@context']
-        }
-    )
+  let event = getIn(framed, ["@graph", 0]);
+  if (event) {
+    event["@context"] = framed["@context"]; // context is needed by jsonld2simpleFormat for expanding prefixes in values
+    event = jsonld2simpleFormat(event);
+  }
 
-    let event = getIn(framed, ['@graph', 0]);
-    if(event) {
-        event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
-        event = jsonld2simpleFormat(event);
-    }
-
-    return event;
+  return event;
 }
 
-
 function generateResponseNeedTo(theirNeed) {
-    const theirSeeks = get(theirNeed, 'seeks');
-    const theirIs = get(theirNeed, 'is');
-    return {
-        is: theirSeeks? generateResponseContentNodeTo(theirSeeks) : undefined,
-        seeks: theirIs? generateResponseContentNodeTo(theirIs) : undefined,
-    };
+  const theirSeeks = get(theirNeed, "seeks");
+  const theirIs = get(theirNeed, "is");
+  return {
+    is: theirSeeks ? generateResponseContentNodeTo(theirSeeks) : undefined,
+    seeks: theirIs ? generateResponseContentNodeTo(theirIs) : undefined,
+  };
 }
 
 function generateResponseContentNodeTo(contentNode) {
-    const theirTitle = get(contentNode, 'title');
-    return {
-        title: 'Re: ' + theirTitle,
-        description: 'Direct response to : ' + theirTitle,
-        //type: reNeedType,
-        tags: cloneAsMutable(get(contentNode, 'tags')),
-        location: cloneAsMutable(get(contentNode, 'location')),
-        noHints: true,
-    };
+  const theirTitle = get(contentNode, "title");
+  return {
+    title: "Re: " + theirTitle,
+    description: "Direct response to : " + theirTitle,
+    //type: reNeedType,
+    tags: cloneAsMutable(get(contentNode, "tags")),
+    location: cloneAsMutable(get(contentNode, "location")),
+    noHints: true,
+  };
 }
 
 export function connectionsClose(connectionUri) {
-    return (dispatch, getState) => {
+  return (dispatch, getState) => {
+    const ownNeed = getState()
+      .get("needs")
+      .filter(need => need.getIn(["connections", connectionUri]))
+      .first();
+    const theirNeedUri = getState().getIn([
+      "needs",
+      ownNeed.get("uri"),
+      "connections",
+      connectionUri,
+      "remoteNeedUri",
+    ]);
+    const theirNeed = getState().getIn(["needs", theirNeedUri]);
+    const theirConnectionUri = ownNeed.getIn([
+      "connections",
+      connectionUri,
+      "remoteConnectionUri",
+    ]);
 
-        const ownNeed = getState().get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-        const theirNeedUri = getState().getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-        const theirNeed = getState().getIn(["needs", theirNeedUri]);
-        const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
-
-        buildCloseMessage(connectionUri, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri)
-            .then(closeMessage => {
-                dispatch(actionCreators.messages__send({
-                    eventUri: closeMessage.eventUri,
-                    message: closeMessage.message
-                }));
-                dispatch({
-                    type: actionTypes.connections.close,
-                    payload: {connectionUri}
-                })
-            });
-    }
+    buildCloseMessage(
+      connectionUri,
+      ownNeed.get("uri"),
+      theirNeedUri,
+      ownNeed.get("nodeUri"),
+      theirNeed.get("nodeUri"),
+      theirConnectionUri,
+    ).then(closeMessage => {
+      dispatch(
+        actionCreators.messages__send({
+          eventUri: closeMessage.eventUri,
+          message: closeMessage.message,
+        }),
+      );
+      dispatch({
+        type: actionTypes.connections.close,
+        payload: { connectionUri },
+      });
+    });
+  };
 }
 
-export function connectionsCloseRemote(message){
-    //Closes the 'remoteConnection' again, if closeConnections(...) only closes the 'own' connection
-    return (dispatch, getState) => {
-        const connectionUri = message.getSender();
-        const remoteNeedUri = message.getSenderNeed();
-        const remoteNode = message.getSenderNode();
-        const ownNeedUri = message.getReceiverNeed();
-        const ownNode = message.getReceiverNode();
+export function connectionsCloseRemote(message) {
+  //Closes the 'remoteConnection' again, if closeConnections(...) only closes the 'own' connection
+  return (dispatch, getState) => {
+    const connectionUri = message.getSender();
+    const remoteNeedUri = message.getSenderNeed();
+    const remoteNode = message.getSenderNode();
+    const ownNeedUri = message.getReceiverNeed();
+    const ownNode = message.getReceiverNode();
 
-        buildCloseMessage(connectionUri, remoteNeedUri, ownNeedUri, ownNode, remoteNode, null)
-            .then(closeMessage => {
-                dispatch(actionCreators.messages__send({
-                    eventUri: closeMessage.eventUri,
-                    message: closeMessage.message
-                }));
-            });
-    }
+    buildCloseMessage(
+      connectionUri,
+      remoteNeedUri,
+      ownNeedUri,
+      ownNode,
+      remoteNode,
+      null,
+    ).then(closeMessage => {
+      dispatch(
+        actionCreators.messages__send({
+          eventUri: closeMessage.eventUri,
+          message: closeMessage.message,
+        }),
+      );
+    });
+  };
 }
 
-export function connectionsRate(connectionUri,rating) {
-    return (dispatch, getState) => {
+export function connectionsRate(connectionUri, rating) {
+  return (dispatch, getState) => {
+    const state = getState();
+    let messageData = null;
 
-        const state = getState();
-        let messageData = null;
+    won
+      .getConnectionWithEventUris(connectionUri)
+      .then(connection => {
+        let msgToRateFor = { connection: connection };
 
-        won.getConnectionWithEventUris(connectionUri)
-            .then(connection=> {
-                let msgToRateFor = {connection: connection};
+        const ownNeed = state
+          .get("needs")
+          .filter(need => need.getIn(["connections", connectionUri]))
+          .first();
+        const theirNeedUri = state.getIn([
+          "needs",
+          ownNeed.get("uri"),
+          "connections",
+          connectionUri,
+          "remoteNeedUri",
+        ]);
+        const theirNeed = state.getIn(["needs", theirNeedUri]);
+        const theirConnectionUri = ownNeed.getIn([
+          "connections",
+          connectionUri,
+          "remoteConnectionUri",
+        ]);
 
-                const ownNeed = state.get("needs").filter(need => need.getIn(["connections", connectionUri])).first();
-                const theirNeedUri = state.getIn(["needs", ownNeed.get("uri"), "connections", connectionUri, "remoteNeedUri"]);
-                const theirNeed = state.getIn(["needs", theirNeedUri]);
-                const theirConnectionUri = ownNeed.getIn(["connections", connectionUri, "remoteConnectionUri"]);
-
-                return buildRateMessage(msgToRateFor, ownNeed.get("uri"), theirNeedUri, ownNeed.get("nodeUri"), theirNeed.get("nodeUri"), theirConnectionUri, rating);
-            }).then(action =>
-                dispatch(
-                    actionCreators.messages__send({
-                        eventUri: action.eventUri,
-                        message: action.message
-                    })
-                )
+        return buildRateMessage(
+          msgToRateFor,
+          ownNeed.get("uri"),
+          theirNeedUri,
+          ownNeed.get("nodeUri"),
+          theirNeed.get("nodeUri"),
+          theirConnectionUri,
+          rating,
         );
-    }
+      })
+      .then(action =>
+        dispatch(
+          actionCreators.messages__send({
+            eventUri: action.eventUri,
+            message: action.message,
+          }),
+        ),
+      );
+  };
 }
 
 export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
-	return (dispatch, getState) => {
-		var url = baseString + 'rest/agreement/getAgreementProtocolUris?connectionUri=' + connectionUri;
-	    var hasChanged = false;
-	    callAgreementsFetch(url)
-        .then(response => {
-            const agreementHeadData = transformDataToSet(response);
-            
-            for(key of keySet) {
-                if(agreementHeadData.hasOwnProperty(key)) {
-                    for(event of agreementHeadData[key]) {
-                    	var chatMessages = getState().getIn(["needs", ownNeedUri, "connections", connectionUri, "messages"]).toArray();
-                    	addAgreementDataToSate(dispatch, chatMessages, ownNeedUri, connectionUri, event, agreementData, key);
-                    	hasChanged = true;
-                    }
-                }
+  return (dispatch, getState) => {
+    var url =
+      baseString +
+      "rest/agreement/getAgreementProtocolUris?connectionUri=" +
+      connectionUri;
+    var hasChanged = false;
+    callAgreementsFetch(url)
+      .then(response => {
+        const agreementHeadData = transformDataToSet(response);
+
+        for (key of keySet) {
+          if (agreementHeadData.hasOwnProperty(key)) {
+            for (event of agreementHeadData[key]) {
+              var chatMessages = getState()
+                .getIn([
+                  "needs",
+                  ownNeedUri,
+                  "connections",
+                  connectionUri,
+                  "messages",
+                ])
+                .toArray();
+              addAgreementDataToSate(
+                dispatch,
+                chatMessages,
+                ownNeedUri,
+                connectionUri,
+                event,
+                agreementData,
+                key,
+              );
+              hasChanged = true;
             }
-            
-            //Remove all retracted/rejected messages
-            if(agreementHeadData["rejectedMessageUris"] || agreementHeadData["retractedMessageUris"]) {
-            	let removalSet = new Set([...agreementHeadData["rejectedMessageUris"], ...agreementHeadData["retractedMessageUris"]]);
-            	
-            	for(uri of removalSet) {
-                	//for(key of keySet) {
-            		var key = "pendingProposalUris";
-            		var data = agreementData;
-                    for(obj of data[key]) {
-                		if(obj.stateUri === uri || obj.headUri === uri) {
-                        	console.log("Message " + uri + " was removed");
-                        	//Update State!
-                        	data[key].delete(obj);
-                        	hasChanged = true;
-                		}
-                    }
-                    if(hasChanged) {
-                    	dispatch({
-                            type: actionCreators.connections__updateAgreementData,
-	                       	 payload: {
-	                   			 connectionUri: connectionUri, 
-	                   			 agreementData: data,
-	               			 }
-                    	})
-                    }
-            	}
+          }
+        }
+
+        //Remove all retracted/rejected messages
+        if (
+          agreementHeadData["rejectedMessageUris"] ||
+          agreementHeadData["retractedMessageUris"]
+        ) {
+          let removalSet = new Set([
+            ...agreementHeadData["rejectedMessageUris"],
+            ...agreementHeadData["retractedMessageUris"],
+          ]);
+
+          for (uri of removalSet) {
+            //for(key of keySet) {
+            var key = "pendingProposalUris";
+            var data = agreementData;
+            for (obj of data[key]) {
+              if (obj.stateUri === uri || obj.headUri === uri) {
+                console.log("Message " + uri + " was removed");
+                //Update State!
+                data[key].delete(obj);
+                hasChanged = true;
+              }
             }
-            
-        }).then(() => {
-        	if(!hasChanged) {
-        		dispatch({
-    				type: actionCreators.connections__setLoading,
-                   	 payload: {
-               			 connectionUri: connectionUri, 
-               			 isLoading: false,
-           			 }
-        		})
-                 
-        	}
-		}).catch(error => {
-			console.error('Error:', error);
-			dispatch({
-				type: actionCreators.connections__setLoading,
-               	 payload: {
-           			 connectionUri: connectionUri, 
-           			 isLoading: false,
-       			 }
-			});
-		})
-	}
+            if (hasChanged) {
+              dispatch({
+                type: actionCreators.connections__updateAgreementData,
+                payload: {
+                  connectionUri: connectionUri,
+                  agreementData: data,
+                },
+              });
+            }
+          }
+        }
+      })
+      .then(() => {
+        if (!hasChanged) {
+          dispatch({
+            type: actionCreators.connections__setLoading,
+            payload: {
+              connectionUri: connectionUri,
+              isLoading: false,
+            },
+          });
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        dispatch({
+          type: actionCreators.connections__setLoading,
+          payload: {
+            connectionUri: connectionUri,
+            isLoading: false,
+          },
+        });
+      });
+  };
 }
 
-export function addAgreementDataToSate(dispatch, chatMessages, ownNeedUri, connectionUri, eventUri, agreementData, key, obj) {
-    return callAgreementEventFetch(ownNeedUri, eventUri)
-    .then(response => {
-        won.wonMessageFromJsonLd(response)
-        .then(msg => {
-            var agreementObject = obj;
+export function addAgreementDataToSate(
+  dispatch,
+  chatMessages,
+  ownNeedUri,
+  connectionUri,
+  eventUri,
+  agreementData,
+  key,
+  obj,
+) {
+  return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
+    won.wonMessageFromJsonLd(response).then(msg => {
+      var agreementObject = obj;
 
-            if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
-                /*if we find out that the receiverneed of the crawled event is actually our
+      if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
+        /*if we find out that the receiverneed of the crawled event is actually our
                  need we will call the method again but this time with the correct eventUri
                  */
-                if(!agreementObject) {
-                	 agreementObject = {
-                             stateUri: undefined,
-                             headUri: undefined,
-                     };
-                }
-                agreementObject.headUri = msg.getMessageUri();
-                addAgreementDataToSate(dispatch, chatMessages, ownNeedUri, connectionUri, msg.getRemoteMessageUri(), agreementData, key, agreementObject);
-            }else {
-                if(!agreementObject) {
-                    agreementObject = {
-                            stateUri: undefined,
-                            headUri: undefined,
-                    };
-                    agreementObject.headUri = msg.getMessageUri();
-                }
-            
-            	agreementObject.stateUri = msg.getMessageUri();
-            	agreementData[key].add(agreementObject);
-            	
-            	
-            	
-            	//Dont load in state again!
-            	var found = false;
-            	for(i = 0; i < chatMessages.size; i++) {
-            		console.log("ChatMessage: " + i, chatMessages[i]);
-            		console.log("ChatMessageSize: ", chatMessages.size);
-            		if(agreementObject.stateUri === chatMessages[i].get("uri")) {
-            			found = true;
-            		}
-            	}
-            	if(!found) {
-            		dispatch({
-            			type: actionCreators.messages__connectionMessageReceived,
-            			msg: msg,
-                          
-            		})
-            	}
-            	 dispatch({
-        			 type: actionCreators.connections__updateAgreementData,
-                	 payload: {
-            			 connectionUri: connectionUri, 
-            			 agreementData: agreementData,
-        			 }
-                 })
-            }  
-        })
-    })
+        if (!agreementObject) {
+          agreementObject = {
+            stateUri: undefined,
+            headUri: undefined,
+          };
+        }
+        agreementObject.headUri = msg.getMessageUri();
+        addAgreementDataToSate(
+          dispatch,
+          chatMessages,
+          ownNeedUri,
+          connectionUri,
+          msg.getRemoteMessageUri(),
+          agreementData,
+          key,
+          agreementObject,
+        );
+      } else {
+        if (!agreementObject) {
+          agreementObject = {
+            stateUri: undefined,
+            headUri: undefined,
+          };
+          agreementObject.headUri = msg.getMessageUri();
+        }
+
+        agreementObject.stateUri = msg.getMessageUri();
+        agreementData[key].add(agreementObject);
+
+        //Dont load in state again!
+        var found = false;
+        for (i = 0; i < chatMessages.size; i++) {
+          console.log("ChatMessage: " + i, chatMessages[i]);
+          console.log("ChatMessageSize: ", chatMessages.size);
+          if (agreementObject.stateUri === chatMessages[i].get("uri")) {
+            found = true;
+          }
+        }
+        if (!found) {
+          dispatch({
+            type: actionCreators.messages__connectionMessageReceived,
+            msg: msg,
+          });
+        }
+        dispatch({
+          type: actionCreators.connections__updateAgreementData,
+          payload: {
+            connectionUri: connectionUri,
+            agreementData: agreementData,
+          },
+        });
+      }
+    });
+  });
 }
 
 /**
@@ -456,51 +587,55 @@ export function addAgreementDataToSate(dispatch, chatMessages, ownNeedUri, conne
  *   events that include the latter.
  * @return {Function}
  */
-export function showLatestMessages(connectionUriParam, numberOfEvents){
-    return (dispatch, getState) => {
-        const state = getState();
-        const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
-        const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
-        const needUri = need && need.get("uri");
-        const connection = connectionUri && selectConnection(state, connectionUri);
-        if (!connectionUri || !connection) return;
+export function showLatestMessages(connectionUriParam, numberOfEvents) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+    const need =
+      connectionUri && selectNeedByConnectionUri(state, connectionUri);
+    const needUri = need && need.get("uri");
+    const connection = connectionUri && selectConnection(state, connectionUri);
+    if (!connectionUri || !connection) return;
 
-        const connectionMessages = connection.get('messages');
-        if (connection.get('isLoading') || !connectionMessages || connectionMessages.size > 0) return; // only start loading once.
+    const connectionMessages = connection.get("messages");
+    if (
+      connection.get("isLoading") ||
+      !connectionMessages ||
+      connectionMessages.size > 0
+    )
+      return; // only start loading once.
 
+    dispatch({
+      type: actionTypes.connections.showLatestMessages,
+      payload: Immutable.fromJS({ connectionUri, isLoading: true }),
+    });
+
+    won
+      .getWonMessagesOfConnection(connectionUri, {
+        requesterWebId: needUri,
+        pagingSize: numOfEvts2pageSize(numberOfEvents),
+        deep: true,
+      })
+      .then(events =>
         dispatch({
-            type: actionTypes.connections.showLatestMessages,
-            payload: Immutable.fromJS({connectionUri, isLoading: true}),
+          type: actionTypes.connections.showLatestMessages,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            events: events,
+          }),
+        }),
+      )
+      .catch(error => {
+        console.error("Failed loading the latest events: ", error);
+        dispatch({
+          type: actionTypes.connections.showLatestMessages,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            error: error,
+          }),
         });
-
-        won.getWonMessagesOfConnection(
-            connectionUri,
-            {
-                requesterWebId: needUri,
-                pagingSize: numOfEvts2pageSize(numberOfEvents),
-                deep: true
-            }
-        )
-            .then(events =>
-                dispatch({
-                    type: actionTypes.connections.showLatestMessages,
-                    payload: Immutable.fromJS({
-                        connectionUri: connectionUri,
-                        events: events,
-                    })
-                })
-        )
-            .catch(error => {
-                console.error('Failed loading the latest events: ', error);
-                dispatch({
-                    type: actionTypes.connections.showLatestMessages,
-                    payload: Immutable.fromJS({
-                        connectionUri: connectionUri,
-                        error: error,
-                    })
-                })
-            });
-    }
+      });
+  };
 }
 
 //TODO replace the won.getEventsOfConnection with this version (and make sure it works for all previous uses).
@@ -546,84 +681,92 @@ export function showLatestMessages(connectionUriParam, numberOfEvents){
  * @return {Function}
  */
 export function showMoreMessages(connectionUriParam, numberOfEvents) {
-    return (dispatch, getState) => {
-        const state = getState();
-        const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
-        const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
-        const needUri = need && need.get("uri");
-        const connection = need && need.getIn(["connections", connectionUri]);
-        const connectionMessages = connection && connection.get("messages");
+  return (dispatch, getState) => {
+    const state = getState();
+    const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
+    const need =
+      connectionUri && selectNeedByConnectionUri(state, connectionUri);
+    const needUri = need && need.get("uri");
+    const connection = need && need.getIn(["connections", connectionUri]);
+    const connectionMessages = connection && connection.get("messages");
 
-        if (connection.get('isLoading')) return; // only start loading once.
+    if (connection.get("isLoading")) return; // only start loading once.
 
-        // determine the oldest loaded event
-        const sortedConnectionMessages = connectionMessages.valueSeq().sort( (msg1, msg2) => msg1.get('date') - msg2.get('date'));
-        const oldestMessage = sortedConnectionMessages.first();
+    // determine the oldest loaded event
+    const sortedConnectionMessages = connectionMessages
+      .valueSeq()
+      .sort((msg1, msg2) => msg1.get("date") - msg2.get("date"));
+    const oldestMessage = sortedConnectionMessages.first();
 
-        const messageHashValue = oldestMessage && oldestMessage
-                .get('uri')
-                .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
+    const messageHashValue =
+      oldestMessage &&
+      oldestMessage.get("uri").replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
+    dispatch({
+      type: actionTypes.connections.showMoreMessages,
+      payload: Immutable.fromJS({ connectionUri, isLoading: true }),
+    });
+
+    won
+      .getWonMessagesOfConnection(connectionUri, {
+        requesterWebId: needUri,
+        pagingSize: numOfEvts2pageSize(numberOfEvents),
+        deep: true,
+        resumebefore: messageHashValue,
+      })
+      .then(events =>
         dispatch({
-            type: actionTypes.connections.showMoreMessages,
-            payload: Immutable.fromJS({connectionUri, isLoading: true}),
+          type: actionTypes.connections.showMoreMessages,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            events: events,
+          }),
+        }),
+      )
+      .catch(error => {
+        console.error("Failed loading more events: ", error);
+        dispatch({
+          type: actionTypes.connections.showMoreMessages,
+          payload: Immutable.fromJS({
+            connectionUri: connectionUri,
+            error: error,
+          }),
         });
-
-        won.getWonMessagesOfConnection(
-            connectionUri,
-            {
-                requesterWebId: needUri,
-                pagingSize: numOfEvts2pageSize(numberOfEvents),
-                deep: true,
-                resumebefore: messageHashValue,
-            }
-        ).then(events =>
-                dispatch({
-                    type: actionTypes.connections.showMoreMessages,
-                    payload: Immutable.fromJS({
-                        connectionUri: connectionUri,
-                        events: events,
-                    })
-                })
-        )
-            .catch(error => {
-                console.error('Failed loading more events: ', error);
-                dispatch({
-                    type: actionTypes.connections.showMoreMessages,
-                    payload: Immutable.fromJS({
-                        connectionUri: connectionUri,
-                        error: error,
-                    })
-                })
-            });
-    }
+      });
+  };
 }
 
 function transformDataToSet(response) {
-    var tmpAgreementData = {
-            agreementUris: new Set(response.agreementUris),
-            pendingProposalUris: new Set(response.pendingProposalUris),
-            pendingProposals: new Set(response.pendingProposals),
-            acceptedCancellationProposalUris: new Set(response.acceptedCancellationProposalUris),
-            cancellationPendingAgreementUris: new Set(response.cancellationPendingAgreementUris),
-            pendingCancellationProposalUris: new Set(response.pendingCancellationProposalUris),
-            cancelledAgreementUris: new Set(response.cancelledAgreementUris),
-            rejectedMessageUris: new Set(response.rejectedMessageUris),
-            retractedMessageUris: new Set(response.retractedMessageUris),
-        }
-    return filterAgreementSet(tmpAgreementData);
+  var tmpAgreementData = {
+    agreementUris: new Set(response.agreementUris),
+    pendingProposalUris: new Set(response.pendingProposalUris),
+    pendingProposals: new Set(response.pendingProposals),
+    acceptedCancellationProposalUris: new Set(
+      response.acceptedCancellationProposalUris,
+    ),
+    cancellationPendingAgreementUris: new Set(
+      response.cancellationPendingAgreementUris,
+    ),
+    pendingCancellationProposalUris: new Set(
+      response.pendingCancellationProposalUris,
+    ),
+    cancelledAgreementUris: new Set(response.cancelledAgreementUris),
+    rejectedMessageUris: new Set(response.rejectedMessageUris),
+    retractedMessageUris: new Set(response.retractedMessageUris),
+  };
+  return filterAgreementSet(tmpAgreementData);
 }
 
-function  filterAgreementSet(tmpAgreementData) {
-    for(prop of tmpAgreementData.cancellationPendingAgreementUris) {
-        if(tmpAgreementData.agreementUris.has(prop)){
-            tmpAgreementData.agreementUris.delete(prop);
-        }
+function filterAgreementSet(tmpAgreementData) {
+  for (prop of tmpAgreementData.cancellationPendingAgreementUris) {
+    if (tmpAgreementData.agreementUris.has(prop)) {
+      tmpAgreementData.agreementUris.delete(prop);
     }
+  }
 
-    return tmpAgreementData;
+  return tmpAgreementData;
 }
 
 function numOfEvts2pageSize(numberOfEvents) {
-    // `*3*` to compensate for the *roughly* 2 additional success events per chat message
-    return numberOfEvents * 3;
+  // `*3*` to compensate for the *roughly* 2 additional success events per chat message
+  return numberOfEvents * 3;
 }

@@ -2,11 +2,10 @@
  * Created by ksinger on 28.08.2015.
  */
 
-;
-import angular from 'angular';
+import angular from "angular";
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <div class="eg__selected" ng-show="self.items">
             <img ng-src="{{self.selectedImgUrl? self.selectedImgUrl : self.items[0]}}" alt="a table"/>
         </div>
@@ -19,28 +18,29 @@ function genComponentConf() {
             </div>
         </div>`;
 
-    class Controller {
-        constructor() {
-            /*TODO maxThumbnails is not reset to default value once it was changed*/
-
-        }
-
-        showImage(src){
-            this.selectedImgUrl = src;
-        }
+  class Controller {
+    constructor() {
+      /*TODO maxThumbnails is not reset to default value once it was changed*/
     }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {maxThumbnails: "=",
-                items: "="},
-        template: template
+    showImage(src) {
+      this.selectedImgUrl = src;
     }
+  }
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      maxThumbnails: "=",
+      items: "=",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.extendedGallery', [])
-    .directive('wonExtendedGallery', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.extendedGallery", [])
+  .directive("wonExtendedGallery", genComponentConf).name;

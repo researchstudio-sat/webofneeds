@@ -1,9 +1,9 @@
-@import 'won-config';
-@import 'flex-layout';
-@import 'title-bar';
+@import "won-config";
+@import "flex-layout";
+@import "title-bar";
 
 .main-tab-bar {
-  @include title-bar('mtb');
+  @include title-bar("mtb");
 
   > .mtb__inner {
     > .mtb__inner__center {

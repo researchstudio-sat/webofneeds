@@ -1,11 +1,10 @@
 /**
  * Created by ksinger on 20.08.2015.
  */
-;
-import angular from 'angular';
+import angular from "angular";
 
 function genLoginConf() {
-    let template = `
+  let template = `
     <div class="avatarimage__header">
         <a class="avatarimage__header__button clickable" ng-click="self.open = false">
             <svg style="--local-primary:var(--won-primary-color);"
@@ -60,20 +59,18 @@ function genLoginConf() {
         <a class="clickable">Upload user image</a>
     </div>`;
 
+  class Controller {}
 
-    class Controller {}
-
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {open: '='},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { open: "=" },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.avatarImageSelector', [])
-    .directive('wonAvatarImageSelector', genLoginConf)
-    .name;
-
+export default angular
+  .module("won.owner.components.avatarImageSelector", [])
+  .directive("wonAvatarImageSelector", genLoginConf).name;

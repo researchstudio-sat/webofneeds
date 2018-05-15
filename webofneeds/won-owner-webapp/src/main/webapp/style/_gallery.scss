@@ -1,5 +1,5 @@
-@import 'won-config';
-@import 'positioning-utils';
+@import "won-config";
+@import "positioning-utils";
 
 %won-gallery__frame {
   border: $thinBorderWidth solid $won-line-gray;
@@ -22,9 +22,10 @@ won-gallery {
 
   $whiteSpace: 1rem;
 
-  &:before, &:after {
+  &:before,
+  &:after {
     /* to prevent margin collapsing of the the selected image */
-    content: ' ';
+    content: " ";
     display: table;
   }
 
@@ -59,11 +60,13 @@ won-gallery {
     justify-content: space-between;
   }
 
-  .won-gallery__back {}
+  .won-gallery__back {
+  }
   .won-gallery__forward {
     transform: rotate(0.5turn);
   }
-  .won-gallery__back, .won-gallery__forward {
+  .won-gallery__back,
+  .won-gallery__forward {
     @include fixed-height(1.8rem);
     // assuming there's no icons that are wider than tall.
     // this assumption has to be made, to prevent chrome

@@ -1,47 +1,38 @@
+import angular from "angular";
+import inviewModule from "angular-inview";
 
-;
-
-import angular from 'angular';
-import inviewModule from 'angular-inview';
-
-import won from '../won-es6.js';
-import jld from 'jsonld';
-import Immutable from 'immutable';
-import squareImageModule from './square-image.js';
-import labelledHrModule from './labelled-hr.js';
+import won from "../won-es6.js";
+import jld from "jsonld";
+import Immutable from "immutable";
+import squareImageModule from "./square-image.js";
+import labelledHrModule from "./labelled-hr.js";
+import { relativeTime } from "../won-label-utils.js";
+import { connect2Redux } from "../won-utils.js";
 import {
-    relativeTime,
-} from '../won-label-utils.js'
+  attach,
+  delay,
+  get,
+  getIn,
+  deepFreeze,
+  dispatchEvent,
+} from "../utils.js";
 import {
-    connect2Redux,
-} from '../won-utils.js';
+  buildProposalMessage,
+  buildModificationMessage,
+} from "../won-message-utils.js";
+import { actionCreators } from "../actions/actions.js";
 import {
-    attach,
-    delay,
-    get,
-    getIn,
-    deepFreeze,
-    dispatchEvent,
-} from '../utils.js'
-import {
-	buildProposalMessage,
-	buildModificationMessage,
-} from '../won-message-utils.js';
-import {
-    actionCreators
-}  from '../actions/actions.js';
-import {
-    selectOpenConnectionUri,
-    selectNeedByConnectionUri,
-} from '../selectors.js';
-import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
+  selectOpenConnectionUri,
+  selectNeedByConnectionUri,
+} from "../selectors.js";
+import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
-const serviceDependencies = ['$ngRedux', '$scope', '$element'];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <won-square-image
             title="self.theirNeed.get('title')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
@@ -192,70 +183,88 @@ function genComponentConf() {
         </div>
     `;
 
+  class Controller {
+    constructor(/* arguments = dependency injections */) {
+      attach(this, serviceDependencies, arguments);
+      this.relativeTime = relativeTime;
+      this.clicked = false;
+      this.showDetail = false;
 
+      window.cmsg4dbg = this;
 
-    class Controller {
-        constructor(/* arguments = dependency injections */) {
-            attach(this, serviceDependencies, arguments);
-            this.relativeTime = relativeTime;
-            this.clicked = false;
-            this.showDetail = false;
-            
-            window.cmsg4dbg = this;
-            
-            const self = this;
+      const self = this;
 
-            self.noTextPlaceholder = 
-                        '«This message couldn\'t be displayed as it didn\'t contain text! ' +
-                        'Click on the \"Show raw RDF data\"-button in ' +
-                        'the main-menu on the right side of the navigationbar to see the \"raw\" message-data.»';
+      self.noTextPlaceholder =
+        "«This message couldn't be displayed as it didn't contain text! " +
+        'Click on the "Show raw RDF data"-button in ' +
+        'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
 
-            const selectFromState = state => {
-                /*
+      const selectFromState = state => {
+        /*
                 const connectionUri = selectOpenConnectionUri(state);
                 */
-                
-                const ownNeed = this.connectionUri && selectNeedByConnectionUri(state, this.connectionUri);
-                const connection = ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
-                const chatMessages = connection && connection.get("messages");
-                const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
-                const message = connection && this.messageUri ? 
-                    getIn(connection, ["messages", this.messageUri]) :
-                    Immutable.Map();
 
-                let text = undefined;
-                if(chatMessages && message && (message.get("isProposeMessage") || message.get("isProposeToCancel"))) {
-                	const clauses = message.get("clauses");
-                	//TODO: delete me
-                	//console.log("clauses: " + clauses);
-                	
-                	//TODO: Array from clauses
-                	//now just one message proposed at a time
-                	text = this.getClausesText(chatMessages, message, clauses);
-                }
-                    
-                return {
-                    ownNeed,
-                    theirNeed,
-                    connection,
-                    message,
-                    isRelevant: message.get('isRelevant')? !this.hideOption : false,
-                    text: text? text : message? message.get("text") : undefined, 
-                    contentGraphs: get(message, 'contentGraphs') || Immutable.List(),
-                    contentGraphTrigPrefixes: getIn(message, ['contentGraphTrig', 'prefixes']),
-                    contentGraphTrig: getIn(message, ['contentGraphTrig', 'body']),
-                    lastUpdateTime: state.get('lastUpdateTime'),
-                    shouldShowRdf: state.get('showRdf'),
-                    allowProposals: connection && connection.get("state") === won.WON.Connected && message.get('text'), //allow showing details only when the connection is already present
-                    //isLoading: isLoading,
-                }
-            };
+        const ownNeed =
+          this.connectionUri &&
+          selectNeedByConnectionUri(state, this.connectionUri);
+        const connection =
+          ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
+        const chatMessages = connection && connection.get("messages");
+        const theirNeed =
+          connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
+        const message =
+          connection && this.messageUri
+            ? getIn(connection, ["messages", this.messageUri])
+            : Immutable.Map();
 
-            connect2Redux(selectFromState, actionCreators, ['self.connectionUri', 'self.messageUri'], this);
+        let text = undefined;
+        if (
+          chatMessages &&
+          message &&
+          (message.get("isProposeMessage") || message.get("isProposeToCancel"))
+        ) {
+          const clauses = message.get("clauses");
+          //TODO: delete me
+          //console.log("clauses: " + clauses);
 
-            // gotta do this via a $watch, as the whole message parsing before 
-            // this point happens synchronously but jsonLdToTrig needs to be async.
-            /*
+          //TODO: Array from clauses
+          //now just one message proposed at a time
+          text = this.getClausesText(chatMessages, message, clauses);
+        }
+
+        return {
+          ownNeed,
+          theirNeed,
+          connection,
+          message,
+          isRelevant: message.get("isRelevant") ? !this.hideOption : false,
+          text: text ? text : message ? message.get("text") : undefined,
+          contentGraphs: get(message, "contentGraphs") || Immutable.List(),
+          contentGraphTrigPrefixes: getIn(message, [
+            "contentGraphTrig",
+            "prefixes",
+          ]),
+          contentGraphTrig: getIn(message, ["contentGraphTrig", "body"]),
+          lastUpdateTime: state.get("lastUpdateTime"),
+          shouldShowRdf: state.get("showRdf"),
+          allowProposals:
+            connection &&
+            connection.get("state") === won.WON.Connected &&
+            message.get("text"), //allow showing details only when the connection is already present
+          //isLoading: isLoading,
+        };
+      };
+
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.connectionUri", "self.messageUri"],
+        this,
+      );
+
+      // gotta do this via a $watch, as the whole message parsing before
+      // this point happens synchronously but jsonLdToTrig needs to be async.
+      /*
             this.$scope.$watch(
                 () => this.contentGraphs,
                 (newVal, oldVal) => {
@@ -269,157 +278,216 @@ function genComponentConf() {
                 }
             )
             */
-        }
-        
-        getClausesText(chatMessages, message, clausesUri) {
-        	for(msg of Array.from(chatMessages)) {
-    			if(msg[1].get("uri") === clausesUri || msg[1].get("remoteUri") === clausesUri) {
-    				//Get through the caluses "chain" and add the original text
-    				if(!msg[1].get("clauses")) {
-    					return msg[1].get("text");
-    				} else {
-    					//TODO: Mutliple clauses
-    					return this.getClausesText(chatMessages, msg, msg[1].get("clauses"));
-    				}
-    				
-    			}
-        	}
-        }
-
-        markAsRead(){
-            if(this.message && this.message.get("unread")){
-                const payload = {
-                    messageUri: this.message.get("uri"),
-                    connectionUri: this.connectionUri,
-                    needUri: this.ownNeed.get("uri")
-                };
-
-                const tmp_messages__markAsRead = this.messages__markAsRead;
-
-                setTimeout(function(){
-                    tmp_messages__markAsRead(payload);
-                }, MESSAGE_READ_TIMEOUT);
-            }
-        }
-        
-        markAsRelevant(relevant){
-        	const payload = {
-    			 messageUri: this.message.get("uri"),
-                 connectionUri: this.connectionUri,
-                 needUri: this.ownNeed.get("uri"),
-                 relevant: relevant,
-        	}
-                	
-        	this.messages__markAsRelevant(payload);
-        }
-        
-        sendProposal(){
-        	this.clicked = true;
-        	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
-        	const trimmedMsg = buildProposalMessage(uri, "proposes", this.message.get("text"));
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	        	
-        	this.onSendProposal({proposalUri: uri});
-        }
-        
-        acceptProposal() {
-        	this.clicked = true;
-        	const msg = ("Accepted proposal : " + this.message.get("remoteUri"));
-        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.markAsRelevant(false);
-        	this.onRemoveData({proposalUri: this.messageUri});
-        }
-        
-        proposeToCancel() {
-        	this.clicked = true;
-        	const uri = this.isOwn? this.message.get("uri") : this.message.get("remoteUri");
-        	const msg = ("Propose to cancel agreement : " + uri);
-        	const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.onUpdate();
-        }
-        
-        acceptProposeToCancel() {
-        	this.clicked = true;
-        	const msg = ("Accepted propose to cancel : " + this.message.get("remoteUri"));
-        	const trimmedMsg = buildProposalMessage(this.message.get("remoteUri"), "accepts", msg);
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-
-        	this.markAsRelevant(false);
-        	this.onRemoveData({proposalUri: this.messageUri});
-        }
-        
-        retractMessage() {
-        	this.clicked = true;
-        	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
-        	const trimmedMsg = buildModificationMessage(uri, "retracts", ("Retract: " + this.text));
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.markAsRelevant(false);
-        	this.onUpdate();
-        }
-        
-        rejectMessage() {
-        	this.clicked = true;
-        	const uri = this.message.get("remoteUri")? this.message.get("remoteUri") : this.message.get("uri");
-        	const trimmedMsg = buildProposalMessage(uri, "rejects",  ("Reject: " + this.text));
-        	this.connections__sendChatMessage(trimmedMsg, this.connectionUri, isTTL=true);
-        	
-        	this.markAsRelevant(false);
-        	this.onUpdate();  
-        }
-
-        rdfToString(jsonld){
-        	return JSON.stringify(jsonld);
-        }
-        
-        isNormalMessage() {
-        	return !(this.message.get('isProposeMessage') ||
-					this.message.get('isAcceptMessage') || 
-					this.message.get('isProposeToCancel') ||
-					this.message.get('isRetractMessage') ||
-					this.message.get('isRejectMessage'));
-        }
-
-        encodeParam(param) {
-            var encoded = encodeURIComponent(param);
-            // console.log("encoding: ",param);
-            // console.log("encoded: ",encoded)
-            return encoded;
-        }
-
-        
     }
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: { 
-            messageUri: '=',
-            connectionUri: '=',
-            hideOption: '=',
-            /*
+    getClausesText(chatMessages, message, clausesUri) {
+      for (msg of Array.from(chatMessages)) {
+        if (
+          msg[1].get("uri") === clausesUri ||
+          msg[1].get("remoteUri") === clausesUri
+        ) {
+          //Get through the caluses "chain" and add the original text
+          if (!msg[1].get("clauses")) {
+            return msg[1].get("text");
+          } else {
+            //TODO: Mutliple clauses
+            return this.getClausesText(
+              chatMessages,
+              msg,
+              msg[1].get("clauses"),
+            );
+          }
+        }
+      }
+    }
+
+    markAsRead() {
+      if (this.message && this.message.get("unread")) {
+        const payload = {
+          messageUri: this.message.get("uri"),
+          connectionUri: this.connectionUri,
+          needUri: this.ownNeed.get("uri"),
+        };
+
+        const tmp_messages__markAsRead = this.messages__markAsRead;
+
+        setTimeout(function() {
+          tmp_messages__markAsRead(payload);
+        }, MESSAGE_READ_TIMEOUT);
+      }
+    }
+
+    markAsRelevant(relevant) {
+      const payload = {
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        relevant: relevant,
+      };
+
+      this.messages__markAsRelevant(payload);
+    }
+
+    sendProposal() {
+      this.clicked = true;
+      const uri = this.message.get("remoteUri")
+        ? this.message.get("remoteUri")
+        : this.message.get("uri");
+      const trimmedMsg = buildProposalMessage(
+        uri,
+        "proposes",
+        this.message.get("text"),
+      );
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        this.connectionUri,
+        (isTTL = true),
+      );
+
+      this.onSendProposal({ proposalUri: uri });
+    }
+
+    acceptProposal() {
+      this.clicked = true;
+      const msg = "Accepted proposal : " + this.message.get("remoteUri");
+      const trimmedMsg = buildProposalMessage(
+        this.message.get("remoteUri"),
+        "accepts",
+        msg,
+      );
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        this.connectionUri,
+        (isTTL = true),
+      );
+
+      this.markAsRelevant(false);
+      this.onRemoveData({ proposalUri: this.messageUri });
+    }
+
+    proposeToCancel() {
+      this.clicked = true;
+      const uri = this.isOwn
+        ? this.message.get("uri")
+        : this.message.get("remoteUri");
+      const msg = "Propose to cancel agreement : " + uri;
+      const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        this.connectionUri,
+        (isTTL = true),
+      );
+
+      this.onUpdate();
+    }
+
+    acceptProposeToCancel() {
+      this.clicked = true;
+      const msg =
+        "Accepted propose to cancel : " + this.message.get("remoteUri");
+      const trimmedMsg = buildProposalMessage(
+        this.message.get("remoteUri"),
+        "accepts",
+        msg,
+      );
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        this.connectionUri,
+        (isTTL = true),
+      );
+
+      this.markAsRelevant(false);
+      this.onRemoveData({ proposalUri: this.messageUri });
+    }
+
+    retractMessage() {
+      this.clicked = true;
+      const uri = this.message.get("remoteUri")
+        ? this.message.get("remoteUri")
+        : this.message.get("uri");
+      const trimmedMsg = buildModificationMessage(
+        uri,
+        "retracts",
+        "Retract: " + this.text,
+      );
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        this.connectionUri,
+        (isTTL = true),
+      );
+
+      this.markAsRelevant(false);
+      this.onUpdate();
+    }
+
+    rejectMessage() {
+      this.clicked = true;
+      const uri = this.message.get("remoteUri")
+        ? this.message.get("remoteUri")
+        : this.message.get("uri");
+      const trimmedMsg = buildProposalMessage(
+        uri,
+        "rejects",
+        "Reject: " + this.text,
+      );
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        this.connectionUri,
+        (isTTL = true),
+      );
+
+      this.markAsRelevant(false);
+      this.onUpdate();
+    }
+
+    rdfToString(jsonld) {
+      return JSON.stringify(jsonld);
+    }
+
+    isNormalMessage() {
+      return !(
+        this.message.get("isProposeMessage") ||
+        this.message.get("isAcceptMessage") ||
+        this.message.get("isProposeToCancel") ||
+        this.message.get("isRetractMessage") ||
+        this.message.get("isRejectMessage")
+      );
+    }
+
+    encodeParam(param) {
+      var encoded = encodeURIComponent(param);
+      // console.log("encoding: ",param);
+      // console.log("encoded: ",encoded)
+      return encoded;
+    }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      messageUri: "=",
+      connectionUri: "=",
+      hideOption: "=",
+      /*
              * Usage:
              *  on-update="::myCallback(draft)"
              */
-            onUpdate: '&',
-            onSendProposal: '&',
-            onRemoveData: '&',
-        },
-        template: template,
-    }
+      onUpdate: "&",
+      onSendProposal: "&",
+      onRemoveData: "&",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.connectionMessage', [
+export default angular
+  .module("won.owner.components.connectionMessage", [
     squareImageModule,
     labelledHrModule,
-    inviewModule.name
-])
-    .directive('wonConnectionMessage', genComponentConf)
-    .name;
+    inviewModule.name,
+  ])
+  .directive("wonConnectionMessage", genComponentConf).name;

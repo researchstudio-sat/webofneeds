@@ -2,12 +2,10 @@
  * Created by ksinger on 23.08.2017.
  */
 
-;
-
-import angular from 'angular';
+import angular from "angular";
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <nav class="signup-title-bar" ng-cloak ng-show="{{true}}">
             <div class="sutb__inner">
                 <a class="sutb__inner__left clickable" ng-click="self.back()">
@@ -21,23 +19,25 @@ function genComponentConf() {
         </nav>
     `;
 
-    class Controller {
-        constructor() {
-            //this.testVar = 42;
-        }
-        back() { window.history.back() }
+  class Controller {
+    constructor() {
+      //this.testVar = 42;
     }
+    back() {
+      window.history.back();
+    }
+  }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        template: template,
-        bindToController: true, //scope-bindings -> ctrl
-        scope: { }
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    template: template,
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {},
+  };
 }
 
-export default angular.module('won.owner.components.signupTitleBar', [])
-    .directive('wonSignupTitleBar', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.signupTitleBar", [])
+  .directive("wonSignupTitleBar", genComponentConf).name;

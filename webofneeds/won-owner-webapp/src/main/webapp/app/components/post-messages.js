@@ -1,65 +1,64 @@
-;
+import won from "../won-es6.js";
+import angular from "angular";
+import jld from "jsonld";
+import Immutable from "immutable";
+import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
+import connectionMessageModule from "./connection-message.js";
+import connectionAgreementModule from "./connection-agreement.js";
+import connectionHeaderModule from "./connection-header.js";
+import labelledHrModule from "./labelled-hr.js";
+import connectionContextDropdownModule from "./connection-context-dropdown.js";
 
-import won from '../won-es6.js';
-import angular from 'angular';
-import jld from 'jsonld';
-import Immutable from 'immutable';
-import chatTextFieldSimpleModule from './chat-textfield-simple.js';
-import connectionMessageModule from './connection-message.js';
-import connectionAgreementModule from './connection-agreement.js';
-import connectionHeaderModule from './connection-header.js';
-import labelledHrModule from './labelled-hr.js';
-import connectionContextDropdownModule from './connection-context-dropdown.js';
+import {} from "../won-label-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import {
+  attach,
+  delay,
+  deepFreeze,
+  clone,
+  checkHttpStatus,
+  dispatchEvent,
+} from "../utils.js";
+import {
+  callAgreementsFetch,
+  callAgreementEventFetch,
+} from "../won-message-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import {
+  selectOpenConnectionUri,
+  selectNeedByConnectionUri,
+} from "../selectors.js";
+import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 
-import {
-    } from '../won-label-utils.js'
-import {
-    connect2Redux,
-    } from '../won-utils.js';
-import {
-    attach,
-    delay,
-    deepFreeze,
-    clone,
-    checkHttpStatus,
-    dispatchEvent,
-    } from '../utils.js'
-import {
-    callAgreementsFetch,
-    callAgreementEventFetch,
-    } from '../won-message-utils.js';
-import {
-    actionCreators
-    }  from '../actions/actions.js';
-import {
-    selectOpenConnectionUri,
-    selectNeedByConnectionUri,
-    } from '../selectors.js';
-import autoresizingTextareaModule from '../directives/textarea-autogrow.js';
-
-const serviceDependencies = ['$ngRedux', '$scope', '$element'];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 const declarations = deepFreeze({
-    proposal: "proposal",
-    agreement: "agreement",
-    proposeToCancel: "proposeToCancel",
+  proposal: "proposal",
+  agreement: "agreement",
+  proposeToCancel: "proposeToCancel",
 });
 
-const keySet = deepFreeze( new Set(["agreementUris", "pendingProposalUris", "cancellationPendingAgreementUris"]));
+const keySet = deepFreeze(
+  new Set([
+    "agreementUris",
+    "pendingProposalUris",
+    "cancellationPendingAgreementUris",
+  ]),
+);
 
 const defaultAgreementData = deepFreeze({
-    agreementUris: new Set(),
-    pendingProposalUris: new Set(),
-    pendingProposals: new Set(),
-    acceptedCancellationProposalUris: new Set(),
-    cancellationPendingAgreementUris: new Set(),
-    pendingCancellationProposalUris: new Set(),
-    cancelledAgreementUris: new Set(),
-    rejectedMessageUris: new Set(),
-    retractedMessageUris: new Set(),
+  agreementUris: new Set(),
+  pendingProposalUris: new Set(),
+  pendingProposals: new Set(),
+  acceptedCancellationProposalUris: new Set(),
+  cancellationPendingAgreementUris: new Set(),
+  pendingCancellationProposalUris: new Set(),
+  cancelledAgreementUris: new Set(),
+  rejectedMessageUris: new Set(),
+  retractedMessageUris: new Set(),
 });
 function genComponentConf() {
-    let template = `
+  let template = `
         <div class="pm__header">
             <a class="pm__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
@@ -218,501 +217,576 @@ function genComponentConf() {
         </div>
     `;
 
+  class Controller {
+    constructor(/* arguments = dependency injections */) {
+      attach(this, serviceDependencies, arguments);
+      window.pm4dbg = this;
 
+      this.reload = true;
 
-    class Controller {
-        constructor(/* arguments = dependency injections */) {
-            attach(this, serviceDependencies, arguments);
-            window.pm4dbg = this;
+      this.showLoadingInfo = false;
 
+      const self = this;
+      this.baseString = "/owner/";
+      this.declarations = clone(declarations);
 
+      this.agreementHeadData = this.cloneDefaultData();
+      //this.agreementStateData = this.cloneDefaultStateData();
+      this.agreementLoadingData = this.cloneDefaultStateData();
 
-            this.reload = true;
+      //this.showAgreementData = false;
 
-            this.showLoadingInfo = false;
+      this.rdfTextfieldHelpText =
+        "Expects valid turtle. " +
+        `<${won.WONMSG.uriPlaceholder.event}> will ` +
+        "be replaced by the uri generated for this message. " +
+        "Use it, so your TTL can be found when parsing the messages. " +
+        "See `won.defaultTurtlePrefixes` " +
+        "for prefixes that will be added automatically. E.g." +
+        `\`<${
+          won.WONMSG.uriPlaceholder.event
+        }> won:hasTextMessage "hello world!". \``;
 
-            const self = this;
-            this.baseString = "/owner/";
-            this.declarations = clone(declarations);
+      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
 
-            this.agreementHeadData = this.cloneDefaultData();
-            //this.agreementStateData = this.cloneDefaultStateData();
-            this.agreementLoadingData = this.cloneDefaultStateData();
+      const selectFromState = state => {
+        const connectionUri = selectOpenConnectionUri(state);
+        const ownNeed = selectNeedByConnectionUri(state, connectionUri);
+        const connection =
+          ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
-            
-            //this.showAgreementData = false;
+        const theirNeed =
+          connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
+        const chatMessages = connection && connection.get("messages");
+        const allLoaded =
+          chatMessages &&
+          chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
 
-            
+        let agreementStateData = connection && connection.get("agreementData");
 
-            this.rdfTextfieldHelpText = 'Expects valid turtle. ' +
-                `<${won.WONMSG.uriPlaceholder.event}> will ` +
-                'be replaced by the uri generated for this message. ' +
-                'Use it, so your TTL can be found when parsing the messages. ' + 
-                'See \`won.defaultTurtlePrefixes\` ' +
-                'for prefixes that will be added automatically. E.g.' +
-                `\`<${won.WONMSG.uriPlaceholder.event}> won:hasTextMessage "hello world!". \``;
-            
-            
-            this.scrollContainer().addEventListener('scroll', e => this.onScroll(e));
-
-            const selectFromState = state => {
-                const connectionUri = selectOpenConnectionUri(state);
-                const ownNeed = selectNeedByConnectionUri(state, connectionUri);
-                const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-
-                const theirNeed = connection && state.getIn(["needs", connection.get('remoteNeedUri')]);
-                const chatMessages = connection && connection.get("messages");
-                const allLoaded = chatMessages && chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
-
-                
-                let agreementStateData = connection && connection.get('agreementData');
-                
-                if(agreementStateData && !agreementStateData.agreementUris) {
-                	agreementStateData = this.cloneDefaultStateData();
-                }
-                
-                //Filter already accepted proposals
-                let sortedMessages = chatMessages && chatMessages.toArray();
-                if(sortedMessages) {
-                    var msgSet = new Set(sortedMessages);
-
-                	// TODO: Optimization
-                	for(msg of msgSet) {
-                		if(msg.get("isProposeMessage") || msg.get("isProposeToCancel") || msg.get("isAcceptMessage")) {
-	                		if(msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-	                			msg.hide = true;
-	                			this.messages__markAsRelevant(
-	                				payload = {
-                 		    			 messageUri: msg.get('uri'),
-                 		                 connectionUri: connectionUri,
-                 		                 needUri: ownNeed.get('uri'),
-                 		                 relevant: false,
-	                				}
-	                			)
-	                		}
-                		} else if(this.agreementHeadData.retractedMessageUris.size) {
-                			//TODO: filter out retracted messages faster
-                			if(msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                				msg.hide = true;
-	                			this.messages__markAsRelevant(
-	                				payload = {
-                 		    			 messageUri: msg.get('uri'),
-                 		                 connectionUri: connectionUri,
-                 		                 needUri: ownNeed.get('uri'),
-                 		                 relevant: false,
-	                				}
-	                			)
-                			}
-                		}               		
-                	}
-                	
-                	sortedMessages = Array.from(msgSet);
-	            	sortedMessages.sort(function(a,b) {
-	                    return a.get("date").getTime() - b.get("date").getTime();
-	                });
-                }
-                if(this.reload && connection) {
-                    this.getAgreementData(connection, ownNeed)
-                	this.reload = false;
-                }
-
-                return {
-                    ownNeed,
-                    theirNeed,
-                    connectionUri,
-                    connection,
-                    agreementStateData,
-                    chatMessages: sortedMessages,
-                    isLoading: connection && connection.get('isLoading'),
-                    showAgreementData: connection && connection.get('showAgreementData'),
-                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
-                    isSentRequest: connection && connection.get('state') === won.WON.RequestSent,
-                    isReceivedRequest: connection && connection.get('state') === won.WON.RequestReceived,
-                    isConnected: connection && connection.get('state') === won.WON.Connected,
-                    debugmode: won.debugmode,
-                    shouldShowRdf: state.get('showRdf'),
-                    // if the connect-message is here, everything else should be as well
-                    allLoaded,
-                }
-            };
-
-            connect2Redux(selectFromState, actionCreators, [], this);
-
-            this.snapToBottom();
-
-            this.$scope.$watchGroup(
-                ['self.connection'],
-                () => this.ensureMessagesAreLoaded()
-            );
-            
-            this.$scope.$watch(
-                () => (this.chatMessages && this.chatMessages.length), // trigger if there's messages added (or removed)
-                () => delay(0).then(() =>
-                        // scroll to bottom directly after rendering, if snapped
-                        this.updateScrollposition()
-                )
-            );
+        if (agreementStateData && !agreementStateData.agreementUris) {
+          agreementStateData = this.cloneDefaultStateData();
         }
 
-        ensureMessagesAreLoaded() {
-            delay(0).then(() => {
-                // make sure latest messages are loaded
-                const INITIAL_MESSAGECOUNT = 15;
-                if ( this.connection && !this.connection.get('isLoading') && !(this.allLoaded || this.connection.get('messages').size > 0)) {
-                    this.connections__showLatestMessages(this.connection.get('uri'), INITIAL_MESSAGECOUNT);
-                }
-            })
-        }
+        //Filter already accepted proposals
+        let sortedMessages = chatMessages && chatMessages.toArray();
+        if (sortedMessages) {
+          var msgSet = new Set(sortedMessages);
 
-        loadPreviousMessages() {
-            delay(0).then(() => {
-                const MORE_MESSAGECOUNT = 5;
-                if ( this.connection && !this.connection.get('isLoading') ) {
-                    this.connections__showMoreMessages(this.connection.get('uri'), MORE_MESSAGECOUNT);
-                }
-            });
-
-        }
-
-        snapToBottom() {
-            this._snapBottom = true;
-            this.scrollToBottom();
-        }
-        unsnapFromBottom() {
-            this._snapBottom = false;
-        }
-        updateScrollposition() {
-            if(this._snapBottom) {
-                this.scrollToBottom();
-            }
-        }
-        scrollToBottom() {
-            this._programmaticallyScrolling = true;
-
-            this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
-        }
-        onScroll(e) {
-            if(!this._programmaticallyScrolling) {
-                //only unsnap if the user scrolled themselves
-                this.unsnapFromBottom();
-            }
-
-            const sc = this.scrollContainer();
-            const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
-            if(isAtBottom) {
-                this.snapToBottom();
-            }
-
-            this._programmaticallyScrolling = false
-        }
-        scrollContainerNg() {
-            return angular.element(this.scrollContainer());
-        }
-        scrollContainer() {
-            if(!this._scrollContainer) {
-                this._scrollContainer = this.$element[0].querySelector('.pm__content');
-            }
-            return this._scrollContainer;
-        }
-
-        send(chatMessage, isTTL=false) {
-        	this.setShowAgreementData(false);;
-            const trimmedMsg = chatMessage.trim();
-            if(trimmedMsg) {
-                this.connections__sendChatMessage(
-                    trimmedMsg,
-                    this.connection.get('uri'),
-                    isTTL
+          // TODO: Optimization
+          for (msg of msgSet) {
+            if (
+              msg.get("isProposeMessage") ||
+              msg.get("isProposeToCancel") ||
+              msg.get("isAcceptMessage")
+            ) {
+              if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
+                msg.hide = true;
+                this.messages__markAsRelevant(
+                  (payload = {
+                    messageUri: msg.get("uri"),
+                    connectionUri: connectionUri,
+                    needUri: ownNeed.get("uri"),
+                    relevant: false,
+                  }),
                 );
+              }
+            } else if (this.agreementHeadData.retractedMessageUris.size) {
+              //TODO: filter out retracted messages faster
+              if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
+                msg.hide = true;
+                this.messages__markAsRelevant(
+                  (payload = {
+                    messageUri: msg.get("uri"),
+                    connectionUri: connectionUri,
+                    needUri: ownNeed.get("uri"),
+                    relevant: false,
+                  }),
+                );
+              }
             }
+          }
+
+          sortedMessages = Array.from(msgSet);
+          sortedMessages.sort(function(a, b) {
+            return a.get("date").getTime() - b.get("date").getTime();
+          });
+        }
+        if (this.reload && connection) {
+          this.getAgreementData(connection, ownNeed);
+          this.reload = false;
         }
 
-        showAgreementDataField() {
-            this.getAgreementData();
-            this.showLoadingInfo = true;
-            this.setShowAgreementData(true);
-        }
-        
-        setShowAgreementData(value) {
-        	this.connections__showAgreementData(payload = {connectionUri: this.connectionUri, showAgreementData: value});
-        }
+        return {
+          ownNeed,
+          theirNeed,
+          connectionUri,
+          connection,
+          agreementStateData,
+          chatMessages: sortedMessages,
+          isLoading: connection && connection.get("isLoading"),
+          showAgreementData: connection && connection.get("showAgreementData"),
+          lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
+          isSentRequest:
+            connection && connection.get("state") === won.WON.RequestSent,
+          isReceivedRequest:
+            connection && connection.get("state") === won.WON.RequestReceived,
+          isConnected:
+            connection && connection.get("state") === won.WON.Connected,
+          debugmode: won.debugmode,
+          shouldShowRdf: state.get("showRdf"),
+          // if the connect-message is here, everything else should be as well
+          allLoaded,
+        };
+      };
 
-        agreementDataIsValid() {
-            var aD = this.agreementStateData;
-            if(aD && (aD.agreementUris.size ||aD.pendingProposalUris.size ||aD.cancellationPendingAgreementUris.size)) {
-                return true;
+      connect2Redux(selectFromState, actionCreators, [], this);
+
+      this.snapToBottom();
+
+      this.$scope.$watchGroup(["self.connection"], () =>
+        this.ensureMessagesAreLoaded(),
+      );
+
+      this.$scope.$watch(
+        () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
+        () =>
+          delay(0).then(() =>
+            // scroll to bottom directly after rendering, if snapped
+            this.updateScrollposition(),
+          ),
+      );
+    }
+
+    ensureMessagesAreLoaded() {
+      delay(0).then(() => {
+        // make sure latest messages are loaded
+        const INITIAL_MESSAGECOUNT = 15;
+        if (
+          this.connection &&
+          !this.connection.get("isLoading") &&
+          !(this.allLoaded || this.connection.get("messages").size > 0)
+        ) {
+          this.connections__showLatestMessages(
+            this.connection.get("uri"),
+            INITIAL_MESSAGECOUNT,
+          );
+        }
+      });
+    }
+
+    loadPreviousMessages() {
+      delay(0).then(() => {
+        const MORE_MESSAGECOUNT = 5;
+        if (this.connection && !this.connection.get("isLoading")) {
+          this.connections__showMoreMessages(
+            this.connection.get("uri"),
+            MORE_MESSAGECOUNT,
+          );
+        }
+      });
+    }
+
+    snapToBottom() {
+      this._snapBottom = true;
+      this.scrollToBottom();
+    }
+    unsnapFromBottom() {
+      this._snapBottom = false;
+    }
+    updateScrollposition() {
+      if (this._snapBottom) {
+        this.scrollToBottom();
+      }
+    }
+    scrollToBottom() {
+      this._programmaticallyScrolling = true;
+
+      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
+    }
+    onScroll(e) {
+      if (!this._programmaticallyScrolling) {
+        //only unsnap if the user scrolled themselves
+        this.unsnapFromBottom();
+      }
+
+      const sc = this.scrollContainer();
+      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
+      if (isAtBottom) {
+        this.snapToBottom();
+      }
+
+      this._programmaticallyScrolling = false;
+    }
+    scrollContainerNg() {
+      return angular.element(this.scrollContainer());
+    }
+    scrollContainer() {
+      if (!this._scrollContainer) {
+        this._scrollContainer = this.$element[0].querySelector(".pm__content");
+      }
+      return this._scrollContainer;
+    }
+
+    send(chatMessage, isTTL = false) {
+      this.setShowAgreementData(false);
+      const trimmedMsg = chatMessage.trim();
+      if (trimmedMsg) {
+        this.connections__sendChatMessage(
+          trimmedMsg,
+          this.connection.get("uri"),
+          isTTL,
+        );
+      }
+    }
+
+    showAgreementDataField() {
+      this.getAgreementData();
+      this.showLoadingInfo = true;
+      this.setShowAgreementData(true);
+    }
+
+    setShowAgreementData(value) {
+      this.connections__showAgreementData(
+        (payload = {
+          connectionUri: this.connectionUri,
+          showAgreementData: value,
+        }),
+      );
+    }
+
+    agreementDataIsValid() {
+      var aD = this.agreementStateData;
+      if (
+        aD &&
+        (aD.agreementUris.size ||
+          aD.pendingProposalUris.size ||
+          aD.cancellationPendingAgreementUris.size)
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    getAgreementData(connection) {
+      if (connection) {
+        this.connection = connection;
+      } else {
+        this.connections__setLoading(
+          (payload = { connectionUri: this.connectionUri, isLoading: true }),
+        );
+      }
+
+      this.agreementLoadingData = this.cloneDefaultStateData();
+      if (!this.agreementStateData) {
+        this.agreementStateData = this.cloneDefaultStateData();
+      }
+
+      this.getAgreementDataUris();
+    }
+
+    getAgreementDataUris() {
+      var url =
+        this.baseString +
+        "rest/agreement/getAgreementProtocolUris?connectionUri=" +
+        this.connection.get("uri");
+      var hasChanged = false;
+      callAgreementsFetch(url)
+        .then(response => {
+          this.agreementHeadData = this.transformDataToSet(response);
+
+          for (key of keySet) {
+            if (this.agreementHeadData.hasOwnProperty(key)) {
+              for (data of this.agreementHeadData[key]) {
+                this.addAgreementDataToSate(data, key);
+                hasChanged = true;
+              }
             }
-            return false;
-        }
+          }
+          //no data found for keyset: no relevant agreementData to show in GUI - clean state data
+          if (!hasChanged) {
+            this.connections__updateAgreementData(
+              (payload = {
+                connectionUri: this.connectionUri,
+                agreementData: this.cloneDefaultStateData(),
+              }),
+            );
+          }
+          //Remove all retracted/rejected messages
+          else if (
+            this.agreementStateData &&
+            (this.agreementHeadData["rejectedMessageUris"] ||
+              this.agreementHeadData["retractedMessageUris"])
+          ) {
+            let removalSet = new Set([
+              ...this.agreementHeadData["rejectedMessageUris"],
+              ...this.agreementHeadData["retractedMessageUris"],
+            ]);
 
-        getAgreementData(connection) {
-            if(connection) {
-                this.connection = connection;
-            }else {
-	          	this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: true});
-            }
-          
-        	
-        	this.agreementLoadingData = this.cloneDefaultStateData();
-            if(!this.agreementStateData) {
-            	this.agreementStateData = this.cloneDefaultStateData()
-            }
-           
-        	this.getAgreementDataUris();
-        }
-
-
-        getAgreementDataUris() {
-            var url = this.baseString + 'rest/agreement/getAgreementProtocolUris?connectionUri='+this.connection.get('uri');
-            var hasChanged = false;
-            callAgreementsFetch(url)
-                .then(response => {
-                    this.agreementHeadData = this.transformDataToSet(response);
-    			
-                    for(key of keySet) {
-                        if(this.agreementHeadData.hasOwnProperty(key)) {
-                            for(data of this.agreementHeadData[key]) {
-                            	this.addAgreementDataToSate(data, key);
-                            	hasChanged = true;
-                            }
-                        }
-                    }
-                    //no data found for keyset: no relevant agreementData to show in GUI - clean state data
-                    if(!hasChanged) {
-                    	this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: this.cloneDefaultStateData()});
-                    }
-                    //Remove all retracted/rejected messages
-                    else if(this.agreementStateData && (this.agreementHeadData["rejectedMessageUris"] || this.agreementHeadData["retractedMessageUris"])) {
-                    	let removalSet = new Set([...this.agreementHeadData["rejectedMessageUris"], ...this.agreementHeadData["retractedMessageUris"]]);
-                    	
-                    	for(uri of removalSet) {
-                    		var key = "pendingProposalUris";
-                    		var data = this.agreementStateData;
-                            for(obj of data[key]) {
-	                    		if(obj.stateUri === uri || obj.headUri === uri) {
-	                            	console.log("Message " + uri + " was removed");
-	                            	data[key].delete(obj);
-	                            	hasChanged = true;
-	                    		}
-                            }      
-                    	}
-                    	if(hasChanged) {
-                    		this.agreementStateData = this.cloneDefaultStateData()
-                    		this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: data});
-                    	}
-                    } 
-                }).then(() => {
-                	if(!hasChanged) {
-                		this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
-                	}
-        		}).catch(error => {
-    				console.error('Error:', error);
-    				this.connections__setLoading(payload = {connectionUri: this.connectionUri, isLoading: false});
-                })
-        }
-
-
-        transformDataToSet(response) {
-            var tmpAgreementData = {
-                agreementUris: new Set(response.agreementUris),
-                pendingProposalUris: new Set(response.pendingProposalUris),
-                pendingProposals: new Set(response.pendingProposals),
-                acceptedCancellationProposalUris: new Set(response.acceptedCancellationProposalUris),
-                cancellationPendingAgreementUris: new Set(response.cancellationPendingAgreementUris),
-                pendingCancellationProposalUris: new Set(response.pendingCancellationProposalUris),
-                cancelledAgreementUris: new Set(response.cancelledAgreementUris),
-                rejectedMessageUris: new Set(response.rejectedMessageUris),
-                retractedMessageUris: new Set(response.retractedMessageUris),
-            }
-
-            return this.filterAgreementSet(tmpAgreementData);
-        }
-
-        filterAgreementSet(tmpAgreementData) {
-            for(prop of tmpAgreementData.cancellationPendingAgreementUris) {
-                if(tmpAgreementData.agreementUris.has(prop)){
-                    tmpAgreementData.agreementUris.delete(prop);
+            for (uri of removalSet) {
+              var key = "pendingProposalUris";
+              var data = this.agreementStateData;
+              for (obj of data[key]) {
+                if (obj.stateUri === uri || obj.headUri === uri) {
+                  console.log("Message " + uri + " was removed");
+                  data[key].delete(obj);
+                  hasChanged = true;
                 }
+              }
             }
+            if (hasChanged) {
+              this.agreementStateData = this.cloneDefaultStateData();
+              this.connections__updateAgreementData(
+                (payload = {
+                  connectionUri: this.connectionUri,
+                  agreementData: data,
+                }),
+              );
+            }
+          }
+        })
+        .then(() => {
+          if (!hasChanged) {
+            this.connections__setLoading(
+              (payload = {
+                connectionUri: this.connectionUri,
+                isLoading: false,
+              }),
+            );
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          this.connections__setLoading(
+            (payload = { connectionUri: this.connectionUri, isLoading: false }),
+          );
+        });
+    }
 
-            return tmpAgreementData;
+    transformDataToSet(response) {
+      var tmpAgreementData = {
+        agreementUris: new Set(response.agreementUris),
+        pendingProposalUris: new Set(response.pendingProposalUris),
+        pendingProposals: new Set(response.pendingProposals),
+        acceptedCancellationProposalUris: new Set(
+          response.acceptedCancellationProposalUris,
+        ),
+        cancellationPendingAgreementUris: new Set(
+          response.cancellationPendingAgreementUris,
+        ),
+        pendingCancellationProposalUris: new Set(
+          response.pendingCancellationProposalUris,
+        ),
+        cancelledAgreementUris: new Set(response.cancelledAgreementUris),
+        rejectedMessageUris: new Set(response.rejectedMessageUris),
+        retractedMessageUris: new Set(response.retractedMessageUris),
+      };
+
+      return this.filterAgreementSet(tmpAgreementData);
+    }
+
+    filterAgreementSet(tmpAgreementData) {
+      for (prop of tmpAgreementData.cancellationPendingAgreementUris) {
+        if (tmpAgreementData.agreementUris.has(prop)) {
+          tmpAgreementData.agreementUris.delete(prop);
         }
+      }
 
-        addAgreementDataToSate(eventUri, key, obj) {
-            const ownNeedUri = this.ownNeed.get("uri");
-            return callAgreementEventFetch(ownNeedUri, eventUri)
-            .then(response => {
-                won.wonMessageFromJsonLd(response)
-                .then(msg => {
-                    var agreementObject = obj;
+      return tmpAgreementData;
+    }
 
-                    if(msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri){
-                        /*if we find out that the receiverneed of the crawled event is actually our
+    addAgreementDataToSate(eventUri, key, obj) {
+      const ownNeedUri = this.ownNeed.get("uri");
+      return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
+        won.wonMessageFromJsonLd(response).then(msg => {
+          var agreementObject = obj;
+
+          if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
+            /*if we find out that the receiverneed of the crawled event is actually our
                          need we will call the method again but this time with the correct eventUri
                          */
-                        if(!agreementObject) {
-                            agreementObject = this.cloneDefaultAgreementObject();
-                        }
-                        agreementObject.headUri = msg.getMessageUri();
-                        this.addAgreementDataToSate(msg.getRemoteMessageUri(), key, agreementObject);
-                    }else {
-                        if(!agreementObject) {
-                            agreementObject = this.cloneDefaultAgreementObject();
-                            agreementObject.headUri = msg.getMessageUri();
-                        }
-                    
-                    	agreementObject.stateUri = msg.getMessageUri();
-                    	this.agreementLoadingData[key].add(agreementObject);
-                    	
-                    	//Dont load in state again!
-                    	var found = false;
-                    	for(i = 0; i < this.chatMessages.length; i++) {
-                    		if(agreementObject.stateUri === this.chatMessages[i].get("uri")) {
-                    			found = true;
-                    		}
-                    	}
-                    	if(!found) {
-                    		this.messages__connectionMessageReceived(msg);
-                    	}
-                    	
-                    	//Update agreementData in State 
-                    	this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: this.agreementLoadingData});
-                    }  
-                })
-            })
-        }
-
-        filterAgreementStateData(agreementObject, del) {
-        	for(key of keySet) {
-    			this.checkObject(key, agreementObject, del)
-			}
-        }
-        
-        checkObject(key, agreementObject, del) {
-        	var data = this.agreementStateData
-        	for(object of data[key]) {
-        		if(object.stateUri === agreementObject.stateUri) {
-        			if(del.value) {
-        				data[key].delete(object);
-        				this.connections__updateAgreementData(payload = {connectionUri: this.connectionUri, agreementData: data});
-        			}
-        			return true;
-        		}
-        	}
-        	return false;
-        }
-        
-        filterMessages(stateUri) {
-        	var object = {
-    			stateUri: stateUri,
-    			headUri: undefined,
-        	}
-        	
-        	var del = {
-    			value: true,
-        	}
-        	this.filterAgreementStateData(object, del);
-        }
-        
-        getCancelUri(agreementUri) {
-            const pendingProposals = this.agreementHeadData.pendingProposals;
-            for(prop of pendingProposals) {
-                if(prop.proposesToCancel.includes(agreementUri)){
-                    return prop.uri;
-                }
+            if (!agreementObject) {
+              agreementObject = this.cloneDefaultAgreementObject();
             }
-            return undefined;
-        }
-
-        checkOwnCancel(headUri) {
-            const pendingProposals = this.agreementHeadData.pendingProposals;
-            for(prop of pendingProposals) {
-                if(prop.proposesToCancel.includes(headUri)){
-                    if(prop.proposingNeedUri === this.ownNeed.get("uri")) {
-                        return true;
-                    }
-                }
+            agreementObject.headUri = msg.getMessageUri();
+            this.addAgreementDataToSate(
+              msg.getRemoteMessageUri(),
+              key,
+              agreementObject,
+            );
+          } else {
+            if (!agreementObject) {
+              agreementObject = this.cloneDefaultAgreementObject();
+              agreementObject.headUri = msg.getMessageUri();
             }
-            return false;
-        }
 
-        isOldAgreementMsg(msg) {
-        	var aD = this.agreementHeadData;
-            if(aD.agreementUris.has(msg.get("uri")) ||
-                aD.agreementUris.has(msg.get("remoteUri")) ||
-                aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
-                aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
-                aD.cancelledAgreementUris.has(msg.get("uri")) ||
-                aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
-                aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
-                aD.acceptedCancellationProposalUris.has(msg.get("remoteUri")) ||
-                aD.retractedMessageUris.has(msg.get("uri")) ||
-                aD.retractedMessageUris.has(msg.get("remoteUri")) ||
-                aD.rejectedMessageUris.has(msg.get("uri")) ||
-                aD.rejectedMessageUris.has(msg.get("remoteUri"))) {
-                return true;
+            agreementObject.stateUri = msg.getMessageUri();
+            this.agreementLoadingData[key].add(agreementObject);
+
+            //Dont load in state again!
+            var found = false;
+            for (i = 0; i < this.chatMessages.length; i++) {
+              if (
+                agreementObject.stateUri === this.chatMessages[i].get("uri")
+              ) {
+                found = true;
+              }
             }
-            return false;
-        }
+            if (!found) {
+              this.messages__connectionMessageReceived(msg);
+            }
 
-        getArrayFromSet(set) {
-        	if(!set) {
-        		set = new Set();
-        	}
-            return Array.from(set);
-        }
-
-        cloneDefaultData() {
-            return defaultData = {
-                agreementUris: new Set(),
-                pendingProposalUris: new Set(),
-                pendingProposals: new Set(),
-                acceptedCancellationProposalUris: new Set(),
-                cancellationPendingAgreementUris: new Set(),
-                pendingCancellationProposalUris: new Set(),
-                cancelledAgreementUris: new Set(),
-                rejectedMessageUris: new Set(),
-                retractedMessageUris: new Set(),
-            };
-        }
-
-        cloneDefaultStateData() {
-            return defaultStateData = {
-                pendingProposalUris: new Set(),
-                agreementUris: new Set(),
-                cancellationPendingAgreementUris: new Set(),
-            };
-        }
-
-        cloneDefaultAgreementObject() {
-            return agreementObject = {
-                stateUri: undefined,
-                headUri: undefined,
-            };
-        }
-
-        openRequest(message){
-            this.connections__open(this.connectionUri, message);
-        }
-
-        closeConnection(){
-            this.connections__close(this.connection.get('uri'));
-            this.router__stateGoCurrent({connectionUri: null});
-        }
+            //Update agreementData in State
+            this.connections__updateAgreementData(
+              (payload = {
+                connectionUri: this.connectionUri,
+                agreementData: this.agreementLoadingData,
+              }),
+            );
+          }
+        });
+      });
     }
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: { },
-        template: template,
+    filterAgreementStateData(agreementObject, del) {
+      for (key of keySet) {
+        this.checkObject(key, agreementObject, del);
+      }
     }
+
+    checkObject(key, agreementObject, del) {
+      var data = this.agreementStateData;
+      for (object of data[key]) {
+        if (object.stateUri === agreementObject.stateUri) {
+          if (del.value) {
+            data[key].delete(object);
+            this.connections__updateAgreementData(
+              (payload = {
+                connectionUri: this.connectionUri,
+                agreementData: data,
+              }),
+            );
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
+    filterMessages(stateUri) {
+      var object = {
+        stateUri: stateUri,
+        headUri: undefined,
+      };
+
+      var del = {
+        value: true,
+      };
+      this.filterAgreementStateData(object, del);
+    }
+
+    getCancelUri(agreementUri) {
+      const pendingProposals = this.agreementHeadData.pendingProposals;
+      for (prop of pendingProposals) {
+        if (prop.proposesToCancel.includes(agreementUri)) {
+          return prop.uri;
+        }
+      }
+      return undefined;
+    }
+
+    checkOwnCancel(headUri) {
+      const pendingProposals = this.agreementHeadData.pendingProposals;
+      for (prop of pendingProposals) {
+        if (prop.proposesToCancel.includes(headUri)) {
+          if (prop.proposingNeedUri === this.ownNeed.get("uri")) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    isOldAgreementMsg(msg) {
+      var aD = this.agreementHeadData;
+      if (
+        aD.agreementUris.has(msg.get("uri")) ||
+        aD.agreementUris.has(msg.get("remoteUri")) ||
+        aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
+        aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
+        aD.cancelledAgreementUris.has(msg.get("uri")) ||
+        aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
+        aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
+        aD.acceptedCancellationProposalUris.has(msg.get("remoteUri")) ||
+        aD.retractedMessageUris.has(msg.get("uri")) ||
+        aD.retractedMessageUris.has(msg.get("remoteUri")) ||
+        aD.rejectedMessageUris.has(msg.get("uri")) ||
+        aD.rejectedMessageUris.has(msg.get("remoteUri"))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    getArrayFromSet(set) {
+      if (!set) {
+        set = new Set();
+      }
+      return Array.from(set);
+    }
+
+    cloneDefaultData() {
+      return (defaultData = {
+        agreementUris: new Set(),
+        pendingProposalUris: new Set(),
+        pendingProposals: new Set(),
+        acceptedCancellationProposalUris: new Set(),
+        cancellationPendingAgreementUris: new Set(),
+        pendingCancellationProposalUris: new Set(),
+        cancelledAgreementUris: new Set(),
+        rejectedMessageUris: new Set(),
+        retractedMessageUris: new Set(),
+      });
+    }
+
+    cloneDefaultStateData() {
+      return (defaultStateData = {
+        pendingProposalUris: new Set(),
+        agreementUris: new Set(),
+        cancellationPendingAgreementUris: new Set(),
+      });
+    }
+
+    cloneDefaultAgreementObject() {
+      return (agreementObject = {
+        stateUri: undefined,
+        headUri: undefined,
+      });
+    }
+
+    openRequest(message) {
+      this.connections__open(this.connectionUri, message);
+    }
+
+    closeConnection() {
+      this.connections__close(this.connection.get("uri"));
+      this.router__stateGoCurrent({ connectionUri: null });
+    }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {},
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.postMessages', [
+export default angular
+  .module("won.owner.components.postMessages", [
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
     connectionMessageModule,
@@ -720,6 +794,5 @@ export default angular.module('won.owner.components.postMessages', [
     connectionHeaderModule,
     labelledHrModule,
     connectionContextDropdownModule,
-])
-    .directive('wonPostMessages', genComponentConf)
-    .name;
+  ])
+  .directive("wonPostMessages", genComponentConf).name;

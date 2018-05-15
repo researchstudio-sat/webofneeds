@@ -1,9 +1,9 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
-@import 'square-image';
-@import 'speech-bubble';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
+@import "square-image";
+@import "speech-bubble";
 
 won-connection-selection-item {
   display: block;
@@ -36,7 +36,13 @@ won-connection-selection-item {
   $invisibleBorder: 0.0625rem solid white;
 
   .conn__inner.selected {
-    @include speech-bubble-right(white, $won-line-gray, 0.625rem, $thinBorderWidth, 1.5rem);
+    @include speech-bubble-right(
+      white,
+      $won-line-gray,
+      0.625rem,
+      $thinBorderWidth,
+      1.5rem
+    );
     border-top: $thinGrayBorder;
     border-bottom: $thinGrayBorder;
   }
@@ -66,7 +72,8 @@ won-connection-selection-item {
     border-top: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
     border-bottom: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
 
-    &:hover, &.selected {
+    &:hover,
+    &.selected {
       background-color: white;
     }
 

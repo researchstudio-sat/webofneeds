@@ -1,9 +1,9 @@
-@import 'won-config';
-@import 'text';
-@import 'needtextfield';
-@import 'animate';
-@import 'sizing-utils';
-@import 'textfield';
+@import "won-config";
+@import "text";
+@import "needtextfield";
+@import "animate";
+@import "sizing-utils";
+@import "textfield";
 
 won-create-isseeks {
   display: flex;
@@ -25,7 +25,8 @@ won-create-isseeks {
         padding-bottom: 1rem;
       }
 
-      p:last-of-type { //this is so that the padding is not present if there is only a single paragraph namely the .medium_title
+      p:last-of-type {
+        //this is so that the padding is not present if there is only a single paragraph namely the .medium_title
         padding-bottom: 0;
       }
     }
@@ -41,17 +42,17 @@ won-create-isseeks {
     @include appearAnimation(0.5s, linear);
 
     .cis__detail__items {
-      @include slideWithOpacityAnimation(.5s, linear, 20rem);
+      @include slideWithOpacityAnimation(0.5s, linear, 20rem);
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      padding: .5rem 0;
+      padding: 0.5rem 0;
 
       .cis__detail__items__item {
         display: flex;
         align-items: center;
-        min-width: .5rem;
-        margin: .3rem;
+        min-width: 0.5rem;
+        margin: 0.3rem;
         font-size: $normalFontSize;
         //padding: .5rem 0;
         cursor: pointer;
@@ -76,14 +77,13 @@ won-create-isseeks {
           //   cursor: default;
           // }
         }
-
       }
     }
   }
 
   .cis__details {
     //@include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
-    @include slideWithOpacityAnimation(.5s, linear, 20rem);
+    @include slideWithOpacityAnimation(0.5s, linear, 20rem);
 
     border-top: $thinBorderWidth solid $won-line-gray;
     padding: 0.5rem 0;
@@ -96,7 +96,7 @@ won-create-isseeks {
     }
 
     .cis__tags {
-      .cis__taglist{
+      .cis__taglist {
         display: flex;
         flex-wrap: wrap;
         margin-bottom: 0.5rem;
@@ -115,12 +115,12 @@ won-create-isseeks {
         border-radius: 0.1rem;
         background-color: white;
 
-
         font-size: $normalFontSize;
         min-height: $formInputHeight;
 
         $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
+          $thinBorderWidth;
         padding: $verticalPadding 0.438rem;
 
         box-sizing: border-box;
@@ -160,7 +160,9 @@ won-create-isseeks {
     display: flex;
     font-size: $mediumFontSize;
     font-weight: 400;
-    &:not(.ttl) { padding-bottom: 1rem; } // ttl uses grid and grid-gap
+    &:not(.ttl) {
+      padding-bottom: 1rem;
+    } // ttl uses grid and grid-gap
 
     span {
       padding-left: 0.5rem;
@@ -191,12 +193,12 @@ won-create-isseeks {
     }
 
     &.tags {
-      font-size: $normalFontSize+.25rem;
+      font-size: $normalFontSize + 0.25rem;
     }
 
     &.detailPicker {
-      font-size: $normalFontSize+.25rem;
-      padding: .5rem 0;
+      font-size: $normalFontSize + 0.25rem;
+      padding: 0.5rem 0;
       color: $won-primary-color;
       --local-primary: $won-primary-color; // for the svg-icons
 
@@ -223,8 +225,7 @@ won-create-isseeks {
     display: block;
 
     %wid__dropzone {
-
-      box-sizing: border-box;;
+      box-sizing: border-box;
       height: 100%;
       width: 100%;
 

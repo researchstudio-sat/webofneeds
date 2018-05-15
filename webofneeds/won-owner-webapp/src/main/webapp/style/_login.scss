@@ -1,6 +1,6 @@
-@import 'won-config';
-@import 'flex-layout';
-@import 'sizing-utils';
+@import "won-config";
+@import "flex-layout";
+@import "sizing-utils";
 
 won-account-menu {
   //display: block;
@@ -22,7 +22,6 @@ won-account-menu {
   }
 }
 
-
 won-login-form {
   display: block;
   min-width: 10rem;
@@ -31,9 +30,9 @@ won-login-form {
     width: 100%;
   }
 
-  input[type=text],
-  input[type=password],
-  input[type=email] {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
     margin: 1rem 0;
     width: 100%;
     background-color: $won-lighter-gray;
@@ -45,7 +44,7 @@ won-login-form {
     color: $won-primary-color;
   }
 
-  .wl__table{
+  .wl__table {
     display: table;
 
     width: 100%;
@@ -58,7 +57,6 @@ won-login-form {
       width: 50%;
       vertical-align: middle;
     }
-
 
     .wlt__right {
       text-align: right;
@@ -92,7 +90,6 @@ won-login-form {
 
     .wl__button__icon {
       @include fixed-square($bigiconSize);
-
     }
 
     & .wl__button__carret {

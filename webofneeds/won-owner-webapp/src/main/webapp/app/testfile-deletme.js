@@ -1,16 +1,15 @@
-
-
-if(module) { //commonjs export for importing with jspm
-    console.log('getting into module export');
-    console.log('requiring angular ', require('angular'));
-    var angular = require('angular');
-    /*
+if (module) {
+  //commonjs export for importing with jspm
+  console.log("getting into module export");
+  console.log("requiring angular ", require("angular"));
+  var angular = require("angular");
+  /*
      //require('app/app_jspm'); //make sure the 'won.owner' module is defined
      -> can't. would lead to dependency cycle.
      */
-    module.exports = {
-        foo: 'bar - in wonservice - commonjs'
-    }
+  module.exports = {
+    foo: "bar - in wonservice - commonjs",
+  };
 }
 
 //DELETE THE CODE BELOW, to make jspm identify the commonjs import/export above correctly
@@ -23,7 +22,6 @@ if(module) { //commonjs export for importing with jspm
  }
  */
 //window.angularity = require('angular');
-
 
 /*
 if(define) { //amd export for importing with jspm

@@ -1,114 +1,141 @@
-@import 'math';
+@import "math";
 
-@mixin _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos) {
+@mixin _speech-bubble(
+  $background-color,
+  $border-color,
+  $triangle-height,
+  $border-width,
+  $pos
+) {
   background-color: $background-color;
   position: relative; // to allow positioning the triangle-parts as absolute
-
   &:after {
-    content: '';
-    display: block; //rly needed?
-
-    background: linear-gradient( -45deg, rgba(0,0,0,0.0) 50%, $background-color 50%);
-
+    content: "";
+    display: block; // rly needed?
+    background: linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0) 50%,
+      $background-color 50%
+    );
     $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
     $size: sqrt($sizeSq) * extractUnit($triangle-height);
-
     height: $size;
     width: $size;
-
     border-color: $border-color;
     border-style: solid;
-
     position: absolute;
-
     /* top | right | bottom | left */
     border-width: $border-width 0 0 $border-width;
   }
 }
-
-
 @function sizeOfSquare($triangle-height) {
   $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
   @return sqrt($sizeSq) * extractUnit($triangle-height);
 }
-
-/**
+/* *
  * @param $triangleSize: the height of the the speech-bubble-triangle
- * @param $pos: a %-value determining where on the top edge the triangle is placed.
- */
-@mixin speech-bubble-top($background-color, $border-color, $triangle-height, $border-width: $thinBorderWidth, $pos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
-
+ * @param $pos: a %-value determining where on the top edge the triangle is placed. */
+@mixin speech-bubble-top(
+  $background-color,
+  $border-color,
+  $triangle-height,
+  $border-width: $thinBorderWidth,
+  $pos: 50%
+) {
+  @include _speech-bubble(
+    $background-color,
+    $border-color,
+    $triangle-height,
+    $border-width,
+    $pos
+  );
   &:after {
     left: $pos;
-    transform: rotate(45deg);
-
-    /*
-    it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    transform: rotate(
+      45deg
+    ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container.
-    */
-    top: - sizeOfSquare($triangle-height)/2;
+    sure the center's at the upper edge of the container. */
+    top: - sizeOfSquare($triangle-height) / 2;
   }
 }
-
-/**
+/* *
  * @param $triangleSize: the height of the the speech-bubble-triangle
- * @param $pos: a %-value determining where on the edge the bottom edge triangle is placed.
- */
-@mixin speech-bubble-bottom($background-color, $border-color, $triangle-height, $border-width: $thinBorderWidth, $pos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
-
+ * @param $pos: a %-value determining where on the edge the bottom edge triangle is placed. */
+@mixin speech-bubble-bottom(
+  $background-color,
+  $border-color,
+  $triangle-height,
+  $border-width: $thinBorderWidth,
+  $pos: 50%
+) {
+  @include _speech-bubble(
+    $background-color,
+    $border-color,
+    $triangle-height,
+    $border-width,
+    $pos
+  );
   &:after {
     left: $pos;
-    transform: rotate(225deg);
-
-    /*
-    it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    transform: rotate(
+      225deg
+    ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container.
-    */
-    bottom: - sizeOfSquare($triangle-height)/2;
+    sure the center's at the upper edge of the container. */
+    bottom: - sizeOfSquare($triangle-height) / 2;
   }
 }
-
-/**
+/* *
  * @param $triangleSize: the height of the the speech-bubble-triangle
- * @param $pos: a %-value determining where on the edge the left edge triangle is placed.
- */
-@mixin speech-bubble-left($background-color, $border-color, $triangle-height, $border-width: $thinBorderWidth, $pos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
-
+ * @param $pos: a %-value determining where on the edge the left edge triangle is placed. */
+@mixin speech-bubble-left(
+  $background-color,
+  $border-color,
+  $triangle-height,
+  $border-width: $thinBorderWidth,
+  $pos: 50%
+) {
+  @include _speech-bubble(
+    $background-color,
+    $border-color,
+    $triangle-height,
+    $border-width,
+    $pos
+  );
   &:after {
     top: $pos;
-    transform: rotate(-45deg);
-
-    /*
-    it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    transform: rotate(
+      -45deg
+    ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container.
-    */
-    left: - sizeOfSquare($triangle-height)/2;
+    sure the center's at the upper edge of the container. */
+    left: - sizeOfSquare($triangle-height) / 2;
   }
 }
-
-/**
+/* *
  * @param $triangleSize: the height of the the speech-bubble-triangle
- * @param $pos: a %-value determining where on the edge the right edge triangle is placed.
- */
-@mixin speech-bubble-right($background-color, $border-color, $triangle-height, $border-width: $thinBorderWidth, $pos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
-
+ * @param $pos: a %-value determining where on the edge the right edge triangle is placed. */
+@mixin speech-bubble-right(
+  $background-color,
+  $border-color,
+  $triangle-height,
+  $border-width: $thinBorderWidth,
+  $pos: 50%
+) {
+  @include _speech-bubble(
+    $background-color,
+    $border-color,
+    $triangle-height,
+    $border-width,
+    $pos
+  );
   &:after {
     top: $pos;
     transform: rotate(135deg);
-
-    /*
-    it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container.
-    */
-    right: - sizeOfSquare($triangle-height)/2;
+    sure the center's at the upper edge of the container. */
+    right: - sizeOfSquare($triangle-height) / 2;
   }
 }
-
