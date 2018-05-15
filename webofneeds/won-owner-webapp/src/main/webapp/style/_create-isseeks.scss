@@ -1,7 +1,6 @@
 @import 'won-config';
 @import 'text';
 @import 'needtextfield';
-@import 'locationpicker';
 @import 'animate';
 @import 'sizing-utils';
 @import 'textfield';
@@ -191,7 +190,6 @@ won-create-isseeks {
       }
     }
 
-    &.location,
     &.tags {
       font-size: $normalFontSize+.25rem;
     }

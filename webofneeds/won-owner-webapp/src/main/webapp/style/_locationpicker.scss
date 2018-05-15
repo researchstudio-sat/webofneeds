@@ -1,44 +1,106 @@
 @import 'won';
 @import '../node_modules/leaflet/dist/leaflet.css';
+@import 'border-utils';
 
 won-location-picker {
 
-  .lp__selected {
-    display: flex;
-    align-items: center;
-    
-    .lp__selected__icon {
-      @include fixed-square(2rem);
-    }
+  display: block;
+  position: relative;
+
+  // remove X rendered by IE and Edge as we have our own clear button
+  ::-ms-clear {
+    width : 0;
+    height: 0;
   }
 
   .lp__searchbox {
-    border-width: $thinBorderWidth;
-    border-style: solid;
-    border-radius: 0.1rem;
-    background-color: white;
+    position: relative; // needed for position: absolute of icon
+    
+    .lp__searchbox__icon {
+      @include fixed-square($bigiconSize);
+      position:absolute;
+      right: .5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
 
+    .lp__searchbox__inner {
+      border-width: $thinBorderWidth;
+      border-style: solid;
+      border-radius: 0.1rem;
+      border-color: $won-line-gray;
+      background-color: white;
 
-    font-size: $normalFontSize;
-    min-height: $formInputHeight;
+      font-size: $normalFontSize;
+      $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding 0.438rem;
+  
+      box-sizing: border-box;
+      min-height: $formInputHeight;
+      min-width: 0; // so a size is specified and break-word works
+      width: 100%;
 
-    $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
-    padding: $verticalPadding 0.438rem;
+      word-wrap: break-word;
+    }
 
+    // remove X rendered by IE and Edge as we have our own clear button
+    .lp__searchbox__inner::-ms-clear {
+      width : 0;
+      height: 0;
+    }
+  }
+
+  // show search results when search box is focused
+  .lp__searchbox:focus-within + .lp__searchresults {
+    display: block;
+  }
+  
+  // needed to make search results appear long enough to be clickable
+  .lp__searchresults:hover {
+    display: block;
+  }
+
+  .lp__searchresults{
+
+    display: none; 
+    border: none;
+
+    &.lp__searchresults--filled {
+      @include thin-border;
+    }
+
+    width: 90%;
     box-sizing: border-box;
 
-    min-width: 0; // so a size is specified and break-word works
-    word-wrap: break-word;
+    position: absolute;
+    z-index: 1;
+    background-color: white;
 
-    border-color: $won-line-gray;
+    list-style-type: none; 
 
-    width: 100%;
+    .lp__searchresult {
+      display: flex;
+      align-items: center;
+
+      padding: 1rem .5rem;
+      font-size: $normalFontSize;
+
+      .lp__searchresult__text{
+        padding: 0 .5rem;
+      }
+
+      .lp__searchresult__icon{
+        @include fixed-square(1.5rem);
+      }
+    }
   }
 
   .lp__mapmount {
     width: 100%;
     height: 31rem;
+    z-index: 0;
+    margin-top: .5rem;
 
     @media (max-width : $responsivenessBreakPoint) {
       height: 15rem;

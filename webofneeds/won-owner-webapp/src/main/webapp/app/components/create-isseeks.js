@@ -118,21 +118,17 @@ function genComponentConf() {
         <div class="cis__details" ng-if="self.showDetail">
 
             <!-- LOCATION -->
-            <div class="cis__location"  ng-if="self.openDetail === 'location'">
-                <div class="cis__addDetail__header location">
-                    <svg class="cis__circleicon">
-                        <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
-                    </svg>
-                    <span>Location</span>
-                </div>
-                <won-location-picker class="seeksPicker"
-                    initial-location="::self.draftObject.location"
-                    on-location-picked="::self.updateLocation(location)">
-                </won-location-picker>
-            </div>
+            <won-location-picker 
+                ng-if="self.openDetail === 'location'"
+                initial-location="::self.draftObject.location"
+                on-location-picked="::self.updateLocation(location)">
+            </won-location-picker>
 
             <!-- TAGS -->
              <div class="cis__tags" ng-if="self.openDetail === 'tags'">
+                <!-- TODO: remove title and move resetTags() to a new button -->
+                <!-- TODO: make tags individually deletable? -->
+                <!-- TODO: add # to tag text -->
                 <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
@@ -144,7 +140,7 @@ function genComponentConf() {
                     <span class="hover">Remove Tags</span>
                 </div>
                 <div class="cis__taglist">
-                    <span class="cis__taglist__tag" ng-repeat="tag in self.draftObject.tags">{{tag}}</span>
+                    <span class="cis__taglist__tag" ng-repeat="tag in self.draftObject.tags">#{{tag}}</span>
                 </div>
                 <input class="cis__tags__input"
                     placeholder="e.g. #couch #free" type="text"
@@ -261,6 +257,7 @@ function genComponentConf() {
         }
 
         updateTags() {
+            // TODO: do something with text that does not start with #
             const tagsInputString = (this.tagsInput() || {}).value;
             this.draftObject.tags = mergeAsSet(
                 (this.textAreaTags || []), 
@@ -302,7 +299,7 @@ function genComponentConf() {
             if(!location && this.details.has("location")){
                 this.details.delete("location");
                 this.draftObject.location = undefined;
-            } else {
+            } else if(location){
                 if(!this.details.has("location")) {
                     this.details.add("location");
                 }

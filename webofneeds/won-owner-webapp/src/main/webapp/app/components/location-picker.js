@@ -12,6 +12,7 @@ import {
     nominatim2draftLocation,
     leafletBounds,
     delay,
+    getIn,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions.js';
 import {
@@ -27,48 +28,57 @@ const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
         <!-- LOCATION SEARCH BOX -->
-        <input type="text" class="lp__searchbox" placeholder="Search for location"/>
-
-        <!-- SELECTED LOCATION -->
-        <div class="lp__selected" ng-if="self.locationIsSaved">
-            <svg class="lp__selected__icon clickable" 
+        <div class="lp__searchbox">
+            <input type="text" class="lp__searchbox__inner" id="lp__searchbox__inner" placeholder="Search for location"/>
+            <svg class="lp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
-                 ng-click="self.resetLocation()">
+                 ng-if="self.showResetButton"
+                 ng-click="self.resetLocationAndSearch()">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
-            <span> {{self.pickedLocation.name}} </span>
         </div>
 
         <!-- LIST OF SUGGESTED LOCATIONS -->
-        <ol>
-            <li ng-if="
-                !self.locationIsSaved && self.currentLocation &&
-                (
-                    !self.lastSearchedFor ||
-                    ([self.currentLocation] | filter:self.lastSearchedFor).length > 0
-                )
-            ">
-                <a href=""
+        <ul class="lp__searchresults" ng-class="{ 
+            'lp__searchresults--filled': self.showResultDropDown(), 
+            'lp__searchresults--empty': !self.showResultDropDown() 
+        }">
+            <!-- CURRENT GEOLOCATION -->
+            <li class="lp__searchresult" 
+                ng-if="self.showCurrentLocationResult()">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
+                    <use xlink:href="#ico16_indicator_location" href="#ico36_location_current"></use>
+                </svg>
+                <a class="lp__searchresult__text" href=""
                     ng-click="self.selectedLocation(self.currentLocation)"
                     ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
                 </a>
-                (current)
             </li>
-            <!--li ng-if="!self.locationIsSaved"
-                ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
-                    <a href=""
-                        ng-click="self.selectedLocation(previousLocation)"
-                        ng-bind-html="self.highlight(previousLocation.name, self.lastSearchedFor)">
-                    </a>
-                    (previous)
-            </li-->
-            <li ng-repeat="result in self.searchResults">
-                <a href=""
+            <!-- PREVIOUS LOCATION -->
+            <li class="lp__searchresult" 
+                ng-if="self.showPrevLocationResult()">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
+                    <!-- TODO: create and use a more appropriate icon here -->
+                    <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
+                </svg>
+                <a class="lp__searchresult__text" href=""
+                    ng-click="self.selectedLocation(self.previousLocation)"
+                    ng-bind-html="self.highlight(self.previousLocation.name, self.lastSearchedFor)">
+                </a>
+                (previous)
+            </li>
+            <!-- SEARCH RESULTS -->
+            <li class="lp__searchresult" 
+                ng-repeat="result in self.searchResults">
+                <svg class="lp__searchresult__icon" style="--local-primary:var(--won-subtitle-gray);">
+                    <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
+                </svg>
+                <a class="lp__searchresult__text" href=""
                     ng-click="self.selectedLocation(result)"
                     ng-bind-html="self.highlight(result.name, self.lastSearchedFor)">
                 </a>
             </li>
-        </ol>
+        </ul>
         <div class="lp__mapmount" id="lp__mapmount"></div>
             `;
 
@@ -82,6 +92,8 @@ function genComponentConf() {
 
             this.locationIsSaved = !!this.initialLocation;
             this.pickedLocation = this.initialLocation;
+            this.previousLocation = undefined;
+            this.showResetButton = false;
             
             window.lp4dbg = this;
 
@@ -92,7 +104,7 @@ function genComponentConf() {
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
-                this.textfieldNg(), 1000
+                this.textfieldNg(), 300
             );
         }
 
@@ -118,8 +130,12 @@ function genComponentConf() {
         }
 
         placeMarkers(locations) {
-            
-            this.removeMarkers();
+            if(this.markers) {
+                //remove previously placed markers
+                for(let m of this.markers) {
+                    this.map.removeLayer(m);
+                }
+            }
 
             this.markers = locations.map(location =>
                 L.marker([location.lat, location.lng])
@@ -131,25 +147,24 @@ function genComponentConf() {
             }
         }
 
-        removeMarkers() {
-            if(this.markers) {
-                //remove previously placed markers
-                for(let m of this.markers) {
-                    this.map.removeLayer(m);
-                }
-            }
-        }
-
         resetSearchResults() {
             this.searchResults = undefined;
             this.lastSearchedFor = undefined;
             this.placeMarkers([]);
         }
 
+        resetLocationAndSearch() {
+            this.resetLocation();
+            this.textfield().value = "";
+        }
+
         resetLocation() {
+            this.previousLocation = this.pickedLocation;
+
             this.locationIsSaved = false;
             this.pickedLocation = undefined;
-            this.removeMarkers();
+            this.placeMarkers([]);
+            this.showResetButton = false;
             
             this.onLocationPicked({location: undefined});
         }
@@ -162,6 +177,8 @@ function genComponentConf() {
             this.pickedLocation = location;
 
             this.resetSearchResults(); // picked one, can hide the rest if they were there
+            this.textfield().value = location.name;
+            this.showResetButton = true;
 
             this.placeMarkers([location]);
             this.map.fitBounds(leafletBounds(location), { animate: true });
@@ -171,9 +188,14 @@ function genComponentConf() {
         doneTyping() {
             const text = this.textfield().value;
 
+            this.showResetButton = false;
+            this.$scope.$apply(() => { this.resetLocation(); });
+
             if(!text) {
                 this.$scope.$apply(() => { this.resetSearchResults(); });
             } else {
+                // TODO: sort results by distance/relevance/???
+                // TODO: limit amount of shown results
                 searchNominatim(text).then( searchResults => {
                     const parsedResults = scrubSearchResults(searchResults, text);
                     this.$scope.$apply(() => {
@@ -187,37 +209,43 @@ function genComponentConf() {
         }
 
         determineCurrentLocation() {
-            // if a location is saved, zoom in on saved location
+            // check if there's any saved location to display instead
             if(this.initialLocation) {
-
                 // constructor may not be done in time, so set values here again.
                 this.locationIsSaved = true;
                 this.pickedLocation = this.initialLocation;
 
-                const lat = this.pickedLocation.lat;
-                const lng = this.pickedLocation.lng;
-                const zoom = 13;
+                const initialLat = this.pickedLocation.lat;
+                const initialLng = this.pickedLocation.lng;
+                const initialZoom = 13; // arbitrary zoom level as there's none available
 
-                this.map.setZoom(zoom);
-                this.map.panTo([lat, lng]);
+                // center map around current location
+                this.map.setZoom(initialZoom);
+                this.map.panTo([initialLat, initialLng]);
 
-                //this.textfield().value = this.pickedLocation.name;
+                this.textfield().value = this.pickedLocation.name;
+                this.showResetButton = true;
                 this.placeMarkers([this.pickedLocation]);
+                this.markers[0].openPopup();
             }
-            // else, try to zoom in on current location
-            else if ("geolocation" in navigator) {
+
+            
+            // check for current geolocation
+            if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     currentLocation => {
 
-                        const lat = currentLocation.coords.latitude;
-                        const lng = currentLocation.coords.longitude;
-                        const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
+                        const geoLat = currentLocation.coords.latitude;
+                        const geoLng = currentLocation.coords.longitude;
+                        const geoZoom = 13; // TODO: use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
-                        // center map around current location
-                        this.map.setZoom(zoom);
-                        this.map.panTo([lat, lng]);
+                        // center map around geolocation only if there's no initial location
+                        if(!this.initialLocation){
+                            this.map.setZoom(geoZoom);
+                            this.map.panTo([geoLat, geoLng]);
+                        }
 
-                        reverseSearchNominatim(lat, lng, zoom)
+                        reverseSearchNominatim(geoLat, geoLng, geoZoom)
                             .then(searchResult => {
                                 const location = nominatim2draftLocation(searchResult);
                                 this.$scope.$apply(() => { this.currentLocation = location });
@@ -233,16 +261,30 @@ function genComponentConf() {
                         timeout: 5000,
                         maximumAge: 0
                     });
-
             }
 
             this.$scope.$apply();
-
         }
 
-        textfieldNg() { return this.domCache.ng('.lp__searchbox'); }
+        showCurrentLocationResult() {
+            return !this.locationIsSaved && this.currentLocation;
+        }
 
-        textfield() { return this.domCache.dom('.lp__searchbox'); }
+        showPrevLocationResult() {
+            return !this.locationIsSaved && this.previousLocation && (
+                getIn(this, ['previousLocation', 'name']) !== getIn(this, ['currentLocation','name'])
+            );
+        }
+
+        showResultDropDown() {
+            return (this.searchResults && this.searchResults.length > 0)  || 
+                this.showPrevLocationResult() || 
+                this.showCurrentLocationResult();
+        }
+
+        textfieldNg() { return this.domCache.ng('#lp__searchbox__inner'); }
+
+        textfield() { return this.domCache.dom('#lp__searchbox__inner'); }
 
         mapMountNg() { return this.domCache.ng('.lp__mapmount'); }
 
