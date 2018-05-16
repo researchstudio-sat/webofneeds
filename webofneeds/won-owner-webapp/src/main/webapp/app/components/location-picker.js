@@ -24,7 +24,12 @@ function genComponentConf() {
   let template = `
         <!-- LOCATION SEARCH BOX -->
         <div class="lp__searchbox">
-            <input type="text" class="lp__searchbox__inner" id="lp__searchbox__inner" placeholder="Search for location"/>
+            <input
+                type="text"
+                id="lp__searchbox__inner"
+                class="lp__searchbox__inner"
+                placeholder="Search for location"
+                ng-class="{'lp__searchbox__inner--withreset' : self.showResetButton}"/>
             <svg class="lp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
                  ng-if="self.showResetButton"
