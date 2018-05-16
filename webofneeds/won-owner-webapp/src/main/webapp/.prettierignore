@@ -10,11 +10,3 @@ scripts/
 *.html
 package.json
 package-lock.json
-style/bootsketch-patches.css
-style/datepicker.css
-style/jquery.fs.scroller.css
-style/lightbox.css
-style/star-rating.css
-test/sockjs-0.3.js
-test/sockjs-0.3.min.js
-test/websocket-test.js
