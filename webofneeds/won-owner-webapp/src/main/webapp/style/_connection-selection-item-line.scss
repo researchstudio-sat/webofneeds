@@ -46,37 +46,32 @@ won-connection-selection-item {
     border-top: $thinGrayBorder;
     border-bottom: $thinGrayBorder;
   }
-
   &:first-child .conn__inner.selected {
-    //don't show border for first item to avoid duplicate borders with the title bar
+    // don't show border for first item to avoid duplicate borders with the title bar
     border-top: $invisibleBorder;
   }
   &:not(:first-child) .conn__inner.selected {
-    //don't show border for first item to avoid duplicate borders with the title bar
+    // don't show border for first item to avoid duplicate borders with the title bar
     border-top: $thinGrayBorder;
   }
-
   &:last-child .conn__inner.selected {
-    //don't show border for first item to avoid duplicate borders with the title bar
+    // don't show border for first item to avoid duplicate borders with the title bar
     border-bottom: $invisibleBorder;
   }
   &:not(:last-child) .conn__inner.selected {
-    //don't show border for first item to avoid duplicate borders with the title bar
+    // don't show border for first item to avoid duplicate borders with the title bar
     border-bottom: $thinGrayBorder;
   }
-
   .conn__inner {
     display: block;
     padding: 0.5rem;
-
-    border-top: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
-    border-bottom: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
-
+    border-top: $invisibleBorder; // this is necessary so that the view does not "jump" when selecting an item
+    border-bottom: $invisibleBorder;
+    // this is necessary so that the view does not "jump" when selecting an item
     &:hover,
     &.selected {
       background-color: white;
     }
-
     .conn__icon {
       margin-left: 0.5rem;
     }

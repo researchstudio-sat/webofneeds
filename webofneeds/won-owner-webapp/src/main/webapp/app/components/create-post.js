@@ -5,9 +5,7 @@ import angular from "angular";
 import ngAnimate from "angular-animate";
 
 import "ng-redux";
-import posttypeSelectModule from "./posttype-select.js";
 import labelledHrModule from "./labelled-hr.js";
-import needTextfieldModule from "./need-textfield.js";
 import imageDropzoneModule from "./image-dropzone.js";
 import locationPickerModule from "./location-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
@@ -357,10 +355,8 @@ function genComponentConf() {
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
   .module("won.owner.components.createPost", [
-    posttypeSelectModule,
     labelledHrModule,
     imageDropzoneModule,
-    needTextfieldModule,
     locationPickerModule,
     createIsseeksModule,
     ngAnimate,

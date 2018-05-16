@@ -6,8 +6,6 @@ import angular from "angular";
 import "ng-redux";
 import won from "../won-es6.js";
 import { postTitleCharacterLimit } from "config";
-import needTextfieldModule from "./need-textfield.js";
-import imageDropzoneModule from "./image-dropzone.js";
 import locationPickerModule from "./location-picker.js";
 import {
   getIn,
@@ -42,17 +40,17 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-        <!-- TEXTBOX -->
-        <div class="cis__mandatory-rest">
-            <!-- Remove image dropzone for now -->
-            <!--won-image-dropzone on-image-picked="::self.pickImage(image)">
-            </won-image-dropzone-->
-            <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+        <!-- Mandatory Input Fields -->
+        <div class="cis__mandatory">
+            <input
+                type="text"
+                length="{{self.characterLimit}}"
+                class="cis__mandatory__title won-txt"
+                placeholder="What? - Short title shown in lists"
+                ng-blur="::self.updateTitle()"
+                ng-keyup="::self.updateTitle()"/>
         </div>
-        <div class="cis__textfield_instruction">
-            <span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-        </div>
-        <!-- /TEXTBOX/ -->
+        <!-- Mandatory Input Fields -->
 
         <!-- DETAILS Picker -->
         <div class="cis__addDetail">
@@ -68,6 +66,18 @@ function genComponentConf() {
                     </svg>
             </div>
             <div class="cis__detail__items" ng-if="self.showDetail" >
+                <!-- DESCRIPTION PICKER -->
+                <div class="cis__detail__items__item description"
+                    ng-click="self.toggleOpenDetail('description')"
+                    ng-class="{'picked' : self.openDetail === 'description'}">
+                        <svg class="cis__circleicon" ng-show="!self.details.has('description')">
+                            <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
+                        </svg>
+                        <svg class="cis__circleicon" ng-show="self.details.has('description')">
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                        </svg>
+                        <span>Description</span>
+                </div>
 
                 <!-- LOCATION PICKER -->
                 <div class="cis__detail__items__item location"
@@ -113,9 +123,25 @@ function genComponentConf() {
         <!-- DETAILS -->
         <!-- TODO: move details into the div opened by the detail picker? -->
         <div class="cis__details" ng-if="self.showDetail">
+            <!-- DESCRIPTION -->
+            <div class="cis__description" ng-if="self.openDetail === 'description'">
+                <div class="cis__addDetail__header description" ng-click="self.details.delete('description') && self.updateDraft()">
+                    <svg class="cis__circleicon">
+                        <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
+                    </svg>
+                    <span class="nonHover">Description</span>
+                    <span class="hover">Remove Description</span>
+                </div>
+                <textarea
+                        won-textarea-autogrow
+                        class="cis__description__text won-txt"
+                        ng-blur="::self.updateDescription()"
+                        ng-keyup="::self.updateDescription()"
+                        placeholder="Enter Description..."></textarea>
+            </div>
 
             <!-- LOCATION -->
-            <won-location-picker 
+            <won-location-picker
                 ng-if="self.openDetail === 'location'"
                 initial-location="::self.draftObject.location"
                 on-location-picked="::self.updateLocation(location)">
@@ -223,6 +249,9 @@ function genComponentConf() {
       if (!this.details.has("ttl")) {
         this.draftObject.ttl = undefined;
       }
+      if (!this.details.has("description")) {
+        this.draftObject.description = undefined;
+      }
 
       this.onUpdate({ draft: this.draftObject });
       dispatchEvent(this.$element[0], "update", { draft: this.draftObject });
@@ -255,6 +284,13 @@ function genComponentConf() {
       this.details.delete("tags"); // remove card
     }
 
+    updateTitle() {
+      const titleString = (this.titleInput() || {}).value || "";
+
+      this.draftObject.title = titleString;
+      this.updateDraft();
+    }
+
     updateTags() {
       // TODO: do something with text that does not start with #
       const tagsInputString = (this.tagsInput() || {}).value;
@@ -274,6 +310,7 @@ function genComponentConf() {
       }
       this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
     }
+
     updateTTL() {
       //await won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + $0.value)
       const ttlString = (this.ttlInput() || {}).value || "";
@@ -292,6 +329,16 @@ function genComponentConf() {
 
       if (ttlString && !this.details.has("ttl")) {
         this.details.add("ttl");
+      }
+    }
+
+    updateDescription() {
+      const descriptionString = (this.descriptionInput() || {}).value || "";
+
+      this.draftObject.description = descriptionString;
+
+      if (descriptionString && !this.details.has("description")) {
+        this.details.add("description");
       }
     }
 
@@ -330,6 +377,17 @@ function genComponentConf() {
       return Array.from(set);
     }
 
+    titleInputNg() {
+      return angular.element(this.titleInput());
+    }
+    titleInput() {
+      if (!this._titleInput) {
+        this._titleInput = this.$element[0].querySelector(".cis__mandatory__title");
+      }
+      return this._titleInput;
+    }
+
+
     ttlInputNg() {
       return angular.element(this.ttlInput());
     }
@@ -338,6 +396,17 @@ function genComponentConf() {
         this._ttlInput = this.$element[0].querySelector(".cis__ttl__text");
       }
       return this._ttlInput;
+    }
+    descriptionInputNg() {
+      return angular.element(this.descriptionInput());
+    }
+    descriptionInput() {
+      if (!this._descriptionInput) {
+        this._descriptionInput = this.$element[0].querySelector(
+          ".cis__description__text",
+        );
+      }
+      return this._descriptionInput;
     }
     tagsInputNg() {
       return angular.element(this.tagsInput());
@@ -371,13 +440,5 @@ function genComponentConf() {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.createIsseek", [
-    /*createNeedTitleBarModule,
-        posttypeSelectModule,
-        labelledHrModule,
-        imageDropzoneModule,
-        needTextfieldModule,
-        locationPickerModule,
-        ngAnimate,*/
-  ])
+  .module("won.owner.components.createIsseek", [])
   .directive("wonCreateIsseeks", genComponentConf).name;

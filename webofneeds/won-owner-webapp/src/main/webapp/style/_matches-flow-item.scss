@@ -34,10 +34,8 @@ won-matches-flow-item {
       50%
     );
   }
-
   .mfi__gallery {
     padding: 0.5rem 0.5rem 0 0.5rem;
-
     won-square-image,
     won-need-map {
       .need-map__mapmount,
@@ -47,21 +45,18 @@ won-matches-flow-item {
         display: flex;
         align-items: center;
         justify-content: center;
-
         &__noimage {
           color: white;
           font-size: 8rem;
         }
       }
     }
-
     won-extended-gallery {
       .eg__selected {
         flex-grow: 1;
         border: $thinGrayBorder;
         position: relative;
         height: initial !important;
-
         > img {
           display: block;
           max-width: 100%;
@@ -72,14 +67,12 @@ won-matches-flow-item {
           top: 0;
         }
       }
-
       .eg__thumbs__more {
         margin: 0.5rem 0 0 0 !important;
         background-color: white;
       }
     }
   }
-
   .mfi__match {
     border-top: $thinGrayBorder;
     background: white;
@@ -88,13 +81,11 @@ won-matches-flow-item {
     padding: 0.5rem;
     min-height: 3rem;
     @include square-image($feedIconSize, 0 0 0 0.5rem);
-
     &:hover {
       .mfi__match__description__title {
         color: $won-primary-color;
       }
     }
-
     &__description {
       color: black;
       flex-grow: 1;
@@ -103,17 +94,14 @@ won-matches-flow-item {
       justify-content: space-between;
       flex-direction: column;
       font-size: $smallFontSize;
-
       &__title {
         font-weight: 700;
       }
-
       &__type {
         font-size: $smallFontSize;
       }
     }
   }
-
   won-feedback-grid {
     border-top: $thinGrayBorder;
   }

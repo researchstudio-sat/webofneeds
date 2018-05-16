@@ -34,8 +34,7 @@ won-location-picker {
       $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
       $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
         $thinBorderWidth;
-      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-        0.438rem;
+      padding: $verticalPadding 0.438rem;
 
       box-sizing: border-box;
       min-height: $formInputHeight;
@@ -43,6 +42,11 @@ won-location-picker {
       width: 100%;
 
       word-wrap: break-word;
+
+      &--withreset {
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
     }
 
     // remove X rendered by IE and Edge as we have our own clear button
