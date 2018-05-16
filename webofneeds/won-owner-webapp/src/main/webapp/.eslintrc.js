@@ -13,6 +13,13 @@ module.exports = {
   rules: {
     "no-console": "warn",
     "no-var": "error",
+    "no-restricted-syntax": [
+      "warn",
+      {
+        selector: "ForStatement",
+        message: "Don't use `for(let i = ...` statements",
+      },
+    ],
   },
   globals: {
     Exception: true,
