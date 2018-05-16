@@ -7,6 +7,7 @@ import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
 import * as LiveReloadPlugin from "webpack-livereload-plugin";
+import * as UnusedWebpackPlugin from "unused-webpack-plugin";
 
 export default config;
 
@@ -147,6 +148,14 @@ function config(env, argv): Configuration {
       ),
       new LiveReloadPlugin(),
       WatchTimePlugin,
+      new UnusedWebpackPlugin({
+        // Source directories
+        directories: [path.join(__dirname, "app")],
+        // Exclude patterns
+        //exclude: ["*.test.js"],
+        // Root directory (optional)
+        root: __dirname,
+      }),
     ],
     devtool: "source-map",
   };
