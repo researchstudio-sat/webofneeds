@@ -30,10 +30,15 @@
   "scripts": {
     "build": "webpack",
     "postinstall": "npm rebuild",
+    "precommit": "lint-staged",
     "watch": "webpack --watch",
     "webpack": "echo Deprecated: This command has been moved to `npm run build` && exit 1",
     "webpack:watch": "echo Deprecated: This command has been moved to `npm run watch` && exit 1",
     "clean": "rimraf ./generated"
+  },
+  "lint-staged": {
+    "gitDir": " ../../../../../",
+    "**/*.{js,json,scss,css,md}": ["prettier --write", "git add"]
   },
   "devDependencies": {
     "@types/copy-webpack-plugin": "^4.4.1",
@@ -51,6 +56,8 @@
     "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.11",
     "exports-loader": "^0.7.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.1.0",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
     "node-sass-import-once": "1.2.0",
