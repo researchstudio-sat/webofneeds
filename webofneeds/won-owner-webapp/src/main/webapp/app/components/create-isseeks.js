@@ -6,19 +6,15 @@ import angular from "angular";
 import "ng-redux";
 import won from "../won-es6.js";
 import { postTitleCharacterLimit } from "config";
-import locationPickerModule from "./location-picker.js";
 import {
-  getIn,
   attach,
   deepFreeze,
   clone,
   dispatchEvent,
-  is,
   mergeAsSet,
   extractHashtags,
 } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import Immutable from "immutable";
 import { connect2Redux } from "../won-utils.js";
 
 const emptyDraft = deepFreeze({
@@ -222,9 +218,7 @@ function genComponentConf() {
 
       this.reset();
 
-      const selectFromState = state => {
-        return {};
-      };
+      const selectFromState = () => ({});
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);

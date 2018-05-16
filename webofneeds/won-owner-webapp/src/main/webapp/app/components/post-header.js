@@ -10,6 +10,7 @@ import { labels, relativeTime } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors.js";
+import won from "../won-es6.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {

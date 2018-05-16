@@ -3,8 +3,6 @@
  */
 
 import angular from "angular";
-import Immutable from "immutable";
-import won from "../won-es6.js";
 import { actionCreators } from "../actions/actions.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -38,7 +36,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      const self = this;
 
       const selectFromState = state => ({
         showMainMenu: state.get("showMainMenu"),

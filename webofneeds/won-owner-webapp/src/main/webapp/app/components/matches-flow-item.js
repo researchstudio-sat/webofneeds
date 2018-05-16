@@ -6,7 +6,7 @@ import feedbackGridModule from "./feedback-grid.js";
 import postHeaderModule from "./post-header.js";
 import postContentModule from "./post-content.js";
 
-import { attach, get, getIn } from "../utils.js";
+import { attach, get } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";

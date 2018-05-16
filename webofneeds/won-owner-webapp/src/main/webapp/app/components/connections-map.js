@@ -4,9 +4,8 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 
-import { attach, decodeUriComponentProperly } from "../utils.js";
-import won from "../won-es6.js";
-import { selectOpenPostUri, selectAllConnections } from "../selectors.js";
+import { attach } from "../utils.js";
+import { selectOpenPostUri } from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import L from "../leaflet-bundleable.js";
 import { initLeaflet } from "../won-utils.js";
@@ -33,21 +32,21 @@ function genComponentConf() {
 
       this.markers = [];
 
-      this.$scope.$watch("self.postLocation", (newValue, oldValue) => {
+      this.$scope.$watch("self.postLocation", newValue => {
         if (newValue) {
           this.updateMap(this.postLocation, this.connections, this.needs);
           this._mapHasBeenAutoCentered = true;
         }
       });
 
-      this.$scope.$watch("self.needs", (newValue, oldValue) => {
+      this.$scope.$watch("self.needs", newValue => {
         if (newValue) {
           this.updateMap(this.postLocation, this.connections, this.needs);
           this._mapHasBeenAutoCentered = true;
         }
       });
 
-      this.$scope.$watch("self.connections", (newValue, oldValue) => {
+      this.$scope.$watch("self.connections", newValue => {
         if (newValue) {
           this.updateMap(this.postLocation, this.connections, this.needs);
           this._mapHasBeenAutoCentered = true;
@@ -102,11 +101,8 @@ function genComponentConf() {
       if (connections && connections.size > 0) {
         connections.map(function(conn) {
           let need = needs && needs.get(conn.get("remoteNeedUri"));
-          let connLocation =
-            needs && needs.getIn([conn.get("remoteNeedUri"), "location"]);
           if (need && need.get("location")) {
             this.markers.push(this.createUniqueMarker(need, conn));
-          } else {
           }
         }, this);
       }
@@ -114,7 +110,7 @@ function genComponentConf() {
       this.markers.forEach(marker => this.map.addLayer(marker));
 
       if (this.markers.length > 0) {
-        var markerGroup = new L.featureGroup(this.markers);
+        const markerGroup = new L.featureGroup(this.markers);
         this.map.fitBounds(markerGroup.getBounds());
         this.mapAlreadyInitialized = true;
       }
@@ -141,13 +137,13 @@ function genComponentConf() {
         .on(
           "click",
           function() {
-            if (false && this.isWhatsAround) {
-              this.router__stateGoAbs("connections", {
-                postUri: need.get("uri"),
-              });
-            } else {
-              this.onSelectedConnection({ connectionUri: conn.get("uri") });
-            }
+            // if (false && this.isWhatsAround) {
+            //   this.router__stateGoAbs("connections", {
+            //     postUri: need.get("uri"),
+            //   });
+            // } else {
+            this.onSelectedConnection({ connectionUri: conn.get("uri") });
+            // }
           },
           this
         );

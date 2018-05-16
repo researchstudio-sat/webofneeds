@@ -4,28 +4,14 @@
 
 import won from "../won-es6.js";
 import Immutable from "immutable";
-import jsonld from "jsonld"; //import *after* the rdfstore to shadow its custom jsonld
 
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
-  selectOpenPostUri,
-  selectRemoteEvents,
   selectConnection,
 } from "../selectors.js";
 
-import {
-  is,
-  urisToLookupMap,
-  getIn,
-  get,
-  jsonld2simpleFormat,
-  cloneAsMutable,
-  deepFreeze,
-  delay,
-} from "../utils.js";
-
-import { makeParams } from "../configRouting.js";
+import { getIn, get, cloneAsMutable, deepFreeze } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -38,7 +24,6 @@ import {
   buildChatMessage,
   buildRateMessage,
   buildConnectMessage,
-  buildAdHocConnectMessage,
   callAgreementsFetch,
   callAgreementEventFetch,
 } from "../won-message-utils.js";
@@ -135,7 +120,6 @@ export function connectionsFetch(data) {
 
 export function connectionsOpen(connectionUri, textMessage) {
   return async (dispatch, getState) => {
-    const state = getState();
     const ownNeed = getState()
       .get("needs")
       .filter(need => need.getIn(["connections", connectionUri]))
@@ -253,21 +237,6 @@ function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
   });
 }
 
-async function messageGraphToEvent(eventUri, messageGraph) {
-  const framed = await jsonld.promises.frame(messageGraph, {
-    "@id": eventUri,
-    "@context": messageGraph["@context"],
-  });
-
-  let event = getIn(framed, ["@graph", 0]);
-  if (event) {
-    event["@context"] = framed["@context"]; // context is needed by jsonld2simpleFormat for expanding prefixes in values
-    event = jsonld2simpleFormat(event);
-  }
-
-  return event;
-}
-
 function generateResponseNeedTo(theirNeed) {
   const theirSeeks = get(theirNeed, "seeks");
   const theirIs = get(theirNeed, "is");
@@ -333,7 +302,7 @@ export function connectionsClose(connectionUri) {
 
 export function connectionsCloseRemote(message) {
   //Closes the 'remoteConnection' again, if closeConnections(...) only closes the 'own' connection
-  return (dispatch, getState) => {
+  return dispatch => {
     const connectionUri = message.getSender();
     const remoteNeedUri = message.getSenderNeed();
     const remoteNode = message.getSenderNode();
@@ -361,7 +330,6 @@ export function connectionsCloseRemote(message) {
 export function connectionsRate(connectionUri, rating) {
   return (dispatch, getState) => {
     const state = getState();
-    let messageData = null;
 
     won
       .getConnectionWithEventUris(connectionUri)
@@ -409,19 +377,19 @@ export function connectionsRate(connectionUri, rating) {
 
 export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
   return (dispatch, getState) => {
-    var url =
+    const url =
       baseString +
       "rest/agreement/getAgreementProtocolUris?connectionUri=" +
       connectionUri;
-    var hasChanged = false;
+    let hasChanged = false;
     callAgreementsFetch(url)
       .then(response => {
         const agreementHeadData = transformDataToSet(response);
 
-        for (key of keySet) {
+        for (let key of keySet) {
           if (agreementHeadData.hasOwnProperty(key)) {
-            for (event of agreementHeadData[key]) {
-              var chatMessages = getState()
+            for (let event of agreementHeadData[key]) {
+              const chatMessages = getState()
                 .getIn([
                   "needs",
                   ownNeedUri,
@@ -454,11 +422,11 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
             ...agreementHeadData["retractedMessageUris"],
           ]);
 
-          for (uri of removalSet) {
+          for (let uri of removalSet) {
             //for(key of keySet) {
-            var key = "pendingProposalUris";
-            var data = agreementData;
-            for (obj of data[key]) {
+            const key = "pendingProposalUris";
+            const data = agreementData;
+            for (let obj of data[key]) {
               if (obj.stateUri === uri || obj.headUri === uri) {
                 console.log("Message " + uri + " was removed");
                 //Update State!
@@ -514,7 +482,7 @@ export function addAgreementDataToSate(
 ) {
   return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
     won.wonMessageFromJsonLd(response).then(msg => {
-      var agreementObject = obj;
+      let agreementObject = obj;
 
       if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
         /*if we find out that the receiverneed of the crawled event is actually our
@@ -550,8 +518,8 @@ export function addAgreementDataToSate(
         agreementData[key].add(agreementObject);
 
         //Dont load in state again!
-        var found = false;
-        for (i = 0; i < chatMessages.size; i++) {
+        let found = false;
+        for (let i = 0; i < chatMessages.size; i++) {
           console.log("ChatMessage: " + i, chatMessages[i]);
           console.log("ChatMessageSize: ", chatMessages.size);
           if (agreementObject.stateUri === chatMessages[i].get("uri")) {
@@ -736,7 +704,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
 }
 
 function transformDataToSet(response) {
-  var tmpAgreementData = {
+  const tmpAgreementData = {
     agreementUris: new Set(response.agreementUris),
     pendingProposalUris: new Set(response.pendingProposalUris),
     pendingProposals: new Set(response.pendingProposals),
@@ -757,7 +725,7 @@ function transformDataToSet(response) {
 }
 
 function filterAgreementSet(tmpAgreementData) {
-  for (prop of tmpAgreementData.cancellationPendingAgreementUris) {
+  for (let prop of tmpAgreementData.cancellationPendingAgreementUris) {
     if (tmpAgreementData.agreementUris.has(prop)) {
       tmpAgreementData.agreementUris.delete(prop);
     }

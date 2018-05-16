@@ -4,12 +4,10 @@
 import angular from "angular";
 
 import "ng-redux";
-import won from "../won-es6.js";
 import needMapModule from "./need-map.js";
 
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import Immutable from "immutable";
 import { connect2Redux } from "../won-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
@@ -80,7 +78,7 @@ function genComponentConf() {
 
       this.showMap = false;
 
-      const selectFromState = state => {
+      const selectFromState = () => {
         return {};
       };
 

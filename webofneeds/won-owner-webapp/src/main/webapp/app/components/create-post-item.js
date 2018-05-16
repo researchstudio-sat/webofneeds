@@ -40,7 +40,6 @@ function genComponentConf() {
 
       this.SEARCH = "search";
       this.POST = "post";
-      const self = this;
 
       const selectFromState = state => {
         const showCreateView = getIn(state, [

@@ -9,10 +9,8 @@
 // import Medium from '../mediumjs-es6.js';
 import angular from "angular";
 // import 'ng-redux';
-import Immutable from "immutable";
 import "angular-sanitize";
-import { dispatchEvent, attach, delay, is } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
+import { dispatchEvent, attach, delay } from "../utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 
 function genComponentConf() {
@@ -62,11 +60,11 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
             */
 
-      this.textFieldNg().bind("input", e => {
+      this.textFieldNg().bind("input", () => {
         this.input();
         return false;
       });
-      this.textFieldNg().bind("paste", e => {
+      this.textFieldNg().bind("paste", () => {
         this.paste();
       });
       this.textFieldNg().bind("keydown", e => {

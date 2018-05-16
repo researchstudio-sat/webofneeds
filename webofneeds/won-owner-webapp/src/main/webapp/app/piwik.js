@@ -2,8 +2,6 @@
  * Created by ksinger on 30.06.2017.
  */
 
-import { getIn } from "./utils.js";
-
 import config from "config";
 
 // ------- INIT  --------------------
@@ -102,7 +100,7 @@ function logUrlChange() {
 
 // ------- ACTION-LOGGING  --------------------
 
-export const piwikMiddleware = store => next => action => {
+export const piwikMiddleware = () => next => action => {
   if (!(action && action.type)) return next(action);
 
   const loggingWhiteList = {

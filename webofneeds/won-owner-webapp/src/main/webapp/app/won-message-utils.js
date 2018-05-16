@@ -4,22 +4,9 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import {
-  checkHttpStatus,
-  mapJoin,
-  urisToLookupMap,
-  flattenObj,
-  flatten,
-  entries,
-  is,
-  getIn,
-} from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
 import { getRandomWonId } from "./won-utils.js";
-
-import { actionTypes } from "./actions/actions.js";
-
-import jsonld from "jsonld";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -41,19 +28,19 @@ export function buildRateMessage(
   theirConnectionUri,
   rating
 ) {
-  return new Promise((resolve, reject) => {
-    var buildMessage = function(envelopeData, eventToRateFor) {
+  return new Promise(resolve => {
+    const buildMessage = function(envelopeData) {
       //TODO: use event URI pattern specified by WoN node
-      var eventUri =
+      const eventUri =
         envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-      var message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
+      const message = new won.MessageBuilder(won.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
         .eventURI(eventUri)
         .hasOwnerDirection()
         .forEnvelopeData(envelopeData)
         .hasSentTimestamp(new Date().getTime().toString())
         .addRating(rating, msgToRateFor.connection.uri)
         .build();
-      //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
+      //const callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
       return { eventUri: eventUri, message: message };
     };
 
@@ -83,17 +70,17 @@ export function buildCloseMessage(
   theirNodeUri,
   theirConnectionUri
 ) {
-  var buildMessage = function(envelopeData) {
+  const buildMessage = function(envelopeData) {
     //TODO: use event URI pattern specified by WoN node
-    var eventUri =
+    const eventUri =
       envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-    var message = new won.MessageBuilder(won.WONMSG.closeMessage)
+    const message = new won.MessageBuilder(won.WONMSG.closeMessage)
       .eventURI(eventUri)
       .forEnvelopeData(envelopeData)
       .hasOwnerDirection()
       .hasSentTimestamp(new Date().getTime().toString())
       .build();
-    //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
+    //const callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
     return { eventUri: eventUri, message: message };
   };
 
@@ -117,9 +104,9 @@ export function buildCloseMessage(
 }
 export function buildCloseNeedMessage(needUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
-    var eventUri =
+    const eventUri =
       envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-    var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
+    const message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
       .eventURI(eventUri)
       .hasReceiverNode(wonNodeUri)
       .hasOwnerDirection()
@@ -134,15 +121,15 @@ export function buildCloseNeedMessage(needUri, wonNodeUri) {
     .getEnvelopeDataForNeed(needUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      err => won.reportError("cannot close need " + needUri)
+      () => won.reportError("cannot close need " + needUri)
     );
 }
 
 export function buildOpenNeedMessage(needUri, wonNodeUri) {
   const buildMessage = function(envelopeData) {
-    var eventUri =
+    const eventUri =
       envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-    var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
+    const message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
       .eventURI(eventUri)
       .hasReceiverNode(wonNodeUri)
       .hasOwnerDirection()
@@ -157,7 +144,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri) {
     .getEnvelopeDataForNeed(needUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      err => won.reportError("cannot close need " + needUri)
+      () => won.reportError("cannot close need " + needUri)
     );
 }
 
@@ -185,9 +172,9 @@ export function buildConnectMessage({
     envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
   }
   //TODO: use event URI pattern specified by WoN node
-  var eventUri =
+  const eventUri =
     envelopeData[won.WONMSG.hasSenderNode] + "/event/" + getRandomWonId();
-  var message = new won.MessageBuilder(won.WONMSG.connectMessage)
+  const message = new won.MessageBuilder(won.WONMSG.connectMessage)
     .eventURI(eventUri)
     .forEnvelopeData(envelopeData)
     .hasFacet(won.WON.OwnerFacet)

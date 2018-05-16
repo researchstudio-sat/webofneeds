@@ -36,7 +36,6 @@
  */
 
 import won from "../won-es6.js";
-import Immutable from "immutable";
 
 // <utils>
 
@@ -75,7 +74,7 @@ import * as messages from "./messages-actions.js";
 import * as configActions from "./config-actions.js";
 
 import { pageLoadAction } from "./load-action.js";
-import { stateGo, stateReload, stateTransitionTo } from "redux-ui-router";
+import { stateGo, stateReload } from "redux-ui-router";
 
 // </action-creators>
 
@@ -315,7 +314,7 @@ export function getConnectionRelatedData(
     .getEventsOfConnection(connectionUri, { requesterWebId: needUri })
     .then(eventsLookup => {
       const eventList = [];
-      for (let [uri, event] of entries(eventsLookup)) {
+      for (let [, event] of entries(eventsLookup)) {
         eventList.push(event);
       }
       return eventList;
@@ -333,7 +332,6 @@ export function getConnectionRelatedData(
 
 export function needsOpen(needUri) {
   return (dispatch, getState) => {
-    const state = getState();
     buildOpenNeedMessage(
       needUri,
       getState().getIn(["config", "defaultNodeUri"])

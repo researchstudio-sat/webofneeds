@@ -19,9 +19,7 @@ class LandingpageController {
 
     window.ldgp4dbg = this;
 
-    const self = this;
-
-    const select = state => ({});
+    const select = () => ({});
 
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
     this.$scope.$on("$destroy", disconnect);

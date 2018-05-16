@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 import Immutable from "immutable";
 import won from "./won-es6.js";
-import { decodeUriComponentProperly, is, getIn } from "./utils.js";
+import { decodeUriComponentProperly, getIn } from "./utils.js";
 
 export const selectLastUpdateTime = state => state.get("lastUpdateTime");
 export const selectRouterParams = state =>

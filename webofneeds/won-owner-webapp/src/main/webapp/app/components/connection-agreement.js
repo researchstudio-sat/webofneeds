@@ -1,16 +1,6 @@
 import angular from "angular";
-import jld from "jsonld";
-import Immutable from "immutable";
-import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  attach,
-  delay,
-  getIn,
-  clone,
-  deepFreeze,
-  dispatchEvent,
-} from "../utils.js";
+import { attach, clone, deepFreeze } from "../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
@@ -90,7 +80,6 @@ function genComponentConf() {
 
       this.declarations = clone(declarations);
 
-      const self = this;
       this.clicked = false;
       this.showDetail = true;
 
@@ -138,7 +127,7 @@ function genComponentConf() {
     }
 
     getClausesText(chatMessages, message, clausesUri) {
-      for (msg of Array.from(chatMessages)) {
+      for (let msg of Array.from(chatMessages)) {
         if (
           msg[1].get("uri") === clausesUri ||
           msg[1].get("remoteUri") === clausesUri
@@ -180,11 +169,7 @@ function genComponentConf() {
         "accepts",
         msg
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
       this.onRemoveData({ proposalUri: this.stateUri });
@@ -197,29 +182,21 @@ function genComponentConf() {
         : this.message.get("remoteUri");
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.onUpdate({ draft: this.stateUri });
     }
 
     acceptProposeToCancel() {
       this.clicked = true;
-      var uri = this.cancelUri;
+      let uri = this.cancelUri;
       if (!uri) {
         uri = this.message.get("remoteUri");
       }
 
       const msg = "Accepted propose to cancel agreement: " + uri;
       const trimmedMsg = buildProposalMessage(uri, "accepts", msg);
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false, uri);
       this.onRemoveData({ proposalUri: uri });
@@ -227,7 +204,7 @@ function genComponentConf() {
 
     retractMessage() {
       this.clicked = true;
-      var uri = this.cancelUri;
+      let uri = this.cancelUri;
       if (!uri) {
         uri = this.isOwn
           ? this.message.get("uri")
@@ -238,11 +215,7 @@ function genComponentConf() {
         "retracts",
         "Retract: " + this.text
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false, uri);
       this.onUpdate();
@@ -250,7 +223,7 @@ function genComponentConf() {
 
     rejectMessage() {
       this.clicked = true;
-      var uri = this.cancelUri;
+      let uri = this.cancelUri;
       if (!uri) {
         uri = this.message.get("remoteUri");
       }
@@ -260,11 +233,7 @@ function genComponentConf() {
         "rejects",
         "Reject: " + this.text
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false, uri);
       this.onUpdate();

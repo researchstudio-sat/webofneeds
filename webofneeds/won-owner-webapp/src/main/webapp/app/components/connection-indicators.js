@@ -106,9 +106,6 @@ function genComponentConf() {
         const unreadConnectedCount =
           unreadConversations && unreadConversations.size;
 
-        const sortedUnreadMatches = sortByDate(unreadMatches);
-        const sortedUnreadConversations = sortByDate(unreadConversations);
-
         const unreadCountSum = unreadConnectedCount + unreadMatchesCount;
 
         return {

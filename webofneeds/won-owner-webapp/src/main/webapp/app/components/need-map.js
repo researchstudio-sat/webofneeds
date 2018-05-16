@@ -5,7 +5,6 @@ import angular from "angular";
 import inviewModule from "angular-inview";
 
 import { attach } from "../utils.js";
-import won from "../won-es6.js";
 import { actionCreators } from "../actions/actions.js";
 import L from "../leaflet-bundleable.js";
 import { initLeaflet, connect2Redux } from "../won-utils.js";
@@ -27,7 +26,7 @@ function genComponentConf() {
 
       this.map = initLeaflet(this.mapMount());
 
-      this.$scope.$watch("self.location", (newLocation, oldLocation) => {
+      this.$scope.$watch("self.location", newLocation => {
         if (newLocation) {
           this.updateMap(newLocation);
           this._mapHasBeenAutoCentered = true;

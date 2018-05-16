@@ -113,9 +113,6 @@ function genComponentConf() {
           ? unreadConversations.size
           : 0;
 
-        const sortedUnreadMatches = sortByDate(unreadMatches);
-        const sortedUnreadConversations = sortByDate(unreadConversations);
-
         return {
           WON: won.WON,
           need,

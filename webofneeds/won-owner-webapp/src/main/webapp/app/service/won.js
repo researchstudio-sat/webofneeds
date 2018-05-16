@@ -18,21 +18,14 @@
  * Created by LEIH-NB on 19.08.2014.
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
-import {
-  jsonld2simpleFormat,
-  is,
-  get,
-  getIn,
-  clone,
-  prefixOfUri,
-} from "../utils.js";
+import { is, prefixOfUri, isArray, clone } from "../utils.js";
 import { clearPrivateId, clearReadUris } from "../won-localstorage.js";
 import jsonld from "jsonld";
 
 import N3 from "n3";
 window.N34dbg = N3;
 
-var won = {};
+let won = {};
 
 /**
  *  Constants
@@ -378,7 +371,7 @@ won.toCompacted = function(longValue) {
   if (!longValue) {
     return undefined;
   }
-  var propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
+  const propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
   propertyPath[propertyPath.length - 1] += "Compacted";
   //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
   return won.lookup(won, propertyPath);
@@ -395,8 +388,8 @@ won.clone = function(obj) {
  */
 
 won.merge = function(/*args...*/) {
-  var o = {};
-  for (var i = 0; i < arguments.length; i++) {
+  const o = {};
+  for (let i = 0; i < arguments.length; i++) {
     won.mergeIntoLast(arguments[i], o);
   }
   return o;
@@ -412,10 +405,11 @@ won.merge = function(/*args...*/) {
      * @param args merges all passed objects onto the first passed
      */
 won.mergeIntoLast = function(/*args...*/) {
-  for (var i = 0; i < arguments.length - 1; i++) {
-    var obj1 = arguments[arguments.length - 1];
-    var obj2 = arguments[i];
-    for (var p in obj2) {
+  let obj1;
+  for (let i = 0; i < arguments.length - 1; i++) {
+    obj1 = arguments[arguments.length - 1];
+    const obj2 = arguments[i];
+    for (const p in obj2) {
       try {
         // Property in destination object set; update its value.
         if (obj2[p].constructor == Object) {
@@ -436,7 +430,13 @@ won.mergeIntoLast = function(/*args...*/) {
 // it is possible to do a reverse lookup. The table contains former values
 // as keys and maps to arrays that define the lookup-path.
 won.constantsReverseLookupTable = {};
-for (var root of ["WON", "UNREAD", "WONMSG", "EVENT", "COMMUNUCATION_STATE"]) {
+for (const root of [
+  "WON",
+  "UNREAD",
+  "WONMSG",
+  "EVENT",
+  "COMMUNUCATION_STATE",
+]) {
   won.mergeIntoLast(
     buildReverseLookup(won[root], [root]),
     won.constantsReverseLookupTable
@@ -451,7 +451,7 @@ won.buildReverseLookup = buildReverseLookup;
  *
  * e.g.:
  *
- *     var obj = { propA: { subProp: 'foo'}, probB: 2 }
+ *     const obj = { propA: { subProp: 'foo'}, probB: 2 }
  *
  *     buildReverseLookup(obj)
  *          ----> {foo  ['propA', 'subProp'], 2: ['probB']}
@@ -465,12 +465,12 @@ function buildReverseLookup(obj, accumulatedPath /* = [] */) {
   accumulatedPath =
     typeof accumulatedPath !== "undefined" ? accumulatedPath : []; // to allow calling with only obj
 
-  var lookupAcc = {};
-  for (var k in obj) {
+  const lookupAcc = {};
+  for (const k in obj) {
     if (obj.hasOwnProperty(k)) {
-      var v = obj[k];
-      var accPathAppended = accumulatedPath.concat([k]);
-      var foundLookups = {};
+      const v = obj[k];
+      const accPathAppended = accumulatedPath.concat([k]);
+      let foundLookups = {};
       if (typeof v === "string" || typeof v === "number") {
         //terminal node
         foundLookups[v] = accPathAppended;
@@ -499,7 +499,7 @@ function lookup(o, propertyPath) {
   if (!o || !propertyPath) {
     return undefined;
   }
-  var resolvedStep = o[propertyPath[0]];
+  const resolvedStep = o[propertyPath[0]];
   if (propertyPath.length === 1) {
     return resolvedStep;
   } else {
@@ -523,7 +523,7 @@ won.getSafeJsonLdValue = function(dataItem) {
 won.getLocalName = function(uriOrQname) {
   if (uriOrQname == null || typeof uriOrQname !== "string") return null;
   //first, try to get the URI hash fragment (without hash)
-  var pos = uriOrQname.lastIndexOf("#");
+  let pos = uriOrQname.lastIndexOf("#");
   if (pos > -1 && pos < uriOrQname.length) {
     return uriOrQname.substring(pos + 1);
   }
@@ -567,7 +567,7 @@ won.isArray = function(x) {
 };
 
 won.replaceRegExp = function(string) {
-  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  return string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
 };
 
 /**
@@ -577,7 +577,7 @@ won.replaceRegExp = function(string) {
  * @param test
  */
 won.deleteWhere = function(array, test) {
-  for (var i = 0; i < array.length; i++) {
+  for (let i = 0; i < array.length; i++) {
     if (test(array[i])) {
       array.splice(i, 1);
       i--;
@@ -587,9 +587,9 @@ won.deleteWhere = function(array, test) {
 };
 
 won.containsAll = function(array, subArray) {
-  for (var skey in subArray) {
-    var found = false;
-    for (var key in array) {
+  for (const skey in subArray) {
+    let found = false;
+    for (const key in array) {
       if (subArray[skey] === array[key]) {
         found = true;
         break;
@@ -718,14 +718,14 @@ won.JsonLdHelper = {
    */
   getGraphNames: function(data) {
     //collect graph URIs in the specified dataset
-    var graphs = data["@graph"];
-    var graphURIs = [];
+    const graphs = data["@graph"];
+    const graphURIs = [];
     if (graphs == null) {
       return graphURIs;
     }
     if (won.isArray(graphs) && graphs.length > 0) {
-      for (var i = 0; i < graphs.length; i++) {
-        var graphURI = graphs[i]["@id"];
+      for (let i = 0; i < graphs.length; i++) {
+        const graphURI = graphs[i]["@id"];
         if (graphURI != null) {
           graphURIs.push(graphURI);
         }
@@ -748,8 +748,8 @@ won.JsonLdHelper = {
       //if the first node doesn't contain an @graph keyword, we assume that there
       //are no named graphs and all data is in the default graph.
       let outermostGraphContent = data["@graph"];
-      for (var i = 0; i < outermostGraphContent.length; i++) {
-        var curNode = outermostGraphContent[i];
+      for (let i = 0; i < outermostGraphContent.length; i++) {
+        const curNode = outermostGraphContent[i];
         if (curNode["@graph"] == null) {
           //we assume there are no named graphs, the outermost graph is the default graph
           return outermostGraphContent;
@@ -775,8 +775,8 @@ won.JsonLdHelper = {
         //outermost node has '@graph' but no '@id'
         //--> @graph array contains named graphs. search for name.
         let outermostGraphContent = data["@graph"];
-        for (var i = 0; i < outermostGraphContent.length; i++) {
-          var curNode = outermostGraphContent[i];
+        for (let i = 0; i < outermostGraphContent.length; i++) {
+          const curNode = outermostGraphContent[i];
           if (curNode["@id"] == null || curNode["@id"] === graphName) {
             //we've found the named graph without an @id attribute - that's the default graph
             return curNode["@graph"];
@@ -787,10 +787,10 @@ won.JsonLdHelper = {
     return null;
   },
   getNodeInGraph: function(data, graphName, nodeId) {
-    var graph = this.getNamedGraph(data, graphName);
+    const graph = this.getNamedGraph(data, graphName);
     for (let key in graph["@graph"]) {
-      var curNode = graph["@graph"][key];
-      var curNodeId = node["@id"];
+      const curNode = graph["@graph"][key];
+      const curNodeId = curNode["@id"];
       if (curNodeId === nodeId) {
         return curNode;
       }
@@ -798,7 +798,7 @@ won.JsonLdHelper = {
     return null;
   },
   addDataToNode: function(data, graphName, nodeId, predicate, object) {
-    var node = this.getNodeInGraph(data, graphName, nodeId);
+    const node = this.getNodeInGraph(data, graphName, nodeId);
     if (node != null) {
       node[predicate] = object;
     }
@@ -820,14 +820,14 @@ won.addContentGraphReferencesToMessageGraph = function(
   if (graphURIs != null) {
     if (won.isArray(graphURIs) && graphURIs.length > 0) {
       //if the message graph already contains content references, fetch them:
-      var existingContentRefs =
+      const existingContentRefs =
         messageGraph["@graph"][0][won.WONMSG.hasContentCompacted];
-      var contentGraphURIs =
+      const contentGraphURIs =
         typeof existingContentRefs === "undefined" ||
         !isArray(existingContentRefs)
           ? []
           : existingContentRefs;
-      for (var i = 0; i < graphURIs.length; i++) {
+      for (let i = 0; i < graphURIs.length; i++) {
         contentGraphURIs.push({ "@id": graphURIs[i] });
       }
       messageGraph["@graph"][0][
@@ -850,7 +850,7 @@ won.addMessageGraph = function(builder, graphURIs, messageType) {
   let graphs = builder.data["@graph"];
   let unsetMessageGraphUri = won.WONMSG.uriPlaceholder.event + "#data";
   //create the message graph, containing the message type
-  var messageGraph = {
+  const messageGraph = {
     "@graph": [
       {
         "@id": won.WONMSG.uriPlaceholder.event,
@@ -915,7 +915,7 @@ won.WonDomainObjects.prototype = {
    * Returns the domain object with the specified URI.
    * @param uri
    */
-  getDomainObject: function(uri) {},
+  getDomainObject: function(/*uri*/) {},
 };
 
 won.DomainObjectFactory = function() {};
@@ -926,140 +926,7 @@ won.DomainObjectFactory.prototype = {
    * Generates domain objects with the specified JSON-LD content. Returns a WonDomainObjects
    * instance containing all domain objects found in the JSON-LD content.
    */
-  jsonLdToWonDomainObjects: function(jsonLdContent) {},
-};
-
-//helper function for the WonMessage hack
-let makeEnvelopeGraphForMessageResource = function(messageResource) {
-  "use strict";
-  let envelopeGraphUri = messageResource.uri + "#data";
-  let messageRes = {
-    "@id": messageResource.uri,
-    "@type": messageResource.type,
-  };
-  let envelope = {
-    "@id": envelopeGraphUri,
-    "@graph": [
-      messageRes,
-      {
-        "@id": envelopeGraphUri,
-        "@type": "http://purl.org/webofneeds/message#EnvelopeGraph",
-      },
-    ],
-  };
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    false,
-    "hasReceivedTimestamp",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    false,
-    "hasSentTimestamp",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasPreviousMessage",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    false,
-    "protocolVersion",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasSenderNeed",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasSender",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasSenderNode",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasReceiverNeed",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasReceiver",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasReceiverNode",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasCorrespondingRemoteMessage",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasMessageType",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasRemoteFacet",
-    messageResource
-  );
-  addPropertyIfPresent(
-    messageRes,
-    "http://purl.org/webofneeds/message#",
-    true,
-    "hasFacet",
-    messageResource
-  );
-  return envelope;
-};
-
-//helper function for the WonMessage hack
-let addPropertyIfPresent = function(
-  toAddTo,
-  prefix,
-  isUri,
-  propertyName,
-  toAddFrom
-) {
-  let value = toAddFrom[propertyName];
-  if (value && typeof value == "string") {
-    toAddTo[prefix + propertyName] = isUri ? { "@id": value } : value;
-  }
+  jsonLdToWonDomainObjects: function(/*jsonLdContent*/) {},
 };
 
 /**
@@ -1114,7 +981,7 @@ won.jsonLdToTrig = async function(jsonldData, addDefaultContext = true) {
   const quadString = await jsonld.promises.toRDF(jsonldData, {
     format: "application/nquads",
   });
-  const { quads, prefixes } = await won.n3Parse(quadString, {
+  const { quads } = await won.n3Parse(quadString, {
     format: "application/n-quads",
   });
 
@@ -1148,7 +1015,7 @@ window.jsonLdToTrig4dbg = won.jsonLdToTrig;
  *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
  */
 won.n3Write = async function(quads, writerArgs) {
-  const { namedNode, literal, defaultGraph, quad } = N3.DataFactory;
+  //const { namedNode, literal, defaultGraph, quad } = N3.DataFactory;
   const writer = N3.Writer(writerArgs);
   return new Promise((resolve, reject) => {
     //quads.forEach(t => writer.addQuad(t))
@@ -1196,7 +1063,7 @@ won.ttlToJsonLd = async function(ttl, prependWonPrefixes = true) {
     : ttl;
 
   const tryConversion = async () => {
-    const { quads, prefixes } = await won.n3Parse(ttl_);
+    const { quads /*prefixes*/ } = await won.n3Parse(ttl_);
     const placeholderGraphUri = "ignoredgraphuri:placeholder";
 
     // overwrite empty graphUri (ttl is just triples) with placeholder string
@@ -1833,7 +1700,6 @@ WonMessage.prototype = {
     }
   },
   __getContainedContentGraphUris: (graph, messageUri) => {
-    let graphUri = graph["@id"];
     let graphData = graph["@graph"];
     const contentUrisArray = graphData
       .filter(resource => resource["@id"] === messageUri)
@@ -1913,7 +1779,7 @@ won.MessageBuilder = function MessageBuilder(messageType, content) {
   if (messageType == null) {
     throw { message: "messageType must not be null!" };
   }
-  var graphNames = null;
+  let graphNames = null;
   if (content != null) {
     this.data = won.clone(content);
     graphNames = won.JsonLdHelper.getGraphNames(this.data);
@@ -1936,7 +1802,7 @@ won.MessageBuilder.prototype = {
       "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
       "@type": "@id",
     };
-    var regex = new RegExp(won.replaceRegExp(this.eventUriValue));
+    const regex = new RegExp(won.replaceRegExp(this.eventUriValue));
     won.visitDepthFirst(this.data, function(element, key, collection) {
       if (collection != null && key === "@id") {
         if (element) collection[key] = element.replace(regex, eventUri);
@@ -1949,7 +1815,7 @@ won.MessageBuilder.prototype = {
     return this.data["@context"];
   },
   forEnvelopeData: function(envelopeData) {
-    var node = this.getMessageEventNode();
+    const node = this.getMessageEventNode();
     for (let key in envelopeData) {
       node[key] = { "@id": envelopeData[key] };
     }
@@ -2047,16 +1913,16 @@ won.MessageBuilder.prototype = {
    * Fetches the content graph, creating it if it doesn't exist.
    */
   getContentGraph: function() {
-    var graphs = this.data["@graph"];
-    var contentGraphUri = this.eventUriValue + "#content";
+    const graphs = this.data["@graph"];
+    const contentGraphUri = this.eventUriValue + "#content";
     for (let key in graphs) {
-      var graph = graphs[key];
+      const graph = graphs[key];
       if (graph["@id"] === contentGraphUri) {
         return graph;
       }
     }
     //none found: create it
-    var contentGraph = {
+    const contentGraph = {
       "@id": this.eventUriValue + "#content",
       "@graph": [{ "@id": this.eventUriValue }],
     };
@@ -2074,7 +1940,7 @@ won.MessageBuilder.prototype = {
    * takes a lists of json-ld-objects and merges them into the content-graph
    */
   mergeIntoContentGraph: function(jsonldPayload) {
-    var contentGraph = this.getContentGraph();
+    const contentGraph = this.getContentGraph();
     contentGraph["@graph"] = contentGraph["@graph"].concat(jsonldPayload);
   },
   addContentGraphData: function(predicate, object) {

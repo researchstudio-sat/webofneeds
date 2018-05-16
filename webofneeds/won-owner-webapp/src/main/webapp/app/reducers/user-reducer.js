@@ -2,29 +2,26 @@
  * Created by ksinger on 10.05.2016.
  */
 import { actionTypes } from "../actions/actions.js";
-import { repeatVar } from "../utils.js";
 import Immutable from "immutable";
-import { createReducer } from "redux-immutablejs";
-import { combineReducersStable } from "../redux-utils.js";
-import won from "../won-es6.js";
 
 const initialState = Immutable.fromJS({ loggedIn: false });
 
 export default function(userData = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.initialPageLoad:
-    case actionTypes.login:
+    case actionTypes.login: {
       //because we get payload as immutablejs-map sometimes but not always
-      var immutablePayload = Immutable.fromJS(action.payload);
+      const immutablePayload = Immutable.fromJS(action.payload);
 
-      var loggedIn = immutablePayload.get("loggedIn");
-      var email = immutablePayload.get("email");
+      const loggedIn = immutablePayload.get("loggedIn");
+      const email = immutablePayload.get("email");
 
       if (loggedIn) {
         return Immutable.fromJS({ loggedIn: true, email: email });
       } else {
         return userData;
       }
+    }
 
     case actionTypes.logout:
       return Immutable.fromJS({ loggedIn: false });

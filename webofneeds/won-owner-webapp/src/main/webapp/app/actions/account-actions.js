@@ -9,16 +9,15 @@ import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
   login,
-  privateId2Credentials,
   logout,
   parseCredentials,
   generatePrivateId,
 } from "../won-utils.js";
 import { clearPrivateId, savePrivateId } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
-import { resetParams, checkAccessToCurrentRoute } from "../configRouting.js";
+import { checkAccessToCurrentRoute } from "../configRouting.js";
 
-import { checkHttpStatus, getIn, delay } from "../utils.js";
+import { getIn } from "../utils.js";
 
 /**
  * @param privateId
@@ -195,7 +194,7 @@ export function accountLogin(credentials, options) {
           return checkAccessToCurrentRoute(dispatch, getState);
         }
       })
-      .then(response => {
+      .then((/*response*/) => {
         if (options_.fetchData) {
           return fetchOwnedData(email, curriedDispatch);
         } else {
@@ -334,8 +333,8 @@ export function accountLogout(options) {
 export function accountRegister(credentials) {
   return (dispatch, getState) =>
     registerAccount(credentials)
-      .then(response =>
-        accountLogin(credentials, {
+      .then(() =>
+        /*response*/ accountLogin(credentials, {
           fetchData: false,
           redirectToFeed: true,
         })(dispatch, getState)

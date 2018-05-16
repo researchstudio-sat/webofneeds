@@ -11,14 +11,10 @@ import {
 
 import Immutable from "immutable";
 
-import { clone, jsonld2simpleFormat, getIn } from "../utils.js";
-
 import {
   fetchDataForOwnedNeeds,
   callAgreementsFetch,
 } from "../won-message-utils.js";
-
-import { makeParams, resetParams } from "../configRouting.js";
 
 export function successfulCloseNeed(event) {
   return (dispatch, getState) => {
@@ -35,7 +31,7 @@ export function successfulCloseNeed(event) {
   };
 }
 export function failedCloseNeed(event) {
-  return (dispatch, getState) => {
+  return dispatch => {
     const needUri = event.getReceiverNeed();
     /*
         * TODO not sure if it's necessary to invalidate
@@ -94,14 +90,10 @@ export function failedCloseNeed(event) {
 export function successfulCloseConnection(event) {
   return (dispatch, getState) => {
     const state = getState();
-    let eventUri = null;
-    let receiverUri = null;
-    let isRemoteResponse = false;
     //TODO maybe refactor these response message handling
     if (
       state.getIn(["messages", "waitingForAnswer", event.getIsResponseTo()])
     ) {
-      eventUri = event.getIsResponseTo();
       dispatch({
         type: actionTypes.messages.close.success,
         payload: event,
@@ -113,7 +105,6 @@ export function successfulCloseConnection(event) {
         event.getIsRemoteResponseTo(),
       ])
     ) {
-      eventUri = event.getIsRemoteResponseTo();
       dispatch({
         type: actionTypes.messages.close.success,
         payload: event,
@@ -136,7 +127,7 @@ export function successfulCreate(event) {
     //get URI of newly created need from message
 
     //load the data into the local rdf store and publish NeedCreatedEvent when done
-    var needURI = event.getReceiverNeed();
+    const needURI = event.getReceiverNeed();
 
     won.getNeed(needURI).then(need => {
       dispatch(
@@ -207,16 +198,17 @@ export function connectionMessageReceived(event) {
     ]);
     const baseString = "/owner/";
 
-    var url =
+    const url =
       baseString +
       "rest/agreement/getMessageEffects?connectionUri=" +
       connectionUri +
       "&messageUri=" +
       event.getMessageUri();
+
     callAgreementsFetch(url).then(response => {
       console.log("response : ", response);
       let change = false;
-      for (effect of response) {
+      for (const effect of response) {
         console.log("effect : ", effect);
         switch (effect.type) {
           case "ACCEPTS":
@@ -306,13 +298,13 @@ export function connectionMessageReceived(event) {
 function getEventUri(messages, messageUri) {
   if (messageUri) {
     let uriSet = new Set();
-    for (message of Array.from(messages)) {
-      uriSet.add(message[0]);
+    for (const [uri] of Array.from(messages)) {
+      uriSet.add(uri);
     }
     if (!uriSet.has(messageUri)) {
-      for (msg of Array.from(messages)) {
-        if (msg[1].get("remoteUri") === messageUri) {
-          messageUri = msg[1].get("uri");
+      for (const [, message] of Array.from(messages)) {
+        if (message.get("remoteUri") === messageUri) {
+          messageUri = message.get("uri");
         }
       }
     }
@@ -365,54 +357,6 @@ export function connectMessageReceived(event) {
       });
     });
   };
-}
-
-/**
- * @deprecated due to the reason given in the TODO.
- * TODO this function indirectly fetches the entire
- * connection again! It should be enough to just
- * use the two events we get in most cases and make
- * the reducers correspondingly smarter.
- * @param eventOnRemote
- * @param eventOnOwn
- * @return {*}
- */
-function getConnectionData(event) {
-  return won
-    .getConnectionWithOwnAndRemoteNeed(
-      event.getReceiverNeed(),
-      event.getSenderNeed()
-    )
-    .then(connectionData =>
-      getConnectionRelatedData(
-        event.getReceiverNeed(),
-        event.getSenderNeed(),
-        connectionData.uri
-      ).then(data => {
-        if (
-          data.events.filter(e => e.uri === event.getMessageUri()).length === 0
-        ) {
-          //
-          /*
-                     * if data.events doesn't contain the arguments-events,
-                     * add them. they might not be contained in the events-list
-                     * due to a race condition, i.e. if data hasn't been
-                     * stored on the node when the query resolves.
-                     */
-          const eventOnOwn_ = clone(event.getFramedMessageResourceForState());
-          eventOnOwn_.hasCorrespondingRemoteMessage = clone(
-            event.getFramedRemoteMessageResourceForState()
-          );
-          data.events.push(eventOnOwn_);
-        }
-
-        data.receivedEvent = event.getMessageUri();
-        data.updatedConnection = connectionData.uri;
-        data.message = event;
-
-        return data;
-      })
-    );
 }
 
 export function markAsRelevant(event) {
@@ -486,7 +430,6 @@ export function hintMessageReceived(event) {
         )
         .then(() => {
           let needUri = event.getReceiverNeed();
-          let match = {};
           //TODO: why do add the matchscore and counterpart when we don't use the event?
 
           event.matchScore = event.getMatchScore();

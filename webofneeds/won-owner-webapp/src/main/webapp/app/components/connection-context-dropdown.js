@@ -56,7 +56,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
-      const self = this;
       const selectFromState = state => {
         const connectionUri = selectOpenConnectionUri(state);
 

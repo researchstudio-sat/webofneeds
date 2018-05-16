@@ -1,4 +1,5 @@
 import angular from "angular";
+import won from "../../won-es6.js";
 import Immutable from "immutable";
 import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";

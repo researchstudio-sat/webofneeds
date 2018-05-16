@@ -2,7 +2,6 @@
  * Created by fsuda on 25.04.2018.
  */
 const READ_URIS = "wonReadUris";
-const PRIVATE_ID = "privateId";
 
 export function markUriAsRead(uri) {
   //TODO: BETTER IMPL
@@ -32,7 +31,7 @@ export function isUriRead(uri) {
   if (readUrisString) {
     let readUriList = JSON.parse(readUrisString);
 
-    for (var i = 0; i < readUriList.length; i++) {
+    for (let i = 0; i < readUriList.length; i++) {
       if (readUriList[i] === uri) {
         return true;
       }

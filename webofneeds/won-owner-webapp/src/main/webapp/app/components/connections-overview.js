@@ -15,8 +15,6 @@ import extendedConnectionIndicatorsModule from "./extended-connection-indicators
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
-import { labels } from "../won-label-utils.js";
-
 import { attach, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";

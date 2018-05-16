@@ -7,10 +7,7 @@ import thunk from "redux-thunk";
 
 import { piwikMiddleware } from "./piwik.js";
 
-import {
-  composeWithDevTools,
-  devToolsEnhancer,
-} from "redux-devtools-extension";
+import { devToolsEnhancer } from "redux-devtools-extension";
 
 export default function configRedux(appModule) {
   appModule.config(createStore);
@@ -27,7 +24,6 @@ function createStore($ngReduxProvider) {
            */
       "ngUiRouterMiddleware",
       thunk,
-      loggingMiddleware,
       piwikMiddleware,
     ],
     [
@@ -60,30 +56,3 @@ function ensureDevToolChangesGetRendered($ngRedux, $rootScope, $timeout) {
     });
   }
 }
-
-const loggingMiddleware = store => next => action => {
-  if (window.won && window.won.debugmode) {
-    const state = store.getState();
-    /*
-        console.debug('action:  ', action.type,
-            action.payload && action.payload.toJS ? action.payload.toJS() : action.payload
-        );
-        console.debug('changing state from ',
-            state && state.toJS ?
-                state.toJS() : state);
-         */
-  }
-
-  const result = next(action);
-
-  if (window.won && window.won.debugmode) {
-    const updatedState = store.getState();
-    /*
-        console.debug('changed state to ',
-            updatedState && updatedState.toJS ?
-                updatedState.toJS() : updatedState);
-         */
-  }
-
-  return result;
-};

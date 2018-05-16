@@ -1,6 +1,5 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { createReducer } from "redux-immutablejs";
 import won from "../won-es6.js";
 import { getIn, generateIdString } from "../utils.js";
 
@@ -17,17 +16,18 @@ export default function(allToasts = initialState, action = {}) {
     case actionTypes.logout:
       return initialState;
 
-    case actionTypes.connections.sendChatMessageFailed:
-      var msg = getIn(action, ["payload", "message"]);
+    case actionTypes.connections.sendChatMessageFailed: {
+      const msg = getIn(action, ["payload", "message"]);
       return pushNewToast(
         allToasts,
         "Error while processing chat message: \n\n" + msg,
         won.WON.errorToast,
         {}
       );
+    }
 
-    case actionTypes.registerFailed:
-      var privateId = getIn(action, ["payload", "privateId"]);
+    case actionTypes.registerFailed: {
+      const privateId = getIn(action, ["payload", "privateId"]);
       if (privateId) {
         return pushNewToast(
           allToasts,
@@ -40,6 +40,7 @@ export default function(allToasts = initialState, action = {}) {
       } else {
         return allToasts;
       }
+    }
 
     case actionTypes.loginFailed:
       if (getIn(action, ["payload", "loginError"]) === "invalid privateId") {
@@ -107,23 +108,25 @@ export default function(allToasts = initialState, action = {}) {
         won.WON.errorToast
       );
 
-    case actionTypes.messages.needMessageReceived:
-      var title = action.payload.needTitle;
-      var message = action.payload.message;
+    case actionTypes.messages.needMessageReceived: {
+      const title = action.payload.needTitle;
+      const message = action.payload.message;
       return pushNewToast(
         allToasts,
         "Notification for your posting '" + title + "': " + message,
         won.WON.infoToast
       );
+    }
 
-    case actionTypes.needs.closedBySystem:
-      title = action.payload.needTitle;
-      message = action.payload.message;
+    case actionTypes.needs.closedBySystem: {
+      const title = action.payload.needTitle;
+      const message = action.payload.message;
       return pushNewToast(
         allToasts,
         "Closed your posting '" + title + "'. Cause: " + message,
         won.WON.infoToast
       );
+    }
 
     //SPECIFIC TOAST ACTIONS
     case actionTypes.toasts.delete:

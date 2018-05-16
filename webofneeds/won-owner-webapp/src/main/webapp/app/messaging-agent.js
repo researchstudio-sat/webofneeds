@@ -17,21 +17,11 @@
  */
 
 import won from "./won-es6.js";
-import {
-  attach,
-  delay,
-  watchImmutableRdxState,
-  checkHttpStatus,
-  is,
-  getIn,
-} from "./utils.js";
-
-import { makeParams } from "./configRouting.js";
+import { watchImmutableRdxState, getIn } from "./utils.js";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
 //import './message-service.js'; //TODO still uses es5
 import SockJS from "sockjs-client";
-import * as messages from "./actions/messages-actions.js";
 
 export function runMessagingAgent(redux) {
   /**
@@ -181,7 +171,7 @@ export function runMessagingAgent(redux) {
           return true;
         } else if (message.isFailureResponse()) {
           //Resend the failed close message
-          var connectionUri = message.getSender();
+          const connectionUri = message.getSender();
           if (connectionUri) {
             console.warn("RESEND CLOSE MESSAGE FOR: ", connectionUri);
             redux.dispatch(actionCreators.connections__closeRemote(message));
@@ -299,16 +289,17 @@ export function runMessagingAgent(redux) {
     won.wonMessageFromJsonLd(data).then(message => {
       won.addJsonLdData(data);
 
-      var messageProcessed = false;
+      let messageProcessed = false;
 
       //process message
-      for (var i = 0; i < messageProcessingArray.length; i++) {
+      for (let i = 0; i < messageProcessingArray.length; i++) {
         messageProcessed =
           messageProcessed || messageProcessingArray[i](message);
       }
 
       //post-process message
-      for (var i = 0; i < messagePostProcessingArray.length; i++) {
+      //TODO emit warning for this pratice
+      for (let i = 0; i < messagePostProcessingArray.length; i++) {
         messagePostProcessingArray[i](message);
       }
 
@@ -358,7 +349,7 @@ export function runMessagingAgent(redux) {
     return ws;
   }
 
-  function onHeartbeat(e) {
+  function onHeartbeat() {
     missedHeartbeats = 0; // reset the deadman count
   }
 
@@ -420,7 +411,7 @@ export function runMessagingAgent(redux) {
       const unsubscribeMsgQWatch = watchImmutableRdxState(
         redux,
         ["messages", "enqueued"],
-        (newMsgBuffer, oldMsgBuffer) => sendFirstInBuffer(newMsgBuffer)
+        newMsgBuffer => sendFirstInBuffer(newMsgBuffer)
       );
       const unsubscribeReconnectWatch = watchImmutableRdxState(
         redux,
