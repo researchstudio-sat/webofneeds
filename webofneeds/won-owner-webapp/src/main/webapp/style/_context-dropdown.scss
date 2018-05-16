@@ -16,7 +16,6 @@ won-connection-context-dropdown {
     @include fixed-square($postIconSizeMobile);
     //padding-left: 0.5rem;
     position: relative;
-    top: -0.5rem;
     right: -0.6rem;
     /*the correct right value would be "calc(-0.5rem - #{$thinBorderWidth});"
     however, it is not displayed correct so we assume the right value with -0.6rem*/
@@ -27,7 +26,7 @@ won-connection-context-dropdown {
     position: relative;
     height: 0;
     z-index: 1000;
-    top: calc((#{$postIconSizeMobile} + #{$thinBorderWidth}) * -1);
+    top: calc((#{$postIconSizeMobile} + #{$thinBorderWidth} + 0.5rem) * -1);
     right: $thinBorderWidth;
 
     .cdd__contextmenu__content {
