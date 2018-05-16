@@ -101,6 +101,7 @@ function genComponentConf() {
                         <span>Tags</span>
                 </div>
 
+                <!-- TTL PICKER -->
                 <div class="cis__detail__items__item ttl"
                     ng-click="self.toggleOpenDetail('ttl')"
                     ng-class="{'picked' : self.openDetail === 'ttl'}">
@@ -137,37 +138,21 @@ function genComponentConf() {
             </div>
 
             <!-- LOCATION -->
-            <won-location-picker
-                ng-if="self.openDetail === 'location'"
+            <won-location-picker 
+                ng-show="self.openDetail === 'location'"
                 initial-location="::self.draftObject.location"
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
             <!-- TAGS -->
-             <div class="cis__tags" ng-if="self.openDetail === 'tags'">
-                <!-- TODO: remove title and move resetTags() to a new button -->
-                <!-- TODO: make tags individually deletable? -->
-                <!-- TODO: add # to tag text -->
-                <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
-                    <svg class="cis__circleicon nonHover">
-                        <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
-                    </svg>
-                    <svg class="cis__circleicon hover">
-                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
-                    </svg>
-                    <span class="nonHover">Tags</span>
-                    <span class="hover">Remove Tags</span>
-                </div>
-                <div class="cis__taglist">
-                    <span class="cis__taglist__tag" ng-repeat="tag in self.draftObject.tags">#{{tag}}</span>
-                </div>
-                <input class="cis__tags__input"
-                    placeholder="e.g. #couch #free" type="text"
-                    ng-keyup="::self.updateTags()"
-                 />
-            </div>
-            <!-- won-tags-picker ng-show="self.openDetail === 'tags'">
-            </won-tags-picker -->
+            <!-- TODO: move resetTags() to a new button -->
+            <!-- TODO: make tags individually deletable? -->
+            <!-- TODO: add # to tag text -->
+            <won-tags-picker
+                ng-show="self.openDetail === 'tags'"
+                initial-tags="::self.draftObject.tags"
+                on-tags-updated="::self.updateTags(tags)">
+            </won-tags-picker>
 
             <!-- TTL -->
             <div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
@@ -299,6 +284,9 @@ function genComponentConf() {
       if (tagsInputString && !this.details.has("tags")) {
         this.details.add("tags");
       }
+
+      // TODO: add updated tags to draft
+      this.updateDraft();
     }
 
     updateTTLBuffered() {

@@ -12,19 +12,20 @@ import {
 const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
-        <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
+        <div class="cis__addDetail__header tags" ng-click="self.resetTags()">
             <svg class="cis__circleicon">
                 <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
             </svg>
+            Remove All Tags
         </div>
-        <div class="cis__taglist">
-            <span class="cis__taglist__tag" ng-repeat="tag in self.tags">#{{tag}}</span>
+        <div class="tp__taglist">
+            <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">#{{tag}}</span>
         </div>
         <input class="tp__input"
             placeholder="e.g. #couch #free" type="text"
-            ng-keyup="::self.updateTags()"
+            ng-keyup="::self.doneTyping()"
         />
-
+        <!-- ng-keyup="::self.updateTags()" -->
 
 
         <input type="text" class="tp__textbox" placeholder="e.g. #couch #free"/>
@@ -37,20 +38,39 @@ function genComponentConf() {
             
             window.tp4dbg = this;
 
-            doneTypingBufferNg(
-                e => this.doneTyping(e),
-                this.textfieldNg(), 1000
-            );
+            this.addedTags = this.initialTags;
+
+            // doneTypingBufferNg(
+            //     e => this.doneTyping(e),
+            //     this.textfieldNg(), 1000
+            // );
         }
 
         doneTyping() {
             const text = this.textfield().value;
 
-            if(!text) {
+            if(!text || text.trim().length === 0) {
                 // do stuff
             } else {
                 // do stuff
+                // if last character was a space, add tag
+                if(text.endsWith(" ")){
+                    this.addTag(text.trim());
+                }
             }
+        }
+
+        addTag(tag) {
+            // TODO: check for duplicates
+            this.addedTags.push(tag);
+            console.log("TAGLIST: ", this.addedTags);
+            //this.onTagsUpdated({tags: this.addedTags});
+        }
+
+        resetTags() {
+            this.addedTags = [];
+            console.log("TAGLIST: ", this.addedTags);
+            //this.onTagsUpdated({tags: this.addedTags});
         }
 
         
@@ -67,6 +87,8 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
+            onTagsUpdated: "&",
+            initialTags: "=",
         },
         template: template
     }
