@@ -1,6 +1,6 @@
 @import "won-config";
 @import "text";
-@import "needtextfield";
+@import "locationpicker";
 @import "animate";
 @import "sizing-utils";
 @import "textfield";
@@ -9,31 +9,8 @@ won-create-isseeks {
   display: flex;
   flex-direction: column;
 
-  .cis__mandatory-rest {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-
-    @include appearAnimation(0.5s, linear);
-
-    & need-textfield {
-      flex-grow: 1;
-      flex-basis: 10rem;
-
-      .medium_title {
-        font-weight: 700;
-        padding-bottom: 1rem;
-      }
-
-      p:last-of-type {
-        //this is so that the padding is not present if there is only a single paragraph namely the .medium_title
-        padding-bottom: 0;
-      }
-    }
-  }
-
-  .cis__textfield_instruction {
-    color: $won-line-gray;
+  .cis__mandatory {
+    display: grid;
   }
 
   .cis__addDetail {
@@ -42,7 +19,7 @@ won-create-isseeks {
     @include appearAnimation(0.5s, linear);
 
     .cis__detail__items {
-      @include slideWithOpacityAnimation(0.5s, linear, 20rem);
+      @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.5rem 0);
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
@@ -134,6 +111,11 @@ won-create-isseeks {
       }
     }
 
+    .cis__description {
+      display: grid;
+      grid-gap: 1rem;
+    }
+
     .cis__ttl {
       display: grid;
       grid-gap: 1rem;
@@ -160,9 +142,12 @@ won-create-isseeks {
     display: flex;
     font-size: $mediumFontSize;
     font-weight: 400;
-    &:not(.ttl) {
+    &.tags {
       padding-bottom: 1rem;
-    } // ttl uses grid and grid-gap
+    } // ttl and description uses grid and grid-gap
+    &.location {
+      padding-bottom: 1rem;
+    } // ttl and description uses grid and grid-gap
 
     span {
       padding-left: 0.5rem;
