@@ -13,462 +13,461 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-.text-height{
-	height:20px;
+.text-height {
+  height: 20px;
 }
 .centering {
-	display:block;
-	margin-left:auto;
-	margin-right:auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 .thumbnail-selected {
-	display: inline-block;
-	display: block;
-	height: 100px;
-	max-width: 100%;
-	padding: 4px;
-	line-height: 1.428571429;
-	background-color: #fff;
-	border: 1px solid black;
-	border-radius: 4px;
-	-webkit-transition: all .2s ease-in-out;
-	transition: all .2s ease-in-out;
-	margin-left:auto;
-	margin-right:auto;
+  display: inline-block;
+  display: block;
+  height: 100px;
+  max-width: 100%;
+  padding: 4px;
+  line-height: 1.428571429;
+  background-color: #fff;
+  border: 1px solid black;
+  border-radius: 4px;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  margin-left: auto;
+  margin-right: auto;
 }
 .thumbnail-non-selected {
-	display: inline-block;
-	display: block;
-	height: 100px;
-	max-width: 100%;
-	padding: 4px;
-	line-height: 1.428571429;
-	background-color: #fff;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	-webkit-transition: all .2s ease-in-out;
-	transition: all .2s ease-in-out;
-	margin-left:auto;
-	margin-right:auto;
+  display: inline-block;
+  display: block;
+  height: 100px;
+  max-width: 100%;
+  padding: 4px;
+  line-height: 1.428571429;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  margin-left: auto;
+  margin-right: auto;
 }
 .bottom-overlap {
-	position: absolute;
-	width: 100%;
-	bottom: 0;
-	height: 20%;
-	padding: 15px;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  height: 20%;
+  padding: 15px;
 }
 #postboxLink {
-    text-decoration: underline;
+  text-decoration: underline;
 }
-#copyImg .fa-copy {display:block; width:16px; height:16px;}
+#copyImg .fa-copy {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
 table.tableSection {
-    display: table;
-    width: 100%;
+  display: table;
+  width: 100%;
 }
-table.tableSection thead, table.tableSection tbody {
-    float: left;
-    width: 100%;
+table.tableSection thead,
+table.tableSection tbody {
+  float: left;
+  width: 100%;
 }
 table.tableSection tbody {
-    overflow: auto;
-    height: 150px;
+  overflow: auto;
+  height: 150px;
 }
 table.tableSection tr {
-    width: 100%;
-    display: table;
-    text-align: left;
-    border-bottom:1px solid black;
+  width: 100%;
+  display: table;
+  text-align: left;
+  border-bottom: 1px solid black;
 }
-table.tableSection th, table.tableSection td {
-    width: 33%;
+table.tableSection th,
+table.tableSection td {
+  width: 33%;
 }
 
 html {
-	position: relative;
-	min-height: 100%;
+  position: relative;
+  min-height: 100%;
 }
 
 body {
-	margin-bottom: 50px; /* height of the footer */
+  margin-bottom: 50px; /* height of the footer */
 }
 
 /** Common **/
 .navbar-bottom {
-    /*z-index: -1;*/
-	/*position:fixed;
+  /*z-index: -1;*/
+  /*position:fixed;
 	bottom: 0px;
 	width: 100%;*/
 
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 50px; /*TODO use ems / propagate via js or preprocessing to other uses */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px; /*TODO use ems / propagate via js or preprocessing to other uses */
 }
-
-
 
 .div-border-bottom {
-    border-bottom: 1px solid;
-
+  border-bottom: 1px solid;
 }
 .div-table-cell {
-	display: table-cell;
-
+  display: table-cell;
 }
 
 .div-table-row {
-	display: table-row;
-
+  display: table-row;
 }
 
 .div-table {
-	display: table;
-
+  display: table;
 }
 
 .centered-text {
-	display: table-cell;
-	vertical-align: middle;
-	text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
 }
 
 .top-buffer {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 .bottom-buffer {
-	margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .top-layer {
-    position:relative;
-    z-index:10001
+  position: relative;
+  z-index: 10001;
 }
 .fill {
-	min-height: 100%;
+  min-height: 100%;
 }
 
 .nav-progress-justified {
-	width: 100%;
+  width: 100%;
 }
 
 .icon-want {
-	background: url('../images/want.jpg') 0 0 no-repeat;
-	height: 16px;
-	line-height: 16px;
-	width: 16px;
+  background: url("../images/want.jpg") 0 0 no-repeat;
+  height: 16px;
+  line-height: 16px;
+  width: 16px;
 }
 
 .nav-progress-justified > li {
-	float: none;
+  float: none;
 }
 
 .nav-progress-justified > li > a:hover,
 .nav-progress-justified > li > a:focus {
-	color: #ffffff;
-	background-color: #178acc;
+  color: #ffffff;
+  background-color: #178acc;
 }
 
 .nav-progress-justified > .active > a,
 .nav-progress-justified > .active > a:hover,
 .nav-progress-justified > .active > a:focus {
-	color: #ffffff;
-	background-color: #178acc;
+  color: #ffffff;
+  background-color: #178acc;
 }
 
 .nav-progress-justified > li > a,
 .nav-progress-justified {
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .nav-progress-justified > li > a {
-	color: #ffffff;
+  color: #ffffff;
 }
 
 .nav-progress-justified > .disabled > a,
 .nav-progress-justified > .disabled > a:hover,
 .nav-progress-justified > .disabled > a:focus {
-	color: #cccccc;
-	background-color: transparent;
+  color: #cccccc;
+  background-color: transparent;
 }
 .messageTable {
-    display: block;
-    overflow: auto;
-    height: 400px;
+  display: block;
+  overflow: auto;
+  height: 400px;
 }
 
 @media (min-width: 768px) {
-	.nav-progress-justified {
-		float: none;
-		margin: 0;
-	}
+  .nav-progress-justified {
+    float: none;
+    margin: 0;
+  }
 
-	.nav-progress-justified > li {
-		display: table-cell;
-		width: 1%;
-	}
+  .nav-progress-justified > li {
+    display: table-cell;
+    width: 1%;
+  }
 
-	.nav-progress-justified > li {
-		float: none;
-	}
+  .nav-progress-justified > li {
+    float: none;
+  }
 
-	.nav-progress-justified > li > a {
-		padding-top: 15px;
-		padding-bottom: 15px;
-	}
+  .nav-progress-justified > li > a {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
 }
 
 @media (min-width: 768px) {
-	.nav-tabs.nav-progress-justified > li {
-		display: table-cell;
-		width: 1%;
-	}
+  .nav-tabs.nav-progress-justified > li {
+    display: table-cell;
+    width: 1%;
+  }
 }
 
 .navbar {
-	border-radius: 0;
-	margin-bottom: 0;
+  border-radius: 0;
+  margin-bottom: 0;
 }
 
 #content {
-    background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .map-canvas {
-	width: 100%;
-	height: 280px;
+  width: 100%;
+  height: 280px;
 }
 
 .btnTag:hover {
-	background-color: black;
+  background-color: black;
 }
 
 .need-panel-body:hover {
-	cursor: pointer;
-	background-color: #F1F1F1;
+  cursor: pointer;
+  background-color: #f1f1f1;
 }
 
 .value-panel {
-	padding-top: 9px;
+  padding-top: 9px;
 }
 
 /** Forms **/
 
 .form-control.ng-dirty.ng-invalid {
-	border: 1px solid #B94A48;
+  border: 1px solid #b94a48;
 }
 
 /** Home **/
 
 h1#main-heading {
-	text-align: center;
-	font-size: 4em;
-	padding-bottom: 0.3em;
+  text-align: center;
+  font-size: 4em;
+  padding-bottom: 0.3em;
 }
 
 #panel-opacity {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	opacity: 0.9;
-	background: white;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.9;
+  background: white;
 }
 
 #panel-sign-in {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	padding-top: 11%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding-top: 11%;
 }
 
 #panel-register {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	padding-top: 11%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding-top: 11%;
 }
 
 #landing_page {
-	display: none;
+  display: none;
 }
 
 #street_scene {
-	position: relative;
+  position: relative;
 }
 
 .hotspot1 {
-	position: absolute;
-	top: 120px;
-	left: 135px;
-	width: 65px;
-	height: 65px;
-	border: 3px solid red;
+  position: absolute;
+  top: 120px;
+  left: 135px;
+  width: 65px;
+  height: 65px;
+  border: 3px solid red;
 }
 
 .hotspot2 {
-	position: absolute;
-	top: 230px;
-	left: 230px;
-	width: 65px;
-	height: 65px;
-	border: 3px solid yellow;
+  position: absolute;
+  top: 230px;
+  left: 230px;
+  width: 65px;
+  height: 65px;
+  border: 3px solid yellow;
 }
 
 .hotspot3 {
-	position: absolute;
-	top: 85px;
-	left: 330px;
-	width: 65px;
-	height: 65px;
-	border: 3px solid blue;
+  position: absolute;
+  top: 85px;
+  left: 330px;
+  width: 65px;
+  height: 65px;
+  border: 3px solid blue;
 }
 
 .hotspot4 {
-	position: absolute;
-	top: 210px;
-	left: 450px;
-	width: 65px;
-	height: 65px;
-	border: 3px solid green;
+  position: absolute;
+  top: 210px;
+  left: 450px;
+  width: 65px;
+  height: 65px;
+  border: 3px solid green;
 }
 
 #street_scene a:hover .hotspot1,
 #street_scene a:focus .hotspot1 {
-	background-color: red;
+  background-color: red;
 }
 
 #street_scene a:hover .hotspot2,
 #street_scene a:focus .hotspot2 {
-	background-color: yellow;
+  background-color: yellow;
 }
 
 #street_scene a:hover .hotspot3,
 #street_scene a:focus .hotspot3 {
-	background-color: blue;
+  background-color: blue;
 }
 
 #street_scene a:hover .hotspot4,
 #street_scene a:focus .hotspot4 {
-	background-color: green;
+  background-color: green;
 }
 
 #comics_panel {
-	width: 810px;
-	display: none;
+  width: 810px;
+  display: none;
 }
 
 #comics {
-	border-right-style: solid;
-	border-right-width: 3px;
+  border-right-style: solid;
+  border-right-width: 3px;
 }
 
 #comics_panel .close_box {
-	float: right;
-	cursor: pointer;
+  float: right;
+  cursor: pointer;
 }
 
 .comics_style {
-	width: 1620px;
+  width: 1620px;
 }
 
 #others_panel {
-	display: none;
+  display: none;
 }
 
 .i_panel_menu_item {
-	background-color: #5bc0de;
+  background-color: #5bc0de;
 }
 
 .others_panel_menu_item {
-	background-color: #ff8c00;
+  background-color: #ff8c00;
 }
 
 #others_panel_menu {
-	border: 1px solid orange;
+  border: 1px solid orange;
 }
 
 /** Create need **/
 .additional-info-title {
-	font-size: large;
+  font-size: large;
 }
 
 .img-upload-box {
-	background-color: #CACACA;
-	border: 1px solid #CACACA;
-	border-radius: 3px;
-	text-align: center;
+  background-color: #cacaca;
+  border: 1px solid #cacaca;
+  border-radius: 3px;
+  text-align: center;
 }
 
 .img-upload-box-big {
-	width: 100%;
-	height: 270px;
-	margin-bottom: 20px;
-	position: relative;
-	overflow: hidden;
+  width: 100%;
+  height: 270px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
 }
 
 .img-upload-box-big h4 {
-	color: white;
+  color: white;
 }
 
 .img-upload-box-big .glyphicon-picture {
-	margin-top: 80px;
-	font-size: 58px;
-	color: white
+  margin-top: 80px;
+  font-size: 58px;
+  color: white;
 }
 
 .img-upload-box-small {
-	height: 81px;
-	color: white;
-	font-size: 23px;
-	cursor: pointer;
-	overflow: hidden;
+  height: 81px;
+  color: white;
+  font-size: 23px;
+  cursor: pointer;
+  overflow: hidden;
 }
 
 .img-upload-box-small .glyphicon-picture {
-	padding-top: 24px;
+  padding-top: 24px;
 }
 
 .img-upload-box-small.selected {
-	border: 1px solid #000;
+  border: 1px solid #000;
 }
 
 .link-to-collapse-panel {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 /** General form stuff */
 .field-date-width {
-    width: 11em;
+  width: 11em;
 }
 
 .field-time-width {
-    width: 9em;
+  width: 9em;
 }
 
-
 .field-right-margin {
-    margin-right: 0.5em;
+  margin-right: 0.5em;
 }
 
 .inline {
-    display: inline;
+  display: inline;
 }
 
 .side-margins {
-    margin-left: 1em;
-    margin-right: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
 }
 
 .button-top-margin {
-    margin-top: 0.5em;
+  margin-top: 0.5em;
 }
 
 /**
@@ -476,76 +475,76 @@ For submenu functionality
 http://stackoverflow.com/questions/18023493/bootstrap-3-dropdown-sub-menu-missing
 */
 .dropdown-submenu-z {
-    position:relative;
-    z-index:10001
+  position: relative;
+  z-index: 10001;
 }
 .dropdown-submenu {
-    position:relative;
+  position: relative;
 }
-.dropdown-submenu>.dropdown-menu {
-    top:0;
-    left:100%;
-    margin-top:-6px;
-    margin-left:-1px;
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
 }
-.dropdown-submenu:hover>.dropdown-menu {
-    display:block;
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
 }
-.dropdown-submenu>a:after {
-    display:block;
-    content:" ";
-    float:right;
-    width:0;
-    height:0;
-    border-color:transparent;
-    border-style:solid;
-    border-width:5px 0 5px 5px;
-    border-left-color:#cccccc;
-    margin-top:5px;
-    margin-right:-10px;
+.dropdown-submenu > a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
 }
-.dropdown-submenu:hover>a:after {
-    border-left-color:#ffffff;
+.dropdown-submenu:hover > a:after {
+  border-left-color: #ffffff;
 }
 .dropdown-submenu.pull-left {
-    float:none;
+  float: none;
 }
-.dropdown-submenu.pull-left>.dropdown-menu {
-    left:-100%;
-    margin-left:10px;
+.dropdown-submenu.pull-left > .dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
 }
 
 .grey-item {
-    background-color: #D4D8D1;
+  background-color: #d4d8d1;
 }
 
 /** resizable columns */
 table th.resizing {
-    cursor: col-resize;
+  cursor: col-resize;
 }
 
 /** classes for sortable tables */
-.st-sort-ascent:after{
-    content: '\25B2';
+.st-sort-ascent:after {
+  content: "\25B2";
 }
 
-.st-sort-descent:after{
-    content: '\25BC';
+.st-sort-descent:after {
+  content: "\25BC";
 }
 
 .underline {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .text-justify {
-    text-align: justify;
+  text-align: justify;
 }
 
 .thumbnail-size {
-    width: 150px;
-    height: 150px;"
+  width: 150px;
+  height: 150px;
 }
 
 #createNeed .panel-title {
-	font-size: large;
+  font-size: large;
 }
