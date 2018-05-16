@@ -2,30 +2,18 @@ import angular from "angular";
 import inviewModule from "angular-inview";
 
 import won from "../won-es6.js";
-import jld from "jsonld";
 import Immutable from "immutable";
 import squareImageModule from "./square-image.js";
 import labelledHrModule from "./labelled-hr.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  attach,
-  delay,
-  get,
-  getIn,
-  deepFreeze,
-  dispatchEvent,
-} from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import {
-  selectOpenConnectionUri,
-  selectNeedByConnectionUri,
-} from "../selectors.js";
-import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
+import { selectNeedByConnectionUri } from "../selectors.js";
 
 const MESSAGE_READ_TIMEOUT = 1500;
 
@@ -281,7 +269,7 @@ function genComponentConf() {
     }
 
     getClausesText(chatMessages, message, clausesUri) {
-      for (msg of Array.from(chatMessages)) {
+      for (let msg of Array.from(chatMessages)) {
         if (
           msg[1].get("uri") === clausesUri ||
           msg[1].get("remoteUri") === clausesUri
@@ -338,11 +326,7 @@ function genComponentConf() {
         "proposes",
         this.message.get("text")
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.onSendProposal({ proposalUri: uri });
     }
@@ -355,11 +339,7 @@ function genComponentConf() {
         "accepts",
         msg
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
       this.onRemoveData({ proposalUri: this.messageUri });
@@ -372,11 +352,7 @@ function genComponentConf() {
         : this.message.get("remoteUri");
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.onUpdate();
     }
@@ -390,11 +366,7 @@ function genComponentConf() {
         "accepts",
         msg
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
       this.onRemoveData({ proposalUri: this.messageUri });
@@ -410,11 +382,7 @@ function genComponentConf() {
         "retracts",
         "Retract: " + this.text
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
       this.onUpdate();
@@ -430,11 +398,7 @@ function genComponentConf() {
         "rejects",
         "Reject: " + this.text
       );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        this.connectionUri,
-        (isTTL = true)
-      );
+      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
       this.onUpdate();
@@ -455,10 +419,7 @@ function genComponentConf() {
     }
 
     encodeParam(param) {
-      var encoded = encodeURIComponent(param);
-      // console.log("encoding: ",param);
-      // console.log("encoded: ",encoded)
-      return encoded;
+      return encodeURIComponent(param);
     }
   }
   Controller.$inject = serviceDependencies;

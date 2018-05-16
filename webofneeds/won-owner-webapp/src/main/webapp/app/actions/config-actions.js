@@ -1,5 +1,5 @@
 import { getIn, get, checkHttpStatus, clone } from "../utils.js";
-import { actionTypes, actionCreators } from "./actions";
+import { actionTypes } from "./actions";
 
 import loadCSS from "loadcss";
 /**
@@ -54,7 +54,7 @@ async function loadDefaultNodeUri() {
   return fetch(/*relativePathToConfig=*/ "appConfig/getDefaultWonNodeUri")
     .then(checkHttpStatus)
     .then(resp => resp.json())
-    .catch(err => {
+    .catch((/*err*/) => {
       const defaultNodeUri = `${location.protocol}://${
         location.host
       }/won/resource`;

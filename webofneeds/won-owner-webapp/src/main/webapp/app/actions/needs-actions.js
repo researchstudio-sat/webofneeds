@@ -3,20 +3,8 @@
  */
 
 import won from "../won-es6.js";
-import Immutable from "immutable";
 
-import {
-  is,
-  urisToLookupMap,
-  msStringToDate,
-  getIn,
-  get,
-  jsonld2simpleFormat,
-  cloneAsMutable,
-  delay,
-} from "../utils.js";
-
-import { actionTypes, actionCreators } from "./actions.js";
+import { actionTypes } from "./actions.js";
 
 import { buildConnectMessage } from "../won-message-utils.js";
 
@@ -31,12 +19,6 @@ export function needsConnect(
     const state = getState();
     const ownNeed = state.getIn(["needs", ownNeedUri]);
     const theirNeed = state.getIn(["needs", theirNeedUri]);
-    let theirNodeUri = null;
-    if (theirNeed) {
-      theirNodeUri = theirNeed.get("nodeUri");
-    } else {
-      theirNodeUri = await won.getNode(theirNeedUri).hasWonNode;
-    }
     const cnctMsg = await buildConnectMessage({
       ownNeedUri: ownNeedUri,
       theirNeedUri: theirNeedUri,

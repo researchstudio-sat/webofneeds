@@ -23,7 +23,6 @@ import {
   is,
   clone,
   contains,
-  deepFreeze,
   rethrow,
   getIn,
   get,
@@ -89,7 +88,7 @@ import won from "./won.js";
     return query;
   }
 
-  var privateData = {};
+  const privateData = {};
 
   won.clearStore = function() {
     //create an rdfstore-js based store as a cache for rdf data.
@@ -140,7 +139,7 @@ import won from "./won.js";
    *
    * @constructor
    */
-  var ReadUpdateLock = function(uri) {
+  const ReadUpdateLock = function(uri) {
     //arrays holding deferred objects until they may proceeed
     this.uri = uri;
     this.blockedUpdaters = [];
@@ -239,12 +238,12 @@ import won from "./won.js";
         //console.log("linkeddata-service-won.js: rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
         //there are blocked updaters. let them proceed.
         this.updateInProgress = true;
-        for (var i = 0; i < this.blockedUpdaters.length; i++) {
-          var deferredUpdate = this.blockedUpdaters[i];
+        for (let i = 0; i < this.blockedUpdaters.length; i++) {
+          const deferredUpdate = this.blockedUpdaters[i];
           this.activeUpdaterCount++;
           deferredUpdate.resolve();
           this.blockedUpdaters.splice(i, 1);
-          i--;
+          i--; //TODO looks fishy. Find cleaner implementation using iterators or high-order functions (e.g. forEach)
         }
       }
     },
@@ -252,12 +251,12 @@ import won from "./won.js";
       if (this.blockedReaders.length > 0) {
         //console.log("linkeddata-service-won.js: rul:readers:all: " + this.uri + " " + this.getLockStatusString());
         //there are blocked readers. let them proceed.
-        for (var i = 0; i < this.blockedReaders.length; i++) {
-          var deferredRead = this.blockedReaders[i];
+        for (let i = 0; i < this.blockedReaders.length; i++) {
+          const deferredRead = this.blockedReaders[i];
           this.activeReaderCount++;
           deferredRead.resolve();
           this.blockedReaders.splice(i, 1);
-          i--;
+          i--; //TODO looks fishy. Find cleaner implementation using iterators or high-order functions (e.g. forEach)
         }
       }
     },
@@ -271,7 +270,7 @@ import won from "./won.js";
    *
    * @param uri
    */
-  var cacheItemInsertOrOverwrite = function(uri, partial) {
+  const cacheItemInsertOrOverwrite = function(uri, partial) {
     //console.log("linkeddata-service-won.js: add to cache:    " + uri);
     privateData.cacheStatus[uri] = {
       timestamp: new Date().getTime(),
@@ -279,10 +278,10 @@ import won from "./won.js";
     };
   };
 
-  var cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(
+  const cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(
     uri
   ) {
-    var entry = privateData.cacheStatus[uri];
+    const entry = privateData.cacheStatus[uri];
     return (
       entry &&
       (entry.state === CACHE_ITEM_STATE.OK ||
@@ -290,7 +289,7 @@ import won from "./won.js";
         entry.state === CACHE_ITEM_STATE.FETCHING)
     );
     /*
-        var ret = false;
+        const ret = false;
         if (typeof entry === 'undefined') {
             ret = false
         } else {
@@ -299,30 +298,14 @@ import won from "./won.js";
                 entry.state === CACHE_ITEM_STATE.UNRESOLVABLE ||
                 entry.state === CACHE_ITEM_STATE.FETCHING;
         }
-        var retStr = (ret + "     ").substr(0,5);
-        //console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
-        return ret;
-        */
-  };
-  var cacheItemIsFetching = function cacheItemIsFetching(uri) {
-    return entry && entry.state === CACHE_ITEM_STATE.FETCHING;
-
-    /*
-        var entry = privateData.cacheStatus[uri];
-        var ret = false;
-        if (typeof entry === 'undefined') {
-            ret = false
-        } else {
-            ret = (entry.state === CACHE_ITEM_STATE.FETCHING);
-        }
-        var retStr = (ret + "     ").substr(0,5);
+        const retStr = (ret + "     ").substr(0,5);
         //console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
         return ret;
         */
   };
 
-  var cacheItemMarkAccessed = function cacheItemMarkAccessed(uri) {
-    var entry = privateData.cacheStatus[uri];
+  const cacheItemMarkAccessed = function cacheItemMarkAccessed(uri) {
+    const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       const message = "Trying to mark unloaded uri " + uri + " as accessed";
       //console.error(message);
@@ -337,8 +320,8 @@ import won from "./won.js";
     privateData.cacheStatus[uri].timestamp = new Date().getTime();
   };
 
-  var cacheItemMarkDirty = function cacheItemMarkDirty(uri) {
-    var entry = privateData.cacheStatus[uri];
+  const cacheItemMarkDirty = function cacheItemMarkDirty(uri) {
+    const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       return;
     }
@@ -346,22 +329,7 @@ import won from "./won.js";
     privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
   };
 
-  var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(
-    uri,
-    reason
-  ) {
-    //console.log("linkeddata-service-won.js: mark unres:      " + uri);
-    privateData.cacheStatus[uri] = {
-      timestamp: new Date().getTime(),
-      state: CACHE_ITEM_STATE.UNRESOLVABLE,
-    };
-    console.error(
-      "Couldn't resolve " + uri + ". reason: ",
-      JSON.stringify(reason)
-    );
-  };
-
-  var cacheItemMarkFetching = function cacheItemMarkFetching(uri) {
+  const cacheItemMarkFetching = function cacheItemMarkFetching(uri) {
     //console.log("linkeddata-service-won.js: mark fetching:   " + uri);
     privateData.cacheStatus[uri] = {
       timestamp: new Date().getTime(),
@@ -369,7 +337,7 @@ import won from "./won.js";
     };
   };
 
-  var cacheItemRemove = function cacheItemRemove(uri) {
+  const cacheItemRemove = function cacheItemRemove(uri) {
     delete privateData.cacheStatus[uri];
   };
 
@@ -426,8 +394,8 @@ import won from "./won.js";
     return Promise.resolve(true); //return a promise for chaining
   };
 
-  var getReadUpdateLockPerUri = function(uri) {
-    var lock = privateData.readUpdateLocksPerUri[uri];
+  const getReadUpdateLockPerUri = function(uri) {
+    let lock = privateData.readUpdateLocksPerUri[uri];
     if (typeof lock === "undefined" || lock == null) {
       lock = new ReadUpdateLock(uri);
       privateData.readUpdateLocksPerUri[uri] = lock;
@@ -435,8 +403,8 @@ import won from "./won.js";
     return lock;
   };
 
-  var getReadUpdateLocksPerUris = function(uris) {
-    var locks = [];
+  const getReadUpdateLocksPerUris = function(uris) {
+    const locks = [];
     //console.log("uris",uris);
     uris.map(function(uri) {
       locks.push(getReadUpdateLockPerUri(uri));
@@ -449,10 +417,10 @@ import won from "./won.js";
    * @param locks
    * @returns {Array|*}
    */
-  var acquireReadLocks = function acquireReadLocks(locks) {
-    var acquiredLocks = [];
+  const acquireReadLocks = function acquireReadLocks(locks) {
+    const acquiredLocks = [];
     locks.map(function(lock) {
-      var promise = lock.acquireReadLock();
+      const promise = lock.acquireReadLock();
       acquiredLocks.push(promise);
     });
     return acquiredLocks;
@@ -469,14 +437,11 @@ import won from "./won.js";
    * * allowMultiple: boolean - if false, more than one result in data is an error
    * * message: string - if set, the message is prepended to the generic error message (with 1 whitespace in between)
    */
-  var rejectIfFailed = function(success, data, options) {
+  const rejectIfFailed = function(success, data, options) {
     const rejectionMessage = buildRejectionMessage(success, data, options);
     if (rejectionMessage) {
       // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
       // property is really not there (and should not be), so in that case it's not an error...
-      //console.log(rejectionMessage);
-      // TODO: this q.reject seems to have no effect
-      q.reject(rejectionMessage);
       return true;
     }
     return false;
@@ -529,7 +494,7 @@ import won from "./won.js";
     optionalSparqlPrefixes,
     optionalSparqlFragment
   ) {
-    var query = "";
+    let query = "";
     if (won.isNull(baseUri)) {
       throw new Error("cannot evaluate property path: baseUri is null");
     }
@@ -549,8 +514,8 @@ import won from "./won.js";
       query = query + optionalSparqlFragment;
     }
     query = query + "} ";
-    query = query.replace(/\:\:baseUri\:\:/g, baseUri);
-    var resultObject = {};
+    query = query.replace(/::baseUri::/g, baseUri);
+    const resultObject = {};
     privateData.store.execute(query, [], [], function(success, results) {
       resultObject.result = [];
       results.forEach(function(elem) {
@@ -863,28 +828,6 @@ import won from "./won.js";
   }
 
   /**
-   * Adds the specified JSON-LD dataset to the store, once to the default graph and once to
-   * the individual graphs contained in the data set.
-   */
-  won.addJsonLdData2 = async function(data) {
-    return new Promise((resolve, reject) => {
-      const callback = (success, results) => {
-        if (success) {
-          resolve();
-        } else {
-          throw new Error(JSON.stringify(results));
-        }
-      };
-
-      try {
-        privateData.store.load("application/ld+json", data, callback); // add to default graph
-      } catch (e) {
-        rethrow(e, "Failed to store json-ld data for " + uri + "\n");
-      }
-    });
-  };
-
-  /**
    * Stores the json-ld passed as `data` in the rdf-store.
    * It saves everything into the default graph, for running sparql-queries
    * (our rdf-store.js can't do cross-graph queries), saves it into it's seperate
@@ -899,8 +842,6 @@ import won from "./won.js";
    *   thus contains data from multiple documents.
    */
   won.addJsonLdData = async function(data, documentUri, deep) {
-    const context = data["@context"];
-
     // const graphsAddedSeperatelyP = Promise.resolve();
     const groupedP = groupByGraphs(data);
 
@@ -1148,7 +1089,7 @@ import won from "./won.js";
     const needJsonLdP = loadStarshapedGraph(store, needUri, propertyTree)
       .then(
         resultGraph =>
-          new Promise((resolve, reject) => {
+          new Promise(resolve => {
             //const resultGraph = loadStarshapedGraph(store, needUri, propertyTree);
             const needJsonLdP = triples2framedJson(
               needUri,
@@ -1258,7 +1199,7 @@ import won from "./won.js";
       };
     },
     type: function(o) {
-      var type = rdf.resolve("rdf:type");
+      const type = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
       return function(t) {
         return t.predicate.equals(type) && t.object.equals(o);
       };
@@ -1434,7 +1375,7 @@ import won from "./won.js";
     } else {
       let resultGraph = new store.rdf.api.Graph();
       let resultLeafNodes = [];
-      for (i = 0; i < localLeafNodes.length; i++) {
+      for (let i = 0; i < localLeafNodes.length; i++) {
         let newStartNode = localLeafNodes[i];
         let newPath = path.splice(1, path.length - 1);
         let subResult = loadGraphForPath(store, newStartNode, newPath);
@@ -1517,13 +1458,13 @@ import won from "./won.js";
       default:
         throw new Error(
           "Encountered triple with object of unknown type: " +
-            t.object.interfaceName +
+            element.object.interfaceName +
             "\n" +
-            t.subject.nominalValue +
+            element.subject.nominalValue +
             " " +
-            t.predicate.nominalValue +
+            element.predicate.nominalValue +
             " " +
-            t.object.nominalValue +
+            element.object.nominalValue +
             " "
         );
     }
@@ -1569,7 +1510,7 @@ import won from "./won.js";
     if (visited.has(needJsonLd)) return;
     visited.add(needJsonLd);
 
-    for (var k of Object.keys(needJsonLd)) {
+    for (const k of Object.keys(needJsonLd)) {
       if (k === "rdfs:member" && !is("Array", needJsonLd[k]))
         needJsonLd[k] = [needJsonLd[k]];
       ensureRdfsMemberArrays(needJsonLd[k], visited);
@@ -1651,7 +1592,9 @@ import won from "./won.js";
       if (theirConnectionUri) {
         ret[won.WONMSG.hasReceiver] = theirConnectionUri;
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("getEnvelopeDataforConnection: ", err.message, err.stack);
+    }
     return Promise.resolve(ret);
   };
 
@@ -1706,14 +1649,14 @@ import won from "./won.js";
       throw { message: "getConnectionsUri: needUri must not be null" };
     }
     return won.ensureLoaded(needUri).then(function() {
-      var lock = getReadUpdateLockPerUri(needUri);
+      const lock = getReadUpdateLockPerUri(needUri);
       return lock.acquireReadLock().then(function() {
         try {
-          var subject = needUri;
-          var predicate = won.WON.hasConnections;
-          var result = {};
+          const subject = needUri;
+          const predicate = won.WON.hasConnections;
+          const result = {};
           privateData.store.node(needUri, function(success, graph) {
-            var resultGraph = graph.match(subject, predicate, null);
+            const resultGraph = graph.match(subject, predicate, null);
             if (
               !rejectIfFailed(success, resultGraph, {
                 allowMultiple: false,
@@ -1726,8 +1669,12 @@ import won from "./won.js";
           });
           return result.result;
         } catch (e) {
-          return q.reject(
-            "could not get connection URIs of need + " + uri + ". Reason:" + e
+          rethrow(
+            "could not get connection URIs of need + " +
+              needUri +
+              ". Reason:" +
+              e,
+            e
           );
         } finally {
           //we don't need to release after a promise resolves because
@@ -2164,7 +2111,7 @@ import won from "./won.js";
    * @param {string} graphUri if omitted, will remove from default graph
    */
   won.deleteTriples = function(triples, graphUri) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const callback = success => {
         if (!success) {
           throw new Error();
@@ -2198,7 +2145,7 @@ import won from "./won.js";
     }
     //console.log("linkeddata-service-won.js: deleting node:   " + uri);
     const query = "delete where {<" + uri + "> ?anyP ?anyO}";
-    //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
+    //const query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
     return new Promise((resolve, reject) => {
       privateData.store.execute(query, function(success, graph) {
         const rejMsg = buildRejectionMessage(success, graph, {
@@ -2242,7 +2189,7 @@ import won from "./won.js";
    * @param {*} graphUri
    */
   function rdfStoreGetGraph(store, graphUri) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const callback = (success, graph) => {
         if (success) {
           resolve(graph);
@@ -2301,21 +2248,21 @@ import won from "./won.js";
     baseUri,
     requesterWebId
   ) {
-    var relevantResources = [];
-    var recursionData = {};
-    var MAX_RECURSIONS = 10;
+    const relevantResources = [];
+    const recursionData = {};
+    const MAX_RECURSIONS = 10;
 
-    var executeQuery = function executeQuery(
+    const executeQuery = function executeQuery(
       query,
       baseUri,
       relevantResources
     ) {
-      query = query.replace(/\:\:baseUri\:\:/g, baseUri);
+      query = query.replace(/::baseUri::/g, baseUri);
       //console.log("linkeddata-service-won.js: executing query: \n"+query);
-      var locks = getReadUpdateLocksPerUris(relevantResources);
-      var promises = acquireReadLocks(locks);
+      const locks = getReadUpdateLocksPerUris(relevantResources);
+      const promises = acquireReadLocks(locks);
       return Promise.all(promises).then(function() {
-        var resultObject = {};
+        const resultObject = {};
         try {
           privateData.store.execute(query, [], [], function(success, results) {
             if (
@@ -2332,7 +2279,7 @@ import won from "./won.js";
           return resultObject.results;
         } catch (e) {
           //console.log("linkeddata-service-won.js: Could not execute query. Reason: " + e);
-          return q.reject("Could not execute query. Reason: " + e);
+          rethrow("Could not execute query. Reason: " + e, e);
         } finally {
           //release the read locks
           locks.map(function(lock) {
@@ -2342,20 +2289,20 @@ import won from "./won.js";
       });
     };
 
-    var resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(
+    const resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(
       propertyPaths,
       baseUri,
       relevantResources
     ) {
       //console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
-      var locks = getReadUpdateLocksPerUris(relevantResources);
-      var promises = acquireReadLocks(locks);
+      const locks = getReadUpdateLocksPerUris(relevantResources);
+      const promises = acquireReadLocks(locks);
       return Promise.all(promises).then(function() {
         try {
-          var resolvedUris = [];
+          const resolvedUris = [];
           propertyPaths.map(function(propertyPath) {
             //console.log("linkeddata-service-won.js: resolving property path: " + propertyPath.propertyPath);
-            var foundUris = won.resolvePropertyPathFromBaseUri(
+            const foundUris = won.resolvePropertyPathFromBaseUri(
               baseUri,
               propertyPath.propertyPath,
               propertyPath.prefixes,
@@ -2378,7 +2325,7 @@ import won from "./won.js";
       });
     };
 
-    var resolveOrExecuteQuery = function resolveOrExecuteQuery(resolvedUris) {
+    const resolveOrExecuteQuery = function resolveOrExecuteQuery(resolvedUris) {
       if (won.isNull(recursionData.depth)) {
         recursionData.depth = 0;
       }
@@ -2393,17 +2340,17 @@ import won from "./won.js";
       } else {
         //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
         Array.prototype.push.apply(relevantResources, resolvedUris);
-        var loadedPromises = relevantResources.map(x =>
+        const loadedPromises = relevantResources.map(x =>
           won.ensureLoaded(x, { requesterWebId })
         );
         return Promise.all(loadedPromises)
-          .then(function(x) {
-            return resolvePropertyPathsFromBaseUri(
+          .then(() =>
+            resolvePropertyPathsFromBaseUri(
               crawlableQuery.propertyPaths,
               baseUri,
               relevantResources
-            );
-          })
+            )
+          )
           .then(function(newlyResolvedUris) {
             return resolveOrExecuteQuery(newlyResolvedUris);
           });
@@ -2539,7 +2486,7 @@ import won from "./won.js";
  * @param {String} graphUri
  */
 export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const callback = (success, results) => {
       if (success) {
         resolve();
@@ -2555,7 +2502,7 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
         store.load(mediaType, jsonldData, callback); // add to default graph
       }
     } catch (e) {
-      rethrow(e, "Failed to store json-ld data for " + uri);
+      rethrow(e, "Failed to store json-ld data for " + graphUri);
     }
   });
 }

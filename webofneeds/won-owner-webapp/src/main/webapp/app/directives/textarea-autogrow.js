@@ -75,7 +75,7 @@ function genDirectiveConf() {
       // area.addEventListener('input', updateHeight);
 
       const observer = new MutationObserver(mutations =>
-        mutations.forEach(mutationRecord => {
+        mutations.forEach(() => {
           updateLineHeightAndOffsets();
           updateHeight();
         })

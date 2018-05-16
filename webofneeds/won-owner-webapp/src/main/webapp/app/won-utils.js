@@ -2,15 +2,12 @@
  * Created by ksinger on 11.08.2016.
  */
 
-import Immutable from "immutable";
 import L from "./leaflet-bundleable.js";
 import {
   arrEq,
   checkHttpStatus,
   generateIdString,
   getIn,
-  is,
-  clone,
   getRandomString,
 } from "./utils.js";
 
@@ -73,7 +70,7 @@ export function initLeafletBaseMaps() {
   return baseMaps;
 }
 
-export function selectTimestamp(event, ownNeedUri) {
+export function selectTimestamp(event) {
   /*
      * the "outer" event is from our own event
      * container. The receivedTimestamp there

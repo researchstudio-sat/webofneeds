@@ -43,8 +43,6 @@ function genComponentConf() {
       this.labels = labels;
       //this.settingsOpen = false;
 
-      const self = this;
-
       const selectFromState = state => {
         const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
         const connection =

@@ -22,15 +22,8 @@ import uiRouterModule from "angular-ui-router";
  * 
  * delete at your own peril
  */
-import uiRouterShimModule from "angular-ui-router-shim";
-import {
-  camel2Hyphen,
-  hyphen2Camel,
-  firstToLowerCase,
-  delay,
-  parseSVG,
-  inlineSVGSpritesheet,
-} from "./utils.js";
+import "angular-ui-router-shim";
+import { delay, inlineSVGSpritesheet } from "./utils.js";
 
 //---------- Config -----------
 import { configRouting, runAccessControl } from "./configRouting.js";
@@ -94,7 +87,7 @@ configRedux(app);
 app
   .filter("filterByNeedState", function() {
     return function(needs, state) {
-      var filtered = [];
+      let filtered = [];
       angular.forEach(needs, function(need) {
         if (need["won:isInState"]["@id"] == state) {
           filtered.push(need);
@@ -106,7 +99,7 @@ app
   })
   .filter("filterEventByType", function() {
     return function(events, uri, type) {
-      var filtered = [];
+      let filtered = [];
       angular.forEach(events, function(event) {
         if (event.hasReceiverNeed == uri && event.eventType == type) {
           filtered.push(event);
@@ -119,7 +112,7 @@ app
   /*Filters All events so that only the ones with textMessages remain*/
   .filter("filterByEventMsgs", function() {
     return function(events) {
-      var filtered = [];
+      let filtered = [];
       angular.forEach(events, function(event) {
         if (
           event.hasTextMessage !== undefined ||

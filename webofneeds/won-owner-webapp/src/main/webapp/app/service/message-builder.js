@@ -17,16 +17,16 @@ import won from "./won.js";
    * @returns {{@graph: Array, @context}}
    */
   won.buildMessageRdf = function(contentRdf, args) {
-    var needGraphId = args.msgUri + "#need";
-    var msgDataUri = args.msgUri + "#envelope";
-    var msgGraph = [];
+    const needGraphId = args.msgUri + "#need";
+    const msgDataUri = args.msgUri + "#envelope";
+    const msgGraph = [];
 
-    var attachments = args.attachments ? args.attachments : [];
+    const attachments = args.attachments ? args.attachments : [];
 
-    var attachmentGraphIds = attachments.map(function(a, i) {
+    const attachmentGraphIds = attachments.map(function(a, i) {
       return args.msgUri + "#attachment-" + i;
     });
-    var nonEnvelopeGraphIds = Array.prototype.concat(
+    const nonEnvelopeGraphIds = Array.prototype.concat(
       [needGraphId],
       attachmentGraphIds
     );
@@ -59,7 +59,7 @@ import won from "./won.js";
       });
     });
 
-    var attachmentBlankNodes = attachments.map(function(a, i) {
+    const attachmentBlankNodes = attachments.map(function(a, i) {
       return {
         "@id": "_:attachment-" + i,
         "msg:hasDestinationUri": { "@id": a.uri },
@@ -67,7 +67,7 @@ import won from "./won.js";
       };
     });
 
-    var envelopeGraph = [
+    const envelopeGraph = [
       {
         "@id": args.msgUri,
         "@type": "msg:FromOwner",
@@ -111,7 +111,7 @@ import won from "./won.js";
   };
 
   function getTypesForContext() {
-    var o = {
+    const o = {
       //'mime' : 'http://purl.org/NET/mediatypes/',
       //'dct' : 'http://purl.org/dc/terms/',
       cnt: "http://www.w3.org/2011/content#",

@@ -5,13 +5,18 @@
 import won from "./won-es6.js";
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions/actions.js";
-import { accountLogin, accountLogout } from "./actions/account-actions.js";
+import { accountLogin } from "./actions/account-actions.js";
 
-import { checkLoginStatus, privateId2Credentials } from "./won-utils.js";
+import { privateId2Credentials } from "./won-utils.js";
 
 import { selectAllNeeds } from "./selectors.js";
 
-import { decodeUriComponentProperly, checkHttpStatus, getIn } from "./utils.js";
+import {
+  decodeUriComponentProperly,
+  getIn,
+  firstToLowerCase,
+  hyphen2Camel,
+} from "./utils.js";
 
 /**
  * As we have configured our router to keep parameters unchanged,
@@ -153,23 +158,11 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
   }
 }
 
-//TODO make into router__back AC
-function back(hasPreviousState, $ngRedux) {
-  if (hasPreviousState) {
-    history.back(); //TODO might break if other
-    // route-changes were caused
-    // while this promise evaluated
-  } else {
-    $ngRedux.dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
-  }
-}
-
 export const runAccessControl = [
   "$transitions",
   "$rootScope",
   "$ngRedux",
-  "$urlRouter",
-  ($transitions, $rootScope, $ngRedux, $urlRouter) => {
+  ($transitions, $rootScope, $ngRedux) => {
     //TODO use access-control provided by $transitions.onStart()
     $rootScope.$on(
       "$stateChangeStart",
@@ -192,9 +185,7 @@ export function accessControl({
   event,
   toState,
   toParams,
-  fromState,
   fromParams,
-  options,
   dispatch,
   getState,
 }) {
@@ -205,7 +196,6 @@ export function accessControl({
     getState
   );
 
-  const hasPreviousState = !!fromState.name;
   const state = getState();
   const errorString =
     'Tried to access view "' +

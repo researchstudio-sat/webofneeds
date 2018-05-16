@@ -24,9 +24,9 @@ window.camel2Hyphen = camel2Hyphen;
 window.firstToLowerCase = firstToLowerCase;
 
 /**
- * Attaches the contents of `attachments` to `target` using the variable names from `names`
+ * Attaches the contents of `attachments` to `target` using the constiable names from `names`
  * @param target the object
- * @param names array of variable names
+ * @param names array of constiable names
  * @param attachments array of objects/values
  */
 export function attach(target, names, attachments) {
@@ -53,11 +53,11 @@ export function dispatchEvent(elem, eventName, eventData) {
  */
 export function deepFreeze(obj) {
   // Retrieve the property names defined on obj
-  var propNames = Object.getOwnPropertyNames(obj);
+  const propNames = Object.getOwnPropertyNames(obj);
 
   // Freeze properties before freezing self
   propNames.forEach(function(name) {
-    var prop = obj[name];
+    const prop = obj[name];
 
     // Freeze prop if it is an object
     if (typeof prop == "object" && !Object.isFrozen(prop)) deepFreeze(prop);
@@ -124,13 +124,13 @@ export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
 /**
  * Generates an array consisting of n times x. e.g.:
  * ```javascript
- * repeatVar('a', 3); // ['a', 'a', 'a']
+ * repeatconst('a', 3); // ['a', 'a', 'a']
  * ```
  * @param x
  * @param n
  * @returns {*}
  */
-export function repeatVar(x, n) {
+export function repeatconst(x, n) {
   return Array.apply(null, Array(n)).map(() => x);
 }
 
@@ -181,7 +181,7 @@ export function flattenTree(tree, delimiter = "__") {
 }
 
 export function delay(milliseconds) {
-  return new Promise((resolve, reject) =>
+  return new Promise(resolve =>
     window.setTimeout(() => resolve(), milliseconds)
   );
 }
@@ -215,7 +215,7 @@ export function watch(subscribe, select, callback) {
 }
 
 /**
- * An oppinioned variant of the generic watch that
+ * An oppinioned constiant of the generic watch that
  * for usage with redux-stores containing immutablejs-objects
  * @param redux {object} should provide `.subscribe` and `.getState`
  *                       (with the latter yielding an immutablejs-object)
@@ -244,7 +244,7 @@ export function mapToMatches(connections) {
   return needMap;
 }
 export function removeAllProperties(obj) {
-  Object.keys(obj).forEach(function(element, index, array) {
+  Object.keys(obj).forEach(function(element) {
     delete obj[element];
   });
 }
@@ -261,7 +261,7 @@ export function getRandomString(
   length,
   chars = "abcdefghijklmnopqrstuvwxyz0123456789"
 ) {
-  var buff = new Array(length);
+  const buff = new Array(length);
   for (let i = 0; i < buff.length; i++) {
     buff[i] = chars[Math.floor(Math.random() * chars.length)];
   }
@@ -303,10 +303,10 @@ export function arrayOfRandoms(length) {
 
 export function readAsDataURL(file) {
   return new Promise((resolve, reject) => {
-    var reader = new FileReader();
+    const reader = new FileReader();
 
     reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(f);
+    reader.onerror = () => reject("Something exploded in the FileReader");
 
     reader.readAsDataURL(file);
   });
@@ -314,8 +314,8 @@ export function readAsDataURL(file) {
 
 export function concatTags(tags) {
   if (tags.length > 0) {
-    var concTags = "";
-    for (var i = 0; i < tags.length; i++) {
+    let concTags = "";
+    for (let i = 0; i < tags.length; i++) {
       if (i == 0) {
         concTags = tags[i].text;
       } else {
@@ -329,20 +329,20 @@ export function concatTags(tags) {
 // This scrolling function
 // is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
 export function scrollTo(eID) {
-  var startY = currentYPosition();
-  var stopY = elmYPosition(eID);
-  var distance = stopY > startY ? stopY - startY : startY - stopY;
+  const startY = currentYPosition();
+  const stopY = elmYPosition(eID);
+  const distance = stopY > startY ? stopY - startY : startY - stopY;
   if (distance < 100) {
     scrollTo(0, stopY);
     return;
   }
-  var speed = Math.round(distance / 100);
+  let speed = Math.round(distance / 100);
   if (speed >= 20) speed = 20;
-  var step = Math.round(distance / 25);
-  var leapY = stopY > startY ? startY + step : startY - step;
-  var timer = 0;
+  const step = Math.round(distance / 25);
+  let leapY = stopY > startY ? startY + step : startY - step;
+  let timer = 0;
   if (stopY > startY) {
-    for (var i = startY; i < stopY; i += step) {
+    for (let i = startY; i < stopY; i += step) {
       setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
       leapY += step;
       if (leapY > stopY) leapY = stopY;
@@ -350,7 +350,7 @@ export function scrollTo(eID) {
     }
     return;
   }
-  for (var i = startY; i > stopY; i -= step) {
+  for (let i = startY; i > stopY; i -= step) {
     setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
     leapY -= step;
     if (leapY < stopY) leapY = stopY;
@@ -369,9 +369,9 @@ export function scrollTo(eID) {
   }
 
   function elmYPosition(eID) {
-    var elm = document.getElementById(eID);
-    var y = elm.offsetTop;
-    var node = elm;
+    const elm = document.getElementById(eID);
+    let y = elm.offsetTop;
+    let node = elm;
     while (node.offsetParent && node.offsetParent != document.body) {
       node = node.offsetParent;
       y += node.offsetTop;
@@ -389,7 +389,7 @@ export function checkHttpStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
   } else {
-    var error = new Error(response.statusText);
+    const error = new Error(response.statusText);
     error.response = response;
     throw error;
   }
@@ -411,7 +411,7 @@ export function checkHttpStatus(response) {
  */
 export function withDefaults(obj, defaults) {
   const ret = {};
-  for (var k in defaults) {
+  for (const k in defaults) {
     ret[k] = obj && obj[k] ? obj[k] : defaults[k];
   }
   return ret;
@@ -468,7 +468,7 @@ export function flatten(listOfLists) {
  */
 export function flattenObj(objOfObj) {
   let flattened = {};
-  for (const [outerKeys, innerObjects] of entries(objOfObj)) {
+  for (const [, innerObjects] of entries(objOfObj)) {
     flattened = Object.assign(flattened, innerObjects);
   }
   return flattened;
@@ -584,7 +584,7 @@ export function mapJoin(object, asyncFunction) {
  * @return {boolean}
  */
 export function is(type, obj) {
-  var clas = Object.prototype.toString.call(obj).slice(8, -1);
+  const clas = Object.prototype.toString.call(obj).slice(8, -1);
   return obj !== undefined && obj !== null && clas === type;
 }
 
@@ -606,7 +606,7 @@ export function msStringToDate(ts) {
  * returns a list with the search results.
  */
 export function searchNominatim(searchStr) {
-  var url =
+  const url =
     "https://nominatim.openstreetmap.org/search" +
     "?q=" +
     encodeURIComponent(searchStr) +
@@ -627,10 +627,10 @@ export function reverseSearchNominatim(lat, lon, zoom) {
     url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
   }
 
-  let json = fetchJSON(url).catch(function(e) {
-    var distance = 0.2;
-    var gp = new GeoPoint(lat, lon);
-    var bBox = gp.boundingCoordinates(distance, true);
+  let json = fetchJSON(url).catch(function() {
+    const distance = 0.2;
+    const gp = new GeoPoint(lat, lon);
+    const bBox = gp.boundingCoordinates(distance, true);
     return {
       display_name: "-",
       lat: lat,
@@ -721,7 +721,7 @@ function fetchJSON(url) {
  * @return {*}
  */
 export function clone(obj) {
-  var copy;
+  let copy;
 
   // Handle the 3 simple types, and null or undefined
   if (null == obj || "object" != typeof obj) return obj;
@@ -736,7 +736,7 @@ export function clone(obj) {
   // Handle Array
   if (obj instanceof Array) {
     copy = [];
-    for (var i = 0, len = obj.length; i < len; i++) {
+    for (let i = 0, len = obj.length; i < len; i++) {
       copy[i] = clone(obj[i]);
     }
     return copy;
@@ -745,7 +745,7 @@ export function clone(obj) {
   // Handle Object
   if (obj instanceof Object) {
     copy = {};
-    for (var attr in obj) {
+    for (const attr in obj) {
       if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
     }
     return copy;
@@ -895,9 +895,9 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
     } else {
       // full fledged jsonld-node. iterate over the keys and recurse into the values.
 
-      var newObj = {};
+      const newObj = {};
       for (let k of Object.keys(jsonldObj)) {
-        var newKey;
+        let newKey;
         switch (k) {
           case "@context":
             // drop it. we can't use the json-ld context in
@@ -914,8 +914,8 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
             // newObj['type'] = jsonldObj['@type'];
             break;
 
-          default:
-            var split = k.split(":");
+          default: {
+            const split = k.split(":");
             if (split.length !== 2) {
               throw new Exception(
                 'encountered unexpected predicate when parsing json-ld. it doesn\'t follow the "<prefix>:<postfix> structure: "' +
@@ -924,6 +924,7 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
             }
             newKey = split[1];
             break;
+          }
         }
         newObj[newKey] = jsonld2simpleFormat(jsonldObj[k], context);
       }
@@ -938,68 +939,16 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
 }
 
 /**
- * Similar to Promise.all, takes an array of promises and returns a promise.
- * That promise will resolve if at least one of the promises succeeds.
- * The value with which it resolves it is an array of equal length as the input
- * containing either the resolve value of the promise or null if rejected.
- * If an errorHandler is specified, it is called with ([array key], [reject value]) of
- * each rejected promise.
- *
- * Consider using `Promise.race` if you just need once Promise to resolve/reject.
- * `somePromises` waits for all promises to either resolve or reject, then resolves
- * if at least one of them was successful.
- *
- * @param promises
- */
-export function somePromises(promises, errorHandler) {
-  if (!promises || promises.length === 0) {
-    Promise.resolve();
-  }
-
-  let numPromises = promises.length,
-    successes = 0,
-    failures = 0,
-    results = Array.isArray(promises) ? [] : {},
-    handler =
-      typeof errorHandler === "function" ? errorHandler : function(x, y) {};
-
-  const resultPromise = new Promise((resolve, reject) =>
-    promises.forEach((promise, key) => {
-      promise.then(
-        value => {
-          successes++;
-          if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-          results[key] = value;
-          if (failures + successes >= numPromises) resolve(results);
-        },
-        reason => {
-          failures++;
-          //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
-          if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-          results[key] = null;
-          handler(key, reason);
-          if (failures >= numPromises) {
-            reject(results);
-          } else if (failures + successes >= numPromises) {
-            resolve(results);
-          }
-        }
-      );
-    })
-  );
-}
-
-/**
  *
  * Adapted from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
  *
  * Usage:
  * ```
  * // query string: ?foo=lorem&bar=&baz
- * var foo = getParameterByName('foo'); // "lorem"
- * var bar = getParameterByName('bar'); // "" (present with empty value)
- * var baz = getParameterByName('baz'); // "" (present with no value)
- * var qux = getParameterByName('qux'); // null (absent)
+ * const foo = getParameterByName('foo'); // "lorem"
+ * const bar = getParameterByName('bar'); // "" (present with empty value)
+ * const baz = getParameterByName('baz'); // "" (present with no value)
+ * const qux = getParameterByName('qux'); // null (absent)
  * ```
  * @param name
  * @param url
@@ -1007,7 +956,7 @@ export function somePromises(promises, errorHandler) {
  */
 export function getParameterByName(name, url) {
   if (!url) url = window.location.href;
-  name = name.replace(/[\[\]]/g, "\\$&");
+  name = name.replace(/[[\]]/g, "\\$&");
   const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
   const results = regex.exec(url);
   if (!results) return null;
@@ -1029,14 +978,14 @@ export function getParameters(url) {
     return {};
   }
 
-  const paramsKVArray = paramsString
+  const paramsKconstray = paramsString
     .split("&") // e.g. ["privateId=5kpskm09-ocri63", "foo=bar", "asdf"]
     .map(p => p.split("=")) // e.g. [["privateId", "5kpskm09-ocri63"], ["foo", "bar"], ["asdf"]]
     .filter(p => p.length === 2); // filter out parameter that's not a proper key-value pair, e.g. "asdf"
 
   // create object from kv-pairs
-  var params = {};
-  paramsKVArray.forEach(kv => (params[kv[0]] = kv[1]));
+  const params = {};
+  paramsKconstray.forEach(kv => (params[kv[0]] = kv[1]));
 
   return params;
 }
@@ -1071,7 +1020,7 @@ export function parseSVG(xmlString) {
 }
 
 /**
- * Fetch and inline an icon-spritemap so it can be colored using css-variables.
+ * Fetch and inline an icon-spritemap so it can be colored using css-constiables.
  */
 export function inlineSVGSpritesheet(path, id) {
   return fetch(path)
@@ -1109,7 +1058,7 @@ export function rethrow(e, prependedMsg = "") {
     throw new Error(prependedMsg + e);
   } else if (e.stack && e.message) {
     // a class defined
-    var g = new Error(prependedMsg + e.message);
+    const g = new Error(prependedMsg + e.message);
     g.stack = e.stack;
     throw g;
   } else {
@@ -1132,7 +1081,7 @@ export function prefixOfUri(uri) {
   // if there's no fragment-identifier, the
   // everything after the last slash is removed.
   if (!prefix.endsWith("#")) {
-    prefix = prefix.replace(/\/([^\/]*)$/, "/");
+    prefix = prefix.replace(/\/([^/]*)$/, "/");
   }
 
   return prefix;
@@ -1212,15 +1161,15 @@ export function extractHashtags(str) {
 }
 
 export function generateHexColor(text) {
-  var hash = 0;
+  let hash = 0;
 
   if (text) {
-    for (var i = 0; i < text.length; i++) {
+    for (let i = 0; i < text.length; i++) {
       hash = text.charCodeAt(i) + ((hash << 5) - hash);
     }
   }
 
-  var c = (hash & 0x00ffffff).toString(16);
+  const c = (hash & 0x00ffffff).toString(16);
 
   return "#" + ("00000".substring(0, 6 - c.length) + c);
 }

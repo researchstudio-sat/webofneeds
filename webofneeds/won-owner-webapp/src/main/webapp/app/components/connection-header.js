@@ -3,6 +3,7 @@
  * Created by ksinger on 10.04.2017.
  */
 import angular from "angular";
+import won from "../won-es6.js";
 import "ng-redux";
 import squareImageModule from "./square-image.js";
 import { actionCreators } from "../actions/actions.js";

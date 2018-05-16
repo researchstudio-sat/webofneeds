@@ -10,20 +10,13 @@ import won from "./won.js";
 (function() {
   // <need-builder-js> scope
 
-  function hasModalities(args) {
-    return (
-      hasPriceSpecification(args) ||
-      hasLocation(args) ||
-      hasTimeConstraint(args)
-    );
-  }
   function hasLocation(args) {
     return !!args.location;
   }
-  function hasPriceSpecification(args) {
+  function hasPriceSpecification() {
     return false; //TODO price-specification not fully implemented yet
   }
-  function hasTimeConstraint(args) {
+  function hasTimeConstraint() {
     return false; //TODO time-constraint-attachment not implemented yet
   }
   function hasAttachmentUrls(args) {
@@ -216,13 +209,15 @@ import won from "./won.js";
       //TODO images, time, currency(?)
     });
 
-    var isWhatsAround = args.is ? args.is.whatsAround : args.seeks.whatsAround;
-    var noHints = args.is ? args.is.noHints : args.seeks.noHints;
-    var matchingContext = args.is
+    const isWhatsAround = args.is
+      ? args.is.whatsAround
+      : args.seeks.whatsAround;
+    const noHints = args.is ? args.is.noHints : args.seeks.noHints;
+    const matchingContext = args.is
       ? args.is.matchingContext
       : args.seeks.matchingContext;
 
-    var isContentUri, seeksContentUri;
+    let isContentUri, seeksContentUri;
     if (isWhatsAround) {
       isContentUri = won.WON.contentNodeBlankUri.whatsAround;
       seeksContentUri = won.WON.contentNodeBlankUri.whatsAround;
@@ -232,7 +227,7 @@ import won from "./won.js";
         ? won.WON.contentNodeBlankUri.seeks
         : undefined;
     }
-    var graph = [
+    const graph = [
       {
         "@id": args.is
           ? args.is.publishedContentUri

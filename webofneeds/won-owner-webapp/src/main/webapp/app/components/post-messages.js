@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: WHAT IS HAPPENING HERE?!
+
 import won from "../won-es6.js";
 import angular from "angular";
 import jld from "jsonld";
@@ -11,14 +14,7 @@ import connectionContextDropdownModule from "./connection-context-dropdown.js";
 
 import {} from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  attach,
-  delay,
-  deepFreeze,
-  clone,
-  checkHttpStatus,
-  dispatchEvent,
-} from "../utils.js";
+import { attach, delay, deepFreeze, clone } from "../utils.js";
 import {
   callAgreementsFetch,
   callAgreementEventFetch,

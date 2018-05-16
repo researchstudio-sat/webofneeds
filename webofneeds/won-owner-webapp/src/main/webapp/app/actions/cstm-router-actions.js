@@ -6,14 +6,12 @@ import Immutable from "immutable";
 
 import { getIn } from "../utils.js";
 
-import { actionCreators, actionTypes } from "./actions.js";
+import { actionCreators } from "./actions.js";
 
 import {
   defaultRoute,
-  makeParams,
   resetParams,
   resetParamsImm,
-  constantParams,
   addConstParams,
 } from "../configRouting.js";
 
@@ -69,7 +67,7 @@ export function stateGoResetParams(state) {
 }
 
 export function stateGoDefault() {
-  return (dispatch, getState) => {
+  return dispatch => {
     return dispatch(actionCreators.router__stateGoResetParams(defaultRoute));
   };
 }

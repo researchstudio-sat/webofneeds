@@ -2,14 +2,11 @@
  * Created by ksinger on 21.08.2017.
  */
 
-import { getParameterByName, getParameters } from "./utils.js";
+import { getParameters } from "./utils.js";
 
 import {
   defaultRoute,
-  makeParams,
-  resetParams,
   resetParamsImm,
-  constantParams,
   addConstParams,
 } from "./configRouting.js";
 

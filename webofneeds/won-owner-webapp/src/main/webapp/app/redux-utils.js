@@ -55,7 +55,6 @@ import Immutable from "immutable";
  */
 export function combineReducersStable(mapOfReducers) {
   return (state = Immutable.Map(), action = {}) => {
-    let hasChanged = false;
     let updatedState = state;
     mapOfReducers.forEach((reducer, domainName) => {
       // the domain is the child-node the reducer is responsible for

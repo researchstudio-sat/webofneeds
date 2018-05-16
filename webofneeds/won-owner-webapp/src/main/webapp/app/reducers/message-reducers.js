@@ -3,10 +3,7 @@
  */
 
 import { actionTypes } from "../actions/actions.js";
-import { repeatVar } from "../utils.js";
 import Immutable from "immutable";
-import { createReducer } from "redux-immutablejs";
-import { combineReducersStable } from "../redux-utils.js";
 
 /* TODO this fragment is part of an attempt to sketch a different
  * approach to asynchronity (Remove it or the thunk-based
@@ -38,12 +35,13 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);
 
-    case actionTypes.messages.waitingForAnswer:
+    case actionTypes.messages.waitingForAnswer: {
       const pendingEventUri = action.payload.eventUri;
       const msg = messages.getIn(["enqueued", pendingEventUri]);
       return messages
         .removeIn(["enqueued", pendingEventUri])
         .setIn(["waitingForAnswer", pendingEventUri], msg);
+    }
 
     case actionTypes.connections.open:
     case actionTypes.connections.sendChatMessage:
@@ -62,7 +60,7 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.reconnectSuccess:
       return messages.set("lostConnection", false).set("reconnecting", false);
 
-    case actionTypes.messages.dispatchActionOn.registerSuccessOwn:
+    case actionTypes.messages.dispatchActionOn.registerSuccessOwn: {
       const pathSO = ["dispatchOnSuccessOwn", action.payload.eventUri];
       const toDispatchListSO = messages.getIn(pathSO);
       if (!toDispatchListSO) {
@@ -71,8 +69,9 @@ export function messagesReducer(messages = initialState, action = {}) {
       return messages.updateIn(pathSO, list =>
         list.push(action.payload.actionToDispatch)
       );
+    }
 
-    case actionTypes.messages.dispatchActionOn.registerFailureOwn:
+    case actionTypes.messages.dispatchActionOn.registerFailureOwn: {
       const pathFO = ["dispatchOnFailureOwn", action.payload.eventUri];
       const toDispatchListFO = messages.getIn(pathFO);
       if (!toDispatchListFO) {
@@ -81,8 +80,9 @@ export function messagesReducer(messages = initialState, action = {}) {
       return messages.updateIn(pathFO, list =>
         list.push(action.payload.actionToDispatch)
       );
+    }
 
-    case actionTypes.messages.dispatchActionOn.registerSuccessRemote:
+    case actionTypes.messages.dispatchActionOn.registerSuccessRemote: {
       const pathSR = ["dispatchOnSuccessRemote", action.payload.eventUri];
       const toDispatchListSR = messages.getIn(pathSR);
       if (!toDispatchListSR) {
@@ -91,8 +91,9 @@ export function messagesReducer(messages = initialState, action = {}) {
       return messages.updateIn(pathSR, list =>
         list.push(action.payload.actionToDispatch)
       );
+    }
 
-    case actionTypes.messages.dispatchActionOn.registerFailureRemote:
+    case actionTypes.messages.dispatchActionOn.registerFailureRemote: {
       const pathFR = ["dispatchOnFailureRemote", action.payload.eventUri];
       const toDispatchListFR = messages.getIn(pathFR);
       if (!toDispatchListFR) {
@@ -101,6 +102,7 @@ export function messagesReducer(messages = initialState, action = {}) {
       return messages.updateIn(pathFR, list =>
         list.push(action.payload.actionToDispatch)
       );
+    }
 
     case actionTypes.messages.dispatchActionOn.failureOwn:
     case actionTypes.messages.dispatchActionOn.successOwn:

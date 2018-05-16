@@ -8,6 +8,7 @@ import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
+import won from "../won-es6.js";
 
 import {
   selectOpenPostUri,

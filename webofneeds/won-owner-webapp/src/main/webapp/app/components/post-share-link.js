@@ -67,7 +67,7 @@ function genComponentConf() {
         linkEl.setSelectionRange(0, linkEl.value.length); //refocus so people can keep writing
 
         try {
-          var successful = document.execCommand("copy");
+          const successful = document.execCommand("copy");
           if (!successful) throw successful;
           this.isCopied = true;
           linkEl.setSelectionRange(0, 0);

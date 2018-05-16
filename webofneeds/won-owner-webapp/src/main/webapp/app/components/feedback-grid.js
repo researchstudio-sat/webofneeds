@@ -1,4 +1,5 @@
 import angular from "angular";
+import won from "../won-es6.js";
 import "ng-redux";
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -44,7 +45,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      const selectFromState = state => ({});
+      const selectFromState = () => ({});
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 

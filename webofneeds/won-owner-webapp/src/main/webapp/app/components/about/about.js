@@ -202,8 +202,6 @@ class AboutController {
   constructor(/* arguments <- serviceDependencies */) {
     attach(this, serviceDependencies, arguments);
 
-    const self = this;
-
     window.ab4dbg = this;
 
     const select = state => {

@@ -18,7 +18,6 @@ import {
 } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
-import Immutable from "immutable";
 import { connect2Redux } from "../won-utils.js";
 
 const postTypeTexts = [
@@ -225,13 +224,9 @@ function genComponentConf() {
     }
 
     mergeMatchingContext() {
-      var list = this.tempMatchingString
+      const list = this.tempMatchingString
         ? this.tempMatchingString.match(/(\S+)/gi)
         : [];
-      var uniq = list.reduce(function(a, b) {
-        if (a.indexOf(b) < 0) a.push(b);
-        return a;
-      }, []);
 
       return list.reduce(function(a, b) {
         if (a.indexOf(b) < 0) a.push(b);
@@ -248,14 +243,14 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        var tmpList = [this.is, this.seeks];
-        var newObject = {
+        const tmpList = [this.is, this.seeks];
+        const newObject = {
           is: this.draftObject.is,
           seeks: this.draftObject.seeks,
         };
 
-        for (i = 0; i < 2; i++) {
-          var tmp = tmpList[i];
+        for (let i = 0; i < 2; i++) {
+          const tmp = tmpList[i];
 
           if (this.tempMatchingContext.length > 0) {
             newObject[tmp].matchingContext = this.tempMatchingContext;
@@ -283,8 +278,6 @@ function genComponentConf() {
               const lat = currentLocation.coords.latitude;
               const lng = currentLocation.coords.longitude;
               const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
-
-              const degreeConstant = 1.0;
 
               // center map around current location
 

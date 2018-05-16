@@ -2,7 +2,7 @@
  * Created by ksinger on 01.09.2017.
  */
 import angular from "angular";
-import { attach, delay, dispatchEvent } from "../utils.js";
+import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 

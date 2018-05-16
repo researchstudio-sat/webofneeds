@@ -45,7 +45,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
-      const self = this;
       const selectFromState = state => {
         const postUri = selectOpenPostUri(state);
         const post = postUri && state.getIn(["needs", postUri]);

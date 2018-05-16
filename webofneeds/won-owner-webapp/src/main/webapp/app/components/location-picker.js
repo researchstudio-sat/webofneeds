@@ -14,7 +14,6 @@ import {
   delay,
   getIn,
 } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
 import { doneTypingBufferNg, DomCache } from "../cstm-ng-utils.js";
 
 import { initLeaflet } from "../won-utils.js";
@@ -332,36 +331,6 @@ function scrubSearchResults(searchResults) {
       .toList()
       .toJS()
   );
-}
-
-function jsonLd2draftLocation(location) {
-  // payload uses the json-ld format
-  const nw = location.getIn(["won:hasBoundingBox", "won:hasNorthWestCorner"]);
-  const se = location.getIn(["won:hasBoundingBox", "won:hasSouthEastCorner"]);
-  return {
-    name: location.get("s:name"),
-    lon: Number.parseFloat(location.getIn(["s:geo", "s:longitude"])),
-    lat: Number.parseFloat(location.getIn(["s:geo", "s:latitude"])),
-    //importance: searchResult.importance,
-    nwCorner: {
-      lat: Number.parseFloat(nw.get("s:latitude")),
-      lng: Number.parseFloat(nw.get("s:longitude")),
-    },
-    seCorner: {
-      lat: Number.parseFloat(se.get("s:latitude")),
-      lng: Number.parseFloat(se.get("s:longitude")),
-    },
-    //bounds: [
-    //    [
-    //        Number.parseFloat(nw.get('s:latitude')),
-    //        Number.parseFloat(nw.get('s:longitude')),
-    //    ],
-    //    [
-    //        Number.parseFloat(se.get('s:latitude')),
-    //        Number.parseFloat(se.get('s:longitude')),
-    //    ]
-    //]
-  };
 }
 
 function onMapClick(e, ctrl) {

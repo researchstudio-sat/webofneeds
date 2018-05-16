@@ -47,8 +47,8 @@ function genComponentConf() {
             this.imageDataUrl = dataUrl; //TODO where do previews go in in multi-img mode?
             this.$scope.$digest(); // so the preview is displayed
 
-            var b64data = dataUrl.split("base64,")[1];
-            var imageData = {
+            const b64data = dataUrl.split("base64,")[1];
+            const imageData = {
               name: f.name,
               type: f.type,
               data: b64data,

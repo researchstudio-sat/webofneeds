@@ -4,6 +4,7 @@
 
 import "leaflet";
 
+/* global L */
 L.Icon.Default.imagePath = "images/map-images/";
 
 export default L;

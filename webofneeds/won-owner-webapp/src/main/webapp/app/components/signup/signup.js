@@ -22,7 +22,6 @@ class SignupController {
     attach(this, serviceDependencies, arguments);
     this.rememberMe = false;
     Object.assign(this, srefUtils); // bind srefUtils to scope
-    const self = this;
 
     const select = state => ({
       //focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
@@ -30,6 +29,7 @@ class SignupController {
       registerError: state.getIn(["user", "registerError"]),
     });
     const disconnect = this.$ngRedux.connect(select, actionCreators)(this);
+    this.$scope.$on("$destroy", disconnect);
   }
 
   formKeyup(event) {

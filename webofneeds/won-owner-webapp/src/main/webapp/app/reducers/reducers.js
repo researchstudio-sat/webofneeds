@@ -39,7 +39,8 @@ const reducers = {
   toasts: toastReducer,
 
   // contains the Date.now() of the last action
-  lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
+  // lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
+  lastUpdateTime: () => Date.now(),
 
   loginInProcessFor: (loginInProcessFor = undefined, action = {}) => {
     switch (action.type) {

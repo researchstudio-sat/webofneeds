@@ -2,12 +2,11 @@
  * Created by ksinger on 18.02.2016.
  */
 
-import won from "../won-es6.js";
 import Immutable from "immutable";
 import { actionTypes, actionCreators } from "./actions.js";
 import { selectOpenPostUri } from "../selectors.js";
 
-import { accessControl, checkAccessToCurrentRoute } from "../configRouting.js";
+import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { stateGoCurrent } from "./cstm-router-actions.js";
 
@@ -15,15 +14,13 @@ import {
   checkLoginStatus,
   privateId2Credentials,
   login,
-  logout,
 } from "../won-utils.js";
 
-import { checkHttpStatus, getParameterByName } from "../utils.js";
+import { getParameterByName } from "../utils.js";
 
 import {
   fetchOwnedData,
   fetchDataForNonOwnedNeedOnly,
-  emptyDataset,
   wellFormedPayload,
 } from "../won-message-utils.js";
 
@@ -41,7 +38,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
          * we're accessing an "accountless"-account and need to sign in with that
          */
     return loadingWithAnonymousAccount(dispatch, getState, privateId).catch(
-      e => {
+      () => {
         loadingWhileSignedOut(dispatch, getState);
       }
     );
@@ -52,7 +49,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
     .then(data => {
       return loadingWhileSignedIn(dispatch, getState, data.username);
     })
-    .catch(error => {
+    .catch(() => {
       /*
          * ok, we're really not logged in -- thus we need to fetch any publicly visible, required data
          */
@@ -72,7 +69,7 @@ function loadingWhileSignedIn(dispatch, getState, username) {
 
 function loadingWithAnonymousAccount(dispatch, getState, privateId) {
   // using an anonymous account. need to log in.
-  const { email, password } = privateId2Credentials(privateId);
+  const { email } = privateId2Credentials(privateId);
   return (
     login({ privateId })
       /* quickly dispatch log-in status, even before loading data, to
@@ -82,10 +79,8 @@ function loadingWithAnonymousAccount(dispatch, getState, privateId) {
         loginSuccess(email, true, dispatch, getState);
         return response;
       })
-      .then(response =>
-        fetchOwnedData(email, dispatchInitialPageLoad(dispatch))
-      )
-      .then(allThatData => {
+      .then(() => fetchOwnedData(email, dispatchInitialPageLoad(dispatch)))
+      .then(() => {
         return dispatch({
           type: actionTypes.initialPageLoad,
           payload: Immutable.fromJS({ initialLoadFinished: true }),
