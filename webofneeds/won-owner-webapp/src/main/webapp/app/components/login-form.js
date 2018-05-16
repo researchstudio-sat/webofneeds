@@ -88,7 +88,7 @@ function genLoginConf() {
           },
           {
             redirectToFeed: false,
-          },
+          }
         );
       }
     }

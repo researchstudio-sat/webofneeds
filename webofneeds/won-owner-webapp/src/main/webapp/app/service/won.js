@@ -26,10 +26,7 @@ import {
   clone,
   prefixOfUri,
 } from "../utils.js";
-import {
-  clearPrivateId,
-  clearReadUris,
-} from "../won-localstorage.js";
+import { clearPrivateId, clearReadUris } from "../won-localstorage.js";
 import jsonld from "jsonld";
 
 import N3 from "n3";
@@ -442,7 +439,7 @@ won.constantsReverseLookupTable = {};
 for (var root of ["WON", "UNREAD", "WONMSG", "EVENT", "COMMUNUCATION_STATE"]) {
   won.mergeIntoLast(
     buildReverseLookup(won[root], [root]),
-    won.constantsReverseLookupTable,
+    won.constantsReverseLookupTable
   );
 }
 
@@ -818,7 +815,7 @@ won.JsonLdHelper = {
  */
 won.addContentGraphReferencesToMessageGraph = function(
   messageGraph,
-  graphURIs,
+  graphURIs
 ) {
   if (graphURIs != null) {
     if (won.isArray(graphURIs) && graphURIs.length > 0) {
@@ -955,98 +952,98 @@ let makeEnvelopeGraphForMessageResource = function(messageResource) {
     "http://purl.org/webofneeds/message#",
     false,
     "hasReceivedTimestamp",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     false,
     "hasSentTimestamp",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasPreviousMessage",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     false,
     "protocolVersion",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasSenderNeed",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasSender",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasSenderNode",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasReceiverNeed",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasReceiver",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasReceiverNode",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasCorrespondingRemoteMessage",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasMessageType",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasRemoteFacet",
-    messageResource,
+    messageResource
   );
   addPropertyIfPresent(
     messageRes,
     "http://purl.org/webofneeds/message#",
     true,
     "hasFacet",
-    messageResource,
+    messageResource
   );
   return envelope;
 };
@@ -1057,7 +1054,7 @@ let addPropertyIfPresent = function(
   prefix,
   isUri,
   propertyName,
-  toAddFrom,
+  toAddFrom
 ) {
   let value = toAddFrom[propertyName];
   if (value && typeof value == "string") {
@@ -1079,7 +1076,7 @@ won.toWonMessage = function(message) {
   } else {
     throw new Exception(
       "Couldn't convert the following to a WonMessage: ",
-      message,
+      message
     );
   }
 };
@@ -1253,7 +1250,7 @@ WonMessage.prototype = {
 
   getRemoteMessageUri: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage",
+      "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
     );
   },
 
@@ -1263,12 +1260,12 @@ WonMessage.prototype = {
     }
     if (messageStructure.containedEnvelopes) {
       let uris = messageStructure.containedEnvelopes.map(envelope =>
-        this.__getMessageUri(envelope),
+        this.__getMessageUri(envelope)
       );
       if (uris.length > 1) {
         throw new Error(
           "Found more than one contained envelope in message with message uris: " +
-            uris,
+            uris
         );
       }
       if (uris.length == 0) {
@@ -1292,14 +1289,14 @@ WonMessage.prototype = {
         if (!is("Array", contentGraphs)) {
           throw new Error(
             "Unexpected content-graph structure: \n\n" +
-              JSON.stringify(contentGraphs),
+              JSON.stringify(contentGraphs)
           );
         }
         const eventUriPrefix = prefixOfUri(this.getMessageUri());
         const jsonldData = {
           "@context": Object.assign(
             { event: eventUriPrefix },
-            won.defaultContext,
+            won.defaultContext
           ),
           "@graph": contentGraphs,
         };
@@ -1380,7 +1377,7 @@ WonMessage.prototype = {
     // walk over graphs, copy all graphs to result that are content graphs
     // we identify content graphs by finding their URI in messageStructure.containedContent
     return this.graphs.filter(
-      graph => this.contentGraphUris.indexOf(graph["@id"]) > -1,
+      graph => this.contentGraphUris.indexOf(graph["@id"]) > -1
     );
   },
   getContentGraphsAsJsonLD: function() {
@@ -1388,17 +1385,17 @@ WonMessage.prototype = {
   },
   getMessageType: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#hasMessageType",
+      "http://purl.org/webofneeds/message#hasMessageType"
     );
   },
   getReceivedTimestamp: function() {
     return this.getPropertyFromLocalMessage(
-      "http://purl.org/webofneeds/message#hasReceivedTimestamp",
+      "http://purl.org/webofneeds/message#hasReceivedTimestamp"
     );
   },
   getSentTimestamp: function() {
     return this.getPropertyFromLocalMessage(
-      "http://purl.org/webofneeds/message#hasSentTimestamp",
+      "http://purl.org/webofneeds/message#hasSentTimestamp"
     );
   },
   /**
@@ -1420,7 +1417,7 @@ WonMessage.prototype = {
   },
   getMatchCounterpart: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/model#hasMatchCounterpart",
+      "http://purl.org/webofneeds/model#hasMatchCounterpart"
     );
   },
 
@@ -1429,12 +1426,12 @@ WonMessage.prototype = {
   },
   getIsRemoteResponseTo: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#isRemoteResponseTo",
+      "http://purl.org/webofneeds/message#isRemoteResponseTo"
     );
   },
   getIsResponseToMessageType: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#isResponseToMessageType",
+      "http://purl.org/webofneeds/message#isResponseToMessageType"
     );
   },
 
@@ -1449,12 +1446,12 @@ WonMessage.prototype = {
   },
   getReceiverNode: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#hasReceiverNode",
+      "http://purl.org/webofneeds/message#hasReceiverNode"
     );
   },
   getReceiverNeed: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#hasReceiverNeed",
+      "http://purl.org/webofneeds/message#hasReceiverNeed"
     );
   },
   getReceiver: function() {
@@ -1470,7 +1467,7 @@ WonMessage.prototype = {
   },
   getProposedToCancelMessages: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/agreement#proposesToCancel",
+      "http://purl.org/webofneeds/agreement#proposesToCancel"
     );
   },
 
@@ -1482,7 +1479,7 @@ WonMessage.prototype = {
   },
   isProposeToCancel: function() {
     return !!this.getProperty(
-      "http://purl.org/webofneeds/agreement#proposesToCancel",
+      "http://purl.org/webofneeds/agreement#proposesToCancel"
     );
   },
   isProposal: function() {
@@ -1497,7 +1494,7 @@ WonMessage.prototype = {
   },
   isRetractMessage: function() {
     return !!this.getProperty(
-      "http://purl.org/webofneeds/modification#retracts",
+      "http://purl.org/webofneeds/modification#retracts"
     );
   },
 
@@ -1510,7 +1507,7 @@ WonMessage.prototype = {
 
   isUnsetRelevantMessage: function() {
     return this.getProperty(
-      "http://purl.org/webofneeds/message#hasUnsetRelevantMessage",
+      "http://purl.org/webofneeds/message#hasUnsetRelevantMessage"
     );
   },
 
@@ -1659,12 +1656,12 @@ WonMessage.prototype = {
     }
     if (messageStructure.containedEnvelopes) {
       let uris = messageStructure.containedEnvelopes.map(envelope =>
-        this.__getMessageDirection(envelope),
+        this.__getMessageDirection(envelope)
       );
       if (uris.length > 1) {
         throw new Error(
           "Found more than one contained envelope in message with message uris: " +
-            uris,
+            uris
         );
       }
       if (uris.length == 0) {
@@ -1701,7 +1698,7 @@ WonMessage.prototype = {
           node.messageDirection = msgUriAndDirection.messageDirection;
         }
         let messageUriAndCorrespondingRemoteMessageUri = this.__getMessageUriAndCorrespondingRemoteMessageUri(
-          graph,
+          graph
         );
         if (messageUriAndCorrespondingRemoteMessageUri) {
           node.messageUri =
@@ -1727,7 +1724,7 @@ WonMessage.prototype = {
           node.containsEnvelopes = containedEnvelopes.map(uri => nodes[uri]);
           //remember that these envelopes are now referenced
           unreferencedEnvelopes = unreferencedEnvelopes.filter(
-            uri => !containedEnvelopes.includes(uri),
+            uri => !containedEnvelopes.includes(uri)
           );
         } else if (!node.correspondingRemoteMessageUri) {
           //remember that this envelope contains no envelopes (and points to no remote messages)
@@ -1737,7 +1734,7 @@ WonMessage.prototype = {
           //if we know the message uri, we can look for content in this envelope
           let containedContent = this.__getContainedContentGraphUris(
             graph,
-            node.messageUri,
+            node.messageUri
           );
           if (containedContent.length > 0) {
             node.containedContent = containedContent.map(uri => nodes[uri]);
@@ -1755,7 +1752,7 @@ WonMessage.prototype = {
         if (node.correspondingRemoteMessageUri) {
           let remoteMessages = unreferencedEnvelopes.filter(
             envelope =>
-              envelope.messageUri == node.correspondingRemoteMessageUri,
+              envelope.messageUri == node.correspondingRemoteMessageUri
           );
           if (remoteMessages.length == 1) {
             //we found a remote envelope. link to it from our node
@@ -1767,12 +1764,12 @@ WonMessage.prototype = {
               //both messages can link to each other, but the FromExternal one
               //is the top level one. mark the other one as referenced
               unreferencedEnvelopes = unreferencedEnvelopes.filter(
-                env => env != node.remoteEnvelope,
+                env => env != node.remoteEnvelope
               );
             }
           } else if (remoteMessages.length > 1) {
             this.parseErrors.push(
-              "more than one candidate for the outermost remoteMessage envelope found",
+              "more than one candidate for the outermost remoteMessage envelope found"
             );
           }
         }
@@ -1790,7 +1787,7 @@ WonMessage.prototype = {
     }
     if (unreferencedEnvelopes.length > 1) {
       this.parseErrors.push(
-        "more than one unreferenced (i.e. outermost) envelope found",
+        "more than one unreferenced (i.e. outermost) envelope found"
       );
     }
     this.messageStructure = nodes[unreferencedEnvelopes[0]]; //set the pointer to the outermost envelope
@@ -1804,8 +1801,8 @@ WonMessage.prototype = {
       resource =>
         resource["@id"] === graphUri &&
         resource["@type"].includes(
-          "http://purl.org/webofneeds/message#EnvelopeGraph",
-        ),
+          "http://purl.org/webofneeds/message#EnvelopeGraph"
+        )
     );
   },
   __isSignatureGraph: graph => {
@@ -1815,8 +1812,8 @@ WonMessage.prototype = {
       resource =>
         resource["@id"] === graphUri &&
         resource["@type"].includes(
-          "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature",
-        ),
+          "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#Signature"
+        )
     );
   },
   __getContainedEnvelopeUris: graph => {
@@ -1826,7 +1823,7 @@ WonMessage.prototype = {
       .filter(resource => resource["@id"] == graphUri)
       .map(
         resource =>
-          resource["http://purl.org/webofneeds/message#containsEnvelope"],
+          resource["http://purl.org/webofneeds/message#containsEnvelope"]
       )
       .filter(x => x);
     if (data.length > 0) {
@@ -1841,7 +1838,7 @@ WonMessage.prototype = {
     const contentUrisArray = graphData
       .filter(resource => resource["@id"] === messageUri)
       .map(
-        resource => resource["http://purl.org/webofneeds/message#hasContent"],
+        resource => resource["http://purl.org/webofneeds/message#hasContent"]
       )
       .filter(x => x);
     if (contentUrisArray.length > 0) {
@@ -1856,14 +1853,14 @@ WonMessage.prototype = {
       .filter(
         resource =>
           resource["@type"].includes(
-            "http://purl.org/webofneeds/message#FromExternal",
+            "http://purl.org/webofneeds/message#FromExternal"
           ) ||
           resource["@type"].includes(
-            "http://purl.org/webofneeds/message#FromOwner",
+            "http://purl.org/webofneeds/message#FromOwner"
           ) ||
           resource["@type"].includes(
-            "http://purl.org/webofneeds/message#FromSystem",
-          ),
+            "http://purl.org/webofneeds/message#FromSystem"
+          )
       )
       .map(resource => ({
         messageUri: resource["@id"],
@@ -1885,7 +1882,7 @@ WonMessage.prototype = {
         resource =>
           resource[
             "http://purl.org/webofneeds/message#hasCorrespondingRemoteMessage"
-          ],
+          ]
       )
       .map(resource => ({
         messageUri: resource["@id"],

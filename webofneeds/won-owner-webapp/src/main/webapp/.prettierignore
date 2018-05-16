@@ -8,6 +8,8 @@ old/
 WEB-INF/
 scripts/
 *.html
+package.json
+package-lock.json
 style/bootsketch-patches.css
 style/datepicker.css
 style/jquery.fs.scroller.css

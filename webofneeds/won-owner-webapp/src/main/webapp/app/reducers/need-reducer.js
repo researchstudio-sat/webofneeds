@@ -25,7 +25,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       // to a different session. we need to mark any needs
       // that are already loaded as non-owned.
       return allNeedsInState.map(need =>
-        need.set("ownNeed", false).set("connections", Immutable.Map()),
+        need.set("ownNeed", false).set("connections", Immutable.Map())
       );
 
     case actionTypes.initialPageLoad:
@@ -36,22 +36,22 @@ export default function(allNeedsInState = initialState, action = {}) {
       theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
       const stateWithOwnNeeds = ownNeeds.reduce(
         (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-        allNeedsInState,
+        allNeedsInState
       );
       const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
         (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnNeeds,
+        stateWithOwnNeeds
       );
 
       return storeConnectionsData(
         stateWithOwnAndTheirNeeds,
-        action.payload.get("connections"),
+        action.payload.get("connections")
       );
 
     case actionTypes.messages.closeNeed.failed:
       return storeConnectionsData(
         allNeedsInState,
-        action.payload.get("connections"),
+        action.payload.get("connections")
       );
 
     case actionTypes.router.accessedNonLoadedPost:
@@ -60,34 +60,34 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.needs.fetch:
       return action.payload.reduce(
         (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-        allNeedsInState,
+        allNeedsInState
       );
 
     case actionTypes.messages.reopenNeed.failed:
       return storeConnectionsData(
         allNeedsInState,
-        action.payload.get("connections"),
+        action.payload.get("connections")
       );
 
     case actionTypes.needs.reopen:
       return changeNeedState(
         allNeedsInState,
         action.payload.ownNeedUri,
-        won.WON.ActiveCompacted,
+        won.WON.ActiveCompacted
       );
 
     case actionTypes.needs.close:
       return changeNeedState(
         allNeedsInState,
         action.payload.ownNeedUri,
-        won.WON.InactiveCompacted,
+        won.WON.InactiveCompacted
       );
 
     case actionTypes.needs.create: // optimistic need adding
       return addNeedInCreation(
         allNeedsInState,
         action.payload.need,
-        action.payload.needUri,
+        action.payload.needUri
       );
     //return addNeedInCreation(allNeedsInState, action.payload.needList, action.payload.needUri);
     case actionTypes.needs.createSuccessful:
@@ -99,16 +99,16 @@ export default function(allNeedsInState = initialState, action = {}) {
           storeConnectionAndRelatedData(
             updatedState,
             connectionWithRelatedData,
-            false,
+            false
           ),
-        allNeedsInState,
+        allNeedsInState
       );
 
     case actionTypes.messages.openMessageReceived:
     case actionTypes.messages.connectMessageReceived:
       var ownNeedFromState = allNeedsInState.get(action.payload.ownNeedUri);
       var remoteNeedFromState = allNeedsInState.get(
-        action.payload.remoteNeed["@id"],
+        action.payload.remoteNeed["@id"]
       );
       var remoteNeed = action.payload.remoteNeed;
 
@@ -124,7 +124,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       if (action.type == actionTypes.messages.connectMessageReceived) {
         changedState = addConnectionFull(
           changedState,
-          action.payload.connection,
+          action.payload.connection
         );
       }
 
@@ -140,14 +140,14 @@ export default function(allNeedsInState = initialState, action = {}) {
           if (state == won.WON.Suggested) return won.WON.RequestReceived;
           if (state == won.WON.Closed) return won.WON.RequestReceived;
           return won.WON.RequestReceived;
-        },
+        }
       );
       return changedState;
     case actionTypes.messages.hintMessageReceived:
       return storeConnectionAndRelatedData(
         allNeedsInState,
         action.payload,
-        true,
+        true
       );
 
     // NEW CONNECTIONS STATE UPDATES
@@ -155,7 +155,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return changeConnectionState(
         allNeedsInState,
         action.payload.connectionUri,
-        won.WON.Closed,
+        won.WON.Closed
       );
 
     case actionTypes.needs.connect: // user has sent a connect request
@@ -169,7 +169,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         stateUpdated = changeConnectionState(
           allNeedsInState,
           action.payload.ownConnectionUri,
-          won.WON.RequestSent,
+          won.WON.RequestSent
         );
         //because we have a connection uri, we can add the message
         return addMessage(stateUpdated, action.payload.optimisticEvent);
@@ -199,7 +199,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         });
         return allNeedsInState.setIn(
           [ownNeedUri, "connections", tmpConnectionUri],
-          optimisticConnection,
+          optimisticConnection
         );
       }
 
@@ -212,7 +212,7 @@ export default function(allNeedsInState = initialState, action = {}) {
           if (state == won.WON.RequestReceived) return won.WON.Connected;
           if (state == won.WON.Suggested) return won.WON.RequestSent;
           if (state == won.WON.Closed) return won.WON.RequestSent;
-        },
+        }
       );
       return addMessage(cnctStateUpdated, action.payload.optimisticEvent);
 
@@ -220,7 +220,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return changeConnectionState(
         allNeedsInState,
         action.payload.events["msg:FromSystem"].hasReceiver,
-        won.WON.RequestReceived,
+        won.WON.RequestReceived
       );
 
     case actionTypes.messages.open.successRemote:
@@ -235,12 +235,12 @@ export default function(allNeedsInState = initialState, action = {}) {
       if (allNeedsInState.getIn([needUri, "connections", connectionUri])) {
         return allNeedsInState.setIn(
           [needUri, "connections", connectionUri, "remoteConnectionUri"],
-          remoteConnectionUri,
+          remoteConnectionUri
         );
       } else {
         console.warn(
           "Open/Connect success for a connection that is not stored in the state yet, connUri: ",
-          connectionUri,
+          connectionUri
         );
         return allNeedsInState;
       }
@@ -253,7 +253,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const connectionUri = wonMessage.getReceiver();
       const needForTmpCnct = selectNeedByConnectionUri(
         allNeedsInState,
-        tmpConnectionUri,
+        tmpConnectionUri
       );
       var unsortedAdHocConnection =
         needForTmpCnct &&
@@ -265,7 +265,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         var needUri = needForTmpCnct.get("uri");
         if (!needForTmpCnct.get("ownNeed")) {
           throw new Exception(
-            'Trying to add/change connection for need that\'s not an "ownNeed".',
+            'Trying to add/change connection for need that\'s not an "ownNeed".'
           );
         }
 
@@ -277,14 +277,14 @@ export default function(allNeedsInState = initialState, action = {}) {
           .deleteIn([needUri, "connections", tmpConnectionUri])
           .mergeDeepIn(
             [needUri, "connections", connectionUri],
-            properConnection,
+            properConnection
           );
       } else {
         // connection has been stored as match first
         return changeConnectionState(
           allNeedsInState,
           connectionUri,
-          won.WON.RequestSent,
+          won.WON.RequestSent
         );
       }
 
@@ -292,14 +292,14 @@ export default function(allNeedsInState = initialState, action = {}) {
       return changeConnectionState(
         allNeedsInState,
         action.payload.getReceiver(),
-        won.WON.Closed,
+        won.WON.Closed
       );
     case actionTypes.messages.markAsRead:
       return markMessageAsRead(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
-        action.payload.needUri,
+        action.payload.needUri
       );
     case actionTypes.messages.markAsRelevant:
       return markMessageAsRelevant(
@@ -307,37 +307,37 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
-        action.payload.relevant,
+        action.payload.relevant
       );
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.needUri,
+        action.payload.needUri
       );
     case actionTypes.connections.markAsRated:
       return markConnectionAsRated(
         allNeedsInState,
-        action.payload.connectionUri,
+        action.payload.connectionUri
       );
     case actionTypes.connections.setLoading:
       return setConnectionLoading(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.isLoading,
+        action.payload.isLoading
       );
 
     case actionTypes.connections.updateAgreementData:
       return updateAgreementStateData(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.agreementData,
+        action.payload.agreementData
       );
     case actionTypes.connections.showAgreementData:
       return setShowAgreementData(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.showAgreementData,
+        action.payload.showAgreementData
       );
     // NEW MESSAGE STATE UPDATES
     case actionTypes.messages.connectionMessageReceived:
@@ -376,7 +376,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       if (eventToUpdate) {
         allNeedsInState = allNeedsInState.setIn(
           [needUri, "connections", connectionUri, "messages", eventUri, "date"],
-          responseDateOnServer,
+          responseDateOnServer
         );
       }
       return allNeedsInState;
@@ -390,7 +390,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState = setConnectionLoading(
           allNeedsInState,
           connectionUri,
-          true,
+          true
         );
       }
 
@@ -400,7 +400,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState = setConnectionLoading(
           allNeedsInState,
           connectionUri,
-          false,
+          false
         );
       }
       const error = action.payload.get("error");
@@ -409,7 +409,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState = setConnectionLoading(
           allNeedsInState,
           connectionUri,
-          false,
+          false
         );
       }
 
@@ -423,7 +423,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 function storeConnectionAndRelatedData(
   state,
   connectionWithRelatedData,
-  unread,
+  unread
 ) {
   const { ownNeed, remoteNeed, connection } = connectionWithRelatedData;
   const stateWithOwnNeed = addNeed(state, ownNeed, true); // guarantee that
@@ -455,7 +455,7 @@ function addNeed(needs, jsonldNeed, ownNeed) {
         // replace it
         parsedNeed = parsedNeed.set(
           "connections",
-          existingNeed.get("connections"),
+          existingNeed.get("connections")
         );
         return needs.setIn([parsedNeed.get("uri")], parsedNeed);
       } else {
@@ -527,21 +527,21 @@ function addConnectionFull(state, connection) {
         //If there is a new message for the connection we will set the connection to newConnection
         state = state.setIn(
           [needUri, "lastUpdateDate"],
-          parsedConnection.getIn(["data", "lastUpdateDate"]),
+          parsedConnection.getIn(["data", "lastUpdateDate"])
         );
         state = state.setIn([needUri, "unread"], true);
       }
 
       return state.mergeDeepIn(
         [needUri, "connections", connectionUri],
-        parsedConnection.get("data"),
+        parsedConnection.get("data")
       );
     } else {
       console.error(
         "Couldnt add valid connection - missing need data in state",
         needUri,
         "parsedConnection: ",
-        parsedConnection.toJS(),
+        parsedConnection.toJS()
       );
     }
   } else {
@@ -572,16 +572,16 @@ function addMessage(state, wonMessage) {
           //If there is a new message for the connection we will set the connection to newConnection
           state = state.setIn(
             [needUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"]),
+            parsedMessage.getIn(["data", "date"])
           );
           state = state.setIn([needUri, "unread"], true);
           state = state.setIn(
             [needUri, "connections", connectionUri, "lastUpdateDate"],
-            parsedMessage.getIn(["data", "date"]),
+            parsedMessage.getIn(["data", "date"])
           );
           state = state.setIn(
             [needUri, "connections", connectionUri, "unread"],
-            true,
+            true
           );
         }
       }
@@ -594,11 +594,11 @@ function addMessage(state, wonMessage) {
         ]);
         messages = messages.set(
           parsedMessage.getIn(["data", "uri"]),
-          parsedMessage.get("data"),
+          parsedMessage.get("data")
         );
         return state.setIn(
           [needUri, "connections", connectionUri, "messages"],
-          messages,
+          messages
         );
       }
     }
@@ -630,7 +630,7 @@ function updateAgreementStateData(state, connectionUri, agreementData) {
   return state
     .setIn(
       [needUri, "connections", connectionUri, "agreementData"],
-      agreementData,
+      agreementData
     )
     .setIn([needUri, "connections", connectionUri, "isLoading"], false);
 }
@@ -647,7 +647,7 @@ function setShowAgreementData(state, connectionUri, showAgreementData) {
 
   return state.setIn(
     [needUri, "connections", connectionUri, "showAgreementData"],
-    showAgreementData,
+    showAgreementData
   );
 }
 
@@ -659,7 +659,7 @@ function setIfNew(state, path, obj) {
         ? // we've seen this need before, no need to overwrite it
           val
         : // it's the first time we see this need -> add it
-          Immutable.fromJS(obj),
+          Immutable.fromJS(obj)
   );
 }
 
@@ -683,7 +683,7 @@ function markMessageAsRelevant(
   messageUri,
   connectionUri,
   needUri,
-  relevant,
+  relevant
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -697,7 +697,7 @@ function markMessageAsRelevant(
       needUri,
       "> connectionUri: <",
       connectionUri,
-      ">",
+      ">"
     );
     return state;
   }
@@ -710,7 +710,7 @@ function markMessageAsRelevant(
       messageUri,
       "isRelevant",
     ],
-    relevant,
+    relevant
   );
 }
 
@@ -729,14 +729,14 @@ function markMessageAsRead(state, messageUri, connectionUri, needUri) {
       needUri,
       "> connectionUri: <",
       connectionUri,
-      ">",
+      ">"
     );
     return state;
   }
 
   state = state.setIn(
     [needUri, "connections", connectionUri, "messages", messageUri, "unread"],
-    false,
+    false
   );
 
   if (
@@ -749,7 +749,7 @@ function markMessageAsRead(state, messageUri, connectionUri, needUri) {
 
   return state.setIn(
     [needUri, "connections", connectionUri, "messages", messageUri, "unread"],
-    false,
+    false
   );
 }
 
@@ -765,7 +765,7 @@ function markConnectionAsRead(state, connectionUri, needUri) {
       connectionUri,
       "> found within needUri: <",
       needUri,
-      ">",
+      ">"
     );
     return state;
   }
@@ -793,14 +793,14 @@ function setConnectionLoading(state, connectionUri, isLoading) {
       connectionUri,
       "> found within needUri: <",
       needUri,
-      ">",
+      ">"
     );
     return state;
   }
 
   return state.setIn(
     [needUri, "connections", connectionUri, "isLoading"],
-    isLoading,
+    isLoading
   );
 }
 
@@ -824,14 +824,14 @@ function markConnectionAsRated(state, connectionUri) {
       connectionUri,
       "> found within needUri: <",
       need.get("uri"),
-      ">",
+      ">"
     );
     return state;
   }
 
   return state.setIn(
     [need.get("uri"), "connections", connectionUri, "isRated"],
-    true,
+    true
   );
 }
 
@@ -853,7 +853,7 @@ function changeConnectionStateByFun(state, connectionUri, fun) {
   return state
     .setIn(
       [needUri, "connections", connectionUri, "state"],
-      fun(connectionState),
+      fun(connectionState)
     )
     .setIn([needUri, "connections", connectionUri, "unread"], true);
 }
@@ -914,7 +914,7 @@ function parseConnection(jsonldConnection) {
     } else {
       console.error(
         "Cant parse connection, data is an invalid connection-object (faulty state): ",
-        jsonldConnectionImm.toJS(),
+        jsonldConnectionImm.toJS()
       );
       return undefined; // FOR UNKNOWN STATES
     }
@@ -923,7 +923,7 @@ function parseConnection(jsonldConnection) {
   } else {
     console.error(
       "Cant parse connection, data is an invalid connection-object (mandatory uris could not be retrieved): ",
-      jsonldConnectionImm.toJS(),
+      jsonldConnectionImm.toJS()
     );
     return undefined;
   }
@@ -946,7 +946,7 @@ function parseMessage(wonMessage) {
         .replace(/\.$/, ".\n")
         .replace(/\;$/, ";\n")
         .replace(/\{$/, "{\n")
-        .replace(/^\}$/, "\n}"),
+        .replace(/^\}$/, "\n}")
     )
     .join("\n")
     .trim();
@@ -997,7 +997,7 @@ function parseMessage(wonMessage) {
   ) {
     console.error(
       "Cant parse chat-message, data is an invalid message-object: ",
-      wonMessage,
+      wonMessage
     );
     return undefined;
   } else {
@@ -1149,7 +1149,7 @@ function parseNeed(jsonldNeed, ownNeed) {
   } else {
     console.error(
       "Cant parse need, data is an invalid need-object: ",
-      jsonldNeedImm && jsonldNeedImm.toJS(),
+      jsonldNeedImm && jsonldNeedImm.toJS()
     );
     return undefined;
   }
@@ -1179,10 +1179,10 @@ function parseLocation(jsonldLocation) {
   location.address = jsonldLocationImm.get("s:name");
 
   location.lat = Number.parseFloat(
-    jsonldLocationImm.getIn(["s:geo", "s:latitude"]),
+    jsonldLocationImm.getIn(["s:geo", "s:latitude"])
   );
   location.lng = Number.parseFloat(
-    jsonldLocationImm.getIn(["s:geo", "s:longitude"]),
+    jsonldLocationImm.getIn(["s:geo", "s:longitude"])
   );
 
   location.nwCorner.lat = Number.parseFloat(
@@ -1190,28 +1190,28 @@ function parseLocation(jsonldLocation) {
       "won:hasBoundingBox",
       "won:hasNorthWestCorner",
       "s:latitude",
-    ]),
+    ])
   );
   location.nwCorner.lng = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasNorthWestCorner",
       "s:longitude",
-    ]),
+    ])
   );
   location.seCorner.lat = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasSouthEastCorner",
       "s:latitude",
-    ]),
+    ])
   );
   location.seCorner.lng = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasSouthEastCorner",
       "s:longitude",
-    ]),
+    ])
   );
 
   if (
@@ -1228,7 +1228,7 @@ function parseLocation(jsonldLocation) {
 
   console.error(
     "Cant parse location, data is an invalid location-object: ",
-    jsonldLocationImm.toJS(),
+    jsonldLocationImm.toJS()
   );
   return undefined;
 }

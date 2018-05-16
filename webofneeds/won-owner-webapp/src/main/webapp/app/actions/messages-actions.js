@@ -50,22 +50,22 @@ export function failedCloseNeed(event) {
       .then(connectionUris =>
         Promise.all(
           connectionUris.map(
-            cnctUri => won.invalidateCacheForNewMessage(cnctUri, needUri), // mark connections dirty
-          ),
-        ),
+            cnctUri => won.invalidateCacheForNewMessage(cnctUri, needUri) // mark connections dirty
+          )
+        )
       )
       .then(
         () =>
           // as the need and it's connections have been marked dirty
           // they will be reloaded on this action.
-          fetchDataForOwnedNeeds([needUri]),
+          fetchDataForOwnedNeeds([needUri])
         //fetchAllAccessibleAndRelevantData([needUri])
       )
       .then(allThatData =>
         dispatch({
           type: actionTypes.messages.closeNeed.failed,
           payload: allThatData,
-        }),
+        })
       );
   };
 }
@@ -144,7 +144,7 @@ export function successfulCreate(event) {
           publishEventUri: event.getIsResponseTo(),
           needUri: event.getSenderNeed(),
           need: need,
-        }),
+        })
       );
     });
   };
@@ -161,7 +161,7 @@ export function openMessageReceived(event) {
     if (state.getIn(["connections", ownConnectionUri])) {
       // already in state. invalidate the version in the rdf-store.
       connectionP = Promise.resolve(
-        state.getIn(["connections", ownConnectionUri]),
+        state.getIn(["connections", ownConnectionUri])
       );
       won.invalidateCacheForNewConnection(ownConnectionUri, ownNeedUri);
     } else {
@@ -265,7 +265,7 @@ export function connectionMessageReceived(event) {
             if (effect.retracts) {
               let messageUri = getEventUri(
                 messages,
-                effect.retractedMessageUri,
+                effect.retractedMessageUri
               );
               dispatch({
                 type: actionTypes.messages.markAsRelevant,
@@ -331,7 +331,7 @@ export function connectMessageReceived(event) {
     if (state.getIn(["connections", ownConnectionUri])) {
       // already in state. invalidate the version in the rdf-store.
       connectionP = Promise.resolve(
-        state.getIn(["connections", ownConnectionUri]),
+        state.getIn(["connections", ownConnectionUri])
       );
       won.invalidateCacheForNewConnection(ownConnectionUri, ownNeedUri);
     } else {
@@ -354,7 +354,7 @@ export function connectMessageReceived(event) {
           updatedConnection: ownConnectionUri,
           connection: connection.set(
             "hasConnectionState",
-            won.WON.RequestReceived,
+            won.WON.RequestReceived
           ),
           ownNeedUri: ownNeedUri,
           ownNeed: ownNeed,
@@ -381,13 +381,13 @@ function getConnectionData(event) {
   return won
     .getConnectionWithOwnAndRemoteNeed(
       event.getReceiverNeed(),
-      event.getSenderNeed(),
+      event.getSenderNeed()
     )
     .then(connectionData =>
       getConnectionRelatedData(
         event.getReceiverNeed(),
         event.getSenderNeed(),
-        connectionData.uri,
+        connectionData.uri
       ).then(data => {
         if (
           data.events.filter(e => e.uri === event.getMessageUri()).length === 0
@@ -401,7 +401,7 @@ function getConnectionData(event) {
                      */
           const eventOnOwn_ = clone(event.getFramedMessageResourceForState());
           eventOnOwn_.hasCorrespondingRemoteMessage = clone(
-            event.getFramedRemoteMessageResourceForState(),
+            event.getFramedRemoteMessageResourceForState()
           );
           data.events.push(eventOnOwn_);
         }
@@ -411,7 +411,7 @@ function getConnectionData(event) {
         data.message = event;
 
         return data;
-      }),
+      })
     );
 }
 
@@ -447,7 +447,7 @@ export function needMessageReceived(event) {
     if (!need) {
       console.log(
         "ignoring needMessage for a need that is not ours:",
-        event.getReceiverNeed(),
+        event.getReceiverNeed()
       );
     }
     dispatch({
@@ -467,7 +467,7 @@ export function hintMessageReceived(event) {
     if (!getState().getIn(["needs", event.getReceiverNeed()])) {
       console.log(
         "ignoring hint for a need that is not ours:",
-        event.getReceiverNeed(),
+        event.getReceiverNeed()
       );
     } else if (
       getState().getIn(["needs", event.getMatchCounterpart(), "state"]) ===
@@ -475,14 +475,14 @@ export function hintMessageReceived(event) {
     ) {
       console.log(
         "ignoring hint for an inactive  need:",
-        event.getMatchCounterpart(),
+        event.getMatchCounterpart()
       );
     } else {
       //event.eventType = won.messageType2EventType[event.hasMessageType]; TODO needed?
       won
         .invalidateCacheForNewConnection(
           event.getReceiver(),
-          event.getReceiverNeed(),
+          event.getReceiverNeed()
         )
         .then(() => {
           let needUri = event.getReceiverNeed();
@@ -495,7 +495,7 @@ export function hintMessageReceived(event) {
           getConnectionRelatedData(
             needUri,
             event.getMatchCounterpart(),
-            event.getReceiver(),
+            event.getReceiver()
           ).then(data => {
             data.receivedEvent = event.getMessageUri();
             data.updatedConnection = event.getReceiver();
@@ -591,7 +591,7 @@ export function dispatchActionOnSuccessRemote(event) {
             dispatch(
               actionCreators.router__stateGoCurrent({
                 connectionUri: event.getReceiver(),
-              }),
+              })
             );
           }
         }

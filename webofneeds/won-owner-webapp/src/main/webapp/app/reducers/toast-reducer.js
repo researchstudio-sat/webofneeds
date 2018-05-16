@@ -23,7 +23,7 @@ export default function(allToasts = initialState, action = {}) {
         allToasts,
         "Error while processing chat message: \n\n" + msg,
         won.WON.errorToast,
-        {},
+        {}
       );
 
     case actionTypes.registerFailed:
@@ -35,7 +35,7 @@ export default function(allToasts = initialState, action = {}) {
             "your url-bar). Copy the text you've written somewhere safe, then log out / remove " +
             "the ID, then refresh the page and try posting again.",
           won.WON.errorToast,
-          {},
+          {}
         );
       } else {
         return allToasts;
@@ -53,7 +53,7 @@ export default function(allToasts = initialState, action = {}) {
             "removing it" +
             "</a> to start fresh.",
           won.WON.errorToast,
-          { unsafeHtmlEnabled: true },
+          { unsafeHtmlEnabled: true }
         );
       } else {
         return allToasts;
@@ -71,7 +71,7 @@ export default function(allToasts = initialState, action = {}) {
           '<a href="https://support.apple.com/en-us/HT204690">Safari</a> and ' +
           '<a href="https://privacy.microsoft.com/en-us/windows-10-location-and-privacy">Internet Explorer Edge</a>.',
         won.WON.warnToast,
-        { unsafeHtmlEnabled: true },
+        { unsafeHtmlEnabled: true }
       );
 
     case actionTypes.lostConnection:
@@ -80,7 +80,7 @@ export default function(allToasts = initialState, action = {}) {
         "Lost connection - progress " +
           "can't be saved any more. Make sure your " +
           'internet-connection is working, then click "Reconnect"',
-        won.WON.warnToast,
+        won.WON.warnToast
       );
     //INFO TOASTS: won.WON.infoToast
 
@@ -90,21 +90,21 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Failed to close posting",
-        won.WON.errorToast,
+        won.WON.errorToast
       );
 
     case actionTypes.messages.reopenNeed.failed:
       return pushNewToast(
         allToasts,
         "Failed to reopen posting",
-        won.WON.errorToast,
+        won.WON.errorToast
       );
 
     case actionTypes.messages.chatMessage.failure:
       return pushNewToast(
         allToasts,
         "Failed to send chat message",
-        won.WON.errorToast,
+        won.WON.errorToast
       );
 
     case actionTypes.messages.needMessageReceived:
@@ -113,7 +113,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Notification for your posting '" + title + "': " + message,
-        won.WON.infoToast,
+        won.WON.infoToast
       );
 
     case actionTypes.needs.closedBySystem:
@@ -122,7 +122,7 @@ export default function(allToasts = initialState, action = {}) {
       return pushNewToast(
         allToasts,
         "Closed your posting '" + title + "'. Cause: " + message,
-        won.WON.infoToast,
+        won.WON.infoToast
       );
 
     //SPECIFIC TOAST ACTIONS
@@ -150,7 +150,7 @@ function pushNewToast(allToasts, msg, type, options) {
     {
       unsafeHtmlEnabled: false,
     },
-    options,
+    options
   );
 
   let toastType = type;
@@ -166,6 +166,6 @@ function pushNewToast(allToasts, msg, type, options) {
       type: toastType,
       msg: msg,
       unsafeHtmlEnabled: options_.unsafeHtmlEnabled,
-    }),
+    })
   );
 }

@@ -76,7 +76,7 @@ export async function ensureLoggedIn(dispatch, getState) {
   } catch (err) {
     console.error(
       `Creating temporary account (${privateId}) has failed due to `,
-      err,
+      err
     );
     dispatch(actionCreators.registerFailed({ privateId }));
   }
@@ -106,7 +106,7 @@ export function accountLogin(credentials, options) {
       redirectToFeed: false,
       relogIfNecessary: true, // if there's a valid session or privateId, log out from that first.
     },
-    options,
+    options
   );
   return (dispatch, getState) => {
     const state = getState();
@@ -130,7 +130,7 @@ export function accountLogin(credentials, options) {
       console.info(
         "Already logging in as ",
         email,
-        ". Canceling redundant attempt.",
+        ". Canceling redundant attempt."
       );
       return;
     }
@@ -143,7 +143,7 @@ export function accountLogin(credentials, options) {
       console.info(
         "Already logged into this account (" +
           (credentials.privateId || credentials.email) +
-          "). Aborting second login attempt.",
+          "). Aborting second login attempt."
       );
       return;
     }
@@ -178,7 +178,7 @@ export function accountLogin(credentials, options) {
         if (options_.doRedirects && credentials.privateId) {
           return stateGoCurrent({ privateId: credentials.privateId })(
             dispatch,
-            getState,
+            getState
           );
         }
       })
@@ -189,7 +189,7 @@ export function accountLogin(credentials, options) {
           return;
         } else if (options_.redirectToFeed) {
           return dispatch(
-            actionCreators.router__stateGoResetParams("connections"),
+            actionCreators.router__stateGoResetParams("connections")
           );
         } else {
           return checkAccessToCurrentRoute(dispatch, getState);
@@ -208,7 +208,7 @@ export function accountLogin(credentials, options) {
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
-        dispatch(actionCreators.reconnect()),
+        dispatch(actionCreators.reconnect())
       )
       .catch(error => {
         console.error("accountLogin ErrorObject", error);
@@ -231,13 +231,13 @@ export function accountLogin(credentials, options) {
                 loginError,
                 error,
                 credentials,
-              }),
+              })
             );
           })
           .then(
             () =>
               options_.doRedirects &&
-              checkAccessToCurrentRoute(dispatch, getState),
+              checkAccessToCurrentRoute(dispatch, getState)
           );
       })
       .then(() => {
@@ -272,7 +272,7 @@ export function accountLogout(options) {
 
     if (state.get("logoutInProcess") || _logoutInProcess) {
       console.info(
-        "There's already a logout in process. Aborting redundant attempt.",
+        "There's already a logout in process. Aborting redundant attempt."
       );
       return;
     }
@@ -284,7 +284,7 @@ export function accountLogout(options) {
           dispatch({
             type: actionTypes.logoutStarted,
             payload: {},
-          }),
+          })
         )
         .then(() => logout())
         .catch(error => {
@@ -305,7 +305,7 @@ export function accountLogout(options) {
           dispatch({
             type: actionTypes.logout,
             payload: Immutable.fromJS({ loggedIn: false }),
-          }),
+          })
         )
         .then(() => {
           won.clearStore();
@@ -318,7 +318,7 @@ export function accountLogout(options) {
         .then(
           () =>
             options_.doRedirects &&
-            checkAccessToCurrentRoute(dispatch, getState),
+            checkAccessToCurrentRoute(dispatch, getState)
         )
         .then(() => {
           _logoutInProcess = false;
@@ -338,7 +338,7 @@ export function accountRegister(credentials) {
         accountLogin(credentials, {
           fetchData: false,
           redirectToFeed: true,
-        })(dispatch, getState),
+        })(dispatch, getState)
       )
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.

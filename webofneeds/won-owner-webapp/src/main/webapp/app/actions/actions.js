@@ -290,7 +290,7 @@ export function startTicking() {
   return dispatch =>
     setInterval(
       () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
-      60000,
+      60000
     );
 }
 
@@ -304,7 +304,7 @@ export function startTicking() {
 export function getConnectionRelatedData(
   needUri,
   remoteNeedUri,
-  connectionUri,
+  connectionUri
 ) {
   const remoteNeed = won.getNeed(remoteNeedUri);
   const ownNeed = won.getNeed(needUri);
@@ -327,7 +327,7 @@ export function getConnectionRelatedData(
       ownNeed: results[1],
       connection: results[2],
       events: results[3],
-    }),
+    })
   );
 }
 
@@ -336,14 +336,14 @@ export function needsOpen(needUri) {
     const state = getState();
     buildOpenNeedMessage(
       needUri,
-      getState().getIn(["config", "defaultNodeUri"]),
+      getState().getIn(["config", "defaultNodeUri"])
     )
       .then(data => {
         dispatch(
           actionCreators.messages__send({
             eventUri: data.eventUri,
             message: data.message,
-          }),
+          })
         );
       })
       .then(() =>
@@ -353,7 +353,7 @@ export function needsOpen(needUri) {
           payload: {
             ownNeedUri: needUri,
           },
-        }),
+        })
       );
   };
 }
@@ -365,7 +365,7 @@ export function needsClosedBySystem(event) {
     if (!need) {
       console.log(
         "ignoring deactivateMessage for a need that is not ours:",
-        event.getReceiverNeed(),
+        event.getReceiverNeed()
       );
     }
     dispatch({
@@ -383,14 +383,14 @@ export function needsClose(needUri) {
   return (dispatch, getState) => {
     buildCloseNeedMessage(
       needUri,
-      getState().getIn(["config", "defaultNodeUri"]),
+      getState().getIn(["config", "defaultNodeUri"])
     )
       .then(data => {
         dispatch(
           actionCreators.messages__send({
             eventUri: data.eventUri,
             message: data.message,
-          }),
+          })
         );
 
         //Close all the open connections of the need
@@ -417,7 +417,7 @@ export function needsClose(needUri) {
           payload: {
             ownNeedUri: needUri,
           },
-        }),
+        })
       );
   };
 }

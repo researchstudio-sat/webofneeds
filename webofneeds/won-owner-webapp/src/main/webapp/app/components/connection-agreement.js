@@ -133,7 +133,7 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri", "self.stateUri"],
-        this,
+        this
       );
     }
 
@@ -151,7 +151,7 @@ function genComponentConf() {
             return this.getClausesText(
               chatMessages,
               msg,
-              msg[1].get("clauses"),
+              msg[1].get("clauses")
             );
           }
         }
@@ -178,12 +178,12 @@ function genComponentConf() {
       const trimmedMsg = buildProposalMessage(
         this.message.get("remoteUri"),
         "accepts",
-        msg,
+        msg
       );
       this.connections__sendChatMessage(
         trimmedMsg,
         this.connectionUri,
-        (isTTL = true),
+        (isTTL = true)
       );
 
       this.markAsRelevant(false);
@@ -200,7 +200,7 @@ function genComponentConf() {
       this.connections__sendChatMessage(
         trimmedMsg,
         this.connectionUri,
-        (isTTL = true),
+        (isTTL = true)
       );
 
       this.onUpdate({ draft: this.stateUri });
@@ -218,7 +218,7 @@ function genComponentConf() {
       this.connections__sendChatMessage(
         trimmedMsg,
         this.connectionUri,
-        (isTTL = true),
+        (isTTL = true)
       );
 
       this.markAsRelevant(false, uri);
@@ -236,12 +236,12 @@ function genComponentConf() {
       const trimmedMsg = buildModificationMessage(
         uri,
         "retracts",
-        "Retract: " + this.text,
+        "Retract: " + this.text
       );
       this.connections__sendChatMessage(
         trimmedMsg,
         this.connectionUri,
-        (isTTL = true),
+        (isTTL = true)
       );
 
       this.markAsRelevant(false, uri);
@@ -258,12 +258,12 @@ function genComponentConf() {
       const trimmedMsg = buildProposalMessage(
         uri,
         "rejects",
-        "Reject: " + this.text,
+        "Reject: " + this.text
       );
       this.connections__sendChatMessage(
         trimmedMsg,
         this.connectionUri,
-        (isTTL = true),
+        (isTTL = true)
       );
 
       this.markAsRelevant(false, uri);

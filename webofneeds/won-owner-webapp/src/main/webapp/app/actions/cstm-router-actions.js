@@ -47,8 +47,8 @@ export function stateGoAbs(state, queryParams) {
     return dispatch(
       actionCreators.router__stateGo(
         state,
-        addConstParams(resetParamsImm.merge(queryParams), currentParams),
-      ),
+        addConstParams(resetParamsImm.merge(queryParams), currentParams)
+      )
     );
   };
 }
@@ -62,8 +62,8 @@ export function stateGoResetParams(state) {
     return dispatch(
       actionCreators.router__stateGo(
         state,
-        addConstParams(resetParams, currentParams),
-      ),
+        addConstParams(resetParams, currentParams)
+      )
     );
   };
 }
@@ -83,14 +83,14 @@ export function stateGoKeepParams(state, queryParamsList) {
     const params = Immutable.Map(
       // [[k,v]] -> Map
       queryParamsList.map(
-        p => [p, currentParams[p]], // get value per param
-      ),
+        p => [p, currentParams[p]] // get value per param
+      )
     );
     return dispatch(
       actionCreators.router__stateGo(
         state,
-        addConstParams(params, currentParams),
-      ),
+        addConstParams(params, currentParams)
+      )
     );
   };
 }
@@ -107,8 +107,8 @@ export function stateGoCurrent(queryParams) {
     return dispatch(
       actionCreators.router__stateGo(
         currentState,
-        addConstParams(queryParams, currentParams),
-      ),
+        addConstParams(queryParams, currentParams)
+      )
     );
   };
 }

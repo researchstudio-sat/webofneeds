@@ -34,7 +34,7 @@ export function broadcastEvent(scopeAndElem, eventName, eventData) {
 export function doneTypingBufferNg(
   listenerCallback,
   ngElement,
-  doneTypingInterval,
+  doneTypingInterval
 ) {
   let typingTimer;
   ngElement.bind("input", e => {

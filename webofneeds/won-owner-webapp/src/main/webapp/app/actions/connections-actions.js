@@ -48,14 +48,14 @@ const keySet = deepFreeze(
     "agreementUris",
     "pendingProposalUris",
     "cancellationPendingAgreementUris",
-  ]),
+  ])
 );
 const baseString = deepFreeze("/owner/");
 
 export function connectionsChatMessage(
   chatMessage,
   connectionUri,
-  isTTL = false,
+  isTTL = false
 ) {
   return (dispatch, getState) => {
     const ownNeed = getState()
@@ -90,7 +90,7 @@ export function connectionsChatMessage(
         Promise.all([
           won.wonMessageFromJsonLd(msgData.message),
           msgData.message,
-        ]),
+        ])
       )
       .then(([optimisticEvent, jsonldMessage]) => {
         // dispatch(actionCreators.messages__send(messageData));
@@ -120,14 +120,14 @@ export function connectionsFetch(data) {
   return dispatch => {
     const allConnectionsPromise = won.executeCrawlableQuery(
       won.queries["getAllConnectionUrisOfNeed"],
-      data.needUri,
+      data.needUri
     );
     allConnectionsPromise.then(function(connections) {
       dispatch(
         actionCreators.needs__connectionsReceived({
           needUri: data.needUri,
           connections: connections,
-        }),
+        })
       );
     });
   };
@@ -161,7 +161,7 @@ export function connectionsOpen(connectionUri, textMessage) {
       ownNeed.get("nodeUri"),
       theirNeed.get("nodeUri"),
       theirConnectionUri,
-      textMessage,
+      textMessage
     );
 
     const optimisticEvent = await won.wonMessageFromJsonLd(openMsg.message);
@@ -180,7 +180,7 @@ export function connectionsOpen(connectionUri, textMessage) {
     dispatch(
       actionCreators.router__stateGoCurrent({
         connectionUri: optimisticEvent.getSender(),
-      }),
+      })
     );
   };
 }
@@ -197,7 +197,7 @@ function connectAdHoc(theirNeedUri, textMessage, dispatch, getState) {
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const { message, eventUri, needUri } = await buildCreateMessage(
       adHocDraft,
-      nodeUri,
+      nodeUri
     );
     const cnctMsg = buildConnectMessage({
       ownNeedUri: needUri,
@@ -315,13 +315,13 @@ export function connectionsClose(connectionUri) {
       theirNeedUri,
       ownNeed.get("nodeUri"),
       theirNeed.get("nodeUri"),
-      theirConnectionUri,
+      theirConnectionUri
     ).then(closeMessage => {
       dispatch(
         actionCreators.messages__send({
           eventUri: closeMessage.eventUri,
           message: closeMessage.message,
-        }),
+        })
       );
       dispatch({
         type: actionTypes.connections.close,
@@ -346,13 +346,13 @@ export function connectionsCloseRemote(message) {
       ownNeedUri,
       ownNode,
       remoteNode,
-      null,
+      null
     ).then(closeMessage => {
       dispatch(
         actionCreators.messages__send({
           eventUri: closeMessage.eventUri,
           message: closeMessage.message,
-        }),
+        })
       );
     });
   };
@@ -393,7 +393,7 @@ export function connectionsRate(connectionUri, rating) {
           ownNeed.get("nodeUri"),
           theirNeed.get("nodeUri"),
           theirConnectionUri,
-          rating,
+          rating
         );
       })
       .then(action =>
@@ -401,8 +401,8 @@ export function connectionsRate(connectionUri, rating) {
           actionCreators.messages__send({
             eventUri: action.eventUri,
             message: action.message,
-          }),
-        ),
+          })
+        )
       );
   };
 }
@@ -437,7 +437,7 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
                 connectionUri,
                 event,
                 agreementData,
-                key,
+                key
               );
               hasChanged = true;
             }
@@ -510,7 +510,7 @@ export function addAgreementDataToSate(
   eventUri,
   agreementData,
   key,
-  obj,
+  obj
 ) {
   return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
     won.wonMessageFromJsonLd(response).then(msg => {
@@ -535,7 +535,7 @@ export function addAgreementDataToSate(
           msg.getRemoteMessageUri(),
           agreementData,
           key,
-          agreementObject,
+          agreementObject
         );
       } else {
         if (!agreementObject) {
@@ -623,7 +623,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
             connectionUri: connectionUri,
             events: events,
           }),
-        }),
+        })
       )
       .catch(error => {
         console.error("Failed loading the latest events: ", error);
@@ -720,7 +720,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
             connectionUri: connectionUri,
             events: events,
           }),
-        }),
+        })
       )
       .catch(error => {
         console.error("Failed loading more events: ", error);
@@ -741,13 +741,13 @@ function transformDataToSet(response) {
     pendingProposalUris: new Set(response.pendingProposalUris),
     pendingProposals: new Set(response.pendingProposals),
     acceptedCancellationProposalUris: new Set(
-      response.acceptedCancellationProposalUris,
+      response.acceptedCancellationProposalUris
     ),
     cancellationPendingAgreementUris: new Set(
-      response.cancellationPendingAgreementUris,
+      response.cancellationPendingAgreementUris
     ),
     pendingCancellationProposalUris: new Set(
-      response.pendingCancellationProposalUris,
+      response.pendingCancellationProposalUris
     ),
     cancelledAgreementUris: new Set(response.cancelledAgreementUris),
     rejectedMessageUris: new Set(response.rejectedMessageUris),

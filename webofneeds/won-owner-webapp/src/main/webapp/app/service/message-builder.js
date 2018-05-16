@@ -28,7 +28,7 @@ import won from "./won.js";
     });
     var nonEnvelopeGraphIds = Array.prototype.concat(
       [needGraphId],
-      attachmentGraphIds,
+      attachmentGraphIds
     );
 
     msgGraph.push({
@@ -105,7 +105,7 @@ import won from "./won.js";
       "@context": won.merge(
         won.defaultContext,
         contentRdf["@context"],
-        getTypesForContext(),
+        getTypesForContext()
       ),
     };
   };

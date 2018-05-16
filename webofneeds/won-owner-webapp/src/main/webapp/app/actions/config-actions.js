@@ -20,7 +20,7 @@ export function configInit() {
             defaultNodeUri,
             theme: defaultTheme.mergeDeep(defaultThemeConfig).toJS(),
           },
-        }),
+        })
     );
   };
 }
@@ -62,7 +62,7 @@ async function loadDefaultNodeUri() {
         "Failed to fetch default node uri at the relative path `",
         "appConfig/getDefaultWonNodeUri",
         "` (is the API endpoint there up and reachable?) -> falling back to the default ",
-        defaultNodeUri,
+        defaultNodeUri
       );
       return defaultNodeUri;
     });

@@ -20,7 +20,7 @@ window.jsonld4dbg = jsonld;
 export function initLeaflet(mapMount) {
   if (!L) {
     throw new Exception(
-      "Tried to initialize a leaflet widget while leaflet wasn't loaded.",
+      "Tried to initialize a leaflet widget while leaflet wasn't loaded."
     );
   }
 
@@ -49,7 +49,7 @@ export function initLeaflet(mapMount) {
 export function initLeafletBaseMaps() {
   if (!L) {
     throw new Exception(
-      "Tried to initialize leaflet map-sources while leaflet wasn't loaded.",
+      "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
     );
   }
   const secureOsmSource = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // secure osm.org
@@ -105,7 +105,7 @@ export function selectTimestamp(event, ownNeedUri) {
 export function reduxSelectDependsOnProperties(
   properties,
   selectFromState,
-  ctrl,
+  ctrl
 ) {
   const firstVals = properties.map(p => getIn(ctrl.$scope, p.split(".")));
   let firstTime = true;
@@ -134,15 +134,15 @@ export function connect2Redux(
   selectFromState,
   actionCreators,
   properties,
-  ctrl,
+  ctrl
 ) {
   const disconnectRdx = ctrl.$ngRedux.connect(selectFromState, actionCreators)(
-    ctrl,
+    ctrl
   );
   const disconnectProps = reduxSelectDependsOnProperties(
     properties,
     selectFromState,
-    ctrl,
+    ctrl
   );
   ctrl.$scope.$on("$destroy", () => {
     disconnectRdx();

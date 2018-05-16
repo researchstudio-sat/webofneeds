@@ -99,7 +99,7 @@ export const selectOpenConnectionUri = createSelector(
   routerParams => {
     //de-escaping is lost in transpiling if not done in two steps :|
     const openConnectionUri = decodeUriComponentProperly(
-      routerParams["connectionUri"] || routerParams["openConversation"],
+      routerParams["connectionUri"] || routerParams["openConversation"]
     );
 
     if (openConnectionUri) {
@@ -107,7 +107,7 @@ export const selectOpenConnectionUri = createSelector(
     } else {
       return undefined;
     }
-  },
+  }
 );
 
 export const selectOpenPostUri = createSelector(
@@ -115,5 +115,5 @@ export const selectOpenPostUri = createSelector(
   state => {
     const encodedPostUri = getIn(state, ["router", "currentParams", "postUri"]);
     return decodeUriComponentProperly(encodedPostUri);
-  },
+  }
 );

@@ -103,7 +103,7 @@ import won from "./won.js";
     if (!args.is && !args.seeks) {
       throw new Exception(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
-          args,
+          args
       );
     }
 
@@ -174,20 +174,20 @@ import won from "./won.js";
                       "@id": isSeeks ? "_:isBoundsNW" : "_:seeksBoundsNW",
                       "@type": "s:GeoCoordinates",
                       "s:latitude": isOrSeeksData.location.nwCorner.lat.toFixed(
-                        6,
+                        6
                       ),
                       "s:longitude": isOrSeeksData.location.nwCorner.lng.toFixed(
-                        6,
+                        6
                       ),
                     },
                     "won:hasSouthEastCorner": {
                       "@id": isSeeks ? "_:isBoundsSE" : "_:seeksBoundsSE",
                       "@type": "s:GeoCoordinates",
                       "s:latitude": isOrSeeksData.location.seCorner.lat.toFixed(
-                        6,
+                        6
                       ),
                       "s:longitude": isOrSeeksData.location.seCorner.lng.toFixed(
-                        6,
+                        6
                       ),
                     },
                   },

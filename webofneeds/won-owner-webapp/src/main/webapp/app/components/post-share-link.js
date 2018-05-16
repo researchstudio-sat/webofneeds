@@ -47,7 +47,7 @@ function genComponentConf() {
             post &&
             new URL(
               "/owner/#!post/?postUri=" + encodeURI(post.get("uri")),
-              window.location.href,
+              window.location.href
             ).href,
         };
       };

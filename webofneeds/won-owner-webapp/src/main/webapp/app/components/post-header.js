@@ -66,7 +66,7 @@ function genComponentConf() {
             need &&
             relativeTime(
               selectLastUpdateTime(state),
-              this.timestamp || need.get("lastUpdateDate"),
+              this.timestamp || need.get("lastUpdateDate")
             ),
         };
       };
@@ -75,7 +75,7 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.needUri", "self.timestamp"],
-        this,
+        this
       );
     }
   }

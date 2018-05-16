@@ -25,10 +25,10 @@ export function hierarchy2Creators(actionHierarchy) {
           }
         },
         [],
-        actionHierarchy,
+        actionHierarchy
       ),
-      "__",
-    ),
+      "__"
+    )
   );
 }
 

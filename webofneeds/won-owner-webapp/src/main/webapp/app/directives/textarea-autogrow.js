@@ -78,7 +78,7 @@ function genDirectiveConf() {
         mutations.forEach(mutationRecord => {
           updateLineHeightAndOffsets();
           updateHeight();
-        }),
+        })
       );
       function startObservingStyleChange() {
         observer &&

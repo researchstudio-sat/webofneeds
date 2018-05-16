@@ -23,7 +23,7 @@ class ConnectionsController {
 
     const selectFromState = state => {
       const selectedPostUri = decodeURIComponent(
-        getIn(state, ["router", "currentParams", "postUri"]),
+        getIn(state, ["router", "currentParams", "postUri"])
       );
       const selectedPost =
         selectedPostUri && state.getIn(["needs", selectedPostUri]);
@@ -33,7 +33,7 @@ class ConnectionsController {
         "showCreateView",
       ]);
       const connectionUri = decodeURIComponent(
-        getIn(state, ["router", "currentParams", "connectionUri"]),
+        getIn(state, ["router", "currentParams", "connectionUri"])
       );
       const need =
         connectionUri && selectNeedByConnectionUri(state, connectionUri);
@@ -48,7 +48,7 @@ class ConnectionsController {
           !(
             post.get("isWhatsAround") &&
             post.get("state") === won.WON.InactiveCompacted
-          ),
+          )
       );
 
       let connections = Immutable.Map();
@@ -71,7 +71,7 @@ class ConnectionsController {
     };
 
     const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-      this,
+      this
     );
     this.$scope.$on("$destroy", disconnect);
   }
@@ -96,7 +96,7 @@ class ConnectionsController {
   markAsRead(connectionUri) {
     const need = selectNeedByConnectionUri(
       this.$ngRedux.getState(),
-      connectionUri,
+      connectionUri
     );
     const connections = need && need.get("connections");
     const connection = connections && connections.get(connectionUri);

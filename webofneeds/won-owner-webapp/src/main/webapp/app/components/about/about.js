@@ -12,17 +12,17 @@ const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
 const howSecure1 =
   window.location.protocol + "//" + window.location.host + "/owner/";
 const howSecure1Link = howSecure1.link(
-  window.location.protocol + "//" + window.location.host + "/owner/",
+  window.location.protocol + "//" + window.location.host + "/owner/"
 );
 const howSecure2 =
   window.location.protocol + "//" + window.location.host + "/won/";
 const howSecure2Link = howSecure2.link(
-  window.location.protocol + "//" + window.location.host + "/won/",
+  window.location.protocol + "//" + window.location.host + "/won/"
 );
 
 const behindScenes = "here";
 const behindScenesLink = behindScenes.link(
-  "http://researchstudio-sat.github.io/webofneeds/",
+  "http://researchstudio-sat.github.io/webofneeds/"
 );
 
 const serviceDependencies = [

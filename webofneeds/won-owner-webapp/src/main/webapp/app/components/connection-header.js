@@ -86,7 +86,7 @@ function genComponentConf() {
             theirNeed &&
             relativeTime(
               selectLastUpdateTime(state),
-              this.timestamp || theirNeed.get("lastUpdateDate"),
+              this.timestamp || theirNeed.get("lastUpdateDate")
             ),
         };
       };
@@ -95,7 +95,7 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri", "self.timestamp"],
-        this,
+        this
       );
     }
 
