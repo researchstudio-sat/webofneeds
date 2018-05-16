@@ -14,6 +14,7 @@ import {
   parseCredentials,
   generatePrivateId,
 } from "../won-utils.js";
+import { clearPrivateId, savePrivateId } from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { resetParams, checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -244,7 +245,7 @@ export function accountLogin(credentials, options) {
       })
       .then(() => {
         if (credentials.privateId) {
-          localStorage.setItem("privateId", credentials.privateId);
+          savePrivateId(credentials.privateId);
         }
       });
   };
@@ -264,7 +265,7 @@ export function accountLogout(options) {
     ...options,
   };
 
-  localStorage.removeItem("privateId");
+  clearPrivateId();
 
   return (dispatch, getState) => {
     const state = getState();

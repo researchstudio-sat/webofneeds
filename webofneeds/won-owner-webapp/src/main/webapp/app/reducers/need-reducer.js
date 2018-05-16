@@ -9,7 +9,7 @@ import { msStringToDate, getIn } from "../utils.js";
 import {
   isUriRead,
   markUriAsRead,
-  resetUrisRead,
+  clearReadUris,
 } from "../won-localstorage.js";
 
 const initialState = Immutable.fromJS({});

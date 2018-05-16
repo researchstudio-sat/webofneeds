@@ -2,11 +2,12 @@
  * Created by fsuda on 25.04.2018.
  */
 const READ_URIS = "wonReadUris";
+const PRIVATE_ID = "privateId";
 
 export function markUriAsRead(uri) {
   //TODO: BETTER IMPL
   if (!isUriRead(uri)) {
-    let readUrisString = window.localStorage.getItem(READ_URIS);
+    let readUrisString = localStorage.getItem(READ_URIS);
     if (!readUrisString) {
       readUrisString = JSON.stringify([uri]);
     } else {
@@ -15,18 +16,18 @@ export function markUriAsRead(uri) {
         readUriList.push(uri);
         readUrisString = JSON.stringify(readUriList);
       } catch (e) {
-        resetUrisRead();
+        clearReadUris();
         readUrisString = JSON.stringify([uri]);
       }
     }
 
-    window.localStorage.setItem(READ_URIS, readUrisString);
+    localStorage.setItem(READ_URIS, readUrisString);
   }
 }
 
 export function isUriRead(uri) {
   //TODO: BETTER IMPL
-  let readUrisString = window.localStorage.getItem(READ_URIS);
+  let readUrisString = localStorage.getItem(READ_URIS);
 
   if (readUrisString) {
     let readUriList = JSON.parse(readUrisString);
@@ -40,6 +41,14 @@ export function isUriRead(uri) {
   return false;
 }
 
-export function resetUrisRead() {
-  window.localStorage.removeItem(READ_URIS);
+export function clearReadUris() {
+  localStorage.removeItem(READ_URIS);
+}
+
+export function clearPrivateId() {
+  localStorage.removeItem("privateId");
+}
+
+export function savePrivateId(privateId) {
+  localStorage.setItem("privateId", privateId);
 }

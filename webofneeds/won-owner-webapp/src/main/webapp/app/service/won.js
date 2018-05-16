@@ -26,6 +26,10 @@ import {
   clone,
   prefixOfUri,
 } from "../utils.js";
+import {
+  clearPrivateId,
+  clearReadUris,
+} from "../won-localstorage.js";
 import jsonld from "jsonld";
 
 import N3 from "n3";
@@ -40,6 +44,9 @@ var won = {};
 
 won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
 won.showRdf = false; //if you set this to true, the RDF icons/links are visible
+
+won.clearPrivateId = clearPrivateId;
+won.clearReadUris = clearReadUris;
 
 won.WON = {};
 won.WON.baseUri = "http://purl.org/webofneeds/model#";
