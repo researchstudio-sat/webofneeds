@@ -44,7 +44,7 @@ function genComponentConf() {
         <div class="cis__mandatory">
             <input
                 type="text"
-                length="{{self.characterLimit}}"
+                maxlength="{{self.characterLimit}}"
                 class="cis__mandatory__title won-txt"
                 placeholder="What? - Short title shown in lists"
                 ng-blur="::self.updateTitle()"
