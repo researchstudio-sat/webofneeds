@@ -150,7 +150,10 @@ function config(env, argv): Configuration {
       WatchTimePlugin,
       new UnusedWebpackPlugin({
         // Source directories
-        directories: [path.join(__dirname, "app")],
+        directories: [
+          path.join(__dirname, "app"),
+          path.join(__dirname, "style"),
+        ],
         // Exclude patterns
         //exclude: ["*.test.js"],
         // Root directory (optional)
