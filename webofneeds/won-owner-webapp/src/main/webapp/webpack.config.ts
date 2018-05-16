@@ -80,23 +80,10 @@ function config(env, argv): Configuration {
           use: [
             {
               loader: "babel-loader",
-              options: {
-                presets: [
-                  [
-                    "env",
-                    {
-                      targets: {
-                        browsers: ["last 2 versions"],
-                      },
-                    },
-                  ],
-                ],
-                plugins: [
-                  "transform-object-rest-spread",
-                  "transform-remove-strict-mode",
-                ],
-              },
             },
+            {
+              loader: "eslint-loader",
+            }
           ],
         },
         {
