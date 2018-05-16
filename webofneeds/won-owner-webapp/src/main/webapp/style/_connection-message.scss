@@ -71,14 +71,12 @@ won-connection-message {
       // lighten bg and text color? (might just suggest pending)
       // float icon on site opposite of bubble-tail
       .won-cm__center__bubble {
-        background-color: white;
-        // like the error toast-notifications
+        background-color: white; // like the error toast-notifications
         color: #8f8f8f;
       }
     }
     .won-cm__center__bubble {
-      background-color: $won-light-gray;
-      // like the error toast-notifications
+      background-color: $won-light-gray; // like the error toast-notifications
       color: black;
     }
     &__trig {
@@ -92,8 +90,7 @@ won-connection-message {
       color: $won-line-gray;
     }
     &__carret {
-      @include fixed-square(1rem);
-      // visually center icon on line
+      @include fixed-square(1rem); // visually center icon on line
       position: relative;
       top: 0.1em;
     }
