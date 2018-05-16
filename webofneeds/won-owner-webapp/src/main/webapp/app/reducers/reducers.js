@@ -119,7 +119,7 @@ const reducers = {
   //config: createReducer(
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),
-    action = {},
+    action = {}
   ) => {
     switch (action.type) {
       case actionTypes.config.init:
@@ -192,7 +192,7 @@ export default reduceReducers(
       default:
         return state;
     }
-  },
+  }
   //-------------------- </cross-cutting-reducer> -------------------
 );
 

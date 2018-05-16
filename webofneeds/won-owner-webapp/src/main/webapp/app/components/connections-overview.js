@@ -177,14 +177,14 @@ function genComponentConf() {
         const openNeeds =
           allOwnNeeds &&
           allOwnNeeds.filter(
-            post => post.get("state") === won.WON.ActiveCompacted,
+            post => post.get("state") === won.WON.ActiveCompacted
           );
         const closedNeeds =
           allOwnNeeds &&
           allOwnNeeds.filter(
             post =>
               post.get("state") === won.WON.InactiveCompacted &&
-              !post.get("isWhatsAround"),
+              !post.get("isWhatsAround")
           ); //Filter whatsAround needs automatically
 
         const routerParams = selectRouterParams(state);
@@ -221,7 +221,7 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri"],
-        this,
+        this
       );
 
       this.$scope.$watch("self.needUriImpliedInRoute", (newValue, oldValue) => {
@@ -270,7 +270,7 @@ function genComponentConf() {
       return sortByDate(
         need
           .get("connections")
-          .filter(conn => conn.get("state") !== won.WON.Closed),
+          .filter(conn => conn.get("state") !== won.WON.Closed)
       );
     }
   }

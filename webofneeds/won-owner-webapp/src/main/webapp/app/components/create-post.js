@@ -268,7 +268,7 @@ function genComponentConf() {
 
         this.needs__create(
           newObject,
-          this.$ngRedux.getState().getIn(["config", "defaultNodeUri"]),
+          this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
     }
@@ -312,7 +312,7 @@ function genComponentConf() {
                 this.draftObject.seeks = this.draftObject.is;
                 this.needs__create(
                   this.draftObject,
-                  this.$ngRedux.getState().getIn(["config", "defaultNodeUri"]),
+                  this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
                 );
               });
             },
@@ -322,7 +322,7 @@ function genComponentConf() {
                 "Could not retrieve geolocation due to error: ",
                 error.code,
                 "fullerror:",
-                error,
+                error
               );
               this.geoLocationDenied();
               this.pendingPublishing = false;
@@ -332,7 +332,7 @@ function genComponentConf() {
               enableHighAccuracy: true,
               timeout: 5000,
               maximumAge: 0,
-            },
+            }
           );
         }
       }

@@ -120,8 +120,8 @@ function genComponentConf() {
       return this.$sce.trustAsHtml(
         text.replace(
           new RegExp(search, "gi"),
-          '<span class="highlightedText">$&</span>',
-        ),
+          '<span class="highlightedText">$&</span>'
+        )
       );
     }
 
@@ -134,7 +134,7 @@ function genComponentConf() {
       }
 
       this.markers = locations.map(location =>
-        L.marker([location.lat, location.lng]).bindPopup(location.name),
+        L.marker([location.lat, location.lng]).bindPopup(location.name)
       );
 
       for (let m of this.markers) {
@@ -247,7 +247,7 @@ function genComponentConf() {
                 this.$scope.$apply(() => {
                   this.currentLocation = location;
                 });
-              },
+              }
             );
           },
           err => {
@@ -261,7 +261,7 @@ function genComponentConf() {
             enableHighAccuracy: true,
             timeout: 5000,
             maximumAge: 0,
-          },
+          }
         );
       }
 
@@ -373,7 +373,7 @@ function onMapClick(e, ctrl) {
   reverseSearchNominatim(
     e.latlng.lat,
     e.latlng.lng,
-    ctrl.map.getZoom(), // - 1
+    ctrl.map.getZoom() // - 1
   ).then(searchResult => {
     const location = nominatim2draftLocation(searchResult);
 

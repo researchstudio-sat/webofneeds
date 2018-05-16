@@ -25,7 +25,7 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.needs.create:
       return messages.setIn(
         ["enqueued", action.payload.eventUri],
-        action.payload.message,
+        action.payload.message
       );
 
     case actionTypes.needs.createSuccessful:
@@ -50,7 +50,7 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.messages.send:
       return messages.setIn(
         ["enqueued", action.payload.eventUri],
-        action.payload.message,
+        action.payload.message
       );
 
     case actionTypes.lostConnection:
@@ -69,7 +69,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         return messages.setIn(pathSO, [action.payload.actionToDispatch]);
       }
       return messages.updateIn(pathSO, list =>
-        list.push(action.payload.actionToDispatch),
+        list.push(action.payload.actionToDispatch)
       );
 
     case actionTypes.messages.dispatchActionOn.registerFailureOwn:
@@ -79,7 +79,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         return messages.setIn(pathFO, [action.payload.actionToDispatch]);
       }
       return messages.updateIn(pathFO, list =>
-        list.push(action.payload.actionToDispatch),
+        list.push(action.payload.actionToDispatch)
       );
 
     case actionTypes.messages.dispatchActionOn.registerSuccessRemote:
@@ -89,7 +89,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         return messages.setIn(pathSR, [action.payload.actionToDispatch]);
       }
       return messages.updateIn(pathSR, list =>
-        list.push(action.payload.actionToDispatch),
+        list.push(action.payload.actionToDispatch)
       );
 
     case actionTypes.messages.dispatchActionOn.registerFailureRemote:
@@ -99,7 +99,7 @@ export function messagesReducer(messages = initialState, action = {}) {
         return messages.setIn(pathFR, [action.payload.actionToDispatch]);
       }
       return messages.updateIn(pathFR, list =>
-        list.push(action.payload.actionToDispatch),
+        list.push(action.payload.actionToDispatch)
       );
 
     case actionTypes.messages.dispatchActionOn.failureOwn:

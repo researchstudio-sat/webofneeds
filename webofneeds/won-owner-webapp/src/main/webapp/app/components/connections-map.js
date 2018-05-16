@@ -75,7 +75,7 @@ function genComponentConf() {
         };
       };
       const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-        this,
+        this
       );
       this.$scope.$on("$destroy", disconnect);
     }
@@ -95,7 +95,7 @@ function genComponentConf() {
           L.marker([
             postLocation.get("lat"),
             postLocation.get("lng"),
-          ]).bindPopup("Your need - " + postLocation.get("address")),
+          ]).bindPopup("Your need - " + postLocation.get("address"))
         );
       }
 
@@ -136,7 +136,7 @@ function genComponentConf() {
 
       return L.marker([lat, lng])
         .bindPopup(
-          need.get("title" + " - " + need.getIn(["location", "address"])),
+          need.get("title" + " - " + need.getIn(["location", "address"]))
         )
         .on(
           "click",
@@ -149,7 +149,7 @@ function genComponentConf() {
               this.onSelectedConnection({ connectionUri: conn.get("uri") });
             }
           },
-          this,
+          this
         );
     }
 

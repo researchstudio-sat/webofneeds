@@ -139,12 +139,12 @@ function genTopnavConf() {
 
       const selectFromState = state => {
         const selectedPostUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "postUri"]),
+          getIn(state, ["router", "currentParams", "postUri"])
         );
         const selectedPost =
           selectedPostUri && state.getIn(["needs", selectedPostUri]);
         const selectedConnectionUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "connectionUri"]),
+          getIn(state, ["router", "currentParams", "connectionUri"])
         );
         const need =
           selectedConnectionUri &&

@@ -39,7 +39,7 @@ export function buildRateMessage(
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri,
-  rating,
+  rating
 ) {
   return new Promise((resolve, reject) => {
     var buildMessage = function(envelopeData, eventToRateFor) {
@@ -65,12 +65,12 @@ export function buildRateMessage(
         theirNeedUri,
         ownNodeUri,
         theirNodeUri,
-        theirConnectionUri,
+        theirConnectionUri
       )
       .then(function(envelopeData) {
         resolve(buildMessage(envelopeData, msgToRateFor.event));
       }, won.reportError(
-        "cannot open connection " + msgToRateFor.connection.uri,
+        "cannot open connection " + msgToRateFor.connection.uri
       ));
   });
 }
@@ -81,7 +81,7 @@ export function buildCloseMessage(
   theirNeedUri,
   ownNodeUri,
   theirNodeUri,
-  theirConnectionUri,
+  theirConnectionUri
 ) {
   var buildMessage = function(envelopeData) {
     //TODO: use event URI pattern specified by WoN node
@@ -105,12 +105,12 @@ export function buildCloseMessage(
       theirNeedUri,
       ownNodeUri,
       theirNodeUri,
-      theirConnectionUri,
+      theirConnectionUri
     )
     .then(envelopeData => buildMessage(envelopeData))
     .catch(err => {
       won.reportError(
-        "cannot close connection " + connectionUri + ": " + JSON.stringify(err),
+        "cannot close connection " + connectionUri + ": " + JSON.stringify(err)
       );
       throw err;
     });
@@ -134,7 +134,7 @@ export function buildCloseNeedMessage(needUri, wonNodeUri) {
     .getEnvelopeDataForNeed(needUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      err => won.reportError("cannot close need " + needUri),
+      err => won.reportError("cannot close need " + needUri)
     );
 }
 
@@ -157,7 +157,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri) {
     .getEnvelopeDataForNeed(needUri, wonNodeUri)
     .then(
       envelopeData => buildMessage(envelopeData),
-      err => won.reportError("cannot close need " + needUri),
+      err => won.reportError("cannot close need " + needUri)
     );
 }
 
@@ -179,7 +179,7 @@ export function buildConnectMessage({
     ownNeedUri,
     theirNeedUri,
     ownNodeUri,
-    theirNodeUri,
+    theirNodeUri
   );
   if (optionalOwnConnectionUri) {
     envelopeData[won.WONMSG.hasSender] = optionalOwnConnectionUri;
@@ -220,7 +220,7 @@ export function buildChatMessage({
     theirNeedUri,
     ownNodeUri,
     theirNodeUri,
-    theirConnectionUri,
+    theirConnectionUri
   );
 
   const messageP = Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
@@ -233,7 +233,7 @@ export function buildChatMessage({
              * and then send to the won-node.
              */
       const wonMessageBuilder = new won.MessageBuilder(
-        won.WONMSG.connectionMessage,
+        won.WONMSG.connectionMessage
       )
         .forEnvelopeData(envelopeData)
         .hasOwnerDirection()
@@ -245,14 +245,14 @@ export function buildChatMessage({
         //add the chatMessage as normal text message
         wonMessageBuilder.addContentGraphData(
           won.WON.hasTextMessage,
-          chatMessage,
+          chatMessage
         );
       } else {
         throw new Exception(
           "No textmessage or valid graph as payload of chat message:" +
             JSON.stringify(chatMessage) +
             " " +
-            JSON.stringify(graphPayload),
+            JSON.stringify(graphPayload)
         );
       }
 
@@ -263,7 +263,7 @@ export function buildChatMessage({
         eventUri,
         message,
       };
-    },
+    }
   );
   return messageP;
 }
@@ -275,7 +275,7 @@ export function buildOpenMessage(
   ownNodeUri,
   theirNodeUri,
   theirConnectionUri,
-  chatMessage,
+  chatMessage
 ) {
   const messageP = won
     .getEnvelopeDataforConnection(
@@ -284,7 +284,7 @@ export function buildOpenMessage(
       theirNeedUri,
       ownNodeUri,
       theirNodeUri,
-      theirConnectionUri,
+      theirConnectionUri
     )
     .then(envelopeData => {
       //TODO: use event URI pattern specified by WoN node
@@ -439,13 +439,13 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
     .then(need =>
       emptyDataset
         .setIn(["theirNeeds", needUri], Immutable.fromJS(need))
-        .set("loggedIn", false),
+        .set("loggedIn", false)
     );
 }
 
 export function fetchOwnedData(email, curriedDispatch) {
   return fetchOwnedNeedUris().then(needUris =>
-    fetchDataForOwnedNeeds(needUris, curriedDispatch),
+    fetchDataForOwnedNeeds(needUris, curriedDispatch)
   );
 }
 //export function fetchDataForOwnedNeeds(needUris, curriedDispatch) {
@@ -494,7 +494,7 @@ export function callAgreementEventFetch(needUri, eventUri) {
         "Content-Type": "application/ld+json",
       },
       credentials: "include",
-    },
+    }
   )
     .then(checkHttpStatus)
     .then(response => response.json());
@@ -504,14 +504,14 @@ window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(
   ownNeedUris,
-  curriedDispatch = () => undefined,
+  curriedDispatch = () => undefined
 ) {
   if (!is("Array", ownNeedUris) || ownNeedUris.length === 0) {
     return Promise.resolve(emptyDataset);
   }
 
   const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
-    fetchOwnNeedAndDispatch(uri, curriedDispatch),
+    fetchOwnNeedAndDispatch(uri, curriedDispatch)
   );
 
   // wait for the own needs to be dispatched then load connections
@@ -523,11 +523,11 @@ function fetchAllAccessibleAndRelevantData(
             .getConnectionUrisOfNeed(uri, false)
             .then(connectionUris =>
               urisToLookupMap(connectionUris, uri =>
-                fetchConnectionAndDispatch(uri, curriedDispatch),
-              ),
-            ),
-        ),
-      ),
+                fetchConnectionAndDispatch(uri, curriedDispatch)
+              )
+            )
+        )
+      )
     )
     .then((connectionMaps) /*[{ uri -> cnct }]*/ =>
       // flatten into one lookup map
@@ -536,15 +536,15 @@ function fetchAllAccessibleAndRelevantData(
   const allTheirNeedsPromise = allConnectionsPromise
     .then(connections => {
       const theirNeedUris = Object.values(connections).map(
-        cnct => cnct.hasRemoteNeed,
+        cnct => cnct.hasRemoteNeed
       );
 
       return Immutable.Set(theirNeedUris).toArray();
     })
     .then(theirNeedUris =>
       urisToLookupMap(theirNeedUris, uri =>
-        fetchTheirNeedAndDispatch(uri, curriedDispatch),
-      ),
+        fetchTheirNeedAndDispatch(uri, curriedDispatch)
+      )
     );
 
   const allDataRawPromise = Promise.all([
@@ -562,7 +562,7 @@ function fetchAllAccessibleAndRelevantData(
           /* will be loaded later when connection is accessed */
         },
         theirNeeds,
-      }),
+      })
   );
 
   /**
@@ -606,20 +606,20 @@ function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
     .ensureLoaded(needUri, { requesterWebId: needUri, deep: true }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
   needP.then(need =>
-    curriedDispatch(wellFormedPayload({ ownNeeds: { [needUri]: need } })),
+    curriedDispatch(wellFormedPayload({ ownNeeds: { [needUri]: need } }))
   );
   return needP;
 }
 
 function fetchConnectionAndDispatch(
   cnctUri,
-  curriedDispatch = () => undefined,
+  curriedDispatch = () => undefined
 ) {
   const cnctP = won.getNode(cnctUri);
   cnctP.then(connection =>
     curriedDispatch(
-      wellFormedPayload({ connections: { [cnctUri]: connection } }),
-    ),
+      wellFormedPayload({ connections: { [cnctUri]: connection } })
+    )
   );
   return cnctP;
 }
@@ -627,7 +627,7 @@ function fetchConnectionAndDispatch(
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
   const needP = won.getNeed(needUri);
   needP.then(need =>
-    curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } })),
+    curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }))
   );
   return needP;
 }

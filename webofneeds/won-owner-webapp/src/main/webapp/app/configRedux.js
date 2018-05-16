@@ -39,7 +39,7 @@ function createStore($ngReduxProvider) {
             */
       devToolsEnhancer(),
       // Specify name here, actionsBlacklist, actionsCreators and other options if needed
-    ],
+    ]
   );
 }
 

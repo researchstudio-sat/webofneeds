@@ -110,7 +110,7 @@ function genComponentConf() {
         //const sendAdHocRequest = getIn(state, ['router', 'currentParams', 'sendAdHocRequest']); //if this parameter is set we will not have a connection to send this request to
 
         const connectionUri = decodeURIComponent(
-          getIn(state, ["router", "currentParams", "connectionUri"]),
+          getIn(state, ["router", "currentParams", "connectionUri"])
         );
         const ownNeed =
           connectionUri && selectNeedByConnectionUri(state, connectionUri);
@@ -157,7 +157,7 @@ function genComponentConf() {
             suggestedPost &&
             relativeTime(
               selectLastUpdateTime(state),
-              suggestedPost.get("creationDate"),
+              suggestedPost.get("creationDate")
             ),
           shouldShowRdf: state.get("showRdf"),
           createdTimestamp: suggestedPost && suggestedPost.get("creationDate"),
@@ -190,7 +190,7 @@ function genComponentConf() {
           this.ownNeed
             .getIn(["connections", this.connectionUri])
             .get("remoteNeedUri"),
-          message,
+          message
         );
         this.router__stateGoCurrent({ connectionUri: this.connectionUri });
       }

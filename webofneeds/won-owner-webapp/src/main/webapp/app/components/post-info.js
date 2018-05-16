@@ -118,7 +118,7 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.includeHeader"],
-        this,
+        this
       );
     }
   }

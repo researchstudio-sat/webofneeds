@@ -88,8 +88,8 @@ export function tree2constants(obj, prefix = "") {
       (acc, k) => acc.concat(k),
       acc => acc.join("."),
       prefix,
-      obj,
-    ),
+      obj
+    )
   );
 }
 
@@ -112,7 +112,7 @@ export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
         reducer,
         mapper,
         reducer(acc, k),
-        obj[k],
+        obj[k]
       );
     }
     return accObj;
@@ -182,7 +182,7 @@ export function flattenTree(tree, delimiter = "__") {
 
 export function delay(milliseconds) {
   return new Promise((resolve, reject) =>
-    window.setTimeout(() => resolve(), milliseconds),
+    window.setTimeout(() => resolve(), milliseconds)
   );
 }
 
@@ -238,7 +238,7 @@ export function mapToMatches(connections) {
         } else {
           needMap[needUri].push(connections[key]);
         }
-      }.bind(this),
+      }.bind(this)
     );
   }
   return needMap;
@@ -259,7 +259,7 @@ export function getKeySize(obj) {
  */
 export function getRandomString(
   length,
-  chars = "abcdefghijklmnopqrstuvwxyz0123456789",
+  chars = "abcdefghijklmnopqrstuvwxyz0123456789"
 ) {
   var buff = new Array(length);
   for (let i = 0; i < buff.length; i++) {
@@ -458,7 +458,7 @@ export function flatten(listOfLists) {
   return listOfLists.reduce(
     (flattendList, innerList) =>
       innerList ? flattendList.concat(innerList) : [], //not concatenating `undefined`s
-    [], //concat onto empty list as start
+    [] //concat onto empty list as start
   );
 }
 
@@ -498,10 +498,10 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
         "\n\n",
         uris,
         "\n\n",
-        error,
+        error
       );
       return undefined;
-    }),
+    })
   );
   return Promise.all(asyncLookups).then(dataObjects => {
     const lookupMap = {};
@@ -537,7 +537,7 @@ export function urisToLookupMapStrict(uris, asyncLookupFunction) {
         urisAsArray,
         uris,
       };
-    }),
+    })
   );
   return Promise.all(asyncLookups).then(dataObjects => {
     const lookupMap = {};
@@ -850,7 +850,7 @@ export function arrEq(xs, ys) {
     xs.length === ys.length &&
     all(
       //elementwise comparison
-      zipWith((x, y) => x === y, xs, ys),
+      zipWith((x, y) => x === y, xs, ys)
     )
   );
 }
@@ -919,7 +919,7 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
             if (split.length !== 2) {
               throw new Exception(
                 'encountered unexpected predicate when parsing json-ld. it doesn\'t follow the "<prefix>:<postfix> structure: "' +
-                  k,
+                  k
               );
             }
             newKey = split[1];
@@ -932,7 +932,7 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
   } else {
     throw new Exception(
       "Encountered unexpected value while parsing json-ld: ",
-      jsonldObj,
+      jsonldObj
     );
   }
 }
@@ -983,9 +983,9 @@ export function somePromises(promises, errorHandler) {
           } else if (failures + successes >= numPromises) {
             resolve(results);
           }
-        },
+        }
       );
-    }),
+    })
   );
 }
 
@@ -1191,7 +1191,7 @@ export function mergeAsSet(arr1, arr2) {
         JSON.stringify(arr2) +
         "(" +
         arr2.toString() +
-        ")",
+        ")"
     );
   }
   const res = new Set(arr1);

@@ -88,7 +88,7 @@ export function updateRelativeTimestamps(
   $scope,
   $interval,
   creationDate,
-  callback,
+  callback
 ) {
   const updateTimeStamp = () =>
     callback(relativeTime(Date.now(), creationDate));

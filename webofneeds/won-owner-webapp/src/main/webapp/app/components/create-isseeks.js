@@ -296,7 +296,7 @@ function genComponentConf() {
       const tagsInputString = (this.tagsInput() || {}).value;
       this.draftObject.tags = mergeAsSet(
         this.textAreaTags || [],
-        extractHashtags(tagsInputString),
+        extractHashtags(tagsInputString)
       );
 
       if (tagsInputString && !this.details.has("tags")) {
@@ -382,11 +382,12 @@ function genComponentConf() {
     }
     titleInput() {
       if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(".cis__mandatory__title");
+        this._titleInput = this.$element[0].querySelector(
+          ".cis__mandatory__title"
+        );
       }
       return this._titleInput;
     }
-
 
     ttlInputNg() {
       return angular.element(this.ttlInput());
@@ -403,7 +404,7 @@ function genComponentConf() {
     descriptionInput() {
       if (!this._descriptionInput) {
         this._descriptionInput = this.$element[0].querySelector(
-          ".cis__description__text",
+          ".cis__description__text"
         );
       }
       return this._descriptionInput;

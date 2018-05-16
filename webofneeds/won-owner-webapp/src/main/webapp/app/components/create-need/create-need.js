@@ -25,7 +25,7 @@ class CreateNeedController {
 
     // Using actionCreators like this means that every action defined there is available in the template.
     const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
-      this,
+      this
     );
     this.$scope.$on("$destroy", disconnect);
   }

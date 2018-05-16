@@ -28,8 +28,8 @@ function config(env, argv): Configuration {
         console.log(
           `_____________\n`,
           `${GREEN}${time.getHours()}:${RED}${("0" + time.getMinutes()).slice(
-            -2,
-          )}:${("0" + time.getSeconds()).slice(-2)} ${GREEN}⇩${NC}`,
+            -2
+          )}:${("0" + time.getSeconds()).slice(-2)} ${GREEN}⇩${NC}`
         );
       });
     },
@@ -56,15 +56,15 @@ function config(env, argv): Configuration {
         fetch: "whatwg-fetch",
         "rdfstore-js$": path.resolve(
           __dirname,
-          "scripts/rdfstore-js/rdf_store.js",
+          "scripts/rdfstore-js/rdf_store.js"
         ),
         "angular-ui-router-shim$": require.resolve(
-          "angular-ui-router/release/stateEvents.js",
+          "angular-ui-router/release/stateEvents.js"
         ),
         config$: path.resolve(
           __dirname,
           "config",
-          `${isLive ? "live" : "default"}.js`,
+          `${isLive ? "live" : "default"}.js`
         ),
       },
     },
@@ -150,13 +150,13 @@ function config(env, argv): Configuration {
             context: path.resolve(
               path.dirname(require.resolve("leaflet/package.json")),
               "dist",
-              "images",
+              "images"
             ),
             from: "**/*",
             to: "./images/",
           },
         ],
-        {},
+        {}
       ),
       new LiveReloadPlugin(),
       WatchTimePlugin,

@@ -43,7 +43,7 @@ const keySet = deepFreeze(
     "agreementUris",
     "pendingProposalUris",
     "cancellationPendingAgreementUris",
-  ]),
+  ])
 );
 
 const defaultAgreementData = deepFreeze({
@@ -288,7 +288,7 @@ function genComponentConf() {
                     connectionUri: connectionUri,
                     needUri: ownNeed.get("uri"),
                     relevant: false,
-                  }),
+                  })
                 );
               }
             } else if (this.agreementHeadData.retractedMessageUris.size) {
@@ -301,7 +301,7 @@ function genComponentConf() {
                     connectionUri: connectionUri,
                     needUri: ownNeed.get("uri"),
                     relevant: false,
-                  }),
+                  })
                 );
               }
             }
@@ -345,7 +345,7 @@ function genComponentConf() {
       this.snapToBottom();
 
       this.$scope.$watchGroup(["self.connection"], () =>
-        this.ensureMessagesAreLoaded(),
+        this.ensureMessagesAreLoaded()
       );
 
       this.$scope.$watch(
@@ -353,8 +353,8 @@ function genComponentConf() {
         () =>
           delay(0).then(() =>
             // scroll to bottom directly after rendering, if snapped
-            this.updateScrollposition(),
-          ),
+            this.updateScrollposition()
+          )
       );
     }
 
@@ -369,7 +369,7 @@ function genComponentConf() {
         ) {
           this.connections__showLatestMessages(
             this.connection.get("uri"),
-            INITIAL_MESSAGECOUNT,
+            INITIAL_MESSAGECOUNT
           );
         }
       });
@@ -381,7 +381,7 @@ function genComponentConf() {
         if (this.connection && !this.connection.get("isLoading")) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
-            MORE_MESSAGECOUNT,
+            MORE_MESSAGECOUNT
           );
         }
       });
@@ -435,7 +435,7 @@ function genComponentConf() {
         this.connections__sendChatMessage(
           trimmedMsg,
           this.connection.get("uri"),
-          isTTL,
+          isTTL
         );
       }
     }
@@ -451,7 +451,7 @@ function genComponentConf() {
         (payload = {
           connectionUri: this.connectionUri,
           showAgreementData: value,
-        }),
+        })
       );
     }
 
@@ -473,7 +473,7 @@ function genComponentConf() {
         this.connection = connection;
       } else {
         this.connections__setLoading(
-          (payload = { connectionUri: this.connectionUri, isLoading: true }),
+          (payload = { connectionUri: this.connectionUri, isLoading: true })
         );
       }
 
@@ -509,7 +509,7 @@ function genComponentConf() {
               (payload = {
                 connectionUri: this.connectionUri,
                 agreementData: this.cloneDefaultStateData(),
-              }),
+              })
             );
           }
           //Remove all retracted/rejected messages
@@ -540,7 +540,7 @@ function genComponentConf() {
                 (payload = {
                   connectionUri: this.connectionUri,
                   agreementData: data,
-                }),
+                })
               );
             }
           }
@@ -551,14 +551,14 @@ function genComponentConf() {
               (payload = {
                 connectionUri: this.connectionUri,
                 isLoading: false,
-              }),
+              })
             );
           }
         })
         .catch(error => {
           console.error("Error:", error);
           this.connections__setLoading(
-            (payload = { connectionUri: this.connectionUri, isLoading: false }),
+            (payload = { connectionUri: this.connectionUri, isLoading: false })
           );
         });
     }
@@ -569,13 +569,13 @@ function genComponentConf() {
         pendingProposalUris: new Set(response.pendingProposalUris),
         pendingProposals: new Set(response.pendingProposals),
         acceptedCancellationProposalUris: new Set(
-          response.acceptedCancellationProposalUris,
+          response.acceptedCancellationProposalUris
         ),
         cancellationPendingAgreementUris: new Set(
-          response.cancellationPendingAgreementUris,
+          response.cancellationPendingAgreementUris
         ),
         pendingCancellationProposalUris: new Set(
-          response.pendingCancellationProposalUris,
+          response.pendingCancellationProposalUris
         ),
         cancelledAgreementUris: new Set(response.cancelledAgreementUris),
         rejectedMessageUris: new Set(response.rejectedMessageUris),
@@ -612,7 +612,7 @@ function genComponentConf() {
             this.addAgreementDataToSate(
               msg.getRemoteMessageUri(),
               key,
-              agreementObject,
+              agreementObject
             );
           } else {
             if (!agreementObject) {
@@ -641,7 +641,7 @@ function genComponentConf() {
               (payload = {
                 connectionUri: this.connectionUri,
                 agreementData: this.agreementLoadingData,
-              }),
+              })
             );
           }
         });
@@ -664,7 +664,7 @@ function genComponentConf() {
               (payload = {
                 connectionUri: this.connectionUri,
                 agreementData: data,
-              }),
+              })
             );
           }
           return true;

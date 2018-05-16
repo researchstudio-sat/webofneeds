@@ -51,7 +51,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromExternal() && message.isConnectMessage()) {
         redux.dispatch(
-          actionCreators.messages__connectMessageReceived(message),
+          actionCreators.messages__connectMessageReceived(message)
         );
         return true;
       }
@@ -68,7 +68,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromExternal() && message.isConnectionMessage()) {
         redux.dispatch(
-          actionCreators.messages__connectionMessageReceived(message),
+          actionCreators.messages__connectionMessageReceived(message)
         );
         return true;
       }
@@ -98,13 +98,13 @@ export function runMessagingAgent(redux) {
           if (message.isFromExternal()) {
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
-              actionCreators.messages__connect__successRemote(message),
+              actionCreators.messages__connect__successRemote(message)
             );
             return true;
           } else {
             // got the first success-response (from our own node) - 1st ACK
             redux.dispatch(
-              actionCreators.messages__connect__successOwn(message),
+              actionCreators.messages__connect__successOwn(message)
             );
             return true;
           }
@@ -121,19 +121,19 @@ export function runMessagingAgent(redux) {
           if (message.isFromExternal()) {
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
-              actionCreators.messages__chatMessage__successRemote(message),
+              actionCreators.messages__chatMessage__successRemote(message)
             );
             return true;
           } else {
             // got the first success-response (from our own node) - 1st ACK
             redux.dispatch(
-              actionCreators.messages__chatMessage__successOwn(message),
+              actionCreators.messages__chatMessage__successOwn(message)
             );
             return true;
           }
         } else if (message.isFailureResponse()) {
           redux.dispatch(
-            actionCreators.messages__chatMessage__failure(message),
+            actionCreators.messages__chatMessage__failure(message)
           );
           return true;
         }
@@ -146,7 +146,7 @@ export function runMessagingAgent(redux) {
           if (message.isFromExternal()) {
             // got the second success-response (from the remote-node) - 2nd ACK
             redux.dispatch(
-              actionCreators.messages__open__successRemote(message),
+              actionCreators.messages__open__successRemote(message)
             );
             return true;
           } else {
@@ -166,7 +166,7 @@ export function runMessagingAgent(redux) {
             actionCreators.router__stateGoAbs("connections", {
               postUri: message.getSenderNeed(),
               connectionUri: message.getSender(),
-            }),
+            })
           );
           return true;
         }
@@ -255,7 +255,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromSystem() && message.isSuccessResponse()) {
         redux.dispatch(
-          actionCreators.messages__dispatchActionOn__successOwn(message),
+          actionCreators.messages__dispatchActionOn__successOwn(message)
         );
         return true;
       }
@@ -264,7 +264,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromSystem() && message.isFailureResponse()) {
         redux.dispatch(
-          actionCreators.messages__dispatchActionOn__failureOwn(message),
+          actionCreators.messages__dispatchActionOn__failureOwn(message)
         );
         return true;
       }
@@ -273,7 +273,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromExternal() && message.isSuccessResponse()) {
         redux.dispatch(
-          actionCreators.messages__dispatchActionOn__successRemote(message),
+          actionCreators.messages__dispatchActionOn__successRemote(message)
         );
         return true;
       }
@@ -282,7 +282,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromExternal() && message.isFailureResponse()) {
         redux.dispatch(
-          actionCreators.messages__dispatchActionOn__failureRemote(message),
+          actionCreators.messages__dispatchActionOn__failureRemote(message)
         );
         return true;
       }
@@ -315,7 +315,7 @@ export function runMessagingAgent(redux) {
       if (!messageProcessed) {
         console.warn(
           "MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ",
-          message,
+          message
         );
       }
     });
@@ -366,12 +366,12 @@ export function runMessagingAgent(redux) {
     console.debug(
       "messaging-agent.js: checking heartbeat presence: ",
       missedHeartbeats,
-      " full intervals of 30s have passed since the last heartbeat.",
+      " full intervals of 30s have passed since the last heartbeat."
     );
 
     if (++missedHeartbeats > 3) {
       console.error(
-        "messaging-agent.js: no websocket-heartbeat present. closing socket.",
+        "messaging-agent.js: no websocket-heartbeat present. closing socket."
       );
       ws.close();
     }
@@ -397,7 +397,7 @@ export function runMessagingAgent(redux) {
             if (firstEntry.length != 2) {
               console.error(
                 "Could not send message, did not find a uri/message pair in the message buffer. The first Entry in the buffer is:",
-                firstEntry,
+                firstEntry
               );
               return;
             }
@@ -407,7 +407,7 @@ export function runMessagingAgent(redux) {
 
             // move message to next stat ("waitingForAnswer"). Also triggers this watch again as a result.
             redux.dispatch(
-              actionCreators.messages__waitingForAnswer({ eventUri, msg }),
+              actionCreators.messages__waitingForAnswer({ eventUri, msg })
             );
           }
         } catch (error) {
@@ -420,7 +420,7 @@ export function runMessagingAgent(redux) {
       const unsubscribeMsgQWatch = watchImmutableRdxState(
         redux,
         ["messages", "enqueued"],
-        (newMsgBuffer, oldMsgBuffer) => sendFirstInBuffer(newMsgBuffer),
+        (newMsgBuffer, oldMsgBuffer) => sendFirstInBuffer(newMsgBuffer)
       );
       const unsubscribeReconnectWatch = watchImmutableRdxState(
         redux,
@@ -436,7 +436,7 @@ export function runMessagingAgent(redux) {
               ws = newSock(); // onClose won't trigger for already closed websockets, so create a new one here.
             }
           }
-        },
+        }
       );
 
       unsubscribeWatches.push(unsubscribeMsgQWatch);
@@ -456,19 +456,19 @@ export function runMessagingAgent(redux) {
     if (e.wasClean) {
       console.log(
         "messaging-agent.js: websocket closed cleanly. reconnectAttempts = ",
-        reconnectAttempts,
+        reconnectAttempts
       );
     } else {
       console.error(
         "messaging-agent.js: websocket crashed. reconnectAttempts = ",
-        reconnectAttempts,
+        reconnectAttempts
       );
     }
 
     if (e.code === 1011 || reconnectAttempts > 1) {
       console.error(
         "messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n",
-        e.reason,
+        e.reason
       );
       // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
       // TODO recovery from timed out session

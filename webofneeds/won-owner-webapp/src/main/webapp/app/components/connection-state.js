@@ -70,7 +70,7 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri"],
-        this,
+        this
       );
     }
   }

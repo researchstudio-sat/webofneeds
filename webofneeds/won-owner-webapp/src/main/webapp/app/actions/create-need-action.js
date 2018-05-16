@@ -40,7 +40,7 @@ export function needCreate(draft, nodeUri) {
       .then(async () => {
         const { message, eventUri, needUri } = await buildCreateMessage(
           draft,
-          nodeUri,
+          nodeUri
         );
         dispatch({
           type: actionTypes.needs.create,
@@ -52,7 +52,7 @@ export function needCreate(draft, nodeUri) {
             postUri: undefined,
             showCreateView: undefined,
             connectionUri: undefined,
-          }),
+          })
         );
       });
   };

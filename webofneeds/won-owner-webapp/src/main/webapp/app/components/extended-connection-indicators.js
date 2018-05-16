@@ -90,14 +90,14 @@ function genComponentConf() {
         const matches =
           allConnectionsByNeedUri &&
           allConnectionsByNeedUri.filter(
-            conn => conn.get("state") === won.WON.Suggested,
+            conn => conn.get("state") === won.WON.Suggested
           );
         const connected =
           allConnectionsByNeedUri &&
           allConnectionsByNeedUri.filter(
             conn =>
               conn.get("state") !== won.WON.Suggested &&
-              conn.get("state") !== won.WON.Closed,
+              conn.get("state") !== won.WON.Closed
           );
 
         const unreadMatches =

@@ -139,14 +139,14 @@ function postViewEnsureLoaded(dispatch, getState, encodedPostUri) {
         dispatch({
           type: actionTypes.router.accessedNonLoadedPost,
           payload: Immutable.fromJS({ theirNeed: need }),
-        }),
+        })
       )
       .catch(error => {
         console.log(
           `Failed to load need ${postUri}.`,
           `Reverting to previous router-state.`,
           `Error: `,
-          error,
+          error
         );
         dispatch(actionCreators.router__back());
       });
@@ -183,7 +183,7 @@ export const runAccessControl = [
           options,
           dispatch: $ngRedux.dispatch,
           getState: $ngRedux.getState,
-        }),
+        })
     );
   },
 ];
@@ -202,7 +202,7 @@ export function accessControl({
     fromParams["privateId"],
     toParams["privateId"],
     dispatch,
-    getState,
+    getState
   );
 
   const hasPreviousState = !!fromState.name;
@@ -288,7 +288,7 @@ function reactToPrivateIdChanges(
   fromPrivateId,
   toPrivateId,
   dispatch,
-  getState,
+  getState
 ) {
   const state = getState();
 
@@ -299,7 +299,7 @@ function reactToPrivateIdChanges(
         email +
         " derived from the privateId " +
         toPrivateId +
-        ".",
+        "."
     );
     return Promise.resolve();
   }
@@ -331,7 +331,7 @@ function reactToPrivateIdChanges(
 export function addConstParams(params, paramsInState) {
   const paramsInStateImm = Immutable.fromJS(paramsInState); // ensure that they're immutable
   const currentConstParams = Immutable.Map(
-    constantParams.map(p => [p, paramsInStateImm.get(p)]), // [ [ paramName, paramValue] ]
+    constantParams.map(p => [p, paramsInStateImm.get(p)]) // [ [ paramName, paramValue] ]
   );
   return currentConstParams.merge(params).toJS();
 }

@@ -45,7 +45,7 @@ export function absParams(queryParams) {
   const currentParams = getParameters();
   const paramsWithConst = addConstParams(
     resetParamsImm.merge(queryParams),
-    currentParams,
+    currentParams
   );
   return paramsWithConst;
 }

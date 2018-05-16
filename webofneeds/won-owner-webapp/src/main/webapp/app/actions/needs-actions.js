@@ -25,7 +25,7 @@ export function needsConnect(
   ownNeedUri,
   ownConnectionUri,
   theirNeedUri,
-  textMessage,
+  textMessage
 ) {
   return async (dispatch, getState) => {
     const state = getState();
