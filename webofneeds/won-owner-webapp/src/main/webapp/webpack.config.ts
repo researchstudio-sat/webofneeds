@@ -84,7 +84,7 @@ function config(env, argv): Configuration {
             },
             {
               loader: "eslint-loader",
-            }
+            },
           ],
         },
         {
@@ -155,7 +155,7 @@ function config(env, argv): Configuration {
           path.join(__dirname, "style"),
         ],
         // Exclude patterns
-        exclude: ["*.html", "*.css"],
+        exclude: ["*.html"],
         // Root directory (optional)
         root: __dirname,
       }),
