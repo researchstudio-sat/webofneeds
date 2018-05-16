@@ -36,10 +36,6 @@
     "webpack:watch": "echo Deprecated: This command has been moved to `npm run watch` && exit 1",
     "clean": "rimraf ./generated"
   },
-  "lint-staged": {
-    "gitDir": " ../../../../../",
-    "**/*.{js,json,scss,css,md}": ["prettier --write", "git add"]
-  },
   "devDependencies": {
     "@types/copy-webpack-plugin": "^4.4.1",
     "@types/mini-css-extract-plugin": "^0.2.0",
