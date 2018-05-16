@@ -155,7 +155,7 @@ function config(env, argv): Configuration {
           path.join(__dirname, "style"),
         ],
         // Exclude patterns
-        //exclude: ["*.test.js"],
+        exclude: ["*.html", "*.css"],
         // Root directory (optional)
         root: __dirname,
       }),
