@@ -1,5 +1,7 @@
 # webofneeds
 
+Finding and cooperating with people. Protocol, not platform. Decentralized. Linked Data. Open Source.
+
 [![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This software is for people who need something, have something to offer, want to discuss something etc. - in short: who wish to connect with others for some reason.
