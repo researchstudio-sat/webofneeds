@@ -1,34 +1,31 @@
 import angular from "angular";
-import {
-  attach,
-  //delay,
-  extractHashtags,
-  mergeAsSet,
-} from "../utils.js";
-import {
-  //doneTypingBufferNg,
-  DomCache,
-} from "../cstm-ng-utils.js";
+import { attach, extractHashtags } from "../utils.js";
+import { DomCache } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element", "$sce"];
 function genComponentConf() {
   let template = `
-    <div class="cis__addDetail__header tags" ng-click="self.resetTags()">
-      <svg class="cis__circleicon">
-        <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
-      </svg>
-      Remove All Tags
+      <!-- TAGS INPUT -->
+      <div class="tp__input">
+        <input 
+          class="tp__input__inner"
+          type="text"
+          placeholder="e.g. #couch #free"
+          ng-keyup="::self.updateTags()"
+          ng-class="{'tp__input__inner--withreset' : self.showResetButton}"
+        />
+        <svg class="tp__input__icon clickable" 
+          style="--local-primary:var(--won-primary-color);"
+          ng-if="self.showResetButton"
+          ng-click="self.resetTags()">
+          <use xlink:href="#ico36_close" href="#ico36_close"></use>
+        </svg>
       </div>
+
+      <!-- LIST OF ADDED TAGS -->
       <div class="tp__taglist">
         <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">#{{tag}}</span>
       </div>
-      <input class="tp__input"
-        placeholder="e.g. #couch #free" type="text"
-        ng-keyup="::self.doneTyping()"
-      />
-
-      <!-- ng-keyup="::self.updateTags()" -->
-      <!-- input type="text" class="tp__textbox" placeholder="e.g. #couch #free"/ -->
     `;
 
   class Controller {
@@ -38,54 +35,36 @@ function genComponentConf() {
 
       window.tp4dbg = this;
 
-      this.addedTags = this.initialTags || [];
-      console.log("initial tags: ", this.addedTags);
-
-      // doneTypingBufferNg(
-      //     e => this.doneTyping(e),
-      //     this.textfieldNg(), 1000
-      // );
+      this.addedTags = this.initialTags;
+      this.showResetButton = false;
     }
 
-    doneTyping() {
+    updateTags() {
       // TODO: do something with text that does not start with #
       const text = this.textfield().value;
 
-      if (!text || text.trim().length === 0) {
-        // do stuff
-      } else if (text.endsWith(" ")) {
-        this.addedTags = mergeAsSet(this.addedTags, extractHashtags(text));
+      if (text && text.trim().length > 0) {
+        this.addedTags = extractHashtags(text);
         this.onTagsUpdated({ tags: this.addedTags });
-        // do stuff
-        // if last character was a space, add tag
-        // if (text.endsWith(" ")) {
-        //   this.addTag(text.trim());
-        // }
+        this.showResetButton = true;
+      } else {
+        this.resetTags();
       }
-      console.log("TAGLIST: ", this.addedTags);
     }
 
-    // addTag(tag) {
-    //   // TODO: check for duplicates
-    //   this.addedTags.push(tag);
-    //   console.log("TAGLIST: ", this.addedTags);
-    //   //this.onTagsUpdated({tags: this.addedTags});
-    // }
-
     resetTags() {
-      this.addedTags = [];
+      this.addedTags = undefined;
       this.textfield().value = "";
-      console.log("TAGLIST: ", this.addedTags);
       this.onTagsUpdated({ tags: this.addedTags });
-      //this.onTagsUpdated({tags: this.addedTags});
+      this.showResetButton = false;
     }
 
     textfieldNg() {
-      return this.domCache.ng(".tp__input");
+      return this.domCache.ng(".tp__input__inner");
     }
 
     textfield() {
-      return this.domCache.dom(".tp__input");
+      return this.domCache.dom(".tp__input__inner");
     }
   }
   Controller.$inject = serviceDependencies;

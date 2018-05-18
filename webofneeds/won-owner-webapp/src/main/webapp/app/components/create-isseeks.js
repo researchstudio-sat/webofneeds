@@ -20,6 +20,18 @@ const emptyDraft = deepFreeze({
   matchingContext: undefined,
 });
 
+// const availableDetails = {
+//   description: {},
+//   location : {
+//     detailName: "location",
+//     detailTitle: "Location",
+//     detailIcon: "ico36_location_circle",
+//     detailComponent: "won-location-picker",
+//   },
+//   tags: {},
+//   ttl: {},
+// };
+
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
@@ -68,6 +80,7 @@ function genComponentConf() {
                         <span>Description</span>
                 </div>
 
+                
                 <!-- LOCATION PICKER -->
                 <div class="cis__detail__items__item location"
                     ng-click="self.toggleOpenDetail('location')"
@@ -209,8 +222,6 @@ function genComponentConf() {
       this.draftObject = clone(emptyDraft);
       this.details = new Set(); // remove all detail-cards
 
-      //this.resetTags();
-
       this.showDetail = false; // and close selector
     }
 
@@ -233,21 +244,13 @@ function genComponentConf() {
     }
 
     setDraft(updatedDraft) {
-      // if (
-      //   updatedDraft &&
-      //   updatedDraft.tags &&
-      //   updatedDraft.tags.length > 0 &&
-      //   !this.details.has("tags")
-      // ) {
-      //   this.details.add("tags");
-      // }
-      // TODO: tags get deleted if draft is changed, why???
-      // this.textAreaTags = updatedDraft.tags;
-      // delete updatedDraft.tags; // so they don't overwrite anything when `Object.assign`ing below
-      // this.updateTags();
-      // TODO: what does mergeTags do???
-      // updatedDraft.tags = this.mergeTags();
       Object.assign(this.draftObject, updatedDraft);
+      this.updateDraft();
+    }
+
+    updateTitle() {
+      const titleString = (this.titleInput() || {}).value || "";
+      this.draftObject.title = titleString;
       this.updateDraft();
     }
 
