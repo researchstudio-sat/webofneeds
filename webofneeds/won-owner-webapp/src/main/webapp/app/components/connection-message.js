@@ -26,7 +26,7 @@ function genComponentConf() {
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
-            ng-show="!self.message.get('outgoingMessage')"><!-- TODO: MAKE THIS LINK WORK FOR SPECIFIC POST.JS/HTML usage too if the view will still exist then -->
+            ng-show="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__center"
                 ng-class="{'won-cm__center--nondisplayable': !self.text}"
@@ -42,8 +42,8 @@ function genComponentConf() {
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
                 	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
                 	<span ng-show="self.message.get('isRejectMessage')"><h3>Reject</h3></span>
-                        {{ self.text? self.text : self.noTextPlaceholder }}
-                         <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
+                        <span class="won-cm__center__bubble__text__message--prewrap">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                        <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
 	                                ng-click="self.showDetail = !self.showDetail"
 	                                ng-if="self.allowProposals"
@@ -79,13 +79,11 @@ function genComponentConf() {
                         <div
                             class="won-cm__center__trig"
                             ng-show="self.contentGraphTrigPrefixes">
-<!-- no intendation here, so it renders correctly -->
-<code ng-show="!self.showTrigPrefixes">@prefix ...</code>
-<code ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code>
+                                <code class="won-cm__center__trig__prefixes--prewrap" ng-show="!self.showTrigPrefixes">@prefix ...</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                                <code class="won-cm__center__trig__prefixes--prewrap" ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                         </div>
                         <div class="won-cm__center__trig">
-<!-- no intendation here, so it renders correctly -->
-<code>{{ self.contentGraphTrig }}</code>
+                            <code class="won-cm__center__trig__contentgraph--prewrap">{{ self.contentGraphTrig }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                         </div>
                     </div>
 
