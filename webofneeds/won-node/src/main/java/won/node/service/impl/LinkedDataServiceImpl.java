@@ -265,7 +265,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     while(namesIt.hasNext()) {
     	String name = namesIt.next();
     	Resource needGraphResource = metaModel.getResource(name);
-    	needMetaInformationResource.addProperty(WON.HAS_CONTENT, needGraphResource);
+    	needResource.addProperty(WON.HAS_CONTENT_GRAPH, needGraphResource);
     }
     
     // add meta model to dataset
