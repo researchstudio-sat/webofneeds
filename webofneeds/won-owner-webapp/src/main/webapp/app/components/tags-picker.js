@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay } from "../utils.js";
+import { attach, delay, extractHashtags, mergeAsSet } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { doneTypingBufferNg, DomCache } from "../cstm-ng-utils.js";
 
@@ -19,9 +19,9 @@ function genComponentConf() {
         placeholder="e.g. #couch #free" type="text"
         ng-keyup="::self.doneTyping()"
       />
-      <!-- ng-keyup="::self.updateTags()" -->
 
-      <input type="text" class="tp__textbox" placeholder="e.g. #couch #free"/>
+      <!-- ng-keyup="::self.updateTags()" -->
+      <!-- input type="text" class="tp__textbox" placeholder="e.g. #couch #free"/ -->
     `;
 
   class Controller {
@@ -31,7 +31,8 @@ function genComponentConf() {
 
       window.tp4dbg = this;
 
-      this.addedTags = this.initialTags;
+      this.addedTags = this.initialTags || [];
+      console.log("initial tags: ", this.addedTags);
 
       // doneTypingBufferNg(
       //     e => this.doneTyping(e),
@@ -40,29 +41,35 @@ function genComponentConf() {
     }
 
     doneTyping() {
+      // TODO: do something with text that does not start with #
       const text = this.textfield().value;
 
       if (!text || text.trim().length === 0) {
         // do stuff
-      } else {
+      } else if (text.endsWith(" ")) {
+        this.addedTags = mergeAsSet(this.addedTags, extractHashtags(text));
+        this.onTagsUpdated({ tags: this.addedTags });
         // do stuff
         // if last character was a space, add tag
-        if (text.endsWith(" ")) {
-          this.addTag(text.trim());
-        }
+        // if (text.endsWith(" ")) {
+        //   this.addTag(text.trim());
+        // }
       }
+      console.log("TAGLIST: ", this.addedTags);
     }
 
-    addTag(tag) {
-      // TODO: check for duplicates
-      this.addedTags.push(tag);
-      console.log("TAGLIST: ", this.addedTags);
-      //this.onTagsUpdated({tags: this.addedTags});
-    }
+    // addTag(tag) {
+    //   // TODO: check for duplicates
+    //   this.addedTags.push(tag);
+    //   console.log("TAGLIST: ", this.addedTags);
+    //   //this.onTagsUpdated({tags: this.addedTags});
+    // }
 
     resetTags() {
       this.addedTags = [];
+      this.textfield().value = "";
       console.log("TAGLIST: ", this.addedTags);
+      this.onTagsUpdated({ tags: this.addedTags });
       //this.onTagsUpdated({tags: this.addedTags});
     }
 
