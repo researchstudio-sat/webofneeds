@@ -11,7 +11,8 @@ module.exports = {
     ecmaVersion: 2017,
   },
   rules: {
-    "no-console": "warn",
+    //Deactivating console errors
+    "no-console": 0,
     "no-var": "error",
     "no-restricted-syntax": [
       "warn",

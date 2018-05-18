@@ -31,8 +31,8 @@ export function isUriRead(uri) {
   if (readUrisString) {
     let readUriList = JSON.parse(readUrisString);
 
-    for (let i = 0; i < readUriList.length; i++) {
-      if (readUriList[i] === uri) {
+    for (const readUri of readUriList) {
+      if (readUri === uri) {
         return true;
       }
     }

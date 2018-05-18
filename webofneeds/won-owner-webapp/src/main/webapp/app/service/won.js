@@ -389,8 +389,8 @@ won.clone = function(obj) {
 
 won.merge = function(/*args...*/) {
   const o = {};
-  for (let i = 0; i < arguments.length; i++) {
-    won.mergeIntoLast(arguments[i], o);
+  for (const argument of arguments) {
+    won.mergeIntoLast(argument, o);
   }
   return o;
 };
@@ -406,9 +406,9 @@ won.merge = function(/*args...*/) {
      */
 won.mergeIntoLast = function(/*args...*/) {
   let obj1;
-  for (let i = 0; i < arguments.length - 1; i++) {
+  for (const argument of arguments) {
     obj1 = arguments[arguments.length - 1];
-    const obj2 = arguments[i];
+    const obj2 = argument;
     for (const p in obj2) {
       try {
         // Property in destination object set; update its value.
@@ -577,13 +577,7 @@ won.replaceRegExp = function(string) {
  * @param test
  */
 won.deleteWhere = function(array, test) {
-  for (let i = 0; i < array.length; i++) {
-    if (test(array[i])) {
-      array.splice(i, 1);
-      i--;
-    }
-  }
-  return array;
+  array.filter(entry => !test(entry));
 };
 
 won.containsAll = function(array, subArray) {
@@ -652,8 +646,8 @@ won.appendStrippingDuplicates = function(array1, array2, comparatorFun) {
     };
   array2
     .filter(function(item) {
-      for (let i = 0; i < array1.length; i++) {
-        if (comparatorFun(item, array1[i]) == 0) {
+      for (const entry of array1) {
+        if (comparatorFun(item, entry) == 0) {
           return false;
         }
       }
@@ -724,8 +718,8 @@ won.JsonLdHelper = {
       return graphURIs;
     }
     if (won.isArray(graphs) && graphs.length > 0) {
-      for (let i = 0; i < graphs.length; i++) {
-        const graphURI = graphs[i]["@id"];
+      for (const graph of graphs) {
+        const graphURI = graph["@id"];
         if (graphURI != null) {
           graphURIs.push(graphURI);
         }
@@ -748,8 +742,7 @@ won.JsonLdHelper = {
       //if the first node doesn't contain an @graph keyword, we assume that there
       //are no named graphs and all data is in the default graph.
       let outermostGraphContent = data["@graph"];
-      for (let i = 0; i < outermostGraphContent.length; i++) {
-        const curNode = outermostGraphContent[i];
+      for (const curNode of outermostGraphContent) {
         if (curNode["@graph"] == null) {
           //we assume there are no named graphs, the outermost graph is the default graph
           return outermostGraphContent;
@@ -775,8 +768,7 @@ won.JsonLdHelper = {
         //outermost node has '@graph' but no '@id'
         //--> @graph array contains named graphs. search for name.
         let outermostGraphContent = data["@graph"];
-        for (let i = 0; i < outermostGraphContent.length; i++) {
-          const curNode = outermostGraphContent[i];
+        for (const curNode of outermostGraphContent) {
           if (curNode["@id"] == null || curNode["@id"] === graphName) {
             //we've found the named graph without an @id attribute - that's the default graph
             return curNode["@graph"];
@@ -827,8 +819,8 @@ won.addContentGraphReferencesToMessageGraph = function(
         !isArray(existingContentRefs)
           ? []
           : existingContentRefs;
-      for (let i = 0; i < graphURIs.length; i++) {
-        contentGraphURIs.push({ "@id": graphURIs[i] });
+      for (const graphURI of graphURIs) {
+        contentGraphURIs.push({ "@id": graphURI });
       }
       messageGraph["@graph"][0][
         won.WONMSG.hasContentCompacted

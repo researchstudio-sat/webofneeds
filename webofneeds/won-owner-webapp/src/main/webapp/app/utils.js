@@ -30,8 +30,13 @@ window.firstToLowerCase = firstToLowerCase;
  * @param attachments array of objects/values
  */
 export function attach(target, names, attachments) {
-  for (let i = 0; i < names.length && i < attachments.length; i++) {
-    target[names[i]] = attachments[i];
+  const pairs = zipWith(
+    (name, attachment) => [name, attachment],
+    names,
+    attachments
+  );
+  for (const [name, attachment] of pairs) {
+    target[name] = attachment;
   }
 }
 
@@ -261,18 +266,23 @@ export function getRandomString(
   length,
   chars = "abcdefghijklmnopqrstuvwxyz0123456789"
 ) {
-  const buff = new Array(length);
-  for (let i = 0; i < buff.length; i++) {
-    buff[i] = chars[Math.floor(Math.random() * chars.length)];
-  }
-  return buff.join("");
+  const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
+  return Array.from(
+    {
+      length: length,
+    },
+    randomChar
+  ).join("");
 }
+
 export function getRandomPosInt() {
   return getRandomInt(1, 9223372036854775807);
 }
+
 export function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 export function isString(o) {
   return (
     typeof o == "string" || (typeof o == "object" && o.constructor === String)
@@ -310,74 +320,6 @@ export function readAsDataURL(file) {
 
     reader.readAsDataURL(file);
   });
-}
-
-export function concatTags(tags) {
-  if (tags.length > 0) {
-    let concTags = "";
-    for (let i = 0; i < tags.length; i++) {
-      if (i == 0) {
-        concTags = tags[i].text;
-      } else {
-        concTags = concTags + "," + tags[i].text;
-      }
-    }
-    return concTags;
-  }
-}
-
-// This scrolling function
-// is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
-export function scrollTo(eID) {
-  const startY = currentYPosition();
-  const stopY = elmYPosition(eID);
-  const distance = stopY > startY ? stopY - startY : startY - stopY;
-  if (distance < 100) {
-    scrollTo(0, stopY);
-    return;
-  }
-  let speed = Math.round(distance / 100);
-  if (speed >= 20) speed = 20;
-  const step = Math.round(distance / 25);
-  let leapY = stopY > startY ? startY + step : startY - step;
-  let timer = 0;
-  if (stopY > startY) {
-    for (let i = startY; i < stopY; i += step) {
-      setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
-      leapY += step;
-      if (leapY > stopY) leapY = stopY;
-      timer++;
-    }
-    return;
-  }
-  for (let i = startY; i > stopY; i -= step) {
-    setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
-    leapY -= step;
-    if (leapY < stopY) leapY = stopY;
-    timer++;
-  }
-
-  function currentYPosition() {
-    // Firefox, Chrome, Opera, Safari
-    if (self.pageYOffset) return self.pageYOffset;
-    // Internet Explorer 6 - standards mode
-    if (document.documentElement && document.documentElement.scrollTop)
-      return document.documentElement.scrollTop;
-    // Internet Explorer 6, 7 and 8
-    if (document.body.scrollTop) return document.body.scrollTop;
-    return 0;
-  }
-
-  function elmYPosition(eID) {
-    const elm = document.getElementById(eID);
-    let y = elm.offsetTop;
-    let node = elm;
-    while (node.offsetParent && node.offsetParent != document.body) {
-      node = node.offsetParent;
-      y += node.offsetTop;
-    }
-    return y;
-  }
 }
 
 /**
@@ -506,11 +448,11 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
   return Promise.all(asyncLookups).then(dataObjects => {
     const lookupMap = {};
     //make sure there's the same
-    for (let i = 0; i < uris.length; i++) {
+    uris.forEach((uri, i) => {
       if (dataObjects[i]) {
-        lookupMap[uris[i]] = dataObjects[i];
+        lookupMap[uri] = dataObjects[i];
       }
-    }
+    });
     return lookupMap;
   });
 }
@@ -542,9 +484,9 @@ export function urisToLookupMapStrict(uris, asyncLookupFunction) {
   return Promise.all(asyncLookups).then(dataObjects => {
     const lookupMap = {};
     //make sure there's the same
-    for (let i = 0; i < uris.length; i++) {
-      lookupMap[uris[i]] = dataObjects[i];
-    }
+    uris.forEach((uri, i) => {
+      lookupMap[uri] = dataObjects[i];
+    });
     return lookupMap;
   });
 }
@@ -736,9 +678,7 @@ export function clone(obj) {
   // Handle Array
   if (obj instanceof Array) {
     copy = [];
-    for (let i = 0, len = obj.length; i < len; i++) {
-      copy[i] = clone(obj[i]);
-    }
+    obj.map(subobj => clone(subobj));
     return copy;
   }
 
@@ -831,11 +771,12 @@ export function contains(arr, el) {
  * @param ys
  */
 export function zipWith(f, xs, ys) {
-  const zs = new Array(Math.min(xs.length, ys.length));
-  for (let i = 0; i < xs.length && i < ys.length; i++) {
-    zs[i] = f(xs[i], ys[i]);
-  }
-  return zs;
+  return Array.from(
+    {
+      length: Math.min(xs.length, ys.length),
+    },
+    (_, i) => f(xs[i], ys[i])
+  );
 }
 
 export function all(boolArr) {
@@ -1164,8 +1105,8 @@ export function generateHexColor(text) {
   let hash = 0;
 
   if (text) {
-    for (let i = 0; i < text.length; i++) {
-      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    for (const char of text.split("")) {
+      hash = char.charCodeAt(0) + ((hash << 5) - hash);
     }
   }
 
