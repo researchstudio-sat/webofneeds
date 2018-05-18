@@ -33,6 +33,8 @@ import jsonld from "jsonld";
 import won from "./won.js";
 
 (function() {
+  const NEWLINE_REPLACEMENT_STRING = "#%§%#§";
+  const NEWLINE_REPLACEMENT_PATTERN = /#%§%#§/gm;
   /**
    * paging parameters as found
    * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
@@ -1478,7 +1480,10 @@ import won from "./won.js";
         case "NamedNode":
           return `<${x.nominalValue}>`;
         case "Literal":
-          return `"${x.nominalValue}"`;
+          return `"${x.nominalValue.replace(
+            /(\r\n|\n|\r)/gm,
+            NEWLINE_REPLACEMENT_STRING
+          )}"`; //TODO: REMOVE FUGLY FIX ONCE n3.js is not having issues with newlines anymore
         case "BlankNode":
           return x.nominalValue;
         default:
@@ -1804,7 +1809,12 @@ import won from "./won.js";
         } else {
           parsedJsonLd = parsedJsonLd[0];
         }
-        return parsedJsonLd;
+        let jsonLdString = JSON.stringify(parsedJsonLd).replace(
+          NEWLINE_REPLACEMENT_PATTERN,
+          "\\n"
+        );
+
+        return JSON.parse(jsonLdString); //TODO: REMOVE FUGLY FIX AND JUST RETURN parsedJsonLd ONCE n3.js is not having issues with newlines anymore
       })
     );
 
