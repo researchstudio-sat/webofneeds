@@ -31,10 +31,7 @@ function genComponentConf() {
                 ng-show="self.isPart.is.get('description')">
                 Description
             </h2>
-            <p class="post-info__details"
-                ng-show="self.isPart.is.get('description')">
-                {{ self.isPart.is.get('description')}}
-            </p>
+            <p class="post-info__details--prewrap" ng-show="self.isPart.is.get('description')">{{ self.isPart.is.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
 
             <h2 class="post-info__heading"
                 ng-show="self.isPart.is.get('tags')">

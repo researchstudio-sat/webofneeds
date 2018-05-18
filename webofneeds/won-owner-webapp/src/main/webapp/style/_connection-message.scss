@@ -65,6 +65,9 @@ won-connection-message {
         border: $thinDarkBorder;
         background: $won-light-gray;
       }
+      &__text__message--prewrap {
+        white-space: pre-wrap;
+      }
     }
     &.won-cm__center--nondisplayable {
       // hsla(57, 100%, 95%, 1);
@@ -81,7 +84,16 @@ won-connection-message {
     }
     &__trig {
       max-width: 100%;
-      white-space: pre-wrap;
+      &__prefixes {
+        display: inline-block;
+        padding-bottom: 1rem;
+        &--prewrap {
+          white-space: pre-wrap;
+        }
+      }
+      &__contentgraph--prewrap {
+        white-space: pre-wrap;
+      }
     }
     &__button {
       padding: 0.5rem;

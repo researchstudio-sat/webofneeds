@@ -71,6 +71,12 @@ won-post-info {
     won-post-is-info,
     won-post-seeks-info {
       padding: 1rem 0;
+
+      .post-info__details {
+        &--prewrap {
+          white-space: pre-wrap;
+        }
+      }
     }
 
     won-need-map {
