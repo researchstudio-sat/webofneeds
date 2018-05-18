@@ -1,36 +1,50 @@
-@import "won";
+@import "won-config";
+@import "textfield";
 
 won-tags-picker {
   .tp__input {
-    border-width: $thinBorderWidth;
-    border-style: solid;
-    border-radius: 0.1rem;
-    background-color: white;
+    position: relative;
 
-    font-size: $normalFontSize;
-    min-height: $formInputHeight;
+    .tp__input__icon {
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
 
-    $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
-      $thinBorderWidth;
-    padding: $verticalPadding 0.438rem;
+    .tp__input__inner {
+      border: $thinGrayBorder;
+      box-sizing: border-box;
+      font-size: $normalFontSize;
+      min-height: $formInputHeight;
+      min-width: 0; // so a size is specified and break-word works
+      width: 100%;
+      word-wrap: break-word;
 
-    box-sizing: border-box;
+      $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
+        $thinBorderWidth;
+      padding: $verticalPadding 0.438rem;
 
-    min-width: 0; // so a size is specified and break-word works
-    word-wrap: break-word;
+      &--withreset {
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+    }
 
-    border-color: $won-line-gray;
-
-    width: 100%;
+    .tp__input__inner::-ms-clear {
+      width: 0;
+      height: 0;
+    }
   }
 
-  .tp__tagslist {
+  .tp__taglist {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
 
-    .__taglist__tag {
+    .tp__taglist__tag {
       border-radius: 0.5rem;
       background: $won-primary-color;
       color: white;
