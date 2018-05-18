@@ -1,7 +1,14 @@
 import angular from "angular";
-import { attach, delay, extractHashtags, mergeAsSet } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { doneTypingBufferNg, DomCache } from "../cstm-ng-utils.js";
+import {
+  attach,
+  //delay,
+  extractHashtags,
+  mergeAsSet,
+} from "../utils.js";
+import {
+  //doneTypingBufferNg,
+  DomCache,
+} from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element", "$sce"];
 function genComponentConf() {

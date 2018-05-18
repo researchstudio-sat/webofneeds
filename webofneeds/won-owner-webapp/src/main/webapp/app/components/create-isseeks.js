@@ -6,14 +6,7 @@ import angular from "angular";
 import "ng-redux";
 import won from "../won-es6.js";
 import { postTitleCharacterLimit } from "config";
-import {
-  attach,
-  deepFreeze,
-  clone,
-  dispatchEvent,
-  mergeAsSet,
-  extractHashtags,
-} from "../utils.js";
+import { attach, deepFreeze, clone, dispatchEvent } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
