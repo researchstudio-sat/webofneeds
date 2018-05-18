@@ -240,26 +240,23 @@ import won from "./won.js";
         //console.log("linkeddata-service-won.js: rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
         //there are blocked updaters. let them proceed.
         this.updateInProgress = true;
-        for (let i = 0; i < this.blockedUpdaters.length; i++) {
-          const deferredUpdate = this.blockedUpdaters[i];
-          this.activeUpdaterCount++;
-          deferredUpdate.resolve();
-          this.blockedUpdaters.splice(i, 1);
-          i--; //TODO looks fishy. Find cleaner implementation using iterators or high-order functions (e.g. forEach)
+
+        this.activeUpdaterCount += this.blockedUpdaters.length;
+        for (const promise of this.blockedUpdaters) {
+          promise.resolve();
         }
+        this.blockedUpdaters = [];
       }
     },
     grantLockToReaders: function() {
       if (this.blockedReaders.length > 0) {
         //console.log("linkeddata-service-won.js: rul:readers:all: " + this.uri + " " + this.getLockStatusString());
         //there are blocked readers. let them proceed.
-        for (let i = 0; i < this.blockedReaders.length; i++) {
-          const deferredRead = this.blockedReaders[i];
-          this.activeReaderCount++;
-          deferredRead.resolve();
-          this.blockedReaders.splice(i, 1);
-          i--; //TODO looks fishy. Find cleaner implementation using iterators or high-order functions (e.g. forEach)
+        this.activeReaderCount += this.blockedReaders.length;
+        for (const promise of this.blockedReaders) {
+          promise.resolve();
         }
+        this.blockedReaders = [];
       }
     },
   };
@@ -1230,14 +1227,14 @@ import won from "./won.js";
     );
     const resultGraphP = tmpResultP.then(tmpResult => {
       try {
-        let dataGraph = dropUnnecessaryTriples(store, tmpResult, tree.roots);
-        let resultGraph = new store.rdf.api.Graph();
-        for (let i = 0; i < tree.roots.length; i++) {
-          let subResult = loadStarshapedGraph_internal(
+        const dataGraph = dropUnnecessaryTriples(store, tmpResult, tree.roots);
+        const resultGraph = new store.rdf.api.Graph();
+        for (const root of tree.roots) {
+          const subResult = loadStarshapedGraph_internal(
             store,
             dataGraph,
             startNode,
-            tree.roots[i]
+            root
           );
           resultGraph.addAll(subResult);
         }
@@ -1338,10 +1335,8 @@ import won from "./won.js";
     let subtreeStartNodes = pathResult.leafNodes;
     if (tree.hasOwnProperty("children")) {
       let children = tree.children;
-      for (let i = 0; i < children.length; i++) {
-        let child = children[i];
-        for (let j = 0; j < subtreeStartNodes.length; j++) {
-          let subtreeStartNode = subtreeStartNodes[j];
+      for (const child of children) {
+        for (const subtreeStartNode of subtreeStartNodes) {
           let subResult = loadStarshapedGraph_internal(
             store,
             dropUnnecessaryTriples(store, dataGraph, child),
@@ -1377,8 +1372,7 @@ import won from "./won.js";
     } else {
       let resultGraph = new store.rdf.api.Graph();
       let resultLeafNodes = [];
-      for (let i = 0; i < localLeafNodes.length; i++) {
-        let newStartNode = localLeafNodes[i];
+      for (const newStartNode of localLeafNodes) {
         let newPath = path.splice(1, path.length - 1);
         let subResult = loadGraphForPath(store, newStartNode, newPath);
         resultGraph.addAll(subResult.graph);

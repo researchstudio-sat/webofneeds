@@ -249,9 +249,7 @@ function genComponentConf() {
           seeks: this.draftObject.seeks,
         };
 
-        for (let i = 0; i < 2; i++) {
-          const tmp = tmpList[i];
-
+        for (const tmp of tmpList) {
           if (this.tempMatchingContext.length > 0) {
             newObject[tmp].matchingContext = this.tempMatchingContext;
           }

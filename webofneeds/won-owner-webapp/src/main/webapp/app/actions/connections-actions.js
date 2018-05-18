@@ -519,10 +519,10 @@ export function addAgreementDataToSate(
 
         //Dont load in state again!
         let found = false;
-        for (let i = 0; i < chatMessages.size; i++) {
-          console.log("ChatMessage: " + i, chatMessages[i]);
+        for (const chatMessage of chatMessages) {
+          console.log("ChatMessage: ", chatMessage);
           console.log("ChatMessageSize: ", chatMessages.size);
-          if (agreementObject.stateUri === chatMessages[i].get("uri")) {
+          if (agreementObject.stateUri === chatMessage.get("uri")) {
             found = true;
           }
         }

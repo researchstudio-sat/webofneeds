@@ -292,15 +292,13 @@ export function runMessagingAgent(redux) {
       let messageProcessed = false;
 
       //process message
-      for (let i = 0; i < messageProcessingArray.length; i++) {
-        messageProcessed =
-          messageProcessed || messageProcessingArray[i](message);
+      for (const messageProcessor of messageProcessingArray) {
+        messageProcessed = messageProcessed || messageProcessor(message);
       }
 
       //post-process message
-      //TODO emit warning for this pratice
-      for (let i = 0; i < messagePostProcessingArray.length; i++) {
-        messagePostProcessingArray[i](message);
+      for (const messagePostprocessor of messagePostProcessingArray) {
+        messagePostprocessor(message);
       }
 
       if (!messageProcessed) {
