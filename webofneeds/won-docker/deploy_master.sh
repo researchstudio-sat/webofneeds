@@ -47,7 +47,7 @@ scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf root@satvm02:$ba
 
 # copy letsencrypt certificate files from satvm01 (live/matchat) to satvm02
 ssh root@satvm02 mkdir -p $base_folder/letsencrypt/certs/live/matchat.org
-scp -3 root@satvm01:$live_base_folder/letsencrypt/certs/live/matchat.org/* root@satvm02:$base_folder/letsencrypt/certs/live/matchat.org/
+scp -3 won@satvm01:$live_base_folder/letsencrypt/certs/live/matchat.org/* root@satvm02:$base_folder/letsencrypt/certs/live/matchat.org/
 
 # TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
 echo run docker containers using docker-compose on satvm02
