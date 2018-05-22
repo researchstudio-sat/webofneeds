@@ -38,7 +38,7 @@ function genComponentConf() {
     			ng-class="{'agreement' : 	!self.isNormalMessage()}">
                     <span class="won-cm__center__bubble__text">
                     <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
-                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Accept</h3></span>
+                	<span ng-show="self.message.get('isAcceptMessage')"><h3>{{ self.acceptText }}</h3></span>
                 	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
                 	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
                 	<span ng-show="self.message.get('isRejectMessage')"><h3>Reject</h3></span>
@@ -175,7 +175,7 @@ function genComponentConf() {
       this.relativeTime = relativeTime;
       this.clicked = false;
       this.showDetail = false;
-
+      this.acceptText = "Accept";
       window.cmsg4dbg = this;
 
       const self = this;
@@ -207,15 +207,30 @@ function genComponentConf() {
         if (
           chatMessages &&
           message &&
-          (message.get("isProposeMessage") || message.get("isProposeToCancel"))
+          (message.get("isProposeMessage") ||
+            message.get("isAcceptMessage") ||
+            message.get("isProposeToCancel"))
         ) {
           const clauses = message.get("clauses");
           //TODO: delete me
           //console.log("clauses: " + clauses);
 
-          //TODO: Array from clauses
-          //now just one message proposed at a time
-          text = this.getClausesText(chatMessages, message, clauses);
+          if (clauses) {
+            //TODO: Array from clauses
+            //now just one message proposed at a time
+            text = this.getClausesText(chatMessages, message, clauses);
+            if (message.get("isAcceptMessage")) {
+              for (const msg of chatMessages.toArray()) {
+                if (
+                  (msg.get("uri") === clauses ||
+                    msg.get("remoteUri") === clauses) &&
+                  msg.get("isProposeToCancel")
+                ) {
+                  this.acceptText = "Accept to Cancel";
+                }
+              }
+            }
+          }
         }
 
         return {

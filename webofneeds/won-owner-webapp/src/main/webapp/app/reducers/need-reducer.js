@@ -944,6 +944,22 @@ function parseMessage(wonMessage) {
     .join("\n")
     .trim();
 
+  let clauses = undefined;
+
+  if (
+    wonMessage.isProposeMessage() ||
+    wonMessage.isAcceptMessage() ||
+    wonMessage.isProposeToCancel()
+  ) {
+    if (wonMessage.isProposeMessage()) {
+      clauses = wonMessage.getProposedMessages();
+    } else if (wonMessage.isAcceptMessage()) {
+      clauses = wonMessage.getAcceptedMessages();
+    } else {
+      clauses = wonMessage.getProposedToCancelMessages();
+    }
+  }
+
   let parsedMessage = {
     belongsToUri: undefined,
     data: {
@@ -959,9 +975,7 @@ function parseMessage(wonMessage) {
         !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
       connectMessage: wonMessage.isConnectMessage(),
       //TODO: add all different types
-      clauses: wonMessage.isProposeMessage()
-        ? wonMessage.getProposedMessages()
-        : wonMessage.getProposedToCancelMessages(),
+      clauses: clauses,
       isProposeMessage: wonMessage.isProposeMessage(),
       isAcceptMessage: wonMessage.isAcceptMessage(),
       isProposeToCancel: wonMessage.isProposeToCancel(),
