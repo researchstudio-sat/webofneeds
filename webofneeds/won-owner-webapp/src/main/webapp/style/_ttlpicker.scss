@@ -18,14 +18,21 @@ won-ttl-picker {
       z-index: 1;
     }
 
-    // .ttlp__input__inner {
-    //   width: 100%;
-    //   min-width: 100%;
-    // }
+    .ttlp__input__inner {
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
   }
 
   .ttlp__parse-error {
     white-space: pre-wrap;
+    word-break: break-all;
     color: $won-primary-color;
     font-family: $font-family-monospace;
     font-size: $smallFontSize;

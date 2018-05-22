@@ -15,19 +15,28 @@ won-tags-picker {
 
     .tp__input__inner {
       border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+
       box-sizing: border-box;
-      font-size: $normalFontSize;
       min-height: $formInputHeight;
       min-width: 0; // so a size is specified and break-word works
       width: 100%;
+
       word-wrap: break-word;
 
-      $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
-        $thinBorderWidth;
-      padding: $verticalPadding 0.438rem;
-
       &--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
         padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
           0.438rem;
       }
