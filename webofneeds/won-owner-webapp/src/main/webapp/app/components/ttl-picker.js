@@ -57,7 +57,6 @@ function genComponentConf() {
 
       window.ttlp4dbg = this;
 
-      //this.textfield().value = this.initialTtl || "";
       this.ttlParseError = undefined;
       this.showResetButton = false;
 
