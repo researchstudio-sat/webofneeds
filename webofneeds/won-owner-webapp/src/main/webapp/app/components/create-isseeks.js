@@ -160,8 +160,8 @@ function genComponentConf() {
             <!-- TTL -->
             <won-ttl-picker
               ng-show="self.openDetail === 'ttl'"
-              initial-TTL="::self.draftObject.ttl"
-              on-ttl-updated="::self.updateTTL(TTL)">
+              initial-ttl="::self.draftObject.ttl"
+              on-ttl-updated="::self.updateTTL(ttl)">
             </won-ttl-picker>
         </div>
         <!-- /DETAILS/ -->
