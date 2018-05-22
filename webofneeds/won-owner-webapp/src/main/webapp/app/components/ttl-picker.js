@@ -57,9 +57,20 @@ function genComponentConf() {
 
       window.ttlp4dbg = this;
 
-      this.textfield().value = this.initialTtl || "";
+      //this.textfield().value = this.initialTtl || "";
       this.ttlParseError = undefined;
       this.showResetButton = false;
+
+      delay(0).then(() => this.showInitialTTL());
+    }
+
+    showInitialTTL() {
+      if (this.initialTtl && this.initialTtl.trim().length > 0) {
+        this.textfield().value = this.initialTtl || "";
+        this.showResetButton = true;
+      }
+
+      this.$scope.$apply();
     }
 
     updateTTLBuffered() {
