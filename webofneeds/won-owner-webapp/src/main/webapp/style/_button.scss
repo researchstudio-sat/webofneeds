@@ -3,7 +3,8 @@
   background: $bg_color;
   outline-color: $color;
 
-  &:active, &:hover {
+  &:active,
+  &:hover {
     filter: brightness(85%);
   }
   &:disabled {
@@ -24,9 +25,10 @@
     //outline: 0; // supress blue outline in chrome
   }
 
-  &:active, &:hover {
+  &:active,
+  &:hover {
     // background: rgba(255, 255, 255, 0.15);
-    background: rgba(white, 0.50);
+    background: rgba(white, 0.5);
   }
   &:disabled {
     /*Default disabled colors, can be changed or extracted will be used
@@ -54,7 +56,6 @@
   @include won-button();
 }
 
-
 @mixin won-button--outlined($color: "") {
   @include won-button;
 
@@ -70,26 +71,36 @@
   &.lighterblue { @include button-color(white, $won-secondary-color-lighter); }
   &.black { @include button-color(white, black); }
   */
-
 }
 .won-button--outlined {
   @include won-button--outlined;
 
-  &.white { @include outline-button-color(white); }
-  &.red { @include outline-button-color($won-primary-color); }
-  &.darkgray { @include outline-button-color($won-dark-gray); }
-  &.lighterblue { @include outline-button-color($won-secondary-color-lighter); }
-  &.black { @include outline-button-color(black); }
-
+  &.white {
+    @include outline-button-color(white);
+  }
+  &.red {
+    @include outline-button-color($won-primary-color);
+  }
+  &.darkgray {
+    @include outline-button-color($won-dark-gray);
+  }
+  &.lighterblue {
+    @include outline-button-color($won-secondary-color-lighter);
+  }
+  &.black {
+    @include outline-button-color(black);
+  }
 }
 
 /* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
 @mixin won-button--filled($color: "", $bgColor: "") {
   @include won-button;
 
-  @if $color != "" { @if $bgColor != "" {
-    @include flat-button-color($color, $bgColor);
-  }}
+  @if $color != "" {
+    @if $bgColor != "" {
+      @include flat-button-color($color, $bgColor);
+    }
+  }
 
   border: 0;
 
@@ -101,9 +112,16 @@
   @include won-button--filled;
 
   /*Button color definitions*/
-  &.red { @include flat-button-color(white,$won-primary-color); }
-  &.darkgray { @include flat-button-color(white, $won-dark-gray); }
-  &.lighterblue { @include flat-button-color(white, $won-secondary-color-lighter); }
-  &.black { @include flat-button-color(white, black); }
+  &.red {
+    @include flat-button-color(white, $won-primary-color);
+  }
+  &.darkgray {
+    @include flat-button-color(white, $won-dark-gray);
+  }
+  &.lighterblue {
+    @include flat-button-color(white, $won-secondary-color-lighter);
+  }
+  &.black {
+    @include flat-button-color(white, black);
+  }
 }
-

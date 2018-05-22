@@ -1,7 +1,7 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
 
 won-connection-indicators {
   display: flex;
@@ -25,11 +25,11 @@ won-connection-indicators {
       line-height: $iconSize;
       font-size: $smallFontSize;
       padding-left: 0.25em;
-      min-width: 2rem;
+      min-width: 1.5rem;
       color: black;
     }
   }
-  .mobile__indicator{
+  .mobile__indicator {
     line-height: $iconSize;
     font-size: $smallFontSize;
     padding-left: 0.5em;
@@ -43,7 +43,7 @@ won-connection-indicators {
       display: none;
     }
   }
-  @media (min-width: $responsivenessBreakPoint){
+  @media (min-width: $responsivenessBreakPoint) {
     .mobile__indicator {
       display: none;
     }

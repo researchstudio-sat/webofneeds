@@ -1,8 +1,6 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-
-
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
 
 .curtain {
   position: fixed;
@@ -20,9 +18,10 @@ main.about {
 
   & > div,
   & > section {
-    width: calc(100% - #{$minContentPadding} *2); //we do have to remove the 2rem padding for each subdiv otherwise we would have a horizontal scrollbar
-    //box-sizing: border-box did not work (the height property was faulty then
-
+    width: calc(
+      100% - #{$minContentPadding} * 2
+    ); //we do have to remove the 2rem padding for each subdiv otherwise we would have a horizontal scrollbar
+    // box-sizing: border-box did not work (the height property was faulty then
     padding-left: $minContentPadding;
     padding-right: $minContentPadding;
     padding-top: 7rem;
@@ -32,129 +31,109 @@ main.about {
       padding-bottom: 2rem;
     }
   }
-
   .fourimgs {
     margin-left: auto;
     margin-right: auto;
-
     $fourPortraitsWidth: 59rem;
     width: $fourPortraitsWidth;
-    @media(max-width: $fourPortraitsWidth) {
+    @media (max-width: $fourPortraitsWidth) {
       width: $fourPortraitsWidth / 2;
     }
-    @media(max-width: $responsivenessBreakPoint) {
+    @media (max-width: $responsivenessBreakPoint) {
       width: $fourPortraitsWidth / 4;
     }
-    @media(max-width: $fourPortraitsWidth / 2) {
+    @media (max-width: $fourPortraitsWidth / 2) {
       width: $fourPortraitsWidth / 4;
     }
   }
-
   .welcome {
-      background-color: $won-secondary-color;
-      color: white;
-      font-family: $font-family-sans-serif;
-
-      background-image: url('../images/network_left-upper-corner.svg'), url('../images/network_right-lower-corner.svg');
-      background-position: left top, right bottom;
-      background-repeat: no-repeat;
-
-      /*
-       * @ background-size:
+    background-color: $won-secondary-color;
+    color: white;
+    font-family: $font-family-sans-serif;
+    background-image: url("../images/network_left-upper-corner.svg"),
+      url("../images/network_right-lower-corner.svg");
+    background-position: left top, right bottom;
+    background-repeat: no-repeat;
+    /* * @ background-size:
        * values have been determined via fiddling/experimenting and should provide
        * a smooth transition with a relative size for the background up to a
-       * maximum size.
-       */
-      background-size: auto 70%, auto 100%;
-      @media(max-width: 85rem) {
-        background-size: auto 70%, 31.7% auto;
-      }
-      @media(max-width: 63rem) {
-        background-size: 60% auto, 31.7% auto;
-      }
-
-      .title{ color: white; }
-
-      .w__description {
-          margin: 0 auto;
-          max-width: 30rem;
-          text-align: center;
-          padding: 1rem;
-          font-size: $smallFontSize;
-          font-weight: 400;
-
-          .wd__title {
-            display: block;
-            color: $won-primary-color;
-            font-size: $normalFontSize;
-            border-top: $thinBorderWidth solid $won-dark-purple;
-            padding-top: 0.5rem;
-            max-width: 22rem;
-            margin: 0 auto;
-          }
-
-          .wd__text {
-            padding-top: 1rem;
-            padding-bottom: 0.5rem;
-            text-align: left;
-            display: block;
-          }
-
-          .wd__more {
-            color: $won-primary-color;
-          }
-
-          .wd__arrow {
-            display: block;
-            margin: 0 auto;
-            width: 1rem;
-          }
-      }
-  }
-
-  .howto {
-  }
-
-  .spitter-within-section {
-      width:15%;
-      margin-top:3rem;
-      margin-bottom:3rem;
-  }
-
-  .faq {
-      background-color: $won-lighter-gray;
-
-      won-accordion {
+       * maximum size. */
+    background-size: auto 70%, auto 100%;
+    @media (max-width: 85rem) {
+      background-size: auto 70%, 31.7% auto;
+    }
+    @media (max-width: 63rem) {
+      background-size: 60% auto, 31.7% auto;
+    }
+    .title {
+      color: white;
+    }
+    .w__description {
+      margin: 0 auto;
+      max-width: 30rem;
+      text-align: center;
+      padding: 1rem;
+      font-size: $smallFontSize;
+      font-weight: 400;
+      .wd__title {
         display: block;
-        max-width: 30rem;
+        color: $won-primary-color;
+        font-size: $normalFontSize;
+        border-top: $thinBorderWidth solid $won-dark-purple;
+        padding-top: 0.5rem;
+        max-width: 22rem;
         margin: 0 auto;
       }
+      .wd__text {
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+        text-align: left;
+        display: block;
+      }
+      .wd__more {
+        color: $won-primary-color;
+      }
+      .wd__arrow {
+        display: block;
+        margin: 0 auto;
+        width: 1rem;
+      }
+    }
   }
-
+  .howto {
+  }
+  .spitter-within-section {
+    width: 15%;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  .faq {
+    background-color: $won-lighter-gray;
+    won-accordion {
+      display: block;
+      max-width: 30rem;
+      margin: 0 auto;
+    }
+  }
   .title {
     text-align: center;
     font-size: $bigFontSize;
     padding-bottom: 2rem;
   }
-
   .imprint {
     background-color: $won-primary-color;
-
     .title {
       position: relative;
       z-index: 101;
       color: white;
     }
-
     .sub {
       font-size: $normalFontSize;
     }
-
     a {
-      text-decoration: none; 
+      text-decoration: none;
       color: white;
     }
-    
     p {
       margin-bottom: 1em;
     }

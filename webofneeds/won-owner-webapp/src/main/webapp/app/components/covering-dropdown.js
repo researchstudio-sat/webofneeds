@@ -2,19 +2,14 @@
  * Created by ksinger on 24.08.2017.
  */
 
+import angular from "angular";
+import { actionCreators } from "../actions/actions.js";
+import { attach } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
 
-import angular from 'angular';
-import Immutable from 'immutable';
-import won from '../won-es6.js';
-import { actionCreators }  from '../actions/actions.js';
-import { attach } from '../utils.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-
-const serviceDependencies = ['$scope', '$ngRedux', '$element'];
+const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
-    let template = `
+  let template = `
       <div
         ng-transclude="header"
         class="dd__open-button clickable"
@@ -38,51 +33,49 @@ function genComponentConf() {
       </div>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            const self = this;
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
 
-            const selectFromState = (state) => ({
-                showMainMenu: state.get('showMainMenu'),
-            });
+      const selectFromState = state => ({
+        showMainMenu: state.get("showMainMenu"),
+      });
 
-            connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, [], this);
 
-            const callback = (event) => {
-                const clickedElement = event.target;
-                //hide MainMenu if click was outside of the component and menu was open
-                if(this.showMainMenu && !this.$element[0].contains(clickedElement)) {
-                    this.hideMainMenuDisplay();
-                }
-            };
-
-            this.$scope.$on('$destroy', () => {
-                window.document.removeEventListener('click', callback);
-            });
-            
-            window.document.addEventListener('click', callback);
+      const callback = event => {
+        const clickedElement = event.target;
+        //hide MainMenu if click was outside of the component and menu was open
+        if (this.showMainMenu && !this.$element[0].contains(clickedElement)) {
+          this.hideMainMenuDisplay();
         }
-    }
-    Controller.$inject = serviceDependencies;
+      };
 
-    return {
-        restrict: 'E',
-        transclude: {
-            header: 'wonDdHeader',
-            menu: 'wonDdMenu',
-        },
+      this.$scope.$on("$destroy", () => {
+        window.document.removeEventListener("click", callback);
+      });
 
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        // //scope: { }, // not isolated on purpose to allow using parent's scope
-        scope: { },
-        template: template
+      window.document.addEventListener("click", callback);
     }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    transclude: {
+      header: "wonDdHeader",
+      menu: "wonDdMenu",
+    },
+
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    // //scope: { }, // not isolated on purpose to allow using parent's scope
+    scope: {},
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.coveringDropdown', [
-])
-    .directive('wonDropdown', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.coveringDropdown", [])
+  .directive("wonDropdown", genComponentConf).name;

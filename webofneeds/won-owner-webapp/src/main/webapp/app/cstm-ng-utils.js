@@ -3,7 +3,7 @@
  * Created by ksinger on 02.09.2015.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
 /**
  * Expects an object with a $scope and/or $element variable (e.g. a controller
@@ -14,15 +14,14 @@ import angular from 'angular';
  * @param eventData
  */
 export function broadcastEvent(scopeAndElem, eventName, eventData) {
-    const payload = {'detail': eventData};
-    if(scopeAndElem.$scope) {
-        //scopeAndElem.$scope.$broadcast(eventName, eventData);
-        scopeAndElem.$scope.$broadcast(eventName, payload);
+  const payload = { detail: eventData };
+  if (scopeAndElem.$scope) {
+    //scopeAndElem.$scope.$broadcast(eventName, eventData);
+    scopeAndElem.$scope.$broadcast(eventName, payload);
 
-        console.log('broadcasting');
-    }
+    console.log("broadcasting");
+  }
 }
-
 
 /**
  * Registers an input listener on the ngElement. The
@@ -32,32 +31,36 @@ export function broadcastEvent(scopeAndElem, eventName, eventData) {
  * @param ngElement
  * @param doneTypingInterval
  */
-export function doneTypingBufferNg(listenerCallback, ngElement, doneTypingInterval) {
-    let typingTimer;
-    ngElement.bind('input', e => {
-        if(typingTimer) {
-            clearTimeout(typingTimer);
-        }
-        typingTimer = setTimeout(() => listenerCallback(e), doneTypingInterval)
-    })
+export function doneTypingBufferNg(
+  listenerCallback,
+  ngElement,
+  doneTypingInterval
+) {
+  let typingTimer;
+  ngElement.bind("input", e => {
+    if (typingTimer) {
+      clearTimeout(typingTimer);
+    }
+    typingTimer = setTimeout(() => listenerCallback(e), doneTypingInterval);
+  });
 }
 
 /**
  * a class for caching dom-query results.
  */
 export class DomCache {
-    constructor($element) {
-        this._elementsNg = {};
-        this.$element = $element;
-    }
+  constructor($element) {
+    this._elementsNg = {};
+    this.$element = $element;
+  }
 
-    ng(selector){
-        return angular.element(this.dom(selector));
+  ng(selector) {
+    return angular.element(this.dom(selector));
+  }
+  dom(selector) {
+    if (!this._elementsNg[selector]) {
+      this._elementsNg[selector] = this.$element[0].querySelector(selector);
     }
-    dom(selector) {
-        if(!this._elementsNg[selector]) {
-            this._elementsNg[selector] = this.$element[0].querySelector(selector);
-        }
-        return this._elementsNg[selector];
-    }
+    return this._elementsNg[selector];
+  }
 }

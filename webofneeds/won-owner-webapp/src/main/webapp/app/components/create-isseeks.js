@@ -1,61 +1,52 @@
 /**
  * Created by ksinger on 24.08.2015.
  */
-;
+import angular from "angular";
 
-import angular from 'angular';
-
-import 'ng-redux';
-import won from '../won-es6.js';
+import "ng-redux";
+import won from "../won-es6.js";
+import { postTitleCharacterLimit } from "config";
 import {
-    postTitleCharacterLimit,
-} from 'config';
-import needTextfieldModule from './need-textfield.js';
-import imageDropzoneModule from './image-dropzone.js';
-import locationPickerModule from './location-picker.js';
-import {
-    getIn,
-    attach,
-    deepFreeze,
-    clone,
-    dispatchEvent,
-    is,
-    mergeAsSet,
-    extractHashtags,
-} from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import Immutable from 'immutable';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-
+  attach,
+  deepFreeze,
+  clone,
+  dispatchEvent,
+  mergeAsSet,
+  extractHashtags,
+} from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
 
 const emptyDraft = deepFreeze({
-    title: "", 
-    type: won.WON.BasicNeedTypeCombined, 
-    description: "",
-    tags: [], 
-    location: undefined, 
-    thumbnail: undefined, 
-    matchingContext: undefined
+  title: "",
+  type: won.WON.BasicNeedTypeCombined,
+  description: "",
+  tags: [],
+  location: undefined,
+  thumbnail: undefined,
+  matchingContext: undefined,
 });
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$ngRedux', '$scope', '$element'/*, '$routeParams' /*injections as strings here*/];
+const serviceDependencies = [
+  "$ngRedux",
+  "$scope",
+  "$element" /*, '$routeParams' /*injections as strings here*/,
+];
 
 function genComponentConf() {
-    const template = `
-        <!-- TEXTBOX -->
-        <div class="cis__mandatory-rest">
-            <!-- Remove image dropzone for now -->
-            <!--won-image-dropzone on-image-picked="::self.pickImage(image)">
-            </won-image-dropzone-->
-            <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
+  const template = `
+        <!-- Mandatory Input Fields -->
+        <div class="cis__mandatory">
+            <input
+                type="text"
+                maxlength="{{self.characterLimit}}"
+                class="cis__mandatory__title won-txt"
+                placeholder="What? - Short title shown in lists"
+                ng-blur="::self.updateTitle()"
+                ng-keyup="::self.updateTitle()"/>
         </div>
-        <div class="cis__textfield_instruction">
-            <span>Title (1st line) &crarr; Longer description. Supports #tags.</span>
-        </div>
-        <!-- /TEXTBOX/ -->
+        <!-- Mandatory Input Fields -->
 
         <!-- DETAILS Picker -->
         <div class="cis__addDetail">
@@ -71,6 +62,18 @@ function genComponentConf() {
                     </svg>
             </div>
             <div class="cis__detail__items" ng-if="self.showDetail" >
+                <!-- DESCRIPTION PICKER -->
+                <div class="cis__detail__items__item description"
+                    ng-click="self.toggleOpenDetail('description')"
+                    ng-class="{'picked' : self.openDetail === 'description'}">
+                        <svg class="cis__circleicon" ng-show="!self.details.has('description')">
+                            <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
+                        </svg>
+                        <svg class="cis__circleicon" ng-show="self.details.has('description')">
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                        </svg>
+                        <span>Description</span>
+                </div>
 
                 <!-- LOCATION PICKER -->
                 <div class="cis__detail__items__item location"
@@ -116,23 +119,35 @@ function genComponentConf() {
         <!-- DETAILS -->
         <!-- TODO: move details into the div opened by the detail picker? -->
         <div class="cis__details" ng-if="self.showDetail">
+            <!-- DESCRIPTION -->
+            <div class="cis__description" ng-if="self.openDetail === 'description'">
+                <div class="cis__addDetail__header description" ng-click="self.details.delete('description') && self.updateDraft()">
+                    <svg class="cis__circleicon">
+                        <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
+                    </svg>
+                    <span class="nonHover">Description</span>
+                    <span class="hover">Remove Description</span>
+                </div>
+                <textarea
+                        won-textarea-autogrow
+                        class="cis__description__text won-txt"
+                        ng-blur="::self.updateDescription()"
+                        ng-keyup="::self.updateDescription()"
+                        placeholder="Enter Description..."></textarea>
+            </div>
 
             <!-- LOCATION -->
-            <div class="cis__location"  ng-if="self.openDetail === 'location'">
-                <div class="cis__addDetail__header location">
-                    <svg class="cis__circleicon">
-                        <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
-                    </svg>
-                    <span>Location</span>
-                </div>
-                <won-location-picker class="seeksPicker"
-                    initial-location="::self.draftObject.location"
-                    on-location-picked="::self.updateLocation(location)">
-                </won-location-picker>
-            </div>
+            <won-location-picker
+                ng-if="self.openDetail === 'location'"
+                initial-location="::self.draftObject.location"
+                on-location-picked="::self.updateLocation(location)">
+            </won-location-picker>
 
             <!-- TAGS -->
              <div class="cis__tags" ng-if="self.openDetail === 'tags'">
+                <!-- TODO: remove title and move resetTags() to a new button -->
+                <!-- TODO: make tags individually deletable? -->
+                <!-- TODO: add # to tag text -->
                 <div class="cis__addDetail__header tags" ng-click="self.resetTags() && self.updateDraft()">
                     <svg class="cis__circleicon nonHover">
                         <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
@@ -144,7 +159,7 @@ function genComponentConf() {
                     <span class="hover">Remove Tags</span>
                 </div>
                 <div class="cis__taglist">
-                    <span class="cis__taglist__tag" ng-repeat="tag in self.draftObject.tags">{{tag}}</span>
+                    <span class="cis__taglist__tag" ng-repeat="tag in self.draftObject.tags">#{{tag}}</span>
                 </div>
                 <input class="cis__tags__input"
                     placeholder="e.g. #couch #free" type="text"
@@ -188,201 +203,237 @@ function genComponentConf() {
         </div>
         <!-- /DETAILS/ -->
 `;
-    
-    class Controller {
-        constructor(/* arguments <- serviceDependencies */) {
-            attach(this, serviceDependencies, arguments);
-            this.won = won;
 
-            //TODO debug; deleteme
-            window.cis4dbg = this;
+  class Controller {
+    constructor(/* arguments <- serviceDependencies */) {
+      attach(this, serviceDependencies, arguments);
+      this.won = won;
 
-            this.characterLimit = postTitleCharacterLimit;
-           
-            this.openDetail = undefined;
-            
-            this.reset();
-            
-            const selectFromState = (state) => {
- 
-                return {
-                   
-                }
-            };
+      //TODO debug; deleteme
+      window.cis4dbg = this;
 
-            // Using actionCreators like this means that every action defined there is available in the template.
-            connect2Redux(selectFromState, actionCreators, [], this);
-        }
+      this.characterLimit = postTitleCharacterLimit;
 
-        reset(){
-            this.draftObject = clone(emptyDraft);
-            this.details = new Set(); // remove all detail-cards
+      this.openDetail = undefined;
 
-            this.resetTags();
+      this.reset();
 
-            this.showDetail = false; // and close selector
-        }
-        
-        updateDraft(){
-            if(!this.details.has("tags")){
-                this.draftObject.tags = undefined;
-            }
-            if(!this.details.has("location")){
-                this.draftObject.location = undefined;
-            }
-            if(!this.details.has("ttl")){
-                this.draftObject.ttl = undefined;
-            }
-            
-            this.onUpdate({draft: this.draftObject});
-            dispatchEvent(this.$element[0], 'update', {draft: this.draftObject});
-        }
-        
-        setDraft(updatedDraft) {       	
-            if(updatedDraft && updatedDraft.tags && updatedDraft.tags.length > 0 && !this.details.has("tags")){
-                this.details.add("tags");
-            }
+      const selectFromState = () => ({});
 
-            this.textAreaTags = updatedDraft.tags;
-            delete updatedDraft.tags; // so they don't overwrite anything when `Object.assign`ing below
-            this.updateTags();
-
-            // updatedDraft.tags = this.mergeTags();
-            Object.assign(this.draftObject, updatedDraft);
-            this.updateDraft();
-        }
-
-        resetTags(){
-            this.tagsString = "";
-            this.textAreaTags = "";
-            this.draftObject.tags = [];
-
-            this.details.delete('tags'); // remove card
-        }
-
-        updateTags() {
-            const tagsInputString = (this.tagsInput() || {}).value;
-            this.draftObject.tags = mergeAsSet(
-                (this.textAreaTags || []), 
-                extractHashtags(tagsInputString)
-            );
-            
-            if(tagsInputString && !this.details.has("tags")){ 
-                this.details.add("tags");
-            }
-        }
-
-        updateTTLBuffered() {
-            if(this._ttlUpdateTimeoutId) {
-                clearTimeout(this._ttlUpdateTimeoutId);
-            }
-            this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
-        }
-        updateTTL() {
-            //await won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + $0.value)
-            const ttlString = ((this.ttlInput() || {}).value || "");
-
-            this.draftObject.ttl = ttlString;
-
-            won.ttlToJsonLd(ttlString)
-            .then(parsedJsonLd => {
-                this.$scope.$apply(() => this.ttlParseError = "");
-                return parsedJsonLd;
-            })
-            .catch(parseError => {
-                this.$scope.$apply(() => this.ttlParseError = parseError.message);
-            })
-
-            if(ttlString && !this.details.has("ttl")){
-                this.details.add("ttl");
-            }
-        }
-
-        updateLocation(location) {
-            if(!location && this.details.has("location")){
-                this.details.delete("location");
-                this.draftObject.location = undefined;
-            } else {
-                if(!this.details.has("location")) {
-                    this.details.add("location");
-                }
-                this.draftObject.location = location;
-            }
-
-            this.updateDraft();
-        }
-
-        pickImage(image) {
-            this.draftObject.thumbnail = image;
-        }
-
-        toggleDetail(){
-            this.showDetail = !this.showDetail;
-        }
-
-        toggleOpenDetail(detail){
-            // open clicked detail
-            if(this.openDetail === detail) {
-                this.openDetail = undefined;
-            } else {
-                this.openDetail = detail;
-            }
-        }
-        
-        getArrayFromSet(set){
-            return Array.from(set);
-        }
-
-        ttlInputNg() {
-            return angular.element(this.ttlInput());
-        }
-        ttlInput() {
-            if(!this._ttlInput) {
-                this._ttlInput = this.$element[0].querySelector('.cis__ttl__text');
-            }
-            return this._ttlInput;
-        }
-        tagsInputNg() {
-            return angular.element(this.tagsInput());
-        }
-        tagsInput() {
-            if(!this._tagsInput) {
-                this._tagsInput = this.$element[0].querySelector('.cis__tags__input');
-            }
-            return this._tagsInput;
-        }
+      // Using actionCreators like this means that every action defined there is available in the template.
+      connect2Redux(selectFromState, actionCreators, [], this);
     }
-    
-    
-    
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            isOrSeeks: '=',
-             /*
+    reset() {
+      this.draftObject = clone(emptyDraft);
+      this.details = new Set(); // remove all detail-cards
+
+      this.resetTags();
+
+      this.showDetail = false; // and close selector
+    }
+
+    updateDraft() {
+      if (!this.details.has("tags")) {
+        this.draftObject.tags = undefined;
+      }
+      if (!this.details.has("location")) {
+        this.draftObject.location = undefined;
+      }
+      if (!this.details.has("ttl")) {
+        this.draftObject.ttl = undefined;
+      }
+      if (!this.details.has("description")) {
+        this.draftObject.description = undefined;
+      }
+
+      this.onUpdate({ draft: this.draftObject });
+      dispatchEvent(this.$element[0], "update", { draft: this.draftObject });
+    }
+
+    setDraft(updatedDraft) {
+      if (
+        updatedDraft &&
+        updatedDraft.tags &&
+        updatedDraft.tags.length > 0 &&
+        !this.details.has("tags")
+      ) {
+        this.details.add("tags");
+      }
+
+      this.textAreaTags = updatedDraft.tags;
+      delete updatedDraft.tags; // so they don't overwrite anything when `Object.assign`ing below
+      this.updateTags();
+
+      // updatedDraft.tags = this.mergeTags();
+      Object.assign(this.draftObject, updatedDraft);
+      this.updateDraft();
+    }
+
+    resetTags() {
+      this.tagsString = "";
+      this.textAreaTags = "";
+      this.draftObject.tags = [];
+
+      this.details.delete("tags"); // remove card
+    }
+
+    updateTitle() {
+      const titleString = (this.titleInput() || {}).value || "";
+
+      this.draftObject.title = titleString;
+      this.updateDraft();
+    }
+
+    updateTags() {
+      // TODO: do something with text that does not start with #
+      const tagsInputString = (this.tagsInput() || {}).value;
+      this.draftObject.tags = mergeAsSet(
+        this.textAreaTags || [],
+        extractHashtags(tagsInputString)
+      );
+
+      if (tagsInputString && !this.details.has("tags")) {
+        this.details.add("tags");
+      }
+    }
+
+    updateTTLBuffered() {
+      if (this._ttlUpdateTimeoutId) {
+        clearTimeout(this._ttlUpdateTimeoutId);
+      }
+      this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
+    }
+
+    updateTTL() {
+      //await won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + $0.value)
+      const ttlString = (this.ttlInput() || {}).value || "";
+
+      this.draftObject.ttl = ttlString;
+
+      won
+        .ttlToJsonLd(ttlString)
+        .then(parsedJsonLd => {
+          this.$scope.$apply(() => (this.ttlParseError = ""));
+          return parsedJsonLd;
+        })
+        .catch(parseError => {
+          this.$scope.$apply(() => (this.ttlParseError = parseError.message));
+        });
+
+      if (ttlString && !this.details.has("ttl")) {
+        this.details.add("ttl");
+      }
+    }
+
+    updateDescription() {
+      const descriptionString = (this.descriptionInput() || {}).value || "";
+
+      this.draftObject.description = descriptionString;
+
+      if (descriptionString && !this.details.has("description")) {
+        this.details.add("description");
+      }
+    }
+
+    updateLocation(location) {
+      if (!location && this.details.has("location")) {
+        this.details.delete("location");
+        this.draftObject.location = undefined;
+      } else if (location) {
+        if (!this.details.has("location")) {
+          this.details.add("location");
+        }
+        this.draftObject.location = location;
+      }
+
+      this.updateDraft();
+    }
+
+    pickImage(image) {
+      this.draftObject.thumbnail = image;
+    }
+
+    toggleDetail() {
+      this.showDetail = !this.showDetail;
+    }
+
+    toggleOpenDetail(detail) {
+      // open clicked detail
+      if (this.openDetail === detail) {
+        this.openDetail = undefined;
+      } else {
+        this.openDetail = detail;
+      }
+    }
+
+    getArrayFromSet(set) {
+      return Array.from(set);
+    }
+
+    titleInputNg() {
+      return angular.element(this.titleInput());
+    }
+    titleInput() {
+      if (!this._titleInput) {
+        this._titleInput = this.$element[0].querySelector(
+          ".cis__mandatory__title"
+        );
+      }
+      return this._titleInput;
+    }
+
+    ttlInputNg() {
+      return angular.element(this.ttlInput());
+    }
+    ttlInput() {
+      if (!this._ttlInput) {
+        this._ttlInput = this.$element[0].querySelector(".cis__ttl__text");
+      }
+      return this._ttlInput;
+    }
+    descriptionInputNg() {
+      return angular.element(this.descriptionInput());
+    }
+    descriptionInput() {
+      if (!this._descriptionInput) {
+        this._descriptionInput = this.$element[0].querySelector(
+          ".cis__description__text"
+        );
+      }
+      return this._descriptionInput;
+    }
+    tagsInputNg() {
+      return angular.element(this.tagsInput());
+    }
+    tagsInput() {
+      if (!this._tagsInput) {
+        this._tagsInput = this.$element[0].querySelector(".cis__tags__input");
+      }
+      return this._tagsInput;
+    }
+  }
+
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      isOrSeeks: "=",
+      /*
              * Usage:
              *  on-update="::myCallback(draft)"
              */
-            onUpdate: '&',
-        },
-        template: template,
-    }
+      onUpdate: "&",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.createIsseek', [
-        /*createNeedTitleBarModule,
-        posttypeSelectModule,
-        labelledHrModule,
-        imageDropzoneModule,
-        needTextfieldModule,
-        locationPickerModule,
-        ngAnimate,*/
-    ])
-    .directive('wonCreateIsseeks', genComponentConf)
-    //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
-    .name;
+export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+angular
+  .module("won.owner.components.createIsseek", [])
+  .directive("wonCreateIsseeks", genComponentConf).name;

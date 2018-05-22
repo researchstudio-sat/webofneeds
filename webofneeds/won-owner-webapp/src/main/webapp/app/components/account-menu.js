@@ -1,23 +1,20 @@
 /**
  * Created by ksinger on 01.09.2017.
  */
-;
-import angular from 'angular';
-import { attach } from '../utils.js';
-import { ellipsizeString } from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
+import angular from "angular";
+import { attach } from "../utils.js";
+import { ellipsizeString } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { connect2Redux } from "../won-utils.js";
 
-import dropdownModule from './covering-dropdown.js';
-import loginFormModule from './login-form.js';
-import loggedInMenuModule from './logged-in-menu.js';
+import dropdownModule from "./covering-dropdown.js";
+import loginFormModule from "./login-form.js";
+import loggedInMenuModule from "./logged-in-menu.js";
 
-import * as srefUtils from '../sref-utils.js';
+import * as srefUtils from "../sref-utils.js";
 
 function genLogoutConf() {
-    let template = `
+  let template = `
         <won-dropdown class="dd-right-aligned-header">
             <won-dd-header class="topnav__button">
 
@@ -54,47 +51,51 @@ function genLogoutConf() {
         </won-dropdown>
     `;
 
-    const serviceDependencies = ['$state', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+  const serviceDependencies = [
+    "$state",
+    "$ngRedux",
+    "$scope" /*'$routeParams' /*injections as strings here*/,
+  ];
 
-    class Controller {
-        constructor(/* arguments <- serviceDependencies */){
-            attach(this, serviceDependencies, arguments);
-            Object.assign(this, srefUtils);
+  class Controller {
+    constructor(/* arguments <- serviceDependencies */) {
+      attach(this, serviceDependencies, arguments);
+      Object.assign(this, srefUtils);
 
-            window.lopu4dbg = this;
+      window.lopu4dbg = this;
 
-            this.email = "";
-            this.password = "";
-            this.maxEmailLength = 16;
+      this.email = "";
+      this.password = "";
+      this.maxEmailLength = 16;
 
-            const logout = (state) => ({
-                loggedIn: state.getIn(['user','loggedIn']),
-                email: state.getIn(['user','email'])
-            });
+      const logout = state => ({
+        loggedIn: state.getIn(["user", "loggedIn"]),
+        email: state.getIn(["user", "email"]),
+      });
 
-            connect2Redux(logout, actionCreators, [], this);
-        }
-
-        getEmail() {
-            return ellipsizeString(this.email, this.maxEmailLength);
-        }
+      connect2Redux(logout, actionCreators, [], this);
     }
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {open: '='},
-        template: template
+    getEmail() {
+      return ellipsizeString(this.email, this.maxEmailLength);
     }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { open: "=" },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.accountMenu', [
+export default angular
+  .module("won.owner.components.accountMenu", [
     dropdownModule,
     loginFormModule,
     loggedInMenuModule,
-])
-    .directive('wonAccountMenu', genLogoutConf)
-    .name;
+  ])
+  .directive("wonAccountMenu", genLogoutConf).name;

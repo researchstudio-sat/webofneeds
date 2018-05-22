@@ -1,0 +1,12 @@
+/.vscode/
+fonts/
+generated/
+images/
+node/
+node_modules/
+old/
+WEB-INF/
+scripts/
+*.html
+package.json
+package-lock.json

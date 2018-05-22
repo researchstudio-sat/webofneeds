@@ -2,26 +2,19 @@
  * Component for rendering the connection indicators as an svg images, with unread count and select handle on the latest (possibly unread) connnectionuri
  * Created by fsuda on 10.04.2017.
  */
-import angular from 'angular';
-import won from '../won-es6.js';
-import 'ng-redux';
-import { labels, } from '../won-label-utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import {
-    selectAllOwnNeeds,
-} from '../selectors.js';
+import angular from "angular";
+import won from "../won-es6.js";
+import "ng-redux";
+import { labels } from "../won-label-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { selectAllOwnNeeds } from "../selectors.js";
 
-import {
-    attach,
-    sortByDate,
-} from '../utils.js'
-import {
-    connect2Redux,
-} from '../won-utils.js'
+import { attach, sortByDate } from "../utils.js";
+import { connect2Redux } from "../won-utils.js";
 
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
-    let template = `
+  let template = `
         <a
             class="extendedindicators__item clickable"
             ng-show="self.latestConnectedUri"
@@ -84,89 +77,101 @@ function genComponentConf() {
         </div>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            this.labels = labels;
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      this.labels = labels;
 
-            const selectFromState = (state) => {
-                const ownNeeds = selectAllOwnNeeds(state);
-                const need = ownNeeds && ownNeeds.get(this.needUri);
-                const allConnectionsByNeedUri = need && need.get("connections");
+      const selectFromState = state => {
+        const ownNeeds = selectAllOwnNeeds(state);
+        const need = ownNeeds && ownNeeds.get(this.needUri);
+        const allConnectionsByNeedUri = need && need.get("connections");
 
-                const matches = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") === won.WON.Suggested);
-                const connected = allConnectionsByNeedUri && allConnectionsByNeedUri.filter(conn => conn.get("state") !== won.WON.Suggested && conn.get("state") !== won.WON.Closed);
+        const matches =
+          allConnectionsByNeedUri &&
+          allConnectionsByNeedUri.filter(
+            conn => conn.get("state") === won.WON.Suggested
+          );
+        const connected =
+          allConnectionsByNeedUri &&
+          allConnectionsByNeedUri.filter(
+            conn =>
+              conn.get("state") !== won.WON.Suggested &&
+              conn.get("state") !== won.WON.Closed
+          );
 
-                const unreadMatches = matches && matches.filter(conn => conn.get("unread"));
-                const unreadConversations = connected && connected.filter(conn => conn.get("unread"));
+        const unreadMatches =
+          matches && matches.filter(conn => conn.get("unread"));
+        const unreadConversations =
+          connected && connected.filter(conn => conn.get("unread"));
 
-                const matchesCount = matches ? matches.size : 0;
-                const connectedCount = connected ? connected.size : 0;
+        const matchesCount = matches ? matches.size : 0;
+        const connectedCount = connected ? connected.size : 0;
 
-                const unreadMatchesCount = unreadMatches ? unreadMatches.size : 0;
-                const unreadConnectedCount = unreadConversations ? unreadConversations.size : 0;
+        const unreadMatchesCount = unreadMatches ? unreadMatches.size : 0;
+        const unreadConnectedCount = unreadConversations
+          ? unreadConversations.size
+          : 0;
 
-                const sortedUnreadMatches = sortByDate(unreadMatches);
-                const sortedUnreadConversations = sortByDate(unreadConversations);
+        return {
+          WON: won.WON,
+          need,
+          connectedCount,
+          matchesCount,
+          unreadConnectedCount,
+          unreadMatchesCount,
+          latestConnectedUri: this.retrieveLatestUri(connected),
+          latestMatchUri: this.retrieveLatestUri(matches),
+        };
+      };
 
-                return {
-                    WON: won.WON,
-                    need,
-                    connectedCount,
-                    matchesCount,
-                    unreadConnectedCount,
-                    unreadMatchesCount,
-                    latestConnectedUri: this.retrieveLatestUri(connected),
-                    latestMatchUri: this.retrieveLatestUri(matches),
-                }
-            };
-
-            connect2Redux(
-                selectFromState, actionCreators,
-                ['self.needUri'],
-                this
-            );
-        }
-
-        /**
-         * This method returns either the latest unread uri of the given connection elements, or the latest uri of a read connection, if nothing is found undefined is returned
-         * @param elements connection elements to retrieve the latest uri from
-         * @returns {*}
-         */
-        retrieveLatestUri(elements) {
-            const unreadElements = elements && elements.filter(conn => conn.get("unread"));
-
-            const sortedUnreadElements = sortByDate(unreadElements);
-            const unreadUri = sortedUnreadElements && sortedUnreadElements[0] && sortedUnreadElements[0].get("uri");
-
-            if(unreadUri){
-                return unreadUri;
-            }else{
-                const sortedElements = sortByDate(elements);
-                return sortedElements && sortedElements[0] && sortedElements[0].get("uri");
-            }
-        }
-
-        setOpen(connectionUri) {
-            this.onSelectedConnection({connectionUri: connectionUri}); //trigger callback with scope-object
-            //TODO either publish a dom-event as well; or directly call the route-change
-        }
+      connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
     }
-    Controller.$inject = serviceDependencies;
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            needUri: '=',
-            onSelectedConnection: "&",
-        },
-        template: template
+
+    /**
+     * This method returns either the latest unread uri of the given connection elements, or the latest uri of a read connection, if nothing is found undefined is returned
+     * @param elements connection elements to retrieve the latest uri from
+     * @returns {*}
+     */
+    retrieveLatestUri(elements) {
+      const unreadElements =
+        elements && elements.filter(conn => conn.get("unread"));
+
+      const sortedUnreadElements = sortByDate(unreadElements);
+      const unreadUri =
+        sortedUnreadElements &&
+        sortedUnreadElements[0] &&
+        sortedUnreadElements[0].get("uri");
+
+      if (unreadUri) {
+        return unreadUri;
+      } else {
+        const sortedElements = sortByDate(elements);
+        return (
+          sortedElements && sortedElements[0] && sortedElements[0].get("uri")
+        );
+      }
     }
+
+    setOpen(connectionUri) {
+      this.onSelectedConnection({ connectionUri: connectionUri }); //trigger callback with scope-object
+      //TODO either publish a dom-event as well; or directly call the route-change
+    }
+  }
+  Controller.$inject = serviceDependencies;
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      needUri: "=",
+      onSelectedConnection: "&",
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.exctendedConnectionIndicators', [
-])
-    .directive('wonExtendedConnectionIndicators', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.exctendedConnectionIndicators", [])
+  .directive("wonExtendedConnectionIndicators", genComponentConf).name;

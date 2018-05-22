@@ -1,20 +1,23 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
 
-@import 'connections-overview';
-@import 'responsiveness-utils';
-
+@import "connections-overview";
+@import "responsiveness-utils";
 
 .connectionscontent {
-  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  @include max-content-width($maxContentWidth, $minContentPadding, "opc");
   align-items: flex-start;
 
-  @include empty-description('opc');
+  @include empty-description("opc");
 
-  .oir__requests{
+  .oir__requests {
     flex-grow: 1;
     max-width: $maxContentWidth / 2;
+
+    @media (min-width: $responsivenessBreakPoint) {
+      min-width: 25rem;
+    }
   }
 }

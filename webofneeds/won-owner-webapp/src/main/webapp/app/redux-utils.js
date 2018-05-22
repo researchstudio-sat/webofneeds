@@ -2,7 +2,7 @@
  * Created by ksinger on 28.09.2015.
  */
 
-import Immutable from 'immutable';
+import Immutable from "immutable";
 
 /**
  * Reducers are functions of type (state, action) => state.
@@ -54,25 +54,24 @@ import Immutable from 'immutable';
  * @returns {Function} a combined reducer that applies to the whole state.
  */
 export function combineReducersStable(mapOfReducers) {
-    return (state = Immutable.Map(), action = {}) => {
-        let hasChanged = false;
-        let updatedState = state;
-        mapOfReducers.forEach((reducer, domainName) => {
-            // the domain is the child-node the reducer is responsible for
-            const domain = state.get(domainName);
+  return (state = Immutable.Map(), action = {}) => {
+    let updatedState = state;
+    mapOfReducers.forEach((reducer, domainName) => {
+      // the domain is the child-node the reducer is responsible for
+      const domain = state.get(domainName);
 
-            // update the domain. if the domain hasn't been created yet,
-            // let the reducer handle that.
-            const actionCurriedReducer = (s) => reducer(s, action);
-            const updatedDomain = domain? actionCurriedReducer(domain) : actionCurriedReducer();
+      // update the domain. if the domain hasn't been created yet,
+      // let the reducer handle that.
+      const actionCurriedReducer = s => reducer(s, action);
+      const updatedDomain = domain
+        ? actionCurriedReducer(domain)
+        : actionCurriedReducer();
 
+      // only change the state object,
+      if (domain !== updatedDomain)
+        updatedState = updatedState.set(domainName, updatedDomain);
+    });
 
-            // only change the state object,
-            if(domain !== updatedDomain)
-                updatedState = updatedState.set(domainName, updatedDomain);
-        });
-
-        return updatedState;
-    }
+    return updatedState;
+  };
 }
-

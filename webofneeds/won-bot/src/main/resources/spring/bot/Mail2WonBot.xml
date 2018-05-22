@@ -46,7 +46,7 @@
                                   should-mark-messages-as-read="true"
                                   auto-startup="true"
                                   java-mail-properties="javaMailProperties">
-        <int:poller fixed-rate="10000" max-messages-per-poll="100"/>
+        <int:poller fixed-rate="300000" max-messages-per-poll="100"/>
     </mail:inbound-channel-adapter>
 
     <mail:outbound-channel-adapter id="outboundAdapter"

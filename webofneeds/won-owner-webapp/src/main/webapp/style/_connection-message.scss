@@ -1,105 +1,110 @@
-
-@import 'speech-bubble';
-@import 'square-image';
+@import "speech-bubble";
+@import "square-image";
 
 won-connection-message {
-    &.won-unread {
-        background-color: $won-unread;
+  &.won-unread {
+    background-color: $won-unread;
+  }
+
+  padding: 0.5rem 0;
+  @include square-image($postIconSize, 0 0.5rem 0 0);
+  display: grid;
+  grid-template-areas: "icon content";
+  grid-template-columns: min-content minmax(min-content, max-content);
+
+  won-square-image {
+    cursor: pointer; /* the image links to their post info */
+    grid-area: icon;
+  }
+
+  &.won-cm--left {
+    justify-content: flex-start;
+
+    & .won-cm__center__bubble {
+      @include speech-bubble-left(
+        $won-light-gray,
+        $won-line-gray,
+        0.3125rem,
+        $thinBorderWidth,
+        0.5rem
+      );
     }
-
-    padding: 0.5rem 0;
-    @include square-image($postIconSize, 0 0.5rem 0 0);
-    display: grid;
-    grid-template-areas: "icon content";
-    grid-template-columns: min-content minmax(min-content, max-content);
-
-    won-square-image {
-        cursor: pointer; /* the image links to their post info */
-        grid-area: icon;
+  }
+  &.won-cm--right {
+    justify-content: flex-end;
+    color: red !important;
+    & .won-cm__center__bubble {
+      @include speech-bubble-right(
+        $won-light-gray,
+        $won-line-gray,
+        0.3125rem,
+        $thinBorderWidth,
+        0.5rem
+      );
     }
-
-    &.won-cm--left {
-        justify-content: flex-start;
-
-        & .won-cm__center__bubble {
-            @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
-        }
+  }
+  &.won-not-relevant {
+    opacity: 0.35;
+    .won-cm__center__bubble {
+      text-decoration: line-through;
+      text-decoration-color: black;
     }
-    &.won-cm--right {
-        justify-content: flex-end;
-        color:red!important;
-
-        & .won-cm__center__bubble {
-            @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
-        }
+  }
+  .won-cm__center {
+    grid-area: content;
+    font-size: $smallFontSize;
+    max-width: 100%;
+    .won-cm__center__bubble {
+      padding: 0.5rem;
+      border: $thinGrayBorder;
+      word-break: break-word;
+      min-height: 2.5rem;
+      box-sizing: border-box; // background: $won-light-gray;
+      &.agreement {
+        padding: 0.5rem;
+        border: $thinDarkBorder;
+        background: $won-light-gray;
+      }
+      &__text__message--prewrap {
+        white-space: pre-wrap;
+      }
     }
-
-    &.won-not-relevant {
-        opacity: 0.35;
-        
-        .won-cm__center__bubble {
-                text-decoration: line-through;
-                text-decoration-color: black;               
-            }
-       
+    &.won-cm__center--nondisplayable {
+      // hsla(57, 100%, 95%, 1);
+      // lighten bg and text color? (might just suggest pending)
+      // float icon on site opposite of bubble-tail
+      .won-cm__center__bubble {
+        background-color: white; // like the error toast-notifications
+        color: #8f8f8f;
+      }
     }
-
-    .won-cm__center {
-        grid-area: content;
-        font-size: $smallFontSize;
-        max-width: 100%;
-
-        .won-cm__center__bubble {
-            padding: 0.5rem;
-            border: $thinGrayBorder;
-            word-break: break-word;
-            min-height: 2.5rem;
-            box-sizing: border-box;
-            //background: $won-light-gray;
-
-                &.agreement {
-                   padding: 0.5rem;
-                   border:  $thinDarkBorder;
-                   background: $won-light-gray;
-                }
-        }
-
-        &.won-cm__center--nondisplayable {
-            // hsla(57, 100%, 95%, 1);
-            // lighten bg and text color? (might just suggest pending)
-            // float icon on site opposite of bubble-tail
-
-            .won-cm__center__bubble {
-                background-color: white; // like the error toast-notifications
-                color: #8f8f8f;
-            }
-        }
-
-        .won-cm__center__bubble {
-            background-color: $won-light-gray; // like the error toast-notifications
-            color: black;
-        }
-
-        &__trig {
-            max-width: 100%;
-            white-space:pre-wrap;
-        }
-
-        &__button{
-            padding: 0.5rem;
-        }
-
-
-        &__time {
-            color: $won-line-gray;
-        }
-    
-        &__carret {
-            @include fixed-square(1rem);
-        
-            // visually center icon on line
-            position: relative;
-            top: 0.1em;
-        }
+    .won-cm__center__bubble {
+      background-color: $won-light-gray; // like the error toast-notifications
+      color: black;
     }
+    &__trig {
+      max-width: 100%;
+      &__prefixes {
+        display: inline-block;
+        padding-bottom: 1rem;
+        &--prewrap {
+          white-space: pre-wrap;
+        }
+      }
+      &__contentgraph--prewrap {
+        white-space: pre-wrap;
+      }
+    }
+    &__button {
+      padding: 0.5rem;
+    }
+    &__time {
+      color: $won-line-gray;
+    }
+    &__carret {
+      @include fixed-square(1rem); // visually center icon on line
+      position: relative;
+      top: 0.1em;
+    }
+  }
 }

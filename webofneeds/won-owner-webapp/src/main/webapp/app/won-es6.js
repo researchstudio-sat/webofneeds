@@ -8,12 +8,8 @@
  * default export`ing the won-object)
  */
 
-import won from './service/won.js';
-import './service/need-builder.js';
-import './service/message-builder.js';
-import './service/linkeddata-service-won.js';
+import won from "./service/won.js";
+import "./service/need-builder.js";
+import "./service/message-builder.js";
+import "./service/linkeddata-service-won.js";
 export default won;
-
-
-
-

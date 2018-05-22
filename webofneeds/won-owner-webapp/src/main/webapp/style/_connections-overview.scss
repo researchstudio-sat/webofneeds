@@ -1,11 +1,11 @@
-@import 'won-config';
-@import 'post-header';
-@import 'connection-header';
-@import 'connection-indicators';
-@import 'extended-connection-indicators';
-@import 'connection-selection-item-line';
-@import 'speech-bubble';
-@import 'animate';
+@import "won-config";
+@import "post-header";
+@import "connection-header";
+@import "connection-indicators";
+@import "extended-connection-indicators";
+@import "connection-selection-item-line";
+@import "speech-bubble";
+@import "animate";
 
 won-connections-overview {
   display: block;
@@ -39,10 +39,10 @@ won-connections-overview {
 
         won-connection-indicators {
           padding-left: 0.5rem;
-          @include appearAnimation(.25s);
+          @include appearAnimation(0.25s);
         }
 
-        &__carret{
+        &__carret {
           // results in a clickable area as large as indicators
           // TODO: make the value less rigid
           padding: 0.625em;
@@ -57,18 +57,18 @@ won-connections-overview {
         border-top: $thinGrayBorder;
         padding-top: 0.5rem;
 
-        @media (min-width: $responsivenessBreakPoint){
+        @media (min-width: $responsivenessBreakPoint) {
           grid-column-gap: 0.5rem;
           grid-template-areas: "indicators actions";
           grid-template-columns: 1fr min-content;
         }
 
-        @media (max-width: $responsivenessBreakPoint){
+        @media (max-width: $responsivenessBreakPoint) {
           grid-row-gap: 0.5rem;
           grid-template-areas: "indicators" "actions";
         }
 
-        @include slideWithOpacityAnimation(.25s, linear, 4rem, 0.5rem 0 0 0);
+        @include slideWithOpacityAnimation(0.25s, linear, 4rem, 0.5rem 0 0 0);
 
         &__actions {
           grid-area: actions;
@@ -85,63 +85,66 @@ won-connections-overview {
         }
       }
 
-      &:hover, &.selected {
-
+      &:hover,
+      &.selected {
       }
 
-      @media (min-width: $responsivenessBreakPoint){
+      @media (min-width: $responsivenessBreakPoint) {
         &.selected {
-          @include speech-bubble-right(white, $won-line-gray, 0.625rem, $thinBorderWidth, 1.5rem);
+          @include speech-bubble-right(
+            white,
+            $won-line-gray,
+            0.625rem,
+            $thinBorderWidth,
+            1.5rem
+          );
         }
       }
     }
-
     &__connections {
       background: white;
-      @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorderWidth, 5rem);
-      @include slideWithOpacityAnimation(.5s, linear, 250rem);
+      @include speech-bubble-top(
+        white,
+        $won-line-gray,
+        0.625rem,
+        $thinBorderWidth,
+        5rem
+      );
+      @include slideWithOpacityAnimation(0.5s, linear, 250rem);
     }
   }
-
   .co__loadspinner {
     width: 100%;
     height: 3rem;
-    padding: .66em 2em;
+    padding: 0.66em 2em;
     text-align: center;
     box-sizing: border-box;
   }
-  
   .co__separator {
     margin-top: 1.5rem;
-    padding: 0 .5rem;
+    padding: 0 0.5rem;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
     align-items: center;
-
     color: $won-line-gray;
-
     &--open {
-      transition: border-bottom-width linear .1s;
+      transition: border-bottom-width linear 0.1s;
       border-bottom: $thinGrayBorder;
       color: $won-primary-color;
-
       &:hover {
         color: $won-line-gray;
       }
     }
-
     &:hover {
       color: $won-primary-color;
     }
-
     &__arrow {
       @include carretSized;
       padding: 0.625em;
     }
   }
-
   .co__closedNeeds {
-    @include slideWithOpacityAnimation(.5s, linear, 250rem);
+    @include slideWithOpacityAnimation(0.5s, linear, 250rem);
   }
 }

@@ -1,9 +1,7 @@
-;
-
-import angular from 'angular';
+import angular from "angular";
 
 function genComponentConf() {
-    let template = `
+  let template = `
             <div class="rightside" ng-show="self.items">
                 <div class="title withoutPadding">Manage Notification Settings</div>
                 <div class="subtitle">can be set individually on create posts page</div>
@@ -69,19 +67,19 @@ function genComponentConf() {
             <div>
     `;
 
-    class Controller {
-        constructor() { }
-    }
+  class Controller {
+    constructor() {}
+  }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {items : "="},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { items: "=" },
+    template: template,
+  };
 }
-export default angular.module('won.owner.components.notificationSettings', [])
-    .directive('wonNotificationSettings', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.notificationSettings", [])
+  .directive("wonNotificationSettings", genComponentConf).name;

@@ -3,24 +3,20 @@
  * a seperate file, plz!
  */
 
-$font-family-sans-serif:          "Open Sans", sans-serif !default;
+$font-family-sans-serif: "Open Sans", sans-serif !default;
 //$font-family-sans-serif:          sans-serif !default;
 //$font-family-light-sans-serif:    "Open Sans Light", sans-serif-light !default;
 $font-family-monospace: "Fira Mono", monospace;
 
-
-
 @font-face {
-  font-family: 'Open Sans';
+  font-family: "Open Sans";
   font-style: normal;
   font-weight: 300; //light
   font-display: swap; // display fallback font until open sans is loaded
-  src:
-  local('Open Sans Light'),
-  local('OpenSans-Light'),
-  url("../fonts/open-sans/OpenSans-Light.woff2") format('woff2'),
-  url("../fonts/open-sans/OpenSans-Light.woff") format('woff'),
-  url("../fonts/open-sans/OpenSans-Light.ttf") format('truetype');
+  src: local("Open Sans Light"), local("OpenSans-Light"),
+    url("../fonts/open-sans/OpenSans-Light.woff2") format("woff2"),
+    url("../fonts/open-sans/OpenSans-Light.woff") format("woff"),
+    url("../fonts/open-sans/OpenSans-Light.ttf") format("truetype");
 }
 //@font-face {
 //  font-family: 'Open Sans';
@@ -32,19 +28,15 @@ $font-family-monospace: "Fira Mono", monospace;
 //  url("../fonts/open-sans/OpenSans-LightItalic.ttf") format('truetype');
 //}
 
-
-
 @font-face {
-  font-family: 'Open Sans';
+  font-family: "Open Sans";
   font-style: normal;
   font-weight: 400; //normal
   font-display: swap; // display fallback font until open sans is loaded
-  src:
-  local('Open Sans'),
-  local('OpenSans-Regular'),
-  url("../fonts/open-sans/OpenSans-Regular.woff2") format('woff2'),
-  url("../fonts/open-sans/OpenSans-Regular.woff") format('woff'),
-  url("../fonts/open-sans/OpenSans-Regular.ttf") format('truetype');
+  src: local("Open Sans"), local("OpenSans-Regular"),
+    url("../fonts/open-sans/OpenSans-Regular.woff2") format("woff2"),
+    url("../fonts/open-sans/OpenSans-Regular.woff") format("woff"),
+    url("../fonts/open-sans/OpenSans-Regular.ttf") format("truetype");
 }
 //@font-face {
 //  font-family: 'Open Sans';
@@ -55,8 +47,6 @@ $font-family-monospace: "Fira Mono", monospace;
 //  local('OpenSans-Italic'),
 //  url("../fonts/open-sans/OpenSans-Italic.ttf") format('truetype');
 //}
-
-
 
 //@font-face {
 //  font-family: 'Open Sans';
@@ -77,19 +67,15 @@ $font-family-monospace: "Fira Mono", monospace;
 //  url("../fonts/open-sans/OpenSans-SemiboldItalic.ttf") format('truetype');
 //}
 
-
-
 @font-face {
-  font-family: 'Open Sans';
+  font-family: "Open Sans";
   font-style: normal;
   font-weight: 700; //bold
   font-display: swap; // display fallback font until open sans is loaded
-  src:
-  local('Open Sans Bold'),
-  local('OpenSans-Bold'),
-  url("../fonts/open-sans/OpenSans-Bold.woff2") format('woff2'),
-  url("../fonts/open-sans/OpenSans-Bold.woff") format('woff'),
-  url("../fonts/open-sans/OpenSans-Bold.ttf") format('truetype');
+  src: local("Open Sans Bold"), local("OpenSans-Bold"),
+    url("../fonts/open-sans/OpenSans-Bold.woff2") format("woff2"),
+    url("../fonts/open-sans/OpenSans-Bold.woff") format("woff"),
+    url("../fonts/open-sans/OpenSans-Bold.ttf") format("truetype");
 }
 //@font-face {
 //  font-family: 'Open Sans';
@@ -100,8 +86,6 @@ $font-family-monospace: "Fira Mono", monospace;
 //  local('OpenSans-BoldItalic'),
 //  url("../fonts/open-sans/OpenSans-BoldItalic.ttf") format('truetype');
 //}
-
-
 
 //@font-face {
 //  font-family: 'Open Sans';
@@ -122,16 +106,13 @@ $font-family-monospace: "Fira Mono", monospace;
 //  url("../fonts/open-sans/OpenSans-ExtraBoldItalic.ttf") format('truetype');
 //}
 
-
-
 @font-face {
-  font-family: 'Fira Mono';
+  font-family: "Fira Mono";
   font-style: normal;
   font-weight: 400;
   font-display: swap; // display fallback font until open sans is loaded
-  src:
-    local('Fira Mono'),
-    url("../fonts/fira-mono/FiraMono-Regular.woff2") format('woff2'),
-    url("../fonts/fira-mono/FiraMono-Regular.woff") format('woff'),
-    url("../fonts/fira-mono/FiraMono-Regular.ttf") format('truetype');
+  src: local("Fira Mono"),
+    url("../fonts/fira-mono/FiraMono-Regular.woff2") format("woff2"),
+    url("../fonts/fira-mono/FiraMono-Regular.woff") format("woff"),
+    url("../fonts/fira-mono/FiraMono-Regular.ttf") format("truetype");
 }

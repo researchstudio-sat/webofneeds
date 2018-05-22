@@ -2,20 +2,14 @@
  * Created by ksinger on 30.06.2017.
  */
 
-import {
-   getIn,
-} from './utils.js';
-
-import config from 'config';
-
+import config from "config";
 
 // ------- INIT  --------------------
-
 
 let _paq = _paq || [];
 window._paq = _paq; // export required for interaction with piwik
 
-const trackerUrl = config.piwik.baseUrl + 'piwik.php'
+const trackerUrl = config.piwik.baseUrl + "piwik.php";
 
 /**
  * Use this function to call the piwik API.
@@ -30,46 +24,50 @@ const trackerUrl = config.piwik.baseUrl + 'piwik.php'
  * @param args
  */
 function piwikCall(args) {
-    const tracker = window.Piwik && window.Piwik.getAsyncTracker(trackerUrl);
-    if (typeof config.piwik.baseUrl !== 'undefined' && config.piwik.baseUrl !== '' && config.piwik.baseUrl !== null) {
-        if (tracker) {
-            // piwik has loaded, we can properly call functions
-            tracker[args[0]].call(tracker,...args.slice(1)
-        )
-            //console.log('piwik.js -- about to call ', args[0], ' with args: ', ...args.slice(1));
-        } else {
-            // push calls to _paq array, that piwik tracker will execute automatically
-            // once it loads.
-            _paq.push(args);
-        }
+  const tracker = window.Piwik && window.Piwik.getAsyncTracker(trackerUrl);
+  if (
+    typeof config.piwik.baseUrl !== "undefined" &&
+    config.piwik.baseUrl !== "" &&
+    config.piwik.baseUrl !== null
+  ) {
+    if (tracker) {
+      // piwik has loaded, we can properly call functions
+      tracker[args[0]].call(tracker, ...args.slice(1));
+      //console.log('piwik.js -- about to call ', args[0], ' with args: ', ...args.slice(1));
+    } else {
+      // push calls to _paq array, that piwik tracker will execute automatically
+      // once it loads.
+      _paq.push(args);
     }
+  }
 }
 
-piwikCall(['setTrackerUrl', trackerUrl]);
-piwikCall(['setSiteId', '1']);
-
+piwikCall(["setTrackerUrl", trackerUrl]);
+piwikCall(["setSiteId", "1"]);
 
 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-piwikCall(['trackPageView']); // log that page has loaded
+piwikCall(["trackPageView"]); // log that page has loaded
 //piwikCall(['enableLinkTracking']);
 
 //_paq.push(['setUserId', 'USER_ID_HERE']);
 //_paq.push(['enableHeartBeatTimer']); // track time spent with the page open and in focus in 15s increments
-const el = document.createElement('script');
-const firstScriptEl = document.getElementsByTagName('script')[0];
+const el = document.createElement("script");
+const firstScriptEl = document.getElementsByTagName("script")[0];
 
-el.type = 'text/javascript';
+el.type = "text/javascript";
 el.async = true;
 el.defer = true;
-el.src = config.piwik.baseUrl + 'piwik.js';
+el.src = config.piwik.baseUrl + "piwik.js";
 
-if (typeof config.piwik.baseUrl !== 'undefined' && config.piwik.baseUrl !== '' && config.piwik.baseUrl !== null) {
-    firstScriptEl.parentNode.insertBefore(el, firstScriptEl);
+if (
+  typeof config.piwik.baseUrl !== "undefined" &&
+  config.piwik.baseUrl !== "" &&
+  config.piwik.baseUrl !== null
+) {
+  firstScriptEl.parentNode.insertBefore(el, firstScriptEl);
 }
 
-
 export const piwikQueue = _paq;
-
 
 // ------- ROUTE-CHANGE-LOGGING  --------------------
 /**
@@ -77,67 +75,58 @@ export const piwikQueue = _paq;
  * Adapted from: https://piwik.org/blog/2017/02/how-to-track-single-page-websites-using-piwik-analytics/
  */
 let _currentUrl = window.location.href;
-window.addEventListener('hashchange', function() {
-    //logUrlChange('' + window.location.hash.substr(1));
-    logUrlChange();
+window.addEventListener("hashchange", function() {
+  //logUrlChange('' + window.location.hash.substr(1));
+  logUrlChange();
 });
 
 function logUrlChange() {
-    piwikCall(['setReferrerUrl', _currentUrl]);
-    _currentUrl = window.location.href;
-    piwikCall(['setCustomUrl', window.location.href]);
-    piwikCall(['setDocumentTitle', window.document.title]);
+  piwikCall(["setReferrerUrl", _currentUrl]);
+  _currentUrl = window.location.href;
+  piwikCall(["setCustomUrl", window.location.href]);
+  piwikCall(["setDocumentTitle", window.document.title]);
 
-    // remove all previously assigned custom variables, requires Piwik 3.0.2
-    piwikCall(['deleteCustomVariables', 'page']);
-    piwikCall(['setGenerationTimeMs', 0]);
-    piwikCall(['trackPageView']);
+  // remove all previously assigned custom variables, requires Piwik 3.0.2
+  piwikCall(["deleteCustomVariables", "page"]);
+  piwikCall(["setGenerationTimeMs", 0]);
+  piwikCall(["trackPageView"]);
 
-    // make Piwik aware of newly added content
-    //piwikCall(['MediaAnalytics::scanForMedia', documentOrElement]); // rescans entire document for changes about audio/video. enable when using MediaAnalytics
-    //piwikCall(['FormAnalytics::scanForForms', docuemntOrElement]); // enable when using form-analytics
-    //piwikCall(['trackContentImpressionsWithinNode', documentOrElement]); // enable when using content-tracking (e.g. ad-views & -clicks)
-    //piwikCall(['enableLinkTracking']); //rescan for outgoing- and download-links // TODO causes error
+  // make Piwik aware of newly added content
+  //piwikCall(['MediaAnalytics::scanForMedia', documentOrElement]); // rescans entire document for changes about audio/video. enable when using MediaAnalytics
+  //piwikCall(['FormAnalytics::scanForForms', docuemntOrElement]); // enable when using form-analytics
+  //piwikCall(['trackContentImpressionsWithinNode', documentOrElement]); // enable when using content-tracking (e.g. ad-views & -clicks)
+  //piwikCall(['enableLinkTracking']); //rescan for outgoing- and download-links // TODO causes error
 }
-
-
 
 // ------- ACTION-LOGGING  --------------------
 
+export const piwikMiddleware = () => next => action => {
+  if (!(action && action.type)) return next(action);
 
-export const piwikMiddleware = store => next => action => {
+  const loggingWhiteList = {
+    Connections: [
+      // log as category "Connections"
+      "connections.sendChatMessage", // log this and following actions
+      "messages.connectionMessageReceived",
+      "connections.open",
+      "messages.openMessageReceived",
+      "connections.connect",
+      "messages.connectMessageReceived",
+      //            'messages.hintMessageReceived',
+      "connections.close",
+    ],
+    Needs: ["drafts.publish", "needs.close", "needs.reopen"],
+  };
 
-    if(! (action && action.type))
-        return next(action);
+  // check if action.type is in the whitelist
+  for (let category of Object.keys(loggingWhiteList)) {
+    loggingWhiteList[category].forEach(actionType => {
+      if (action.type === actionType) {
+        //send HTTP-GET to piwik-server
+        piwikCall(["trackEvent", category, actionType, "", 1]);
+      }
+    });
+  }
 
-    const loggingWhiteList = {
-        Connections: [ // log as category "Connections"
-            'connections.sendChatMessage', // log this and following actions
-            'messages.connectionMessageReceived',
-            'connections.open',
-            'messages.openMessageReceived',
-            'connections.connect',
-            'messages.connectMessageReceived',
-//            'messages.hintMessageReceived', 
-            'connections.close',
-        ],
-        Needs: [
-            'drafts.publish',
-            'needs.close',
-            'needs.reopen',
-        ]
-
-    };
-
-    // check if action.type is in the whitelist
-    for(let category of Object.keys(loggingWhiteList)) {
-        loggingWhiteList[category].forEach(actionType => {
-            if(action.type === actionType) {
-                //send HTTP-GET to piwik-server
-                piwikCall(['trackEvent', category, actionType, '', 1])
-            }
-        })
-    }
-
-    return next(action);
+  return next(action);
 };

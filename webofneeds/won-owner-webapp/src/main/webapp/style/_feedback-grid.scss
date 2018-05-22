@@ -1,7 +1,7 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
+@import "won-config";
+@import "sizing-utils";
+@import "fonts";
+@import "flex-layout";
 
 won-feedback-grid {
   max-height: 4rem;
@@ -43,7 +43,6 @@ won-feedback-grid {
     }
 
     &:hover {
-
       .feedback__text {
         color: white;
       }
@@ -54,9 +53,8 @@ won-feedback-grid {
       .feedback__icon.unselected {
         display: none;
       }
-      
+
       background: $won-primary-color;
     }
   }
 }
-

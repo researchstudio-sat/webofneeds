@@ -1,9 +1,7 @@
-;
-
-import angular from 'angular';
+import angular from "angular";
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <div class="title">Account</div>
         <div class="flexrow">
             <div class="leftside">
@@ -41,19 +39,19 @@ function genComponentConf() {
         </div>
     `;
 
-    class Controller {
-        constructor() { }
-    }
+  class Controller {
+    constructor() {}
+  }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {},
+    template: template,
+  };
 }
-export default angular.module('won.owner.components.acountSettings', [])
-    .directive('wonAccountSettings', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.acountSettings", [])
+  .directive("wonAccountSettings", genComponentConf).name;

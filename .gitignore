@@ -19,6 +19,9 @@ nbproject
 .settings
 **/.springBeans
 
+# VSCode
+.vscode/
+
 # Buildtools
 build.properties
 mvn.properties

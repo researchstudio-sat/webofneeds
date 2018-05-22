@@ -1,6 +1,6 @@
-@import 'flex-layout';
-@import 'sizing-utils';
-@import 'won-config';
+@import "flex-layout";
+@import "sizing-utils";
+@import "won-config";
 
 @mixin underlined-tabs($underlineColor) {
   @include flex-row-spaced;
@@ -30,7 +30,6 @@
     }
   }
 
-
   // vertical white-space
   li a {
     padding-bottom: $verticalPadding;
@@ -40,7 +39,6 @@
     padding-bottom: $verticalPadding - $selectedBorderWidth;
     padding-top: $verticalPadding;
   }
-
 
   // horizontal white-space
   li {

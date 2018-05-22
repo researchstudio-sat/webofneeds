@@ -1,10 +1,8 @@
-;
-
-import angular from 'angular';
-import avatarImageSelectorModule from '../settings/avatarimage-selector.js';
+import angular from "angular";
+import avatarImageSelectorModule from "../settings/avatarimage-selector.js";
 
 function genComponentConf() {
-    let template = `
+  let template = `
             <div class="noavatars" ng-show="!self.items">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="avataricon">
@@ -94,31 +92,106 @@ function genComponentConf() {
                 <button class="won-button--filled red" ng-click="settings.saveAccount()">Save Settings</button>
             </div>`;
 
-    class Controller {
-        constructor() {
-            this.items = [{open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", usedInGroups: [{name: "group1"}, {name: "group2"}, {name: "group4"}], creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", usedInGroups: [{name: "group1"}, {name: "group2"}, {name: "group4"}], creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", usedInGroups: [{name: "group1"}, {name: "group2"}, {name: "group4"}], creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", usedInGroups: [{name: "group1"}, {name: "group2"}, {name: "group4"}], creationDate: "10.01.2015"},
-                {open: false, screenName: "", imageUrl: "", description: "", aboutMe: "", creationDate: "10.01.2015"}];
-
-        }
+  class Controller {
+    constructor() {
+      this.items = [
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          usedInGroups: [
+            { name: "group1" },
+            { name: "group2" },
+            { name: "group4" },
+          ],
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          usedInGroups: [
+            { name: "group1" },
+            { name: "group2" },
+            { name: "group4" },
+          ],
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          usedInGroups: [
+            { name: "group1" },
+            { name: "group2" },
+            { name: "group4" },
+          ],
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          usedInGroups: [
+            { name: "group1" },
+            { name: "group2" },
+            { name: "group4" },
+          ],
+          creationDate: "10.01.2015",
+        },
+        {
+          open: false,
+          screenName: "",
+          imageUrl: "",
+          description: "",
+          aboutMe: "",
+          creationDate: "10.01.2015",
+        },
+      ];
     }
+  }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {},//items: '='},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {}, //items: '='},
+    template: template,
+  };
 }
-export default angular.module('won.owner.components.avatarSettings', [
-    avatarImageSelectorModule
-])
-    .directive('wonAvatarSettings', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.avatarSettings", [avatarImageSelectorModule])
+  .directive("wonAvatarSettings", genComponentConf).name;

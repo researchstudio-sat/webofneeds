@@ -1,5 +1,5 @@
-@import 'sizing-utils';
-@import 'square-image';
+@import "sizing-utils";
+@import "square-image";
 
 won-post-header {
   color: black;
@@ -16,7 +16,7 @@ won-post-header {
   won-square-image {
     grid-area: icon;
 
-    .image{
+    .image {
       border: $thinBorderWidth solid $won-light-gray;
     }
   }
@@ -60,6 +60,12 @@ won-post-header {
       flex-direction: row;
       font-size: $smallFontSize;
       min-width: 0;
+
+      &__type {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
 
       &__group {
         display: flex;

@@ -2,35 +2,24 @@
  * Created by ksinger on 10.05.2016.
  */
 
+import angular from "angular";
+import postSeeksInfoModule from "./post-seeks-info.js";
+import postIsInfoModule from "./post-is-info.js";
+import postHeaderModule from "./post-header.js";
+import postShareLinkModule from "./post-share-link.js";
+import labelledHrModule from "./labelled-hr.js";
+import postContextDropdownModule from "./post-context-dropdown.js";
 
-;
+import { attach } from "../utils.js";
+import won from "../won-es6.js";
+import { relativeTime } from "../won-label-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import { selectOpenPostUri, selectLastUpdateTime } from "../selectors.js";
+import { actionCreators } from "../actions/actions.js";
 
-import angular from 'angular';
-import postSeeksInfoModule from './post-seeks-info.js';
-import postIsInfoModule from './post-is-info.js';
-import postHeaderModule from './post-header.js';
-import postShareLinkModule from './post-share-link.js';
-import labelledHrModule from './labelled-hr.js';
-import postContextDropdownModule from './post-context-dropdown.js';
-
-import { attach, } from '../utils.js';
-import won from '../won-es6.js';
-import {
-    relativeTime,
-} from '../won-label-utils.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-import {
-    selectOpenPostUri,
-    selectLastUpdateTime,
-} from '../selectors.js';
-import { actionCreators }  from '../actions/actions.js';
-
-const serviceDependencies = ['$ngRedux', '$scope', '$element'];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
-
-    let template = `
+  let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
             <a class="post-info__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({postUri : null})">
@@ -78,71 +67,82 @@ function genComponentConf() {
         </div>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
 
-            this.is = 'is';
-            this.seeks = 'seeks';
+      this.is = "is";
+      this.seeks = "seeks";
 
-            const selectFromState = (state) => {
-                const postUri = selectOpenPostUri(state);
-                const post = state.getIn(["needs", postUri]);
-                const is = post? post.get('is') : undefined;
-                
-                //TODO it will be possible to have more than one seeks
-                const seeks = post? post.get('seeks') : undefined;
-                
-                return {
-                    WON: won.WON,
-                	isPart: is? {
-                		postUri: postUri,
-                		is: is,
-                		isString: 'is',
-                		location: is && is.get('location'),
-                		address: is.get('location') && is.get('location').get('address'),
-                	}: undefined,
-                	seeksPart: seeks? {
-                		postUri: postUri,
-                		seeks: seeks,
-                		seeksString: 'seeks',
-                		location: seeks && seeks.get('location'),
-                		address: seeks.get('location') && seeks.get('location').get('address'),
-                	}: undefined,
-                    post,
-                    showRequestButton: post && !post.get('ownNeed') && !post.get('isWhatsAround'),
-                    friendlyTimestamp: post && relativeTime(
-                        selectLastUpdateTime(state),
-                        post.get('creationDate')
-                    ),
-                    createdTimestamp: post && post.get('creationDate'),
-                    shouldShowRdf: state.get('showRdf'),
-                }
-            };
-            connect2Redux(selectFromState, actionCreators, ['self.includeHeader'], this);
-        }
+      const selectFromState = state => {
+        const postUri = selectOpenPostUri(state);
+        const post = state.getIn(["needs", postUri]);
+        const is = post ? post.get("is") : undefined;
+
+        //TODO it will be possible to have more than one seeks
+        const seeks = post ? post.get("seeks") : undefined;
+
+        return {
+          WON: won.WON,
+          isPart: is
+            ? {
+                postUri: postUri,
+                is: is,
+                isString: "is",
+                location: is && is.get("location"),
+                address:
+                  is.get("location") && is.get("location").get("address"),
+              }
+            : undefined,
+          seeksPart: seeks
+            ? {
+                postUri: postUri,
+                seeks: seeks,
+                seeksString: "seeks",
+                location: seeks && seeks.get("location"),
+                address:
+                  seeks.get("location") && seeks.get("location").get("address"),
+              }
+            : undefined,
+          post,
+          showRequestButton:
+            post && !post.get("ownNeed") && !post.get("isWhatsAround"),
+          friendlyTimestamp:
+            post &&
+            relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
+          createdTimestamp: post && post.get("creationDate"),
+          shouldShowRdf: state.get("showRdf"),
+        };
+      };
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.includeHeader"],
+        this
+      );
     }
+  }
 
-    Controller.$inject = serviceDependencies;
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        template: template,
-        scope: {
-            includeHeader: "="
-        }
-    }
+  Controller.$inject = serviceDependencies;
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    template: template,
+    scope: {
+      includeHeader: "=",
+    },
+  };
 }
 
-export default angular.module('won.owner.components.postInfo', [ 
-		postIsInfoModule,
-		postSeeksInfoModule,
-        postHeaderModule,
-        postShareLinkModule,
-        labelledHrModule,
-        postContextDropdownModule,
-	])
-    .directive('wonPostInfo', genComponentConf)
-    .name;
+export default angular
+  .module("won.owner.components.postInfo", [
+    postIsInfoModule,
+    postSeeksInfoModule,
+    postHeaderModule,
+    postShareLinkModule,
+    labelledHrModule,
+    postContextDropdownModule,
+  ])
+  .directive("wonPostInfo", genComponentConf).name;

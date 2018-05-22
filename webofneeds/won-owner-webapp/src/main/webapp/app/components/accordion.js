@@ -1,9 +1,7 @@
-;
-
-import angular from 'angular';
+import angular from "angular";
 
 function genComponentConf() {
-    let template = `
+  let template = `
             <div class="accordion__element clickable" ng-click="self.openElement($index)" ng-repeat="item in self.items">
                 <div class="header clickable">{{item.title}}</div>
 
@@ -22,29 +20,28 @@ function genComponentConf() {
             </div>
     `;
 
-    class Controller {
-        constructor() { }
+  class Controller {
+    constructor() {}
 
-        openElement(index) {
-            if(index === this.selectedIdx){
-                this.selectedIdx = undefined;
-            }else{
-                this.selectedIdx = index;
-            }
-        }
+    openElement(index) {
+      if (index === this.selectedIdx) {
+        this.selectedIdx = undefined;
+      } else {
+        this.selectedIdx = index;
+      }
     }
+  }
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {items: '='},
-        template: template
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: { items: "=" },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.accordion', [])
-    .directive('wonAccordion', genComponentConf)
-    .name;
-
+export default angular
+  .module("won.owner.components.accordion", [])
+  .directive("wonAccordion", genComponentConf).name;

@@ -1,7 +1,7 @@
-@import 'won-config';
+@import "won-config";
 
-$verticalPadding: .2rem;
-$horizontalPadding: .5rem;
+$verticalPadding: 0.2rem;
+$horizontalPadding: 0.5rem;
 $minHeight: $iconSize + $verticalPadding * 2;
 
 %typeselect {
@@ -12,27 +12,33 @@ $minHeight: $iconSize + $verticalPadding * 2;
   min-height: $formInputHeight;
   box-sizing: border-box;
 
-  & .ts__option{
-    &:first-of-type { margin-top: 0.5rem; }
-    &:last-of-type { margin-bottom: 0.5rem; }
+  & .ts__option {
+    &:first-of-type {
+      margin-top: 0.5rem;
+    }
+    &:last-of-type {
+      margin-bottom: 0.5rem;
+    }
   }
   & .ts__option--selected {
     margin-top: 0.5rem;
-    margin-bottom: 0.5rem; 
+    margin-bottom: 0.5rem;
   }
-  & .ts__option, & .ts__option--selected {
+  & .ts__option,
+  & .ts__option--selected {
     padding: $verticalPadding $horizontalPadding;
     min-height: $minHeight;
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     position: relative; // so the help-boxes can be placed absolutely
 
     @include flex-row-spaced;
 
-    &:hover, &:focus { 
-      background-color: $won-light-gray; 
+    &:hover,
+    &:focus {
+      background-color: $won-light-gray;
     }
-    &:active { 
+    &:active {
       background-color: $won-light-gray;
       filter: brightness(90%);
     }
@@ -65,10 +71,13 @@ $minHeight: $iconSize + $verticalPadding * 2;
 .typeselect--expanded {
   @extend %typeselect;
 
-  & .ts__option, & .ts__option--selected {
-
-    &:hover, &:focus  {
-      .ts__option__help-btn { display: inline-block; }
+  & .ts__option,
+  & .ts__option--selected {
+    &:hover,
+    &:focus {
+      .ts__option__help-btn {
+        display: inline-block;
+      }
     }
 
     .ts__option__help-btn {
@@ -86,7 +95,9 @@ $minHeight: $iconSize + $verticalPadding * 2;
       display: none;
     }
 
-    .ts__option__carret { display: none }
+    .ts__option__carret {
+      display: none;
+    }
   }
 }
 
@@ -95,6 +106,8 @@ $minHeight: $iconSize + $verticalPadding * 2;
   .ts__option:not(.ts__option--selected) {
     display: none;
 
-    .ts__option__help-btn { display: none; }
+    .ts__option__help-btn {
+      display: none;
+    }
   }
 }

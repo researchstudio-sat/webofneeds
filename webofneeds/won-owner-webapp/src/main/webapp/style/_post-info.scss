@@ -1,7 +1,7 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'animate';
-@import 'responsiveness-utils';
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+@import "responsiveness-utils";
 
 won-send-request,
 won-post-info {
@@ -71,17 +71,23 @@ won-post-info {
     won-post-is-info,
     won-post-seeks-info {
       padding: 1rem 0;
+
+      .post-info__details {
+        &--prewrap {
+          white-space: pre-wrap;
+        }
+      }
     }
 
-    won-need-map{
+    won-need-map {
       display: block;
-      @include slideWithOpacityAnimation(.5s, linear, 20rem);
+      @include slideWithOpacityAnimation(0.5s, linear, 20rem);
 
       .need-map__mapmount {
         width: 100%;
         height: 31rem;
 
-        @media (max-width : $responsivenessBreakPoint) {
+        @media (max-width: $responsivenessBreakPoint) {
           height: 15rem;
         }
       }

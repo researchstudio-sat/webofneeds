@@ -1,38 +1,29 @@
-;
-
-import angular from 'angular';
-import 'ng-redux';
-import connectionHeaderModule from './connection-header.js';
-import feedbackGridModule from './feedback-grid.js';
-import postSeeksInfoModule from './post-seeks-info.js';
-import postIsInfoModule from './post-is-info.js';
-import postShareLinkModule from './post-share-link.js';
-import labelledHrModule from './labelled-hr.js';
-import chatTextFieldSimpleModule from './chat-textfield-simple.js';
-import connectionContextDropdownModule from './connection-context-dropdown.js';
+import angular from "angular";
+import "ng-redux";
+import connectionHeaderModule from "./connection-header.js";
+import feedbackGridModule from "./feedback-grid.js";
+import postSeeksInfoModule from "./post-seeks-info.js";
+import postIsInfoModule from "./post-is-info.js";
+import postShareLinkModule from "./post-share-link.js";
+import labelledHrModule from "./labelled-hr.js";
+import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
+import connectionContextDropdownModule from "./connection-context-dropdown.js";
+import won from "../won-es6.js";
 
 import {
-    selectOpenPostUri,
-    selectNeedByConnectionUri,
-    selectLastUpdateTime,
-} from '../selectors.js';
-import {
-    connect2Redux,
-} from '../won-utils.js';
-import {
-    relativeTime,
-} from '../won-label-utils.js';
-import {
-    attach,
-    getIn,
-} from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
+  selectOpenPostUri,
+  selectNeedByConnectionUri,
+  selectLastUpdateTime,
+} from "../selectors.js";
+import { connect2Redux } from "../won-utils.js";
+import { relativeTime } from "../won-label-utils.js";
+import { attach, getIn } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
 
-const serviceDependencies = ['$ngRedux', '$scope', '$element'];
-
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
-    let template = `
+  let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
             <a class="post-info__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined, sendAdHocRequest: undefined})">
@@ -108,100 +99,120 @@ function genComponentConf() {
         </div>
     `;
 
-    class Controller {
-        constructor() {
-            attach(this, serviceDependencies, arguments);
-            this.maxThumbnails = 9;
-            this.message = '';
-            this.WON = won.WON;
-            window.openMatch4dbg = this;
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      this.maxThumbnails = 9;
+      this.message = "";
+      this.WON = won.WON;
+      window.openMatch4dbg = this;
 
-            const selectFromState = (state) => {
-                //const sendAdHocRequest = getIn(state, ['router', 'currentParams', 'sendAdHocRequest']); //if this parameter is set we will not have a connection to send this request to
+      const selectFromState = state => {
+        //const sendAdHocRequest = getIn(state, ['router', 'currentParams', 'sendAdHocRequest']); //if this parameter is set we will not have a connection to send this request to
 
-                const connectionUri = decodeURIComponent(getIn(state, ['router', 'currentParams', 'connectionUri']));
-                const ownNeed = connectionUri && selectNeedByConnectionUri(state, connectionUri);
-                const connection = ownNeed && ownNeed.getIn(["connections", connectionUri]);
-                const postUriToConnectTo = !connection ? selectOpenPostUri(state) : connection && connection.get("remoteNeedUri");
+        const connectionUri = decodeURIComponent(
+          getIn(state, ["router", "currentParams", "connectionUri"])
+        );
+        const ownNeed =
+          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const connection =
+          ownNeed && ownNeed.getIn(["connections", connectionUri]);
+        const postUriToConnectTo = !connection
+          ? selectOpenPostUri(state)
+          : connection && connection.get("remoteNeedUri");
 
-                const suggestedPost = state.getIn(["needs", postUriToConnectTo]);
+        const suggestedPost = state.getIn(["needs", postUriToConnectTo]);
 
-                const is = suggestedPost? suggestedPost.get('is') : undefined;
-                //TODO it will be possible to have more than one seeks
-                const seeks = suggestedPost? suggestedPost.get('seeks') : undefined;
+        const is = suggestedPost ? suggestedPost.get("is") : undefined;
+        //TODO it will be possible to have more than one seeks
+        const seeks = suggestedPost ? suggestedPost.get("seeks") : undefined;
 
-                return {
-                    connection,
-                    connectionUri,
-                    ownNeed,
-                    isPart: is? {
-                        postUri: postUriToConnectTo,
-                        is: is,
-                        isString: 'is',
-                        location: is && is.get('location'),
-                        address: is.get('location') && is.get('location').get('address'),
-                    }: undefined,
-                    seeksPart: seeks? {
-                        postUri: postUriToConnectTo,
-                        seeks: seeks,
-                        seeksString: 'seeks',
-                        location: seeks && seeks.get('location'),
-                        address: seeks.get('location') && seeks.get('location').get('address'),
-                    }: undefined,
-                    suggestedPost,
-                    lastUpdateTimestamp: connection && connection.get('lastUpdateDate'),
-                    postUriToConnectTo,
-                    friendlyTimestamp: suggestedPost && relativeTime(
-                        selectLastUpdateTime(state),
-                        suggestedPost.get('creationDate')
-                    ),
-                    shouldShowRdf: state.get('showRdf'),
-                    createdTimestamp: suggestedPost && suggestedPost.get('creationDate'),
-                }
-            };
-            connect2Redux(selectFromState, actionCreators, [], this);
+        return {
+          connection,
+          connectionUri,
+          ownNeed,
+          isPart: is
+            ? {
+                postUri: postUriToConnectTo,
+                is: is,
+                isString: "is",
+                location: is && is.get("location"),
+                address:
+                  is.get("location") && is.get("location").get("address"),
+              }
+            : undefined,
+          seeksPart: seeks
+            ? {
+                postUri: postUriToConnectTo,
+                seeks: seeks,
+                seeksString: "seeks",
+                location: seeks && seeks.get("location"),
+                address:
+                  seeks.get("location") && seeks.get("location").get("address"),
+              }
+            : undefined,
+          suggestedPost,
+          lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
+          postUriToConnectTo,
+          friendlyTimestamp:
+            suggestedPost &&
+            relativeTime(
+              selectLastUpdateTime(state),
+              suggestedPost.get("creationDate")
+            ),
+          shouldShowRdf: state.get("showRdf"),
+          createdTimestamp: suggestedPost && suggestedPost.get("creationDate"),
+        };
+      };
+      connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    sendRequest(message) {
+      if (
+        !this.connection ||
+        (this.ownNeed && this.ownNeed.get("isWhatsAround"))
+      ) {
+        this.router__stateGoResetParams("connections");
+
+        if (this.ownNeed && this.ownNeed.get("isWhatsAround")) {
+          //Close the connection if there was a present connection for a whatsaround need
+          this.connections__close(this.connectionUri);
         }
 
-        sendRequest(message) {
-            if(!this.connection || (this.ownNeed && this.ownNeed.get("isWhatsAround"))){
-
-                this.router__stateGoResetParams('connections');
-                
-                if(this.ownNeed && this.ownNeed.get("isWhatsAround")){
-                    //Close the connection if there was a present connection for a whatsaround need
-                    this.connections__close(this.connectionUri);
-                }
-
-                if(this.postUriToConnectTo){
-                    this.connections__connectAdHoc(this.postUriToConnectTo, message);
-                }
-
-                //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
-            }else{
-                this.needs__connect(
-                		this.ownNeed.get("uri"), 
-                		this.connectionUri,
-                		this.ownNeed.getIn(['connections',this.connectionUri]).get("remoteNeedUri"), 
-                		message);
-                this.router__stateGoCurrent({connectionUri: this.connectionUri})
-            }
+        if (this.postUriToConnectTo) {
+          this.connections__connectAdHoc(this.postUriToConnectTo, message);
         }
-    }
-    Controller.$inject = serviceDependencies;
 
-    return {
-        restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            includeHeader: '=' //only read once
-        },
-        template: template
+        //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
+      } else {
+        this.needs__connect(
+          this.ownNeed.get("uri"),
+          this.connectionUri,
+          this.ownNeed
+            .getIn(["connections", this.connectionUri])
+            .get("remoteNeedUri"),
+          message
+        );
+        this.router__stateGoCurrent({ connectionUri: this.connectionUri });
+      }
     }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      includeHeader: "=", //only read once
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.sendRequest', [
+export default angular
+  .module("won.owner.components.sendRequest", [
     postIsInfoModule,
     postSeeksInfoModule,
     connectionHeaderModule,
@@ -210,7 +221,5 @@ export default angular.module('won.owner.components.sendRequest', [
     chatTextFieldSimpleModule,
     postShareLinkModule,
     connectionContextDropdownModule,
-])
-    .directive('wonSendRequest', genComponentConf)
-    .name;
-
+  ])
+  .directive("wonSendRequest", genComponentConf).name;

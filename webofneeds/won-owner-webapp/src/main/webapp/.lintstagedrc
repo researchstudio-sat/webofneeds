@@ -1,0 +1,5 @@
+{
+  "gitDir": " ../../../../../",
+  "*.{js,json,scss,css,md}": ["prettier --write", "git add"],
+  "*.js": ["eslint --fix", "git add"]
+}

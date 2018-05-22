@@ -1,5 +1,5 @@
-@import 'won-config';
-@import 'positioning-utils';
+@import "won-config";
+@import "positioning-utils";
 
 %won-extended-gallery__frame {
   border: $thinGrayBorder;
@@ -35,7 +35,7 @@ won-extended-gallery {
       flex: 0 0 6.5rem;
 
       &__more,
-      &__frame{
+      &__frame {
         margin: 0 0 0.5rem 0.5rem;
       }
     }
@@ -54,7 +54,7 @@ won-extended-gallery {
       flex-direction: row;
 
       &__more,
-      &__frame{
+      &__frame {
         margin: 0.5rem 0.5rem 0 0;
       }
     }
@@ -73,7 +73,7 @@ won-extended-gallery {
       height: $postIconSize;
     }
 
-    &__more{
+    &__more {
       @include fixed-square($postIconSize);
       border: $thinGrayBorder;
       display: flex;

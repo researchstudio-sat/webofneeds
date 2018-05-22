@@ -4,120 +4,125 @@
 
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
-import won from './won.js';
-(function(){ // <message-builder-js> scope
+import won from "./won.js";
+(function() {
+  // <message-builder-js> scope
 
-    /**
-     * Builds the dataset that makes up the message. The set consists of several named
-     * graphs (usually `args.msgUri + '#nameOfSubgraph'`), that contain the payload-
-     * and meta-data.
-     * @param contentRdf
-     * @param args
-     * @returns {{@graph: Array, @context}}
-     */
-    won.buildMessageRdf = function (contentRdf, args) {
-        var needGraphId = args.msgUri + '#need';
-        var msgDataUri = args.msgUri + '#envelope';
-        var msgGraph = [];
+  /**
+   * Builds the dataset that makes up the message. The set consists of several named
+   * graphs (usually `args.msgUri + '#nameOfSubgraph'`), that contain the payload-
+   * and meta-data.
+   * @param contentRdf
+   * @param args
+   * @returns {{@graph: Array, @context}}
+   */
+  won.buildMessageRdf = function(contentRdf, args) {
+    const needGraphId = args.msgUri + "#need";
+    const msgDataUri = args.msgUri + "#envelope";
+    const msgGraph = [];
 
-        var attachments = args.attachments? args.attachments : [];
+    const attachments = args.attachments ? args.attachments : [];
 
+    const attachmentGraphIds = attachments.map(function(a, i) {
+      return args.msgUri + "#attachment-" + i;
+    });
+    const nonEnvelopeGraphIds = Array.prototype.concat(
+      [needGraphId],
+      attachmentGraphIds
+    );
 
-        var attachmentGraphIds = attachments.map(function(a, i){ return args.msgUri + '#attachment-' + i })
-        var nonEnvelopeGraphIds = Array.prototype.concat([needGraphId], attachmentGraphIds);
+    msgGraph.push({
+      // content
+      "@id": needGraphId,
+      "@graph": contentRdf["@graph"],
+    });
 
-        msgGraph.push({
-            // content
-            '@id': needGraphId,
-            '@graph': contentRdf['@graph']
-        });
+    attachments.forEach(function(attachment, i) {
+      msgGraph.push({
+        "@id": attachmentGraphIds[i],
+        "@graph": [
+          {
+            // link to attachment metadata (e.g. signatures, autor-info,...)
+            // and b64-encoded attachment
+            "@id": attachment.uri,
+            // + .png to get image later (but without crypto-signature).
 
-        attachments.forEach(function(attachment, i) {
-            msgGraph.push({
-                '@id' : attachmentGraphIds[i],
-                '@graph' : [
-                    {
-                        // link to attachment metadata (e.g. signatures, autor-info,...)
-                        // and b64-encoded attachment
-                        '@id': attachment.uri,
-                        // + .png to get image later (but without crypto-signature).
-
-                        // using ContentAsBase64: http://www.w3.org/TR/Content-in-RDF10/#ContentAsBase64Class
-                        'cnt:ContentAsBase64' : {
-                            'cnt:bytes': attachment.data,
-                            'msg:contentType': attachment.type
-                            //'dct:isFormatOf : { '@id' : 'http://...png' }
-                            //'dct:format' : { '@id' : 'mime:png' }
-                        }
-                    }
-                ]
-            });
-        });
-
-        var attachmentBlankNodes = attachments.map(function(a, i) {
-            return {
-                '@id': '_:attachment-' + i,
-                'msg:hasDestinationUri': {'@id' : a.uri},
-                'msg:hasAttachmentGraphUri': {'@id' : attachmentGraphIds[i]}
-            }
-        });
-
-        var envelopeGraph = [
-            {
-                '@id': args.msgUri,
-                '@type' : 'msg:FromOwner',
-                'msg:hasSentTimestamp' : (new Date().getTime()),
-                'msg:hasMessageType': { '@id': args.msgType },
-                'msg:hasContent': nonEnvelopeGraphIds.map(function(graphId) {return {'@id': graphId} }),
-                'msg:hasReceiverNode': { '@id': args.receiverNode },
-                'msg:hasSenderNode': { '@id': args.senderNode },
-                'msg:hasSenderNeed': { '@id': args.publishedContentUri },
-                'msg:hasAttachment': attachmentBlankNodes.map(function(n) {return {'@id' : n['@id']} }),
+            // using ContentAsBase64: http://www.w3.org/TR/Content-in-RDF10/#ContentAsBase64Class
+            "cnt:ContentAsBase64": {
+              "cnt:bytes": attachment.data,
+              "msg:contentType": attachment.type,
+              //'dct:isFormatOf : { '@id' : 'http://...png' }
+              //'dct:format' : { '@id' : 'mime:png' }
             },
-            {
-                '@id': msgDataUri,
-                '@type': 'msg:EnvelopeGraph',
-                'rdfg:subGraphOf': { '@id': args.msgUri }
-            }
-        ];
+          },
+        ],
+      });
+    });
 
+    const attachmentBlankNodes = attachments.map(function(a, i) {
+      return {
+        "@id": "_:attachment-" + i,
+        "msg:hasDestinationUri": { "@id": a.uri },
+        "msg:hasAttachmentGraphUri": { "@id": attachmentGraphIds[i] },
+      };
+    });
 
-        msgGraph.push({
-            // msg envelope
-            '@id': msgDataUri,
-            '@graph': envelopeGraph.concat(attachmentBlankNodes)
-        });
+    const envelopeGraph = [
+      {
+        "@id": args.msgUri,
+        "@type": "msg:FromOwner",
+        "msg:hasSentTimestamp": new Date().getTime(),
+        "msg:hasMessageType": { "@id": args.msgType },
+        "msg:hasContent": nonEnvelopeGraphIds.map(function(graphId) {
+          return { "@id": graphId };
+        }),
+        "msg:hasReceiverNode": { "@id": args.receiverNode },
+        "msg:hasSenderNode": { "@id": args.senderNode },
+        "msg:hasSenderNeed": { "@id": args.publishedContentUri },
+        "msg:hasAttachment": attachmentBlankNodes.map(function(n) {
+          return { "@id": n["@id"] };
+        }),
+      },
+      {
+        "@id": msgDataUri,
+        "@type": "msg:EnvelopeGraph",
+        "rdfg:subGraphOf": { "@id": args.msgUri },
+      },
+    ];
 
+    msgGraph.push({
+      // msg envelope
+      "@id": msgDataUri,
+      "@graph": envelopeGraph.concat(attachmentBlankNodes),
+    });
 
-        /*
+    /*
          //TODO in need: links to both unsigned (plain pngs) and signed (in rdf) attachments
          */
 
-        return {
-            '@graph': msgGraph,
-            '@context': won.merge(
-                won.defaultContext,
-                contentRdf['@context'],
-                getTypesForContext()
-            )
-        }
-    }
+    return {
+      "@graph": msgGraph,
+      "@context": won.merge(
+        won.defaultContext,
+        contentRdf["@context"],
+        getTypesForContext()
+      ),
+    };
+  };
 
-
-    function getTypesForContext(){
-        var o = {
-            //'mime' : 'http://purl.org/NET/mediatypes/',
-            //'dct' : 'http://purl.org/dc/terms/',
-            'cnt' : 'http://www.w3.org/2011/content#'
-        };
-        o[won.WONMSG.EnvelopeGraphCompacted] = {
-            '@id': 'http://purl.org/webofneeds/message#EnvelopeGraph',
-            '@type': '@id'
-        };
-        return o;
-    }
-})() // </message-builder-js> scope
-
+  function getTypesForContext() {
+    const o = {
+      //'mime' : 'http://purl.org/NET/mediatypes/',
+      //'dct' : 'http://purl.org/dc/terms/',
+      cnt: "http://www.w3.org/2011/content#",
+    };
+    o[won.WONMSG.EnvelopeGraphCompacted] = {
+      "@id": "http://purl.org/webofneeds/message#EnvelopeGraph",
+      "@type": "@id",
+    };
+    return o;
+  }
+})(); // </message-builder-js> scope
 
 // local loading should be fast enough -> take handles, load & resolve promises during (build()) TODO
 /*

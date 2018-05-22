@@ -1,65 +1,63 @@
 /**
  * Created by ksinger on 24.08.2015.
  */
-;
+import angular from "angular";
+import ngAnimate from "angular-animate";
 
-import angular from 'angular';
-import ngAnimate from 'angular-animate';
-
-import 'ng-redux';
-import posttypeSelectModule from './posttype-select.js';
-import labelledHrModule from './labelled-hr.js';
-import needTextfieldModule from './need-textfield.js';
-import imageDropzoneModule from './image-dropzone.js';
-import locationPickerModule from './location-picker.js';
-import createIsseeksModule from './create-isseeks.js';
+import "ng-redux";
+import labelledHrModule from "./labelled-hr.js";
+import imageDropzoneModule from "./image-dropzone.js";
+import locationPickerModule from "./location-picker.js";
+import createIsseeksModule from "./create-isseeks.js";
+import { postTitleCharacterLimit } from "config";
 import {
-	postTitleCharacterLimit,
-} from 'config';
-import {
-	getIn,
-    attach,
-    reverseSearchNominatim,
-    nominatim2draftLocation,
-} from '../utils.js';
-import { actionCreators }  from '../actions/actions.js';
-import won from '../won-es6.js';
-import Immutable from 'immutable';
-import {
-    connect2Redux,
-} from '../won-utils.js';
+  getIn,
+  attach,
+  reverseSearchNominatim,
+  nominatim2draftLocation,
+} from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import won from "../won-es6.js";
+import { connect2Redux } from "../won-utils.js";
 
 const postTypeTexts = [
-    {
-        type: won.WON.BasicNeedTypeDemand,
-        text: 'I\'m looking for',
-        helpText: 'Select this if you are looking for things or services other people offer',
-    },
-    {
-        type: won.WON.BasicNeedTypeSupply,
-        text: 'I\'m offering',
-        helpText: 'Use this if you are offering an item or a service. You will find people who said' +
-        ' that they\'re looking for something.'
-    },
-    {
-        type: won.WON.BasicNeedTypeDotogether,
-        text: 'I want to find someone to',
-        helpText: 'Select this if you are looking to find other people who share your interest. You will be matched' +
-        ' with other people who chose this option as well.'
-    },
-    {
-        type: won.WON.BasicNeedTypeCombined,
-        text: 'I\'m offering and looking for',
-        helpText: 'Select this if you are looking for things or services other people offer + Use this if you are offering an item or a service. You will find people who said' +
-        ' that they\'re looking for something.'
-    },
+  {
+    type: won.WON.BasicNeedTypeDemand,
+    text: "I'm looking for",
+    helpText:
+      "Select this if you are looking for things or services other people offer",
+  },
+  {
+    type: won.WON.BasicNeedTypeSupply,
+    text: "I'm offering",
+    helpText:
+      "Use this if you are offering an item or a service. You will find people who said" +
+      " that they're looking for something.",
+  },
+  {
+    type: won.WON.BasicNeedTypeDotogether,
+    text: "I want to find someone to",
+    helpText:
+      "Select this if you are looking to find other people who share your interest. You will be matched" +
+      " with other people who chose this option as well.",
+  },
+  {
+    type: won.WON.BasicNeedTypeCombined,
+    text: "I'm offering and looking for",
+    helpText:
+      "Select this if you are looking for things or services other people offer + Use this if you are offering an item or a service. You will find people who said" +
+      " that they're looking for something.",
+  },
 ];
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = [
+  "$ngRedux",
+  "$scope" /*'$routeParams' /*injections as strings here*/,
+];
 
 function genComponentConf() {
-    const template = `
+  const template = `
         <div class="cp__header">
             <a class="cp__header__back clickable show-in-responsive"
                 ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
@@ -122,193 +120,236 @@ function genComponentConf() {
         </div>
         -->
     `;
-    
-    class Controller {
-        constructor(/* arguments <- serviceDependencies */) {
-            attach(this, serviceDependencies, arguments);
 
-            this.SEARCH = "search";
-            this.POST = "post";
+  class Controller {
+    constructor(/* arguments <- serviceDependencies */) {
+      attach(this, serviceDependencies, arguments);
 
-            //TODO debug; deleteme
-            window.cnc = this;
-           
-            this.postTypeTexts = postTypeTexts;
-            this.characterLimit = postTitleCharacterLimit;
-            this.draftIs = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
-            this.draftSeeks = {title: "", type: postTypeTexts[3].type, description: "", tags: undefined, location: undefined, thumbnail: undefined, matchingContext: undefined};
-            
-            this.draftObject = {is: this.draftIs, seeks: this.draftSeeks};
-            
-            this.is = 'is'
-            this.seeks = 'seeks';
-           
-            this.pendingPublishing = false;
-            this.details = {is: [], seeks: []};
-            this.isNew = true;
-            
-            this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
-            this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : [];
-            this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
-            
-            const selectFromState = (state) => {
-                const showCreateView = getIn(state, ['router', 'currentParams', 'showCreateView']);
-                const isSearch = showCreateView === this.SEARCH;
-                const isPost = showCreateView && !isSearch;
+      this.SEARCH = "search";
+      this.POST = "post";
 
-            	return {
-                    existingWhatsAroundNeeds: state.get("needs").filter(need => need.get("isWhatsAround")),
-                    showCreateView,
-                    isSearch,
-                    isPost
-                }
-            };
-            
-            
-            // Using actionCreators like this means that every action defined there is available in the template.
-            connect2Redux(selectFromState, actionCreators, [], this);
+      //TODO debug; deleteme
+      window.cnc = this;
+
+      this.postTypeTexts = postTypeTexts;
+      this.characterLimit = postTitleCharacterLimit;
+      this.draftIs = {
+        title: "",
+        type: postTypeTexts[3].type,
+        description: "",
+        tags: undefined,
+        location: undefined,
+        thumbnail: undefined,
+        matchingContext: undefined,
+      };
+      this.draftSeeks = {
+        title: "",
+        type: postTypeTexts[3].type,
+        description: "",
+        tags: undefined,
+        location: undefined,
+        thumbnail: undefined,
+        matchingContext: undefined,
+      };
+
+      this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
+
+      this.is = "is";
+      this.seeks = "seeks";
+
+      this.pendingPublishing = false;
+      this.details = { is: [], seeks: [] };
+      this.isNew = true;
+
+      this.defaultContext = this.$ngRedux
+        .getState()
+        .getIn(["config", "theme", "defaultContext"]);
+      this.tempMatchingContext = this.defaultContext
+        ? this.defaultContext.toJS()
+        : [];
+      this.tempMatchingString = this.tempMatchingContext
+        ? this.tempMatchingContext.join(" ")
+        : "";
+
+      const selectFromState = state => {
+        const showCreateView = getIn(state, [
+          "router",
+          "currentParams",
+          "showCreateView",
+        ]);
+        const isSearch = showCreateView === this.SEARCH;
+        const isPost = showCreateView && !isSearch;
+
+        return {
+          existingWhatsAroundNeeds: state
+            .get("needs")
+            .filter(need => need.get("isWhatsAround")),
+          showCreateView,
+          isSearch,
+          isPost,
+        };
+      };
+
+      // Using actionCreators like this means that every action defined there is available in the template.
+      connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    isValid() {
+      return (
+        (this.draftObject[this.is] || this.draftObject[this.seeks]) &&
+        (this.draftObject[this.is].title ||
+          this.draftObject[this.seeks].title) &&
+        (this.draftObject[this.is].title.length < this.characterLimit ||
+          this.draftObject[this.seeks].title.length < this.characterLimit)
+      );
+    }
+
+    updateDraft(updatedDraft, isSeeks) {
+      if (this.isNew) {
+        this.isNew = false;
+        if (!this.defaultContext) {
+          this.defaultContext = this.$ngRedux
+            .getState()
+            .getIn(["config", "theme", "defaultContext"]);
+          this.tempMatchingContext = this.defaultContext
+            ? this.defaultContext.toJS()
+            : [];
+          this.tempMatchingString = this.tempMatchingContext
+            ? this.tempMatchingContext.join(" ")
+            : "";
         }
-        
-        isValid(){
-            return (this.draftObject[this.is] || this.draftObject[this.seeks]) 
-            		&& (this.draftObject[this.is].title || this.draftObject[this.seeks].title)
-            		&& ((this.draftObject[this.is].title.length < this.characterLimit) || (this.draftObject[this.seeks].title.length < this.characterLimit));
-        }
-       
-        updateDraft(updatedDraft, isSeeks) {
-        	if(this.isNew){
-        		this.isNew = false;
-        		if(!this.defaultContext) {
-	        		this.defaultContext = this.$ngRedux.getState().getIn(['config', 'theme', 'defaultContext']);
-	                this.tempMatchingContext = this.defaultContext? this.defaultContext.toJS() : [];
-	                this.tempMatchingString = this.tempMatchingContext? this.tempMatchingContext.join(" ") : "";
-        		}
-        	}
-        	
-        	this.draftObject[isSeeks] = updatedDraft;
-        }
-        
-        mergeMatchingContext() {
-        	var list = this.tempMatchingString? this.tempMatchingString.match(/(\S+)/gi) : [];
-        	var uniq = list.reduce(function(a,b){
-        	    if (a.indexOf(b) < 0 ) a.push(b);
-        	    return a;
-        	  },[]);
+      }
 
-        	return list.reduce(function(a,b){if(a.indexOf(b)<0)a.push(b);return a;},[]);          
-        }
-        
-        addMatchingContext() {
-            this.tempMatchingContext = this.mergeMatchingContext();
+      this.draftObject[isSeeks] = updatedDraft;
+    }
+
+    mergeMatchingContext() {
+      const list = this.tempMatchingString
+        ? this.tempMatchingString.match(/(\S+)/gi)
+        : [];
+
+      return list.reduce(function(a, b) {
+        if (a.indexOf(b) < 0) a.push(b);
+        return a;
+      }, []);
+    }
+
+    addMatchingContext() {
+      this.tempMatchingContext = this.mergeMatchingContext();
+    }
+
+    publish() {
+      // Post both needs
+      if (!this.pendingPublishing) {
+        this.pendingPublishing = true;
+
+        const tmpList = [this.is, this.seeks];
+        const newObject = {
+          is: this.draftObject.is,
+          seeks: this.draftObject.seeks,
+        };
+
+        for (const tmp of tmpList) {
+          if (this.tempMatchingContext.length > 0) {
+            newObject[tmp].matchingContext = this.tempMatchingContext;
+          }
+
+          if (newObject[tmp].title === "") {
+            delete newObject[tmp];
+          }
         }
 
-        
-        publish() {
-        	// Post both needs
-            if (!this.pendingPublishing) {
-                this.pendingPublishing = true;
+        this.needs__create(
+          newObject,
+          this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
+        );
+      }
+    }
 
-                var tmpList = [this.is, this.seeks];
-                var newObject = {is: this.draftObject.is, seeks: this.draftObject.seeks}; 
-                
-                for(i = 0; i < 2; i ++){
-                	var tmp = tmpList[i];
-                	                   
-                    if(this.tempMatchingContext.length > 0){
-                    	newObject[tmp].matchingContext = this.tempMatchingContext;
-                    }
-                    
-                    if(newObject[tmp].title === "") {
-                    	delete newObject[tmp];
-                    }
-                }
-                
-               this.needs__create(
-                    newObject,
-                		this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
+    createWhatsAround() {
+      if (!this.pendingPublishing) {
+        this.pendingPublishing = true;
+
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            currentLocation => {
+              const lat = currentLocation.coords.latitude;
+              const lng = currentLocation.coords.longitude;
+              const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
+
+              // center map around current location
+
+              reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
+                const location = nominatim2draftLocation(searchResult);
+
+                let whatsAround = {
+                  title: "What's Around?",
+                  type: "http://purl.org/webofneeds/model#DoTogether",
+                  description:
+                    "Automatically created post to see what's happening in your area",
+                  tags: undefined,
+                  location: location,
+                  thumbnail: undefined,
+                  whatsAround: true,
+                  matchingContext: this.tempMatchingContext,
+                };
+
+                this.existingWhatsAroundNeeds
+                  .filter(need => need.get("state") == "won:Active")
+                  .map(need => this.needs__close(need.get("uri")));
+
+                //TODO: Point to same DataSet instead of double it
+                this.draftObject.is = whatsAround;
+                this.draftObject.seeks = this.draftObject.is;
+                this.needs__create(
+                  this.draftObject,
+                  this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
                 );
+              });
+            },
+            error => {
+              //error handler
+              console.error(
+                "Could not retrieve geolocation due to error: ",
+                error.code,
+                "fullerror:",
+                error
+              );
+              this.geoLocationDenied();
+              this.pendingPublishing = false;
+            },
+            {
+              //options
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0,
             }
+          );
         }
-      
-        createWhatsAround(){
-            if (!this.pendingPublishing) {
-                this.pendingPublishing = true;
-
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        currentLocation => {
-                            const lat = currentLocation.coords.latitude;
-                            const lng = currentLocation.coords.longitude;
-                            const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
-
-                            const degreeConstant = 1.0;
-
-                            // center map around current location
-
-                            reverseSearchNominatim(lat, lng, zoom)
-                                .then(searchResult => {
-                                    const location = nominatim2draftLocation(searchResult);
-
-                                    let whatsAround = {
-                                        title: "What's Around?",
-                                        type: "http://purl.org/webofneeds/model#DoTogether",
-                                        description: "Automatically created post to see what's happening in your area",
-                                        tags: undefined,
-                                        location: location,
-                                        thumbnail: undefined,
-                                        whatsAround: true,
-                                        matchingContext: this.tempMatchingContext
-                                    };
-
-                                    this.existingWhatsAroundNeeds
-                                    	.filter( need => need.get("state") == "won:Active" )
-                                    	.map(need => this.needs__close(need.get("uri")) );
-
-                                    //TODO: Point to same DataSet instead of double it
-                                    this.draftObject.is = whatsAround;
-                                    this.draftObject.seeks = this.draftObject.is;
-                                    this.needs__create(
-                                        this.draftObject,
-                                        this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
-                                    );
-                                });
-                        },
-                        error => { //error handler
-                            console.error("Could not retrieve geolocation due to error: ", error.code, "fullerror:", error);
-                            this.geoLocationDenied();
-                            this.pendingPublishing = false;
-                        },
-                        { //options
-                            enableHighAccuracy: true,
-                            timeout: 5000,
-                            maximumAge: 0
-                        }
-                    )
-                }
-            }
-        }
+      }
     }
-    Controller.$inject = serviceDependencies;
+  }
+  Controller.$inject = serviceDependencies;
 
-    return {
-    	restrict: 'E',
-        controller: Controller,
-        controllerAs: 'self',
-        bindToController: true, //scope-bindings -> ctrl
-        scope: {/*scope-isolation*/},
-        template: template,
-    }
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      /*scope-isolation*/
+    },
+    template: template,
+  };
 }
 
-export default angular.module('won.owner.components.createPost', [
-        posttypeSelectModule,
-        labelledHrModule,
-        imageDropzoneModule,
-        needTextfieldModule,
-        locationPickerModule,
-        createIsseeksModule,
-        ngAnimate,
-    ])
-    .directive('wonCreatePost', genComponentConf)
-    //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
-    .name;
+export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+angular
+  .module("won.owner.components.createPost", [
+    labelledHrModule,
+    imageDropzoneModule,
+    locationPickerModule,
+    createIsseeksModule,
+    ngAnimate,
+  ])
+  .directive("wonCreatePost", genComponentConf).name;
