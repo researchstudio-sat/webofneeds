@@ -50,6 +50,7 @@ function genComponentConf() {
         this.initialTags.forEach(function(tag) {
           _tagsForTextfield += "#" + tag + " ";
         });
+        this.showResetButton = true;
       }
       this.textfield().value = _tagsForTextfield.trim();
 
