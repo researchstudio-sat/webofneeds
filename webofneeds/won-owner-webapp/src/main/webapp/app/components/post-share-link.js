@@ -48,8 +48,7 @@ function genComponentConf() {
           linkToPost:
             post &&
             new URL(
-              ownerBaseUrl + "#!post/?postUri=" + encodeURI(post.get("uri")),
-              window.location.href
+              ownerBaseUrl + "#!post/?postUri=" + encodeURI(post.get("uri"))
             ).href,
         };
       };
