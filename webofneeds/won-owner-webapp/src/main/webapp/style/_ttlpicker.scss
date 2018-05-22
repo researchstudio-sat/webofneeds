@@ -1,0 +1,38 @@
+@import "won-config";
+@import "text";
+@import "textfield";
+
+won-ttl-picker {
+  display: grid;
+  grid-gap: 1rem;
+
+  .ttlp__input {
+    position: relative;
+    display: grid; // to stretch input__inner
+
+    .ttlp__input__icon {
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
+
+    // .ttlp__input__inner {
+    //   width: 100%;
+    //   min-width: 100%;
+    // }
+  }
+
+  .ttlp__parse-error {
+    white-space: pre-wrap;
+    color: $won-primary-color;
+    font-family: $font-family-monospace;
+    font-size: $smallFontSize;
+    //@include appearAnimation(0.5s, linear);
+  }
+
+  .ttlp__helptext {
+    @include fine-print;
+  }
+}
