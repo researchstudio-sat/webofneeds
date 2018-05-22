@@ -145,14 +145,14 @@ function genComponentConf() {
 
             <!-- LOCATION -->
             <won-location-picker 
-                ng-show="self.openDetail === 'location'"
+                ng-if="self.openDetail === 'location'"
                 initial-location="::self.draftObject.location"
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
             <!-- TAGS -->
             <won-tags-picker
-                ng-show="self.openDetail === 'tags'"
+                ng-if="self.openDetail === 'tags'"
                 initial-tags="::self.draftObject.tags"
                 on-tags-updated="::self.updateTags(tags)">
             </won-tags-picker>

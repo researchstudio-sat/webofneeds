@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, extractHashtags } from "../utils.js";
+import { attach, delay, extractHashtags } from "../utils.js";
 import { DomCache } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element", "$sce"];
@@ -39,6 +39,21 @@ function genComponentConf() {
 
       this.addedTags = this.initialTags;
       this.showResetButton = false;
+
+      delay(0).then(() => this.showInitialTags());
+    }
+
+    showInitialTags() {
+      this.addedTags = this.initialTags;
+      let _tagsForTextfield = "";
+      if (this.initialTags) {
+        this.initialTags.forEach(function(tag) {
+          _tagsForTextfield += "#" + tag + " ";
+        });
+      }
+      this.textfield().value = _tagsForTextfield.trim();
+
+      this.$scope.$apply();
     }
 
     updateTags() {
@@ -57,7 +72,7 @@ function genComponentConf() {
     resetTags() {
       this.addedTags = undefined;
       this.textfield().value = "";
-      this.onTagsUpdated({ tags: this.addedTags });
+      this.onTagsUpdated({ tags: undefined });
       this.showResetButton = false;
     }
 
