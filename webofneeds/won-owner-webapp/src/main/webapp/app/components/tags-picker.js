@@ -23,6 +23,8 @@ function genComponentConf() {
       </div>
 
       <!-- LIST OF ADDED TAGS -->
+      <!-- TODO: make tags individually deletable -->
+      <!-- TODO: add # to tag text -->
       <div class="tp__taglist">
         <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">#{{tag}}</span>
       </div>

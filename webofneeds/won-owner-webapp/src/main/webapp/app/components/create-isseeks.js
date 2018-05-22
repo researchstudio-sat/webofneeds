@@ -151,9 +151,6 @@ function genComponentConf() {
             </won-location-picker>
 
             <!-- TAGS -->
-            <!-- TODO: move resetTags() to a new button -->
-            <!-- TODO: make tags individually deletable? -->
-            <!-- TODO: add # to tag text -->
             <won-tags-picker
                 ng-show="self.openDetail === 'tags'"
                 initial-tags="::self.draftObject.tags"
