@@ -9,6 +9,7 @@
     "angular-sanitize": "1.6.6",
     "angular-ui-router": "1.0.3",
     "geopoint": "1.0.1",
+    "identicon.js": "^2.3.2",
     "immutable": "3.7.5",
     "jsonld": "1.0.1",
     "leaflet": "0.7.7",
