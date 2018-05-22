@@ -5,6 +5,8 @@ import { attach } from "../utils.js";
 
 import { connect2Redux } from "../won-utils.js";
 
+import { ownerBaseUrl } from "config";
+
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
@@ -46,7 +48,7 @@ function genComponentConf() {
           linkToPost:
             post &&
             new URL(
-              "/owner/#!post/?postUri=" + encodeURI(post.get("uri")),
+              ownerBaseUrl + "#!post/?postUri=" + encodeURI(post.get("uri")),
               window.location.href
             ).href,
         };

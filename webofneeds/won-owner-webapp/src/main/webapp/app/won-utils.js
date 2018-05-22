@@ -11,6 +11,8 @@ import {
   getRandomString,
 } from "./utils.js";
 
+import { ownerBaseUrl } from "config";
+
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
 
@@ -170,7 +172,7 @@ export function checkLoginStatus() {
  */
 export function registerAccount(credentials) {
   const { email, password } = parseCredentials(credentials);
-  return fetch("/owner/rest/users/", {
+  return fetch(ownerBaseUrl + "rest/users/", {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -187,7 +189,7 @@ export function registerAccount(credentials) {
  */
 export function login(credentials) {
   const { email, password, rememberMe } = parseCredentials(credentials);
-  const loginUrl = "/owner/rest/users/signin";
+  const loginUrl = ownerBaseUrl + "rest/users/signin";
   const params =
     "username=" +
     encodeURIComponent(email) +
@@ -207,7 +209,7 @@ export function login(credentials) {
 }
 
 export function logout() {
-  return fetch("/owner/rest/users/signout", {
+  return fetch(ownerBaseUrl + "rest/users/signout", {
     method: "post",
     headers: {
       Accept: "application/json",

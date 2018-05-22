@@ -17,6 +17,8 @@ import { ensureLoggedIn } from "./account-actions";
 
 import { actionTypes, actionCreators } from "./actions.js";
 
+import { ownerBaseUrl } from "config";
+
 import {
   buildCreateMessage,
   buildOpenMessage,
@@ -35,7 +37,6 @@ const keySet = deepFreeze(
     "cancellationPendingAgreementUris",
   ])
 );
-const baseString = deepFreeze("/owner/");
 
 export function connectionsChatMessage(
   chatMessage,
@@ -378,7 +379,7 @@ export function connectionsRate(connectionUri, rating) {
 export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
   return (dispatch, getState) => {
     const url =
-      baseString +
+      ownerBaseUrl +
       "rest/agreement/getAgreementProtocolUris?connectionUri=" +
       connectionUri;
     let hasChanged = false;

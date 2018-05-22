@@ -5,14 +5,15 @@ import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
+import { ownerBaseUrl } from "config";
 
 const goodServicesOffer = "matchat.org";
 const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
 
 const howSecure1 =
-  window.location.protocol + "//" + window.location.host + "/owner/";
+  window.location.protocol + "//" + window.location.host + ownerBaseUrl;
 const howSecure1Link = howSecure1.link(
-  window.location.protocol + "//" + window.location.host + "/owner/"
+  window.location.protocol + "//" + window.location.host + ownerBaseUrl
 );
 const howSecure2 =
   window.location.protocol + "//" + window.location.host + "/won/";

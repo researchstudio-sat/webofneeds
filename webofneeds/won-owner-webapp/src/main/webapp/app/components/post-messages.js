@@ -9,7 +9,8 @@ import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 
-import {} from "../won-label-utils.js";
+import { ownerBaseUrl } from "config";
+
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay, deepFreeze, clone } from "../utils.js";
 import {
@@ -208,7 +209,6 @@ function genComponentConf() {
 
       this.showLoadingInfo = false;
 
-      this.baseString = "/owner/";
       this.declarations = clone(declarations);
 
       this.agreementHeadData = this.cloneDefaultData();
@@ -463,7 +463,7 @@ function genComponentConf() {
 
     getAgreementDataUris() {
       const url =
-        this.baseString +
+        ownerBaseUrl +
         "rest/agreement/getAgreementProtocolUris?connectionUri=" +
         this.connection.get("uri");
       let hasChanged = false;

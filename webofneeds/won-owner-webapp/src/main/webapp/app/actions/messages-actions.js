@@ -9,6 +9,8 @@ import {
   getConnectionRelatedData,
 } from "./actions.js";
 
+import { ownerBaseUrl } from "config";
+
 import Immutable from "immutable";
 
 import {
@@ -196,10 +198,9 @@ export function connectionMessageReceived(event) {
       connectionUri,
       "messages",
     ]);
-    const baseString = "/owner/";
 
     const url =
-      baseString +
+      ownerBaseUrl +
       "rest/agreement/getMessageEffects?connectionUri=" +
       connectionUri +
       "&messageUri=" +

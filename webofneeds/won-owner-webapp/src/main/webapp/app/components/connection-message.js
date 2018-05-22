@@ -15,6 +15,8 @@ import {
 import { actionCreators } from "../actions/actions.js";
 import { selectNeedByConnectionUri } from "../selectors.js";
 
+import { ownerBaseUrl } from "config";
+
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -154,14 +156,14 @@ function genComponentConf() {
             </div>
             <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
                 target="_blank"
-                href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
+                href="{{self.ownerBaseUrl}}rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
                     <svg class="rdflink__small clickable">
                             <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
             </a>
             <a ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
                 target="_blank"
-                href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
+                href="{{self.ownerBaseUrl}}rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
                     <svg class="rdflink__small clickable">
                         <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
@@ -175,6 +177,8 @@ function genComponentConf() {
       this.relativeTime = relativeTime;
       this.clicked = false;
       this.showDetail = false;
+
+      this.ownerBaseUrl = ownerBaseUrl;
 
       window.cmsg4dbg = this;
 

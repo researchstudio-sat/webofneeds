@@ -6,6 +6,8 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
+import { ownerBaseUrl } from "config";
+
 import { getRandomWonId } from "./won-utils.js";
 
 export const emptyDataset = Immutable.fromJS({
@@ -442,7 +444,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 function fetchOwnedNeedUris() {
-  return fetch("/owner/rest/needs/", {
+  return fetch(ownerBaseUrl + "rest/needs/", {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -470,7 +472,8 @@ export function callAgreementsFetch(url) {
 
 export function callAgreementEventFetch(needUri, eventUri) {
   return fetch(
-    "/owner/rest/linked-data/?requester=" +
+    ownerBaseUrl +
+      "rest/linked-data/?requester=" +
       encodeURI(needUri) +
       "&uri=" +
       encodeURI(eventUri),

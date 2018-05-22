@@ -28,6 +28,8 @@ import {
   get,
 } from "../utils.js";
 
+import { ownerBaseUrl } from "config";
+
 import rdfstore from "rdfstore-js";
 import jsonld from "jsonld";
 import won from "./won.js";
@@ -65,7 +67,7 @@ import won from "./won.js";
    * @returns {string}
    */
   function queryString(dataUri, queryParams = {}) {
-    let queryOnOwner = "/owner/rest/linked-data/?";
+    let queryOnOwner = ownerBaseUrl + "rest/linked-data/?";
     if (queryParams.requesterWebId) {
       queryOnOwner +=
         "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
@@ -1096,23 +1098,7 @@ import won from "./won.js";
               {
                 /* frame */
                 "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
-                "@context": {
-                  msg: "http://purl.org/webofneeds/message#",
-                  woncrypt: "http://purl.org/webofneeds/woncrypt#",
-                  xsd: "http://www.w3.org/2001/XMLSchema#",
-                  cert: "http://www.w3.org/ns/auth/cert#",
-                  rdfs: "http://www.w3.org/2000/01/rdf-schema#",
-                  sig:
-                    "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
-                  geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
-                  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                  won: "http://purl.org/webofneeds/model#",
-                  ldp: "http://www.w3.org/ns/ldp#",
-                  sioc: "http://rdfs.org/sioc/ns#",
-                  dc: "http://purl.org/dc/elements/1.1/",
-                  dct: "http://purl.org/dc/terms/",
-                  s: "http://schema.org/",
-                },
+                "@context": won.defaultContext,
               }
             );
             resolve(needJsonLdP);
