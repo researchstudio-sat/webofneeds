@@ -1,0 +1,55 @@
+@import "won-config";
+@import "textfield";
+
+won-tags-picker {
+  .tp__input {
+    position: relative;
+
+    .tp__input__icon {
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
+
+    .tp__input__inner {
+      border: $thinGrayBorder;
+      box-sizing: border-box;
+      font-size: $normalFontSize;
+      min-height: $formInputHeight;
+      min-width: 0; // so a size is specified and break-word works
+      width: 100%;
+      word-wrap: break-word;
+
+      $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
+        $thinBorderWidth;
+      padding: $verticalPadding 0.438rem;
+
+      &--withreset {
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+    }
+
+    .tp__input__inner::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .tp__taglist {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0.5rem 0;
+
+    .tp__taglist__tag {
+      border-radius: 0.5rem;
+      background: $won-primary-color;
+      color: white;
+      margin: 0.25rem 0.25rem 0.25rem 0;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+}
