@@ -8,7 +8,7 @@ import {
 } from "../utils.js";
 import { DomCache } from "../cstm-ng-utils.js";
 
-const serviceDependencies = ["$scope", "$element", "$sce"];
+const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <!-- INPUT FIELD -->
@@ -53,28 +53,17 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
+      this.won = won;
 
       window.ttlp4dbg = this;
 
-      this.savedTTL = this.initialTTL;
+      this.textfield().value = this.initialTtl || "";
       this.ttlParseError = undefined;
       this.showResetButton = false;
     }
 
-    // doneTyping() {
-    //   const text = this.textfield().value;
-
-    //   this.showResetButton = false;
-
-    //   if (!text) {
-    //     // do something
-    //   } else {
-    //     // do something
-    //   }
-    // }
-
     updateTTLBuffered() {
-      if (this.textfield().value !== "") {
+      if (this.textfield().value.length > 0) {
         this.showResetButton = true;
       }
 
@@ -85,38 +74,42 @@ function genComponentConf() {
     }
 
     updateTTL() {
-      delay(200).then(() => {
-        const ttlString = this.textfield().value;
-        //delay(200);
+      const ttlString = this.textfield().value;
+      if (ttlString && ttlString.trim().length > 0) {
+        this.onTtlUpdated({ ttl: ttlString });
+      } else {
+        this.showResetButton = false;
+        this.ttlParseError = undefined;
+      }
 
-        if (ttlString && ttlString.trim().length > 0) {
-          return won
-            .ttlToJsonLd(ttlString)
-            .then(parsedJsonLd => {
-              this.$scope.$apply(() => (this.ttlParseError = ""));
-              console.log("no error");
-              return parsedJsonLd;
-            })
-            .catch(parseError => {
-              this.$scope.$apply(
-                () => (this.ttlParseError = parseError.message)
-              );
-            });
-        } else {
-          this.showResetButton = false;
+      this.checkTTLparsability();
+    }
+
+    async checkTTLparsability() {
+      // everything below is just for checking if the string is parsable
+      // prints an error message if not
+      await delay(200); // nicer deletion behaviour
+      const ttlString = this.textfield().value;
+
+      if (ttlString && ttlString.trim().length > 0) {
+        try {
+          await won.ttlToJsonLd(ttlString);
           this.ttlParseError = undefined;
+          this.$scope.$apply();
+        } catch (parseError) {
+          this.ttlParseError = parseError.message;
+          this.$scope.$apply();
         }
-      });
-
-      // writes error message if an error occurs
+      }
     }
 
     resetTTL() {
-      this.savedTTL = undefined;
       this.ttlParseError = undefined;
       this.textfield().value = "";
-      this.onTTLUpdated({ ttl: this.savedTTL });
+      this.onTtlUpdated({ ttl: undefined });
       this.showResetButton = false;
+      // make sure that the textfield updates its size:
+      this.textfield().dispatchEvent(new Event("input"));
     }
 
     textfieldNg() {
@@ -135,8 +128,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onTTLUpdated: "&",
-      initialTTL: "=",
+      onTtlUpdated: "&",
+      initialTtl: "=",
     },
     template: template,
   };
