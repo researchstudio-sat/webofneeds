@@ -18,11 +18,11 @@
     *  Restart Eclipse. 
     *  Open Window >> Preferences >> General >> Keys and select the scheme "Intellij Idea".
 11. Change "spaces for tabs" settings: 
-    * General: Window >> Preferences >> General >> Editors >> Text Editors >> Check 'Insert spaces for tabs'
-    * JavaScript: Window >> Preferences >> Javascript >> Code Style >> Formatter >> Edit >> Indentation >> Tab policy >> choose 'spaces only'
-        * Set 'Indentation size' + 'Tab size': '2'
+    * General: Window >> Preferences >> General >> Editors >> Text Editors >> Check `Insert spaces for tabs`
+    * JavaScript: Window >> Preferences >> Javascript >> Code Style >> Formatter >> Edit >> Indentation >> Tab policy >> choose `spaces only`
+        * Set `Indentation size` + `Tab size`: `2`
         * Rename the formatter settings profile to save it
-12. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check 'skip-tests'
+12. Set maven profiles: right-click the webofneeds project in the package explorer >> Maven >> Select Maven Profiles. check `skip-tests`
 13. If you develop on Windows you will need to setup `node`s `windows-build-tools` (see [this guide](./installation-setting-up-frontend-development-environment.md#installing-windows-build-tools-on-windows))
 
 ### Tomcat integration:
