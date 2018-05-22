@@ -1,7 +1,16 @@
-/**
+@function calcVerticalPaddingToHeight(
+  $fontSize,
+  $lineHeightFactor,
+  $borderWidth,
+  $intendedHeight
+) {
+  $heightOfALine: $fontSize * $lineHeightFactor;
+  $verticalPadding: ($intendedHeight - $heightOfALine) / 2 - $borderWidth;
+  @return $verticalPadding;
+}
+/* *
  * Pads a textfield so it has the $intendedHeight. Note, that for growing
- * textareas this only holds at the start, tho ^^
- */
+ * textareas this only holds at the start, tho ^^ */
 @mixin padToHeight(
   $fontSize,
   $lineHeightFactor,
@@ -10,11 +19,31 @@
 ) {
   font-size: $fontSize;
   border-width: $borderWidth;
-  $heightOfALine: $fontSize * $lineHeightFactor;
-  $verticalPadding: ($intendedHeight - $heightOfALine) / 2 - $borderWidth;
+  $verticalPadding: calcVerticalPaddingToHeight(
+    $fontSize,
+    $lineHeightFactor,
+    $borderWidth,
+    $intendedHeight
+  );
   padding-top: $verticalPadding;
   padding-bottom: $verticalPadding;
-  padding: $verticalPadding (0.438 * $fontSize);
+  padding-left: 0.438 * $fontSize;
+  padding-right: 0.438 * $fontSize;
+}
+@mixin textfieldPadding(
+  $fontSize,
+  $lineHeightFactor,
+  $borderWidth,
+  $intendedHeight
+) {
+  @include padToHeight(
+    $fontSize,
+    $lineHeightFactor,
+    $borderWidth,
+    $intendedHeight
+  );
+  padding-left: 0.438 * $fontSize;
+  padding-right: 0.438 * $fontSize;
 }
 .won-txt {
   border-style: solid;
@@ -32,7 +61,7 @@
     border-color: $won-primary-color;
   }
   &:not(.won-txt--code) {
-    @include padToHeight(
+    @include textfieldPadding(
       $normalFontSize,
       22/16,
       $thinBorderWidth,
@@ -40,7 +69,7 @@
     );
   }
   &.won-txt--code {
-    @include padToHeight(
+    @include textfieldPadding(
       $smallFontSize,
       22/16,
       $thinBorderWidth,

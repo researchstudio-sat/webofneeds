@@ -2,6 +2,7 @@
 @import "text";
 @import "locationpicker";
 @import "tagspicker";
+@import "ttlpicker";
 @import "animate";
 @import "sizing-utils";
 @import "textfield";
@@ -37,10 +38,6 @@ won-create-isseeks {
 
         color: black;
         --local-primary: black; // for the svg-icons
-        // &:hover {
-        //   color: $won-primary-color;
-        //   --local-primary: $won-primary-color; // for the svg-icons
-        // }
 
         &.picked,
         &.picked .cis__circleicon {
@@ -49,12 +46,6 @@ won-create-isseeks {
           color: $won-primary-color;
           --local-primary: $won-primary-color;
           cursor: default;
-
-          // &:hover {
-          //   color: $won-line-gray;
-          //   --local-primary: $won-line-gray; // for the svg-icons
-          //   cursor: default;
-          // }
         }
       }
     }
@@ -77,22 +68,6 @@ won-create-isseeks {
     .cis__description {
       display: grid;
       grid-gap: 1rem;
-    }
-
-    .cis__ttl {
-      display: grid;
-      grid-gap: 1rem;
-
-      .cis__ttl__helptext {
-        @include fine-print;
-      }
-      .cis__ttl__parse-error {
-        white-space: pre-wrap;
-        color: $won-primary-color;
-        font-family: $font-family-monospace;
-        font-size: $smallFontSize;
-        //@include appearAnimation(0.5s, linear);
-      }
     }
   }
 

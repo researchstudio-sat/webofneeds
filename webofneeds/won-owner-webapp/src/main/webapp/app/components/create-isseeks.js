@@ -158,39 +158,11 @@ function genComponentConf() {
             </won-tags-picker>
 
             <!-- TTL -->
-            <div class="cis__ttl" ng-if="self.openDetail === 'ttl'">
-                <div class="cis__addDetail__header ttl" ng-click="self.details.delete('ttl') && self.updateDraft()">
-                    <svg class="cis__circleicon nonHover">
-                        <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
-                    </svg>
-                    <svg class="cis__circleicon hover">
-                        <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
-                    </svg>
-                    <span class="nonHover">Turtle (TTL)</span>
-                    <span class="hover">Remove Turtle (TTL)</span>
-                </div>
-                <textarea
-                    won-textarea-autogrow
-                    class="cis__ttl__text won-txt won-txt--code"
-                    ng-blur="::self.updateTTL()"
-                    ng-keyup="::self.updateTTLBuffered()"
-                    placeholder="Enter TTL..."></textarea>
-                <div class="cis__ttl__helptext">
-                    Expects valid turtle.
-                    <code><{{::self.won.WON.contentNodeBlankUri.is}}></code> and
-                    <code><{{::self.won.WON.contentNodeBlankUri.seeks}}></code> and
-                    will be replaced by the URI generated for this part (i.e. is/description 
-                    or seeks/searches) of the need. Use the URI, so your TTL can be found 
-                    when parsing the need. See <code>won.defaultTurtlePrefixes</code>
-                    for prefixes that will be added automatically. E.g.
-                    <code><{{::self.won.WON.contentNodeBlankUri.is}}> dc:description "hello world!".</code>
-                    For more information see the
-                    <a href="https://github.com/researchstudio-sat/webofneeds/blob/master/documentation/need-structure.md">
-                        documentation on the need-structure
-                    </a>.
-                </div>
-                <div class="cis__ttl__parse-error" ng-show="self.ttlParseError">{{self.ttlParseError}}</div>
-            </div>
+            <won-ttl-picker
+              ng-if="self.openDetail === 'ttl'"
+              initial-ttl="::self.draftObject.ttl"
+              on-ttl-updated="::self.updateTTL(ttl)">
+            </won-ttl-picker>
         </div>
         <!-- /DETAILS/ -->
 `;
@@ -251,34 +223,6 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    updateTTLBuffered() {
-      if (this._ttlUpdateTimeoutId) {
-        clearTimeout(this._ttlUpdateTimeoutId);
-      }
-      this._ttlUpdateTimeoutId = setTimeout(() => this.updateTTL(), 4000);
-    }
-
-    updateTTL() {
-      //await won.ttlToJsonLd(won.defaultTurtlePrefixes + '\n' + $0.value)
-      const ttlString = (this.ttlInput() || {}).value || "";
-
-      this.draftObject.ttl = ttlString;
-
-      won
-        .ttlToJsonLd(ttlString)
-        .then(parsedJsonLd => {
-          this.$scope.$apply(() => (this.ttlParseError = ""));
-          return parsedJsonLd;
-        })
-        .catch(parseError => {
-          this.$scope.$apply(() => (this.ttlParseError = parseError.message));
-        });
-
-      if (ttlString && !this.details.has("ttl")) {
-        this.details.add("ttl");
-      }
-    }
-
     updateDescription() {
       const descriptionString = (this.descriptionInput() || {}).value || "";
 
@@ -317,6 +261,20 @@ function genComponentConf() {
       this.updateDraft();
     }
 
+    updateTTL(ttl) {
+      if (ttl && ttl.length > 0) {
+        if (!this.details.has("ttl")) {
+          this.details.add("ttl");
+        }
+        this.draftObject.ttl = ttl;
+      } else if (this.details.has("ttl")) {
+        this.details.delete("ttl");
+        this.draftObject.ttl = [];
+      }
+
+      this.updateDraft();
+    }
+
     pickImage(image) {
       this.draftObject.thumbnail = image;
     }
@@ -350,15 +308,6 @@ function genComponentConf() {
       return this._titleInput;
     }
 
-    ttlInputNg() {
-      return angular.element(this.ttlInput());
-    }
-    ttlInput() {
-      if (!this._ttlInput) {
-        this._ttlInput = this.$element[0].querySelector(".cis__ttl__text");
-      }
-      return this._ttlInput;
-    }
     descriptionInputNg() {
       return angular.element(this.descriptionInput());
     }

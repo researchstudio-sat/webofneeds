@@ -9,6 +9,7 @@ import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
 import locationPickerModule from "./location-picker.js";
 import tagsPickerModule from "./tags-picker.js";
+import ttlPickerModule from "./ttl-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
 import {
@@ -351,6 +352,7 @@ angular
     imageDropzoneModule,
     locationPickerModule,
     tagsPickerModule,
+    ttlPickerModule,
     createIsseeksModule,
     ngAnimate,
   ])
