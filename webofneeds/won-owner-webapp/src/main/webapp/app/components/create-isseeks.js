@@ -159,7 +159,7 @@ function genComponentConf() {
 
             <!-- TTL -->
             <won-ttl-picker
-              ng-show="self.openDetail === 'ttl'"
+              ng-if="self.openDetail === 'ttl'"
               initial-ttl="::self.draftObject.ttl"
               on-ttl-updated="::self.updateTTL(ttl)">
             </won-ttl-picker>
@@ -262,15 +262,16 @@ function genComponentConf() {
     }
 
     updateTTL(ttl) {
-      if (!ttl && this.details.has("ttl")) {
-        this.details.delete("ttl");
-        this.draftObject.ttl = undefined;
-      } else if (ttl) {
+      if (ttl && ttl.length > 0) {
         if (!this.details.has("ttl")) {
           this.details.add("ttl");
         }
         this.draftObject.ttl = ttl;
+      } else if (this.details.has("ttl")) {
+        this.details.delete("ttl");
+        this.draftObject.ttl = [];
       }
+
       this.updateDraft();
     }
 
