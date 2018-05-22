@@ -10,16 +10,10 @@ import { ownerBaseUrl } from "config";
 const goodServicesOffer = "matchat.org";
 const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
 
-const howSecure1 =
-  window.location.protocol + "//" + window.location.host + ownerBaseUrl;
-const howSecure1Link = howSecure1.link(
-  window.location.protocol + "//" + window.location.host + ownerBaseUrl
-);
-const howSecure2 =
-  window.location.protocol + "//" + window.location.host + "/won/";
-const howSecure2Link = howSecure2.link(
-  window.location.protocol + "//" + window.location.host + "/won/"
-);
+const howSecure1 = ownerBaseUrl;
+const howSecure1Link = howSecure1.link(ownerBaseUrl);
+const howSecure2 = "/won/";
+const howSecure2Link = howSecure2.link("/won/");
 
 const behindScenes = "here";
 const behindScenesLink = behindScenes.link(
