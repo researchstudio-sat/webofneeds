@@ -1,6 +1,8 @@
 @import "won-config";
 @import "text";
 @import "locationpicker";
+@import "tagspicker";
+@import "ttlpicker";
 @import "animate";
 @import "sizing-utils";
 @import "textfield";
@@ -36,23 +38,14 @@ won-create-isseeks {
 
         color: black;
         --local-primary: black; // for the svg-icons
-        // &:hover {
-        //   color: $won-primary-color;
-        //   --local-primary: $won-primary-color; // for the svg-icons
-        // }
 
-        &.picked {
+        &.picked,
+        &.picked .cis__circleicon {
           //color: $won-line-gray;
           //--local-primary: $won-line-gray; // for the svg-icons
           color: $won-primary-color;
           --local-primary: $won-primary-color;
           cursor: default;
-
-          // &:hover {
-          //   color: $won-line-gray;
-          //   --local-primary: $won-line-gray; // for the svg-icons
-          //   cursor: default;
-          // }
         }
       }
     }
@@ -72,64 +65,9 @@ won-create-isseeks {
       --local-primary: $won-primary-color; // for the svg-icons
     }
 
-    .cis__tags {
-      .cis__taglist {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 0.5rem;
-
-        .cis__taglist__tag {
-          border-radius: 0.5rem;
-          background: $won-dark-purple;
-          color: white;
-          margin: 0.25rem 0.25rem 0.25rem 0;
-          padding: 0.25rem 0.5rem;
-        }
-      }
-      .cis__tags__input {
-        border-width: $thinBorderWidth;
-        border-style: solid;
-        border-radius: 0.1rem;
-        background-color: white;
-
-        font-size: $normalFontSize;
-        min-height: $formInputHeight;
-
-        $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-        $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
-          $thinBorderWidth;
-        padding: $verticalPadding 0.438rem;
-
-        box-sizing: border-box;
-
-        min-width: 0; // so a size is specified and break-word works
-        word-wrap: break-word;
-
-        border-color: $won-line-gray;
-
-        width: 100%;
-      }
-    }
-
     .cis__description {
       display: grid;
       grid-gap: 1rem;
-    }
-
-    .cis__ttl {
-      display: grid;
-      grid-gap: 1rem;
-
-      .cis__ttl__helptext {
-        @include fine-print;
-      }
-      .cis__ttl__parse-error {
-        white-space: pre-wrap;
-        color: $won-primary-color;
-        font-family: $font-family-monospace;
-        font-size: $smallFontSize;
-        //@include appearAnimation(0.5s, linear);
-      }
     }
   }
 

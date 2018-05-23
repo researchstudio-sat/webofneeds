@@ -3,35 +3,36 @@ set -e
 
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
 export base_folder=/usr/share/webofneeds/master
+export live_base_folder=/home/won/matchat
 
 # check if all application data should be removed before deployment
 if [ "$remove_all_data" = true ] ; then
 
   echo generating new certificates! Old files will be deleted!
-  ssh root@satvm02 rm -rf $base_folder/won-server-certs1
-  ssh root@satvm02 rm -rf $base_folder/won-server-certs2
+  ssh root@satvm02 rm -rf $base_folder/won-server-certsownerblue
+  ssh root@satvm02 rm -rf $base_folder/won-server-certsownergreen
   ssh root@satvm02 rm -rf $base_folder/won-client-certs
 
   echo delete postgres, bigdata and solr databases!
-  ssh root@satvm02 rm -rf $base_folder/postgres1/data
-  ssh root@satvm02 rm -rf $base_folder/postgres2/data
+  ssh root@satvm02 rm -rf $base_folder/postgresblue/data
+  ssh root@satvm02 rm -rf $base_folder/postgresgreen/data
   ssh root@satvm02 rm -rf $base_folder/bigdata/data
   ssh root@satvm02 rm -rf $base_folder/solr/won/data
   ssh root@satvm02 rm -rf $base_folder/solr/wontest/data
   ssh root@satvm02 rm -rf $base_folder/mongodb/data
 fi
 
-ssh root@satvm02 mkdir -p $base_folder/won-server-certs1
-ssh root@satvm02 mkdir -p $base_folder/won-server-certs2
+ssh root@satvm02 mkdir -p $base_folder/won-server-certsownerblue
+ssh root@satvm02 mkdir -p $base_folder/won-server-certsownergreen
 ssh root@satvm02 mkdir -p $base_folder/won-client-certs
 
 # create a password file for the certificates, variable ${won_certificate_passwd} must be set from outside the script
-# note: name of the password file is fixed in won-docker/image/nginx/nginx-master.conf
+# note: name of the password file is fixed in won-docker/image/nginx/nginx.conf
 echo ${won_certificate_passwd} > won_certificate_passwd_file
-ssh root@satvm02 mkdir -p $base_folder/won-server-certs1
-scp won_certificate_passwd_file root@satvm02:$base_folder/won-server-certs1/won_certificate_passwd_file
-ssh root@satvm02 mkdir -p $base_folder/won-server-certs2
-scp won_certificate_passwd_file root@satvm02:$base_folder/won-server-certs2/won_certificate_passwd_file
+ssh root@satvm02 mkdir -p $base_folder/won-server-certsownerblue
+scp won_certificate_passwd_file root@satvm02:$base_folder/won-server-certsownerblue/won_certificate_passwd_file
+ssh root@satvm02 mkdir -p $base_folder/won-server-certsownergreen
+scp won_certificate_passwd_file root@satvm02:$base_folder/won-server-certsownergreen/won_certificate_passwd_file
 rm won_certificate_passwd_file
 
 # create the solr data directories (if not available yet) with full rights for every user.
@@ -41,8 +42,13 @@ ssh root@satvm02 mkdir -p $base_folder/solr/wontest/data
 ssh root@satvm02 chmod 777 $base_folder/solr/won/data
 ssh root@satvm02 chmod 777 $base_folder/solr/wontest/data
 
-# copy the nginx.conf file to the proxy server
-rsync $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-master.conf root@satvm02:$base_folder/nginx-master.conf
+# copy the openssl.conf file to the server where the certificates are generated
+# the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf
+scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf root@satvm02:$base_folder/openssl.conf
+
+# copy letsencrypt certificate files from satvm01 (live/matchat) to satvm02
+ssh root@satvm02 mkdir -p $base_folder/letsencrypt/certs/live/matchat.org
+scp -3 won@satvm01:$live_base_folder/letsencrypt/certs/live/matchat.org/* root@satvm02:$base_folder/letsencrypt/certs/live/matchat.org/
 
 # TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
 echo run docker containers using docker-compose on satvm02

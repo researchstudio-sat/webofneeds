@@ -1,6 +1,7 @@
 @import "won";
 @import "../node_modules/leaflet/dist/leaflet.css";
 @import "border-utils";
+@import "textfield";
 
 won-location-picker {
   display: block;
@@ -24,17 +25,15 @@ won-location-picker {
     }
 
     .lp__searchbox__inner {
-      border-width: $thinBorderWidth;
-      border-style: solid;
-      border-radius: 0.1rem;
-      border-color: $won-line-gray;
+      border: $thinGrayBorder;
       background-color: white;
 
-      font-size: $normalFontSize;
-      $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-      $verticalPadding: ($formInputHeight - $realFontHeight) / 2 -
-        $thinBorderWidth;
-      padding: $verticalPadding 0.438rem;
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
 
       box-sizing: border-box;
       min-height: $formInputHeight;
@@ -44,6 +43,12 @@ won-location-picker {
       word-wrap: break-word;
 
       &--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
         padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
           0.438rem;
       }
