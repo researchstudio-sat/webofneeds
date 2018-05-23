@@ -380,7 +380,7 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
   return (dispatch, getState) => {
     const url =
       ownerBaseUrl +
-      "rest/agreement/getAgreementProtocolUris?connectionUri=" +
+      "/rest/agreement/getAgreementProtocolUris?connectionUri=" +
       connectionUri;
     let hasChanged = false;
     callAgreementsFetch(url)

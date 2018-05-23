@@ -156,14 +156,14 @@ function genComponentConf() {
             </div>
             <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
                 target="_blank"
-                href="{{self.ownerBaseUrl}}rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
+                href="{{self.ownerBaseUrl}}/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
                     <svg class="rdflink__small clickable">
                             <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
             </a>
             <a ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
                 target="_blank"
-                href="{{self.ownerBaseUrl}}rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
+                href="{{self.ownerBaseUrl}}/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
                     <svg class="rdflink__small clickable">
                         <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>

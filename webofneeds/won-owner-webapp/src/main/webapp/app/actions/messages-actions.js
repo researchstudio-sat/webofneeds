@@ -201,7 +201,7 @@ export function connectionMessageReceived(event) {
 
     const url =
       ownerBaseUrl +
-      "rest/agreement/getMessageEffects?connectionUri=" +
+      "/rest/agreement/getMessageEffects?connectionUri=" +
       connectionUri +
       "&messageUri=" +
       event.getMessageUri();

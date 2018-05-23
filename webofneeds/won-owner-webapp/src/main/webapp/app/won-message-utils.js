@@ -444,7 +444,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 function fetchOwnedNeedUris() {
-  return fetch(ownerBaseUrl + "rest/needs/", {
+  return fetch(ownerBaseUrl + "/rest/needs/", {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -473,7 +473,7 @@ export function callAgreementsFetch(url) {
 export function callAgreementEventFetch(needUri, eventUri) {
   return fetch(
     ownerBaseUrl +
-      "rest/linked-data/?requester=" +
+      "/rest/linked-data/?requester=" +
       encodeURI(needUri) +
       "&uri=" +
       encodeURI(eventUri),

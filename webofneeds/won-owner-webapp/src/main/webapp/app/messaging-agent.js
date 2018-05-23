@@ -336,7 +336,7 @@ export function runMessagingAgent(redux) {
   setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
 
   function newSock() {
-    const ws = new SockJS(ownerBaseUrl + "msg", null, { debug: true });
+    const ws = new SockJS(ownerBaseUrl + "/msg", null, { debug: true });
     ws.onopen = onOpen;
     ws.onmessage = onMessage;
     ws.onerror = onError;

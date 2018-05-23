@@ -67,7 +67,7 @@ import won from "./won.js";
    * @returns {string}
    */
   function queryString(dataUri, queryParams = {}) {
-    let queryOnOwner = ownerBaseUrl + "rest/linked-data/?";
+    let queryOnOwner = ownerBaseUrl + "/rest/linked-data/?";
     if (queryParams.requesterWebId) {
       queryOnOwner +=
         "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
@@ -963,10 +963,9 @@ import won from "./won.js";
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.getNeed = function(needUri) {
-    return won
-      .ensureLoaded(needUri)
-      .then(() => selectNeedData(needUri, privateData.store));
+  won.getNeed = async function(needUri) {
+    await won.ensureLoaded(needUri);
+    return selectNeedData(needUri, privateData.store);
   };
 
   function selectNeedData(needUri, store) {

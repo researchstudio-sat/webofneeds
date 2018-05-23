@@ -464,7 +464,7 @@ function genComponentConf() {
     getAgreementDataUris() {
       const url =
         ownerBaseUrl +
-        "rest/agreement/getAgreementProtocolUris?connectionUri=" +
+        "/rest/agreement/getAgreementProtocolUris?connectionUri=" +
         this.connection.get("uri");
       let hasChanged = false;
       callAgreementsFetch(url)
