@@ -23,10 +23,10 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
 
-      this.generateHexColor = generateHexColor; // TODO
+      // TODO change so it takes a palette and then use for identicons
+      this.generateHexColor = generateHexColor;
 
       this.$scope.$watch("self.uri", newVal => this.updateIdenticon(newVal));
-      // this.updateIdenticon(this.title);
     }
 
     updateIdenticon(input) {
