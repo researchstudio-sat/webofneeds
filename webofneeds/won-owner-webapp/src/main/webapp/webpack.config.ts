@@ -88,6 +88,11 @@ function config(env, argv): Configuration {
           ],
         },
         {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: ["ts-loader"],
+        },
+        {
           test: /\.scss$/,
           use: [
             MiniCssExtractPlugin.loader,
