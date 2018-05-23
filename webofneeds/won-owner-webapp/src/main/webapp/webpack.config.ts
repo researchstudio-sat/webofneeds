@@ -76,7 +76,7 @@ function config(env, argv): Configuration {
           use: "exports-loader?rdfstore",
         },
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: [/node_modules/, /rdf_store\.js/],
           use: [
             {
@@ -86,11 +86,6 @@ function config(env, argv): Configuration {
               loader: "eslint-loader",
             },
           ],
-        },
-        {
-          test: /\.tsx?$/,
-          exclude: /node_modules/,
-          use: ["ts-loader"],
         },
         {
           test: /\.scss$/,

@@ -9,7 +9,7 @@ import { postTitleCharacterLimit } from "config";
 import { attach, deepFreeze, clone, dispatchEvent } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
-import { name as descriptionPickerName } from "./description-picker.tsx";
+import { name as descriptionPickerName } from "./description-picker.jsx";
 
 const emptyDraft = deepFreeze({
   title: "",
