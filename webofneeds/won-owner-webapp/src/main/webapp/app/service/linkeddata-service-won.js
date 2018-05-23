@@ -885,7 +885,8 @@ import won from "./won.js";
         console.error(
           "Adding a dataset loaded with `deep=true` " +
             "that isn't an event-container. The cache will " +
-            "be faulty and deletion won't work properly."
+            "be faulty and deletion won't work properly. Uri: ",
+          documentUri
         );
       } else {
         const documentToGraphUri = await selectContainedDocumentAndGraphUrisHACK(
