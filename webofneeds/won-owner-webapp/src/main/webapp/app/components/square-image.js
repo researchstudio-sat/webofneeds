@@ -1,20 +1,49 @@
 import angular from "angular";
 
-import { generateHexColor, generateTitleCharacter } from "../utils.js";
+import { attach, generateHexColor } from "../utils.js";
 
+import Identicon from "identicon.js";
+window.Identicon4dbg = Identicon;
+
+import shajs from "sha.js";
+window.shajs4dbg = shajs;
+
+const serviceDependencies = ["$scope"];
 function genComponentConf() {
   let template = `
-                <img class="image" ng-show="self.src" ng-src="{{self.src}}"/>
-                <div title="{{self.title}}" class="image" style="background-color: {{self.generateHexColor(self.uri)}}" ng-show="!self.src"><!-- figure out some better way to color -->
-                    <span class="image__noimage">{{self.generateTitleCharacter(self.title)}}</span>
-                </div>`;
+    <img class="image" ng-show="self.src" ng-src="{{self.src}}"/>
+
+    <img class="image" 
+      ng-show="!self.src && self.identiconSvg" 
+      alt="Auto-generated title image for {{self.title}}"
+      src="data:image/svg+xml;base64,{{self.identiconSvg}}">
+  `;
 
   class Controller {
-    constructor() {
-      this.generateHexColor = generateHexColor;
-      this.generateTitleCharacter = generateTitleCharacter;
+    constructor(/* arguments = dependency injections */) {
+      attach(this, serviceDependencies, arguments);
+
+      this.generateHexColor = generateHexColor; // TODO
+
+      this.$scope.$watch("self.uri", newVal => this.updateIdenticon(newVal));
+      // this.updateIdenticon(this.title);
+    }
+
+    updateIdenticon(input) {
+      // quick extra hash here as identicon.js only uses first 15
+      // chars (which wouldn't work for our uris):
+      const hash = new shajs.sha512().update(input).digest("hex");
+      const idc = new Identicon(hash, {
+        size: 100,
+        foreground: [255, 255, 255, 255], // rgba white
+        background: [40, 40, 40, 255], // rgba dark gray
+        margin: 0.2,
+        format: "svg",
+      });
+      this.identiconSvg = idc.toString();
     }
   }
+  Controller.$inject = serviceDependencies;
 
   return {
     restrict: "E",
