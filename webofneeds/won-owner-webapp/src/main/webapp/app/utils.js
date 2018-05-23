@@ -1128,3 +1128,25 @@ export function generateTitleCharacter(title) {
     return "?";
   }
 }
+
+/**
+ * Returns the URL if it's already absolute,
+ * otherwise prepends window.location.origin.
+ *
+ * e.g.
+ * ```
+ * toAbsoluteURL("/somepath/")
+ * // => URL("http://example.org/somepath/")
+ *
+ * toAbsoluteURL("http://example.org/anotherpath/")
+ * // => URL("http://example.org/anotherpath/")
+ * ```
+ * @param {*} pathOrURL
+ */
+export function toAbsoluteURL(pathOrURL) {
+  if (pathOrURL.match(/^https?:\/\//)) {
+    return new URL(pathOrURL);
+  } else {
+    return new URL(pathOrURL, window.location.origin);
+  }
+}

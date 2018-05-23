@@ -1,7 +1,7 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import { attach } from "../utils.js";
+import { attach, toAbsoluteURL } from "../utils.js";
 
 import { connect2Redux } from "../won-utils.js";
 
@@ -43,18 +43,11 @@ function genComponentConf() {
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
 
-        let absoluteBaseUrl;
-        if (ownerBaseUrl.match(/^https?:\/\//)) {
-          absoluteBaseUrl = new URL(ownerBaseUrl);
-        } else {
-          absoluteBaseUrl = new URL(ownerBaseUrl, window.location.origin);
-        }
-
         let linkToPost;
-        if (absoluteBaseUrl && post) {
+        if (ownerBaseUrl && post) {
           linkToPost = new URL(
             "#!post/?postUri=" + encodeURI(post.get("uri")),
-            absoluteBaseUrl
+            toAbsoluteURL(ownerBaseUrl)
           );
         }
 
