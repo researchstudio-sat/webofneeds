@@ -43,13 +43,24 @@ function genComponentConf() {
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
 
+        let absoluteBaseUrl;
+        if (ownerBaseUrl.match(/^https?:\/\//)) {
+          absoluteBaseUrl = new URL(ownerBaseUrl);
+        } else {
+          absoluteBaseUrl = new URL(ownerBaseUrl, window.location.origin);
+        }
+
+        let linkToPost;
+        if (absoluteBaseUrl && post) {
+          linkToPost = new URL(
+            "#!post/?postUri=" + encodeURI(post.get("uri")),
+            absoluteBaseUrl
+          );
+        }
+
         return {
           post,
-          linkToPost:
-            post &&
-            new URL(
-              ownerBaseUrl + "#!post/?postUri=" + encodeURI(post.get("uri"))
-            ).href,
+          linkToPost,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
