@@ -42,7 +42,7 @@ services:
     build: ../../image/wonnode
     image: webofneeds/wonnode:master
     environment:
-      - "uri.host=nodeblue.master.machat.org"
+      - "uri.host=nodeblue.master.matchat.org"
       - "http.port=8888"
       - "uri.prefix=https://nodeblue.master.matchat.org/won"
       - "client.authentication.behind.proxy=true"
@@ -77,7 +77,7 @@ services:
     build: ../../image/owner
     image: webofneeds/owner:master
     environment:
-      - "node.default.host=nodeblue.master.machat.org"
+      - "node.default.host=nodeblue.master.matchat.org"
       - "uri.host=ownerblue.master.machat.org"
       - "http.port=8081"
       - "node.default.http.port=443"
