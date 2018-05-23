@@ -1,10 +1,10 @@
 :root {
   --skinning-test-var: rgb(165, 14, 185);
-  --won-primary-color: #2c2ded;
-  --won-primary-color-light: #746fed;
-  --won-secondary-color: #e6fe00;
-  --won-secondary-color-light: #e2fa00;
-  --won-secondary-color-lighter: #f4fa7c;
+  --won-primary-color: #5696db;
+  --won-primary-color-light: #7ea7db;
+  --won-secondary-color: #56db9b;
+  --won-secondary-color-light: #b6dbc4;
+  --won-secondary-color-lighter: #cddbd0;
   --won-disabled-color: #ccd2d2;
 
   --won-light-gray: #f0f2f4; /*used for headings*/
@@ -12,6 +12,6 @@
   --won-line-gray: #cbd2d1; /*use for lines*/
   --won-subtitle-gray: #808080;
   --won-helpbox-yellow: #fffce5;
-  --won-dark-purple: #ffba00;
+  --won-dark-purple: #00db6b;
   --won-dark-gray: #303a43;
 }

@@ -31,19 +31,19 @@ function genComponentConf() {
             <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.unread && self.state === self.WON.Closed">
                  <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
             </svg>
-            <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.Suggested">
+            <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color-light);" ng-if="!self.unread && self.state === self.WON.Suggested">
                  <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
-            <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.RequestSent">
+            <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color-light);" ng-if="!self.unread && self.state === self.WON.RequestSent">
                  <use xlink:href="#ico36_outgoing" href="#ico36_outgoing"></use>
             </svg>
-            <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.RequestReceived">
+            <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color-light);" ng-if="!self.unread && self.state === self.WON.RequestReceived">
                  <use xlink:href="#ico36_incoming" href="#ico36_incoming"></use>
             </svg>
-            <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.Connected">
+            <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color-light);" ng-if="!self.unread && self.state === self.WON.Connected">
                  <use xlink:href="#ico36_message" href="#ico36_message"></use>
             </svg>
-            <svg class="cs__state__icon" style="--local-primary:#F09F9F;" ng-if="!self.unread && self.state === self.WON.Closed">
+            <svg class="cs__state__icon" style="--local-primary:var(--won-primary-color-light);" ng-if="!self.unread && self.state === self.WON.Closed">
                  <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
             </svg>
         </div>
