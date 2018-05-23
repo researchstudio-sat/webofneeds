@@ -5,6 +5,8 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
+import urljoin from "url-join";
+
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
@@ -378,10 +380,11 @@ export function connectionsRate(connectionUri, rating) {
 
 export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
   return (dispatch, getState) => {
-    const url =
-      ownerBaseUrl +
-      "/rest/agreement/getAgreementProtocolUris?connectionUri=" +
-      connectionUri;
+    const url = urljoin(
+      ownerBaseUrl,
+      "/rest/agreement/getAgreementProtocolUris",
+      "?connectionUri=" + connectionUri
+    );
     let hasChanged = false;
     callAgreementsFetch(url)
       .then(response => {

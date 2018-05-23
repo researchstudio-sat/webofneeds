@@ -6,6 +6,7 @@ import { attach, toAbsoluteURL } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
 import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
@@ -45,9 +46,10 @@ function genComponentConf() {
 
         let linkToPost;
         if (ownerBaseUrl && post) {
-          linkToPost = new URL(
-            "#!post/?postUri=" + encodeURI(post.get("uri")),
-            toAbsoluteURL(ownerBaseUrl)
+          linkToPost = urljoin(
+            toAbsoluteURL(ownerBaseUrl),
+            "#!post/",
+            `?postUri=${encodeURI(post.get("uri"))}`
           );
         }
 

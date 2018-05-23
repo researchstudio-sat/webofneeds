@@ -10,6 +10,7 @@ import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 
 import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
 
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay, deepFreeze, clone } from "../utils.js";
@@ -462,10 +463,11 @@ function genComponentConf() {
     }
 
     getAgreementDataUris() {
-      const url =
-        ownerBaseUrl +
-        "/rest/agreement/getAgreementProtocolUris?connectionUri=" +
-        this.connection.get("uri");
+      const url = urljoin(
+        ownerBaseUrl,
+        "/rest/agreement/getAgreementProtocolUris",
+        `?connectionUri=${this.connection.get("uri")}`
+      );
       let hasChanged = false;
       callAgreementsFetch(url)
         .then(response => {

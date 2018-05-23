@@ -20,6 +20,7 @@ import won from "./won-es6.js";
 import { watchImmutableRdxState, getIn } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
 
 import { actionTypes, actionCreators } from "./actions/actions.js";
 //import './message-service.js'; //TODO still uses es5
@@ -336,7 +337,7 @@ export function runMessagingAgent(redux) {
   setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
 
   function newSock() {
-    const ws = new SockJS(ownerBaseUrl + "/msg", null, { debug: true });
+    const ws = new SockJS(urljoin(ownerBaseUrl, "/msg"), null, { debug: true });
     ws.onopen = onOpen;
     ws.onmessage = onMessage;
     ws.onerror = onError;

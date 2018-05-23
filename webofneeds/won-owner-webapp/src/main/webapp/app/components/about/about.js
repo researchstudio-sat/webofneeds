@@ -3,16 +3,16 @@ import topNavModule from "../topnav.js";
 import compareToModule from "../../directives/compareTo.js";
 import accordionModule from "../accordion.js";
 import flexGridModule from "../flexgrid.js";
-import { attach, getIn } from "../../utils.js";
+import { attach, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 
 const goodServicesOffer = "matchat.org";
 const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
 
-const howSecure1 = ownerBaseUrl;
+const howSecure1 = toAbsoluteURL(ownerBaseUrl).toString();
 const howSecure1Link = howSecure1.link(ownerBaseUrl);
-const howSecure2 = "/won/";
+const howSecure2 = toAbsoluteURL("/won/").toString();
 const howSecure2Link = howSecure2.link("/won/");
 
 const behindScenes = "here";

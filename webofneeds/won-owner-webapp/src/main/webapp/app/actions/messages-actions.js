@@ -9,6 +9,8 @@ import {
   getConnectionRelatedData,
 } from "./actions.js";
 
+import urljoin from "url-join";
+
 import { ownerBaseUrl } from "config";
 
 import Immutable from "immutable";
@@ -199,12 +201,12 @@ export function connectionMessageReceived(event) {
       "messages",
     ]);
 
-    const url =
-      ownerBaseUrl +
-      "/rest/agreement/getMessageEffects?connectionUri=" +
-      connectionUri +
-      "&messageUri=" +
-      event.getMessageUri();
+    const url = urljoin(
+      ownerBaseUrl,
+      "/rest/agreement/getMessageEffects",
+      `?connectionUri=${connectionUri}`,
+      `&messageUri=${event.getMessageUri()}`
+    );
 
     callAgreementsFetch(url).then(response => {
       console.log("response : ", response);

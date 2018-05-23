@@ -7,6 +7,7 @@ import Immutable from "immutable";
 import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
 
@@ -444,7 +445,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 function fetchOwnedNeedUris() {
-  return fetch(ownerBaseUrl + "/rest/needs/", {
+  return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -471,21 +472,21 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
-  return fetch(
-    ownerBaseUrl +
-      "/rest/linked-data/?requester=" +
-      encodeURI(needUri) +
-      "&uri=" +
-      encodeURI(eventUri),
-    {
-      method: "get",
-      headers: {
-        Accept: "application/ld+json",
-        "Content-Type": "application/ld+json",
-      },
-      credentials: "include",
-    }
-  )
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/linked-data/",
+    `?requester=${encodeURI(needUri)}`,
+    `&uri=${encodeURI(eventUri)}`
+  );
+  const httpOptions = {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  };
+  return fetch(url, httpOptions)
     .then(checkHttpStatus)
     .then(response => response.json());
 }
