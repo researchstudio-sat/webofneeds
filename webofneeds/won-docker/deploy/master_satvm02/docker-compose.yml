@@ -45,6 +45,7 @@ services:
       - "uri.host=nodeblue.master.machat.org"
       - "http.port=8888"
       - "uri.prefix=https://nodeblue.master.matchat.org/won"
+      - "client.authentication.behind.proxy=true"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5432/won_node"
       - "db.ddl.strategy=validate"
