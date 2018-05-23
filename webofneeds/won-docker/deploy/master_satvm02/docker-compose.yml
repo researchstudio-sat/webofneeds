@@ -59,7 +59,7 @@ services:
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
     ports:
       - "8888:8443"
-      - "61622:61612"
+      - "61612:61612"
       - "62916:62916"
       - "9016:9016"
     volumes:
@@ -143,7 +143,7 @@ services:
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
     ports:
       - "8889:8443"
-      - "61621:61611"
+      - "61611:61611"
       - "62918:62918"
       - "9018:9018"
     volumes:
