@@ -42,6 +42,12 @@ ssh root@satvm02 mkdir -p $base_folder/solr/wontest/data
 ssh root@satvm02 chmod 777 $base_folder/solr/won/data
 ssh root@satvm02 chmod 777 $base_folder/solr/wontest/data
 
+# copy the uki skin to the custom skin folder that get used by this instance
+ssh won@satvm02 mkdir -p $base_folder/custom_owner_skin_blue
+ssh won@satvm02 mkdir -p $base_folder/custom_owner_skin_green
+scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/blue/* won@satvm02:$base_folder/custom_owner_skin_blue/
+scp -r $WORKSPACE/webofneeds/won-owner-webapp/src/main/webapp/skin/green/* won@satvm02:$base_folder/custom_owner_skin_green/
+
 # copy the openssl.conf file to the server where the certificates are generated
 # the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf
 scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf root@satvm02:$base_folder/openssl.conf

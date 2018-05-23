@@ -102,6 +102,7 @@ services:
       - "62917:62917"
       - "9017:9017"
     volumes:
+      - $base_folder/custom_owner_skin_blue:/usr/local/tomcat/webapps/owner/skin/current/
       - $base_folder/won-server-certsownerblue:/usr/local/tomcat/conf/ssl/
       - $base_folder/won-client-certs/ownerblue:/usr/local/tomcat/won/client-certs/
     depends_on:
@@ -186,6 +187,7 @@ services:
       - "62919:62919"
       - "9019:9019"
     volumes:
+      - $base_folder/custom_owner_skin_green:/usr/local/tomcat/webapps/owner/skin/current/
       - $base_folder/won-server-certsownergreen:/usr/local/tomcat/conf/ssl/
       - $base_folder/won-client-certs/ownergreen:/usr/local/tomcat/won/client-certs/
     depends_on:
