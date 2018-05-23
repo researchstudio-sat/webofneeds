@@ -967,7 +967,7 @@ import won from "./won.js";
    * to get the connection-uris. Thus it's faster.
    */
   won.getNeed = async function(needUri) {
-    await won.ensureLoaded(needUri, { requesterWebId: needUri });
+    await won.ensureLoaded(needUri);
     return selectNeedData(needUri, privateData.store);
   };
 
