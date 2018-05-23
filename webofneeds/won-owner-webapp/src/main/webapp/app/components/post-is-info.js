@@ -39,7 +39,7 @@ function genComponentConf() {
             </h2>
             <div class="post-info__details post-info__tags"
                 ng-show="self.isPart.is.get('tags')">
-                    <span class="post-info__tags__tag" ng-repeat="tag in self.isPart.is.get('tags').toJS()">{{tag}}</span>
+                    <span class="post-info__tags__tag" ng-repeat="tag in self.isPart.is.get('tags').toJS()">#{{tag}}</span>
             </div>
 
             <h2 class="post-info__heading"

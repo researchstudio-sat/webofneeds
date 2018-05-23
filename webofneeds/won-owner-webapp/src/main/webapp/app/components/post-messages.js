@@ -1,10 +1,7 @@
-/* eslint-disable */
 // TODO: WHAT IS HAPPENING HERE?!
 
 import won from "../won-es6.js";
 import angular from "angular";
-import jld from "jsonld";
-import Immutable from "immutable";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./connection-message.js";
 import connectionAgreementModule from "./connection-agreement.js";
@@ -42,17 +39,6 @@ const keySet = deepFreeze(
   ])
 );
 
-const defaultAgreementData = deepFreeze({
-  agreementUris: new Set(),
-  pendingProposalUris: new Set(),
-  pendingProposals: new Set(),
-  acceptedCancellationProposalUris: new Set(),
-  cancellationPendingAgreementUris: new Set(),
-  pendingCancellationProposalUris: new Set(),
-  cancelledAgreementUris: new Set(),
-  rejectedMessageUris: new Set(),
-  retractedMessageUris: new Set(),
-});
 function genComponentConf() {
   let template = `
         <div class="pm__header">
@@ -222,7 +208,6 @@ function genComponentConf() {
 
       this.showLoadingInfo = false;
 
-      const self = this;
       this.baseString = "/owner/";
       this.declarations = clone(declarations);
 
@@ -267,10 +252,10 @@ function genComponentConf() {
         //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
         if (sortedMessages) {
-          var msgSet = new Set(sortedMessages);
+          const msgSet = new Set(sortedMessages);
 
           // TODO: Optimization
-          for (msg of msgSet) {
+          for (const msg of msgSet) {
             if (
               msg.get("isProposeMessage") ||
               msg.get("isProposeToCancel") ||
@@ -278,27 +263,23 @@ function genComponentConf() {
             ) {
               if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
                 msg.hide = true;
-                this.messages__markAsRelevant(
-                  (payload = {
-                    messageUri: msg.get("uri"),
-                    connectionUri: connectionUri,
-                    needUri: ownNeed.get("uri"),
-                    relevant: false,
-                  })
-                );
+                this.messages__markAsRelevant({
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  relevant: false,
+                });
               }
             } else if (this.agreementHeadData.retractedMessageUris.size) {
               //TODO: filter out retracted messages faster
               if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
                 msg.hide = true;
-                this.messages__markAsRelevant(
-                  (payload = {
-                    messageUri: msg.get("uri"),
-                    connectionUri: connectionUri,
-                    needUri: ownNeed.get("uri"),
-                    relevant: false,
-                  })
-                );
+                this.messages__markAsRelevant({
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  relevant: false,
+                });
               }
             }
           }
@@ -400,7 +381,7 @@ function genComponentConf() {
 
       this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
     }
-    onScroll(e) {
+    onScroll() {
       if (!this._programmaticallyScrolling) {
         //only unsnap if the user scrolled themselves
         this.unsnapFromBottom();
@@ -443,16 +424,14 @@ function genComponentConf() {
     }
 
     setShowAgreementData(value) {
-      this.connections__showAgreementData(
-        (payload = {
-          connectionUri: this.connectionUri,
-          showAgreementData: value,
-        })
-      );
+      this.connections__showAgreementData({
+        connectionUri: this.connectionUri,
+        showAgreementData: value,
+      });
     }
 
     agreementDataIsValid() {
-      var aD = this.agreementStateData;
+      const aD = this.agreementStateData;
       if (
         aD &&
         (aD.agreementUris.size ||
@@ -468,9 +447,10 @@ function genComponentConf() {
       if (connection) {
         this.connection = connection;
       } else {
-        this.connections__setLoading(
-          (payload = { connectionUri: this.connectionUri, isLoading: true })
-        );
+        this.connections__setLoading({
+          connectionUri: this.connectionUri,
+          isLoading: true,
+        });
       }
 
       this.agreementLoadingData = this.cloneDefaultStateData();
@@ -482,18 +462,18 @@ function genComponentConf() {
     }
 
     getAgreementDataUris() {
-      var url =
+      const url =
         this.baseString +
         "rest/agreement/getAgreementProtocolUris?connectionUri=" +
         this.connection.get("uri");
-      var hasChanged = false;
+      let hasChanged = false;
       callAgreementsFetch(url)
         .then(response => {
           this.agreementHeadData = this.transformDataToSet(response);
 
-          for (key of keySet) {
+          for (const key of keySet) {
             if (this.agreementHeadData.hasOwnProperty(key)) {
-              for (data of this.agreementHeadData[key]) {
+              for (const data of this.agreementHeadData[key]) {
                 this.addAgreementDataToSate(data, key);
                 hasChanged = true;
               }
@@ -501,12 +481,10 @@ function genComponentConf() {
           }
           //no data found for keyset: no relevant agreementData to show in GUI - clean state data
           if (!hasChanged) {
-            this.connections__updateAgreementData(
-              (payload = {
-                connectionUri: this.connectionUri,
-                agreementData: this.cloneDefaultStateData(),
-              })
-            );
+            this.connections__updateAgreementData({
+              connectionUri: this.connectionUri,
+              agreementData: this.cloneDefaultStateData(),
+            });
           }
           //Remove all retracted/rejected messages
           else if (
@@ -519,10 +497,11 @@ function genComponentConf() {
               ...this.agreementHeadData["retractedMessageUris"],
             ]);
 
-            for (uri of removalSet) {
-              var key = "pendingProposalUris";
-              var data = this.agreementStateData;
-              for (obj of data[key]) {
+            const data = this.agreementStateData;
+
+            for (const uri of removalSet) {
+              const key = "pendingProposalUris";
+              for (const obj of data[key]) {
                 if (obj.stateUri === uri || obj.headUri === uri) {
                   console.log("Message " + uri + " was removed");
                   data[key].delete(obj);
@@ -532,35 +511,32 @@ function genComponentConf() {
             }
             if (hasChanged) {
               this.agreementStateData = this.cloneDefaultStateData();
-              this.connections__updateAgreementData(
-                (payload = {
-                  connectionUri: this.connectionUri,
-                  agreementData: data,
-                })
-              );
+              this.connections__updateAgreementData({
+                connectionUri: this.connectionUri,
+                agreementData: data,
+              });
             }
           }
         })
         .then(() => {
           if (!hasChanged) {
-            this.connections__setLoading(
-              (payload = {
-                connectionUri: this.connectionUri,
-                isLoading: false,
-              })
-            );
+            this.connections__setLoading({
+              connectionUri: this.connectionUri,
+              isLoading: false,
+            });
           }
         })
         .catch(error => {
           console.error("Error:", error);
-          this.connections__setLoading(
-            (payload = { connectionUri: this.connectionUri, isLoading: false })
-          );
+          this.connections__setLoading({
+            connectionUri: this.connectionUri,
+            isLoading: false,
+          });
         });
     }
 
     transformDataToSet(response) {
-      var tmpAgreementData = {
+      const tmpAgreementData = {
         agreementUris: new Set(response.agreementUris),
         pendingProposalUris: new Set(response.pendingProposalUris),
         pendingProposals: new Set(response.pendingProposals),
@@ -582,7 +558,7 @@ function genComponentConf() {
     }
 
     filterAgreementSet(tmpAgreementData) {
-      for (prop of tmpAgreementData.cancellationPendingAgreementUris) {
+      for (const prop of tmpAgreementData.cancellationPendingAgreementUris) {
         if (tmpAgreementData.agreementUris.has(prop)) {
           tmpAgreementData.agreementUris.delete(prop);
         }
@@ -595,7 +571,7 @@ function genComponentConf() {
       const ownNeedUri = this.ownNeed.get("uri");
       return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
-          var agreementObject = obj;
+          let agreementObject = obj;
 
           if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
             /*if we find out that the receiverneed of the crawled event is actually our
@@ -620,11 +596,9 @@ function genComponentConf() {
             this.agreementLoadingData[key].add(agreementObject);
 
             //Dont load in state again!
-            var found = false;
-            for (i = 0; i < this.chatMessages.length; i++) {
-              if (
-                agreementObject.stateUri === this.chatMessages[i].get("uri")
-              ) {
+            let found = false;
+            for (const chatMessage of this.chatMessages) {
+              if (agreementObject.stateUri === chatMessage.get("uri")) {
                 found = true;
               }
             }
@@ -633,35 +607,31 @@ function genComponentConf() {
             }
 
             //Update agreementData in State
-            this.connections__updateAgreementData(
-              (payload = {
-                connectionUri: this.connectionUri,
-                agreementData: this.agreementLoadingData,
-              })
-            );
+            this.connections__updateAgreementData({
+              connectionUri: this.connectionUri,
+              agreementData: this.agreementLoadingData,
+            });
           }
         });
       });
     }
 
     filterAgreementStateData(agreementObject, del) {
-      for (key of keySet) {
+      for (const key of keySet) {
         this.checkObject(key, agreementObject, del);
       }
     }
 
     checkObject(key, agreementObject, del) {
-      var data = this.agreementStateData;
-      for (object of data[key]) {
+      const data = this.agreementStateData;
+      for (const object of data[key]) {
         if (object.stateUri === agreementObject.stateUri) {
           if (del.value) {
             data[key].delete(object);
-            this.connections__updateAgreementData(
-              (payload = {
-                connectionUri: this.connectionUri,
-                agreementData: data,
-              })
-            );
+            this.connections__updateAgreementData({
+              connectionUri: this.connectionUri,
+              agreementData: data,
+            });
           }
           return true;
         }
@@ -670,12 +640,12 @@ function genComponentConf() {
     }
 
     filterMessages(stateUri) {
-      var object = {
+      const object = {
         stateUri: stateUri,
         headUri: undefined,
       };
 
-      var del = {
+      const del = {
         value: true,
       };
       this.filterAgreementStateData(object, del);
@@ -683,7 +653,7 @@ function genComponentConf() {
 
     getCancelUri(agreementUri) {
       const pendingProposals = this.agreementHeadData.pendingProposals;
-      for (prop of pendingProposals) {
+      for (const prop of pendingProposals) {
         if (prop.proposesToCancel.includes(agreementUri)) {
           return prop.uri;
         }
@@ -693,7 +663,7 @@ function genComponentConf() {
 
     checkOwnCancel(headUri) {
       const pendingProposals = this.agreementHeadData.pendingProposals;
-      for (prop of pendingProposals) {
+      for (const prop of pendingProposals) {
         if (prop.proposesToCancel.includes(headUri)) {
           if (prop.proposingNeedUri === this.ownNeed.get("uri")) {
             return true;
@@ -704,7 +674,7 @@ function genComponentConf() {
     }
 
     isOldAgreementMsg(msg) {
-      var aD = this.agreementHeadData;
+      const aD = this.agreementHeadData;
       if (
         aD.agreementUris.has(msg.get("uri")) ||
         aD.agreementUris.has(msg.get("remoteUri")) ||
@@ -732,7 +702,7 @@ function genComponentConf() {
     }
 
     cloneDefaultData() {
-      return (defaultData = {
+      return {
         agreementUris: new Set(),
         pendingProposalUris: new Set(),
         pendingProposals: new Set(),
@@ -742,22 +712,22 @@ function genComponentConf() {
         cancelledAgreementUris: new Set(),
         rejectedMessageUris: new Set(),
         retractedMessageUris: new Set(),
-      });
+      };
     }
 
     cloneDefaultStateData() {
-      return (defaultStateData = {
+      return {
         pendingProposalUris: new Set(),
         agreementUris: new Set(),
         cancellationPendingAgreementUris: new Set(),
-      });
+      };
     }
 
     cloneDefaultAgreementObject() {
-      return (agreementObject = {
+      return {
         stateUri: undefined,
         headUri: undefined,
-      });
+      };
     }
 
     openRequest(message) {

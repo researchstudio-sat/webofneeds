@@ -47,7 +47,6 @@
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-remove-strict-mode": "0.0.2",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "copy-webpack-plugin": "^4.5.1",
