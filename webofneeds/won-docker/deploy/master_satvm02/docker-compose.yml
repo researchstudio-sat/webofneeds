@@ -78,7 +78,7 @@ services:
     image: webofneeds/owner:master
     environment:
       - "node.default.host=nodeblue.master.matchat.org"
-      - "uri.host=ownerblue.master.machat.org"
+      - "uri.host=ownerblue.master.matchat.org"
       - "http.port=8081"
       - "node.default.http.port=443"
       - "uri.prefix=https://ownerblue.master.matchat.org"
