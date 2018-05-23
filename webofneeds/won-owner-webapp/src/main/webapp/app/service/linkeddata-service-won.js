@@ -30,7 +30,6 @@ import {
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
-window.urljoin4dbg = urljoin;
 
 import rdfstore from "rdfstore-js";
 import jsonld from "jsonld";
@@ -70,25 +69,24 @@ import won from "./won.js";
    */
   function queryString(dataUri, queryParams = {}) {
     let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/");
+
     if (queryParams.requesterWebId) {
-      queryOnOwner = urljoin(
-        queryOnOwner,
-        "?requester=" + encodeURIComponent(queryParams.requesterWebId)
-      );
+      queryOnOwner +=
+        "?requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
     }
 
     // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
+    let firstParam = true;
     let queryOnNode = dataUri;
     for (let [paramName, paramValue] of entries(queryParams)) {
       if (contains(legitQueryParameters, paramName)) {
-        queryOnNode = urljoin(queryOnNode, `?${paramName}=${paramValue}`);
+        queryOnNode = queryOnNode + (firstParam ? "?" : "&");
+        firstParam = false;
+        queryOnNode = queryOnNode + paramName + "=" + paramValue;
       }
     }
 
-    let query = urljoin(
-      queryOnOwner,
-      "?uri=" + encodeURIComponent(queryOnNode)
-    );
+    let query = queryOnOwner + "uri=" + encodeURIComponent(queryOnNode);
 
     // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
     query = query.replace(new RegExp("%3A", "g"), ":");
