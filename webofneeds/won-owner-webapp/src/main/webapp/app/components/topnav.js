@@ -57,10 +57,16 @@ function genTopnavConf() {
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
 
-                        <li ng-show="!self.loggedIn">
+                        <li ng-show="!self.loggedIn && !self.isPrivateIdUser">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn hide-in-responsive">
                                     Sign up
+                            </a>
+                        </li>
+                        <li ng-show="self.isPrivateIdUser">
+                            <a  ui-sref="{{ self.absSRef('signup') }}"
+                                class="topnav__signupbtn hide-in-responsive">
+                                    Transfer Account
                             </a>
                         </li>
 
@@ -148,6 +154,11 @@ function genTopnavConf() {
         const selectedConnectionUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "connectionUri"])
         );
+        const privateId = getIn(state, [
+          "router",
+          "currentParams",
+          "privateId",
+        ]);
         const need =
           selectedConnectionUri &&
           selectNeedByConnectionUri(state, selectedConnectionUri);
@@ -161,6 +172,7 @@ function genTopnavConf() {
           WON: won.WON,
           loggedIn: state.getIn(["user", "loggedIn"]),
           email: state.getIn(["user", "email"]),
+          isPrivateIdUser: !!privateId,
           connectionOrPostDetailOpen: selectedConnection || selectedPost,
           toastsArray: state.getIn(["toasts"]).toArray(),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator

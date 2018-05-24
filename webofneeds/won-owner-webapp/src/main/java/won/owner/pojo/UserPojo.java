@@ -18,6 +18,8 @@ public class UserPojo {
 	@NotEmpty
 	private String password;
 
+    private String privateUsername;
+
 	public String getUsername() {
 		return username;
 	}
@@ -33,4 +35,12 @@ public class UserPojo {
 	public void setPassword(final String password) {
 		this.password = password;
 	}
+
+    public String getPrivateUsername() {
+        return privateUsername;
+    }
+
+    public void setPrivateUsername(String privateUsername) {
+        this.privateUsername = privateUsername;
+    }
 }

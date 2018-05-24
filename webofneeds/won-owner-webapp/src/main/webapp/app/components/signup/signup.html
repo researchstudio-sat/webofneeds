@@ -62,9 +62,16 @@
                     </div>
                 </div>
                 <button id="signup" class="won-button--filled red"
+                        ng-if="!self.isPrivateIdUser"
                         ng-disabled="registerForm.$invalid"
                         ng-click="::self.register({email: self.email, password: self.password, rememberMe: self.rememberMe})">
                     That’s all we need. Let’s go!
+                </button>
+                <button id="signup" class="won-button--filled red"
+                        ng-if="self.isPrivateIdUser"
+                        ng-disabled="registerForm.$invalid"
+                        ng-click="::self.transfer({email: self.email, password: self.password, privateId: self.privateId, rememberMe: self.rememberMe})">
+                    Transfer Account
                 </button>
             </div>
         </div>

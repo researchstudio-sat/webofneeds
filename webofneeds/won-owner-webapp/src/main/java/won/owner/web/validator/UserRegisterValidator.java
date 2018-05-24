@@ -46,7 +46,7 @@ public class UserRegisterValidator implements Validator {
 			errors.rejectValue("password", "passwordTooShort", "Password needs to be at least 6 Characters long");
 		}
 
-		if(errors.getFieldError("username") != null) {
+        if(errors.getFieldError("username") != null) {
 			User userInDb = (User) wonUserDetailService.loadUserByUsername(user.getUsername());
 			if(userInDb != null) {
 				errors.reject("userIsAlreadyInDb", "Username already exists, please choose a different one");

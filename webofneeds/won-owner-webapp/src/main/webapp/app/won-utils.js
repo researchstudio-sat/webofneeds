@@ -181,6 +181,25 @@ export function registerAccount(credentials) {
   }).then(checkHttpStatus);
 }
 
+export function transferAccount(credentials) {
+  const { email, password, privateId } = credentials;
+  const privateUsername = privateId2Credentials(privateId).email;
+
+  return fetch("/owner/rest/users/", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      password: password,
+      privateUsername: privateUsername,
+    }),
+  }).then(checkHttpStatus);
+}
+
 /**
  * @param credentials either {email, password} or {privateId}
  * @returns {*}
