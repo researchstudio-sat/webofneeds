@@ -13,10 +13,16 @@ function genComponentConf() {
     <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.email }}">{{ self.email }}</span>
     <hr class="show-in-responsive"/>
     <a
+        href="{{ self.absHRef(self.$state, 'settings') }}"
+        class="won-button--outlined thin red"
+        ng-click="self.hideMainMenuDisplay()">
+        <span>Account Settings</span>
+    </a>
+    <a
         href="{{ self.absHRef(self.$state, 'about') }}"
         class="won-button--outlined thin red"
         ng-click="self.hideMainMenuDisplay()">
-            About
+        <span>About</span>
     </a>
     <a class="won-button--outlined thin red"
         ng-click="self.toggleRdfDisplay()">
