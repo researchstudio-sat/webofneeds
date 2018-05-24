@@ -21,7 +21,7 @@ function genComponentConf() {
             ng-click="self.setOpen(self.latestConnectedUri)">
                 <svg class="indicators__item__icon"
                     title="Show latest message/request"
-                    style="--local-primary:#F09F9F;"
+                    style="--local-primary:var(--won-primary-color-light);"
                     ng-show="!self.unreadConnectedCount">
                         <use xlink:href="#ico36_message" href="#ico36_message"></use>
                 </svg>
