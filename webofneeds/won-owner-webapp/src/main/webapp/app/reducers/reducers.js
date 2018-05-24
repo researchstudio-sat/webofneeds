@@ -117,6 +117,27 @@ const reducers = {
     }
   },
 
+  showModalDialog: (isShowingModalDialog = false, action = {}) => {
+    switch (action.type) {
+      case actionTypes.openModalDialog:
+        return true;
+      case actionTypes.closeModalDialog:
+        return false;
+      default:
+        return isShowingModalDialog;
+    }
+  },
+
+  modalDialog: (modalDialog = undefined, action = {}) => {
+    switch (action.type) {
+      case actionTypes.openModalDialog:
+        return Immutable.fromJS(action.payload);
+      case actionTypes.closeModalDialog:
+      default:
+        return modalDialog;
+    }
+  },
+
   //config: createReducer(
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),
