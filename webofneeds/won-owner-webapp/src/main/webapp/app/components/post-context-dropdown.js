@@ -82,8 +82,29 @@ function genComponentConf() {
     closePost() {
       if (this.isOwnPost) {
         console.log("CLOSING THE POST: " + this.post.get("uri"));
-        this.needs__close(this.post.get("uri"));
-        this.router__stateGoCurrent({ postUri: null });
+
+        const payload = {
+          caption: "Attention!",
+          text:
+            "Archiving the Post will close all connections, do you want to proceed?",
+          buttons: [
+            {
+              caption: "Yes, Archive!",
+              callback: () => {
+                this.needs__close(this.post.get("uri"));
+                this.router__stateGoCurrent({ postUri: null });
+                this.closeModalDialog();
+              },
+            },
+            {
+              caption: "No, I'm scared",
+              callback: () => {
+                this.closeModalDialog();
+              },
+            },
+          ],
+        };
+        this.openModalDialog(payload);
       }
     }
 
