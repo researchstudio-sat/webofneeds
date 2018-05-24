@@ -7,7 +7,7 @@ import squareImageModule from "./square-image.js";
 import labelledHrModule from "./labelled-hr.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, get, getIn } from "../utils.js";
+import { attach, get, getIn, deepFreeze } from "../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
@@ -18,6 +18,15 @@ import { selectNeedByConnectionUri } from "../selectors.js";
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
+
+const messageHeaders = deepFreeze({
+  proposal: "Propose",
+  accept: "Accept proposal",
+  acceptCancel: "Accept to cancel",
+  proposeCancel: "Propose to cancel",
+  retract: "Retract",
+  reject: "Reject",
+});
 
 function genComponentConf() {
   let template = `
@@ -37,11 +46,7 @@ function genComponentConf() {
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
     			ng-class="{'agreement' : 	!self.isNormalMessage()}">
                     <span class="won-cm__center__bubble__text">
-                    <span ng-show="self.message.get('isProposeMessage')"><h3>Proposal</h3></span>	
-                	<span ng-show="self.message.get('isAcceptMessage')"><h3>Accept</h3></span>
-                	<span ng-show="self.message.get('isProposeToCancel')"><h3>ProposeToCancel</h3></span>
-                	<span ng-show="self.message.get('isRetractMessage')"><h3>Retract</h3></span>
-                	<span ng-show="self.message.get('isRejectMessage')"><h3>Reject</h3></span>
+                    <span ng-show="self.headerText"><h3>{{ self.headerText }}</h3></span>	
                         <span class="won-cm__center__bubble__text__message--prewrap">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                         <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
@@ -203,19 +208,38 @@ function genComponentConf() {
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
+        if (message && !this.isNormalMessage(message)) {
+          this.headerText = this.getHeaderText(message);
+        }
+
         let text = undefined;
         if (
           chatMessages &&
           message &&
-          (message.get("isProposeMessage") || message.get("isProposeToCancel"))
+          (message.get("isProposeMessage") ||
+            message.get("isAcceptMessage") ||
+            message.get("isProposeToCancel"))
         ) {
           const clauses = message.get("clauses");
           //TODO: delete me
           //console.log("clauses: " + clauses);
 
-          //TODO: Array from clauses
-          //now just one message proposed at a time
-          text = this.getClausesText(chatMessages, message, clauses);
+          if (clauses) {
+            //TODO: Array from clauses
+            //now just one message proposed at a time
+            text = this.getClausesText(chatMessages, message, clauses);
+            if (message.get("isAcceptMessage")) {
+              for (const msg of chatMessages.toArray()) {
+                if (
+                  (msg.get("uri") === clauses ||
+                    msg.get("remoteUri") === clauses) &&
+                  msg.get("isProposeToCancel")
+                ) {
+                  this.headerText = messageHeaders.acceptCancel;
+                }
+              }
+            }
+          }
         }
 
         return {
@@ -266,6 +290,19 @@ function genComponentConf() {
             */
     }
 
+    getHeaderText(message) {
+      if (message.get("isProposeMessage")) {
+        return messageHeaders.proposal;
+      } else if (message.get("isAcceptMessage")) {
+        return messageHeaders.accept;
+      } else if (message.get("isProposeToCancel")) {
+        return messageHeaders.proposeCancel;
+      } else if (message.get("isRetractMessage")) {
+        return messageHeaders.retract;
+      } else if (message.get("isRejectMessage")) {
+        return messageHeaders.reject;
+      }
+    }
     getClausesText(chatMessages, message, clausesUri) {
       for (let msg of Array.from(chatMessages)) {
         if (
@@ -375,11 +412,7 @@ function genComponentConf() {
       const uri = this.message.get("remoteUri")
         ? this.message.get("remoteUri")
         : this.message.get("uri");
-      const trimmedMsg = buildModificationMessage(
-        uri,
-        "retracts",
-        "Retract: " + this.text
-      );
+      const trimmedMsg = buildModificationMessage(uri, "retracts", this.text);
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
@@ -391,11 +424,7 @@ function genComponentConf() {
       const uri = this.message.get("remoteUri")
         ? this.message.get("remoteUri")
         : this.message.get("uri");
-      const trimmedMsg = buildProposalMessage(
-        uri,
-        "rejects",
-        "Reject: " + this.text
-      );
+      const trimmedMsg = buildProposalMessage(uri, "rejects", this.text);
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
@@ -406,7 +435,10 @@ function genComponentConf() {
       return JSON.stringify(jsonld);
     }
 
-    isNormalMessage() {
+    isNormalMessage(message) {
+      if (message) {
+        this.message = message;
+      }
       return !(
         this.message.get("isProposeMessage") ||
         this.message.get("isAcceptMessage") ||
