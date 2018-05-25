@@ -9,6 +9,7 @@ import { postTitleCharacterLimit } from "config";
 import { attach, deepFreeze, clone, dispatchEvent } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
+import { name as descriptionPickerName } from "./description-picker.jsx";
 
 const emptyDraft = deepFreeze({
   title: "",
@@ -127,21 +128,11 @@ function genComponentConf() {
         <!-- TODO: move details into the div opened by the detail picker? -->
         <div class="cis__details" ng-if="self.showDetail">
             <!-- DESCRIPTION -->
-            <div class="cis__description" ng-if="self.openDetail === 'description'">
-                <div class="cis__addDetail__header description" ng-click="self.details.delete('description') && self.updateDraft()">
-                    <svg class="cis__circleicon">
-                        <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
-                    </svg>
-                    <span class="nonHover">Description</span>
-                    <span class="hover">Remove Description</span>
-                </div>
-                <textarea
-                        won-textarea-autogrow
-                        class="cis__description__text won-txt"
-                        ng-blur="::self.updateDescription()"
-                        ng-keyup="::self.updateDescription()"
-                        placeholder="Enter Description..."></textarea>
-            </div>
+            <won-description-picker
+                ng-if="self.openDetail === 'description'"
+                initial-description="::self.draftObject.description"
+                on-description-updated="::self.updateDescription(description)">
+            </won-description-picker>
 
             <!-- LOCATION -->
             <won-location-picker 
@@ -223,14 +214,10 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    updateDescription() {
-      const descriptionString = (this.descriptionInput() || {}).value || "";
+    updateDescription(description) {
+      this.draftObject.description = description;
 
-      this.draftObject.description = descriptionString;
-
-      if (descriptionString && !this.details.has("description")) {
-        this.details.add("description");
-      }
+      this.details.add("description");
     }
 
     updateLocation(location) {
@@ -342,5 +329,5 @@ function genComponentConf() {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.createIsseek", [])
+  .module("won.owner.components.createIsseek", [descriptionPickerName])
   .directive("wonCreateIsseeks", genComponentConf).name;
