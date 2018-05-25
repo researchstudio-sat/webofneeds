@@ -15,6 +15,9 @@ import {
 import { actionCreators } from "../actions/actions.js";
 import { selectNeedByConnectionUri } from "../selectors.js";
 
+import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
+
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -24,8 +27,8 @@ const messageHeaders = deepFreeze({
   accept: "Accept proposal",
   acceptCancel: "Accept to cancel",
   proposeCancel: "Propose to cancel",
-  retract: "Retract",
-  reject: "Reject",
+  retract: "Retract message",
+  reject: "Reject message",
 });
 
 function genComponentConf() {
@@ -44,10 +47,24 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			ng-class="{'agreement' : 	!self.isNormalMessage()}">
+    			ng-class="{'agreement' : 	!self.isNormalMessage(), 'info' : self.isInfoMessage()}">
                     <span class="won-cm__center__bubble__text">
-                    <span ng-show="self.headerText"><h3>{{ self.headerText }}</h3></span>	
-                        <span class="won-cm__center__bubble__text__message--prewrap">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                      <span ng-show="self.headerText">
+                        <h3>
+                          {{ self.headerText }}
+                          <svg class="won-cm__center__carret clickable"
+                                  ng-if="!self.showText && (self.isInfoMessage() || !self.isRelevant)"
+                                  ng-click="self.showText = true">
+                              <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                          </svg>
+                          <svg class="won-cm__center__carret clickable"
+                                  ng-if="self.showText && (self.isInfoMessage() || !self.isRelevant)"
+                                  ng-click="self.showText = false">
+                              <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                          </svg>
+                         </h3>
+                        </span>	
+                        <span class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                         <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
 	                                ng-click="self.showDetail = !self.showDetail"
@@ -157,18 +174,11 @@ function genComponentConf() {
                 class="won-cm__center__time">
                     {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
             </div>
-            <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
+            <a ng-show="self.rdfLinkURL"
                 target="_blank"
-                href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
+                href="{{self.rdfLinkURL}}">
                     <svg class="rdflink__small clickable">
                             <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
-                    </svg>
-            </a>
-            <a ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
-                target="_blank"
-                href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
-                    <svg class="rdflink__small clickable">
-                        <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
             </a>
         </div>
@@ -242,12 +252,29 @@ function genComponentConf() {
           }
         }
 
+        const shouldShowRdf = state.get("showRdf");
+
+        let rdfLinkURL;
+        if (shouldShowRdf && ownerBaseUrl) {
+          rdfLinkURL = urljoin(
+            ownerBaseUrl,
+            "/rest/linked-data/",
+            `?requester=${this.encodeParam(ownNeed.get("uri"))}`,
+            `&uri=${this.encodeParam(message.get("uri"))}`,
+            message.get("outgoingMessage") ? "&deep=true" : ""
+          );
+          console.log("whyyyyyyyy ", ownerBaseUrl, rdfLinkURL);
+        }
+
+        const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
+
         return {
           ownNeed,
           theirNeed,
           connection,
           message,
-          isRelevant: message.get("isRelevant") ? !this.hideOption : false,
+          isRelevant: isRelevant,
+          showText: this.isInfoMessage(message) ? false : isRelevant,
           text: text ? text : message ? message.get("text") : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrigPrefixes: getIn(message, [
@@ -256,7 +283,8 @@ function genComponentConf() {
           ]),
           contentGraphTrig: getIn(message, ["contentGraphTrig", "body"]),
           lastUpdateTime: state.get("lastUpdateTime"),
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf,
+          rdfLinkURL,
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
@@ -443,6 +471,17 @@ function genComponentConf() {
         this.message.get("isProposeMessage") ||
         this.message.get("isAcceptMessage") ||
         this.message.get("isProposeToCancel") ||
+        this.message.get("isRetractMessage") ||
+        this.message.get("isRejectMessage")
+      );
+    }
+
+    isInfoMessage(message) {
+      if (message) {
+        this.message = message;
+      }
+      return !!(
+        this.message.get("isAcceptMessage") ||
         this.message.get("isRetractMessage") ||
         this.message.get("isRejectMessage")
       );

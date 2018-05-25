@@ -28,6 +28,9 @@ import {
   get,
 } from "../utils.js";
 
+import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
+
 import rdfstore from "rdfstore-js";
 import jsonld from "jsonld";
 import won from "./won.js";
@@ -65,15 +68,16 @@ import won from "./won.js";
    * @returns {string}
    */
   function queryString(dataUri, queryParams = {}) {
-    let queryOnOwner = "/owner/rest/linked-data/?";
+    let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
+
     if (queryParams.requesterWebId) {
       queryOnOwner +=
         "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
     }
 
     // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
-    let queryOnNode = dataUri;
     let firstParam = true;
+    let queryOnNode = dataUri;
     for (let [paramName, paramValue] of entries(queryParams)) {
       if (contains(legitQueryParameters, paramName)) {
         queryOnNode = queryOnNode + (firstParam ? "?" : "&");
@@ -881,7 +885,8 @@ import won from "./won.js";
         console.error(
           "Adding a dataset loaded with `deep=true` " +
             "that isn't an event-container. The cache will " +
-            "be faulty and deletion won't work properly."
+            "be faulty and deletion won't work properly. Uri: ",
+          documentUri
         );
       } else {
         const documentToGraphUri = await selectContainedDocumentAndGraphUrisHACK(
@@ -961,10 +966,9 @@ import won from "./won.js";
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.getNeed = function(needUri) {
-    return won
-      .ensureLoaded(needUri)
-      .then(() => selectNeedData(needUri, privateData.store));
+  won.getNeed = async function(needUri) {
+    await won.ensureLoaded(needUri);
+    return selectNeedData(needUri, privateData.store);
   };
 
   function selectNeedData(needUri, store) {
@@ -1096,23 +1100,7 @@ import won from "./won.js";
               {
                 /* frame */
                 "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
-                "@context": {
-                  msg: "http://purl.org/webofneeds/message#",
-                  woncrypt: "http://purl.org/webofneeds/woncrypt#",
-                  xsd: "http://www.w3.org/2001/XMLSchema#",
-                  cert: "http://www.w3.org/ns/auth/cert#",
-                  rdfs: "http://www.w3.org/2000/01/rdf-schema#",
-                  sig:
-                    "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
-                  geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
-                  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                  won: "http://purl.org/webofneeds/model#",
-                  ldp: "http://www.w3.org/ns/ldp#",
-                  sioc: "http://rdfs.org/sioc/ns#",
-                  dc: "http://purl.org/dc/elements/1.1/",
-                  dct: "http://purl.org/dc/terms/",
-                  s: "http://schema.org/",
-                },
+                "@context": won.defaultContext,
               }
             );
             resolve(needJsonLdP);

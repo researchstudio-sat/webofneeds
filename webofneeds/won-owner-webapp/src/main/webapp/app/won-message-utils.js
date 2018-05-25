@@ -6,6 +6,9 @@ import won from "./won-es6.js";
 import Immutable from "immutable";
 import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
 
+import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
+
 import { getRandomWonId } from "./won-utils.js";
 
 export const emptyDataset = Immutable.fromJS({
@@ -442,7 +445,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 function fetchOwnedNeedUris() {
-  return fetch("/owner/rest/needs/", {
+  return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -469,20 +472,21 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
-  return fetch(
-    "/owner/rest/linked-data/?requester=" +
-      encodeURI(needUri) +
-      "&uri=" +
-      encodeURI(eventUri),
-    {
-      method: "get",
-      headers: {
-        Accept: "application/ld+json",
-        "Content-Type": "application/ld+json",
-      },
-      credentials: "include",
-    }
-  )
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/linked-data/",
+    `?requester=${encodeURI(needUri)}`,
+    `&uri=${encodeURI(eventUri)}`
+  );
+  const httpOptions = {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  };
+  return fetch(url, httpOptions)
     .then(checkHttpStatus)
     .then(response => response.json());
 }
@@ -590,7 +594,7 @@ function fetchAllAccessibleAndRelevantData(
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
   const needP = won
-    .ensureLoaded(needUri, { requesterWebId: needUri, deep: true }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
+    .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
   needP.then(need =>
     curriedDispatch(wellFormedPayload({ ownNeeds: { [needUri]: need } }))

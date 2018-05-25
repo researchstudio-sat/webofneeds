@@ -98,7 +98,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
 	 * response) throws IOException { return response; } };
 	 */
 
-	@RequestMapping(value = "/", method = RequestMethod.GET, produces = { "*/*" })
+	@RequestMapping(value = {"/",""}, method = RequestMethod.GET, produces = { "*/*" })
 	public void fetchResource(@RequestParam("uri") String resourceUri,
 			@RequestParam(value = "requester", required = false) String requesterWebId,
 			final HttpServletResponse response, final HttpServletRequest request) throws IOException {
