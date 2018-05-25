@@ -24,8 +24,8 @@ const messageHeaders = deepFreeze({
   accept: "Accept proposal",
   acceptCancel: "Accept to cancel",
   proposeCancel: "Propose to cancel",
-  retract: "Retract",
-  reject: "Reject",
+  retract: "Retract message",
+  reject: "Reject message",
 });
 
 function genComponentConf() {
@@ -44,10 +44,24 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			ng-class="{'agreement' : 	!self.isNormalMessage()}">
+    			ng-class="{'agreement' : 	!self.isNormalMessage(), 'info' : self.isInfoMessage()}">
                     <span class="won-cm__center__bubble__text">
-                    <span ng-show="self.headerText"><h3>{{ self.headerText }}</h3></span>	
-                        <span class="won-cm__center__bubble__text__message--prewrap">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                      <span ng-show="self.headerText">
+                        <h3>
+                          {{ self.headerText }}
+                          <svg class="won-cm__center__carret clickable"
+                                  ng-if="!self.showText && (self.isInfoMessage() || !self.isRelevant)"
+                                  ng-click="self.showText = true">
+                              <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                          </svg>
+                          <svg class="won-cm__center__carret clickable"
+                                  ng-if="self.showText && (self.isInfoMessage() || !self.isRelevant)"
+                                  ng-click="self.showText = false">
+                              <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                          </svg>
+                         </h3>
+                        </span>	
+                        <span class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                         <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
 	                        <svg class="won-cm__center__carret clickable"
 	                                ng-click="self.showDetail = !self.showDetail"
@@ -242,12 +256,14 @@ function genComponentConf() {
           }
         }
 
+        const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
         return {
           ownNeed,
           theirNeed,
           connection,
           message,
-          isRelevant: message.get("isRelevant") ? !this.hideOption : false,
+          isRelevant: isRelevant,
+          showText: this.isInfoMessage(message) ? false : isRelevant,
           text: text ? text : message ? message.get("text") : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrigPrefixes: getIn(message, [
@@ -443,6 +459,17 @@ function genComponentConf() {
         this.message.get("isProposeMessage") ||
         this.message.get("isAcceptMessage") ||
         this.message.get("isProposeToCancel") ||
+        this.message.get("isRetractMessage") ||
+        this.message.get("isRejectMessage")
+      );
+    }
+
+    isInfoMessage(message) {
+      if (message) {
+        this.message = message;
+      }
+      return !!(
+        this.message.get("isAcceptMessage") ||
         this.message.get("isRetractMessage") ||
         this.message.get("isRejectMessage")
       );

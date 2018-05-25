@@ -65,6 +65,12 @@ won-connection-message {
         border: $thinDarkBorder;
         background: $won-light-gray;
       }
+      &.info {
+        opacity: 0.9;
+        padding: 0.5rem;
+        border: $thinDarkBorder;
+        background: $won-light-gray;
+      }
       &__text__message--prewrap {
         white-space: pre-wrap;
       }
