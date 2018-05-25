@@ -210,11 +210,7 @@ function genComponentConf() {
           ? this.message.get("uri")
           : this.message.get("remoteUri");
       }
-      const trimmedMsg = buildModificationMessage(
-        uri,
-        "retracts",
-        "Retract: " + this.text
-      );
+      const trimmedMsg = buildModificationMessage(uri, "retracts", this.text);
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false, uri);
@@ -228,11 +224,7 @@ function genComponentConf() {
         uri = this.message.get("remoteUri");
       }
 
-      const trimmedMsg = buildProposalMessage(
-        uri,
-        "rejects",
-        "Reject: " + this.text
-      );
+      const trimmedMsg = buildProposalMessage(uri, "rejects", this.text);
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false, uri);

@@ -3,10 +3,12 @@
  */
 import won from "../won-es6.js";
 import angular from "angular";
+import ngAnimate from "angular-animate";
 //import loginComponent from './login.js';
 //import logoutComponent from './logout.js';
 import dropdownModule from "./covering-dropdown.js";
 import accountMenuModule from "./account-menu.js";
+import modalDialogModule from "./modal-dialog.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
@@ -37,7 +39,7 @@ function genTopnavConf() {
                 ng-show="self.reconnecting"
                 class="hspinner"/>
         </div>
-
+        <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 
         <nav class="topnav" ng-class="{'hide-in-responsive': self.connectionOrPostDetailOpen}">
             <div class="topnav__inner">
@@ -163,6 +165,7 @@ function genTopnavConf() {
           toastsArray: state.getIn(["toasts"]).toArray(),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
+          showModalDialog: state.get("showModalDialog"),
         };
       };
 
@@ -188,5 +191,7 @@ export default angular
     //logoutComponent,
     dropdownModule,
     accountMenuModule,
+    modalDialogModule,
+    ngAnimate,
   ])
   .directive("wonTopnav", genTopnavConf).name;
