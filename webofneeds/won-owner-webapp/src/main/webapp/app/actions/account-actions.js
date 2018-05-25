@@ -360,7 +360,7 @@ export function accountTransfer(credentials) {
         credentials.privateId = undefined;
         /*response*/
         accountLogin(credentials, {
-          fetchData: false,
+          fetchData: true,
           redirectToFeed: true,
         })(dispatch, getState);
       })
