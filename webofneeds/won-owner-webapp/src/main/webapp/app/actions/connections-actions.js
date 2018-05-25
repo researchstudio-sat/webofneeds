@@ -5,6 +5,8 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
+import urljoin from "url-join";
+
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
@@ -16,6 +18,8 @@ import { getIn, get, cloneAsMutable, deepFreeze } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions";
 
 import { actionTypes, actionCreators } from "./actions.js";
+
+import { ownerBaseUrl } from "config";
 
 import {
   buildCreateMessage,
@@ -35,7 +39,6 @@ const keySet = deepFreeze(
     "cancellationPendingAgreementUris",
   ])
 );
-const baseString = deepFreeze("/owner/");
 
 export function connectionsChatMessage(
   chatMessage,
@@ -377,10 +380,11 @@ export function connectionsRate(connectionUri, rating) {
 
 export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
   return (dispatch, getState) => {
-    const url =
-      baseString +
-      "rest/agreement/getAgreementProtocolUris?connectionUri=" +
-      connectionUri;
+    const url = urljoin(
+      ownerBaseUrl,
+      "/rest/agreement/getAgreementProtocolUris",
+      "?connectionUri=" + connectionUri
+    );
     let hasChanged = false;
     callAgreementsFetch(url)
       .then(response => {

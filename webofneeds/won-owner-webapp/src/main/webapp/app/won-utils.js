@@ -11,6 +11,9 @@ import {
   getRandomString,
 } from "./utils.js";
 
+import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
+
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
 
@@ -170,7 +173,8 @@ export function checkLoginStatus() {
  */
 export function registerAccount(credentials) {
   const { email, password } = parseCredentials(credentials);
-  return fetch("/owner/rest/users/", {
+  const url = urljoin(ownerBaseUrl, "/rest/users/");
+  const httpOptions = {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -178,7 +182,8 @@ export function registerAccount(credentials) {
     },
     credentials: "include",
     body: JSON.stringify({ username: email, password: password }),
-  }).then(checkHttpStatus);
+  };
+  return fetch(url, httpOptions).then(checkHttpStatus);
 }
 
 /**
@@ -187,7 +192,7 @@ export function registerAccount(credentials) {
  */
 export function login(credentials) {
   const { email, password, rememberMe } = parseCredentials(credentials);
-  const loginUrl = "/owner/rest/users/signin";
+  const loginUrl = urljoin(ownerBaseUrl, "/rest/users/signin");
   const params =
     "username=" +
     encodeURIComponent(email) +
@@ -207,7 +212,8 @@ export function login(credentials) {
 }
 
 export function logout() {
-  return fetch("/owner/rest/users/signout", {
+  const url = urljoin(ownerBaseUrl, "/rest/users/signout");
+  const httpOptions = {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -215,7 +221,8 @@ export function logout() {
     },
     credentials: "include",
     body: JSON.stringify({}),
-  }).then(checkHttpStatus);
+  };
+  return fetch(url, httpOptions).then(checkHttpStatus);
 }
 
 /**

@@ -2,14 +2,14 @@
  * Created by ksinger on 30.06.2017.
  */
 
-import config from "config";
+import { piwik } from "config";
 
 // ------- INIT  --------------------
 
 let _paq = _paq || [];
 window._paq = _paq; // export required for interaction with piwik
 
-const trackerUrl = config.piwik.baseUrl + "piwik.php";
+const trackerUrl = piwik.baseUrl + "piwik.php";
 
 /**
  * Use this function to call the piwik API.
@@ -26,9 +26,9 @@ const trackerUrl = config.piwik.baseUrl + "piwik.php";
 function piwikCall(args) {
   const tracker = window.Piwik && window.Piwik.getAsyncTracker(trackerUrl);
   if (
-    typeof config.piwik.baseUrl !== "undefined" &&
-    config.piwik.baseUrl !== "" &&
-    config.piwik.baseUrl !== null
+    typeof piwik.baseUrl !== "undefined" &&
+    piwik.baseUrl !== "" &&
+    piwik.baseUrl !== null
   ) {
     if (tracker) {
       // piwik has loaded, we can properly call functions
@@ -57,12 +57,12 @@ const firstScriptEl = document.getElementsByTagName("script")[0];
 el.type = "text/javascript";
 el.async = true;
 el.defer = true;
-el.src = config.piwik.baseUrl + "piwik.js";
+el.src = piwik.baseUrl + "piwik.js";
 
 if (
-  typeof config.piwik.baseUrl !== "undefined" &&
-  config.piwik.baseUrl !== "" &&
-  config.piwik.baseUrl !== null
+  typeof piwik.baseUrl !== "undefined" &&
+  piwik.baseUrl !== "" &&
+  piwik.baseUrl !== null
 ) {
   firstScriptEl.parentNode.insertBefore(el, firstScriptEl);
 }

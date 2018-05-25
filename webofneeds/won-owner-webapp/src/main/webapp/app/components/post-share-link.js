@@ -1,9 +1,11 @@
 import angular from "angular";
 import ngAnimate from "angular-animate";
 import { actionCreators } from "../actions/actions.js";
-import { attach } from "../utils.js";
+import { attach, toAbsoluteURL } from "../utils.js";
 
 import { connect2Redux } from "../won-utils.js";
+
+import { ownerBaseUrl } from "config";
 
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
@@ -41,14 +43,16 @@ function genComponentConf() {
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
 
+        let linkToPost;
+        if (ownerBaseUrl && post) {
+          const path = "#!post/" + `?postUri=${encodeURI(post.get("uri"))}`;
+
+          linkToPost = toAbsoluteURL(ownerBaseUrl).toString() + path;
+        }
+
         return {
           post,
-          linkToPost:
-            post &&
-            new URL(
-              "/owner/#!post/?postUri=" + encodeURI(post.get("uri")),
-              window.location.href
-            ).href,
+          linkToPost,
         };
       };
       connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);

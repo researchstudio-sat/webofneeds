@@ -15,6 +15,9 @@ import {
 import { actionCreators } from "../actions/actions.js";
 import { selectNeedByConnectionUri } from "../selectors.js";
 
+import { ownerBaseUrl } from "config";
+import urljoin from "url-join";
+
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
@@ -171,18 +174,11 @@ function genComponentConf() {
                 class="won-cm__center__time">
                     {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
             </div>
-            <a ng-show="self.shouldShowRdf && self.message.get('outgoingMessage')"
+            <a ng-show="self.rdfLinkURL"
                 target="_blank"
-                href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}&deep=true">
+                href="{{self.rdfLinkURL}}">
                     <svg class="rdflink__small clickable">
                             <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
-                    </svg>
-            </a>
-            <a ng-show="self.shouldShowRdf && !self.message.get('outgoingMessage')"
-                target="_blank"
-                href="/owner/rest/linked-data/?requester={{self.encodeParam(self.ownNeed.get('uri'))}}&uri={{self.encodeParam(self.message.get('uri'))}}">
-                    <svg class="rdflink__small clickable">
-                        <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
                     </svg>
             </a>
         </div>
@@ -256,7 +252,22 @@ function genComponentConf() {
           }
         }
 
+        const shouldShowRdf = state.get("showRdf");
+
+        let rdfLinkURL;
+        if (shouldShowRdf && ownerBaseUrl) {
+          rdfLinkURL = urljoin(
+            ownerBaseUrl,
+            "/rest/linked-data/",
+            `?requester=${this.encodeParam(ownNeed.get("uri"))}`,
+            `&uri=${this.encodeParam(message.get("uri"))}`,
+            message.get("outgoingMessage") ? "&deep=true" : ""
+          );
+          console.log("whyyyyyyyy ", ownerBaseUrl, rdfLinkURL);
+        }
+
         const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
+        
         return {
           ownNeed,
           theirNeed,
@@ -272,7 +283,8 @@ function genComponentConf() {
           ]),
           contentGraphTrig: getIn(message, ["contentGraphTrig", "body"]),
           lastUpdateTime: state.get("lastUpdateTime"),
-          shouldShowRdf: state.get("showRdf"),
+          shouldShowRdf,
+          rdfLinkURL,
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
