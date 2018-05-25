@@ -6,6 +6,7 @@ import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 
 import signupTitleBarModule from "../signup-title-bar.js";
+import labelledHrModule from "../labelled-hr.js";
 
 import topNavModule from "../topnav.js";
 
@@ -65,6 +66,7 @@ export default angular
     //accordionModule,
     signupTitleBarModule,
     topNavModule,
+    labelledHrModule,
     //flexGridModule,
     //compareToModule,
   ])

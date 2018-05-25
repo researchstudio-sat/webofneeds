@@ -56,25 +56,16 @@ function genTopnavConf() {
                 <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
-
-                        <li ng-show="!self.loggedIn && !self.isPrivateIdUser">
+                        <li ng-show="!self.isSignUp && (self.isPrivateIdUser || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn hide-in-responsive">
                                     Sign up
                             </a>
                         </li>
-                        <li ng-show="self.isPrivateIdUser">
-                            <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__signupbtn hide-in-responsive">
-                                    Transfer Account
-                            </a>
-                        </li>
-
                         <li>
                             <won-account-menu>
                             </won-account-menu>
                         </li>
-
                     </ul>
                 </div>
             </div>
@@ -146,6 +137,7 @@ function genTopnavConf() {
       window.tnc4dbg = this;
 
       const selectFromState = state => {
+        const currentRoute = getIn(state, ["router", "currentState", "name"]);
         const selectedPostUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "postUri"])
         );
@@ -178,6 +170,7 @@ function genTopnavConf() {
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
           showModalDialog: state.get("showModalDialog"),
+          isSignUp: currentRoute === "signup",
         };
       };
 
