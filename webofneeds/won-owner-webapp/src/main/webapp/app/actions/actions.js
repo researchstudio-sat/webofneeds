@@ -231,6 +231,9 @@ const actionHierarchy = {
   showMainMenuDisplay: INJ_DEFAULT,
   hideMainMenuDisplay: INJ_DEFAULT,
 
+  openModalDialog: INJ_DEFAULT,
+  closeModalDialog: INJ_DEFAULT,
+
   toasts: {
     delete: INJ_DEFAULT,
     test: INJ_DEFAULT,

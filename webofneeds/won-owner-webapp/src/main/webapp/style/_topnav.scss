@@ -6,6 +6,8 @@
 @import "topnav-toasts";
 @import "button";
 @import "responsiveness-utils";
+@import "modal-dialog";
+@import "animate";
 
 .topnav {
   //TODO split into single-purpose-classes
@@ -91,4 +93,8 @@
     @include won-button--filled(white, $won-secondary-color-lighter);
     @extend .topnav__button;
   }
+}
+
+won-modal-dialog {
+  @include appearAnimation(0.5s);
 }
