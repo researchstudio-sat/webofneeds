@@ -356,12 +356,14 @@ export function accountRegister(credentials) {
 export function accountTransfer(credentials) {
   return (dispatch, getState) =>
     transferPrivateAccount(credentials)
-      .then(() =>
-        /*response*/ accountLogin(credentials, {
+      .then(() => {
+        credentials.privateId = undefined;
+        /*response*/
+        accountLogin(credentials, {
           fetchData: false,
           redirectToFeed: true,
-        })(dispatch, getState)
-      )
+        })(dispatch, getState);
+      })
       .catch(error => {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError = "Account Transfer failed";

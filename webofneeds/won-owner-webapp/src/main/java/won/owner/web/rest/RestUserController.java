@@ -539,10 +539,8 @@ public class RestUserController {
                 throw new IllegalStateException("could not create keystore for user " + newEmail);
             }
             //keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
-            user.setKeystorePasswordHolder(newKeystorePassword);
-            user.setKeystoreHolder(newKeystoreHolder);
-
-
+            privateUser.setKeystorePasswordHolder(newKeystorePassword);
+            privateUser.setKeystoreHolder(newKeystoreHolder);
 
             userRepository.save(privateUser);
         } catch(DataIntegrityViolationException e) {
