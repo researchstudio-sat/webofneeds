@@ -267,7 +267,7 @@ function genComponentConf() {
         }
 
         const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
-        
+
         return {
           ownNeed,
           theirNeed,
