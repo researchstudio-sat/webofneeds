@@ -19,6 +19,7 @@ function genComponentConf() {
         Transfer Account
     </a>
     <a
+        ng-if="!self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'settings') }}"
         class="won-button--outlined thin red"
         ng-click="self.hideMainMenuDisplay()">
@@ -42,7 +43,7 @@ function genComponentConf() {
         class="won-button--filled lighterblue"
         style="width:100%"
         ng-click="::self.logout()">
-            Sign out
+        <span>Sign out</span>
     </button>
     `;
 

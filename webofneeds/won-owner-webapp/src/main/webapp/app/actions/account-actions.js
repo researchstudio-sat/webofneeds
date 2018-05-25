@@ -8,7 +8,7 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
-  transferAccount,
+  transferPrivateAccount,
   login,
   logout,
   parseCredentials,
@@ -355,7 +355,7 @@ export function accountRegister(credentials) {
  */
 export function accountTransfer(credentials) {
   return (dispatch, getState) =>
-    transferAccount(credentials)
+    transferPrivateAccount(credentials)
       .then(() =>
         /*response*/ accountLogin(credentials, {
           fetchData: false,
