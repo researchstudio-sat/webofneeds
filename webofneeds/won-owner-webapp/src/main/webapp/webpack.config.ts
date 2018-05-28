@@ -15,7 +15,7 @@ function config(env, argv): Configuration {
   const mode: "development" | "production" =
     argv.mode || (argv.watch ? "development" : "production");
 
-  const isLive: boolean = env && env.WON_DEPLOY_NODE_ENV == "live";
+  const nodeEnv = process.env.WON_DEPLOY_NODE_ENV || "default";
 
   //TODO: When `webpack-watch-time-plugin` is updated for newer versions of webpack switch to that.
   const WatchTimePlugin = {
@@ -62,11 +62,7 @@ function config(env, argv): Configuration {
         "angular-ui-router-shim$": require.resolve(
           "angular-ui-router/release/stateEvents.js"
         ),
-        config$: path.resolve(
-          __dirname,
-          "config",
-          `${isLive ? "live" : "default"}.js`
-        ),
+        config$: path.resolve(__dirname, "config", `${nodeEnv}.js`),
       },
     },
     module: {
