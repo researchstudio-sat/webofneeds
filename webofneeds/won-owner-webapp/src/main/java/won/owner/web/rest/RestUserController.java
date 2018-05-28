@@ -8,7 +8,6 @@ package won.owner.web.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -30,19 +27,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import won.owner.model.KeystoreHolder;
-import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.TransferUserPojo;
 import won.owner.pojo.UserPojo;
 import won.owner.pojo.UserSettingsPojo;
-import won.owner.repository.KeystoreHolderRepository;
-import won.owner.repository.KeystorePasswordRepository;
 import won.owner.repository.UserNeedRepository;
-import won.owner.repository.UserRepository;
 import won.owner.service.impl.*;
-import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
 
@@ -64,25 +55,16 @@ public class RestUserController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private WONUserDetailService wonUserDetailService;
-
     private AuthenticationManager authenticationManager;
 
     private SecurityContextRepository securityContextRepository;
 
     private UserRegisterValidator userRegisterValidator;
 
-    private WonOwnerMailSender emailSender;
-
     private UserNeedRepository userNeedRepository;
 
-    private UserRepository userRepository;
-
     @Autowired
-    private KeystoreHolderRepository keystoreHolderRepository;
-
-    @Autowired
-    private KeystorePasswordRepository keystorePasswordRepository;
+    private UserService userService;
 
     @Autowired
     private KeystoreEnabledPersistentRememberMeServices keystoreEnabledPersistentRememberMeServices;
@@ -94,18 +76,13 @@ public class RestUserController {
     RememberMeServices rememberMeServices = new NullRememberMeServices();
 
     @Autowired
-    public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
+    public RestUserController(final AuthenticationManager authenticationManager,
                               final SecurityContextRepository securityContextRepository,
                               final UserRegisterValidator userRegisterValidator,
-                              final WonOwnerMailSender emailSender,
-                              final UserRepository userRepository,
                               final UserNeedRepository userNeedRepository) {
-        this.wonUserDetailService = wonUserDetailService;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
         this.userRegisterValidator = userRegisterValidator;
-        this.emailSender = emailSender;
-        this.userRepository = userRepository;
         this.userNeedRepository = userNeedRepository;
     }
 
@@ -135,7 +112,7 @@ public class RestUserController {
                     return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
                 }
             }
-            registerUser(user.getUsername(), user.getPassword(), null);
+            userService.registerUser(user.getUsername(), user.getPassword(), null);
         } catch (UserAlreadyExistsException e) {
             // username is already in database
             return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
@@ -161,7 +138,7 @@ public class RestUserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
         // therefore, we have to retrieve the user object from the user repository
-        User user = userRepository.findByUsername(username);
+        User user = userService.getByUsername(username);
         if (user == null && !transferUserPojo.getPrivateUsername().equals(user.getUsername())) {
             logger.warn("trying to transfer a user that is not the one that is logged in");
             return new ResponseEntity("\"user name problem\"", HttpStatus.BAD_REQUEST);
@@ -178,7 +155,7 @@ public class RestUserController {
                     return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
                 }
             }
-            transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
+            userService.transferUser(transferUserPojo.getUsername(), transferUserPojo.getPassword(), transferUserPojo.getPrivateUsername(), transferUserPojo.getPrivatePassword());
         } catch (UserAlreadyExistsException e) {
             // username is already in database
             return new ResponseEntity("\"Cannot transfer to new user: name is already in use.\"", HttpStatus.CONFLICT);
@@ -201,7 +178,7 @@ public class RestUserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
         // therefore, we have to retrieve the user object from the user repository
-        User user = userRepository.findByUsername(username);
+        User user = userService.getByUsername(username);
         UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
         URI needUri = null;
         try {
@@ -235,7 +212,7 @@ public class RestUserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in this session need,
         // therefore, we have to retrieve the user object from the user repository
-        User user = userRepository.findByUsername(username);
+        User user = userService.getByUsername(username);
         if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
             logger.warn("user name wrong");
             return new ResponseEntity("\"user name problem\"", HttpStatus.BAD_REQUEST);
@@ -245,12 +222,12 @@ public class RestUserController {
             //TODO validate email server-side?
             // set email:
             user.setEmail(userSettingsPojo.getEmail());
-            userRepository.save(user);
+            userService.save(user);
         } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
             //TODO validate email server-side?
             // change email:
             user.setEmail(userSettingsPojo.getEmail());
-            userRepository.save(user);
+            userService.save(user);
             logger.info("change email requested - email changed");
         }
 
@@ -303,7 +280,7 @@ public class RestUserController {
                     return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
                 }
             } else {
-                registerUser(user.getUsername(), user.getPassword(), "ROLE_PRIVATE");
+                userService.registerUser(user.getUsername(), user.getPassword(), "ROLE_PRIVATE");
             }
         } catch (UserAlreadyExistsException e) {
             // username is already in database
@@ -456,95 +433,5 @@ public class RestUserController {
         this.rememberMeServices = rememberMeServices;
     }
 
-    /**
-     * Registers the specified user with password and an opional role.
-     * Assumes values have already been checked for syntactic validity.
-     *
-     * @param email
-     * @param password
-     * @param role
-     * @throws UserAlreadyExistsException
-     */
-    private void registerUser(String email, String password, String role) throws UserAlreadyExistsException {
-        User user = userRepository.findByUsername(email);
-        if (user != null) {
-            throw new UserAlreadyExistsException();
-        }
-        try {
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            user = new User(email, passwordEncoder.encode(password), role);
-            user.setEmail(email);
-            KeystorePasswordHolder keystorePassword = new KeystorePasswordHolder();
-            //generate a password for the keystore and save it in the database, encrypted with a symmetric key
-            //derived from the user's password
-            keystorePassword.setPassword(
-                    KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES),
-                    password);
-            //keystorePassword = keystorePasswordRepository.save(keystorePassword);
-            //generate the keystore for the user
-            KeystoreHolder keystoreHolder = new KeystoreHolder();
-            try {
-                // create the keystore if it doesnt exist yet
-                keystoreHolder.getKeystore(keystorePassword.getPassword(password));
-            } catch (Exception e) {
-                throw new IllegalStateException("could not create keystore for user " + email);
-            }
-            //keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
-            user.setKeystorePasswordHolder(keystorePassword);
-            user.setKeystoreHolder(keystoreHolder);
-            userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            // username is already in database
-            throw new UserAlreadyExistsException();
-        }
-    }
 
-    private void transferUser(String email, String password, String privateUsername, String privatePassword) throws UserAlreadyExistsException, UserNotFoundException {
-        transferUser(email, password, privateUsername, privatePassword, null);
-    }
-
-    private void transferUser(String newEmail, String newPassword, String privateUsername, String privatePassword, String role) throws UserAlreadyExistsException, UserNotFoundException{
-        User user = userRepository.findByUsername(newEmail);
-        if (user != null) {
-            throw new UserAlreadyExistsException();
-        }
-        try {
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            User privateUser = userRepository.findByUsername(privateUsername);
-
-            if (privateUser == null) {
-                throw new UserNotFoundException();
-            }
-
-            //change the username/email and keystorpw holder
-            privateUser.setUsername(newEmail);
-            privateUser.setPassword(passwordEncoder.encode(newPassword));
-            privateUser.setEmail(newEmail);
-            if(role != null) {
-                privateUser.setRole(role);
-            }
-
-            KeystorePasswordHolder newKeystorePassword = new KeystorePasswordHolder();
-            //generate a newPassword for the keystore and save it in the database, encrypted with a symmetric key
-            //derived from the user's new password
-            newKeystorePassword.setPassword(
-                    KeystorePasswordUtils.generatePassword(KeystorePasswordUtils.KEYSTORE_PASSWORD_BYTES),
-                    newPassword);
-            //TODO: taketh the old keystore and change the password of it or something
-            KeystoreHolder newKeystoreHolder = new KeystoreHolder();
-            try {
-                // create the keystore if it doesnt exist yet
-                newKeystoreHolder.getKeystore(newKeystorePassword.getPassword(newPassword));
-            } catch (Exception e) {
-                throw new IllegalStateException("could not create keystore for user " + newEmail);
-            }
-            //keystoreHolder = keystoreHolderRepository.save(keystoreHolder);
-            privateUser.setKeystorePasswordHolder(newKeystorePassword);
-            privateUser.setKeystoreHolder(newKeystoreHolder);
-
-            userRepository.save(privateUser);
-        } catch(DataIntegrityViolationException e) {
-            throw new UserAlreadyExistsException();
-        }
-    }
 }
