@@ -34,7 +34,7 @@ function genComponentConf() {
                         class="won-button--outlined thin red"
                         ng-if="!self.isSuggested"
                         ng-click="self.goToPost(self.connection.get('remoteNeedUri'))">
-                        Show Post Details
+                        Show Details
                     </button>
                     <button
                         ng-if="self.isConnected || self.isSuggested"
