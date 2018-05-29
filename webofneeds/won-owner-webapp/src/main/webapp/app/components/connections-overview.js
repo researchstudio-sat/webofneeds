@@ -69,13 +69,13 @@ function genComponentConf() {
                             ng-if="need.get('uri') !== self.needUriInRoute"
                             class="co__item__need__detail__actions__button won-button--outlined thin red"
                             ng-click="self.selectNeed(need.get('uri'))">
-                            Show Post Details
+                            Show Details
                         </button>
                         <button
                             ng-if="need.get('uri') === self.needUriInRoute"
                             class="co__item__need__detail__actions__button won-button--outlined thin red"
                             ng-click="self.selectNeed(undefined)">
-                            Hide Post Details
+                            Hide Details
                         </button>
                     </div>
                 </div>
@@ -139,13 +139,13 @@ function genComponentConf() {
                                 ng-if="need.get('uri') !== self.needUriInRoute"
                                 class="co__item__need__detail__actions__button won-button--outlined thin red"
                                 ng-click="self.selectNeed(need.get('uri'))">
-                                Show Post Details
+                                Show Details
                             </button>
                             <button
                                 ng-if="need.get('uri') === self.needUriInRoute"
                                 class="co__item__need__detail__actions__button won-button--outlined thin red"
                                 ng-click="self.selectNeed(undefined)">
-                                Hide Post Details
+                                Hide Details
                             </button>
                         </div>
                     </div>
