@@ -91,7 +91,20 @@ function genComponentConf() {
                         <svg class="cis__circleicon" ng-show="self.details.has('location')">
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
-                        <span>Address or Location</span>
+                        <span>Location</span>
+                </div>
+
+                <!-- ROUTE PICKER -->
+                <div class="cis__detail__items__item route"
+                    ng-click="self.toggleOpenDetail('route')"
+                    ng-class="{'picked' : self.openDetail === 'route'}">
+                        <svg class="cis__circleicon" ng-show="!self.details.has('route')">
+                            <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
+                        </svg>
+                        <svg class="cis__circleicon" ng-show="self.details.has('route')">
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                        </svg>
+                        <span>Route (From - To)</span>
                 </div>
 
                 <!-- TAGS PICKER -->
@@ -139,6 +152,13 @@ function genComponentConf() {
                 initial-location="::self.draftObject.location"
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
+
+            <won-route-picker
+              ng-if="self.openDetail === 'route'"
+              initial-fromLocation="::self.draftObject.fromLcoation"
+              initial-toLocation="::self.draftObject.toLocation"
+              on-route-updated="::self.updateRoute(fromLocation, toLocation)">
+            </won-route-picker>
 
             <!-- TAGS -->
             <won-tags-picker
