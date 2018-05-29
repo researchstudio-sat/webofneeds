@@ -1183,41 +1183,47 @@ function parseLocation(jsonldLocation) {
     },
   };
 
-  location.address = jsonldLocationImm.get("s:name");
+  location.address = jsonldLocationImm.get("http://schema.org/name");
 
   location.lat = Number.parseFloat(
-    jsonldLocationImm.getIn(["s:geo", "s:latitude"])
+    jsonldLocationImm.getIn([
+      "http://schema.org/geo",
+      "http://schema.org/latitude",
+    ])
   );
   location.lng = Number.parseFloat(
-    jsonldLocationImm.getIn(["s:geo", "s:longitude"])
+    jsonldLocationImm.getIn([
+      "http://schema.org/geo",
+      "http://schema.org/longitude",
+    ])
   );
 
   location.nwCorner.lat = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasNorthWestCorner",
-      "s:latitude",
+      "http://schema.org/latitude",
     ])
   );
   location.nwCorner.lng = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasNorthWestCorner",
-      "s:longitude",
+      "http://schema.org/longitude",
     ])
   );
   location.seCorner.lat = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasSouthEastCorner",
-      "s:latitude",
+      "http://schema.org/latitude",
     ])
   );
   location.seCorner.lng = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasSouthEastCorner",
-      "s:longitude",
+      "http://schema.org/longitude",
     ])
   );
 
