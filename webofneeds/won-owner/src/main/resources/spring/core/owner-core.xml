@@ -30,5 +30,5 @@
 		class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
 
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
-
+    <bean id="userService" class="won.owner.service.impl.UserService" />
 </beans>

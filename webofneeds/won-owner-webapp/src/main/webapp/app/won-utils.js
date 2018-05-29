@@ -187,6 +187,33 @@ export function registerAccount(credentials) {
 }
 
 /**
+ * Transfer an existing privateId User,
+ * to a non existing User
+ * @param credentials {email, password, privateId}
+ * @returns {*}
+ */
+export function transferPrivateAccount(credentials) {
+  const { email, password, privateId } = credentials;
+  const privateUsername = privateId2Credentials(privateId).email;
+  const privatePassword = privateId2Credentials(privateId).password;
+
+  return fetch("/owner/rest/users/transfer", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      password: password,
+      privateUsername: privateUsername,
+      privatePassword: privatePassword,
+    }),
+  }).then(checkHttpStatus);
+}
+
+/**
  * @param credentials either {email, password} or {privateId}
  * @returns {*}
  */

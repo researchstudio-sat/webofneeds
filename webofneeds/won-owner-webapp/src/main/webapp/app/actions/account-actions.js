@@ -8,6 +8,7 @@ import { actionTypes, actionCreators } from "./actions.js";
 import { fetchOwnedData } from "../won-message-utils.js";
 import {
   registerAccount,
+  transferPrivateAccount,
   login,
   logout,
   parseCredentials,
@@ -343,6 +344,29 @@ export function accountRegister(credentials) {
         //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
         const registerError =
           "Registration failed (E-Mail might already be used)";
+        console.error(registerError, error);
+        dispatch(actionCreators.registerFailed({ registerError, error }));
+      });
+}
+
+/**
+ * @param credentials {email, password, privateId}
+ * @returns {Function}
+ */
+export function accountTransfer(credentials) {
+  return (dispatch, getState) =>
+    transferPrivateAccount(credentials)
+      .then(() => {
+        credentials.privateId = undefined;
+        /*response*/
+        accountLogin(credentials, {
+          fetchData: true,
+          redirectToFeed: true,
+        })(dispatch, getState);
+      })
+      .catch(error => {
+        //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
+        const registerError = "Account Transfer failed";
         console.error(registerError, error);
         dispatch(actionCreators.registerFailed({ registerError, error }));
       });

@@ -2,7 +2,7 @@
  * Created by ksinger on 20.08.2015.
  */
 import angular from "angular";
-import { attach } from "../utils.js";
+import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -13,6 +13,13 @@ function genComponentConf() {
     <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.email }}">{{ self.email }}</span>
     <hr class="show-in-responsive"/>
     <a
+        ng-if="self.isPrivateIdUser"
+        href="{{ self.absHRef(self.$state, 'signup') }}"
+        class="won-button--outlined thin red show-in-responsive">
+        Transfer Account
+    </a>
+    <a
+        ng-if="!self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'settings') }}"
         class="won-button--outlined thin red"
         ng-click="self.hideMainMenuDisplay()">
@@ -36,7 +43,7 @@ function genComponentConf() {
         class="won-button--filled lighterblue"
         style="width:100%"
         ng-click="::self.logout()">
-            Sign out
+        <span>Sign out</span>
     </button>
     `;
 
@@ -56,11 +63,20 @@ function genComponentConf() {
       this.email = "";
       this.password = "";
 
-      const logout = state => ({
-        loggedIn: state.getIn(["user", "loggedIn"]),
-        shouldShowRdf: state.get("showRdf"),
-        email: state.getIn(["user", "email"]),
-      });
+      const logout = state => {
+        const privateId = getIn(state, [
+          "router",
+          "currentParams",
+          "privateId",
+        ]);
+
+        return {
+          loggedIn: state.getIn(["user", "loggedIn"]),
+          shouldShowRdf: state.get("showRdf"),
+          email: state.getIn(["user", "email"]),
+          isPrivateIdUser: !!privateId,
+        };
+      };
 
       connect2Redux(logout, actionCreators, [], this);
     }

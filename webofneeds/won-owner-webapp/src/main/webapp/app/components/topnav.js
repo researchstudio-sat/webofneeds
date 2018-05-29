@@ -56,19 +56,16 @@ function genTopnavConf() {
                 <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
-
-                        <li ng-show="!self.loggedIn">
+                        <li ng-show="!self.isSignUp && (self.isPrivateIdUser || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn hide-in-responsive">
                                     Sign up
                             </a>
                         </li>
-
                         <li>
                             <won-account-menu>
                             </won-account-menu>
                         </li>
-
                     </ul>
                 </div>
             </div>
@@ -140,6 +137,7 @@ function genTopnavConf() {
       window.tnc4dbg = this;
 
       const selectFromState = state => {
+        const currentRoute = getIn(state, ["router", "currentState", "name"]);
         const selectedPostUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "postUri"])
         );
@@ -148,6 +146,11 @@ function genTopnavConf() {
         const selectedConnectionUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "connectionUri"])
         );
+        const privateId = getIn(state, [
+          "router",
+          "currentParams",
+          "privateId",
+        ]);
         const need =
           selectedConnectionUri &&
           selectNeedByConnectionUri(state, selectedConnectionUri);
@@ -161,11 +164,13 @@ function genTopnavConf() {
           WON: won.WON,
           loggedIn: state.getIn(["user", "loggedIn"]),
           email: state.getIn(["user", "email"]),
+          isPrivateIdUser: !!privateId,
           connectionOrPostDetailOpen: selectedConnection || selectedPost,
           toastsArray: state.getIn(["toasts"]).toArray(),
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
           showModalDialog: state.get("showModalDialog"),
+          isSignUp: currentRoute === "signup",
         };
       };
 
