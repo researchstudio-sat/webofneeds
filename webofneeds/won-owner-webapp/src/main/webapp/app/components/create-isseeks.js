@@ -128,9 +128,9 @@ function genComponentConf() {
         <div class="cis__details" ng-if="self.showDetail">
             <!-- DESCRIPTION -->
             <won-description-picker 
-              ng-if="self.openDetail === 'description'">
+              ng-if="self.openDetail === 'description'"
               initial-description="::self.draftObject.description"
-              on-description-updated="::self.updateDescription(description)"
+              on-description-updated="::self.updateDescription(description)">
             </won-description-picker>
 
             <!-- LOCATION -->
