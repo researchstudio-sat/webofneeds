@@ -34,7 +34,6 @@ function genComponentConf() {
     }
 
     showInitialDescription() {
-      console.log("initial desc: ", this.initialDescription);
       this.addedDescription = this.initialDescription;
 
       if (
@@ -54,7 +53,6 @@ function genComponentConf() {
       if (text && text.trim().length > 0) {
         this.addedDescription = text;
         this.onDescriptionUpdated({ description: this.addedDescription }); // does not work?
-        console.log("sent update: ", this.addedDescription);
         this.showResetButton = true;
       } else {
         this.resetDescription();
