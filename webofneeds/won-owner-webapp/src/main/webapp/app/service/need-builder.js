@@ -10,8 +10,37 @@ import won from "./won.js";
 (function() {
   // <need-builder-js> scope
 
-  function hasLocation(args) {
-    return !!args.location;
+  function location(isOrSeeksLocation, isSeeks) {
+    if (!isOrSeeksLocation) {
+      return undefined;
+    }
+    return {
+      "@type": "s:Place",
+      "s:geo": {
+        "@id": isSeeks ? "_:isLocation" : "_:seeksLocation",
+        "@type": "s:GeoCoordinates",
+        "s:latitude": isOrSeeksLocation.lat.toFixed(6),
+        "s:longitude": isOrSeeksLocation.lng.toFixed(6),
+      },
+      "s:name": isOrSeeksLocation.name,
+      "won:hasBoundingBox":
+        !isOrSeeksLocation.nwCorner || !isOrSeeksLocation.seCorner
+          ? undefined
+          : {
+              "won:hasNorthWestCorner": {
+                "@id": isSeeks ? "_:isBoundsNW" : "_:seeksBoundsNW",
+                "@type": "s:GeoCoordinates",
+                "s:latitude": isOrSeeksLocation.nwCorner.lat.toFixed(6),
+                "s:longitude": isOrSeeksLocation.nwCorner.lng.toFixed(6),
+              },
+              "won:hasSouthEastCorner": {
+                "@id": isSeeks ? "_:isBoundsSE" : "_:seeksBoundsSE",
+                "@type": "s:GeoCoordinates",
+                "s:latitude": isOrSeeksLocation.seCorner.lat.toFixed(6),
+                "s:longitude": isOrSeeksLocation.seCorner.lng.toFixed(6),
+              },
+            },
+    };
   }
   function hasPriceSpecification() {
     return false; //TODO price-specification not fully implemented yet
@@ -147,44 +176,9 @@ import won from "./won.js";
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
-      "won:hasLocation": !hasLocation(isOrSeeksData)
-        ? undefined
-        : {
-            "@type": "s:Place",
-            "s:geo": {
-              "@id": isSeeks ? "_:isLocation" : "_:seeksLocation",
-              "@type": "s:GeoCoordinates",
-              "s:latitude": isOrSeeksData.location.lat.toFixed(6),
-              "s:longitude": isOrSeeksData.location.lng.toFixed(6),
-            },
-            "s:name": isOrSeeksData.location.name,
-            "won:hasBoundingBox":
-              !isOrSeeksData.location.nwCorner ||
-              !isOrSeeksData.location.seCorner
-                ? undefined
-                : {
-                    "won:hasNorthWestCorner": {
-                      "@id": isSeeks ? "_:isBoundsNW" : "_:seeksBoundsNW",
-                      "@type": "s:GeoCoordinates",
-                      "s:latitude": isOrSeeksData.location.nwCorner.lat.toFixed(
-                        6
-                      ),
-                      "s:longitude": isOrSeeksData.location.nwCorner.lng.toFixed(
-                        6
-                      ),
-                    },
-                    "won:hasSouthEastCorner": {
-                      "@id": isSeeks ? "_:isBoundsSE" : "_:seeksBoundsSE",
-                      "@type": "s:GeoCoordinates",
-                      "s:latitude": isOrSeeksData.location.seCorner.lat.toFixed(
-                        6
-                      ),
-                      "s:longitude": isOrSeeksData.location.seCorner.lng.toFixed(
-                        6
-                      ),
-                    },
-                  },
-          },
+      "won:hasLocation": location(isOrSeeksData.location, isSeeks),
+      "won:hasFromLocation": location(isOrSeeksData.fromLocation, isSeeks),
+      "won:hasToLocation": location(isOrSeeksData.toLocation, isSeeks),
       //TODO: Different id for is and seeks
       "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
         ? undefined

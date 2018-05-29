@@ -16,6 +16,8 @@ const emptyDraft = deepFreeze({
   description: "",
   tags: [],
   location: undefined,
+  fromLocation: undefined,
+  toLocation: undefined,
   thumbnail: undefined,
   matchingContext: undefined,
 });
@@ -32,7 +34,7 @@ const emptyDraft = deepFreeze({
 //   ttl: {},
 // };
 
-//TODO can't inject $scope with the angular2-router, preventing redux-cleanup
+//TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
   "$scope",
@@ -182,7 +184,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.won = won;
 
-      //TODO debug; deleteme
+      //TODO: debug; deleteme
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
@@ -216,6 +218,10 @@ function genComponentConf() {
       }
       if (!this.details.has("description")) {
         this.draftObject.description = undefined;
+      }
+      if (!this.description.has("route")) {
+        this.draftObject.fromLocation = undefined;
+        this.draftObject.toLocation = undefined;
       }
 
       this.onUpdate({ draft: this.draftObject });

@@ -124,6 +124,8 @@ function genComponentConf() {
         description: "",
         tags: undefined,
         location: undefined,
+        fromLocation: undefined,
+        toLocation: undefined,
         thumbnail: undefined,
         matchingContext: undefined,
       };
@@ -133,6 +135,8 @@ function genComponentConf() {
         description: "",
         tags: undefined,
         location: undefined,
+        fromLocation: undefined,
+        toLocation: undefined,
         thumbnail: undefined,
         matchingContext: undefined,
       };
