@@ -9,7 +9,10 @@ import java.util.stream.StreamSupport;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelExtract;
 import org.apache.jena.rdf.model.RDFNode;
@@ -18,6 +21,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StatementBoundary;
 import org.apache.jena.rdf.model.StatementBoundaryBase;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpProject;
 import org.apache.jena.sparql.core.BasicPattern;
@@ -78,8 +82,40 @@ public class SparqlMatcherActor extends UntypedActor {
 		log.info("Received inactive need.");
 	}
 
-	private static String hashFunction(String input) {
+	private static String hashFunction(Object input) {
 		return Integer.toHexString(input.hashCode());
+	}
+	
+	private static BasicPattern createDetailsQuery(Model model) {
+		BasicPattern pattern = new BasicPattern();
+		
+		StreamSupport.stream(Spliterators.spliteratorUnknownSize(model.listStatements(), Spliterator.CONCURRENT), true)
+		.map((statement) -> {
+			Triple triple = statement.asTriple();
+			RDFNode object = statement.getObject();
+			
+			Node newSubject = NodeFactory.createVariable(hashFunction(triple.getSubject()));
+			
+			Node newObject = triple.getObject();
+			
+			if(object.isAnon()) {
+				newObject = NodeFactory.createVariable(hashFunction(newObject));
+			}
+			
+			return new Triple(newSubject, triple.getPredicate(), newObject);
+		}).forEach(pattern::add);
+		
+		return pattern;
+	}
+	
+	private static Op createNeedQuery(Model model, Node parentPredicate, Node rootName) {
+		BasicPattern pattern = createDetailsQuery(model);
+		
+		Var resultVariable = Var.alloc("result");
+		
+		pattern.add(new Triple(resultVariable.asNode(), parentPredicate, rootName));
+		
+		return new OpProject(new OpBGP(pattern), Arrays.asList(new Var[]{resultVariable}));
 	}
 
 	protected void processActiveNeedEvent(NeedEvent needEvent) throws IOException, JsonLdError {
@@ -92,56 +128,45 @@ public class SparqlMatcherActor extends UntypedActor {
 		StatementBoundary boundary = new StatementBoundaryBase() {
 			public boolean stopAt(Statement s) {
 				String subjectURI = s.getSubject().getURI();
-				String predicate = s.getPredicate().getLocalName();
-
-				if (needURI.equals(subjectURI)) {
-					if (predicate.equals("is") || predicate.equals("seeks")) {
-						return false;
-					} else {
-						return true;
-					}
-				} else {
-					return false;
-				}
+				return needURI.equals(subjectURI);
 			}
 		};
 
-		model = new ModelExtract(boundary).extract(model.createResource(needURI), model);
-
+		Statement seeks = model.getRequiredProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
+		
+		Model seeksModel = new ModelExtract(boundary).extract(seeks.getObject().asResource(), model);
+		
 		BasicPattern base = new BasicPattern();
 
-		StreamSupport.stream(Spliterators.spliteratorUnknownSize(model.listStatements(), Spliterator.CONCURRENT), true)
+		StreamSupport.stream(Spliterators.spliteratorUnknownSize(seeksModel.listStatements(), Spliterator.CONCURRENT), true)
 				.map((statement) -> {
-					Resource subject = statement.getSubject();
-					String predicate = statement.getPredicate().getURI();
+					Triple triple = statement.asTriple();
 					RDFNode object = statement.getObject();
-
-					if (needURI.equals(subject.getURI())) {
-						if (predicate.equals("http://purl.org/webofneeds/model#is")) {
-							predicate = "http://purl.org/webofneeds/model#seeks";
-						} else if (predicate.equals("http://purl.org/webofneeds/model#seeks")) {
-							predicate = "http://purl.org/webofneeds/model#is";
-						} else {
-							return null;
-						}
+					
+					Node newSubject = NodeFactory.createVariable(hashFunction(triple.getSubject()));
+					
+					Node newObject = triple.getObject();
+					
+					if(object.isAnon()) {
+						newObject = NodeFactory.createVariable(hashFunction(newObject));
 					}
-
-					Node subjectNode = subject.isAnon() ? NodeFactory.createVariable(hashFunction(subject.getId().toString())) : NodeFactory.createVariable(hashFunction(subject.getURI().toString()));
-
-					if (object.isLiteral()) {
-						return new Triple(subjectNode, NodeFactory.createURI(predicate), NodeFactory.createVariable(hashFunction(statement.toString())));
-					} else {
-						Resource objectResource = object.asResource();
-						Node objectNode = objectResource.isAnon() ? NodeFactory.createVariable(hashFunction(objectResource.getId().toString()))
-								: NodeFactory.createURI(objectResource.getURI());
-						return new Triple(subjectNode,
-								NodeFactory.createURI(predicate), objectNode);
-					}
-
-				}).filter((elem) -> elem != null).forEach(base::add);
+					
+					return new Triple(newSubject, triple.getPredicate(), newObject);
+				}).forEach(base::add);
 		
-		Op projection = new OpProject(new OpBGP(base), Arrays.asList(new Var[]{Var.alloc(hashFunction(needURI))}));
+		Var resultVariable = Var.alloc(hashFunction(needURI));
+		base.add(new Triple(resultVariable.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#is"), NodeFactory.createVariable(hashFunction(seeks.getObject()))));
 		
+		Op projection = new OpProject(new OpBGP(base), Arrays.asList(new Var[]{resultVariable}));
+		
+		QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(projection));
+		
+		ResultSet result = execution.execSelect();
+		
+		while(result.hasNext()) {
+			QuerySolution solution = result.nextSolution();
+			log.info("Found result: " + solution.get(hashFunction(needURI)).toString());
+		}
 	}
 
 	@Override
