@@ -24,6 +24,7 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,12 +109,19 @@ public class SparqlMatcherActor extends UntypedActor {
 		return pattern;
 	}
 	
-	private static Op createNeedQuery(Model model, Node parentPredicate, Node rootName) {
-		BasicPattern pattern = createDetailsQuery(model);
+	private static Op createNeedQuery(Model model, Statement parentStatement, Node newPredicate) {
+		StatementBoundary boundary = new StatementBoundaryBase() {
+			public boolean stopAt(Statement s) {
+				return parentStatement.getSubject().equals(s.getSubject());
+			}
+		};
+		
+		Model subModel = new ModelExtract(boundary).extract(parentStatement.getObject().asResource(), model);
+		BasicPattern pattern = createDetailsQuery(subModel);
 		
 		Var resultVariable = Var.alloc("result");
 		
-		pattern.add(new Triple(resultVariable.asNode(), parentPredicate, rootName));
+		pattern.add(new Triple(resultVariable.asNode(), newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
 		
 		return new OpProject(new OpBGP(pattern), Arrays.asList(new Var[]{resultVariable}));
 	}
@@ -124,48 +132,38 @@ public class SparqlMatcherActor extends UntypedActor {
 		String needURI = needEvent.getUri();
 
 		Model model = needEvent.deserializeNeedDataset().getUnionModel();
-
-		StatementBoundary boundary = new StatementBoundaryBase() {
-			public boolean stopAt(Statement s) {
-				String subjectURI = s.getSubject().getURI();
-				return needURI.equals(subjectURI);
+		
+		Op query = null;
+		
+		Statement seeks = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
+		
+		if(seeks != null) {
+			Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
+			
+			query = seeksQuery;
+		}
+		
+		Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
+		
+		if(is != null) {
+			Op isQuery = createNeedQuery(model, is, NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
+			
+			if(query == null) {
+				query = isQuery;
+			} else {
+				query = new OpProject(new OpUnion(query, isQuery), Arrays.asList(new Var[]{Var.alloc("result")}));
 			}
-		};
-
-		Statement seeks = model.getRequiredProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
+		}
 		
-		Model seeksModel = new ModelExtract(boundary).extract(seeks.getObject().asResource(), model);
-		
-		BasicPattern base = new BasicPattern();
-
-		StreamSupport.stream(Spliterators.spliteratorUnknownSize(seeksModel.listStatements(), Spliterator.CONCURRENT), true)
-				.map((statement) -> {
-					Triple triple = statement.asTriple();
-					RDFNode object = statement.getObject();
-					
-					Node newSubject = NodeFactory.createVariable(hashFunction(triple.getSubject()));
-					
-					Node newObject = triple.getObject();
-					
-					if(object.isAnon()) {
-						newObject = NodeFactory.createVariable(hashFunction(newObject));
-					}
-					
-					return new Triple(newSubject, triple.getPredicate(), newObject);
-				}).forEach(base::add);
-		
-		Var resultVariable = Var.alloc(hashFunction(needURI));
-		base.add(new Triple(resultVariable.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#is"), NodeFactory.createVariable(hashFunction(seeks.getObject()))));
-		
-		Op projection = new OpProject(new OpBGP(base), Arrays.asList(new Var[]{resultVariable}));
-		
-		QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(projection));
-		
-		ResultSet result = execution.execSelect();
-		
-		while(result.hasNext()) {
-			QuerySolution solution = result.nextSolution();
-			log.info("Found result: " + solution.get(hashFunction(needURI)).toString());
+		if(query != null) {
+			QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(query));
+			
+			ResultSet result = execution.execSelect();
+			
+			while(result.hasNext()) {
+				QuerySolution solution = result.nextSolution();
+				log.info("Found result: " + solution.get("result").toString());
+			}
 		}
 	}
 
