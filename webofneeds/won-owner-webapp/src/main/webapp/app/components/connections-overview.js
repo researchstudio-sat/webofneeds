@@ -182,8 +182,8 @@ function genComponentConf() {
           allOwnNeeds.filter(
             post =>
               post.get("state") === won.WON.InactiveCompacted &&
-              !post.get("isWhatsAround")
-          ); //Filter whatsAround needs automatically
+              !(post.get("isWhatsAround") || post.get("isWhatsNew"))
+          ); //Filter whatsAround and whatsNew needs automatically
 
         const routerParams = selectRouterParams(state);
         const showCreateView = getIn(state, [
