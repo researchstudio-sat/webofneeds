@@ -7,10 +7,9 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
-import descriptionPickerModule from "./description-picker.js";
-//import descriptionPickerModule from "./details/description-picker.js";
+import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
-//import routePickerModule from "./details/route-picker.js";
+import routePickerModule from "./details/route-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
@@ -280,6 +279,7 @@ angular
     imageDropzoneModule,
     descriptionPickerModule,
     locationPickerModule,
+    routePickerModule,
     tagsPickerModule,
     ttlPickerModule,
     createIsseeksModule,
