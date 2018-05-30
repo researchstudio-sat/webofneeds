@@ -157,7 +157,7 @@ function genComponentConf() {
 
             <won-route-picker
               ng-if="self.openDetail === 'route'"
-              initial-fromLocation="::self.draftObject.fromLcoation"
+              initial-fromLocation="::self.draftObject.fromLocation"
               initial-toLocation="::self.draftObject.toLocation"
               on-route-updated="::self.updateRoute(fromLocation, toLocation)">
             </won-route-picker>
@@ -261,6 +261,22 @@ function genComponentConf() {
       } else if (this.details.has("location")) {
         this.details.delete("location");
         this.draftObject.location = undefined;
+      }
+
+      this.updateDraft();
+    }
+
+    updateRoute(fromLocation, toLocation) {
+      if (fromLocation || toLocation) {
+        if (!this.details.has("route")) {
+          this.details.add("route");
+        }
+        this.draftObject.fromLocation = fromLocation;
+        this.draftObject.toLocation = toLocation;
+      } else if (this.details.has("route")) {
+        this.details.delete("route");
+        this.draftObject.fromLocation = undefined;
+        this.draftObject.toLocation = undefined;
       }
 
       this.updateDraft();
