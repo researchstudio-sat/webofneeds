@@ -352,7 +352,7 @@ services:
     depends_on:
       - matcher_service
 
-  matcher_solr:
+  matcher_sparql:
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
