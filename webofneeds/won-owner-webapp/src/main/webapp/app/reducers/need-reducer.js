@@ -481,6 +481,9 @@ function addNeedInCreation(needs, needInCreation, needUri) {
     if (need.get("whatsAround")) {
       need = need.set("isWhatsAround", true);
     }
+    if (need.get("whatsNew")) {
+      need = need.set("isWhatsNew", true);
+    }
     newState = needs.setIn([needUri], need);
   } else {
     console.error("Tried to add invalid need-object: ", needInCreation);
@@ -1030,6 +1033,7 @@ function parseNeed(jsonldNeed, ownNeed) {
     unread: false,
     ownNeed: !!ownNeed,
     isWhatsAround: false,
+    isWhatsNew: false,
     matchingContexts: undefined,
   };
 
@@ -1069,6 +1073,16 @@ function parseNeed(jsonldNeed, ownNeed) {
           return flag.get("@id") === "won:WhatsAround";
         } else {
           return flag === "won:WhatsAround";
+        }
+      }).size > 0;
+
+    const isWhatsNew =
+      wonHasFlags &&
+      wonHasFlags.filter(function(flag) {
+        if (flag instanceof Immutable.Map) {
+          return flag.get("@id") === "won:WhatsNew";
+        } else {
+          return flag === "won:WhatsNew";
         }
       }).size > 0;
 
@@ -1143,10 +1157,17 @@ function parseNeed(jsonldNeed, ownNeed) {
 
     parsedNeed.is = isPart;
     parsedNeed.seeks = seeksPart;
-    parsedNeed.type = isWhatsAround
-      ? won.WON.BasicNeedTypeWhatsAroundCompacted
-      : type;
+
+    if (isWhatsAround) {
+      parsedNeed.type = won.WON.BasicNeedTypeWhatsAroundCompacted;
+    } else if (isWhatsNew) {
+      parsedNeed.type = won.WON.BasicNeedTypeWhatsNewCompacted;
+    } else {
+      parsedNeed.type = type;
+    }
+
     parsedNeed.isWhatsAround = !!isWhatsAround;
+    parsedNeed.isWhatsNew = !!isWhatsNew;
     parsedNeed.matchingContexts = wonHasMatchingContexts
       ? Immutable.List.isList(wonHasMatchingContexts)
         ? wonHasMatchingContexts
