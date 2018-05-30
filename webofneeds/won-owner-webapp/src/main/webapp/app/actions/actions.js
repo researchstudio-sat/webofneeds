@@ -46,7 +46,11 @@ import {
   buildOpenNeedMessage,
 } from "../won-message-utils.js";
 
-import { needCreate } from "./create-need-action.js";
+import {
+  needCreate,
+  createWhatsNew,
+  createWhatsAround,
+} from "./create-need-action.js";
 
 import { needsConnect } from "./needs-actions.js";
 
@@ -108,6 +112,8 @@ const actionHierarchy = {
     connectionsReceived: INJ_DEFAULT,
     clean: INJ_DEFAULT,
     create: needCreate,
+    whatsNew: createWhatsNew,
+    whatsAround: createWhatsAround,
     createSuccessful: INJ_DEFAULT,
     reopen: needsOpen,
     close: needsClose,

@@ -8,7 +8,11 @@ import { actionCreators, actionTypes } from "./actions.js";
 
 import { ensureLoggedIn } from "./account-actions.js";
 
-import { getIn } from "../utils.js";
+import {
+  getIn,
+  reverseSearchNominatim,
+  nominatim2draftLocation,
+} from "../utils.js";
 
 export function needCreate(draft, nodeUri) {
   return (dispatch, getState) => {
@@ -51,5 +55,108 @@ export function needCreate(draft, nodeUri) {
           })
         );
       });
+  };
+}
+
+export function createWhatsNew() {
+  return (dispatch, getState) => {
+    const state = getState();
+    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
+
+    const whatsNew = {
+      title: "What's New?",
+      type: "http://purl.org/webofneeds/model#DoTogether",
+      description:
+        "Automatically created post to see what's happening recently",
+      tags: undefined,
+      thumbnail: undefined,
+      whatsNew: true,
+      matchingContext: defaultContext,
+    };
+
+    //TODO: Point to same DataSet instead of double it
+    const whatsNewObject = {
+      is: whatsNew,
+      seeks: whatsNew,
+    };
+
+    getIn(state, ["needs"])
+      .filter(
+        need =>
+          need.get("state") === "won:Active" &&
+          (need.get("isWhatsAround") || need.get("isWhatsNew"))
+      )
+      .map(need => {
+        dispatch(actionCreators.needs__close(need.get("uri")));
+      });
+
+    dispatch(actionCreators.needs__create(whatsNewObject, nodeUri));
+  };
+}
+
+export function createWhatsAround() {
+  return (dispatch, getState) => {
+    const state = getState();
+    const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
+    const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        currentLocation => {
+          const lat = currentLocation.coords.latitude;
+          const lng = currentLocation.coords.longitude;
+          const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
+
+          // center map around current location
+
+          reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
+            const location = nominatim2draftLocation(searchResult);
+            let whatsAround = {
+              title: "What's Around?",
+              type: "http://purl.org/webofneeds/model#DoTogether",
+              description:
+                "Automatically created post to see what's happening in your area",
+              tags: undefined,
+              location: location,
+              thumbnail: undefined,
+              whatsAround: true,
+              matchingContext: defaultContext,
+            };
+
+            getIn(state, ["needs"])
+              .filter(
+                need =>
+                  need.get("state") === "won:Active" &&
+                  (need.get("isWhatsAround") || need.get("isWhatsNew"))
+              )
+              .map(need => {
+                dispatch(actionCreators.needs__close(need.get("uri")));
+              });
+            const whatsAroundObject = {
+              is: whatsAround,
+              seeks: whatsAround,
+            };
+
+            dispatch(actionCreators.needs__create(whatsAroundObject, nodeUri));
+          });
+        },
+        error => {
+          //error handler
+          console.error(
+            "Could not retrieve geolocation due to error: ",
+            error.code,
+            "fullerror:",
+            error
+          );
+        },
+        {
+          //options
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
+    }
   };
 }
