@@ -351,6 +351,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
     location: getIn(needDataIsOrSeeks, ["location"]),
     whatsAround: needDataIsOrSeeks.whatsAround,
+    whatsNew: needDataIsOrSeeks.whatsNew,
     noHints: needDataIsOrSeeks.noHints,
 
     arbitraryJsonLd: needDataIsOrSeeks.ttl
