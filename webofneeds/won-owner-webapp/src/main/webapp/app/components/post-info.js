@@ -106,7 +106,10 @@ function genComponentConf() {
             : undefined,
           post,
           showRequestButton:
-            post && !post.get("ownNeed") && !post.get("isWhatsAround"),
+            post &&
+            !post.get("ownNeed") &&
+            !post.get("isWhatsAround") &&
+            !post.get("isWhatsNew"),
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
