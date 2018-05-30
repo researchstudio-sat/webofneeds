@@ -244,6 +244,22 @@ export function accountLogin(credentials, options) {
         _loginInProcessFor = undefined;
       })
       .then(() => {
+        if ("geolocation" in navigator && navigator.permissions) {
+          navigator.permissions
+            .query({
+              name: "geolocation",
+            })
+            .then(
+              permission =>
+                permission.state === "granted"
+                  ? dispatch(actionCreators.needs__whatsAround())
+                  : dispatch(actionCreators.needs__whatsNew())
+            );
+        } else {
+          dispatch(actionCreators.needs__whatsNew());
+        }
+      })
+      .then(() => {
         if (credentials.privateId) {
           savePrivateId(credentials.privateId);
         }
