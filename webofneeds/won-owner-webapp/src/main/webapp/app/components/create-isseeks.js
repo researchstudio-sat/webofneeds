@@ -219,7 +219,7 @@ function genComponentConf() {
       if (!this.details.has("description")) {
         this.draftObject.description = undefined;
       }
-      if (!this.description.has("route")) {
+      if (!this.details.has("route")) {
         this.draftObject.fromLocation = undefined;
         this.draftObject.toLocation = undefined;
       }
