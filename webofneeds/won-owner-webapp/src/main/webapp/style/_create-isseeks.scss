@@ -1,5 +1,6 @@
 @import "won-config";
 @import "text";
+@import "descriptionpicker";
 @import "locationpicker";
 @import "tagspicker";
 @import "ttlpicker";
@@ -11,10 +12,12 @@ won-create-isseeks {
   display: flex;
   flex-direction: column;
 
+  // title
   .cis__mandatory {
     display: grid;
   }
 
+  // details picker
   .cis__addDetail {
     //border-top: $thinBorderWidth solid $won-line-gray;
     padding: 0 0 0 0;
@@ -51,6 +54,7 @@ won-create-isseeks {
     }
   }
 
+  // details components
   .cis__details {
     //@include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
     @include slideWithOpacityAnimation(0.5s, linear, 20rem);
@@ -60,15 +64,6 @@ won-create-isseeks {
 
     color: black;
     --local-primary: black; // for the svg-icons
-    .cis__header:hover {
-      color: $won-primary-color;
-      --local-primary: $won-primary-color; // for the svg-icons
-    }
-
-    .cis__description {
-      display: grid;
-      grid-gap: 1rem;
-    }
   }
 
   .cis__circleicon {

@@ -127,21 +127,11 @@ function genComponentConf() {
         <!-- TODO: move details into the div opened by the detail picker? -->
         <div class="cis__details" ng-if="self.showDetail">
             <!-- DESCRIPTION -->
-            <div class="cis__description" ng-if="self.openDetail === 'description'">
-                <div class="cis__addDetail__header description" ng-click="self.details.delete('description') && self.updateDraft()">
-                    <svg class="cis__circleicon">
-                        <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
-                    </svg>
-                    <span class="nonHover">Description</span>
-                    <span class="hover">Remove Description</span>
-                </div>
-                <textarea
-                        won-textarea-autogrow
-                        class="cis__description__text won-txt"
-                        ng-blur="::self.updateDescription()"
-                        ng-keyup="::self.updateDescription()"
-                        placeholder="Enter Description..."></textarea>
-            </div>
+            <won-description-picker 
+              ng-if="self.openDetail === 'description'"
+              initial-description="::self.draftObject.description"
+              on-description-updated="::self.updateDescription(description)">
+            </won-description-picker>
 
             <!-- LOCATION -->
             <won-location-picker 
@@ -223,13 +213,16 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    updateDescription() {
-      const descriptionString = (this.descriptionInput() || {}).value || "";
-
-      this.draftObject.description = descriptionString;
-
-      if (descriptionString && !this.details.has("description")) {
-        this.details.add("description");
+    updateDescription(description) {
+      console.log("description updated with: ", description);
+      if (description && description.length > 0) {
+        if (!this.details.has("description")) {
+          this.details.add("description");
+        }
+        this.draftObject.description = description;
+      } else if (this.details.has("description")) {
+        this.details.delete("description");
+        this.draftObject.description = undefined;
       }
     }
 
@@ -269,7 +262,7 @@ function genComponentConf() {
         this.draftObject.ttl = ttl;
       } else if (this.details.has("ttl")) {
         this.details.delete("ttl");
-        this.draftObject.ttl = [];
+        this.draftObject.ttl = undefined;
       }
 
       this.updateDraft();
@@ -292,10 +285,6 @@ function genComponentConf() {
       }
     }
 
-    getArrayFromSet(set) {
-      return Array.from(set);
-    }
-
     titleInputNg() {
       return angular.element(this.titleInput());
     }
@@ -306,18 +295,6 @@ function genComponentConf() {
         );
       }
       return this._titleInput;
-    }
-
-    descriptionInputNg() {
-      return angular.element(this.descriptionInput());
-    }
-    descriptionInput() {
-      if (!this._descriptionInput) {
-        this._descriptionInput = this.$element[0].querySelector(
-          ".cis__description__text"
-        );
-      }
-      return this._descriptionInput;
     }
   }
 

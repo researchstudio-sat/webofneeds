@@ -7,6 +7,7 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
+import descriptionPickerModule from "./description-picker.js";
 import locationPickerModule from "./location-picker.js";
 import tagsPickerModule from "./tags-picker.js";
 import ttlPickerModule from "./ttl-picker.js";
@@ -350,6 +351,7 @@ angular
   .module("won.owner.components.createPost", [
     labelledHrModule,
     imageDropzoneModule,
+    descriptionPickerModule,
     locationPickerModule,
     tagsPickerModule,
     ttlPickerModule,
