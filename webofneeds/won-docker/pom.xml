@@ -320,6 +320,43 @@
                             </resources>
                         </configuration>
                     </execution>
+
+                    <!-- copy matcher sparql resources -->
+                    <execution>
+                        <id>copy-matcher-sparql-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>image/matcher-sparql</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/won-matcher-sparql/target</directory>
+                                    <includes>
+                                        <include>won-matcher-sparql.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-matcher-sparql-conf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>image/matcher-sparql/conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/conf</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
