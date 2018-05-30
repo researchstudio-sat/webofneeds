@@ -47,7 +47,7 @@ won-create-isseeks {
           //color: $won-line-gray;
           //--local-primary: $won-line-gray; // for the svg-icons
           color: $won-primary-color;
-          --local-primary: $won-primary-color;
+          --local-primary: #{$won-primary-color};
           cursor: default;
         }
       }
