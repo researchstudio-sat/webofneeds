@@ -157,8 +157,8 @@ function genComponentConf() {
 
             <won-route-picker
               ng-if="self.openDetail === 'route'"
-              initial-fromLocation="::self.draftObject.fromLocation"
-              initial-toLocation="::self.draftObject.toLocation"
+              initial-from-location="::self.draftObject.fromLocation"
+              initial-to-location="::self.draftObject.toLocation"
               on-route-updated="::self.updateRoute(fromLocation, toLocation)">
             </won-route-picker>
 
