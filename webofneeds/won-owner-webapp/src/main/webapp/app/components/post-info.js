@@ -61,9 +61,16 @@ function genComponentConf() {
         </div>
         <div class="post-info__footer">
             <won-post-share-link
-                ng-if="self.post.get('state') !== self.WON.InactiveCompacted"
+                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
                 post-uri="self.post.get('uri')">
             </won-post-share-link>
+            <button class="won-button--filled red post-info__footer__button"
+                ng-if="self.post.get('ownNeed') && self.post.get('isWhatsNew')">
+                <svg class="won-button-icon" style="--local-primary:white;">
+                    <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
+                </svg>
+                <span>What's in your Area? (Location access required)</span>
+            </button>
         </div>
     `;
 
