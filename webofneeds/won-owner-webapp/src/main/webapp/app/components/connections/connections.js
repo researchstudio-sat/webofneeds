@@ -47,7 +47,7 @@ class ConnectionsController {
       const ownNeeds = selectAllOwnNeeds(state).filter(
         post =>
           !(
-            post.get("isWhatsAround") &&
+            (post.get("isWhatsAround") || post.get("isWhatsNew")) &&
             post.get("state") === won.WON.InactiveCompacted
           )
       );

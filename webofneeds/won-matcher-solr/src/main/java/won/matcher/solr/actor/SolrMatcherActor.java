@@ -107,7 +107,10 @@ public class SolrMatcherActor extends UntypedActor {
             // WhatsAround doesnt match on terms only other needs in close location are boosted
             WhatsAroundQueryFactory qf = new WhatsAroundQueryFactory(dataset);
             queryString = qf.createQuery();
-        } else {
+        } else if(needModelWrapper.hasFlag(WON.WHATS_NEW)){
+            WhatsNewQueryFactory qf = new WhatsNewQueryFactory(dataset);
+            queryString = qf.createQuery();
+        }else {
             // default query matches content terms (of fields title, description and tags) with different weights
             // and gives an additional multiplicative boost for geographically closer needs
             DefaultNeedQueryFactory qf = new DefaultNeedQueryFactory(dataset);
@@ -140,14 +143,11 @@ public class SolrMatcherActor extends UntypedActor {
             SolrDocumentList docs = queryExecutor.executeNeedQuery(queryString, config.getMaxHints(),null, filterQueries.toArray(new String[filterQueries.size()]));
             if (docs != null) {
 
+                // perform knee detection depending on current need is WhatsAround/WhatsNew or not)
+                boolean kneeDetection = needModelWrapper.hasFlag(WON.WHATS_NEW) || needModelWrapper.hasFlag(WON.WHATS_AROUND) ? false : true;
+
                 // generate hints for current need (only generate hints for current need, suppress hints for matched needs,
-                // perform knee detection depending on current need is WhatsAround or not)
-                BulkHintEvent events = null;
-                if (needModelWrapper.hasFlag(WON.WHATS_AROUND)) {
-                    events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, false);
-                } else {
-                    events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, true);
-                }
+                BulkHintEvent events = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper, false, true, kneeDetection);
 
                 log.info("Create {} hints for need {} and need list 1 (without NoHintForCounterpart)", events.getHintEvents().size(), needEvent);
 
@@ -166,6 +166,7 @@ public class SolrMatcherActor extends UntypedActor {
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
         filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
         filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND)).createQuery());
+        filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
         if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
         }
@@ -195,6 +196,7 @@ public class SolrMatcherActor extends UntypedActor {
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
         filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
         filterQueries.add(new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND).createQuery());
+        filterQueries.add(new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW).createQuery());
         if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
         }

@@ -173,6 +173,8 @@ public class WON {
     public static final Resource USED_FOR_TESTING = m.createResource(BASE_URI + "UsedForTesting");
 
     public static final Resource WHATS_AROUND = m.createResource(BASE_URI + "WhatsAround");
+
+    public static final Resource WHATS_NEW = m.createResource(BASE_URI + "WhatsNew");
     
     // hint behaviour
     public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI + "NoHintForCounterpart");

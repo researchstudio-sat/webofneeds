@@ -170,11 +170,15 @@ function genComponentConf() {
     sendRequest(message) {
       if (
         !this.connection ||
-        (this.ownNeed && this.ownNeed.get("isWhatsAround"))
+        (this.ownNeed &&
+          (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew")))
       ) {
         this.router__stateGoResetParams("connections");
 
-        if (this.ownNeed && this.ownNeed.get("isWhatsAround")) {
+        if (
+          this.ownNeed &&
+          (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"))
+        ) {
           //Close the connection if there was a present connection for a whatsaround need
           this.connections__close(this.connectionUri);
         }

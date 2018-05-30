@@ -13,12 +13,7 @@ import tagsPickerModule from "./tags-picker.js";
 import ttlPickerModule from "./ttl-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import {
-  getIn,
-  attach,
-  reverseSearchNominatim,
-  nominatim2draftLocation,
-} from "../utils.js";
+import { getIn, attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
@@ -184,9 +179,6 @@ function genComponentConf() {
         const isPost = showCreateView && !isSearch;
 
         return {
-          existingWhatsAroundNeeds: state
-            .get("needs")
-            .filter(need => need.get("isWhatsAround")),
           showCreateView,
           isSearch,
           isPost,
@@ -269,66 +261,10 @@ function genComponentConf() {
       }
     }
 
-    createWhatsAround() {
+    createWhatsNew() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
-
-        if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            currentLocation => {
-              const lat = currentLocation.coords.latitude;
-              const lng = currentLocation.coords.longitude;
-              const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
-
-              // center map around current location
-
-              reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
-                const location = nominatim2draftLocation(searchResult);
-
-                let whatsAround = {
-                  title: "What's Around?",
-                  type: "http://purl.org/webofneeds/model#DoTogether",
-                  description:
-                    "Automatically created post to see what's happening in your area",
-                  tags: undefined,
-                  location: location,
-                  thumbnail: undefined,
-                  whatsAround: true,
-                  matchingContext: this.tempMatchingContext,
-                };
-
-                this.existingWhatsAroundNeeds
-                  .filter(need => need.get("state") == "won:Active")
-                  .map(need => this.needs__close(need.get("uri")));
-
-                //TODO: Point to same DataSet instead of double it
-                this.draftObject.is = whatsAround;
-                this.draftObject.seeks = this.draftObject.is;
-                this.needs__create(
-                  this.draftObject,
-                  this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
-                );
-              });
-            },
-            error => {
-              //error handler
-              console.error(
-                "Could not retrieve geolocation due to error: ",
-                error.code,
-                "fullerror:",
-                error
-              );
-              this.geoLocationDenied();
-              this.pendingPublishing = false;
-            },
-            {
-              //options
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0,
-            }
-          );
-        }
+        this.needs__whatsNew();
       }
     }
   }

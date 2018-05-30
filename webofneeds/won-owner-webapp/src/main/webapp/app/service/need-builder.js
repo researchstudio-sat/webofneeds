@@ -111,7 +111,7 @@ import won from "./won.js";
         const putIntoSeeks =
             putIntoBoth ||
             args.type === won.WON.BasicNeedTypeDemandCompacted;
-        
+
         let hasFlag = [];
 
         if(!!won.debugmode) {
@@ -212,6 +212,7 @@ import won from "./won.js";
     const isWhatsAround = args.is
       ? args.is.whatsAround
       : args.seeks.whatsAround;
+    const isWhatsNew = args.is ? args.is.whatsNew : args.seeks.whatsNew;
     const noHints = args.is ? args.is.noHints : args.seeks.noHints;
     const matchingContext = args.is
       ? args.is.matchingContext
@@ -221,6 +222,9 @@ import won from "./won.js";
     if (isWhatsAround) {
       isContentUri = won.WON.contentNodeBlankUri.whatsAround;
       seeksContentUri = won.WON.contentNodeBlankUri.whatsAround;
+    } else if (isWhatsNew) {
+      isContentUri = won.WON.contentNodeBlankUri.whatsNew;
+      seeksContentUri = won.WON.contentNodeBlankUri.whatsNew;
     } else {
       isContentUri = args.is ? won.WON.contentNodeBlankUri.is : undefined;
       seeksContentUri = args.seeks
@@ -240,7 +244,8 @@ import won from "./won.js";
           won.debugmode ? "won:UsedForTesting" : undefined,
 
           isWhatsAround ? "won:WhatsAround" : undefined,
-          isWhatsAround ? "won:NoHintForCounterpart" : undefined,
+          isWhatsNew ? "won:WhatsNew" : undefined,
+          isWhatsAround || isWhatsNew ? "won:NoHintForCounterpart" : undefined,
 
           noHints ? "won:NoHintForMe" : undefined,
           noHints ? "won:NoHintForCounterpart" : undefined,

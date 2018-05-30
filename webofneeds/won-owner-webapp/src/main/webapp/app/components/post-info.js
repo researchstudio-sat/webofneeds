@@ -9,7 +9,6 @@ import postHeaderModule from "./post-header.js";
 import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
-
 import { attach } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
@@ -61,9 +60,19 @@ function genComponentConf() {
         </div>
         <div class="post-info__footer">
             <won-post-share-link
-                ng-if="self.post.get('state') !== self.WON.InactiveCompacted"
+                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
                 post-uri="self.post.get('uri')">
             </won-post-share-link>
+            <button class="won-button--filled red post-info__footer__button"
+                ng-if="self.post.get('ownNeed') && self.post.get('isWhatsNew')"
+                ng-click="self.createWhatsAround()"
+                ng-disabled="self.pendingPublishing">
+                <svg class="won-button-icon" style="--local-primary:white;">
+                    <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
+                </svg>
+                <span ng-if="!self.pendingPublishing">What's in your Area? (Location access required)</span>
+                <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
+            </button>
         </div>
     `;
 
@@ -73,6 +82,15 @@ function genComponentConf() {
 
       this.is = "is";
       this.seeks = "seeks";
+
+      this.pendingPublishing = false;
+
+      this.defaultContext = this.$ngRedux
+        .getState()
+        .getIn(["config", "theme", "defaultContext"]);
+      this.tempMatchingContext = this.defaultContext
+        ? this.defaultContext.toJS()
+        : [];
 
       const selectFromState = state => {
         const postUri = selectOpenPostUri(state);
@@ -105,8 +123,6 @@ function genComponentConf() {
               }
             : undefined,
           post,
-          showRequestButton:
-            post && !post.get("ownNeed") && !post.get("isWhatsAround"),
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
@@ -120,6 +136,13 @@ function genComponentConf() {
         ["self.includeHeader"],
         this
       );
+    }
+
+    createWhatsAround() {
+      if (!this.pendingPublishing) {
+        this.pendingPublishing = true;
+        this.needs__whatsAround();
+      }
     }
   }
 

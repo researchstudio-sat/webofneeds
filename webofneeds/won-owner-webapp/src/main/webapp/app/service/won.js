@@ -129,6 +129,7 @@ won.WON.BasicNeedTypeCombinedCompacted = won.WON.baseUri + ":Combined";
 won.WON.BasicNeedTypeCritique = won.WON.baseUri + "Critique";
 won.WON.BasicNeedTypeCritiqueCompacted = won.WON.prefix + ":Critique";
 won.WON.BasicNeedTypeWhatsAroundCompacted = won.WON.prefix + ":WhatsAround";
+won.WON.BasicNeedTypeWhatsNewCompacted = won.WON.prefix + ":WhatsNew";
 won.WON.OwnerFacet = won.WON.baseUri + "OwnerFacet";
 won.WON.OwnerFacetCompacted = won.WON.prefix + ":OwnerFacet";
 won.WON.GroupFacet = won.WON.baseUri + "GroupFacet";
@@ -356,6 +357,7 @@ won.WON.contentNodeBlankUri = Object.freeze({
   is: "_:isNeedContent",
   seeks: "_:seeksNeedContent",
   whatsAround: "_:needContent",
+  whatsNew: "_:needContent",
 });
 
 /**

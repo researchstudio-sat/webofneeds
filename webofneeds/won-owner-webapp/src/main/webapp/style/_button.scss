@@ -39,6 +39,12 @@
 }
 
 @mixin won-button() {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
   padding: 0.66em 2em;
   font-size: $normalFontSize;
   text-align: center;
