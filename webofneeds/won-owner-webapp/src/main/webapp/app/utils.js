@@ -623,6 +623,8 @@ export function leafletBounds(location) {
   }
 }
 
+// TODO: make leafletBoundsFnct for 2 locations
+
 function fetchJSON(url) {
   return fetch(url, {
     method: "get",
