@@ -16,7 +16,14 @@ public class SparqlMatcherConfig
 	 @Value("${matcher.sparql.uri.sparql.endpoint}")
 	 private String sparqlEndpoint;
 	 
+	 @Value("${matcher.sparql.uri.public}")
+	 private String matcherUri;
+	 
 	 public String getSparqlEndpoint() {
 		 return sparqlEndpoint;
+	 }
+	 
+	 public String getMatcherUri() {
+		 return matcherUri;
 	 }
 }

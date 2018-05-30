@@ -188,7 +188,7 @@ public class SparqlMatcherActor extends UntypedActor {
 				String foundNeedURI = solution.get(resultName.getName()).toString();
 				String foundNeedNodeURI = solution.get(wonNodeVar.getName()).toString();
 				
-				bulkHintEvent.addHintEvent(new HintEvent(needEvent.getWonNodeUri(), needURI, foundNeedNodeURI, foundNeedURI, "", 1));
+				bulkHintEvent.addHintEvent(new HintEvent(needEvent.getWonNodeUri(), needURI, foundNeedNodeURI, foundNeedURI, config.getMatcherUri(), 1));
 			}
 			
 			pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
