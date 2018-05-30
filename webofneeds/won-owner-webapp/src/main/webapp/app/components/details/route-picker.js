@@ -16,7 +16,7 @@ import { initLeaflet } from "../won-utils.js";
 
 const serviceDependencies = ["$scope", "$element", "$sce"];
 function genComponentConf() {
-  const prevLocationBlock = selectLocationFnctName => `
+  const prevLocationBlock = (selectLocationFnctName, prevLocation) => `
   <!-- PREVIOUS LOCATION -->
   <li class="rp__searchresult" 
       ng-if="self.showPrevLocationResult()">
@@ -24,10 +24,9 @@ function genComponentConf() {
           <!-- TODO: create and use a more appropriate icon here -->
           <use xlink:href="#ico16_indicator_location" href="#ico16_indicator_location"></use>
       </svg>
-      <!-- TODO: show only previous location for from/to field here -->
       <a class="rp__searchresult__text" href=""
-          ng-click="${selectLocationFnctName}(self.previousLocation)"
-          ng-bind-html="self.highlight(self.previousLocation.name, self.lastSearchedFor)">
+          ng-click="${selectLocationFnctName}(${prevLocation})"
+          ng-bind-html="self.highlight(${prevLocation}.name, self.lastSearchedFor)">
       </a>
       (previous)
   </li>`;
@@ -76,7 +75,10 @@ function genComponentConf() {
                     ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
                 </a>
             </li>
-            ${prevLocationBlock("self.selectedFromLocation")}
+            ${prevLocationBlock(
+              "self.selectedFromLocation",
+              "self.previousFromLocation"
+            )}
             ${searchResultsBlock("self.selectedFromLocation")}
         </ul>
 
@@ -84,7 +86,7 @@ function genComponentConf() {
         <div class="rp__searchbox">
             <input
                 type="text"
-                id="rp__searchbox__inner"
+                id="rp__to-searchbox__inner"
                 class="rp__searchbox__inner"
                 placeholder="Destination"
                 ng-class="{'rp__searchbox__inner--withreset' : self.showToResetButton}"/>
@@ -100,7 +102,10 @@ function genComponentConf() {
             'rp__searchresults--filled': self.showToResultDropDown(), 
             'rp__searchresults--empty': !self.showToResultDropDown() 
         }">
-            ${prevLocationBlock("self.selectedToLocation")}
+            ${prevLocationBlock(
+              "self.selectedToLocation",
+              "self.previousToLocation"
+            )}
             ${searchResultsBlock("self.selectedToLocation")}
         </ul>
 
@@ -116,39 +121,58 @@ function genComponentConf() {
       this.map = initLeaflet(this.mapMount());
       this.map.on("click", e => onMapClick(e, this));
 
-      this.locationIsSaved = !!this.initialLocation;
-      this.pickedLocation = this.initialLocation;
-      this.previousLocation = undefined;
-      this.showResetButton = false;
+      // debug output
+      window.rp4dbg = this;
 
-      window.lp4dbg = this;
+      // TODO: do I need this?
+      //   this.locationIsSaved = !!this.initialLocation;
+
+      this.addedFromLocation = this.initialFromLocation;
+      this.addedToLocation = this.initialToLocation;
+
+      this.previousFromLocation = undefined;
+      this.previousToLocation = undefined;
+
+      this.showFromResetButton = false;
+      this.showToResetButton = false;
 
       // needs to happen after constructor finishes, otherwise
       // the component's callbacks won't be registered.
-      delay(0).then(() => this.determineCurrentLocation());
+      delay(0).then(() => this.showInitialLocations());
+
+      // only works if we have access to the current location
+      // TODO: if we do have access, set this as the default fromLocation?
+      // Issue: if form checking is implemented checking whether both/no fields are filled,
+      // putting down geoLocation as fromLocation by default requires user to make the form valid again
+      // just closing the picker would result in an error message!
+      this.determineCurrentLocation();
 
       doneTypingBufferNg(e => this.doneTyping(e), this.textfieldNg(), 300);
     }
 
-    /**
-     * Taken from <http://stackoverflow.com/questions/15519713/highlighting-a-filtered-result-in-angularjs>
-     * @param text
-     * @param search
-     * @return {*}
-     */
-    highlight(text, search) {
-      if (!text) {
-        text = "";
+    showInitialLocations() {
+      // TODO: set invalid attribute element.validity.invalid; if invalid
+      // TODO: zoom/center to show one/both markers?
+      this.addedFromLocation = this.initialFromLocation;
+      this.addedToLocation = this.initialToLocation;
+
+      let markedLocations = [];
+
+      if (this.initialFromLocation) {
+        markedLocations.push(this.initialFromLocation);
+        this.showFromResetButton = true;
+        this.fromTextfield().value = this.initialFromLocation.name;
       }
-      if (!search) {
-        return this.$sce.trustAsHtml(text);
+
+      if (this.initialToLocation) {
+        markedLocations.push(this.initialToLocation);
+        this.showToResetButton = true;
+        this.toTextfield().value = this.initialToLocation.name;
       }
-      return this.$sce.trustAsHtml(
-        text.replace(
-          new RegExp(search, "gi"),
-          '<span class="highlightedText">$&</span>'
-        )
-      );
+
+      this.placeMarkers(markedLocations);
+
+      this.$scope.$apply();
     }
 
     placeMarkers(locations) {
@@ -168,28 +192,57 @@ function genComponentConf() {
       }
     }
 
+    resetLocations() {
+      this.resetFromLocation();
+      this.resetToLocation();
+    }
+
+    resetFromLocation() {
+      this.previousFromLocation = this.addedFromLocation;
+      this.addedFromLocation = undefined;
+
+      let markers = this.addedToLocation || [];
+      this.placeMarkers(markers);
+
+      this.showFromResetButton = false;
+      this.fromTextfield().value = "";
+
+      this.onRouteUpdated({
+        fromLocation: undefined,
+        toLocation: this.addedToLocation,
+      });
+    }
+
+    resetToLocation() {
+      this.previousToLocation = this.addedToLocation;
+      this.addedToLocation = undefined;
+
+      let markers = this.addedFromLocation || [];
+      this.placeMarkers(markers);
+
+      this.showToResetButton = false;
+      this.toTextfield().value = "";
+
+      this.onRouteUpdated({
+        fromLocation: this.addedFromLocation,
+        toLocation: undefined,
+      });
+    }
+
+    // TODO:
     resetSearchResults() {
       this.searchResults = undefined;
       this.lastSearchedFor = undefined;
       this.placeMarkers([]);
     }
 
+    // TODO:
     resetLocationAndSearch() {
       this.resetLocation();
       this.textfield().value = "";
     }
 
-    resetLocation() {
-      this.previousLocation = this.pickedLocation;
-
-      this.locationIsSaved = false;
-      this.pickedLocation = undefined;
-      this.placeMarkers([]);
-      this.showResetButton = false;
-
-      this.onLocationPicked({ location: undefined });
-    }
-
+    // TODO: split into from/to (or add another parameter)
     selectedLocation(location) {
       // callback to update location in isseeks
       this.onLocationPicked({ location: location });
@@ -205,6 +258,7 @@ function genComponentConf() {
       this.markers[0].openPopup();
     }
 
+    // TODO: needs to work for both textfields
     doneTyping() {
       const text = this.textfield().value;
 
@@ -232,26 +286,47 @@ function genComponentConf() {
       }
     }
 
+    /**
+     * Taken from <http://stackoverflow.com/questions/15519713/highlighting-a-filtered-result-in-angularjs>
+     * @param text
+     * @param search
+     * @return {*}
+     */
+    highlight(text, search) {
+      if (!text) {
+        text = "";
+      }
+      if (!search) {
+        return this.$sce.trustAsHtml(text);
+      }
+      return this.$sce.trustAsHtml(
+        text.replace(
+          new RegExp(search, "gi"),
+          '<span class="highlightedText">$&</span>'
+        )
+      );
+    }
+
     determineCurrentLocation() {
       // check if there's any saved location to display instead
-      if (this.initialLocation) {
-        // constructor may not be done in time, so set values here again.
-        this.locationIsSaved = true;
-        this.pickedLocation = this.initialLocation;
+      //   if (this.initialFromLocation) {
+      //     // constructor may not be done in time, so set values here again.
+      //     this.locationIsSaved = true;
+      //     this.pickedLocation = this.initialLocation;
 
-        const initialLat = this.pickedLocation.lat;
-        const initialLng = this.pickedLocation.lng;
-        const initialZoom = 13; // arbitrary zoom level as there's none available
+      //     const initialLat = this.pickedLocation.lat;
+      //     const initialLng = this.pickedLocation.lng;
+      //     const initialZoom = 13; // arbitrary zoom level as there's none available
 
-        // center map around current location
-        this.map.setZoom(initialZoom);
-        this.map.panTo([initialLat, initialLng]);
+      //     // center map around current location
+      //     this.map.setZoom(initialZoom);
+      //     this.map.panTo([initialLat, initialLng]);
 
-        this.textfield().value = this.pickedLocation.name;
-        this.showResetButton = true;
-        this.placeMarkers([this.pickedLocation]);
-        this.markers[0].openPopup();
-      }
+      //     this.textfield().value = this.pickedLocation.name;
+      //     this.showResetButton = true;
+      //     this.placeMarkers([this.pickedLocation]);
+      //     this.markers[0].openPopup();
+      //   }
 
       // check for current geolocation
       if ("geolocation" in navigator) {
@@ -262,7 +337,7 @@ function genComponentConf() {
             const geoZoom = 13; // TODO: use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
             // center map around geolocation only if there's no initial location
-            if (!this.initialLocation) {
+            if (!this.initialFromLocation) {
               this.map.setZoom(geoZoom);
               this.map.panTo([geoLat, geoLng]);
             }
@@ -291,44 +366,51 @@ function genComponentConf() {
         );
       }
 
-      this.$scope.$apply();
+      //this.$scope.$apply();
     }
 
-    showCurrentLocationResult() {
-      return !this.locationIsSaved && this.currentLocation;
-    }
+    showFromResultDropdown() {
+      let showGeo = !this.addedFromLocation && this.currentLocation;
+      let showPrev =
+        !this.addedFromLocation &&
+        this.previousFromLocation &&
+        getIn(this, ["previousFromLocation", "name"]) !==
+          getIn(this, ["currentLocation", "name"]);
 
-    showPrevLocationResult() {
-      return (
-        !this.locationIsSaved &&
-        this.previousLocation &&
-        getIn(this, ["previousLocation", "name"]) !==
-          getIn(this, ["currentLocation", "name"])
-      );
-    }
-
-    showResultDropDown() {
       return (
         (this.searchResults && this.searchResults.length > 0) ||
-        this.showPrevLocationResult() ||
-        this.showCurrentLocationResult()
+        showGeo ||
+        showPrev
       );
     }
 
-    textfieldNg() {
-      return this.domCache.ng("#lp__searchbox__inner");
+    showToResultDropDown() {
+      let showPrev = !this.addedToLocation && this.previousToLocation;
+      return (this.searchResults && this.searchResults.length > 0) || showPrev;
     }
 
-    textfield() {
-      return this.domCache.dom("#lp__searchbox__inner");
+    fromTextfieldNg() {
+      return this.domCache.ng("#rp__from-searchbox__inner");
+    }
+
+    fromTextfield() {
+      return this.domCache.dom("#rp__from-searchbox__inner");
+    }
+
+    toTextfieldNg() {
+      return this.domCache.ng("#rp__from-searchbox__inner");
+    }
+
+    toTextfield() {
+      return this.domCache.dom("#rp__from-searchbox__inner");
     }
 
     mapMountNg() {
-      return this.domCache.ng(".lp__mapmount");
+      return this.domCache.ng(".rp__mapmount");
     }
 
     mapMount() {
-      return this.domCache.dom(".lp__mapmount");
+      return this.domCache.dom(".rp__mapmount");
     }
   }
   Controller.$inject = serviceDependencies;
@@ -385,8 +467,8 @@ function onMapClick(e, ctrl) {
 }
 
 export default angular
-  .module("won.owner.components.locationPicker", [])
-  .directive("wonLocationPicker", genComponentConf).name;
+  .module("won.owner.components.routePicker", [])
+  .directive("wonRoutePicker", genComponentConf).name;
 
 window.searchNominatim4dbg = searchNominatim;
 window.reverseSearchNominatim4dbg = reverseSearchNominatim;
