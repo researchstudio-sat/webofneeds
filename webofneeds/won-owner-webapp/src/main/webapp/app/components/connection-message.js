@@ -255,7 +255,7 @@ function genComponentConf() {
         const shouldShowRdf = state.get("showRdf");
 
         let rdfLinkURL;
-        if (shouldShowRdf && ownerBaseUrl) {
+        if (shouldShowRdf && ownerBaseUrl && ownNeed && message) {
           rdfLinkURL = urljoin(
             ownerBaseUrl,
             "/rest/linked-data/",
@@ -263,7 +263,8 @@ function genComponentConf() {
             `&uri=${this.encodeParam(message.get("uri"))}`,
             message.get("outgoingMessage") ? "&deep=true" : ""
           );
-          console.log("whyyyyyyyy ", ownerBaseUrl, rdfLinkURL);
+          //TODO delete me
+          console.log("why: ", ownerBaseUrl, rdfLinkURL);
         }
 
         const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
