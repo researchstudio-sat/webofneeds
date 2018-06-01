@@ -81,7 +81,7 @@ function genComponentConf() {
             </li>
             
             ${prevLocationBlock(
-              "self.showFromPrevLocation()",
+              "self.showFromPrevLocationResult()",
               "self.selectedFromLocation",
               "self.fromPreviousLocation"
             )}
@@ -113,7 +113,7 @@ function genComponentConf() {
         }">
    
             ${prevLocationBlock(
-              "self.showToPrevLocation()",
+              "self.showToPrevLocationResult()",
               "self.selectedToLocation",
               "self.toPreviousLocation"
             )}
@@ -126,7 +126,6 @@ function genComponentConf() {
         <div class="rp__mapmount" id="rp__mapmount"></div>
             `;
 
-  // TODO: add attribute if not valid -> use attribute to disable publish
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
@@ -137,9 +136,6 @@ function genComponentConf() {
 
       // debug output
       window.rp4dbg = this;
-
-      // TODO: do I need this?
-      //   this.locationIsSaved = !!this.initialLocation;
 
       this.fromAddedLocation = this.initialFromLocation;
       this.fromPreviousLocation = undefined;
@@ -154,10 +150,6 @@ function genComponentConf() {
       delay(0).then(() => this.showInitialLocations());
 
       // only works if we have access to the current location
-      // TODO: if we do have access, set this as the default fromLocation?
-      // Issue: if form checking is implemented checking whether both/no fields are filled,
-      // putting down geoLocation as fromLocation by default requires user to make the form valid again
-      // just closing the picker would result in an error message!
       this.determineCurrentLocation();
 
       this.typingBuffer(e => this.doneTypingFrom(e), this.fromTextfield(), 300);
@@ -175,7 +167,6 @@ function genComponentConf() {
     }
 
     showInitialLocations() {
-      // TODO: zoom/center to show one/both markers?
       this.fromAddedLocation = this.initialFromLocation;
       this.toAddedLocation = this.initialToLocation;
 
@@ -229,7 +220,6 @@ function genComponentConf() {
       }
       this.placeMarkers(markers);
       this.markers[0].openPopup();
-      // TODO: fit map around selected locations
       this.map.fitBounds(
         leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
         { animate: true }
@@ -257,7 +247,6 @@ function genComponentConf() {
       }
       this.placeMarkers(markers);
       this.markers[0].openPopup();
-      // TODO: fit map around selected locations
       this.map.fitBounds(
         leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
         { animate: true }
@@ -288,7 +277,6 @@ function genComponentConf() {
           const parsedResults = scrubSearchResults(searchResults, fromText);
           this.$scope.$apply(() => {
             this.fromSearchResults = parsedResults;
-            //this.lastSearchedFor = { name: text };
             this.lastSearchedFor = fromText;
           });
         });
@@ -319,7 +307,6 @@ function genComponentConf() {
           const parsedResults = scrubSearchResults(searchResults, toText);
           this.$scope.$apply(() => {
             this.toSearchResults = parsedResults;
-            //this.lastSearchedFor = { name: text };
             this.lastSearchedFor = toText;
           });
         });
@@ -397,11 +384,11 @@ function genComponentConf() {
 
     resetFromSearchResults() {
       this.fromSearchResults = undefined;
-      this.fromLastSearchedFor = undefined;
+      this.lastSearchedFor = undefined;
     }
     resetToSearchResults() {
       this.toSearchResults = undefined;
-      this.toLastSearchedFor = undefined;
+      this.lastSearchedFor = undefined;
     }
 
     showCurrentLocationResult() {
@@ -553,7 +540,7 @@ function scrubSearchResults(searchResults) {
   );
 }
 
-// TODO: disable this? pick from first and to only if from is selected?
+// TODO: decide on appropriate behaviour and implement it.
 // function onMapClick(e, ctrl) {
 //   //`this` is the mapcontainer here as leaflet
 //   // apparently binds itself to the function.
