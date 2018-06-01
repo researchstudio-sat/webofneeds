@@ -10,7 +10,6 @@ won-connection-selection-item {
   $padding: 0.5rem;
   display: block;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
-  border: $thinGrayBorder;
   padding-left: $padding + $triangleCutoutSize;
   padding-right: $padding;
   padding-top: $padding;
@@ -34,9 +33,12 @@ won-connection-selection-item {
     margin-left: 0.5rem;
   }
 
-  //border-top: $invisibleBorder; // this is necessary so that the view does not "jump" when selecting an item
-  //border-bottom: $invisibleBorder;
+  $invisibleBorder: $thinBorderWidth solid white;
+  border-left: $thinGrayBorder;
+  border-top: $invisibleBorder; // this is necessary so that the view does not "jump" when selecting an item
+  border-bottom: $invisibleBorder;
   // this is necessary so that the view does not "jump" when selecting an item
+
   &:hover,
   &.selected {
     background-color: white;
@@ -58,8 +60,6 @@ won-connection-selection-item {
     margin-left: 0.5rem;
   }
 
-  $invisibleBorder: 0.0625rem solid white;
-
   &.selected {
     @include speech-bubble-right(
       white,
@@ -68,23 +68,23 @@ won-connection-selection-item {
       $thinBorderWidth,
       1.5rem
     );
-    //border-top: $thinGrayBorder;
-    //border-bottom: $thinGrayBorder;
+    border-top: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
   }
-  &:first-child .conn__inner.selected {
+  &:first-child .selected {
     // don't show border for first item to avoid duplicate borders with the title bar
-    // border-top: $invisibleBorder;
+    border-top: $invisibleBorder;
   }
-  &:not(:first-child) .conn__inner.selected {
+  &:not(:first-child) .selected {
     // don't show border for first item to avoid duplicate borders with the title bar
-    // border-top: $thinGrayBorder;
+    border-top: $thinGrayBorder;
   }
-  &:last-child .conn__inner.selected {
+  &:last-child .selected {
     // don't show border for first item to avoid duplicate borders with the title bar
-    //border-bottom: $invisibleBorder;
+    border-bottom: $invisibleBorder;
   }
-  &:not(:last-child) .conn__inner.selected {
+  &:not(:last-child) .selected {
     // don't show border for first item to avoid duplicate borders with the title bar
-    // border-bottom: $thinGrayBorder;
+    border-bottom: $thinGrayBorder;
   }
 }
