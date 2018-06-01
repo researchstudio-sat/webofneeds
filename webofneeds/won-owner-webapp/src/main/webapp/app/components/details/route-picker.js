@@ -55,8 +55,7 @@ function genComponentConf() {
                 id="rp__from-searchbox__inner"
                 class="rp__searchbox__inner"
                 placeholder="Start Location"
-                ng-class="{'rp__searchbox__inner--withreset' : self.fromShowResetButton}"
-                ng-blur="::self.onBlurFunction()"/>
+                ng-class="{'rp__searchbox__inner--withreset' : self.fromShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
                  ng-if="self.fromShowResetButton"
@@ -99,8 +98,7 @@ function genComponentConf() {
                 id="rp__to-searchbox__inner"
                 class="rp__searchbox__inner"
                 placeholder="Destination"
-                ng-class="{'rp__searchbox__inner--withreset' : self.toShowResetButton}"
-                ng-blur="::self.onBlurFunction()"/>
+                ng-class="{'rp__searchbox__inner--withreset' : self.toShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
                  ng-if="self.toShowResetButton"
@@ -167,7 +165,7 @@ function genComponentConf() {
         this.fromTextfieldNg(),
         300
       );
-      doneTypingBufferNg(e => this.doneTypingTo(e), this.toTextfieldNg(), 300);
+      //doneTypingBufferNg(e => this.doneTypingTo(e), this.toTextfieldNg(), 300);
     }
 
     showInitialLocations() {
@@ -194,21 +192,12 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    onBlurFunction() {
-      // TODO: resetting results here results in not being able to click results
-      // chekc if not resetting results is fine
-      // TODO: validity might be checked before a result is selected -> potential wrong validation
-      this.checkValidity();
-      //this.resetSearchResults();
-    }
-
     // TODO: implement
     checkValidity() {
       // validity check
-      // set validity
+      // set validity - invalid if exactly one location is undefined
     }
 
-    // TODO: split into from/to (or add another parameter)
     selectedFromLocation(location) {
       // save new location value
       this.onRouteUpdated({
@@ -218,7 +207,8 @@ function genComponentConf() {
       this.fromAddedLocation = location;
 
       // represent new value to user
-      this.resetFromSearchResults();
+      this.checkValidity();
+      this.resetSearchResults();
       this.fromTextfield().value = location.name;
       this.fromShowResetButton = true;
 
@@ -242,7 +232,8 @@ function genComponentConf() {
       this.toAddedLocation = location;
 
       // represent new value to user
-      this.resetToSearchResults(); // picked one, can hide the rest if they were there
+      this.checkValidity();
+      this.resetSearchResults(); // picked one, can hide the rest if they were there
       this.toTextfield().value = location.name;
       this.toShowResetButton = true;
 
@@ -257,9 +248,10 @@ function genComponentConf() {
       // this.map.fitBounds(leafletBounds(location), { animate: true });
     }
 
-    // TODO: needs to work for both textfields
     doneTypingFrom() {
       const fromText = this.fromTextfield().value;
+
+      this.resetToSearchResults(); // reset search results of other field
 
       if (this.fromAddedLocation !== undefined) {
         this.fromShowResetButton = false;
@@ -287,7 +279,36 @@ function genComponentConf() {
       }
     }
 
-    doneTypingTo() {}
+    doneTypingTo() {
+      const toText = this.toTextfield().value;
+
+      this.resetFromSearchResults(); // reset search results of other field
+
+      if (this.toAddedLocation !== undefined) {
+        this.toShowResetButton = false;
+        this.$scope.$apply(() => {
+          this.resetToLocation();
+        });
+      }
+
+      if (!toText) {
+        this.$scope.$apply(() => {
+          this.resetToSearchResults();
+        });
+      } else {
+        // search for new results
+        // TODO: sort results by distance/relevance/???
+        // TODO: limit amount of shown results
+        searchNominatim(toText).then(searchResults => {
+          const parsedResults = scrubSearchResults(searchResults, toText);
+          this.$scope.$apply(() => {
+            this.toSearchResults = parsedResults;
+            //this.lastSearchedFor = { name: text };
+            this.lastSearchedFor = toText;
+          });
+        });
+      }
+    }
 
     placeMarkers(locations) {
       if (this.markers) {
@@ -328,6 +349,8 @@ function genComponentConf() {
         fromLocation: undefined,
         toLocation: this.toAddedLocation,
       });
+
+      this.checkValidity();
     }
 
     resetToLocation() {
@@ -347,6 +370,8 @@ function genComponentConf() {
         fromLocation: this.fromAddedLocation,
         toLocation: undefined,
       });
+
+      this.checkValidity();
     }
 
     resetSearchResults() {
@@ -466,11 +491,11 @@ function genComponentConf() {
     }
 
     toTextfieldNg() {
-      return this.domCache.ng("#rp__from-searchbox__inner");
+      return this.domCache.ng("#rp__to-searchbox__inner");
     }
 
     toTextfield() {
-      return this.domCache.dom("#rp__from-searchbox__inner");
+      return this.domCache.dom("#rp__to-searchbox__inner");
     }
 
     mapMountNg() {

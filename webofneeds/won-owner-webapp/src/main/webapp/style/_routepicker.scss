@@ -97,6 +97,11 @@ won-route-picker {
         @include fixed-square(1.5rem);
       }
     }
+
+    // needed? check for best method to keep resutls clickable
+    .rp__searchresult:active {
+      display: block;
+    }
   }
 
   .rp__mapmount {
