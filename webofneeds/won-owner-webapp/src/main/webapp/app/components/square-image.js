@@ -14,9 +14,9 @@ function genComponentConf() {
     <img class="image" ng-show="self.src" ng-src="{{self.src}}"/>
 
     <img class="image" 
-      ng-show="!self.src && self.identiconSvg" 
+      ng-if="!self.src && self.identiconSvg" 
       alt="Auto-generated title image for {{self.title}}"
-      src="data:image/svg+xml;base64,{{self.identiconSvg}}">
+      ng-src="data:image/svg+xml;base64,{{self.identiconSvg}}">
   `;
 
   class Controller {
@@ -30,6 +30,7 @@ function genComponentConf() {
     }
 
     updateIdenticon(input) {
+      if (!input) return;
       // quick extra hash here as identicon.js only uses first 15
       // chars (which wouldn't work for our uris):
       const hash = new shajs.sha512().update(input).digest("hex");
