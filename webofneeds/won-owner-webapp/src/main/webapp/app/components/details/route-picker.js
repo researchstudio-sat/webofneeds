@@ -6,11 +6,11 @@ import {
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
-  // leafletBounds,
+  leafletBoundsAny,
   delay,
   getIn,
 } from "../../utils.js";
-import { doneTypingBufferNg, DomCache } from "../../cstm-ng-utils.js";
+import { DomCache } from "../../cstm-ng-utils.js";
 
 import { initLeaflet } from "../../won-utils.js";
 
@@ -102,7 +102,7 @@ function genComponentConf() {
             <svg class="rp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
                  ng-if="self.toShowResetButton"
-                 ng-click="self.resetToLocationAndSearch()">
+                 ng-click="self.resetToLocation()">
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
             </svg>
         </div>
@@ -160,12 +160,18 @@ function genComponentConf() {
       // just closing the picker would result in an error message!
       this.determineCurrentLocation();
 
-      doneTypingBufferNg(
-        e => this.doneTypingFrom(e),
-        this.fromTextfieldNg(),
-        300
-      );
-      //doneTypingBufferNg(e => this.doneTypingTo(e), this.toTextfieldNg(), 300);
+      this.typingBuffer(e => this.doneTypingFrom(e), this.fromTextfield(), 300);
+      this.typingBuffer(e => this.doneTypingTo(e), this.toTextfield(), 300);
+    }
+
+    typingBuffer(listenerCallback, domElement, doneTypingInterval) {
+      let typingTimer;
+      domElement.addEventListener("input", e => {
+        if (typingTimer) {
+          clearTimeout(typingTimer);
+        }
+        typingTimer = setTimeout(() => listenerCallback(e), doneTypingInterval);
+      });
     }
 
     showInitialLocations() {
@@ -188,6 +194,10 @@ function genComponentConf() {
       }
 
       this.placeMarkers(markedLocations);
+      this.map.fitBounds(
+        leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
+        { animate: true }
+      );
 
       this.$scope.$apply();
     }
@@ -220,7 +230,10 @@ function genComponentConf() {
       this.placeMarkers(markers);
       this.markers[0].openPopup();
       // TODO: fit map around selected locations
-      // this.map.fitBounds(leafletBounds(location), { animate: true });
+      this.map.fitBounds(
+        leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
+        { animate: true }
+      );
     }
 
     selectedToLocation(location) {
@@ -245,7 +258,10 @@ function genComponentConf() {
       this.placeMarkers(markers);
       this.markers[0].openPopup();
       // TODO: fit map around selected locations
-      // this.map.fitBounds(leafletBounds(location), { animate: true });
+      this.map.fitBounds(
+        leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
+        { animate: true }
+      );
     }
 
     doneTypingFrom() {
@@ -388,6 +404,10 @@ function genComponentConf() {
       this.toLastSearchedFor = undefined;
     }
 
+    showCurrentLocationResult() {
+      return !this.fromAddedLocation && !!this.currentLocation;
+    }
+
     showFromPrevLocationResult() {
       return (
         !this.fromAddedLocation &&
@@ -398,13 +418,10 @@ function genComponentConf() {
     }
 
     showFromResultDropdown() {
-      let showGeo = !this.fromAddedLocation && this.currentLocation;
-      let showPrev = this.showFromPrevLocationResult();
-
       return (
         (this.fromSearchResults && this.fromSearchResults.length > 0) ||
-        showGeo ||
-        showPrev
+        this.showCurrentLocationResult() ||
+        this.showFromPrevLocationResult()
       );
     }
 
@@ -416,9 +433,9 @@ function genComponentConf() {
     }
 
     showToResultDropDown() {
-      let showPrev = this.showToPrevLocationResult();
       return (
-        (this.toSearchResults && this.toSearchResults.length > 0) || showPrev
+        (this.toSearchResults && this.toSearchResults.length > 0) ||
+        this.showToPrevLocationResult()
       );
     }
 
