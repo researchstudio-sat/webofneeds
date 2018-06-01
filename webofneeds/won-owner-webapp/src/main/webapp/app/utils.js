@@ -639,10 +639,10 @@ export function leafletBoundsAny(locations) {
       if (!nwCorner.lng || location.nwCorner.lng > nwCorner.lng) {
         nwCorner.lng = location.nwCorner.lng;
       }
-      if (!seCorner.lat || location.seCorner.lat > seCorner.lat) {
+      if (!seCorner.lat || location.seCorner.lat < seCorner.lat) {
         seCorner.lat = location.seCorner.lat;
       }
-      if (!seCorner.lng || location.seCorner.lng > seCorner.lng) {
+      if (!seCorner.lng || location.seCorner.lng < seCorner.lng) {
         seCorner.lng = location.seCorner.lng;
       }
     }
