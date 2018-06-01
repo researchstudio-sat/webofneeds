@@ -61,13 +61,13 @@ won-connection-selection-item {
   $invisibleBorder: 0.0625rem solid white;
 
   &.selected {
-    // @include speech-bubble-right(
-    //   white,
-    //   $won-line-gray,
-    //   0.625rem,
-    //   $thinBorderWidth,
-    //   1.5rem
-    // );
+    @include speech-bubble-right(
+      white,
+      $won-line-gray,
+      0.625rem,
+      $thinBorderWidth,
+      1.5rem
+    );
     //border-top: $thinGrayBorder;
     //border-bottom: $thinGrayBorder;
   }
