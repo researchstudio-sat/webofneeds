@@ -21,7 +21,8 @@ won-connection-selection-item {
     $won-line-gray,
     $triangleCutoutSize,
     $thinBorderWidth,
-    1.5rem
+    1.5rem,
+    "before" /* needed so there can be another tail*/
   );
 
   &.won-unread {

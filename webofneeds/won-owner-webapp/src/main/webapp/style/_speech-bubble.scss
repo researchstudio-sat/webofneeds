@@ -5,10 +5,11 @@
   $border-color,
   $triangle-height,
   $border-width,
-  $pos
+  $pos,
+  $whichPseudoElem: "after"
 ) {
   position: relative; // to allow positioning the triangle-parts as absolute
-  &:after {
+  &:#{$whichPseudoElem} {
     content: "";
     display: block; // rly needed?
     background: linear-gradient(
@@ -121,22 +122,25 @@
  * @param $background-color: the color of whatever's behind this element. can't do clipping/true transparency with a complex border in css, sry
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the edge the left edge triangle is placed. 
+ * @param $whichPseudoElem:  use "before" to allow it co-occuring with an outward tail
  */
 @mixin speech-bubble-left-inward(
   $background-color,
   $border-color,
   $triangle-height,
   $border-width: $thinBorderWidth,
-  $pos: 50%
+  $pos: 50%,
+  $whichPseudoElem: "before"
 ) {
   @include _speech-bubble(
     $background-color,
     $border-color,
     $triangle-height,
     $border-width,
-    $pos
+    $pos,
+    $whichPseudoElem
   );
-  &:after {
+  &:#{$whichPseudoElem} {
     top: $pos;
     transform: rotate(135deg);
     /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
