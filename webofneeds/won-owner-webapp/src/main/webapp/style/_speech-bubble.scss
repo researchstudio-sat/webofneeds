@@ -7,7 +7,6 @@
   $border-width,
   $pos
 ) {
-  background-color: $background-color;
   position: relative; // to allow positioning the triangle-parts as absolute
   &:after {
     content: "";
@@ -28,10 +27,12 @@
     border-width: $border-width 0 0 $border-width;
   }
 }
+
 @function sizeOfSquare($triangle-height) {
   $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
   @return sqrt($sizeSq) * extractUnit($triangle-height);
 }
+
 /* *
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the top edge the triangle is placed. */
@@ -42,6 +43,7 @@
   $border-width: $thinBorderWidth,
   $pos: 50%
 ) {
+  background-color: $background-color;
   @include _speech-bubble(
     $background-color,
     $border-color,
@@ -69,6 +71,7 @@
   $border-width: $thinBorderWidth,
   $pos: 50%
 ) {
+  background-color: $background-color;
   @include _speech-bubble(
     $background-color,
     $border-color,
@@ -96,6 +99,7 @@
   $border-width: $thinBorderWidth,
   $pos: 50%
 ) {
+  background-color: $background-color;
   @include _speech-bubble(
     $background-color,
     $border-color,
@@ -113,6 +117,35 @@
     left: - sizeOfSquare($triangle-height) / 2;
   }
 }
+
+/**
+ * @param $background-color: the color of whatever's behind this element. can't do clipping/true transparency with a complex border in css, sry
+ * @param $triangleSize: the height of the the speech-bubble-triangle
+ * @param $pos: a %-value determining where on the edge the left edge triangle is placed. 
+ */
+@mixin speech-bubble-left-inward(
+  $background-color,
+  $border-color,
+  $triangle-height,
+  $border-width: $thinBorderWidth,
+  $pos: 50%
+) {
+  @include _speech-bubble(
+    $background-color,
+    $border-color,
+    $triangle-height,
+    $border-width,
+    $pos
+  );
+  &:after {
+    top: $pos;
+    transform: rotate(135deg);
+    /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
+    sure the center's at the upper edge of the container. */
+    left: sizeOfSquare($triangle-height) / 2;
+  }
+}
 /* *
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the edge the right edge triangle is placed. */
@@ -123,6 +156,7 @@
   $border-width: $thinBorderWidth,
   $pos: 50%
 ) {
+  background-color: $background-color;
   @include _speech-bubble(
     $background-color,
     $border-color,
