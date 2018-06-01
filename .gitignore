@@ -62,6 +62,8 @@ webofneeds/won-docker/image/matcher-service/conf/
 webofneeds/won-docker/image/matcher-service/won-matcher-service.jar
 webofneeds/won-docker/image/matcher-solr/conf/
 webofneeds/won-docker/image/matcher-solr/won-matcher-solr.jar
+webofneeds/won-docker/image/matcher-sparql/conf/
+webofneeds/won-docker/image/matcher-sparql/won-matcher-sparql.jar
 webofneeds/won-docker/image/owner/conf/
 webofneeds/won-docker/image/owner/owner.war
 webofneeds/won-docker/image/owner/tomcat-libs/
