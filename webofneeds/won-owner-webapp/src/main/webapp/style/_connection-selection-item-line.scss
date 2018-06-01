@@ -15,8 +15,10 @@ won-connection-selection-item {
   padding-top: $padding;
   padding-bottom: $padding;
 
+  background-color: $won-light-gray;
+
   @include speech-bubble-left-inward(
-    $won-light-gray,
+    /* TODO line-gray for a fill? -->*/ $won-line-gray,
     $won-line-gray,
     $triangleCutoutSize,
     $thinBorderWidth,
@@ -39,11 +41,6 @@ won-connection-selection-item {
   border-bottom: $invisibleBorder;
   // this is necessary so that the view does not "jump" when selecting an item
 
-  &:hover,
-  &.selected {
-    background-color: white;
-  }
-
   won-connection-state {
     position: absolute;
     left: 0.25rem;
@@ -60,6 +57,10 @@ won-connection-selection-item {
     margin-left: 0.5rem;
   }
 
+  &:hover,
+  &.selected {
+    background-color: white;
+  }
   &.selected {
     @include speech-bubble-right(
       white,

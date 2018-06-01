@@ -85,10 +85,6 @@ won-connections-overview {
         }
       }
 
-      &:hover,
-      &.selected {
-      }
-
       @media (min-width: $responsivenessBreakPoint) {
         &.selected {
           @include speech-bubble-right(
@@ -102,9 +98,8 @@ won-connections-overview {
       }
     }
     &__connections {
-      background: white;
       padding-left: 1rem; // intent connections so it's clear they belong *to* the post
-      background: $won-light-gray;
+      background: $won-line-gray; //TODO line-gray for a fill?
 
       @include slideWithOpacityAnimation(0.5s, linear, 250rem);
     }
