@@ -1,0 +1,120 @@
+@import "won";
+@import "../node_modules/leaflet/dist/leaflet.css";
+@import "border-utils";
+@import "textfield";
+
+won-route-picker {
+  display: block;
+  position: relative;
+
+  // remove X rendered by IE and Edge as we have our own clear button
+  ::-ms-clear {
+    width: 0;
+    height: 0;
+  }
+
+  .rp__searchbox {
+    position: relative; // needed for position: absolute of icon
+
+    .rp__searchbox__icon {
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
+
+    .rp__searchbox__inner {
+      border: $thinGrayBorder;
+      background-color: white;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+
+      box-sizing: border-box;
+      min-height: $formInputHeight;
+      min-width: 0; // so a size is specified and break-word works
+      width: 100%;
+
+      word-wrap: break-word;
+
+      &--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+    }
+  }
+
+  // show search results when search box is focused
+  .rp__searchbox:focus-within + .rp__searchresults {
+    display: block;
+  }
+
+  // needed to make search results appear long enough to be clickable
+  .rp__searchresults:hover {
+    display: block;
+  }
+
+  .rp__searchresults {
+    display: none;
+    border: none;
+
+    &.rp__searchresults--filled {
+      @include thin-border;
+    }
+
+    width: 90%;
+    box-sizing: border-box;
+
+    position: absolute;
+    z-index: 1;
+    background-color: white;
+
+    list-style-type: none;
+
+    .rp__searchresult {
+      display: flex;
+      align-items: center;
+
+      padding: 1rem 0.5rem;
+      font-size: $normalFontSize;
+
+      .rp__searchresult__text {
+        padding: 0 0.5rem;
+      }
+
+      .rp__searchresult__icon {
+        @include fixed-square(1.5rem);
+      }
+    }
+
+    // needed? check for best method to keep resutls clickable
+    .rp__searchresult:active {
+      display: block;
+    }
+  }
+
+  .rp__mapmount {
+    width: 100%;
+    height: 31rem;
+    z-index: 0;
+    margin-top: 0.5rem;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      height: 15rem;
+    }
+  }
+  .highlightedText {
+    font-weight: bold;
+  }
+}
