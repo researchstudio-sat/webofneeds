@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -339,23 +339,14 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
   //if type === create -> use needBuilder as well
   const prepareContentNodeData = async needDataIsOrSeeks => ({
-    type: won.toCompacted(needDataIsOrSeeks.type), //mandatory
-    title: needDataIsOrSeeks.title, //mandatory
-    description: needDataIsOrSeeks.description,
-    publishedContentUri: publishedContentUri, //mandatory
-    tags: needDataIsOrSeeks.tags,
-    matchingContext: needDataIsOrSeeks.matchingContext,
+    // Adds all fields from needDataIsOrSeeks:
+    // title, description, tags, matchingContext, location,...
+    ...needDataIsOrSeeks,
 
+    publishedContentUri: publishedContentUri, //mandatory
+    type: won.toCompacted(needDataIsOrSeeks.type), //mandatory
     //TODO attach to either is or seeks?
     attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-
-    location: getIn(needDataIsOrSeeks, ["location"]),
-    fromLocation: getIn(needDataIsOrSeeks, ["fromLocation"]),
-    toLocation: getIn(needDataIsOrSeeks, ["toLocation"]),
-    whatsAround: needDataIsOrSeeks.whatsAround,
-    whatsNew: needDataIsOrSeeks.whatsNew,
-    noHints: needDataIsOrSeeks.noHints,
-
     arbitraryJsonLd: needDataIsOrSeeks.ttl
       ? await won.ttlToJsonLd(needDataIsOrSeeks.ttl)
       : [],
