@@ -21,14 +21,6 @@ function genComponentConf() {
   let template = `
       <div class="ch__icon">
           <won-square-image
-            class="ch__icon__ownneed"
-            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.ownNeed.get('state') === self.WON.InactiveCompacted}"
-            src="self.ownNeed.get('TODO')"
-            title="self.ownNeed.get('title')"
-            uri="self.ownNeed.get('uri')"
-            ng-show="!self.hideImage">
-          </won-square-image>
-          <won-square-image
             class="ch__icon__theirneed"
             ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
             src="self.theirNeed.get('TODO')"

@@ -16,21 +16,6 @@ won-connection-header {
     width: $postIconSize;
 
     @include square-image($postIconSize);
-
-    .ch__icon__ownneed,
-    .ch__icon__theirneed {
-      position: absolute;
-    }
-
-    .ch__icon__ownneed {
-      z-index: 1;
-      clip-path: polygon(0 0, 44% 0, 44% 105%, 0 105%); // left half
-    }
-
-    .ch__icon__theirneed {
-      z-index: 2;
-      clip-path: polygon(48% 0, 105% 0, 105% 105%, 48% 105%); // right half
-    }
   }
   .ch__right {
     grid-area: main;
