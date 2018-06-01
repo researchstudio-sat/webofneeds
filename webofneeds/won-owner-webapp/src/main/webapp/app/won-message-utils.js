@@ -350,6 +350,8 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
 
     location: getIn(needDataIsOrSeeks, ["location"]),
+    fromLocation: getIn(needDataIsOrSeeks, ["fromLocation"]),
+    toLocation: getIn(needDataIsOrSeeks, ["toLocation"]),
     whatsAround: needDataIsOrSeeks.whatsAround,
     whatsNew: needDataIsOrSeeks.whatsNew,
     noHints: needDataIsOrSeeks.noHints,

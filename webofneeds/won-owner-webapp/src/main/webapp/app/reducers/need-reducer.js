@@ -1133,6 +1133,12 @@ function parseNeed(jsonldNeed, ownNeed) {
         location: is.get("won:hasLocation")
           ? parseLocation(is.get("won:hasLocation"))
           : undefined,
+        fromLocation: is.get("won:hasFromLocation")
+          ? parseLocation(is.get("won:hasFromLocation"))
+          : undefined,
+        toLocation: is.get("won:hasToLocation")
+          ? parseLocation(is.get("won:hasToLocation"))
+          : undefined,
       };
     }
     if (seeksPresent) {
@@ -1151,6 +1157,12 @@ function parseNeed(jsonldNeed, ownNeed) {
           : undefined,
         location: seeks.get("won:hasLocation")
           ? parseLocation(seeks.get("won:hasLocation"))
+          : undefined,
+        fromLocation: seeks.get("won:hasFromLocation")
+          ? parseLocation(seeks.get("won:hasFromLocation"))
+          : undefined,
+        toLocation: seeks.get("won:hasToLocation")
+          ? parseLocation(seeks.get("won:hasToLocation"))
           : undefined,
       };
     }
