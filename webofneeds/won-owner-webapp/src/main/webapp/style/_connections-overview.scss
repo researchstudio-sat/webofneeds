@@ -103,13 +103,9 @@ won-connections-overview {
     }
     &__connections {
       background: white;
-      @include speech-bubble-top(
-        white,
-        $won-line-gray,
-        0.625rem,
-        $thinBorderWidth,
-        5rem
-      );
+      padding-left: 1rem; // intent connections so it's clear they belong *to* the post
+      background: $won-light-gray;
+
       @include slideWithOpacityAnimation(0.5s, linear, 250rem);
     }
   }

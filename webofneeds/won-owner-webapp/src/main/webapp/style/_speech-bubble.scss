@@ -85,7 +85,7 @@
       225deg
     ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container. */
+    sure the center's at the bottom edge of the container. */
     bottom: - sizeOfSquare($triangle-height) / 2;
   }
 }
@@ -109,11 +109,10 @@
   );
   &:after {
     top: $pos;
-    transform: rotate(
-      -45deg
-    ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    transform: rotate(-45deg);
+    /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container. */
+    sure the center's at the left edge of the container. */
     left: - sizeOfSquare($triangle-height) / 2;
   }
 }
@@ -142,8 +141,8 @@
     transform: rotate(135deg);
     /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container. */
-    left: sizeOfSquare($triangle-height) / 2;
+    sure the center's at the left edge of the container. */
+    left: - sizeOfSquare($triangle-height) / 2;
   }
 }
 /* *
@@ -169,7 +168,7 @@
     transform: rotate(135deg);
     /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
-    sure the center's at the upper edge of the container. */
+    sure the center's at the right edge of the container. */
     right: - sizeOfSquare($triangle-height) / 2;
   }
 }
