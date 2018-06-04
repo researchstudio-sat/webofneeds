@@ -68,6 +68,7 @@ import won from "./won.js";
    * @returns {string}
    */
   function queryString(dataUri, queryParams = {}) {
+    console.log("queryString");
     let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
 
     if (queryParams.requesterWebId) {
@@ -97,6 +98,7 @@ import won from "./won.js";
   const privateData = {};
 
   won.clearStore = function() {
+    console.log("clearStore");
     //create an rdfstore-js based store as a cache for rdf data.
     privateData.store = rdfstore.create();
     privateData.store.setPrefix("msg", "http://purl.org/webofneeds/message#");
@@ -146,6 +148,7 @@ import won from "./won.js";
    * @constructor
    */
   const ReadUpdateLock = function(uri) {
+    console.log("ReadUpdateLock");
     //arrays holding deferred objects until they may proceeed
     this.uri = uri;
     this.blockedUpdaters = [];
@@ -158,6 +161,7 @@ import won from "./won.js";
   ReadUpdateLock.prototype = {
     constructor: won.ReadUpdateLock,
     isLocked: function() {
+      console.log("ReadUpdateLock.isLocked");
       return (
         this.blockedUpdaters.length > 0 ||
         this.blockedReaders.length > 0 ||
@@ -166,6 +170,7 @@ import won from "./won.js";
       );
     },
     getLockStatusString: function() {
+      console.log("ReadUpdateLock.getLockStatusString");
       return (
         "[blockedUpdaters: " +
         this.blockedUpdaters.length +
@@ -179,6 +184,7 @@ import won from "./won.js";
       );
     },
     acquireReadLock: function() {
+      console.log("ReadUpdateLock.acquireReadLock");
       let deferred = {};
       let promise = new Promise((resolve, reject) => {
         deferred = { resolve, reject };
@@ -199,6 +205,7 @@ import won from "./won.js";
       return promise;
     },
     acquireUpdateLock: function() {
+      console.log("ReadUpdateLock.acquireUpdateLock");
       let deferred = {};
       let promise = new Promise((resolve, reject) => {
         deferred = { resolve, reject };
@@ -219,6 +226,7 @@ import won from "./won.js";
       return promise;
     },
     releaseReadLock: function() {
+      console.log("ReadUpdateLock.releaseReadLock");
       //console.log("linkeddata-service-won.js: rul:read:release:" + this.uri + " " + this.getLockStatusString());
       this.activeReaderCount--;
       if (this.activeReaderCount < 0) {
@@ -229,6 +237,7 @@ import won from "./won.js";
       }
     },
     releaseUpdateLock: function() {
+      console.log("ReadUpdateLock.releaseUpdateLock");
       //console.log("linkeddata-service-won.js: rul:updt:release:" + this.uri + " " + this.getLockStatusString());
       this.activeUpdaterCount--;
       if (this.activeUpdaterCount < 0) {
@@ -240,6 +249,7 @@ import won from "./won.js";
       }
     },
     grantLockToUpdaters: function() {
+      console.log("ReadUpdateLock.grantLockToUpdaters");
       if (this.blockedUpdaters.length > 0 && !this.updateInProgress) {
         //console.log("linkeddata-service-won.js: rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
         //there are blocked updaters. let them proceed.
@@ -253,6 +263,7 @@ import won from "./won.js";
       }
     },
     grantLockToReaders: function() {
+      console.log("ReadUpdateLock.grantLockToReaders");
       if (this.blockedReaders.length > 0) {
         //console.log("linkeddata-service-won.js: rul:readers:all: " + this.uri + " " + this.getLockStatusString());
         //there are blocked readers. let them proceed.
@@ -274,6 +285,7 @@ import won from "./won.js";
    * @param uri
    */
   const cacheItemInsertOrOverwrite = function(uri, partial) {
+    console.log("cacheItemInsertOrOverwrite");
     //console.log("linkeddata-service-won.js: add to cache:    " + uri);
     privateData.cacheStatus[uri] = {
       timestamp: new Date().getTime(),
@@ -284,6 +296,7 @@ import won from "./won.js";
   const cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(
     uri
   ) {
+    console.log("cacheItemIsOkOrUnresolvableOrFetching");
     const entry = privateData.cacheStatus[uri];
     return (
       entry &&
@@ -308,6 +321,7 @@ import won from "./won.js";
   };
 
   const cacheItemMarkAccessed = function cacheItemMarkAccessed(uri) {
+    console.log("cacheItemMarkAccessed");
     const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       const message = "Trying to mark unloaded uri " + uri + " as accessed";
@@ -324,6 +338,7 @@ import won from "./won.js";
   };
 
   const cacheItemMarkDirty = function cacheItemMarkDirty(uri) {
+    console.log("cacheItemMarkDirty");
     const entry = privateData.cacheStatus[uri];
     if (typeof entry === "undefined") {
       return;
@@ -333,6 +348,7 @@ import won from "./won.js";
   };
 
   const cacheItemMarkFetching = function cacheItemMarkFetching(uri) {
+    console.log("cacheItemMarkFetching");
     //console.log("linkeddata-service-won.js: mark fetching:   " + uri);
     privateData.cacheStatus[uri] = {
       timestamp: new Date().getTime(),
@@ -341,6 +357,7 @@ import won from "./won.js";
   };
 
   const cacheItemRemove = function cacheItemRemove(uri) {
+    console.log("cacheItemRemove");
     delete privateData.cacheStatus[uri];
   };
 
@@ -357,6 +374,7 @@ import won from "./won.js";
    * @return a promise so the caller can chain promises after this one
    */
   won.invalidateCacheForNewConnection = function(connectionUri, needUri) {
+    console.log("invalidateCacheForNewConnection");
     if (connectionUri) {
       cacheItemMarkDirty(connectionUri);
     }
@@ -380,6 +398,7 @@ import won from "./won.js";
    * @return a promise so that the caller can chain another promise
    */
   won.invalidateCacheForNewMessage = function(connectionUri) {
+    console.log("invalidateCacheForNewMessage");
     if (connectionUri != null) {
       cacheItemMarkDirty(connectionUri);
     }
@@ -390,6 +409,7 @@ import won from "./won.js";
     });
   };
   won.invalidateCacheForNeed = function(needUri) {
+    console.log("invalidateCacheForNeed");
     if (needUri != null) {
       cacheItemMarkDirty(needUri);
       cacheItemMarkDirty(needUri + "/connections");
@@ -398,6 +418,7 @@ import won from "./won.js";
   };
 
   const getReadUpdateLockPerUri = function(uri) {
+    console.log("getReadUpdateLockPerUri");
     let lock = privateData.readUpdateLocksPerUri[uri];
     if (typeof lock === "undefined" || lock == null) {
       lock = new ReadUpdateLock(uri);
@@ -407,6 +428,7 @@ import won from "./won.js";
   };
 
   const getReadUpdateLocksPerUris = function(uris) {
+    console.log("getReadUpdateLockPerUris");
     const locks = [];
     //console.log("uris",uris);
     uris.map(function(uri) {
@@ -421,6 +443,7 @@ import won from "./won.js";
    * @returns {Array|*}
    */
   const acquireReadLocks = function acquireReadLocks(locks) {
+    console.log("acquireReadLocks");
     const acquiredLocks = [];
     locks.map(function(lock) {
       const promise = lock.acquireReadLock();
@@ -441,6 +464,7 @@ import won from "./won.js";
    * * message: string - if set, the message is prepended to the generic error message (with 1 whitespace in between)
    */
   const rejectIfFailed = function(success, data, options) {
+    console.log("rejectIfFailed");
     const rejectionMessage = buildRejectionMessage(success, data, options);
     if (rejectionMessage) {
       // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
@@ -451,6 +475,7 @@ import won from "./won.js";
   };
 
   function buildRejectionMessage(success, data, options) {
+    console.log("buildRejectionMessage");
     let errorMessage = null;
     if (typeof options === "undefined" || options == null) {
       options = {};
@@ -497,6 +522,7 @@ import won from "./won.js";
     optionalSparqlPrefixes,
     optionalSparqlFragment
   ) {
+    console.log("resolvePropertyPathFromBaseUri");
     let query = "";
     if (won.isNull(baseUri)) {
       throw new Error("cannot evaluate property path: baseUri is null");
@@ -541,6 +567,7 @@ import won from "./won.js";
    * @return {*}
    */
   won.ensureLoaded = async function(uri, fetchParams = {}) {
+    console.log("ensureLoaded");
     if (!uri) {
       throw { message: "ensureLoaded: uri must not be null" };
     }
@@ -617,6 +644,7 @@ import won from "./won.js";
   };
 
   function fetchesPartialRessource(requestParams) {
+    console.log("fetchesPartialRessource");
     if (requestParams.pagingSize) {
       return true;
     } else {
@@ -643,6 +671,7 @@ import won from "./won.js";
    * @param {*} dataset
    */
   function selectLoadedDocumentUrisFromDataset(dataset) {
+    console.log("selectLoadedDocumentUrisFromDataset");
     /*
          * create a temporary store to load the dataset into
          * so we only query over the new triples
@@ -700,6 +729,7 @@ import won from "./won.js";
    * @returns a map from document-uri to a set of contained graph-uris
    */
   async function selectContainedDocumentAndGraphUrisHACK(data) {
+    console.log("selectContainedDocumentAndGraphUrisHACK");
     const loadedDocumentUris = await selectLoadedDocumentUrisFromDataset(data);
 
     const tmpstore = rdfstore.create(); // TODO reuse tmpstore from `selectLoadedDocumentUrisFromDataset`
@@ -775,6 +805,7 @@ import won from "./won.js";
    * @return {Promise}
    */
   function loadFromOwnServerIntoCache(uri, params, removeCacheItem = false) {
+    console.log("loadFromOwnServerIntoCache");
     let requestUri = queryString(uri, params);
 
     //console.log("linkeddata-service-won.js: fetching:        " + requestUri);
@@ -845,6 +876,7 @@ import won from "./won.js";
    *   thus contains data from multiple documents.
    */
   won.addJsonLdData = async function(data, documentUri, deep) {
+    console.log("addJsonLdData: documentUri: ", documentUri);
     // const graphsAddedSeperatelyP = Promise.resolve();
     const groupedP = groupByGraphs(data);
 
@@ -953,6 +985,7 @@ import won from "./won.js";
    *  Save mapping from documentUri to graphUris, e.g. for future deletion operations
    */
   function saveDocToGraphMapping(documentUri, graphUris) {
+    console.log("saveDocToGraphMapping");
     const prevGraphUris = privateData.documentToGraph[documentUri];
     if (!prevGraphUris) {
       privateData.documentToGraph[documentUri] = new Set(graphUris);
@@ -967,11 +1000,13 @@ import won from "./won.js";
    * to get the connection-uris. Thus it's faster.
    */
   won.getNeed = async function(needUri) {
+    console.log("getNeed");
     await won.ensureLoaded(needUri);
     return selectNeedData(needUri, privateData.store);
   };
 
   function selectNeedData(needUri, store) {
+    console.log("selectNeedData");
     let propertyTree = {
       prefixes: {
         won: "http://purl.org/webofneeds/model#",
@@ -1197,6 +1232,7 @@ import won from "./won.js";
   // property path, collecting all reachable triples
   // returns a JS RDF Interfaces Graph object
   /*async*/ function loadStarshapedGraph(store, startUri, tree) {
+    console.log("loadStarshapedGraph");
     let prefixes = tree.prefixes;
     if (prefixes != null) {
       for (let key in prefixes) {
@@ -1247,7 +1283,8 @@ import won from "./won.js";
   }
 
   function dropUnnecessaryTriples(store, graph, roots) {
-    "use strict";
+    console.log("dropUnnecessaryTriples");
+    ("use strict");
     let usedProperties = collectProperties(store, roots);
     //let usedPropertiesString = usedProperties.reduce( (acc, val) => acc + val);
     return graph.filter(triple => {
@@ -1258,6 +1295,7 @@ import won from "./won.js";
   }
 
   function collectProperties(store, node) {
+    console.log("collectProperties");
     let usedProperties = [];
     if (Array.isArray(node)) {
       node.forEach(element => {
@@ -1306,6 +1344,7 @@ import won from "./won.js";
    * using the specified property tree.
    */
   function loadStarshapedGraph_internal(store, dataGraph, startNode, tree) {
+    console.log("loadStarshapedGraph_internal");
     let resultGraph = new store.rdf.api.Graph();
     // convert node path into an array if it isn't one already
     //   (this allows for specifying a property path instead of just one property  )
@@ -1345,6 +1384,7 @@ import won from "./won.js";
    * @param path
    */
   function loadGraphForPath(store, dataGraph, startNode, path) {
+    console.log("loadGraphForPath");
     if (path.length == 0) return null;
     let localResultGraph = dataGraph.filter(
       won.tripleFilters.sp(startNode, store.rdf.createNamedNode(path[0]))
@@ -1371,6 +1411,7 @@ import won from "./won.js";
   }
 
   function getObjectsFromGraph(graph) {
+    console.log("getObjectsFromGraph");
     let objects = [];
     graph.forEach(triple => {
       objects.push(triple.object);
@@ -1379,6 +1420,7 @@ import won from "./won.js";
   }
 
   function triples2framedJson(needUri, triples, frame) {
+    console.log("triples2framedJson: ", needUri);
     const jsonldjsQuads = {
       // everything in our rdfstore is in the default-graph atm
       "@default": triples.map(triple => ({
@@ -1388,8 +1430,6 @@ import won from "./won.js";
         //object.datatype: ? //TODO
       })),
     };
-
-    //console.log('jsonldjsQuads: ', jsonldjsQuads);
 
     const context = frame["@context"] ? clone(frame["@context"]) : {}; //TODO
     context.useNativeTypes = true; //do some of the parsing from strings to numbers
@@ -1424,6 +1464,7 @@ import won from "./won.js";
    * @return {{value: *, type: undefined}}
    */
   function rdfstorejsToJsonldjs(element) {
+    console.log("rdfstorejsToJsonldjs: ", element);
     const result = {
       value: element.nominalValue,
       type: undefined,
@@ -1457,6 +1498,7 @@ import won from "./won.js";
   }
 
   function rdfstoreTriplesToString(triples, graphUri) {
+    console.log("rdfstoreTriplesToString");
     const toToken = x => {
       switch (x.interfaceName) {
         case "NamedNode":
@@ -1494,6 +1536,12 @@ import won from "./won.js";
    * @param visited
    */
   function ensureRdfsMemberArrays(needJsonLd, visited = new Set()) {
+    console.log(
+      "ensureRdfsMemberArrays visitedSize:",
+      visited.size(),
+      " : ",
+      needJsonLd
+    );
     if (visited.has(needJsonLd)) return;
     visited.add(needJsonLd);
 
@@ -1505,6 +1553,12 @@ import won from "./won.js";
   }
 
   won.getEnvelopeDataForNeed = function(needUri, nodeUri) {
+    console.log(
+      "getEnvelopeDataForNeed: needUri:",
+      needUri,
+      "nodeUri: ",
+      nodeUri
+    );
     if (typeof needUri === "undefined" || needUri == null) {
       throw { message: "getEnvelopeDataForNeed: needUri must not be null" };
     }
@@ -1527,6 +1581,7 @@ import won from "./won.js";
     ownNodeUri,
     theirNodeUri
   ) {
+    console.log("getEnvelopeDataforNewConnection");
     if (!ownNeedUri) {
       console.log("no own need uri");
       throw {
@@ -1562,6 +1617,7 @@ import won from "./won.js";
     theirNodeUri,
     theirConnectionUri
   ) {
+    console.log("getEnvelopeDataforConnection");
     if (typeof connectionUri === "undefined" || connectionUri == null) {
       throw {
         message: "getEnvelopeDataforConnection: connectionUri must not be null",
@@ -1589,7 +1645,8 @@ import won from "./won.js";
    * @param needUri
    * @return {*} the data of all connection-nodes referenced by that need
    */
-  won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
+  won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) => {
+    console.log("getConnectionsOfNeed");
     won
       .getConnectionUrisOfNeed(needUri, requesterWebId, false)
       .then(connectionUris =>
@@ -1597,7 +1654,7 @@ import won from "./won.js";
           won.getConnectionWithEventUris(uri, { requesterWebId })
         )
       );
-
+  };
   /*
      * Loads all URIs of a need's connections.
      */
@@ -1606,6 +1663,7 @@ import won from "./won.js";
     requesterWebId,
     includeClosed = false
   ) => {
+    console.log("getConnectionUrisOfNeed");
     if (includeClosed) {
       return won
         .executeCrawlableQuery(
@@ -1632,6 +1690,7 @@ import won from "./won.js";
    *              connections for the given need
    */
   function getConnectionContainerOfNeed(needUri) {
+    console.log("getConnectionContainerOfNeed");
     if (typeof needUri === "undefined" || needUri == null) {
       throw { message: "getConnectionsUri: needUri must not be null" };
     }
@@ -1680,6 +1739,7 @@ import won from "./won.js";
    * @param fetchParams See `ensureLoaded`.
    */
   won.getEventsOfConnection = function(connectionUri, fetchParams) {
+    console.log("getEventsOfConnection");
     return won
       .getEventUrisOfConnection(connectionUri, fetchParams)
       .then(eventUris =>
@@ -1696,6 +1756,7 @@ import won from "./won.js";
    * @param fetchParams See `ensureLoaded`.
    */
   won.getRawEventsOfConnection = async function(connectionUri, fetchParams) {
+    console.log("getRawEventsOfConnection");
     const eventUris = won.getEventUrisOfConnection(connectionUri, fetchParams);
     return urisToLookupMap(eventUris, eventUri =>
       won.getRawEvent(eventUri, fetchParams)
@@ -1708,6 +1769,7 @@ import won from "./won.js";
    * @param fetchParams See `ensureLoaded`.
    */
   won.getWonMessagesOfConnection = async function(connectionUri, fetchParams) {
+    console.log("getWonMessagesOfConnection");
     const eventUris = await won.getEventUrisOfConnection(
       connectionUri,
       fetchParams
@@ -1724,6 +1786,7 @@ import won from "./won.js";
    * @returns promise for an array strings (the uris)
    */
   won.getEventUrisOfConnection = function(connectionUri, fetchParams) {
+    console.log("getEventUrisOfConnection");
     return won
       .getConnectionWithEventUris(connectionUri, fetchParams)
       .then(connection => connection.hasEvents);
@@ -1735,6 +1798,7 @@ import won from "./won.js";
    * @return {*} the connections predicates along with the uris of associated events
    */
   won.getConnectionWithEventUris = function(connectionUri, fetchParams) {
+    console.log("getConnectionWithEventUris");
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -1766,12 +1830,14 @@ import won from "./won.js";
   };
 
   won.getWonMessage = async (eventUri, fetchParams) => {
+    console.log("getWonMessage");
     const rawEvent = await won.getRawEvent(eventUri, fetchParams);
     const wonMessage = await won.wonMessageFromJsonLd(rawEvent);
     return wonMessage;
   };
 
   won.getRawEvent = async (eventUri, fetchParams) => {
+    console.log("getRawEvent");
     await won.ensureLoaded(eventUri, fetchParams);
     const eventGraphs = await Promise.all(
       Array.from(privateData.documentToGraph[eventUri]).map(async graphUri => {
@@ -1825,6 +1891,7 @@ import won from "./won.js";
    * @param {*} fetchParams
    */
   won.getEventNode = async (eventUri, fetchParams) => {
+    console.log("getEventNode");
     const event = await won.getNode(eventUri, fetchParams);
 
     event.rawJsonLd = await won.getRawEvent(eventUri, fetchParams);
@@ -1893,6 +1960,7 @@ import won from "./won.js";
    * @param {*} fetchParams see won.getGraph/won.ensureLoaded
    */
   /*async*/ function addContentGraphTrig(event, fetchParams) {
+    console.log("addContentGraphTrig");
     if (!event.hasContent) {
       return Promise.resolve();
     }
@@ -1953,6 +2021,7 @@ import won from "./won.js";
    * @param fetchParams See `ensureLoaded`.
    */
   won.getNode = function(uri, fetchParams) {
+    console.log("getNode");
     if (!uri) {
       return Promise.reject({ message: "getNode: uri must not be null" });
     }
@@ -2039,6 +2108,7 @@ import won from "./won.js";
    * from all graphs.
    */
   won.deleteDocumentFromStore = function(documentUri, removeCacheItem = true) {
+    console.log("deleteDocumentFromStore");
     return won
       .getCachedGraphTriples(documentUri) // this retrieval requires addJsonLdData to save everything as a special graph equal to the documentUri
       .catch(e => {
@@ -2103,6 +2173,7 @@ import won from "./won.js";
    * @param {string} graphUri if omitted, will remove from default graph
    */
   won.deleteTriples = function(triples, graphUri) {
+    console.log("deleteTriples");
     return new Promise(resolve => {
       const callback = success => {
         if (!success) {
@@ -2132,6 +2203,7 @@ import won from "./won.js";
    * reads on the rdf store if called without a read lock.
    */
   won.deleteNode = function(uri, removeCacheItem = true) {
+    console.log("deleteNode");
     if (typeof uri === "undefined" || uri == null) {
       throw { message: "deleteNode: uri must not be null" };
     }
@@ -2160,6 +2232,7 @@ import won from "./won.js";
     graphUri,
     removeAtGraphTriples = true
   ) {
+    console.log("getCachedGraphTriples");
     const graph = await rdfStoreGetGraph(privateData.store, graphUri);
 
     if (removeAtGraphTriples) {
@@ -2181,6 +2254,7 @@ import won from "./won.js";
    * @param {*} graphUri
    */
   function rdfStoreGetGraph(store, graphUri) {
+    console.log("rdfStoreGetGraph");
     return new Promise(resolve => {
       const callback = (success, graph) => {
         if (success) {
@@ -2209,12 +2283,14 @@ import won from "./won.js";
    * @param {*} fetchParams params necessary for fetching that document
    */
   won.getGraph = async function(graphUri, documentUri, fetchParams) {
+    console.log("getGraph");
     return won
       .ensureLoaded(documentUri, fetchParams)
       .then(() => won.getCachedGraphTriples(graphUri));
   };
 
   won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
+    console.log("getConnectionWithOwnAndRemoteNeed");
     return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
       for (let connectionUri of Object.keys(connections)) {
         if (connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
@@ -2240,6 +2316,7 @@ import won from "./won.js";
     baseUri,
     requesterWebId
   ) {
+    console.log("executeCrawlableQuery");
     const relevantResources = [];
     const recursionData = {};
     const MAX_RECURSIONS = 10;
@@ -2286,6 +2363,7 @@ import won from "./won.js";
       baseUri,
       relevantResources
     ) {
+      console.log("resolvePropertyPathsFromBaseUri");
       //console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
       const locks = getReadUpdateLocksPerUris(relevantResources);
       const promises = acquireReadLocks(locks);
@@ -2318,6 +2396,7 @@ import won from "./won.js";
     };
 
     const resolveOrExecuteQuery = function resolveOrExecuteQuery(resolvedUris) {
+      console.log("resolveOrExecuteQuery");
       if (won.isNull(recursionData.depth)) {
         recursionData.depth = 0;
       }
@@ -2478,6 +2557,12 @@ import won from "./won.js";
  * @param {String} graphUri
  */
 export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
+  console.log(
+    "loadIntoRdfStore: mediaType: ",
+    mediaType,
+    "graphUri: ",
+    graphUri
+  );
   return new Promise(resolve => {
     const callback = (success, results) => {
       if (success) {
@@ -2505,6 +2590,7 @@ export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
  * @param {*} sparqlQuery
  */
 export async function executeQueryOnRdfStore(store, sparqlQuery) {
+  console.log("executeQueryOnRdfStore");
   return new Promise((resolve, reject) =>
     store.execute(sparqlQuery, (success, results) => {
       if (success) {
@@ -2523,6 +2609,7 @@ window.groupByGraphs4dbg = groupByGraphs;
  * @param {*} addDefaultContext
  */
 function groupByGraphs(jsonldData, addDefaultContext = true) {
+  console.log("groupByGraphs");
   const context = addDefaultContext
     ? Object.assign(clone(won.defaultContext), jsonldData["@context"])
     : jsonldData["@context"];
