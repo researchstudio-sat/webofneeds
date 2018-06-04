@@ -1273,7 +1273,7 @@ import won from "./won.js";
   }
 
   function dropUnnecessaryTriples(store, graph, roots) {
-    console.log("dropUnnecessaryTriples");
+    console.log("dropUnnecessaryTriples: roots: ", roots);
     ("use strict");
     let usedProperties = collectProperties(store, roots);
     //let usedPropertiesString = usedProperties.reduce( (acc, val) => acc + val);
@@ -1285,7 +1285,7 @@ import won from "./won.js";
   }
 
   function collectProperties(store, node) {
-    console.log("collectProperties");
+    console.log("collectProperties, node:", node);
     let usedProperties = [];
     if (Array.isArray(node)) {
       node.forEach(element => {
