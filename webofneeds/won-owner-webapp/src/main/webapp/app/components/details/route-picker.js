@@ -6,7 +6,6 @@ import {
   searchNominatim,
   reverseSearchNominatim,
   nominatim2draftLocation,
-  leafletBoundsAny,
   delay,
   getIn,
 } from "../../utils.js";
@@ -189,8 +188,11 @@ function genComponentConf() {
 
         this.placeMarkers(markedLocations);
         this.map.fitBounds(
-          leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
-          { animate: true }
+          this.getBoundCoords([this.fromAddedLocation, this.toAddedLocation]),
+          {
+            animate: true,
+            maxZoom: 14,
+          }
         );
 
         this.$scope.$apply();
@@ -226,8 +228,11 @@ function genComponentConf() {
       this.placeMarkers(markers);
       this.markers[0].openPopup();
       this.map.fitBounds(
-        leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
-        { animate: true }
+        this.getBoundCoords([location, this.toAddedLocation]),
+        {
+          animate: true,
+          maxZoom: 14,
+        }
       );
     }
 
@@ -254,8 +259,11 @@ function genComponentConf() {
       this.placeMarkers(markers);
       this.markers[0].openPopup();
       this.map.fitBounds(
-        leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
-        { animate: true }
+        this.getBoundCoords([location, this.fromAddedLocation]),
+        {
+          animate: true,
+          maxZoom: 14,
+        }
       );
     }
 
@@ -317,6 +325,16 @@ function genComponentConf() {
           });
         });
       }
+    }
+
+    getBoundCoords(locations) {
+      let coords = [];
+      for (let location of locations) {
+        if (location) {
+          coords.push(new L.LatLng(location.lat, location.lng));
+        }
+      }
+      return coords;
     }
 
     placeMarkers(locations) {

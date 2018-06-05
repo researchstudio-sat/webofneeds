@@ -623,48 +623,6 @@ export function leafletBounds(location) {
   }
 }
 
-/**
- * Determines a leaflet bounding box for an arbitrary number of locations.
- * Returns latitude and longitude of the bounding corners.
- */
-export function leafletBoundsAny(locations) {
-  let nwCorner = { lat: undefined, lng: undefined };
-  let seCorner = { lat: undefined, lng: undefined };
-
-  for (let location of locations) {
-    if (location) {
-      if (!nwCorner.lat || location.nwCorner.lat > nwCorner.lat) {
-        nwCorner.lat = location.nwCorner.lat;
-      }
-      if (!nwCorner.lng || location.nwCorner.lng > nwCorner.lng) {
-        nwCorner.lng = location.nwCorner.lng;
-      }
-      if (!seCorner.lat || location.seCorner.lat < seCorner.lat) {
-        seCorner.lat = location.seCorner.lat;
-      }
-      if (!seCorner.lng || location.seCorner.lng < seCorner.lng) {
-        seCorner.lng = location.seCorner.lng;
-      }
-    }
-  }
-
-  // fallback in case all locations were undefined - shows complete map
-  if (!nwCorner.lat) {
-    nwCorner.lat = 90;
-  }
-  if (!nwCorner.lng) {
-    nwCorner.lng = 180;
-  }
-  if (!seCorner.lat) {
-    seCorner.lat = -90;
-  }
-  if (!seCorner.lng) {
-    seCorner.lng = -180;
-  }
-
-  return [[nwCorner.lat, nwCorner.lng], [seCorner.lat, seCorner.lng]];
-}
-
 function fetchJSON(url) {
   return fetch(url, {
     method: "get",
