@@ -139,20 +139,20 @@ function genComponentConf() {
 
       this.travelAction = {};
 
-      this.fromAddedLocation = this.initialFromLocation;
+      this.fromAddedLocation = undefined;
       this.fromPreviousLocation = undefined;
       this.fromShowResetButton = false;
 
-      this.toAddedLocation = this.initialToLocation;
+      this.toAddedLocation = undefined;
       this.toPreviousLocation = undefined;
       this.toShowResetButton = false;
+
+      // only works if we have access to the current location
+      this.determineCurrentLocation();
 
       // needs to happen after constructor finishes, otherwise
       // the component's callbacks won't be registered.
       delay(0).then(() => this.showInitialLocations());
-
-      // only works if we have access to the current location
-      this.determineCurrentLocation();
 
       this.typingBuffer(e => this.doneTypingFrom(e), this.fromTextfield(), 300);
       this.typingBuffer(e => this.doneTypingTo(e), this.toTextfield(), 300);
@@ -443,7 +443,7 @@ function genComponentConf() {
             const geoZoom = 13; // TODO: use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
             // center map around geolocation only if there's no initial location
-            if (!this.initialFromLocation) {
+            if (!this.initialTravelAction) {
               this.map.setZoom(geoZoom);
               this.map.panTo([geoLat, geoLng]);
             }
