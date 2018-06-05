@@ -1115,6 +1115,18 @@ export function generateHexColor(text) {
   return "#" + ("00000".substring(0, 6 - c.length) + c);
 }
 
+export function generateRgbColorArray(text) {
+  if (!text) return [0, 0, 0];
+  const hexStr = generateHexColor(text);
+  const colorArray = [
+    // ignore first char, as that's the `#`
+    hexStr.slice(1, 3),
+    hexStr.slice(3, 5),
+    hexStr.slice(5, 7),
+  ].map(hexColor => parseInt(hexColor, 16));
+  return colorArray;
+}
+
 export function generateTitleCharacter(title) {
   if (title) {
     try {

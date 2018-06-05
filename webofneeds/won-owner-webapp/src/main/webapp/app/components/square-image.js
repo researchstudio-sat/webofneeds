@@ -1,6 +1,6 @@
 import angular from "angular";
 
-import { attach, generateHexColor } from "../utils.js";
+import { attach, generateRgbColorArray } from "../utils.js";
 
 import Identicon from "identicon.js";
 window.Identicon4dbg = Identicon;
@@ -23,21 +23,19 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
 
-      // TODO change so it takes a palette and then use for identicons
-      this.generateHexColor = generateHexColor;
-
       this.$scope.$watch("self.uri", newVal => this.updateIdenticon(newVal));
     }
 
     updateIdenticon(input) {
       if (!input) return;
       // quick extra hash here as identicon.js only uses first 15
-      // chars (which wouldn't work for our uris):
+      // chars (which aren't very unique for our uris due to the base-url):
       const hash = new shajs.sha512().update(input).digest("hex");
+      const rgbColorArray = generateRgbColorArray(hash);
       const idc = new Identicon(hash, {
         size: 100,
         foreground: [255, 255, 255, 255], // rgba white
-        background: [40, 40, 40, 255], // rgba dark gray
+        background: [...rgbColorArray, 255], // rgba
         margin: 0.2,
         format: "svg",
       });
