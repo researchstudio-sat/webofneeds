@@ -661,6 +661,13 @@ won.appendStrippingDuplicates = function(array1, array2, comparatorFun) {
   return array1;
 };
 
+function context2ttlPrefixes(jsonldContext) {
+  return Object.entries(jsonldContext)
+    .filter(([, uri]) => is("String", uri))
+    .map(([prefix, uri]) => `@prefix ${prefix}: <${uri}>.`)
+    .join("\n");
+}
+
 won.minimalContext = {
   msg: "http://purl.org/webofneeds/message#",
   won: "http://purl.org/webofneeds/model#",
@@ -668,44 +675,30 @@ won.minimalContext = {
   agr: "http://purl.org/webofneeds/agreement#",
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
 };
-won.minimalTurtlePrefixes =
-  "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
-  "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
-  "@prefix agr: <http://purl.org/webofneeds/agreement#>.\n" +
-  "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
-  "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
+won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
 
 won.defaultContext = {
+  ...won.minimalContext,
   webID: "http://www.example.com/webids/",
-  msg: "http://purl.org/webofneeds/message#",
   dc: "http://purl.org/dc/elements/1.1/",
   rdfs: "http://www.w3.org/2000/01/rdf-schema#",
   geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
   xsd: "http://www.w3.org/2001/XMLSchema#",
-  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  won: "http://purl.org/webofneeds/model#",
-  agr: "http://purl.org/webofneeds/agreement#",
   gr: "http://purl.org/goodrelations/v1#",
   ldp: "http://www.w3.org/ns/ldp#",
-  rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
+  sig: "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
+  sioc: "http://rdfs.org/sioc/ns#",
+  dct: "http://purl.org/dc/terms/",
+  cert: "http://www.w3.org/ns/auth/cert#",
+  woncrypt: "http://purl.org/webofneeds/woncrypt#",
+  s: "http://schema.org/",
   "msg:hasMessageType": {
     "@id": "http://purl.org/webofneeds/message#hasMessageType",
     "@type": "@id",
   },
 };
-won.defaultTurtlePrefixes =
-  "@prefix webID: <http://www.example.com/webids/>.\n" +
-  "@prefix msg: <http://purl.org/webofneeds/message#>.\n" +
-  "@prefix dc: <http://purl.org/dc/elements/1.1/>.\n" +
-  "@prefix agr: <http://purl.org/webofneeds/agreement#>.\n" +
-  "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n" +
-  "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.\n" +
-  "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n" +
-  "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n" +
-  "@prefix won: <http://purl.org/webofneeds/model#>.\n" +
-  "@prefix gr: <http://purl.org/goodrelations/v1#>.\n" +
-  "@prefix ldp: <http://www.w3.org/ns/ldp#>.\n" +
-  "@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1/>.\n";
+/** ttl-prefixes e.g. `@prefix msg: <http://purl.org/webofneeds/message#>.\n @prefix...` */
+won.defaultTurtlePrefixes = context2ttlPrefixes(won.defaultContext);
 
 won.JsonLdHelper = {
   /**
