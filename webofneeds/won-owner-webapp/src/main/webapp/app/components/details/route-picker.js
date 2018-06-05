@@ -137,6 +137,8 @@ function genComponentConf() {
       // debug output
       window.rp4dbg = this;
 
+      this.travelAction = {};
+
       this.fromAddedLocation = this.initialFromLocation;
       this.fromPreviousLocation = undefined;
       this.fromShowResetButton = false;
@@ -167,30 +169,32 @@ function genComponentConf() {
     }
 
     showInitialLocations() {
-      this.fromAddedLocation = this.initialFromLocation;
-      this.toAddedLocation = this.initialToLocation;
+      if (this.initialTravelAction) {
+        this.fromAddedLocation = this.initialTravelAction.fromLocation;
+        this.toAddedLocation = this.initialTravelAction.toLocation;
 
-      let markedLocations = [];
+        let markedLocations = [];
 
-      if (this.initialFromLocation) {
-        markedLocations.push(this.initialFromLocation);
-        this.fromShowResetButton = true;
-        this.fromTextfield().value = this.initialFromLocation.name;
+        if (this.initialTravelAction.fromLocation) {
+          markedLocations.push(this.initialTravelAction.fromLocation);
+          this.fromShowResetButton = true;
+          this.fromTextfield().value = this.initialTravelAction.fromLocation.name;
+        }
+
+        if (this.initialTravelAction.toLocation) {
+          markedLocations.push(this.initialTravelAction.toLocation);
+          this.toShowResetButton = true;
+          this.toTextfield().value = this.initialTravelAction.toLocation.name;
+        }
+
+        this.placeMarkers(markedLocations);
+        this.map.fitBounds(
+          leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
+          { animate: true }
+        );
+
+        this.$scope.$apply();
       }
-
-      if (this.initialToLocation) {
-        markedLocations.push(this.initialToLocation);
-        this.toShowResetButton = true;
-        this.toTextfield().value = this.initialToLocation.name;
-      }
-
-      this.placeMarkers(markedLocations);
-      this.map.fitBounds(
-        leafletBoundsAny([this.fromAddedLocation, this.toAddedLocation]),
-        { animate: true }
-      );
-
-      this.$scope.$apply();
     }
 
     // TODO: implement
@@ -201,9 +205,10 @@ function genComponentConf() {
 
     selectedFromLocation(location) {
       // save new location value
+      this.travelAction.fromLocation = location;
+      this.travelAction.toLocation = this.toAddedLocation;
       this.onRouteUpdated({
-        fromLocation: location,
-        toLocation: this.toAddedLocation,
+        travelAction: this.travelAction,
       });
       this.fromAddedLocation = location;
 
@@ -228,9 +233,10 @@ function genComponentConf() {
 
     selectedToLocation(location) {
       // save new location value
+      this.travelAction.fromLocation = this.fromAddedLocation;
+      this.travelAction.toLocation = location;
       this.onRouteUpdated({
-        fromLocation: this.fromAddedLocation,
-        toLocation: location,
+        travelAction: this.travelAction,
       });
       this.toAddedLocation = location;
 
@@ -348,9 +354,10 @@ function genComponentConf() {
       this.fromShowResetButton = false;
       this.fromTextfield().value = "";
 
+      this.travelAction.fromLocation = undefined;
+      this.travelAction.toLocation = this.toAddedLocation;
       this.onRouteUpdated({
-        fromLocation: undefined,
-        toLocation: this.toAddedLocation,
+        travelAction: this.travelAction,
       });
 
       this.checkValidity();
@@ -369,9 +376,10 @@ function genComponentConf() {
       this.toShowResetButton = false;
       this.toTextfield().value = "";
 
+      this.travelAction.fromLocation = this.fromAddedLocation;
+      this.travelAction.toLocation = undefined;
       this.onRouteUpdated({
-        fromLocation: this.fromAddedLocation,
-        toLocation: undefined,
+        travelAction: this.travelAction,
       });
 
       this.checkValidity();
@@ -519,8 +527,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       onRouteUpdated: "&",
-      initialFromLocation: "=",
-      initialToLocation: "=",
+      initialTravelAction: "=",
     },
     template: template,
   };

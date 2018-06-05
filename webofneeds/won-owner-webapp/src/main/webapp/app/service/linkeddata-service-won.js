@@ -1075,31 +1075,16 @@ import won from "./won.js";
               ],
             },
             {
-              node: "won:hasFromLocation",
+              node: "s:travelAction",
               children: [
-                { node: "s:name" },
                 { node: "rdf:type" },
                 {
-                  node: "s:geo",
+                  node: "s:fromLocation",
                   children: [
                     { node: "rdf:type" },
-                    { node: "s:latitude" },
-                    { node: "s:longitude" },
-                  ],
-                },
-                {
-                  node: "won:hasBoundingBox",
-                  children: [
+                    { node: "s:name" },
                     {
-                      node: "won:hasNorthWestCorner",
-                      children: [
-                        { node: "rdf:type" },
-                        { node: "s:latitude" },
-                        { node: "s:longitude" },
-                      ],
-                    },
-                    {
-                      node: "won:hasSouthEastCorner",
+                      node: "s:geo",
                       children: [
                         { node: "rdf:type" },
                         { node: "s:latitude" },
@@ -1108,34 +1093,13 @@ import won from "./won.js";
                     },
                   ],
                 },
-              ],
-            },
-            {
-              node: "won:hasToLocation",
-              children: [
-                { node: "s:name" },
-                { node: "rdf:type" },
                 {
-                  node: "s:geo",
+                  node: "s:toLocation",
                   children: [
                     { node: "rdf:type" },
-                    { node: "s:latitude" },
-                    { node: "s:longitude" },
-                  ],
-                },
-                {
-                  node: "won:hasBoundingBox",
-                  children: [
+                    { node: "s:name" },
                     {
-                      node: "won:hasNorthWestCorner",
-                      children: [
-                        { node: "rdf:type" },
-                        { node: "s:latitude" },
-                        { node: "s:longitude" },
-                      ],
-                    },
-                    {
-                      node: "won:hasSouthEastCorner",
+                      node: "s:geo",
                       children: [
                         { node: "rdf:type" },
                         { node: "s:latitude" },
@@ -1192,31 +1156,16 @@ import won from "./won.js";
               ],
             },
             {
-              node: "won:hasFromLocation",
+              node: "s:travelAction",
               children: [
-                { node: "s:name" },
                 { node: "rdf:type" },
                 {
-                  node: "s:geo",
+                  node: "s:fromLocation",
                   children: [
                     { node: "rdf:type" },
-                    { node: "s:latitude" },
-                    { node: "s:longitude" },
-                  ],
-                },
-                {
-                  node: "won:hasBoundingBox",
-                  children: [
+                    { node: "s:name" },
                     {
-                      node: "won:hasNorthWestCorner",
-                      children: [
-                        { node: "rdf:type" },
-                        { node: "s:latitude" },
-                        { node: "s:longitude" },
-                      ],
-                    },
-                    {
-                      node: "won:hasSouthEastCorner",
+                      node: "s:geo",
                       children: [
                         { node: "rdf:type" },
                         { node: "s:latitude" },
@@ -1225,34 +1174,13 @@ import won from "./won.js";
                     },
                   ],
                 },
-              ],
-            },
-            {
-              node: "won:hasToLocation",
-              children: [
-                { node: "s:name" },
-                { node: "rdf:type" },
                 {
-                  node: "s:geo",
+                  node: "s:toLocation",
                   children: [
                     { node: "rdf:type" },
-                    { node: "s:latitude" },
-                    { node: "s:longitude" },
-                  ],
-                },
-                {
-                  node: "won:hasBoundingBox",
-                  children: [
+                    { node: "s:name" },
                     {
-                      node: "won:hasNorthWestCorner",
-                      children: [
-                        { node: "rdf:type" },
-                        { node: "s:latitude" },
-                        { node: "s:longitude" },
-                      ],
-                    },
-                    {
-                      node: "won:hasSouthEastCorner",
+                      node: "s:geo",
                       children: [
                         { node: "rdf:type" },
                         { node: "s:latitude" },

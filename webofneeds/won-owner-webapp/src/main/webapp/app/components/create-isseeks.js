@@ -16,8 +16,7 @@ const emptyDraft = deepFreeze({
   description: "",
   tags: [],
   location: undefined,
-  fromLocation: undefined,
-  toLocation: undefined,
+  travelAction: undefined,
   thumbnail: undefined,
   matchingContext: undefined,
 });
@@ -155,11 +154,11 @@ function genComponentConf() {
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
+            <!-- FROM A TO B -->
             <won-route-picker
               ng-if="self.openDetail === 'route'"
-              initial-from-location="::self.draftObject.fromLocation"
-              initial-to-location="::self.draftObject.toLocation"
-              on-route-updated="::self.updateRoute(fromLocation, toLocation)">
+              initial-travel-action="::self.draftObject.travelAction"
+              on-route-updated="::self.updateRoute(travelAction)">
             </won-route-picker>
 
             <!-- TAGS -->
@@ -220,8 +219,7 @@ function genComponentConf() {
         this.draftObject.description = undefined;
       }
       if (!this.details.has("route")) {
-        this.draftObject.fromLocation = undefined;
-        this.draftObject.toLocation = undefined;
+        this.draftObject.travelAction = undefined;
       }
 
       this.onUpdate({ draft: this.draftObject });
@@ -266,17 +264,18 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    updateRoute(fromLocation, toLocation) {
-      if (fromLocation || toLocation) {
+    updateRoute(travelAction) {
+      if (
+        travelAction &&
+        (travelAction.fromLocation || travelAction.toLocation)
+      ) {
         if (!this.details.has("route")) {
           this.details.add("route");
         }
-        this.draftObject.fromLocation = fromLocation;
-        this.draftObject.toLocation = toLocation;
+        this.draftObject.travelAction = travelAction;
       } else if (this.details.has("route")) {
         this.details.delete("route");
-        this.draftObject.fromLocation = undefined;
-        this.draftObject.toLocation = undefined;
+        this.draftObject.travelAction = undefined;
       }
 
       this.updateDraft();
