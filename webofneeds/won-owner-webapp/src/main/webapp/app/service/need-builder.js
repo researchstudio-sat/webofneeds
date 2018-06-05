@@ -182,7 +182,7 @@ import won from "./won.js";
                     },
                   },
           },
-      "s:travelAction": !isOrSeeksData.travelAction
+      "won:travelAction": !isOrSeeksData.travelAction
         ? undefined
         : {
             "@type": "s:travelAction",

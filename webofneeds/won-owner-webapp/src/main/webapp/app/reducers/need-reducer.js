@@ -1133,8 +1133,8 @@ function parseNeed(jsonldNeed, ownNeed) {
         location: is.get("won:hasLocation")
           ? parseLocation(is.get("won:hasLocation"))
           : undefined,
-        travelAction: is.get("s:travelAction")
-          ? is.get("s:travelAction")
+        travelAction: is.get("won:travelAction")
+          ? is.get("won:travelAction")
           : undefined,
       };
     }
@@ -1155,8 +1155,8 @@ function parseNeed(jsonldNeed, ownNeed) {
         location: seeks.get("won:hasLocation")
           ? parseLocation(seeks.get("won:hasLocation"))
           : undefined,
-        travelAction: seeks.get("s:travelAction")
-          ? seeks.get("s:travelAction")
+        travelAction: seeks.get("won:travelAction")
+          ? seeks.get("won:travelAction")
           : undefined,
       };
     }

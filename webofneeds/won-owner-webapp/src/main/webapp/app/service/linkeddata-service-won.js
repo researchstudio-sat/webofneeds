@@ -1075,7 +1075,7 @@ import won from "./won.js";
               ],
             },
             {
-              node: "s:travelAction",
+              node: "won:travelAction",
               children: [
                 { node: "rdf:type" },
                 {
@@ -1156,7 +1156,7 @@ import won from "./won.js";
               ],
             },
             {
-              node: "s:travelAction",
+              node: "won:travelAction",
               children: [
                 { node: "rdf:type" },
                 {
