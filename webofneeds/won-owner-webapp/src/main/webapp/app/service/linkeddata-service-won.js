@@ -1636,7 +1636,7 @@ import won from "./won.js";
           needUri,
           requesterWebId
         )
-        .then(result => result.map(x => x.connection.value));
+        .then(result => result.map(x => x.connectionUri.value));
     } else {
       return won
         .executeCrawlableQuery(
@@ -1644,7 +1644,7 @@ import won from "./won.js";
           needUri,
           requesterWebId
         )
-        .then(result => result.map(x => x.connection.value));
+        .then(result => result.map(x => x.connectionUri.value));
     }
   };
 
@@ -2414,11 +2414,6 @@ import won from "./won.js";
         {
           prefixes:
             "prefix " +
-            won.WONMSG.prefix +
-            ": <" +
-            won.WONMSG.baseUri +
-            "> " +
-            "prefix " +
             won.WON.prefix +
             ": <" +
             won.WON.baseUri +
@@ -2428,11 +2423,6 @@ import won from "./won.js";
         },
         {
           prefixes:
-            "prefix " +
-            won.WONMSG.prefix +
-            ": <" +
-            won.WONMSG.baseUri +
-            "> " +
             "prefix " +
             won.WON.prefix +
             ": <" +
@@ -2446,29 +2436,18 @@ import won from "./won.js";
         "prefix msg: <http://purl.org/webofneeds/message#> \n" +
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connection ?need ?remoteNeed ?connectionState  \n" +
+        "select ?connectionUri \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
         "           won:hasConnections ?connections.\n" +
-        "  ?connections rdfs:member ?connection. \n" +
-        "  ?connection won:belongsToNeed ?need; \n" +
-        "              won:hasRemoteNeed ?remoteNeed; \n" +
-        "                  won:hasConnectionState ?connectionState. \n" +
+        "  ?connections rdfs:member ?connectionUri. \n" +
         "} \n",
     },
-    /**
-     * Despite the name, returns the connections fo the specified need themselves. TODO rename
-     */
     getUnclosedConnectionUrisOfActiveNeed: {
       propertyPaths: [
         {
           prefixes:
             "prefix " +
-            won.WONMSG.prefix +
-            ": <" +
-            won.WONMSG.baseUri +
-            "> " +
-            "prefix " +
             won.WON.prefix +
             ": <" +
             won.WON.baseUri +
@@ -2479,11 +2458,6 @@ import won from "./won.js";
         },
         {
           prefixes:
-            "prefix " +
-            won.WONMSG.prefix +
-            ": <" +
-            won.WONMSG.baseUri +
-            "> " +
             "prefix " +
             won.WON.prefix +
             ": <" +
@@ -2498,15 +2472,13 @@ import won from "./won.js";
         "prefix msg: <http://purl.org/webofneeds/message#> \n" +
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-        "select ?connection ?need ?remoteNeed ?connectionState  \n" +
+        "select ?connectionUri \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
         "           won:hasConnections ?connections; \n" +
         "           won:isInState ?needState.\n " +
-        "  ?connections rdfs:member ?connection. \n" +
-        "  ?connection won:belongsToNeed ?need; \n" +
-        "              won:hasRemoteNeed ?remoteNeed; \n" +
-        "                  won:hasConnectionState ?connectionState. \n" +
+        "  ?connections rdfs:member ?connectionUri. \n" +
+        "  ?connectionUri won:hasConnectionState ?connectionState. \n" +
         "  filter ( ?connectionState != won:Closed && ?needState = won:Active) \n" +
         "} \n",
     },
