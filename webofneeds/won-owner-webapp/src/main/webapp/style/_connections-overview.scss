@@ -90,9 +90,9 @@ won-connections-overview {
           @include speech-bubble-right(
             white,
             $won-line-gray,
-            0.625rem,
+            $speechBubbleTailSize,
             $thinBorderWidth,
-            1.5rem
+            50%
           );
         }
       }

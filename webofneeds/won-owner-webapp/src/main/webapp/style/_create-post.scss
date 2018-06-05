@@ -27,6 +27,9 @@ won-create-post {
     min-width: 0;
     align-items: center;
 
+    // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
+    padding-left: 0.5rem;
+
     &__title {
       grid-area: header_title;
       color: $won-subtitle-gray;

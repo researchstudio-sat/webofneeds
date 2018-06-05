@@ -6,7 +6,7 @@
 @import "speech-bubble";
 
 won-connection-selection-item {
-  $triangleCutoutSize: 0.625rem;
+  $triangleCutoutSize: $speechBubbleTailSize;
   $padding: 0.5rem;
   display: block;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
@@ -22,7 +22,7 @@ won-connection-selection-item {
     $won-line-gray,
     $triangleCutoutSize,
     $thinBorderWidth,
-    1.5rem,
+    50%,
     "before" /* needed so there can be another tail*/
   );
 
@@ -65,9 +65,9 @@ won-connection-selection-item {
     @include speech-bubble-right(
       white,
       $won-line-gray,
-      0.625rem,
+      $speechBubbleTailSize,
       $thinBorderWidth,
-      1.5rem
+      50%
     );
     border-top: $thinGrayBorder;
     border-bottom: $thinGrayBorder;

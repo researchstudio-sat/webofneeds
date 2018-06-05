@@ -17,8 +17,9 @@
       rgba(0, 0, 0, 0) 50%,
       $background-color 50%
     );
-    $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
-    $size: sqrt($sizeSq) * extractUnit($triangle-height);
+    // $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
+    // $size: sqrt($sizeSq) * extractUnit($triangle-height);
+    $size: sizeOfSquare($triangle-height);
     height: $size;
     width: $size;
     border-color: $border-color;
@@ -53,7 +54,8 @@
     $pos
   );
   &:after {
-    left: $pos;
+    // shifted so pos is around the tip
+    left: calc(#{$pos} - #{sizeOfSquare($triangle-height) / 2});
     transform: rotate(
       45deg
     ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
@@ -81,7 +83,8 @@
     $pos
   );
   &:after {
-    left: $pos;
+    // shifted so pos is around the tip
+    left: calc(#{$pos} - #{sizeOfSquare($triangle-height) / 2});
     transform: rotate(
       225deg
     ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
@@ -109,7 +112,8 @@
     $pos
   );
   &:after {
-    top: $pos;
+    // shifted so pos is around the tip
+    top: calc(#{$pos} - #{sizeOfSquare($triangle-height) / 2});
     transform: rotate(-45deg);
     /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
@@ -141,7 +145,8 @@
     $whichPseudoElem
   );
   &:#{$whichPseudoElem} {
-    top: $pos;
+    // shifted so pos is around the tip
+    top: calc(#{$pos} - #{sizeOfSquare($triangle-height) / 2});
     transform: rotate(135deg);
     /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
@@ -168,7 +173,8 @@
     $pos
   );
   &:after {
-    top: $pos;
+    // shifted so pos is around the tip
+    top: calc(#{$pos} - #{sizeOfSquare($triangle-height) / 2});
     transform: rotate(135deg);
     /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
