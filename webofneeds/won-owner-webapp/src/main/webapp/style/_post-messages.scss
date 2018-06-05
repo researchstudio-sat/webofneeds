@@ -53,6 +53,10 @@
     box-sizing: border-box;
     padding: $gridRowGap;
 
+    &.chattextfield_android {
+      grid-template-rows: min-content minmax(5rem, 1fr) min-content;
+    }
+
     .pm__header {
       display: grid;
       grid-template-columns: auto 1fr auto;
