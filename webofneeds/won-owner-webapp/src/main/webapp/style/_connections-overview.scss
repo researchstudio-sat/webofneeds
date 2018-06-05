@@ -17,11 +17,6 @@ won-connections-overview {
     border-right: $thinGrayBorder;
     border-bottom: $thinGrayBorder;
 
-    &--withconn {
-      .co__item__need {
-        border-bottom: $thinGrayBorder;
-      }
-    }
     @media (max-width: $responsivenessBreakPoint) {
       border-left: none;
       border-right: none;

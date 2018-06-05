@@ -35,11 +35,14 @@ won-connection-selection-item {
     margin-left: 0.5rem;
   }
 
-  $invisibleBorder: $thinBorderWidth solid white;
+  $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;
-  border-top: $invisibleBorder; // this is necessary so that the view does not "jump" when selecting an item
-  border-bottom: $invisibleBorder;
-  // this is necessary so that the view does not "jump" when selecting an item
+  &:not(:first-child) {
+    border-top: $thinGrayBorder;
+  }
+  &:not(:last-child) {
+    border-top: $thinGrayBorder;
+  }
 
   won-connection-state {
     position: absolute;
@@ -69,23 +72,5 @@ won-connection-selection-item {
       $thinBorderWidth,
       50%
     );
-    border-top: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-  }
-  &:first-child .selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $invisibleBorder;
-  }
-  &:not(:first-child) .selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $thinGrayBorder;
-  }
-  &:last-child .selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-bottom: $invisibleBorder;
-  }
-  &:not(:last-child) .selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-bottom: $thinGrayBorder;
   }
 }
