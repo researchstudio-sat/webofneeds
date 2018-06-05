@@ -16,7 +16,7 @@ function genComponentConf() {
         ng-if="self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'signup') }}"
         class="won-button--outlined thin red show-in-responsive">
-        Transfer Account
+        Sign up
     </a>
     <a
         ng-if="!self.isPrivateIdUser"
