@@ -85,21 +85,6 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
-        <!-- TODO: move whatsaround functionality somewhere else. i commented out the following code snippet because the fallback ng-if-clause has turned into an oxymoron
-            Excluded due to #1632 https://github.com/researchstudio-sat/webofneeds/issues/1632
-        -->
-        <!--div ng-if="!self.isPost && !self.isSearch">
-            <button type="submit"
-                    class="won-button--filled red"
-                    ng-click="::self.createWhatsAround()">
-                <span ng-show="!self.pendingPublishing">
-                    See What's Around
-                </span>
-                <span ng-show="self.pendingPublishing">
-                    Retrieving What's Around&nbsp;&hellip;
-                </span>
-            </button>
-        </div-->
         <!-- Excluded due to #1627 https://github.com/researchstudio-sat/webofneeds/issues/1627
         Be aware that the styling of these elements is not valid anymore
         <won-labelled-hr label="::'add context?'" class="cp__footer__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
