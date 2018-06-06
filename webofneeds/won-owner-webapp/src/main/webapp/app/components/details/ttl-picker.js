@@ -1,12 +1,12 @@
 import angular from "angular";
-import won from "../won-es6.js";
+import won from "../../won-es6.js";
 //import Immutable from "immutable";
 import {
   attach,
   delay,
   //getIn
-} from "../utils.js";
-import { DomCache } from "../cstm-ng-utils.js";
+} from "../../utils.js";
+import { DomCache } from "../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

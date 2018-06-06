@@ -110,6 +110,13 @@ function genComponentConf() {
                 location: is && is.get("location"),
                 address:
                   is.get("location") && is.get("location").get("address"),
+                travelAction: is && is.get("travelAction"),
+                fromAddress:
+                  is.get("travelAction") &&
+                  is.get("travelAction").get("fromAddress"),
+                toAddress:
+                  is.get("travelAction") &&
+                  is.get("travelAction").get("toAddress"),
               }
             : undefined,
           seeksPart: seeks
@@ -120,6 +127,13 @@ function genComponentConf() {
                 location: seeks && seeks.get("location"),
                 address:
                   seeks.get("location") && seeks.get("location").get("address"),
+                travelAction: seeks && seeks.get("travelAction"),
+                fromAddress:
+                  seeks.get("travelAction") &&
+                  seeks.get("travelAction").get("fromAddress"),
+                toAddress:
+                  seeks.get("travelAction") &&
+                  seeks.get("travelAction").get("toAddress"),
               }
             : undefined,
           post,

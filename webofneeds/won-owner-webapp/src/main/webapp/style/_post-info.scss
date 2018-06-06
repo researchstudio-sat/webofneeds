@@ -7,7 +7,7 @@ won-send-request,
 won-post-info {
   display: grid;
   grid-template-areas: "header" "main" "footer";
-  grid-template-rows: min-content minmax(10rem, 1fr) min-content;
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
   width: 100%;
   max-width: $maxContentWidth;
@@ -18,7 +18,7 @@ won-post-info {
   &.won-post-info--noheader,
   &.won-send-request--noheader {
     grid-template-areas: "main" "footer";
-    grid-template-rows: minmax(10rem, 1fr) min-content;
+    grid-template-rows: minmax($minimalGridRows, 1fr) min-content;
 
     .post-info__content {
       border-top: none;

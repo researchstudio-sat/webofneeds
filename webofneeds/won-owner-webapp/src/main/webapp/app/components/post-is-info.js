@@ -47,22 +47,55 @@ function genComponentConf() {
                 Location
             </h2>
             <p class="post-info__details clickable"
-                ng-show="self.isPart.address"  ng-click="self.toggleMap()">
+               ng-show="self.isPart.address"
+               ng-click="self.toggleMap()">
+               
                 {{ self.isPart.address }}
-				<svg class="post-info__carret">
+
+				        <svg class="post-info__carret">
                   <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
                 </svg>
-				<svg class="post-info__carret" ng-show="!self.showMap">
-	               <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-	            </svg>
+				        <svg class="post-info__carret" ng-show="!self.showMap">
+	                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+	              </svg>
                 <svg class="post-info__carret" ng-show="self.showMap">
                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
             </p>                
             <won-need-map 
-                uri="self.isPart.postUri"
-                is-seeks="self.isPart.isString"
-                ng-if="self.isPart.location && self.showMap">
+              locations="[self.location]"
+              ng-if="self.isPart.location && self.showMap">
+            </won-need-map>
+
+            <h2 class="post-info__heading"
+                ng-show="self.isPart.travelAction">
+                Route
+            </h2>
+            <p class="post-info__details clickable"
+               ng-show="self.isPart.travelAction"
+               ng-click="self.toggleRouteMap()">
+
+              <span ng-if="self.isPart.fromAddress">
+                <strong>From: </strong>{{ self.isPart.fromAddress }}
+              </span>
+              </br>
+              <span ng-if="self.isPart.toAddress">
+              <strong>To: </strong>{{ self.isPart.toAddress }}
+              </span>
+
+              <svg class="post-info__carret">
+                <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
+              </svg>
+              <svg class="post-info__carret" ng-show="!self.showRouteMap">
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+              </svg>
+              <svg class="post-info__carret" ng-show="self.showRouteMap">
+                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+              </svg>
+            </p>
+            <won-need-map
+              locations="self.travelLocations"
+              ng-if="self.isPart.travelAction && self.showRouteMap">
             </won-need-map>
     	`;
 
@@ -74,17 +107,41 @@ function genComponentConf() {
       window.cis4dbg = this;
 
       this.showMap = false;
+      this.showRouteMap = false;
 
-      const selectFromState = () => {
-        return {};
+      // const selectFromState = () => {
+      //   return {};
+      // };
+      const selectFromState = state => {
+        const post =
+          this.isPart &&
+          this.isPart.postUri &&
+          state.getIn(["needs", this.isPart.postUri]);
+        const isSeeksPart = post && post.get(this.isPart.isString);
+
+        const location = isSeeksPart && isSeeksPart.get("location");
+        const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
+
+        return {
+          location: location,
+          travelAction: travelAction,
+          travelLocations: travelAction && [
+            travelAction.get("fromLocation"),
+            travelAction.get("toLocation"),
+          ],
+        };
       };
 
       // Using actionCreators like this means that every action defined there is available in the template.
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, ["self.isPart"], this);
     }
 
     toggleMap() {
       this.showMap = !this.showMap;
+    }
+
+    toggleRouteMap() {
+      this.showRouteMap = !this.showRouteMap;
     }
   }
 

@@ -10,9 +10,6 @@ import won from "./won.js";
 (function() {
   // <need-builder-js> scope
 
-  function hasLocation(args) {
-    return !!args.location;
-  }
   function hasPriceSpecification() {
     return false; //TODO price-specification not fully implemented yet
   }
@@ -147,7 +144,7 @@ import won from "./won.js";
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
-      "won:hasLocation": !hasLocation(isOrSeeksData)
+      "won:hasLocation": !isOrSeeksData.location
         ? undefined
         : {
             "@type": "s:Place",
@@ -184,6 +181,41 @@ import won from "./won.js";
                       ),
                     },
                   },
+          },
+      "won:travelAction": !isOrSeeksData.travelAction
+        ? undefined
+        : {
+            "@type": "s:travelAction",
+            "s:fromLocation": !isOrSeeksData.travelAction.fromLocation
+              ? undefined
+              : {
+                  "@type": "s:Place",
+                  "s:geo": {
+                    "@Type": "s:Geocoordinates",
+                    "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
+                      6
+                    ),
+                    "s:longitude": isOrSeeksData.travelAction.fromLocation.lng.toFixed(
+                      6
+                    ),
+                  },
+                  "s:name": isOrSeeksData.travelAction.fromLocation.name,
+                },
+            "s:toLocation": !isOrSeeksData.travelAction.toLocation
+              ? undefined
+              : {
+                  "@type": "s:Place",
+                  "s:geo": {
+                    "@Type": "s:Geocoordinates",
+                    "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
+                      6
+                    ),
+                    "s:longitude": isOrSeeksData.travelAction.toLocation.lng.toFixed(
+                      6
+                    ),
+                  },
+                  "s:name": isOrSeeksData.travelAction.toLocation.name,
+                },
           },
       //TODO: Different id for is and seeks
       "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)

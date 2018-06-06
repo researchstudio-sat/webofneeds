@@ -4,7 +4,7 @@
 
 import won from "./won-es6.js";
 import Immutable from "immutable";
-import { checkHttpStatus, urisToLookupMap, is, getIn } from "./utils.js";
+import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -339,21 +339,14 @@ export async function buildCreateMessage(needData, wonNodeUri) {
 
   //if type === create -> use needBuilder as well
   const prepareContentNodeData = async needDataIsOrSeeks => ({
-    type: won.toCompacted(needDataIsOrSeeks.type), //mandatory
-    title: needDataIsOrSeeks.title, //mandatory
-    description: needDataIsOrSeeks.description,
-    publishedContentUri: publishedContentUri, //mandatory
-    tags: needDataIsOrSeeks.tags,
-    matchingContext: needDataIsOrSeeks.matchingContext,
+    // Adds all fields from needDataIsOrSeeks:
+    // title, description, tags, matchingContext, location,...
+    ...needDataIsOrSeeks,
 
+    publishedContentUri: publishedContentUri, //mandatory
+    type: won.toCompacted(needDataIsOrSeeks.type), //mandatory
     //TODO attach to either is or seeks?
     attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-
-    location: getIn(needDataIsOrSeeks, ["location"]),
-    whatsAround: needDataIsOrSeeks.whatsAround,
-    whatsNew: needDataIsOrSeeks.whatsNew,
-    noHints: needDataIsOrSeeks.noHints,
-
     arbitraryJsonLd: needDataIsOrSeeks.ttl
       ? await won.ttlToJsonLd(needDataIsOrSeeks.ttl)
       : [],
@@ -425,6 +418,7 @@ export function isSuccessMessage(event) {
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
+  console.log("fetchDataForNonOwnedNeedOnly");
   return won
     .getNeed(needUri)
     .then(need =>
@@ -435,6 +429,7 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 }
 
 export function fetchOwnedData(email, curriedDispatch) {
+  console.log("fetchOwnedData");
   return fetchOwnedNeedUris().then(needUris =>
     fetchDataForOwnedNeeds(needUris, curriedDispatch)
   );
@@ -446,6 +441,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 function fetchOwnedNeedUris() {
+  console.log("fetchOwnedNeedUris");
   return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
     method: "get",
     headers: {
@@ -460,6 +456,7 @@ function fetchOwnedNeedUris() {
 
 // API call to get agreements data for a connection
 export function callAgreementsFetch(url) {
+  console.log("callAgreementsFetch: ", url);
   return fetch(url, {
     method: "get",
     headers: {
@@ -473,6 +470,7 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
+  console.log("callAgreementEventFetch: ", needUri, " eventUri: ", eventUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/linked-data/",
@@ -546,7 +544,7 @@ function fetchAllAccessibleAndRelevantData(
   ]);
 
   return allDataRawPromise.then(
-    ([ownNeeds, connections, /* events, */ theirNeeds]) =>
+    ([ownNeeds, connections, /* events, */ theirNeeds]) => {
       wellFormedPayload({
         ownNeeds,
         connections,
@@ -554,7 +552,8 @@ function fetchAllAccessibleAndRelevantData(
           /* will be loaded later when connection is accessed */
         },
         theirNeeds,
-      })
+      });
+    }
   );
 
   /**
@@ -594,6 +593,7 @@ function fetchAllAccessibleAndRelevantData(
 }
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+  console.log("fetchOwnNeedAndDispatch: ", needUri);
   const needP = won
     .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
@@ -607,6 +607,7 @@ function fetchConnectionAndDispatch(
   cnctUri,
   curriedDispatch = () => undefined
 ) {
+  console.log("fetchConnectionAndDispatch: ", cnctUri);
   const cnctP = won.getNode(cnctUri);
   cnctP.then(connection =>
     curriedDispatch(
@@ -617,6 +618,7 @@ function fetchConnectionAndDispatch(
 }
 
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+  console.log("fetchTheirNeedAndDispatch: ", needUri);
   const needP = won.getNeed(needUri);
   needP.then(need =>
     curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }))

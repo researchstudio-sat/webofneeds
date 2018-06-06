@@ -2,13 +2,11 @@
     <won-topnav></won-topnav>
 </header>
 <main class="connectionscontent">
-    
+
     <!-- LEFT SIDE -->
     <div class="oir__requests" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView}">
-        <won-connections-overview
-            on-selected-connection="self.selectedConnection(connectionUri)",
-            on-selected-need="self.selectedNeed(needUri)",
-            open="self.open">
+        <won-connections-overview on-selected-connection="self.selectedConnection(connectionUri)" , on-selected-need="self.selectedNeed(needUri)"
+            , open="self.open">
         </won-connections-overview>
     </div>
 
