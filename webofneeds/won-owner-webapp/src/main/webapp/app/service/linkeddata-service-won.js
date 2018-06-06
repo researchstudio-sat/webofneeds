@@ -2376,7 +2376,7 @@ import won from "./won.js";
       } else {
         //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
         Array.prototype.push.apply(relevantResources, resolvedUris);
-        const loadedPromises = relevantResources.map(x => {
+        const loadedPromises = resolvedUris.map(x => {
           console.log(
             "ensureLoaded for: ",
             x,
@@ -2392,7 +2392,7 @@ import won from "./won.js";
             resolvePropertyPathsFromBaseUri(
               crawlableQuery.propertyPaths,
               baseUri,
-              relevantResources
+              resolvedUris
             )
           )
           .then(function(newlyResolvedUris) {
@@ -2442,6 +2442,7 @@ import won from "./won.js";
       ],
       query:
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
+        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
         "select ?connectionUri \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
@@ -2476,6 +2477,7 @@ import won from "./won.js";
       ],
       query:
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
+        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
         "select ?connectionUri \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
