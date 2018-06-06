@@ -37,12 +37,7 @@ won-connection-selection-item {
 
   $invisibleBorder: $thinBorderWidth solid $won-light-gray;
   border-left: $thinGrayBorder;
-  &:not(:first-child) {
-    border-top: $thinGrayBorder;
-  }
-  &:not(:last-child) {
-    border-top: $thinGrayBorder;
-  }
+  border-top: $thinGrayBorder;
 
   won-connection-state {
     position: absolute;
