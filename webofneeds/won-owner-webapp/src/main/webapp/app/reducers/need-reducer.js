@@ -9,6 +9,8 @@ import {
   isUriRead,
   markUriAsRead,
   markConnUriAsClosed,
+  addInactiveNeed,
+  removeInactiveNeed,
 } from "../won-localstorage.js";
 
 const initialState = Immutable.fromJS({});
@@ -471,6 +473,16 @@ function addNeed(needs, jsonldNeed, ownNeed) {
     console.error("Tried to add invalid need-object: ", jsonldNeedImm.toJS());
     newState = needs;
   }
+
+  switch (parsedNeed.state) {
+    case won.WON.InactiveCompacted:
+      addInactiveNeed(parsedNeed.get("uri"));
+      break;
+    case won.WON.ActiveCompacted:
+      removeInactiveNeed(parsedNeed.get("uri"));
+      break;
+  }
+
   return newState;
 }
 
@@ -864,6 +876,14 @@ function changeConnectionStateByFun(state, connectionUri, fun) {
 }
 
 function changeNeedState(state, needUri, newState) {
+  switch (newState) {
+    case won.WON.InactiveCompacted:
+      addInactiveNeed(needUri);
+      break;
+    case won.WON.ActiveCompacted:
+      removeInactiveNeed(needUri);
+      break;
+  }
   return state.setIn([needUri, "state"], newState);
 }
 
