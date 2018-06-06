@@ -15,19 +15,12 @@ import {
   selectNeedByConnectionUri,
   selectAllTheirNeeds,
 } from "../selectors.js";
+import connectionStateModule from "./connection-state.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
       <div class="ch__icon">
-          <won-square-image
-            class="ch__icon__ownneed"
-            ng-class="{'bigger' : self.biggerImage, 'inactive' : self.ownNeed.get('state') === self.WON.InactiveCompacted}"
-            src="self.ownNeed.get('TODO')"
-            title="self.ownNeed.get('title')"
-            uri="self.ownNeed.get('uri')"
-            ng-show="!self.hideImage">
-          </won-square-image>
           <won-square-image
             class="ch__icon__theirneed"
             ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
@@ -59,6 +52,10 @@ function genComponentConf() {
           </span>
           -->
           <span class="ch__right__subtitle__type">
+
+            <won-connection-state 
+              connection-uri="self.connection.get('uri')">
+            </won-connection-state>
             {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
           </span>
         </div>
@@ -146,5 +143,8 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionHeader", [squareImageModule])
+  .module("won.owner.components.connectionHeader", [
+    squareImageModule,
+    connectionStateModule,
+  ])
   .directive("wonConnectionHeader", genComponentConf).name;

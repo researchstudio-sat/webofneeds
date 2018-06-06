@@ -6,74 +6,51 @@
 @import "speech-bubble";
 
 won-connection-selection-item {
+  $triangleCutoutSize: $speechBubbleTailSize;
+  $padding: 0.5rem;
   display: block;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
+  padding-left: $padding + $triangleCutoutSize;
+  padding-right: $padding;
+  padding-top: $padding;
+  padding-bottom: $padding;
 
-  &.won-unread {
-    background-color: $won-unread; //TODO: CHANGE THE UNREAD APPEARANCE BECAUSE THE "invisible border" is off for unread elements
-  }
+  background-color: $won-light-gray;
+
+  @include speech-bubble-left-inward(
+    /* TODO line-gray for a fill? -->*/ $won-line-gray,
+    $won-line-gray,
+    $triangleCutoutSize,
+    $thinBorderWidth,
+    50%,
+    "before" /* needed so there can be another tail*/
+  );
 
   .conn__icon {
     @include fixed-square(1rem);
+    margin-left: 0.5rem;
   }
 
-  won-connection-state {
-    position: absolute;
-    left: 0.25rem;
-    top: 0.25rem;
-    z-index: 10;
-
-    svg {
-      @include fixed-square(1.5rem);
-    }
-  }
+  $invisibleBorder: $thinBorderWidth solid $won-light-gray;
+  border-left: $thinGrayBorder;
+  border-top: $thinGrayBorder;
 
   .conn__unreadCount {
     color: $won-primary-color;
     margin-left: 0.5rem;
   }
 
-  $invisibleBorder: 0.0625rem solid white;
-
-  .conn__inner.selected {
+  &:hover,
+  &.selected {
+    background-color: white;
+  }
+  &.selected {
     @include speech-bubble-right(
       white,
       $won-line-gray,
-      0.625rem,
+      $speechBubbleTailSize,
       $thinBorderWidth,
-      1.5rem
+      50%
     );
-    border-top: $thinGrayBorder;
-    border-bottom: $thinGrayBorder;
-  }
-  &:first-child .conn__inner.selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $invisibleBorder;
-  }
-  &:not(:first-child) .conn__inner.selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-top: $thinGrayBorder;
-  }
-  &:last-child .conn__inner.selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-bottom: $invisibleBorder;
-  }
-  &:not(:last-child) .conn__inner.selected {
-    // don't show border for first item to avoid duplicate borders with the title bar
-    border-bottom: $thinGrayBorder;
-  }
-  .conn__inner {
-    display: block;
-    padding: 0.5rem;
-    border-top: $invisibleBorder; // this is necessary so that the view does not "jump" when selecting an item
-    border-bottom: $invisibleBorder;
-    // this is necessary so that the view does not "jump" when selecting an item
-    &:hover,
-    &.selected {
-      background-color: white;
-    }
-    .conn__icon {
-      margin-left: 0.5rem;
-    }
   }
 }

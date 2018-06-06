@@ -70,6 +70,7 @@ import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.LDP;
+import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
 
 /**
@@ -234,6 +235,11 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Model metaModel = needModelMapper.toModel(need);
 
     Resource needResource = metaModel.getResource(needUri.toString());
+    String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
+    Resource needMetaInformationResource = metaModel.getResource(needMetaInformationURI);
+    
+    //link needMetaInformationURI to need via rdfg:subGraphOf
+    needMetaInformationResource.addProperty(RDFG.SUBGRAPH_OF, needResource);
 
     // add connections
     Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections");
@@ -254,8 +260,15 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add WON node link
     needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
 
+    // link all need graphs taken from the create message to need uri:
+    Iterator<String> namesIt = dataset.listNames();
+    while(namesIt.hasNext()) {
+    	String name = namesIt.next();
+    	Resource needGraphResource = metaModel.getResource(name);
+    	needResource.addProperty(WON.HAS_CONTENT_GRAPH, needGraphResource);
+    }
+    
     // add meta model to dataset
-    String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
     dataset.addNamedModel(needMetaInformationURI, metaModel);
     addBaseUriAndDefaultPrefixes(dataset);
 

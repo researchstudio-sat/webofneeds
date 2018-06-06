@@ -14,26 +14,20 @@ import {
 } from "../selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
-import connectionStateModule from "./connection-state.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div
-      class="conn__inner"
-      ng-class="self.isOpen() ? 'selected' : ''">
-        <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') === self.WON.Suggested">
-        </won-connection-state>
-        <won-connection-header
-          connection-uri="self.connectionUri"
-          timestamp="self.lastUpdateTimestamp"
-          ng-click="self.setOpen()"
-          class="clickable">
-        </won-post-header>
+      <won-connection-header
+        connection-uri="self.connectionUri"
+        timestamp="self.lastUpdateTimestamp"
+        ng-click="self.setOpen()"
+        class="clickable">
+      </won-post-header>
 
-        <div class="conn__unreadCount" ng-if="self.connection.get('state') === self.WON.Connected">
-          {{ self.unreadMessagesCount }}
-        </div>
+      <div class="conn__unreadCount" ng-if="self.connection.get('state') === self.WON.Connected">
+        {{ self.unreadMessagesCount }}
       </div>
     `;
 
@@ -72,6 +66,8 @@ function genComponentConf() {
         ["self.connectionUri"],
         this
       );
+
+      classOnComponentRoot("selected", () => this.isOpen(), this);
     }
     isOpen() {
       return this.openConnectionUri === this.connectionUri;
@@ -102,6 +98,5 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.connectionSelectionItem", [
     connectionHeaderModule,
-    connectionStateModule,
   ])
   .directive("wonConnectionSelectionItem", genComponentConf).name;

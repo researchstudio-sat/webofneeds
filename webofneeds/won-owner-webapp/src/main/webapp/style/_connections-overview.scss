@@ -17,11 +17,6 @@ won-connections-overview {
     border-right: $thinGrayBorder;
     border-bottom: $thinGrayBorder;
 
-    &--withconn {
-      .co__item__need {
-        border-bottom: $thinGrayBorder;
-      }
-    }
     @media (max-width: $responsivenessBreakPoint) {
       border-left: none;
       border-right: none;
@@ -85,31 +80,22 @@ won-connections-overview {
         }
       }
 
-      &:hover,
-      &.selected {
-      }
-
       @media (min-width: $responsivenessBreakPoint) {
         &.selected {
           @include speech-bubble-right(
             white,
             $won-line-gray,
-            0.625rem,
+            $speechBubbleTailSize,
             $thinBorderWidth,
-            1.5rem
+            50%
           );
         }
       }
     }
     &__connections {
-      background: white;
-      @include speech-bubble-top(
-        white,
-        $won-line-gray,
-        0.625rem,
-        $thinBorderWidth,
-        5rem
-      );
+      padding-left: 0.5rem; // intent connections so it's clear they belong *to* the post
+      background: $won-line-gray; //TODO line-gray for a fill?
+
       @include slideWithOpacityAnimation(0.5s, linear, 250rem);
     }
   }

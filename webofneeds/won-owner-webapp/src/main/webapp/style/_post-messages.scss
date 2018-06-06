@@ -121,7 +121,7 @@
         @include speech-bubble-bottom(
           $won-light-gray,
           $won-line-gray,
-          0.3125rem,
+          $speechBubbleTailSize/2,
           $thinBorderWidth,
           0.5rem
         );
