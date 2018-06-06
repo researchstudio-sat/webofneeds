@@ -98,7 +98,7 @@ import won from "./won.js";
   const privateData = {};
 
   won.clearStore = function() {
-    console.log("clearStore");
+    console.log("clearStore - RDF-Store creation");
     //create an rdfstore-js based store as a cache for rdf data.
     privateData.store = rdfstore.create();
     privateData.store.setPrefix("msg", "http://purl.org/webofneeds/message#");
@@ -522,7 +522,7 @@ import won from "./won.js";
     optionalSparqlPrefixes,
     optionalSparqlFragment
   ) {
-    console.log("resolvePropertyPathFromBaseUri");
+    console.log("resolvePropertyPathFromBaseUri - RDF-Store access");
     let query = "";
     if (won.isNull(baseUri)) {
       throw new Error("cannot evaluate property path: baseUri is null");
@@ -876,7 +876,7 @@ import won from "./won.js";
    *   thus contains data from multiple documents.
    */
   won.addJsonLdData = async function(data, documentUri, deep) {
-    console.log("addJsonLdData: documentUri: ", documentUri);
+    console.log("addJsonLdData - RDF-Store access: documentUri: ", documentUri);
     // const graphsAddedSeperatelyP = Promise.resolve();
     const groupedP = groupByGraphs(data);
 
@@ -1000,7 +1000,7 @@ import won from "./won.js";
    * to get the connection-uris. Thus it's faster.
    */
   won.getNeed = async function(needUri) {
-    console.log("getNeed");
+    console.log("getNeed - RDF-Store access");
     await won.ensureLoaded(needUri);
     return selectNeedData(needUri, privateData.store);
   };
@@ -1655,7 +1655,7 @@ import won from "./won.js";
    *              connections for the given need
    */
   function getConnectionContainerOfNeed(needUri) {
-    console.log("getConnectionContainerOfNeed");
+    console.log("getConnectionContainerOfNeed - RDF-Store access");
     if (typeof needUri === "undefined" || needUri == null) {
       throw { message: "getConnectionsUri: needUri must not be null" };
     }
@@ -1986,7 +1986,7 @@ import won from "./won.js";
    * @param fetchParams See `ensureLoaded`.
    */
   won.getNode = function(uri, fetchParams) {
-    console.log("getNode");
+    console.log("getNode - RDF-Store access");
     if (!uri) {
       return Promise.reject({ message: "getNode: uri must not be null" });
     }
@@ -2138,7 +2138,7 @@ import won from "./won.js";
    * @param {string} graphUri if omitted, will remove from default graph
    */
   won.deleteTriples = function(triples, graphUri) {
-    console.log("deleteTriples");
+    console.log("deleteTriples - RDF-Store access");
     return new Promise(resolve => {
       const callback = success => {
         if (!success) {
@@ -2168,7 +2168,7 @@ import won from "./won.js";
    * reads on the rdf store if called without a read lock.
    */
   won.deleteNode = function(uri, removeCacheItem = true) {
-    console.log("deleteNode");
+    console.log("deleteNode - RDF-Store access");
     if (typeof uri === "undefined" || uri == null) {
       throw { message: "deleteNode: uri must not be null" };
     }
@@ -2197,7 +2197,7 @@ import won from "./won.js";
     graphUri,
     removeAtGraphTriples = true
   ) {
-    console.log("getCachedGraphTriples");
+    console.log("getCachedGraphTriples - RDF-Store access");
     const graph = await rdfStoreGetGraph(privateData.store, graphUri);
 
     if (removeAtGraphTriples) {
@@ -2281,7 +2281,7 @@ import won from "./won.js";
     baseUri,
     requesterWebId
   ) {
-    console.log("executeCrawlableQuery");
+    console.log("executeCrawlableQuery - RDF-Store access");
     const relevantResources = [];
     const recursionData = {};
     const MAX_RECURSIONS = 10;
@@ -2376,9 +2376,17 @@ import won from "./won.js";
       } else {
         //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
         Array.prototype.push.apply(relevantResources, resolvedUris);
-        const loadedPromises = relevantResources.map(x =>
-          won.ensureLoaded(x, { requesterWebId })
-        );
+        const loadedPromises = relevantResources.map(x => {
+          console.log(
+            "ensureLoaded for: ",
+            x,
+            "reqWebId: ",
+            requesterWebId,
+            "resolvedUris: ",
+            resolvedUris
+          );
+          won.ensureLoaded(x, { requesterWebId });
+        });
         return Promise.all(loadedPromises)
           .then(() =>
             resolvePropertyPathsFromBaseUri(
@@ -2433,9 +2441,7 @@ import won from "./won.js";
         },
       ],
       query:
-        "prefix msg: <http://purl.org/webofneeds/message#> \n" +
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
-        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
         "select ?connectionUri \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
@@ -2469,9 +2475,7 @@ import won from "./won.js";
         },
       ],
       query:
-        "prefix msg: <http://purl.org/webofneeds/message#> \n" +
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
-        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
         "select ?connectionUri \n" +
         " where { \n" +
         " <::baseUri::> a won:Need; \n" +
@@ -2495,7 +2499,7 @@ import won from "./won.js";
  */
 export async function loadIntoRdfStore(store, mediaType, jsonldData, graphUri) {
   console.log(
-    "loadIntoRdfStore: mediaType: ",
+    "loadIntoRdfStore - RDF-Store access: mediaType: ",
     mediaType,
     "graphUri: ",
     graphUri
