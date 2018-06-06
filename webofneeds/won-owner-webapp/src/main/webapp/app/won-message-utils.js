@@ -425,6 +425,7 @@ export function isSuccessMessage(event) {
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
+  console.log("fetchDataForNonOwnedNeedOnly");
   return won
     .getNeed(needUri)
     .then(need =>
@@ -435,6 +436,7 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 }
 
 export function fetchOwnedData(email, curriedDispatch) {
+  console.log("fetchOwnedData");
   return fetchOwnedNeedUris().then(needUris =>
     fetchDataForOwnedNeeds(needUris, curriedDispatch)
   );
@@ -446,6 +448,7 @@ export function fetchOwnedData(email, curriedDispatch) {
 //        });
 //}
 function fetchOwnedNeedUris() {
+  console.log("fetchOwnedNeedUris");
   return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
     method: "get",
     headers: {
@@ -460,6 +463,7 @@ function fetchOwnedNeedUris() {
 
 // API call to get agreements data for a connection
 export function callAgreementsFetch(url) {
+  console.log("callAgreementsFetch: ", url);
   return fetch(url, {
     method: "get",
     headers: {
@@ -473,6 +477,7 @@ export function callAgreementsFetch(url) {
 }
 
 export function callAgreementEventFetch(needUri, eventUri) {
+  console.log("callAgreementEventFetch: ", needUri, " eventUri: ", eventUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/linked-data/",
@@ -546,7 +551,7 @@ function fetchAllAccessibleAndRelevantData(
   ]);
 
   return allDataRawPromise.then(
-    ([ownNeeds, connections, /* events, */ theirNeeds]) =>
+    ([ownNeeds, connections, /* events, */ theirNeeds]) => {
       wellFormedPayload({
         ownNeeds,
         connections,
@@ -554,7 +559,8 @@ function fetchAllAccessibleAndRelevantData(
           /* will be loaded later when connection is accessed */
         },
         theirNeeds,
-      })
+      });
+    }
   );
 
   /**
@@ -594,6 +600,7 @@ function fetchAllAccessibleAndRelevantData(
 }
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+  console.log("fetchOwnNeedAndDispatch: ", needUri);
   const needP = won
     .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
@@ -607,6 +614,7 @@ function fetchConnectionAndDispatch(
   cnctUri,
   curriedDispatch = () => undefined
 ) {
+  console.log("fetchConnectionAndDispatch: ", cnctUri);
   const cnctP = won.getNode(cnctUri);
   cnctP.then(connection =>
     curriedDispatch(
@@ -617,6 +625,7 @@ function fetchConnectionAndDispatch(
 }
 
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
+  console.log("fetchTheirNeedAndDispatch: ", needUri);
   const needP = won.getNeed(needUri);
   needP.then(need =>
     curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }))
