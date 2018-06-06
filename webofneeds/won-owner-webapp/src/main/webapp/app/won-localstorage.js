@@ -103,3 +103,15 @@ export function isConnUriClosed(uri) {
 export function clearClosedConnUris() {
   localStorage.removeItem(CLOSED_CONN_URIS);
 }
+
+export function isInactiveNeed(needUri) {
+  return localStorage.getItem(`inactiveNeeds/${needUri}`) !== null;
+}
+
+export function addInactiveNeed(needUri) {
+  localStorage.setItem(`inactiveNeeds/${needUri}`, true);
+}
+
+export function removeInactiveNeed(needUri) {
+  localStorage.removeItem(`inactiveNeeds/${needUri}`);
+}
