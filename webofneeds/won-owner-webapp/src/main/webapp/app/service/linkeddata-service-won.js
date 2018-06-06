@@ -2376,17 +2376,9 @@ import won from "./won.js";
       } else {
         //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
         Array.prototype.push.apply(relevantResources, resolvedUris);
-        const loadedPromises = resolvedUris.map(x => {
-          console.log(
-            "ensureLoaded for: ",
-            x,
-            "reqWebId: ",
-            requesterWebId,
-            "resolvedUris: ",
-            resolvedUris
-          );
-          won.ensureLoaded(x, { requesterWebId });
-        });
+        const loadedPromises = resolvedUris.map(x =>
+          won.ensureLoaded(x, { requesterWebId })
+        );
         return Promise.all(loadedPromises)
           .then(() =>
             resolvePropertyPathsFromBaseUri(
