@@ -1088,7 +1088,7 @@ function parseNeed(jsonldNeed, ownNeed) {
 
     const wonHasMatchingContexts = jsonldNeedImm.get("won:hasMatchingContext");
 
-    const creationDate = jsonldNeedImm.get("dct:created");
+    const creationDate = jsonldNeedImm.get("http://purl.org/dc/terms/created");
     if (creationDate) {
       parsedNeed.creationDate = new Date(creationDate);
       parsedNeed.lastUpdateDate = parsedNeed.creationDate;
