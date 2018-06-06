@@ -94,6 +94,19 @@ class ConnectionsController {
     });
   }
 
+  /*
+  isMobileDevice() {
+    console.log("Screen height", screen.height);
+    let ua = navigator.userAgent.toLowerCase();
+    //let isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+    let isMobile = ua.indexOf("mobile") > -1;
+    if (isMobile) {
+      console.log("MobileDevice");
+      return true;
+    }
+    return false;
+  }*/
+
   markAsRead(connectionUri) {
     const need = selectNeedByConnectionUri(
       this.$ngRedux.getState(),
