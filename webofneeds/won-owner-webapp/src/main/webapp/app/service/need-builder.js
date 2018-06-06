@@ -186,32 +186,36 @@ import won from "./won.js";
         ? undefined
         : {
             "@type": "s:travelAction",
-            "s:fromLocation": {
-              "@type": "s:Place",
-              "s:geo": {
-                "@Type": "s:Geocoordinates",
-                "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
-                  6
-                ),
-                "s:longitude": isOrSeeksData.travelAction.fromLocation.lng.toFixed(
-                  6
-                ),
-              },
-              "s:name": isOrSeeksData.travelAction.fromLocation.name,
-            },
-            "s:toLocation": {
-              "@type": "s:Place",
-              "s:geo": {
-                "@Type": "s:Geocoordinates",
-                "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
-                  6
-                ),
-                "s:longitude": isOrSeeksData.travelAction.toLocation.lng.toFixed(
-                  6
-                ),
-              },
-              "s:name": isOrSeeksData.travelAction.toLocation.name,
-            },
+            "s:fromLocation": !isOrSeeksData.travelAction.fromLocation
+              ? undefined
+              : {
+                  "@type": "s:Place",
+                  "s:geo": {
+                    "@Type": "s:Geocoordinates",
+                    "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
+                      6
+                    ),
+                    "s:longitude": isOrSeeksData.travelAction.fromLocation.lng.toFixed(
+                      6
+                    ),
+                  },
+                  "s:name": isOrSeeksData.travelAction.fromLocation.name,
+                },
+            "s:toLocation": !isOrSeeksData.travelAction.toLocation
+              ? undefined
+              : {
+                  "@type": "s:Place",
+                  "s:geo": {
+                    "@Type": "s:Geocoordinates",
+                    "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
+                      6
+                    ),
+                    "s:longitude": isOrSeeksData.travelAction.toLocation.lng.toFixed(
+                      6
+                    ),
+                  },
+                  "s:name": isOrSeeksData.travelAction.toLocation.name,
+                },
           },
       //TODO: Different id for is and seeks
       "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
