@@ -39,17 +39,6 @@ won-connection-selection-item {
   border-left: $thinGrayBorder;
   border-top: $thinGrayBorder;
 
-  won-connection-state {
-    position: absolute;
-    left: 0.25rem;
-    top: 0.25rem;
-    z-index: 10;
-
-    svg {
-      @include fixed-square(1.5rem);
-    }
-  }
-
   .conn__unreadCount {
     color: $won-primary-color;
     margin-left: 0.5rem;

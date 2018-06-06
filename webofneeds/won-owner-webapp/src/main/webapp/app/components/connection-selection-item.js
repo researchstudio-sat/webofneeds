@@ -14,14 +14,11 @@ import {
 } from "../selectors.js";
 
 import connectionHeaderModule from "./connection-header.js";
-import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <won-connection-state connection-uri="self.connectionUri" ng-if="self.connection.get('state') === self.WON.Suggested">
-      </won-connection-state>
       <won-connection-header
         connection-uri="self.connectionUri"
         timestamp="self.lastUpdateTimestamp"
@@ -101,6 +98,5 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.connectionSelectionItem", [
     connectionHeaderModule,
-    connectionStateModule,
   ])
   .directive("wonConnectionSelectionItem", genComponentConf).name;

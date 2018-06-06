@@ -11,6 +11,13 @@ won-connection-header {
   grid-column-gap: 0.5rem;
   min-width: 0;
 
+  won-connection-state {
+    display: inline-block;
+    svg {
+      @include fixed-square($smallFontSize);
+    }
+  }
+
   .ch__icon {
     grid-area: icon;
     width: $postIconSize;

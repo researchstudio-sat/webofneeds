@@ -15,6 +15,7 @@ import {
   selectNeedByConnectionUri,
   selectAllTheirNeeds,
 } from "../selectors.js";
+import connectionStateModule from "./connection-state.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -51,6 +52,10 @@ function genComponentConf() {
           </span>
           -->
           <span class="ch__right__subtitle__type">
+
+            <won-connection-state 
+              connection-uri="self.connection.get('uri')">
+            </won-connection-state>
             {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
           </span>
         </div>
@@ -138,5 +143,8 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.connectionHeader", [squareImageModule])
+  .module("won.owner.components.connectionHeader", [
+    squareImageModule,
+    connectionStateModule,
+  ])
   .directive("wonConnectionHeader", genComponentConf).name;
