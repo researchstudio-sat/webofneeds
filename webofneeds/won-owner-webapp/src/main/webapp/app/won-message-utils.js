@@ -9,6 +9,8 @@ import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
+import { isInactiveNeed } from "./won-localstorage.js";
+
 import { getRandomWonId } from "./won-utils.js";
 import { getClosedConnUris } from "./won-localstorage.js";
 
@@ -501,9 +503,13 @@ function fetchAllAccessibleAndRelevantData(
     return Promise.resolve(emptyDataset);
   }
 
-  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
-    fetchOwnNeedAndDispatch(uri, curriedDispatch)
-  );
+  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri => {
+    if (isInactiveNeed(uri)) {
+      return undefined;
+    } else {
+      return fetchOwnNeedAndDispatch(uri, curriedDispatch);
+    }
+  });
 
   // wait for the own needs to be dispatched then load connections
   const allConnectionsPromise = allOwnNeedsPromise
