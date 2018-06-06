@@ -47,14 +47,14 @@
   won-post-messages {
     display: grid;
     grid-template-areas: "header" "main" "footer";
-    grid-template-rows: min-content minmax(10rem, 1fr) min-content;
+    grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
     grid-row-gap: $gridRowGap;
     width: 100%;
     box-sizing: border-box;
     padding: $gridRowGap;
 
-    &.chattextfield_android {
-      grid-template-rows: min-content minmax(5rem, 1fr) min-content;
+    &.chattextfield-mobile {
+      grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
     }
 
     .pm__header {

@@ -94,7 +94,7 @@ class ConnectionsController {
     });
   }
 
-  isAndroidDevice() {
+  isMobileDevice() {
     console.log("Screen height", screen.height);
     let ua = navigator.userAgent.toLowerCase();
     //let isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");

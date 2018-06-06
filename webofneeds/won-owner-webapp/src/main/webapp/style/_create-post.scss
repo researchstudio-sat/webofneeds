@@ -9,13 +9,17 @@
 won-create-post {
   display: grid;
   grid-template-areas: "header" "main" "footer";
-  grid-template-rows: min-content minmax(10rem, 1fr) min-content;
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
   width: 100%;
   max-width: $maxContentWidth;
   height: 100%;
   box-sizing: border-box;
   padding: $gridRowGap;
+
+  &.create-post-mobile {
+    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
+  }
 
   .cp__header {
     grid-area: header;
