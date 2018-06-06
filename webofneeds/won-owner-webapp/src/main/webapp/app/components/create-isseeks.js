@@ -238,7 +238,6 @@ function genComponentConf() {
     }
 
     updateDescription(description) {
-      console.log("description updated with: ", description);
       if (description && description.length > 0) {
         if (!this.details.has("description")) {
           this.details.add("description");
