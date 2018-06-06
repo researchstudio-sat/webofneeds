@@ -26,10 +26,6 @@ won-connection-selection-item {
     "before" /* needed so there can be another tail*/
   );
 
-  &.won-unread {
-    background-color: $won-unread; //TODO: CHANGE THE UNREAD APPEARANCE BECAUSE THE "invisible border" is off for unread elements
-  }
-
   .conn__icon {
     @include fixed-square(1rem);
     margin-left: 0.5rem;
