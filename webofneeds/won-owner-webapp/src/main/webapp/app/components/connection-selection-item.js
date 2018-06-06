@@ -15,6 +15,7 @@ import {
 
 import connectionHeaderModule from "./connection-header.js";
 import connectionStateModule from "./connection-state.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -69,16 +70,7 @@ function genComponentConf() {
         this
       );
 
-      this.$scope.$watch(
-        () => this.isOpen(),
-        newVal => {
-          if (newVal) {
-            this.$element[0].classList.add("selected");
-          } else {
-            this.$element[0].classList.remove("selected");
-          }
-        }
-      );
+      classOnComponentRoot("selected", () => this.isOpen(), this);
     }
     isOpen() {
       return this.openConnectionUri === this.connectionUri;
