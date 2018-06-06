@@ -23,7 +23,10 @@ function genComponentConf() {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
 
-      this.$scope.$watch("self.uri", newVal => this.updateIdenticon(newVal));
+      const unregister = this.$scope.$watch("self.uri", newVal => {
+        if (newVal) unregister(); // only need to do this once
+        this.updateIdenticon(newVal);
+      });
     }
 
     updateIdenticon(input) {
@@ -52,7 +55,7 @@ function genComponentConf() {
     scope: {
       src: "=",
       title: "=",
-      uri: "=",
+      uri: "=", // only read once
     },
     template: template,
   };
