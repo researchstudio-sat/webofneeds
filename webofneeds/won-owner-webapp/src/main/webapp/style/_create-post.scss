@@ -17,9 +17,10 @@ won-create-post {
   box-sizing: border-box;
   padding: $gridRowGap;
 
+  /*
   &.create-post-mobile {
     grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }
+  }*/
 
   .cp__header {
     grid-area: header;

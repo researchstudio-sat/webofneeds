@@ -94,6 +94,7 @@ class ConnectionsController {
     });
   }
 
+  /*
   isMobileDevice() {
     console.log("Screen height", screen.height);
     let ua = navigator.userAgent.toLowerCase();
@@ -104,7 +105,7 @@ class ConnectionsController {
       return true;
     }
     return false;
-  }
+  }*/
 
   markAsRead(connectionUri) {
     const need = selectNeedByConnectionUri(

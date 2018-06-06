@@ -17,10 +17,9 @@
         </span>
     </div>
     <div class="post__contentside" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
-        <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection" ng-class="{'create-post-mobile' : self.isMobileDevice()}"></won-create-post>
+        <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection"></won-create-post>
         <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Suggested"></won-send-request>
-        <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent)"
-            ng-class="{'chattextfield-mobile' : self.isMobileDevice()}"></won-post-messages>
+        <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent)"></won-post-messages>
         <won-post-info include-header="true" ng-if="self.selectedPost && !self.showCreateView"></won-post-info>
     </div>
 </main>
