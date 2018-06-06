@@ -16,6 +16,7 @@ const emptyDraft = deepFreeze({
   description: "",
   tags: [],
   location: undefined,
+  travelAction: undefined,
   thumbnail: undefined,
   matchingContext: undefined,
 });
@@ -32,7 +33,7 @@ const emptyDraft = deepFreeze({
 //   ttl: {},
 // };
 
-//TODO can't inject $scope with the angular2-router, preventing redux-cleanup
+//TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
   "$scope",
@@ -91,7 +92,20 @@ function genComponentConf() {
                         <svg class="cis__circleicon" ng-show="self.details.has('location')">
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
-                        <span>Address or Location</span>
+                        <span>Location</span>
+                </div>
+
+                <!-- ROUTE PICKER -->
+                <div class="cis__detail__items__item route"
+                    ng-click="self.toggleOpenDetail('route')"
+                    ng-class="{'picked' : self.openDetail === 'route'}">
+                        <svg class="cis__circleicon" ng-show="!self.details.has('route')">
+                            <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
+                        </svg>
+                        <svg class="cis__circleicon" ng-show="self.details.has('route')">
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                        </svg>
+                        <span>Route (From - To)</span>
                 </div>
 
                 <!-- TAGS PICKER -->
@@ -140,6 +154,13 @@ function genComponentConf() {
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
+            <!-- FROM A TO B -->
+            <won-route-picker
+              ng-if="self.openDetail === 'route'"
+              initial-travel-action="::self.draftObject.travelAction"
+              on-route-updated="::self.updateRoute(travelAction)">
+            </won-route-picker>
+
             <!-- TAGS -->
             <won-tags-picker
                 ng-if="self.openDetail === 'tags'"
@@ -162,7 +183,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.won = won;
 
-      //TODO debug; deleteme
+      //TODO: debug; deleteme
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
@@ -196,6 +217,9 @@ function genComponentConf() {
       }
       if (!this.details.has("description")) {
         this.draftObject.description = undefined;
+      }
+      if (!this.details.has("route")) {
+        this.draftObject.travelAction = undefined;
       }
 
       this.onUpdate({ draft: this.draftObject });
@@ -235,6 +259,23 @@ function genComponentConf() {
       } else if (this.details.has("location")) {
         this.details.delete("location");
         this.draftObject.location = undefined;
+      }
+
+      this.updateDraft();
+    }
+
+    updateRoute(travelAction) {
+      if (
+        travelAction &&
+        (travelAction.fromLocation || travelAction.toLocation)
+      ) {
+        if (!this.details.has("route")) {
+          this.details.add("route");
+        }
+        this.draftObject.travelAction = travelAction;
+      } else if (this.details.has("route")) {
+        this.details.delete("route");
+        this.draftObject.travelAction = undefined;
       }
 
       this.updateDraft();

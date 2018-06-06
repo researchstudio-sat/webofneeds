@@ -1074,6 +1074,42 @@ import won from "./won.js";
                 },
               ],
             },
+            {
+              node: "won:travelAction",
+              children: [
+                { node: "rdf:type" },
+                {
+                  node: "s:fromLocation",
+                  children: [
+                    { node: "rdf:type" },
+                    { node: "s:name" },
+                    {
+                      node: "s:geo",
+                      children: [
+                        { node: "rdf:type" },
+                        { node: "s:latitude" },
+                        { node: "s:longitude" },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  node: "s:toLocation",
+                  children: [
+                    { node: "rdf:type" },
+                    { node: "s:name" },
+                    {
+                      node: "s:geo",
+                      children: [
+                        { node: "rdf:type" },
+                        { node: "s:latitude" },
+                        { node: "s:longitude" },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
           ],
         },
         {
@@ -1109,6 +1145,42 @@ import won from "./won.js";
                     },
                     {
                       node: "won:hasSouthEastCorner",
+                      children: [
+                        { node: "rdf:type" },
+                        { node: "s:latitude" },
+                        { node: "s:longitude" },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              node: "won:travelAction",
+              children: [
+                { node: "rdf:type" },
+                {
+                  node: "s:fromLocation",
+                  children: [
+                    { node: "rdf:type" },
+                    { node: "s:name" },
+                    {
+                      node: "s:geo",
+                      children: [
+                        { node: "rdf:type" },
+                        { node: "s:latitude" },
+                        { node: "s:longitude" },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  node: "s:toLocation",
+                  children: [
+                    { node: "rdf:type" },
+                    { node: "s:name" },
+                    {
+                      node: "s:geo",
                       children: [
                         { node: "rdf:type" },
                         { node: "s:latitude" },

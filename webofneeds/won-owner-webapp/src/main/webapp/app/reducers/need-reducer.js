@@ -1133,6 +1133,9 @@ function parseNeed(jsonldNeed, ownNeed) {
         location: is.get("won:hasLocation")
           ? parseLocation(is.get("won:hasLocation"))
           : undefined,
+        travelAction: is.get("won:travelAction")
+          ? parseTravelAction(is.get("won:travelAction"))
+          : undefined,
       };
     }
     if (seeksPresent) {
@@ -1151,6 +1154,9 @@ function parseNeed(jsonldNeed, ownNeed) {
           : undefined,
         location: seeks.get("won:hasLocation")
           ? parseLocation(seeks.get("won:hasLocation"))
+          : undefined,
+        travelAction: seeks.get("won:travelAction")
+          ? parseTravelAction(seeks.get("won:travelAction"))
           : undefined,
       };
     }
@@ -1263,6 +1269,76 @@ function parseLocation(jsonldLocation) {
   console.error(
     "Cant parse location, data is an invalid location-object: ",
     jsonldLocationImm.toJS()
+  );
+  return undefined;
+}
+
+function parseTravelAction(jsonTravelAction) {
+  if (!jsonTravelAction) return undefined;
+
+  const travelActionImm = Immutable.fromJS(jsonTravelAction);
+
+  let travelAction = {
+    fromAddress: undefined,
+    fromLocation: {
+      lat: undefined,
+      lng: undefined,
+    },
+    toAddress: undefined,
+    toLocation: {
+      lat: undefined,
+      lng: undefined,
+    },
+  };
+
+  travelAction.fromAddress = travelActionImm.getIn([
+    "http://schema.org/fromLocation",
+    "http://schema.org/name",
+  ]);
+
+  travelAction.fromLocation.lat = travelActionImm.getIn([
+    "http://schema.org/fromLocation",
+    "http://schema.org/geo",
+    "http://schema.org/latitude",
+  ]);
+
+  travelAction.fromLocation.lng = travelActionImm.getIn([
+    "http://schema.org/fromLocation",
+    "http://schema.org/geo",
+    "http://schema.org/longitude",
+  ]);
+
+  travelAction.toAddress = travelActionImm.getIn([
+    "http://schema.org/toLocation",
+    "http://schema.org/name",
+  ]);
+
+  travelAction.toLocation.lat = travelActionImm.getIn([
+    "http://schema.org/toLocation",
+    "http://schema.org/geo",
+    "http://schema.org/latitude",
+  ]);
+
+  travelAction.toLocation.lng = travelActionImm.getIn([
+    "http://schema.org/toLocation",
+    "http://schema.org/geo",
+    "http://schema.org/longitude",
+  ]);
+
+  if (
+    (travelAction.fromAddress &&
+      travelAction.fromLocation.lat &&
+      travelAction.fromLocation.lng) ||
+    (travelAction.toAddress &&
+      travelAction.toLocation.lat &&
+      travelAction.toLocation.lng)
+  ) {
+    return Immutable.fromJS(travelAction);
+  }
+
+  console.error(
+    "Cant parse travelAction, data is an invalid travelAction-object: ",
+    travelActionImm.toJS()
   );
   return undefined;
 }

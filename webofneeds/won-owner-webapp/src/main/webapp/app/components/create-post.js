@@ -7,10 +7,11 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
-import descriptionPickerModule from "./description-picker.js";
-import locationPickerModule from "./location-picker.js";
-import tagsPickerModule from "./tags-picker.js";
-import ttlPickerModule from "./ttl-picker.js";
+import descriptionPickerModule from "./details/description-picker.js";
+import locationPickerModule from "./details/location-picker.js";
+import routePickerModule from "./details/route-picker.js";
+import tagsPickerModule from "./details/tags-picker.js";
+import ttlPickerModule from "./details/ttl-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
 import { getIn, attach } from "../utils.js";
@@ -122,6 +123,7 @@ function genComponentConf() {
         description: "",
         tags: undefined,
         location: undefined,
+        travelAction: undefined,
         thumbnail: undefined,
         matchingContext: undefined,
       };
@@ -131,6 +133,7 @@ function genComponentConf() {
         description: "",
         tags: undefined,
         location: undefined,
+        travelAction: undefined,
         thumbnail: undefined,
         matchingContext: undefined,
       };
@@ -274,6 +277,7 @@ angular
     imageDropzoneModule,
     descriptionPickerModule,
     locationPickerModule,
+    routePickerModule,
     tagsPickerModule,
     ttlPickerModule,
     createIsseeksModule,
