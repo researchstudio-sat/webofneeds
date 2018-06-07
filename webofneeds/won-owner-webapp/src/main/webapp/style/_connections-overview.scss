@@ -49,8 +49,6 @@ won-connections-overview {
 
       &__detail {
         display: grid;
-        border-top: $thinGrayBorder;
-        padding-top: 0.5rem;
 
         @media (min-width: $responsivenessBreakPoint) {
           grid-column-gap: 0.5rem;
