@@ -70,7 +70,7 @@ function genComponentConf() {
                 <svg class="won-button-icon" style="--local-primary:white;">
                     <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                 </svg>
-                <span ng-if="!self.pendingPublishing">What's in your Area? (Location access required)</span>
+                <span ng-if="!self.pendingPublishing">What's in your Area?</span>
                 <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
             </button>
         </div>
