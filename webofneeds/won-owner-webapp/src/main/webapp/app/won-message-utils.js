@@ -10,7 +10,7 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
-import { isConnUriClosed } from "./won-localstorage.js";
+import { getClosedConnUris } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -513,16 +513,13 @@ function fetchAllAccessibleAndRelevantData(
           won
             .getConnectionUrisOfNeed(needUri, needUri, true)
             .then(connectionUris =>
-              urisToLookupMap(connectionUris, connUri => {
-                if (!isConnUriClosed(connUri)) {
-                  fetchConnectionAndDispatch(connUri, curriedDispatch);
-                } else {
-                  console.log(
-                    connUri,
-                    " closed, ommit further crawl for this connection"
-                  );
-                }
-              })
+              urisToLookupMap(
+                connectionUris,
+                uri => {
+                  fetchConnectionAndDispatch(uri, curriedDispatch);
+                },
+                getClosedConnUris()
+              )
             )
         )
       )
