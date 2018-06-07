@@ -60,7 +60,7 @@ won-connections-overview {
 
         @media (max-width: $responsivenessBreakPoint) {
           grid-row-gap: 0.5rem;
-          grid-template-areas: "indicators" "actions";
+          grid-template-areas: "actions" "indicators";
         }
 
         @include slideWithOpacityAnimation(0.25s, linear, 4rem, 0.5rem 0 0 0);
@@ -93,9 +93,9 @@ won-connections-overview {
       }
     }
     &__connections {
-      padding-left: 0.5rem; // intent connections so it's clear they belong *to* the post
-      background: $won-line-gray; //TODO line-gray for a fill?
-
+      padding-left: 0.5rem; // intrent connections so it's clear they belong *to* the post
+      background: $won-line-gray;
+      // TODO line-gray for a fill?
       @include slideWithOpacityAnimation(0.5s, linear, 250rem);
     }
   }
