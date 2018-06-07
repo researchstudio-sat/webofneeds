@@ -1332,11 +1332,13 @@ function parseTravelAction(jsonTravelAction) {
       "http://schema.org/latitude",
     ]);
 
-  travelAction.fromLocation.lng = travelActionImm.getIn([
-    "http://schema.org/fromLocation",
-    "http://schema.org/geo",
-    "http://schema.org/longitude",
-  ]);
+  travelAction.fromLocation.lng =
+    travelActionImm.getIn(["s:fromLocation", "s:geo", "s:longitude"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/fromLocation",
+      "http://schema.org/geo",
+      "http://schema.org/longitude",
+    ]);
 
   travelAction.toAddress =
     travelActionImm.getIn(["s:toLocation", "s:name"]) ||
