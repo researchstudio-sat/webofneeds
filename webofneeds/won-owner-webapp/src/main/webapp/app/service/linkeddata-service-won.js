@@ -2493,16 +2493,6 @@ import won from "./won.js";
             "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
           propertyPath: "won:hasConnections",
         },
-        {
-          prefixes:
-            "prefix " +
-            won.WON.prefix +
-            ": <" +
-            won.WON.baseUri +
-            "> " +
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
-          propertyPath: "won:hasConnections/rdfs:member",
-        },
       ],
       query:
         "prefix won: <http://purl.org/webofneeds/model#> \n" +
