@@ -191,7 +191,7 @@ import won from "./won.js";
               : {
                   "@type": "s:Place",
                   "s:geo": {
-                    "@Type": "s:GeoCoordinates",
+                    "@type": "s:GeoCoordinates",
                     "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
                       6
                     ),
@@ -206,7 +206,7 @@ import won from "./won.js";
               : {
                   "@type": "s:Place",
                   "s:geo": {
-                    "@Type": "s:GeoCoordinates",
+                    "@type": "s:GeoCoordinates",
                     "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
                       6
                     ),
