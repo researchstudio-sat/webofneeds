@@ -185,13 +185,13 @@ import won from "./won.js";
       "won:travelAction": !isOrSeeksData.travelAction
         ? undefined
         : {
-            "@type": "s:travelAction",
+            "@type": "s:TravelAction",
             "s:fromLocation": !isOrSeeksData.travelAction.fromLocation
               ? undefined
               : {
                   "@type": "s:Place",
                   "s:geo": {
-                    "@Type": "s:Geocoordinates",
+                    "@type": "s:GeoCoordinates",
                     "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
                       6
                     ),
@@ -206,7 +206,7 @@ import won from "./won.js";
               : {
                   "@type": "s:Place",
                   "s:geo": {
-                    "@Type": "s:Geocoordinates",
+                    "@type": "s:GeoCoordinates",
                     "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
                       6
                     ),

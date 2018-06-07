@@ -1088,7 +1088,9 @@ function parseNeed(jsonldNeed, ownNeed) {
 
     const wonHasMatchingContexts = jsonldNeedImm.get("won:hasMatchingContext");
 
-    const creationDate = jsonldNeedImm.get("http://purl.org/dc/terms/created");
+    const creationDate =
+      jsonldNeedImm.get("dct:created") ||
+      jsonldNeedImm.get("http://purl.org/dc/terms/created");
     if (creationDate) {
       parsedNeed.creationDate = new Date(creationDate);
       parsedNeed.lastUpdateDate = parsedNeed.creationDate;
@@ -1210,48 +1212,72 @@ function parseLocation(jsonldLocation) {
     },
   };
 
-  location.address = jsonldLocationImm.get("http://schema.org/name");
+  location.address =
+    jsonldLocationImm.get("s:name") ||
+    jsonldLocationImm.get("http://schema.org/name");
 
   location.lat = Number.parseFloat(
-    jsonldLocationImm.getIn([
-      "http://schema.org/geo",
-      "http://schema.org/latitude",
-    ])
+    jsonldLocationImm.getIn(["s:geo", "s:latitude"]) ||
+      jsonldLocationImm.getIn([
+        "http://schema.org/geo",
+        "http://schema.org/latitude",
+      ])
   );
   location.lng = Number.parseFloat(
-    jsonldLocationImm.getIn([
-      "http://schema.org/geo",
-      "http://schema.org/longitude",
-    ])
+    jsonldLocationImm.getIn(["s:geo", "s:longitude"]) ||
+      jsonldLocationImm.getIn([
+        "http://schema.org/geo",
+        "http://schema.org/longitude",
+      ])
   );
 
   location.nwCorner.lat = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasNorthWestCorner",
-      "http://schema.org/latitude",
-    ])
+      "s:latitude",
+    ]) ||
+      jsonldLocationImm.getIn([
+        "won:hasBoundingBox",
+        "won:hasNorthWestCorner",
+        "http://schema.org/latitude",
+      ])
   );
   location.nwCorner.lng = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasNorthWestCorner",
-      "http://schema.org/longitude",
-    ])
+      "s:longitude",
+    ]) ||
+      jsonldLocationImm.getIn([
+        "won:hasBoundingBox",
+        "won:hasNorthWestCorner",
+        "http://schema.org/longitude",
+      ])
   );
   location.seCorner.lat = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasSouthEastCorner",
-      "http://schema.org/latitude",
-    ])
+      "s:latitude",
+    ]) ||
+      jsonldLocationImm.getIn([
+        "won:hasBoundingBox",
+        "won:hasSouthEastCorner",
+        "http://schema.org/latitude",
+      ])
   );
   location.seCorner.lng = Number.parseFloat(
     jsonldLocationImm.getIn([
       "won:hasBoundingBox",
       "won:hasSouthEastCorner",
-      "http://schema.org/longitude",
-    ])
+      "s:longitude",
+    ]) ||
+      jsonldLocationImm.getIn([
+        "won:hasBoundingBox",
+        "won:hasSouthEastCorner",
+        "http://schema.org/longitude",
+      ])
   );
 
   if (
@@ -1291,39 +1317,51 @@ function parseTravelAction(jsonTravelAction) {
     },
   };
 
-  travelAction.fromAddress = travelActionImm.getIn([
-    "http://schema.org/fromLocation",
-    "http://schema.org/name",
-  ]);
+  travelAction.fromAddress =
+    travelActionImm.getIn(["s:fromLocation", "s:name"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/fromLocation",
+      "http://schema.org/name",
+    ]);
 
-  travelAction.fromLocation.lat = travelActionImm.getIn([
-    "http://schema.org/fromLocation",
-    "http://schema.org/geo",
-    "http://schema.org/latitude",
-  ]);
+  travelAction.fromLocation.lat =
+    travelActionImm.getIn(["s:fromLocation", "s:geo", "s:latitude"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/fromLocation",
+      "http://schema.org/geo",
+      "http://schema.org/latitude",
+    ]);
 
-  travelAction.fromLocation.lng = travelActionImm.getIn([
-    "http://schema.org/fromLocation",
-    "http://schema.org/geo",
-    "http://schema.org/longitude",
-  ]);
+  travelAction.fromLocation.lng =
+    travelActionImm.getIn(["s:fromLocation", "s:geo", "s:longitude"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/fromLocation",
+      "http://schema.org/geo",
+      "http://schema.org/longitude",
+    ]);
 
-  travelAction.toAddress = travelActionImm.getIn([
-    "http://schema.org/toLocation",
-    "http://schema.org/name",
-  ]);
+  travelAction.toAddress =
+    travelActionImm.getIn(["s:toLocation", "s:name"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/toLocation",
+      "http://schema.org/name",
+    ]);
 
-  travelAction.toLocation.lat = travelActionImm.getIn([
-    "http://schema.org/toLocation",
-    "http://schema.org/geo",
-    "http://schema.org/latitude",
-  ]);
+  travelAction.toLocation.lat =
+    travelActionImm.getIn(["s:toLocation", "s:geo", "s:latitude"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/toLocation",
+      "http://schema.org/geo",
+      "http://schema.org/latitude",
+    ]);
 
-  travelAction.toLocation.lng = travelActionImm.getIn([
-    "http://schema.org/toLocation",
-    "http://schema.org/geo",
-    "http://schema.org/longitude",
-  ]);
+  travelAction.toLocation.lng =
+    travelActionImm.getIn(["s:toLocation", "s:geo", "s:longitude"]) ||
+    travelActionImm.getIn([
+      "http://schema.org/toLocation",
+      "http://schema.org/geo",
+      "http://schema.org/longitude",
+    ]);
 
   if (
     (travelAction.fromAddress &&
