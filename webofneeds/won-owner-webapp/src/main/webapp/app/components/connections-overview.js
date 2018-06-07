@@ -66,16 +66,13 @@ function genComponentConf() {
                     </won-extended-connection-indicators>
                     <div class="co__item__need__detail__actions">
                         <button
-                            ng-if="need.get('uri') !== self.needUriInRoute"
-                            class="co__item__need__detail__actions__button won-button--outlined thin red"
-                            ng-click="self.selectNeed(need.get('uri'))">
-                            Show Details
-                        </button>
-                        <button
-                            ng-if="need.get('uri') === self.needUriInRoute"
-                            class="co__item__need__detail__actions__button won-button--outlined thin red"
-                            ng-click="self.selectNeed(undefined)">
-                            Hide Details
+                            class="co__item__need__detail__actions__button red"
+                            ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
+                            ng-class="{
+                              'won-button--filled' : need.get('uri') === self.needUriInRoute,
+                              'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
+                            }">
+                            Details
                         </button>
                     </div>
                 </div>
@@ -136,16 +133,13 @@ function genComponentConf() {
                         </won-extended-connection-indicators>
                         <div class="co__item__need__detail__actions">
                             <button
-                                ng-if="need.get('uri') !== self.needUriInRoute"
-                                class="co__item__need__detail__actions__button won-button--outlined thin red"
-                                ng-click="self.selectNeed(need.get('uri'))">
-                                Show Details
-                            </button>
-                            <button
-                                ng-if="need.get('uri') === self.needUriInRoute"
-                                class="co__item__need__detail__actions__button won-button--outlined thin red"
-                                ng-click="self.selectNeed(undefined)">
-                                Hide Details
+                                class="co__item__need__detail__actions__button red"
+                                ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
+                                ng-class="{
+                                  'won-button--filled' : need.get('uri') === self.needUriInRoute,
+                                  'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
+                                }">
+                                Details
                             </button>
                         </div>
                     </div>
