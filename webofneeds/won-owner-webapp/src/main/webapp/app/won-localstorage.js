@@ -74,6 +74,16 @@ export function markConnUriAsClosed(uri) {
   }
 }
 
+export function getClosedConnUris() {
+  let closedConnUrisString = localStorage.getItem(CLOSED_CONN_URIS);
+
+  if (!closedConnUrisString) {
+    return [];
+  } else {
+    return JSON.parse(closedConnUrisString);
+  }
+}
+
 export function isConnUriClosed(uri) {
   //TODO: BETTER IMPL
   let closedConnUrisString = localStorage.getItem(CLOSED_CONN_URIS);
