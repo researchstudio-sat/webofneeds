@@ -516,7 +516,7 @@ function fetchAllAccessibleAndRelevantData(
               urisToLookupMap(
                 connectionUris,
                 uri => {
-                  fetchConnectionAndDispatch(uri, curriedDispatch);
+                  return fetchConnectionAndDispatch(uri, curriedDispatch);
                 },
                 getClosedConnUris()
               )
