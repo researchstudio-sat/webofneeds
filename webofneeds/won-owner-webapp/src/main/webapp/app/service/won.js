@@ -19,7 +19,11 @@
  */
 "format es6" /* required to force babel to transpile this so the minifier is happy */;
 import { is, prefixOfUri, isArray, clone } from "../utils.js";
-import { clearPrivateId, clearReadUris } from "../won-localstorage.js";
+import {
+  clearPrivateId,
+  clearReadUris,
+  clearClosedConnUris,
+} from "../won-localstorage.js";
 import jsonld from "jsonld";
 
 import N3 from "n3";
@@ -37,6 +41,7 @@ won.showRdf = false; //if you set this to true, the RDF icons/links are visible
 
 won.clearPrivateId = clearPrivateId;
 won.clearReadUris = clearReadUris;
+won.clearClosedConnUris = clearClosedConnUris;
 
 won.WON = {};
 won.WON.baseUri = "http://purl.org/webofneeds/model#";
