@@ -185,7 +185,7 @@ import won from "./won.js";
       "won:travelAction": !isOrSeeksData.travelAction
         ? undefined
         : {
-            "@type": "s:travelAction",
+            "@type": "s:TravelAction",
             "s:fromLocation": !isOrSeeksData.travelAction.fromLocation
               ? undefined
               : {
