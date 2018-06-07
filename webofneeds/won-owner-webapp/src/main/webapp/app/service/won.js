@@ -23,6 +23,7 @@ import {
   clearPrivateId,
   clearReadUris,
   clearClosedConnUris,
+  getClosedConnUris,
 } from "../won-localstorage.js";
 import jsonld from "jsonld";
 
@@ -42,6 +43,7 @@ won.showRdf = false; //if you set this to true, the RDF icons/links are visible
 won.clearPrivateId = clearPrivateId;
 won.clearReadUris = clearReadUris;
 won.clearClosedConnUris = clearClosedConnUris;
+won.getClosedConnUris = getClosedConnUris;
 
 won.WON = {};
 won.WON.baseUri = "http://purl.org/webofneeds/model#";
