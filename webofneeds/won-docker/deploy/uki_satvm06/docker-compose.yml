@@ -5,7 +5,7 @@ services:
   gencert:
     build: ../../image/gencert
     environment:
-      - "CN=line.uki.or.at"
+      - "CN=meicogsci.matchat.org"
       - "PASS=file:/usr/local/certs/out/uki_certificate_passwd_file"
       - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
     volumes:
@@ -27,8 +27,8 @@ services:
   wonnode:
     build: ../../image/wonnode
     environment:
-      - "uri.host=line.uki.or.at"
-      - "uri.prefix=https://line.uki.or.at/won"
+      - "uri.host=meicogsci.matchat.org"
+      - "uri.prefix=https://meicogsci.matchat.org/won"
       - "http.port=8443"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5433/won_node"
@@ -43,10 +43,10 @@ services:
       - "8443:8443"
       - "61627:61626"
     volumes:
-      - $base_folder/letsencrypt/certs/live/line.uki.or.at/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
-      - $base_folder/letsencrypt/certs/live/line.uki.or.at/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
-      - $base_folder/letsencrypt/certs/live/line.uki.or.at/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
-      - $base_folder/letsencrypt/certs/live/line.uki.or.at/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
+      - $base_folder/letsencrypt/certs/live/meicogsci.matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
+      - $base_folder/letsencrypt/certs/live/meicogsci.matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
+      - $base_folder/letsencrypt/certs/live/meicogsci.matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
+      - $base_folder/letsencrypt/certs/live/meicogsci.matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
       - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
     depends_on:
       - postgres_node
@@ -66,12 +66,12 @@ services:
   owner:
     build: ../../image/owner
     environment:
-      - "node.default.host=line.uki.or.at"
-      - "uri.host=line.uki.or.at"
+      - "node.default.host=meicogsci.matchat.org"
+      - "uri.host=meicogsci.matchat.org"
       - "http.port=8082"
       - "node.default.http.port=443"
-      - "uri.prefix=https://line.uki.or.at/owner"
-      - "uri.prefix.node.default=https://line.uki.or.at/won"
+      - "uri.prefix=https://meicogsci.matchat.org/owner"
+      - "uri.prefix.node.default=https://meicogsci.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5432/won_owner"
       - "db.ddl.strategy=validate"
@@ -106,10 +106,10 @@ services:
     build: ../../image/matcher-service
     environment:
       - "node.host=satvm06.researchstudio.at"
-      - "matcher.uri=https://line.uki.or.at/matcher_service"
+      - "matcher.uri=https://meicogsci.matchat.org/matcher_service"
       - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
       - "uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://line.uki.or.at/won/resource,https://node.matchat.org/won/resource" # crawl uki won node and matchat won node
+      - "wonNodeController.wonNode.crawl=https://meicogsci.matchat.org/won/resource,https://node.matchat.org/won/resource" # crawl uki won node and matchat won node
       - "cluster.local.port=2561"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
@@ -162,11 +162,11 @@ services:
   debug_bot:
     build: ../../image/bots
     environment:
-      - "uri.prefix.owner=https://line.uki.or.at/debug_bot"  # set this for the trust store alias
-      - "node.default.host=line.uki.or.at"
+      - "uri.prefix.owner=https://meicogsci.matchat.org/debug_bot"  # set this for the trust store alias
+      - "node.default.host=meicogsci.matchat.org"
       - "node.default.http.port=443"
-      - "uri.prefix.node.default=https://line.uki.or.at/won"
-      - "won.node.uris=https://line.uki.or.at/won/resource"
+      - "uri.prefix.node.default=https://meicogsci.matchat.org/won"
+      - "won.node.uris=https://meicogsci.matchat.org/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
       - "botContext.mongodb.pass=$mongo_db_passwd"
