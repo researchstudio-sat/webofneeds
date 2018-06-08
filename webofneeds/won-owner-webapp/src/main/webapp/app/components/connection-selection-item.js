@@ -24,7 +24,7 @@ function genComponentConf() {
         timestamp="self.lastUpdateTimestamp"
         ng-click="self.setOpen()"
         class="clickable">
-      </won-post-header>
+      </won-connection-header>
 
       <div class="conn__unreadCount" ng-if="self.connection.get('state') === self.WON.Connected">
         {{ self.unreadMessagesCount }}
