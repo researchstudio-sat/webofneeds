@@ -509,15 +509,13 @@ function fetchAllAccessibleAndRelevantData(
   const allConnectionsPromise = allOwnNeedsPromise
     .then(() =>
       Promise.all(
-        ownNeedUris.map(needUri =>
+        ownNeedUris.map(uri =>
           won
-            .getConnectionUrisOfNeed(needUri, needUri, true)
+            .getConnectionUrisOfNeed(uri, uri, true)
             .then(connectionUris =>
               urisToLookupMap(
                 connectionUris,
-                uri => {
-                  return fetchConnectionAndDispatch(uri, curriedDispatch);
-                },
+                uri => fetchConnectionAndDispatch(uri, curriedDispatch),
                 getClosedConnUris()
               )
             )
