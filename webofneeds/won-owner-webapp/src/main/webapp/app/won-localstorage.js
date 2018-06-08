@@ -3,6 +3,7 @@
  */
 const READ_URIS = "wonReadUris";
 const CLOSED_CONN_URIS = "wonClosedConnectionUris";
+const INACTIVE_NEED_URIS = "inactiveNeedUris";
 
 export function markUriAsRead(uri) {
   //TODO: BETTER IMPL
@@ -104,14 +105,41 @@ export function clearClosedConnUris() {
   localStorage.removeItem(CLOSED_CONN_URIS);
 }
 
-export function isInactiveNeed(needUri) {
-  return localStorage.getItem(`inactiveNeeds/${needUri}`) !== null;
-}
-
 export function addInactiveNeed(needUri) {
-  localStorage.setItem(`inactiveNeeds/${needUri}`, true);
+  const inactiveNeeds = getInactiveNeedUris();
+  if (inactiveNeeds.includes(needUri)) {
+    return false;
+  } else {
+    localStorage.setItem(
+      INACTIVE_NEED_URIS,
+      JSON.stringify(inactiveNeeds.concat([needUri]))
+    );
+    return true;
+  }
 }
 
 export function removeInactiveNeed(needUri) {
-  localStorage.removeItem(`inactiveNeeds/${needUri}`);
+  localStorage.setItem(
+    INACTIVE_NEED_URIS,
+    JSON.stringify(getInactiveNeedUris().filter(uri => uri != needUri))
+  );
+}
+
+export function getInactiveNeedUris() {
+  try {
+    const needUris = JSON.parse(localStorage.getItem(INACTIVE_NEED_URIS)) || [];
+    if (Array.isArray(needUris)) {
+      return needUris;
+    } else {
+      return [];
+    }
+  } catch (e) {
+    console.warn(e);
+    clearInactiveNeedUris();
+    return [];
+  }
+}
+
+export function clearInactiveNeedUris() {
+  localStorage.removeItem(INACTIVE_NEED_URIS);
 }
