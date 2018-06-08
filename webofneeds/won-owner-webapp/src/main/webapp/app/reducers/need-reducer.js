@@ -30,6 +30,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.initialPageLoad:
+    case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.login: {
       let ownNeeds = action.payload.get("ownNeeds");
       ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
@@ -452,6 +453,14 @@ function addNeed(needs, jsonldNeed, ownNeed) {
   if (parsedNeed && parsedNeed.get("uri")) {
     let existingNeed = needs.get(parsedNeed.get("uri"));
     if (ownNeed && existingNeed) {
+      switch (parsedNeed.state) {
+        case won.WON.InactiveCompacted:
+          addInactiveNeed(parsedNeed.get("uri"));
+          break;
+        case won.WON.ActiveCompacted:
+          removeInactiveNeed(parsedNeed.get("uri"));
+          break;
+      }
       // If need is already present and the
       // need is claimed as an own need we set
       // have to set it
@@ -472,15 +481,6 @@ function addNeed(needs, jsonldNeed, ownNeed) {
   } else {
     console.error("Tried to add invalid need-object: ", jsonldNeedImm.toJS());
     newState = needs;
-  }
-
-  switch (parsedNeed.state) {
-    case won.WON.InactiveCompacted:
-      addInactiveNeed(parsedNeed.get("uri"));
-      break;
-    case won.WON.ActiveCompacted:
-      removeInactiveNeed(parsedNeed.get("uri"));
-      break;
   }
 
   return newState;

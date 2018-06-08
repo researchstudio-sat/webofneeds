@@ -6,7 +6,22 @@ import won from "../won-es6.js";
 
 import { actionTypes } from "./actions.js";
 
-import { buildConnectMessage } from "../won-message-utils.js";
+import {
+  buildConnectMessage,
+  fetchUnloadedData,
+} from "../won-message-utils.js";
+
+export function fetchUnloadedNeeds() {
+  return async dispatch => {
+    const curriedDispatch = payload => {
+      dispatch({
+        type: actionTypes.needs.fetchUnloadedNeeds,
+        payload: payload,
+      });
+    };
+    fetchUnloadedData(curriedDispatch);
+  };
+}
 
 //ownConnectionUri is optional - set if known
 export function needsConnect(

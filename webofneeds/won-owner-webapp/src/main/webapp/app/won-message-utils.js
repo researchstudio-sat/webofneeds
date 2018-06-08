@@ -9,10 +9,8 @@ import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
-import { isInactiveNeed } from "./won-localstorage.js";
-
 import { getRandomWonId } from "./won-utils.js";
-import { getClosedConnUris } from "./won-localstorage.js";
+import { getClosedConnUris, getInactiveNeedUris } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -431,6 +429,18 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
     );
 }
 
+export function fetchUnloadedData(curriedDispatch) {
+  console.log("fetchUnloadedData");
+  return fetchOwnedNeedUris().then(needUris => {
+    const unloadedNeedUris = getInactiveNeedUris();
+    return fetchDataForOwnedNeeds(
+      needUris.filter(uri => unloadedNeedUris.includes(uri)),
+      curriedDispatch,
+      []
+    );
+  });
+}
+
 export function fetchOwnedData(email, curriedDispatch) {
   console.log("fetchOwnedData");
   return fetchOwnedNeedUris().then(needUris =>
@@ -503,13 +513,9 @@ function fetchAllAccessibleAndRelevantData(
     return Promise.resolve(emptyDataset);
   }
 
-  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri => {
-    if (isInactiveNeed(uri)) {
-      return undefined;
-    } else {
-      return fetchOwnNeedAndDispatch(uri, curriedDispatch);
-    }
-  });
+  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
+    fetchOwnNeedAndDispatch(uri, curriedDispatch)
+  );
 
   // wait for the own needs to be dispatched then load connections
   const allConnectionsPromise = allOwnNeedsPromise

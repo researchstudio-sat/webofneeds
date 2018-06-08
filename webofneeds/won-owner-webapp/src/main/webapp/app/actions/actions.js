@@ -52,7 +52,7 @@ import {
   createWhatsAround,
 } from "./create-need-action.js";
 
-import { needsConnect } from "./needs-actions.js";
+import { needsConnect, fetchUnloadedNeeds } from "./needs-actions.js";
 
 import {
   stateBack,
@@ -119,6 +119,7 @@ const actionHierarchy = {
     closedBySystem: needsClosedBySystem,
     failed: INJ_DEFAULT,
     connect: needsConnect,
+    fetchUnloadedNeeds: fetchUnloadedNeeds,
   },
   router: {
     stateGo, // only overwrites parameters that are explicitly mentioned, unless called without queryParams object (which also resets "pervasive" parameters, that shouldn't be removed
