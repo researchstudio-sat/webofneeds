@@ -10,7 +10,11 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
-import { getClosedConnUris, getInactiveNeedUris } from "./won-localstorage.js";
+import {
+  getClosedConnUris,
+  getInactiveNeedUris,
+  removeInactiveNeed,
+} from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -507,14 +511,23 @@ window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(
   ownNeedUris,
-  curriedDispatch = () => undefined
+  curriedDispatch = () => undefined,
+  filterUris = getInactiveNeedUris()
 ) {
   if (!is("Array", ownNeedUris) || ownNeedUris.length === 0) {
     return Promise.resolve(emptyDataset);
   }
 
-  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
-    fetchOwnNeedAndDispatch(uri, curriedDispatch)
+  filterUris.forEach(uri => {
+    if (!ownNeedUris.includes(uri)) {
+      removeInactiveNeed(uri);
+    }
+  });
+
+  const allOwnNeedsPromise = urisToLookupMap(
+    ownNeedUris,
+    uri => fetchOwnNeedAndDispatch(uri, curriedDispatch),
+    filterUris
   );
 
   // wait for the own needs to be dispatched then load connections

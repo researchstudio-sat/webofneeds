@@ -451,9 +451,8 @@ function addNeed(needs, jsonldNeed, ownNeed) {
   let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
   if (parsedNeed && parsedNeed.get("uri")) {
-    let existingNeed = needs.get(parsedNeed.get("uri"));
-    if (ownNeed && existingNeed) {
-      switch (parsedNeed.state) {
+    if (ownNeed) {
+      switch (parsedNeed.get("state")) {
         case won.WON.InactiveCompacted:
           addInactiveNeed(parsedNeed.get("uri"));
           break;
@@ -461,6 +460,9 @@ function addNeed(needs, jsonldNeed, ownNeed) {
           removeInactiveNeed(parsedNeed.get("uri"));
           break;
       }
+    }
+    let existingNeed = needs.get(parsedNeed.get("uri"));
+    if (ownNeed && existingNeed) {
       // If need is already present and the
       // need is claimed as an own need we set
       // have to set it
