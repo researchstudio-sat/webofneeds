@@ -429,10 +429,9 @@ export function flattenObj(objOfObj) {
 export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
   //make sure we have an array and not a single uri.
   const urisAsArray = is("Array", uris) ? uris : [uris];
-  const excludeUrisAsArray = is(
-    "Array",
-    excludeUris ? excludeUris : [excludeUris]
-  );
+  const excludeUrisAsArray = is("Array", excludeUris)
+    ? excludeUris
+    : [excludeUris];
 
   const urisAsArrayWithoutExcludes = urisAsArray.filter(uri => {
     const exclude = excludeUrisAsArray.indexOf(uri) < 0;
