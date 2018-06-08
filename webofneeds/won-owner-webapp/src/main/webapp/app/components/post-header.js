@@ -16,13 +16,13 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
 
-    <won-square-image ng-if="!self.need.get('beingCreated')"
+    <won-square-image ng-if="!self.need.get('isBeingCreated')"
         ng-class="{'bigger' : self.biggerImage, 'inactive' : self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.need.get('beingCreated')">
+    <div class="ph__right" ng-if="!self.need.get('isBeingCreated')">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title">
           {{ self.need.get('title') }}
@@ -51,22 +51,21 @@ function genComponentConf() {
       </div>
     </div>
     
-    <won-square-image ng-if="self.need.get('beingCreated')"
+    <won-square-image ng-if="self.need.get('isBeingCreated')"
       ng-class="{'bigger' : self.biggerImage}"
       src="self.need.get('TODO')"
-      title="self.need.get('is') ? self.need.getIn('is', 'title') : self.need.getIn('search', 'title')"
       uri="self.needUri"
       ng-show="!self.hideImage">
     </won-square-image>
-    <div class="ph__right" ng-if="self.need.get('beingCreated')">
+    <div class="ph__right" ng-if="self.need.get('isBeingCreated')">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title">
-          Creating {{self.need.get("is") ? "Post" : "Search"}}...
+          Creating...
         </div>
       </div>
       <div class="ph__right__subtitle">
         <span class="ph__right__subtitle__type">
-          {{self.need.get("is") ? "Post" : "Search"}}
+          {{self.labels.type[self.need.get('type')]}}
         </span>
       </div>
     </div>

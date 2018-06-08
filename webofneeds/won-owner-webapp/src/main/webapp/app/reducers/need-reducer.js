@@ -453,7 +453,8 @@ function addNeed(needs, jsonldNeed, ownNeed) {
       // If need is already present and the
       // need is claimed as an own need we set
       // have to set it
-      if (existingNeed.get("beingCreated")) {
+      const isBeingCreated = existingNeed.get("isBeingCreated");
+      if (isBeingCreated) {
         // replace it
         parsedNeed = parsedNeed.set(
           "connections",
@@ -477,18 +478,52 @@ function addNeed(needs, jsonldNeed, ownNeed) {
 function addNeedInCreation(needs, needInCreation, needUri) {
   let newState;
   let need = Immutable.fromJS(needInCreation);
+
   if (need) {
-    need = need.set("beingCreated", true);
+    need = need.set("uri", needUri);
     need = need.set("ownNeed", true);
-    need = need.set("needUri", needUri);
-    need = need.set("connections", Immutable.Map());
-    if (need.get("whatsAround")) {
-      need = need.set("isWhatsAround", true);
+    need = need.set("isBeingCreated", true);
+
+    let type = undefined;
+    let title = undefined;
+
+    if (need.get("is")) {
+      type = need.get("seeks")
+        ? won.WON.BasicNeedTypeCombinedCompacted
+        : won.WON.BasicNeedTypeSupplyCompacted;
+      title = need.getIn(["is", "title"]);
+      console.log("is title: ", title);
     }
-    if (need.get("whatsNew")) {
-      need = need.set("isWhatsNew", true);
+
+    if (need.get("seeks")) {
+      type = need.get("is")
+        ? won.WON.BasicNeedTypeCombinedCompacted
+        : won.WON.BasicNeedTypeDemandCompacted;
+      title = need.getIn(["seeks", "title"]);
+      console.log("seeks title: ", title);
     }
+
+    need = need.set("type", type);
+    need = need.set("title", title);
+
+    let isWhatsAround = false;
+    let isWhatsNew = false;
+
+    if (
+      need.getIn(["is", "whatsAround"]) ||
+      need.getIn(["seeks", "whatsAround"])
+    ) {
+      isWhatsAround = true;
+    }
+    if (need.getIn(["is", "whatsNew"]) || need.getIn(["seeks", "whatsNew"])) {
+      isWhatsNew = true;
+    }
+
+    need = need.set("isWhatsAround", isWhatsAround);
+    need = need.set("isWhatsNew", isWhatsNew);
+
     newState = needs.setIn([needUri], need);
+    console.log("need-reducer create new need: ", need.toJS());
   } else {
     console.error("Tried to add invalid need-object: ", needInCreation);
     newState = needs;
@@ -1030,16 +1065,14 @@ function parseNeed(jsonldNeed, ownNeed) {
     uri: undefined,
     nodeUri: undefined,
     title: undefined,
-    description: undefined,
     type: undefined,
     state: undefined,
-    tags: undefined,
-    location: undefined,
     connections: Immutable.Map(),
     creationDate: undefined,
     lastUpdateDate: undefined,
     unread: false,
     ownNeed: !!ownNeed,
+    isBeingCreated: false,
     isWhatsAround: false,
     isWhatsNew: false,
     matchingContexts: undefined,

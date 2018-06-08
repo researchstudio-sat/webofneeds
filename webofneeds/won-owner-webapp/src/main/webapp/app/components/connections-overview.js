@@ -31,12 +31,12 @@ function genComponentConf() {
         <won-create-post-item ng-class="{'selected' : self.showCreateView}"></won-create-post-item>
         <div ng-repeat="need in self.beingCreatedNeeds" class="co__item">
             <!-- ng-if="self.beingCreatedNeeds.size > 0" -->
-            <div class="co__item__need" ng-class="{'selected' : need.get('needUri') === self.needUriInRoute}">
+            <div class="co__item__need" ng-class="{'selected' : need.get('uri') === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
-                        need-uri="need.get('needUri')"
+                        need-uri="need.get('uri')"
                         timestamp="'TODOlatestOfThatType'"
-                        ng-click="self.toggleDetails(need.get('needUri'))"
+                        ng-click="self.toggleDetails(need.get('uri'))"
                         class="clickable">
                     </won-post-header>
                 </div>
@@ -194,7 +194,7 @@ function genComponentConf() {
 
         // needs that have been created but are not confirmed by the server yet
         const beingCreatedNeeds =
-          allOwnNeeds && allOwnNeeds.filter(post => post.get("beingCreated"));
+          allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
 
         const routerParams = selectRouterParams(state);
         const showCreateView = getIn(state, [
