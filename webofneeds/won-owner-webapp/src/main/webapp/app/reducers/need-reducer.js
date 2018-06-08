@@ -5,7 +5,11 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import won from "../won-es6.js";
 import { msStringToDate, getIn } from "../utils.js";
-import { isUriRead, markUriAsRead } from "../won-localstorage.js";
+import {
+  isUriRead,
+  markUriAsRead,
+  markConnUriAsClosed,
+} from "../won-localstorage.js";
 
 const initialState = Immutable.fromJS({});
 
@@ -531,6 +535,10 @@ function addConnectionFull(state, connection) {
         state = state.setIn([needUri, "unread"], true);
       }
 
+      if (parsedConnection.getIn(["data", "state"]) === won.WON.Closed) {
+        markConnUriAsClosed(connectionUri);
+      }
+
       return state.mergeDeepIn(
         [needUri, "connections", connectionUri],
         parsedConnection.get("data")
@@ -669,6 +677,10 @@ function changeConnectionState(state, connectionUri, newState) {
   }
 
   const needUri = need.get("uri");
+
+  if (newState === won.WON.Closed) {
+    markConnUriAsClosed(connectionUri);
+  }
 
   return state
     .setIn([needUri, "connections", connectionUri, "state"], newState)
@@ -847,12 +859,8 @@ function changeConnectionStateByFun(state, connectionUri, fun) {
     connectionUri,
     "state",
   ]);
-  return state
-    .setIn(
-      [needUri, "connections", connectionUri, "state"],
-      fun(connectionState)
-    )
-    .setIn([needUri, "connections", connectionUri, "unread"], true);
+
+  return changeConnectionState(state, connectionUri, fun(connectionState));
 }
 
 function changeNeedState(state, needUri, newState) {

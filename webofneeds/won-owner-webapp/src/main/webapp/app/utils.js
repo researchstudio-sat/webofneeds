@@ -426,17 +426,31 @@ export function flattenObj(objOfObj) {
  * @param asyncLookupFunction
  * @return {*}
  */
-export function urisToLookupMap(uris, asyncLookupFunction) {
+export function urisToLookupMap(uris, asyncLookupFunction, excludeUris = []) {
   //make sure we have an array and not a single uri.
   const urisAsArray = is("Array", uris) ? uris : [uris];
-  const asyncLookups = urisAsArray.map(uri =>
+  const excludeUrisAsArray = is("Array", excludeUris)
+    ? excludeUris
+    : [excludeUris];
+
+  const urisAsArrayWithoutExcludes = urisAsArray.filter(uri => {
+    const exclude = excludeUrisAsArray.indexOf(uri) < 0;
+    if (exclude) {
+      return true;
+    } else {
+      console.log(uri, "closed, ommit further crawl for this uri");
+      return false;
+    }
+  });
+
+  const asyncLookups = urisAsArrayWithoutExcludes.map(uri =>
     asyncLookupFunction(uri).catch(error => {
       console.error(
         `failed lookup for ${uri} in utils.js:urisToLookupMap ` + error.message,
         "\n\n",
         error.stack,
         "\n\n",
-        urisAsArray,
+        urisAsArrayWithoutExcludes,
         "\n\n",
         uris,
         "\n\n",

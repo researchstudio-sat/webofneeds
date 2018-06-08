@@ -104,23 +104,6 @@ export function connectionsChatMessage(
   };
 }
 
-export function connectionsFetch(data) {
-  return dispatch => {
-    const allConnectionsPromise = won.executeCrawlableQuery(
-      won.queries["getAllConnectionUrisOfNeed"],
-      data.needUri
-    );
-    allConnectionsPromise.then(function(connections) {
-      dispatch(
-        actionCreators.needs__connectionsReceived({
-          needUri: data.needUri,
-          connections: connections,
-        })
-      );
-    });
-  };
-}
-
 export function connectionsOpen(connectionUri, textMessage) {
   return async (dispatch, getState) => {
     const ownNeed = getState()

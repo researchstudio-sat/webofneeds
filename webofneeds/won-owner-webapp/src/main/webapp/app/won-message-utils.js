@@ -10,6 +10,7 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
+import { getClosedConnUris } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -510,10 +511,12 @@ function fetchAllAccessibleAndRelevantData(
       Promise.all(
         ownNeedUris.map(uri =>
           won
-            .getConnectionUrisOfNeed(uri, false)
+            .getConnectionUrisOfNeed(uri, uri, true)
             .then(connectionUris =>
-              urisToLookupMap(connectionUris, uri =>
-                fetchConnectionAndDispatch(uri, curriedDispatch)
+              urisToLookupMap(
+                connectionUris,
+                uri => fetchConnectionAndDispatch(uri, curriedDispatch),
+                getClosedConnUris()
               )
             )
         )

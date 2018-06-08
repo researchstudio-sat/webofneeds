@@ -91,7 +91,6 @@ const INJ_DEFAULT = "INJECT_DEFAULT_ACTION_CREATOR";
 const actionHierarchy = {
   initialPageLoad: pageLoadAction,
   connections: {
-    fetch: cnct.connectionsFetch,
     open: cnct.connectionsOpen,
     connectAdHoc: cnct.connectionsConnectAdHoc,
     close: cnct.connectionsClose,
