@@ -14,15 +14,15 @@ rm uki_certificate_passwd_file
 
 # copy the openssl.conf file to the server where the certificates are generated
 # the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf
-# for entries of alternative server names: line.uki.or.at, satvm06.researchstudio.at
+# for entries of alternative server names: meicogsci.matchat.org, satvm06.researchstudio.at
 scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-uki.conf won@satvm06:$base_folder/openssl.conf
 
 # copy the nginx.conf file to the proxy server
 scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-uki-http.conf won@satvm01:$live_base_folder/nginx-uki-http.conf
 
 # copy letsencrypt certificate files from satvm01 (live/matchat) to satvm06
-ssh won@satvm06 mkdir -p $base_folder/letsencrypt/certs/live/line.uki.or.at
-scp -3 won@satvm01:$live_base_folder/letsencrypt/certs/live/line.uki.or.at/* won@satvm06:$base_folder/letsencrypt/certs/live/line.uki.or.at/
+ssh won@satvm06 mkdir -p $base_folder/letsencrypt/certs/live/meicogsci.matchat.org
+scp -3 won@satvm01:$live_base_folder/letsencrypt/certs/live/meicogsci.matchat.org/* won@satvm06:$base_folder/letsencrypt/certs/live/meicogsci.matchat.org/
 
 # create the solr data directories (if not available yet) with full rights for every user.
 # This is done so that the directory on the host can be written by the solr user from inside the container
