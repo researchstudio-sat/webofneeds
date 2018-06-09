@@ -30,6 +30,19 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
         <won-create-post-item ng-class="{'selected' : self.showCreateView}"></won-create-post-item>
+        <div ng-repeat="need in self.beingCreatedNeeds" class="co__item">
+            <!-- ng-if="self.beingCreatedNeeds.size > 0" -->
+            <div class="co__item__need" ng-class="{'selected' : need.get('uri') === self.needUriInRoute}">
+                <div class="co__item__need__header">
+                    <won-post-header
+                        need-uri="need.get('uri')"
+                        timestamp="'TODOlatestOfThatType'"
+                        ng-click="self.toggleDetails(need.get('uri'))"
+                        class="clickable">
+                    </won-post-header>
+                </div>
+            </div>
+        </div>
         <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
             ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenConnections(need)}">
             <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
@@ -180,6 +193,10 @@ function genComponentConf() {
               !(post.get("isWhatsAround") || post.get("isWhatsNew"))
           ); //Filter whatsAround and whatsNew needs automatically
 
+        // needs that have been created but are not confirmed by the server yet
+        const beingCreatedNeeds =
+          allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
+
         const routerParams = selectRouterParams(state);
         const showCreateView = getIn(state, [
           "router",
@@ -208,6 +225,7 @@ function genComponentConf() {
           showCreateView,
           needUriInRoute,
           needUriImpliedInRoute,
+          beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
           sortedOpenNeeds,
           sortedClosedNeeds,
           unloadedNeedsSize: unloadedNeeds.length,

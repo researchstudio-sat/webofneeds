@@ -15,40 +15,60 @@ import won from "../won-es6.js";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-      <won-square-image
+
+    <won-square-image ng-if="!self.need.get('isBeingCreated')"
         ng-class="{'bigger' : self.biggerImage, 'inactive' : self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
-      </won-square-image>
-      <div class="ph__right">
-        <div class="ph__right__topline">
-          <div class="ph__right__topline__title">
-            {{ self.need.get('title') }}
-          </div>
-          <div class="ph__right__topline__date">
-            {{ self.friendlyTimestamp }}
-          </div>
+    </won-square-image>
+    <div class="ph__right" ng-if="!self.need.get('isBeingCreated')">
+      <div class="ph__right__topline">
+        <div class="ph__right__topline__title">
+          {{ self.need.get('title') }}
         </div>
-        <div class="ph__right__subtitle">
-          <!--
-          <span class="piu__header__title__subtitle__group" ng-show="{{self.need.get('group')}}">
-            
-          <svg style="--local-primary:var(--won-primary-color);"
-            class="piu__header__title__subtitle__group__icon">
-              <use xlink:href="#ico36_group" href="#ico36_group"></use>
-          </svg>
-
-
-            {{self.need.get('group')}}
-            <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
-          </span>
-          -->
-          <span class="ph__right__subtitle__type">
-            {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : '' }}
-          </span>
+        <div class="ph__right__topline__date">
+          {{ self.friendlyTimestamp }}
         </div>
       </div>
+      <div class="ph__right__subtitle">
+        <!--
+        <span class="piu__header__title__subtitle__group" ng-show="{{self.need.get('group')}}">
+          
+        <svg style="--local-primary:var(--won-primary-color);"
+          class="piu__header__title__subtitle__group__icon">
+            <use xlink:href="#ico36_group" href="#ico36_group"></use>
+        </svg>
+
+
+          {{self.need.get('group')}}
+          <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
+        </span>
+        -->
+        <span class="ph__right__subtitle__type">
+          {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : '' }}
+        </span>
+      </div>
+    </div>
+    
+    <won-square-image ng-if="self.need.get('isBeingCreated')"
+      ng-class="{'bigger' : self.biggerImage}"
+      src="self.need.get('TODO')"
+      uri="self.needUri"
+      ng-show="!self.hideImage">
+    </won-square-image>
+    <div class="ph__right" ng-if="self.need.get('isBeingCreated')">
+      <div class="ph__right__topline">
+        <div class="ph__right__topline__title">
+          Creating...
+        </div>
+      </div>
+      <div class="ph__right__subtitle">
+        <span class="ph__right__subtitle__type">
+          {{self.labels.type[self.need.get('type')]}}
+        </span>
+      </div>
+    </div>
     `;
 
   class Controller {
