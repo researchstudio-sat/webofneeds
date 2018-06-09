@@ -24,6 +24,7 @@ import {
   selectRouterParams,
   selectNeedByConnectionUri,
 } from "../selectors.js";
+import { getInactiveNeedUris } from "../won-localstorage.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -87,8 +88,8 @@ function genComponentConf() {
                 </won-connection-selection-item>
             </div>
         </div>
-        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.closedNeedsSize > 0" ng-click="self.toggleClosedNeedsDisplay()">
-            <span class="co__separator__text">Archived Posts ({{ self.closedNeedsSize }})</span>
+        <div class="co__separator clickable" ng-class="{'co__separator--open' : self.showClosedNeeds}" ng-if="self.hasClosedNeeds()" ng-click="self.toggleClosedNeeds()">
+            <span class="co__separator__text">Archived Posts ({{self.getClosedNeedsText()}})</span>
             <svg
                 style="--local-primary:var(--won-secondary-color);"
                 class="co__separator__arrow"
@@ -197,6 +198,10 @@ function genComponentConf() {
         let sortedOpenNeeds = sortByDate(openNeeds);
         let sortedClosedNeeds = sortByDate(closedNeeds);
 
+        const unloadedNeeds = getInactiveNeedUris().filter(uri =>
+          (allOwnNeeds || []).every(need => need.get("uri") != uri)
+        );
+
         return {
           isLoading: !state.get("initialLoadFinished"),
           showClosedNeeds: state.get("showClosedNeeds"),
@@ -205,8 +210,8 @@ function genComponentConf() {
           needUriImpliedInRoute,
           sortedOpenNeeds,
           sortedClosedNeeds,
-          closedNeedsSize:
-            closedNeeds && closedNeeds.size > 0 ? closedNeeds.size : undefined,
+          unloadedNeedsSize: unloadedNeeds.length,
+          closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
         };
       };
       connect2Redux(
@@ -232,6 +237,27 @@ function genComponentConf() {
       } else {
         this.open[ownNeedUri] = true;
       }
+    }
+
+    hasClosedNeeds() {
+      return this.unloadedNeedsSize + this.closedNeedsSize > 0;
+    }
+
+    getClosedNeedsText() {
+      let output = [];
+      if (this.closedNeedsSize > 0) {
+        output.push(`${this.closedNeedsSize}`);
+      }
+      if (this.unloadedNeedsSize > 0) {
+        output.push(`${this.unloadedNeedsSize} unloaded`);
+      }
+
+      return output.join(" + ");
+    }
+
+    toggleClosedNeeds() {
+      this.needs__fetchUnloadedNeeds();
+      this.toggleClosedNeedsDisplay();
     }
 
     isOpen(ownNeedUri) {

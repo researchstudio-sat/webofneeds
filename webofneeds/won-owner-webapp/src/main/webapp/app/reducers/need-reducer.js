@@ -9,6 +9,8 @@ import {
   isUriRead,
   markUriAsRead,
   markConnUriAsClosed,
+  addInactiveNeed,
+  removeInactiveNeed,
 } from "../won-localstorage.js";
 
 const initialState = Immutable.fromJS({});
@@ -28,6 +30,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       );
 
     case actionTypes.initialPageLoad:
+    case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.login: {
       let ownNeeds = action.payload.get("ownNeeds");
       ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
@@ -448,6 +451,16 @@ function addNeed(needs, jsonldNeed, ownNeed) {
   let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
   if (parsedNeed && parsedNeed.get("uri")) {
+    if (ownNeed) {
+      switch (parsedNeed.get("state")) {
+        case won.WON.InactiveCompacted:
+          addInactiveNeed(parsedNeed.get("uri"));
+          break;
+        case won.WON.ActiveCompacted:
+          removeInactiveNeed(parsedNeed.get("uri"));
+          break;
+      }
+    }
     let existingNeed = needs.get(parsedNeed.get("uri"));
     if (ownNeed && existingNeed) {
       // If need is already present and the
@@ -471,6 +484,7 @@ function addNeed(needs, jsonldNeed, ownNeed) {
     console.error("Tried to add invalid need-object: ", jsonldNeedImm.toJS());
     newState = needs;
   }
+
   return newState;
 }
 
@@ -864,6 +878,14 @@ function changeConnectionStateByFun(state, connectionUri, fun) {
 }
 
 function changeNeedState(state, needUri, newState) {
+  switch (newState) {
+    case won.WON.InactiveCompacted:
+      addInactiveNeed(needUri);
+      break;
+    case won.WON.ActiveCompacted:
+      removeInactiveNeed(needUri);
+      break;
+  }
   return state.setIn([needUri, "state"], newState);
 }
 
