@@ -52,7 +52,8 @@ const postTypeTexts = [
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
-  "$scope" /*'$routeParams' /*injections as strings here*/,
+  "$scope",
+  "$element" /*'$routeParams' /*injections as strings here*/,
 ];
 
 function genComponentConf() {
@@ -69,11 +70,22 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.snapToBottom"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.snapToBottom"></won-create-isseeks>
             <!-- TODO: decide on whether to re-add stuff like an additional search/description window or something for adding contexts -->
+            <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
+            <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
+                    ng-disabled="!self.isValid()"
+                    ng-click="::self.publish()">
+                <span ng-show="!self.pendingPublishing">
+                    Publish
+                </span>
+                <span ng-show="self.pendingPublishing">
+                    Publishing&nbsp;&hellip;
+                </span>
+            </button>
         </div>
-        <div class="cp__footer">
+        <div class="cp__footer hide-in-responsive" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__footer__publish"
                     ng-disabled="!self.isValid()"
@@ -138,6 +150,7 @@ function genComponentConf() {
         matchingContext: undefined,
       };
 
+      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
       this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
 
       this.is = "is";
@@ -175,6 +188,47 @@ function genComponentConf() {
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    snapToBottom() {
+      this._snapBottom = true;
+      this.scrollToBottom();
+    }
+    unsnapFromBottom() {
+      this._snapBottom = false;
+    }
+    updateScrollposition() {
+      if (this._snapBottom) {
+        this.scrollToBottom();
+      }
+    }
+    scrollToBottom() {
+      this._programmaticallyScrolling = true;
+
+      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
+    }
+    onScroll() {
+      if (!this._programmaticallyScrolling) {
+        //only unsnap if the user scrolled themselves
+        this.unsnapFromBottom();
+      }
+
+      const sc = this.scrollContainer();
+      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
+      if (isAtBottom) {
+        this.snapToBottom();
+      }
+
+      this._programmaticallyScrolling = false;
+    }
+    scrollContainerNg() {
+      return angular.element(this.scrollContainer());
+    }
+    scrollContainer() {
+      if (!this._scrollContainer) {
+        this._scrollContainer = this.$element[0].querySelector(".cp__content");
+      }
+      return this._scrollContainer;
     }
 
     isValid() {

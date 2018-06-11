@@ -53,6 +53,8 @@
   white-space: nowrap;
   user-select: none;
 
+  flex-shrink: 0;
+
   svg.won-button-icon {
     @include fixed-square($normalFontSize);
     margin-right: 0.5rem;
