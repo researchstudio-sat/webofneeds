@@ -141,7 +141,8 @@ function genComponentConf() {
         <!-- TODO: move details into the div opened by the detail picker? -->
         <div class="cis__details" ng-if="self.showDetail">
             <!-- DESCRIPTION -->
-            <won-description-picker 
+            <won-description-picker
+              ng-click="self.onScroll()"
               ng-if="self.openDetail === 'description'"
               initial-description="::self.draftObject.description"
               on-description-updated="::self.updateDescription(description)">
@@ -163,6 +164,7 @@ function genComponentConf() {
 
             <!-- TAGS -->
             <won-tags-picker
+                ng-click="self.onScroll()"
                 ng-if="self.openDetail === 'tags'"
                 initial-tags="::self.draftObject.tags"
                 on-tags-updated="::self.updateTags(tags)">
@@ -170,6 +172,7 @@ function genComponentConf() {
 
             <!-- TTL -->
             <won-ttl-picker
+              ng-click="self.onScroll()"
               ng-if="self.openDetail === 'ttl'"
               initial-ttl="::self.draftObject.ttl"
               on-ttl-updated="::self.updateTTL(ttl)">
@@ -409,6 +412,11 @@ function genComponentConf() {
       }
 
       this.updateDraft();
+    }
+
+    updateScroll() {
+      console.log("Scoll activity");
+      this.onScroll();
     }
 
     pickImage(image) {
