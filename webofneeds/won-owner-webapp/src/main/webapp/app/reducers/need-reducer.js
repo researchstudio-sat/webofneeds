@@ -497,6 +497,7 @@ function addNeedInCreation(needs, needInCreation, needUri) {
     need = need.set("uri", needUri);
     need = need.set("ownNeed", true);
     need = need.set("isBeingCreated", true);
+    need = need.set("connections", Immutable.Map());
 
     let type = undefined;
     let title = undefined;
