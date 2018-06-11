@@ -75,14 +75,6 @@ export default function(allToasts = initialState, action = {}) {
         { unsafeHtmlEnabled: true }
       );
 
-    case actionTypes.lostConnection:
-      return pushNewToast(
-        allToasts,
-        "Lost connection - progress " +
-          "can't be saved any more. Make sure your " +
-          'internet-connection is working, then click "Reconnect"',
-        won.WON.warnToast
-      );
     //INFO TOASTS: won.WON.infoToast
 
     //WARN TOASTS: won.WON.warnToast
