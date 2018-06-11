@@ -33,7 +33,7 @@ echo copied $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-uki-http.conf to 
 # copy letsencrypt certificate files from satvm01 (live/matchat) to satvm06
 ssh won@satvm06 mkdir -p $base_folder/letsencrypt/certs/live/meicogsci.matchat.org
 echo made directory $base_folder/letsencrypt/certs/live/meicogsci.matchat.org
-scp -3 won@satvm01:$live_base_folder/letsencrypt/certs/live/meicogsci.matchat.org/* won@satvm06:$base_folder/letsencrypt/certs/live/meicogsci.matchat.org/
+scp -3 -v won@satvm01:$live_base_folder/letsencrypt/certs/live/meicogsci.matchat.org/* won@satvm06:$base_folder/letsencrypt/certs/live/meicogsci.matchat.org/
 echo copied won@satvm01:$live_base_folder/letsencrypt/certs/live/meicogsci.matchat.org/* to won@satvm06:$base_folder/letsencrypt/certs/live/meicogsci.matchat.org/
 
 # create the solr data directories (if not available yet) with full rights for every user.
