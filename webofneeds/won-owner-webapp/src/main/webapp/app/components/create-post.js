@@ -71,8 +71,8 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.snapToBottom"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.snapToBottom"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.scrollToBottom()"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.scrollToBottom()"></won-create-isseeks>
             <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
@@ -134,7 +134,7 @@ function genComponentConf() {
         matchingContext: undefined,
       };
 
-      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
+      //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
       this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
 
       this.is = "is";
@@ -164,6 +164,7 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
+    /*
     snapToBottom() {
       this._snapBottom = true;
       this.scrollToBottom();
@@ -176,11 +177,13 @@ function genComponentConf() {
         this.scrollToBottom();
       }
     }
+    */
     scrollToBottom() {
       this._programmaticallyScrolling = true;
 
       this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
     }
+    /*
     onScroll() {
       if (!this._programmaticallyScrolling) {
         //only unsnap if the user scrolled themselves
@@ -197,7 +200,7 @@ function genComponentConf() {
     }
     scrollContainerNg() {
       return angular.element(this.scrollContainer());
-    }
+    }*/
     scrollContainer() {
       if (!this._scrollContainer) {
         this._scrollContainer = this.$element[0].querySelector(".cp__content");

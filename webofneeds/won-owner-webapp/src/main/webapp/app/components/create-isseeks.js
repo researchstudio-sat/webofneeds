@@ -314,10 +314,6 @@ function genComponentConf() {
       dispatchEvent(this.$element[0], "update", { draft: this.draftObject });
     }
 
-    updateScroll() {
-      this.onScroll();
-    }
-
     setDraft(updatedDraft) {
       Object.assign(this.draftObject, updatedDraft);
       this.updateDraft();
@@ -421,7 +417,7 @@ function genComponentConf() {
 
     toggleDetail() {
       if (!this.showDetail) {
-        this.updateScroll();
+        this.onScroll();
       }
       this.showDetail = !this.showDetail;
     }
@@ -439,6 +435,7 @@ function genComponentConf() {
         this.openDetail = undefined;
       } else {
         this.openDetail = detail;
+        this.onScroll();
       }
     }
 
