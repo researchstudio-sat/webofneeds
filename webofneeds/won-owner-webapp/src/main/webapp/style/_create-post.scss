@@ -45,6 +45,9 @@ won-create-post {
     &__back {
       grid-area: header_back;
       &__icon {
+        /*@media (max-width: $responsivenessBreakPoint) {
+          @include fixed-square(2.5rem);
+        }*/
         @include fixed-square($backIconSize);
       }
     }
