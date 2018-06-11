@@ -12,6 +12,7 @@
 won-create-isseeks {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 
   // title
   .cis__mandatory {

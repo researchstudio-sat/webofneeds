@@ -192,11 +192,57 @@ function genComponentConf() {
 
       this.reset();
 
+      //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
       const selectFromState = () => ({});
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
     }
+
+    /*
+    snapToBottom() {
+      this._snapBottom = true;
+      this.scrollToBottom();
+    }
+    unsnapFromBottom() {
+      this._snapBottom = false;
+    }
+    updateScrollposition() {
+      if (this._snapBottom) {
+        this.scrollToBottom();
+      }
+    }
+    scrollToBottom() {
+      this._programmaticallyScrolling = true;
+
+      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
+    }
+    onScroll() {
+      if (!this._programmaticallyScrolling) {
+        //only unsnap if the user scrolled themselves
+        this.unsnapFromBottom();
+      }
+
+      const sc = this.scrollContainer();
+      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
+      if (isAtBottom) {
+        this.snapToBottom();
+      }
+
+      this._programmaticallyScrolling = false;
+    }
+    scrollContainerNg() {
+      return angular.element(this.scrollContainer());
+    }
+    scrollContainer() {
+      if (!this._scrollContainer) {
+        this._scrollContainer = this.$element[0].querySelector(
+          ".won-create-isseeks"
+        );
+      }
+      return this._scrollContainer;
+    }
+    */
 
     reset() {
       this.draftObject = clone(emptyDraft);
@@ -224,6 +270,10 @@ function genComponentConf() {
 
       this.onUpdate({ draft: this.draftObject });
       dispatchEvent(this.$element[0], "update", { draft: this.draftObject });
+    }
+
+    updateScroll() {
+      this.onScroll();
     }
 
     setDraft(updatedDraft) {
@@ -313,6 +363,9 @@ function genComponentConf() {
     }
 
     toggleDetail() {
+      if (!this.showDetail) {
+        this.updateScroll();
+      }
       this.showDetail = !this.showDetail;
     }
 
@@ -352,6 +405,7 @@ function genComponentConf() {
              *  on-update="::myCallback(draft)"
              */
       onUpdate: "&",
+      onScroll: "&",
     },
     template: template,
   };
