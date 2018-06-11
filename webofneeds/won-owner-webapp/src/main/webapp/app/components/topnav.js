@@ -18,7 +18,6 @@ import * as srefUtils from "../sref-utils.js";
 
 function genTopnavConf() {
   let template = `
-        <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
             <svg class="si__icon" style="--local-primary:white;">
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>

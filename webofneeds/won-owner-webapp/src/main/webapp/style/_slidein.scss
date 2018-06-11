@@ -1,3 +1,4 @@
+@import "won-config";
 @import "button";
 @import "collapsible";
 @import "button";
@@ -7,7 +8,7 @@
 
   color: white;
 
-  background: $won-primary-color;
+  background: $won-secondary-color-lighter;
 
   padding: 1rem;
 
@@ -15,19 +16,45 @@
   justify-content: center;
   align-items: center;
 
+  @media (max-width: $responsivenessBreakPoint) {
+    flex-direction: column;
+  }
+
   & > .si__icon {
-    margin-left: 1rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      margin: 0;
+    }
+
+    @media (min-width: $responsivenessBreakPoint) {
+      margin-left: 1rem;
+    }
+
     @include fixed-square(2rem);
   }
 
   & > .si__text {
-    margin-left: 0.5rem;
-    margin-right: 1rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      margin: 0;
+      text-align: center;
+    }
+
+    @media (min-width: $responsivenessBreakPoint) {
+      margin-left: 0.5rem;
+      margin-right: 1rem;
+      text-align: left;
+    }
   }
 
   & > .si__button {
-    margin-left: 1.3rem;
-    margin-right: 1rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      margin: 0.5rem 0 0 0;
+    }
+
+    @media (min-width: $responsivenessBreakPoint) {
+      margin-left: 1.3rem;
+      margin-right: 1rem;
+    }
+
     @include won-button--outlined(white);
   }
 
