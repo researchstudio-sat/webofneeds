@@ -170,6 +170,7 @@ function genComponentConf() {
             <!-- MATCHING CONTEXT -->
             <won-matching-context-picker
               ng-if="self.openDetail === 'matching-context'"
+              default-matching-context="::self.defaultMatchingContext"
               initial-matching-context="::self.draftObject.matchingContext"
               on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
             </won-matching-context-picker>
@@ -196,6 +197,12 @@ function genComponentConf() {
             </won-ttl-picker>
         </div>
         <!-- /DETAILS/ -->
+
+        <!-- 
+            TODO: put matching context picker in new element: "Tune Matching Behaviour" 
+            TODO: differentiate between matching context was never added & matching context purposefully left blank
+            TODO: use default matching context in draft by default! - if user never opens matching context, this should be set      
+        -->
 `;
 
   class Controller {
@@ -207,6 +214,13 @@ function genComponentConf() {
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
+      // TODO: check if this is a good way to do this.
+      this.defaultMatchingContextList = this.$ngRedux
+        .getState()
+        .getIn(["config", "theme", "defaultContext"]);
+      this.defaultMatchingContext = this.defaultMatchingContextList
+        ? this.defaultMatchingContextList.toJS()
+        : [];
 
       this.openDetail = undefined;
 
@@ -337,8 +351,8 @@ function genComponentConf() {
     }
 
     updateMatchingContext(matchingContext) {
-      // TODO: check if size or length (matchingContext is an array)
-      if (matchingContext && matchingContext.length > 0) {
+      // also accepts []!
+      if (matchingContext) {
         if (!this.details.has("matching-context")) {
           this.details.add("matching-context");
         }

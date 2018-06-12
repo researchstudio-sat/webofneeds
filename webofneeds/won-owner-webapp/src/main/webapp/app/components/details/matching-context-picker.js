@@ -9,7 +9,7 @@ function genComponentConf() {
         <input 
           class="mcp__input__inner"
           type="text"
-          placeholder="Enter Matching Context..."
+          placeholder="self.defaultPlaceholder"
           ng-keyup="::self.updateMatchingContext()"
           ng-class="{'mcp__input__inner--withreset' : self.showResetButton}"
         />
@@ -25,20 +25,13 @@ function genComponentConf() {
         <span>use whitespace to separate context names</span>
       </div>
 
-      <!--
-          <div class="mcp__contextlist">
-              <span class="mcp__contextlist__context" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
-          </div>
-          <input 
-            placeholder="{{self.tempMatchingString ? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}"
-          />
-      -->
+      <div class="mcp__contextlist">
+          <span class="mcp__contextlist__context" ng-repeat="context in self.addedContexts">{{context}}</span>
+      </div>
     `;
 
-  // TODO: get default contexts -> see create-post
   // TODO: check how hard checkboxes would be to implement
-  // TODO: check with tags picker to use list of contexts instead of just string
-  // --> can use array, is converted to a list in need reducer
+  // TODO: "restore default" - thingy?
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
@@ -46,95 +39,35 @@ function genComponentConf() {
 
       window.mcp4dbg = this;
 
-      this.addedMatchingContext = this.initialMatchingContext;
+      this.addedContexts = this.initialMatchingContext;
+      this.defaultContexts = this.defaultMatchingContext;
+      this.defaultPlaceholder = "e.g. 'sports fitness'";
+
       this.showResetButton = false;
 
-      // this.defaultContext = this.$ngRedux
-      //   .getState()
-      //   .getIn(["config", "theme", "defaultContext"]);
-      // this.tempMatchingContext = this.defaultContext
-      //   ? this.defaultContext.toJS()
-      //   : [];
-
       delay(0).then(() => this.showInitialMatchingContext());
-
-      // this.tempMatchingString = this.tempMatchingContext
-      //   ? this.tempMatchingContext.join(" ")
-      //   : "";
     }
 
-    // S|TART stuff from create-posts.js
-
-    // updateDraft(updatedDraft, isSeeks) {
-    //   if (this.isNew) {
-    //     this.isNew = false;
-    //     if (!this.defaultContext) {
-    //       this.defaultContext = this.$ngRedux
-    //         .getState()
-    //         .getIn(["config", "theme", "defaultContext"]);
-    //       this.tempMatchingContext = this.defaultContext
-    //         ? this.defaultContext.toJS()
-    //         : [];
-    //       this.tempMatchingString = this.tempMatchingContext
-    //         ? this.tempMatchingContext.join(" ")
-    //         : "";
-    //     }
-    //   }
-
-    //   this.draftObject[isSeeks] = updatedDraft;
-    // }
-
-    // mergeMatchingContext() {
-    //   const list = this.tempMatchingString
-    //     ? this.tempMatchingString.match(/(\S+)/gi)
-    //     : [];
-
-    //   return list.reduce(function(a, b) {
-    //     if (a.indexOf(b) < 0) a.push(b);
-    //     return a;
-    //   }, []);
-    // }
-
-    // addMatchingContext() {
-    //   this.tempMatchingContext = this.mergeMatchingContext();
-    // }
-
-    // publish() {
-    //   // Post both needs
-    //   if (!this.pendingPublishing) {
-    //     this.pendingPublishing = true;
-
-    //     const tmpList = [this.is, this.seeks];
-    //     const newObject = {
-    //       is: this.draftObject.is,
-    //       seeks: this.draftObject.seeks,
-    //     };
-
-    //     for (const tmp of tmpList) {
-    //       if (this.tempMatchingContext.length > 0) {
-    //         newObject[tmp].matchingContext = this.tempMatchingContext;
-    //       }
-    //
-    //       if (newObject[tmp].title === "") {
-    //         delete newObject[tmp];
-    //       }
-    //     }
-
-    //     this.needs__create(
-    //       newObject,
-    //       this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
-    //     );
-    //   }
-    // }
-
-    // END stuff from create-posts.js
-
     showInitialMatchingContext() {
-      // TODO: change for matching contexts
-      this.addedMatchingContext = this.initialMatchingContext;
+      this.addedContexts = this.initialMatchingContext;
+      this.defaultContexts = this.defaultMatchingContext;
+      this.defaultPlaceholder =
+        this.defaultContexts && this.defaultContexts.length > 0
+          ? this.defaultContexts.join(" ")
+          : "e.g. 'sports fitness'";
 
-      if (this.initialMatchingContext) {
-        this.textfield().value = this.initialMatchingContext.toString();
+      if (
+        this.initialMatchingContext &&
+        this.initialMatchingContext.length > 0
+      ) {
+        this.textfield().value = this.initialMatchingContext.join(" ");
+        this.showResetButton = true;
+      } else if (
+        !this.initialMatchingContext &&
+        this.defaultContexts.length > 0
+      ) {
+        this.textfield().value = this.defaultContexts.join(" ");
+        this.addedContexts = this.defaultContexts;
         this.showResetButton = true;
       }
 
@@ -145,9 +78,15 @@ function genComponentConf() {
       const text = this.textfield().value;
 
       if (text && text.trim().length > 0) {
-        this.addedMatchingContext = text.trim().split(/\s+/); // split on whitespace
+        // split on whitespace
+        let contextArray = text.trim().split(/\s+/);
+        // remove duplicates
+        this.addedContexts = contextArray.reduce(function(a, b) {
+          if (a.indexOf(b) < 0) a.push(b);
+          return a;
+        }, []);
         this.onMatchingContextUpdated({
-          matchingContext: this.addedMatchingContext,
+          matchingContext: this.addedContexts,
         });
         this.showResetButton = true;
       } else {
@@ -156,9 +95,9 @@ function genComponentConf() {
     }
 
     resetMatchingContext() {
-      this.addedMatchingContext = undefined;
+      this.addedContexts = [];
       this.textfield().value = "";
-      this.onMatchingContextUpdated({ matchingContext: undefined });
+      this.onMatchingContextUpdated({ matchingContext: [] });
       this.showResetButton = false;
     }
 
@@ -179,6 +118,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       onMatchingContextUpdated: "&",
+      defaultMatchingContext: "=",
       initialMatchingContext: "=",
     },
     template: template,
