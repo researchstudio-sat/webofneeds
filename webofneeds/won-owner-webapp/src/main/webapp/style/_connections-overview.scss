@@ -34,7 +34,10 @@ won-connections-overview {
 
         won-connection-indicators {
           padding-left: 0.5rem;
-          @include appearAnimation(0.25s);
+        }
+
+        &__button {
+          font-size: $smallFontSize;
         }
 
         &__carret {
@@ -48,34 +51,7 @@ won-connections-overview {
       }
 
       &__detail {
-        display: grid;
-
-        @media (min-width: $responsivenessBreakPoint) {
-          grid-column-gap: 0.5rem;
-          grid-template-areas: "indicators actions";
-          grid-template-columns: 1fr min-content;
-        }
-
-        @media (max-width: $responsivenessBreakPoint) {
-          grid-row-gap: 0.5rem;
-          grid-template-areas: "actions" "indicators";
-        }
-
-        @include slideWithOpacityAnimation(0.25s, linear, 4rem, 0.5rem 0 0 0);
-
-        &__actions {
-          grid-area: actions;
-
-          &__button {
-            width: 100%;
-            padding: 0.66em;
-            font-size: $smallFontSize;
-          }
-        }
-
-        &__indicators {
-          grid-area: indicators;
-        }
+        @include slideWithOpacityAnimation(0.25s, linear, 4rem, 0);
       }
 
       @media (min-width: $responsivenessBreakPoint) {
