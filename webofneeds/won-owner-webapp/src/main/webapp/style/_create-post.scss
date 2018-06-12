@@ -34,6 +34,9 @@ won-create-post {
 
     // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
     padding-left: 0.5rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      padding-left: 0;
+    }
 
     &__title {
       grid-area: header_title;
@@ -45,6 +48,9 @@ won-create-post {
     &__back {
       grid-area: header_back;
       &__icon {
+        /*@media (max-width: $responsivenessBreakPoint) {
+          @include fixed-square(2.5rem);
+        }*/
         @include fixed-square($backIconSize);
       }
     }
