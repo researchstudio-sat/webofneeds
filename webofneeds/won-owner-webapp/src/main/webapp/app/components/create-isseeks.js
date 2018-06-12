@@ -94,6 +94,19 @@ function genComponentConf() {
                         </svg>
                         <span>Location</span>
                 </div>
+                
+                <!-- MATCHING CONTEXT PICKER -->
+                <div class="cis__detail__items__item matching-context"
+                    ng-click="self.toggleOpenDetail('matching-context')"
+                    ng-class="{'picked' : self.openDetail === 'matching-context'}">
+                        <svg class="cis__circleicon" ng-show="!self.details.has('matching-context')">
+                            <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
+                        </svg>
+                        <svg class="cis__circleicon" ng-show="self.details.has('matching-context')">
+                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                        </svg>
+                        <span>Matching Context</span>
+                </div>
 
                 <!-- ROUTE PICKER -->
                 <div class="cis__detail__items__item route"
@@ -154,7 +167,14 @@ function genComponentConf() {
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
-            <!-- FROM A TO B -->
+            <!-- MATCHING CONTEXT -->
+            <won-matching-context-picker
+              ng-if="self.openDetail === 'matching-context'"
+              initial-matching-context="::self.draftObject.matchingContext"
+              on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
+            </won-matching-context-picker>
+
+            <!-- ROUTE -->
             <won-route-picker
               ng-if="self.openDetail === 'route'"
               initial-travel-action="::self.draftObject.travelAction"
@@ -252,20 +272,23 @@ function genComponentConf() {
     }
 
     updateDraft() {
+      if (!this.details.has("description")) {
+        this.draftObject.description = undefined;
+      }
       if (!this.details.has("location")) {
         this.draftObject.location = undefined;
+      }
+      if (!this.details.has("matching-context")) {
+        this.draftObject.matchingContext = undefined;
+      }
+      if (!this.details.has("route")) {
+        this.draftObject.travelAction = undefined;
       }
       if (!this.details.has("tags")) {
         this.draftObject.tags = [];
       }
       if (!this.details.has("ttl")) {
         this.draftObject.ttl = undefined;
-      }
-      if (!this.details.has("description")) {
-        this.draftObject.description = undefined;
-      }
-      if (!this.details.has("route")) {
-        this.draftObject.travelAction = undefined;
       }
 
       this.onUpdate({ draft: this.draftObject });
@@ -308,6 +331,21 @@ function genComponentConf() {
       } else if (this.details.has("location")) {
         this.details.delete("location");
         this.draftObject.location = undefined;
+      }
+
+      this.updateDraft();
+    }
+
+    updateMatchingContext(matchingContext) {
+      // TODO: check if size or length (matchingContext is an array)
+      if (matchingContext && matchingContext.length > 0) {
+        if (!this.details.has("matching-context")) {
+          this.details.add("matching-context");
+        }
+        this.draftObject.matchingContext = matchingContext;
+      } else if (this.details.has("matching-context")) {
+        this.details.delete("matching-context");
+        this.draftObject.matchingContext = undefined;
       }
 
       this.updateDraft();

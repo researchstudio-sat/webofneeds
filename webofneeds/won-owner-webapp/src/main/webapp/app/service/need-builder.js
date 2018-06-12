@@ -241,6 +241,7 @@ import won from "./won.js";
       //TODO images, time, currency(?)
     });
 
+    // TODO: if both is and seeks are present, the seeks content gets ignored here
     const isWhatsAround = args.is
       ? args.is.whatsAround
       : args.seeks.whatsAround;
