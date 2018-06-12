@@ -58,6 +58,16 @@ function genComponentConf() {
                         need-uri="need.get('uri')"
                         ng-if="!self.isOpen(need.get('uri'))">
                     </won-connection-indicators>
+                    <button
+                        class="co__item__need__header__button red"
+                        ng-if="self.isOpen(need.get('uri'))"
+                        ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
+                        ng-class="{
+                          'won-button--filled' : need.get('uri') === self.needUriInRoute,
+                          'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
+                        }">
+                        Details
+                    </button>
                     <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))">
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
@@ -78,17 +88,6 @@ function genComponentConf() {
                         on-selected-connection="self.selectConnection(connectionUri)"
                         need-uri="need.get('uri')">
                     </won-extended-connection-indicators>
-                    <div class="co__item__need__detail__actions">
-                        <button
-                            class="co__item__need__detail__actions__button red"
-                            ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
-                            ng-class="{
-                              'won-button--filled' : need.get('uri') === self.needUriInRoute,
-                              'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
-                            }">
-                            Details
-                        </button>
-                    </div>
                 </div>
             </div>
             <div class="co__item__connections"
@@ -125,6 +124,16 @@ function genComponentConf() {
                             ng-click="self.toggleDetails(need.get('uri'))"
                             class="clickable">
                         </won-post-header>
+                        <button
+                            class="co__item__need__header__button red"
+                            ng-if="self.isOpen(need.get('uri'))"
+                            ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
+                            ng-class="{
+                              'won-button--filled' : need.get('uri') === self.needUriInRoute,
+                              'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
+                            }">
+                            Details
+                        </button>
                         <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))">
                             <svg
                                 style="--local-primary:var(--won-secondary-color);"
@@ -145,17 +154,6 @@ function genComponentConf() {
                             on-selected-connection="self.selectConnection(connectionUri)"
                             need-uri="need.get('uri')">
                         </won-extended-connection-indicators>
-                        <div class="co__item__need__detail__actions">
-                            <button
-                                class="co__item__need__detail__actions__button red"
-                                ng-click="need.get('uri') === self.needUriInRoute ? self.selectNeed(undefined) : self.selectNeed(need.get('uri'))"
-                                ng-class="{
-                                  'won-button--filled' : need.get('uri') === self.needUriInRoute,
-                                  'won-button--outlined thin': need.get('uri') !== self.needUriInRoute
-                                }">
-                                Details
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
