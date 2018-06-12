@@ -37,6 +37,12 @@ function genComponentConf() {
                         Show Details
                     </button>
                     <button
+                        ng-if="self.isConnected && !self.showAgreementData"
+                        class="won-button--outlined thin red"
+                        ng-click="self.showAgreementDataField()">
+                        Show Agreement Data
+                    </button>
+                    <button
                         ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
@@ -67,6 +73,7 @@ function genComponentConf() {
         return {
           connection,
           connectionUri,
+          showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState === won.WON.Connected,
           isSentRequest: connectionState === won.WON.RequestSent,
           isReceivedRequest: connectionState === won.WON.RequestReceived,
@@ -110,7 +117,9 @@ function genComponentConf() {
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
-    scope: {},
+    scope: {
+      showAgreementDataField: "&",
+    },
     template: template,
   };
 }
