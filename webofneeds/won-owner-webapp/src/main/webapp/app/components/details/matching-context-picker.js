@@ -6,35 +6,32 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="mcp__input">
+        <input 
+          class="mcp__input__inner"
+          type="text"
+          placeholder="Enter Matching Context..."
+          ng-keyup="::self.updateMatchingContext()"
+          ng-class="{'mcp__input__inner--withreset' : self.showResetButton}"
+        />
         <svg class="mcp__input__icon clickable" 
           style="--local-primary:var(--won-primary-color);"
           ng-if="self.showResetButton"
           ng-click="self.resetMatchingContext()">
           <use xlink:href="#ico36_close" href="#ico36_close"></use>
         </svg>
-        <textarea
-          won-textarea-autogrow
-          class="mcp__input__inner won-txt"
-          ng-keyup="::self.updateMatchingContext()"
-          placeholder="Enter Matching Context..."></textarea>
-      </div> 
-
-      <!-- Excluded due to #1627 https://github.com/researchstudio-sat/webofneeds/issues/1627
-      Be aware that the styling of these elements is not valid anymore
-      <won-labelled-hr label="::'add context?'" class="cp__footer__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-
-      <div class="cp__detail" ng-if="self.isValid()">
-          <div class="cp__detail__header context">
-              <span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
-          </div>
-          <div class="cp__taglist">
-              <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
-          </div>
-          <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
-          <div class="cp__textfield_instruction">
-              <span>use whitespace to separate context names</span>
-          </div>
       </div>
+      
+      <div class="mcp__helptext">
+        <span>use whitespace to separate context names</span>
+      </div>
+
+      <!--
+          <div class="mcp__contextlist">
+              <span class="mcp__contextlist__context" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
+          </div>
+          <input 
+            placeholder="{{self.tempMatchingString ? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}"
+          />
       -->
     `;
 
@@ -136,11 +133,8 @@ function genComponentConf() {
       // TODO: change for matching contexts
       this.addedMatchingContext = this.initialMatchingContext;
 
-      if (
-        this.initialMatchingContext &&
-        this.initialMatchingContext.trim().length > 0
-      ) {
-        this.textfield().value = this.initialMatchingContext.trim();
+      if (this.initialMatchingContext) {
+        this.textfield().value = this.initialMatchingContext.toString();
         this.showResetButton = true;
       }
 
@@ -148,11 +142,10 @@ function genComponentConf() {
     }
 
     updateMatchingContext() {
-      console.log("text");
       const text = this.textfield().value;
-      // TODO:
+
       if (text && text.trim().length > 0) {
-        this.addedMatchingContext = text;
+        this.addedMatchingContext = text.trim().split(/\s+/); // split on whitespace
         this.onMatchingContextUpdated({
           matchingContext: this.addedMatchingContext,
         });
