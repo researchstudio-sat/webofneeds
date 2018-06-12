@@ -60,13 +60,13 @@ function genComponentConf() {
             		ng-show="self.showDetail && self.checkDeclaration(self.declarations.proposeToCancel) && !self.ownCancel">
             		 Reject
             	</button>
-            	<span ng-show="self.showDetail && ((self.checkDeclaration(self.declarations.proposal) && self.isOwn) || (self.checkDeclaration(self.declarations.proposeToCancel) && self.ownCancel))">
-        			You proposed this - 
-        			<button class="won-button--filled thin black"
-            			ng-click="self.retractMessage()">
-    					 Retract
-            		</button>
-        		</span>
+            	<div class="won-ca__content__footer" ng-show="self.showDetail && ((self.checkDeclaration(self.declarations.proposal) && self.isOwn) || (self.checkDeclaration(self.declarations.proposeToCancel) && self.ownCancel))">
+                <span>You proposed this</span>
+                <button class="won-button--filled thin black"
+                    ng-click="self.retractMessage()">
+                  Retract
+                </button>
+        		  </div>
         	</div>
         </div>
 `;

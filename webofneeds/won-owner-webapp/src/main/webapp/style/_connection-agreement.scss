@@ -37,7 +37,9 @@ won-connection-agreement {
 
     &__footer {
       padding: 0.2rem 0.5rem 0.2rem;
-      //border-top: $thinBorderWidth solid $won-line-gray;
+      display: grid;
+      grid-auto-flow: column;
+      grid-gap: 0.5rem;
     }
 
     &__time {
