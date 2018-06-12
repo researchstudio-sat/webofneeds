@@ -24,22 +24,15 @@ function genDirectiveConf() {
          */
       let lineHeight, offsets;
       function updateLineHeightAndOffsets() {
-        const originalContent = area.value;
-        const originalPlaceholder = area.placeholder;
-
-        // reduce to one line in height, so lineHeight can be calculated correctly
-        area.value = "";
-        area.placeholder = "";
-        area.style.height = "0px";
-
         const style = window.getComputedStyle(area, null);
         offsets =
           parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
 
-        lineHeight = area.scrollHeight - offsets;
-
-        area.value = originalContent;
-        area.placeholder = originalPlaceholder;
+        if (style.lineHeight == "normal") {
+          lineHeight = parseFloat(style.fontSize) * 1.2;
+        } else {
+          lineHeight = parseFloat(style.lineHeight);
+        }
         return { lineHeight, offsets };
       }
       updateLineHeightAndOffsets();
@@ -49,22 +42,31 @@ function genDirectiveConf() {
          */
 
       function updateHeight() {
-        stopObservingStyleChange(); // we don't want the style listener to trigger due to the height-change
+        window.requestAnimationFrame(() => {
+          stopObservingStyleChange(); // we don't want the style listener to trigger due to the height-change
+          if (area.value == "") {
+            area.style.height = "0";
+          }
 
-        area.style.height = "0px";
-        const height = area.scrollHeight - offsets;
+          const height = area.scrollHeight - offsets;
 
-        const lines = clamp(Math.floor(height / lineHeight), minRows, maxRows);
-        if (height < lineHeight * (maxRows + 1)) {
-          area.style.overflowY = "hidden";
-        } else {
-          area.style.overflowY = "scroll";
-        }
-        area.style.height = lines * lineHeight + "px";
+          const lines = clamp(
+            Math.round(height / lineHeight),
+            minRows,
+            maxRows
+          );
+          if (height < lineHeight * maxRows) {
+            area.style.overflowY = "hidden";
+          } else {
+            area.style.overflowY = "scroll";
+          }
+          area.style.height = lines * lineHeight + "px";
 
-        startObservingStyleChange(); // start listening for style changes again
+          startObservingStyleChange(); // start listening for style changes again
+        });
       }
 
+      area.style.height = "0";
       updateHeight();
 
       /*
