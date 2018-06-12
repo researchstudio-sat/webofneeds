@@ -1,5 +1,3 @@
-// TODO: WHAT IS HAPPENING HERE?!
-
 import won from "../won-es6.js";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
@@ -56,7 +54,7 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__content">
             <div class="pm__content__loadspinner"
@@ -171,15 +169,6 @@ function genComponentConf() {
                 is-code="self.shouldShowRdf? 'true' : ''"
             >
             </chat-textfield-simple>
-
-            <div class="pm__footer__agreement">
-                <!-- quick and dirty button to get agreements -->
-                <button class="won-button--filled thin black"
-                    ng-click="self.showAgreementDataField()"
-                    ng-show="!self.showAgreementData">
-                        Show Agreement Data
-                 </button>
-            </div>
         </div>
         <div class="pm__footer" ng-show="self.isSentRequest">
             Waiting for them to accept your chat request.
