@@ -47,7 +47,7 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			ng-class="{'agreement' : 	!self.isNormalMessage(), 'info' : self.isInfoMessage()}">
+    			      ng-class="{'agreement' : 	!self.isNormalMessage(), 'info' : self.isInfoMessage()}">
                     <span class="won-cm__center__bubble__text">
                       <span ng-show="self.headerText">
                         <h3>
@@ -69,25 +69,28 @@ function genComponentConf() {
 	                        <svg class="won-cm__center__carret clickable"
 	                                ng-click="self.showDetail = !self.showDetail"
 	                                ng-if="self.allowProposals"
-	                                ng-show="!self.showDetail">
+	                                ng-show="!self.showDetail && self.isRelevant">
 	                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
 	                        </svg>
 	                        <span class="won-cm__center__carret clickable"
 	                            ng-click="self.showDetail = !self.showDetail"
-	                            ng-show="self.showDetail">
+	                            ng-show="self.showDetail  && self.isRelevant">
 	                        	<won-labelled-hr arrow="'up'" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>   
                     		</span>
                     	</span>
-                    	<span ng-show="self.showDetail"><br /></span>
-                    	<button class="won-button--filled thin black"
+                      <!-- <span ng-show="self.showDetail"><br /></span> -->
+                      <div class="won-cm__center__bubble__button-area" ng-show="self.showDetail && self.isRelevant">
+                    	  <button class="won-button--filled thin black"
                         		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
-                        		ng-show="self.showDetail">Propose <span ng-show="self.clicked">(again)</span>
+                            ng-show="self.showDetail">
+                          Propose <span ng-show="self.clicked">(again)</span>
                         </button>
                         <button class="won-button--filled thin black"
                         		ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
                         		ng-show="self.showDetail && self.message.get('outgoingMessage')">
                         		Retract
                         </button>
+                      </div>
                     </span>
 
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
@@ -121,28 +124,28 @@ function genComponentConf() {
                        	</button>
                     </div>
                     -->
-                    <div class="won-cm__center__button" 
+                    <div class="won-cm__center__bubble__button-area" 
                         ng-if="self.message.get('isProposeMessage')
                             && !self.message.get('isAcceptMessage')
                             && !self.clicked
                             && self.isRelevant ">
                         <button class="won-button--filled thin red" 
                         		ng-show="!self.message.get('outgoingMessage') && !self.clicked" 
-    							ng-click="self.acceptProposal()">
-    						Accept
-    					</button>
+    							          ng-click="self.acceptProposal()">
+    						          Accept
+    					          </button>
                         <button class="won-button--filled thin black"
-    							ng-show="!self.message.get('outgoingMessage')"
-    							ng-click="self.rejectMessage()">
-    						Reject
-    					</button>
-    					<button class="won-button--filled thin black"
-    							ng-show="self.message.get('outgoingMessage')"
-    							ng-click="self.retractMessage()">
-    						Retract
-    					</button>
+    							          ng-show="!self.message.get('outgoingMessage')"
+                            ng-click="self.rejectMessage()">
+    						          Reject
+    					          </button>
+    					          <button class="won-button--filled thin black"
+                            ng-show="self.message.get('outgoingMessage')"
+                            ng-click="self.retractMessage()">
+    					            	Retract
+    					          </button>
                     </div>
-                    <div class="won-cm__center__button" 
+                    <div class="won-cm__center__bubble__button-area" 
                         ng-if="self.message.get('isProposeToCancel')
                             && !self.message.get('isAcceptMessage')
                             && !self.clicked
@@ -154,16 +157,16 @@ function genComponentConf() {
                         </button>
                         <button class="won-button--filled thin black"
                         		ng-show="!self.message.get('outgoingMessage')"
-    							ng-click="self.rejectMessage()">
-    						Reject
-    					</button>
-    					<button class="won-button--filled thin black"
-                        		ng-show="self.message.get('outgoingMessage')"
-    							ng-click="self.retractMessage()">
-    						Retract
-    					</button>
+    							          ng-click="self.rejectMessage()">
+    						          Reject
+    					          </button>
+                        <button class="won-button--filled thin black"
+                            ng-show="self.message.get('outgoingMessage')"
+                            ng-click="self.retractMessage()">
+                          Retract
+                        </button>
                     </div>
-            </div>
+              </div>
             <div
                 ng-show="self.message.get('unconfirmed')"
                 class="won-cm__center__time">

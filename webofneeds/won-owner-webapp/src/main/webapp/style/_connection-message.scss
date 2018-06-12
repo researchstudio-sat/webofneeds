@@ -74,6 +74,12 @@ won-connection-message {
       &__text__message--prewrap {
         white-space: pre-wrap;
       }
+      &__button-area {
+        padding-top: 0.5rem;
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 0.5rem;
+      }
     }
     &.won-cm__center--nondisplayable {
       // hsla(57, 100%, 95%, 1);
@@ -101,7 +107,7 @@ won-connection-message {
         white-space: pre-wrap;
       }
     }
-    &__button {
+    &__ {
       padding: 0.5rem;
     }
     &__time {
