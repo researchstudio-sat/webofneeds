@@ -11,13 +11,26 @@
 
 #### Installing Windows Build Tools on Windows
 
-Windows users will need to run `npm install -g windows-build-tools` (otherwise building `node-sass` and `rdf-canonize` might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet)
+Run
+```
+mvn install
+```
+once. It will fail but install node in the won-owner-webapp module. You'll need to modify *that* node installation, but you need Administrator privileges to do so.
 
-If your Windows User does not have admin permissions, installing `windows-build-tools` with an admin user will unfortunately install them only for that user. (Further info at https://github.com/researchstudio-sat/webofneeds/pull/1743) The Visual Studio build tools are installed correctly however, so you only need to fix your Python installation.
+You'll need to run `npm install -g windows-build-tools` (otherwise building `node-sass` and `rdf-canonize` might fail later with a message about not finding VCBuild.exe. the command will install a python-environment and dotnet)
+
+Open a windows power shell with admin permissions and run these commmand (possibly adapting the path for your settings):
+
+```
+$env:PATH = "C:\DATA\DEV\workspace\webofneeds\webofneeds\won-owner-webapp\src\main\webapp\node;" + $env:PATH`
+npm install -g windows-build-tools
+```
+
+If your Windows User does not have admin permissions, installing `windows-build-tools` with an admin user will unfortunately install them only for that user. (Further info at https://github.com/researchstudio-sat/webofneeds/pull/1743) The Visual Studio build tools are installed correctly however, so you only need to fix your Python installation:
 
 1. Go to https://www.python.org/downloads/ and download and install Python 2.7 (Python 3 will not work!)
 2. Locate your Python installation (your `python.exe`), we will call this path `$PATH_TO_PYTHON_EXE`
-3. Run `npm config set python $PATH_TO_PYTHON_EXE` to update the python location
+3. With the same user that will execute the maven build, run `npm config set python $PATH_TO_PYTHON_EXE` to update the python location
 
 <!--
 ### Building with IntelliJ
