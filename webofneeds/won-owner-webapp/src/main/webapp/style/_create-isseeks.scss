@@ -2,6 +2,7 @@
 @import "text";
 @import "descriptionpicker";
 @import "locationpicker";
+@import "matching-contextpicker";
 @import "routepicker";
 @import "tagspicker";
 @import "ttlpicker";
@@ -53,6 +54,11 @@ won-create-isseeks {
           cursor: default;
         }
       }
+    }
+
+    .cis__detail__matching-context {
+      @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
+      padding: 0.3rem 0 0 0;
     }
   }
 

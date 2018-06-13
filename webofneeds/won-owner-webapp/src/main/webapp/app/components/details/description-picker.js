@@ -52,7 +52,7 @@ function genComponentConf() {
 
       if (text && text.trim().length > 0) {
         this.addedDescription = text;
-        this.onDescriptionUpdated({ description: this.addedDescription }); // does not work?
+        this.onDescriptionUpdated({ description: this.addedDescription });
         this.showResetButton = true;
       } else {
         this.resetDescription();

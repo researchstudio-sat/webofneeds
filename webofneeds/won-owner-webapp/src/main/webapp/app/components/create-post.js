@@ -9,6 +9,7 @@ import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
+import matchingContextPicker from "./details/matching-context-picker.js";
 import routePickerModule from "./details/route-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
@@ -72,7 +73,7 @@ function genComponentConf() {
         <div class="cp__content">
             <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.snapToBottom"></won-create-isseeks>
             <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.snapToBottom"></won-create-isseeks>
-            <!-- TODO: decide on whether to re-add stuff like an additional search/description window or something for adding contexts -->
+            <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
                     ng-disabled="!self.isValid()"
@@ -98,23 +99,6 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
-        <!-- Excluded due to #1627 https://github.com/researchstudio-sat/webofneeds/issues/1627
-        Be aware that the styling of these elements is not valid anymore
-        <won-labelled-hr label="::'add context?'" class="cp__footer__labelledhr" ng-if="self.isValid()"></won-labelled-hr>
-
-        <div class="cp__detail" ng-if="self.isValid()">
-            <div class="cp__detail__header context">
-                <span>Matching Context(s) <span class="opt">(restricts matching)</span></span><br/>
-            </div>
-            <div class="cp__taglist">
-                <span class="cp__taglist__tag" ng-repeat="context in self.tempMatchingContext">{{context}} </span>
-            </div>
-            <input class="cp__tags__input" placeholder="{{self.tempMatchingString? self.tempMatchingString : 'e.g. \\'sports fitness\\''}}" type="text" ng-model="self.tempMatchingString" ng-keyup="::self.addMatchingContext()"/>
-            <div class="cp__textfield_instruction">
-                <span>use whitespace to separate context names</span>
-            </div>
-        </div>
-        -->
     `;
 
   class Controller {
@@ -159,16 +143,6 @@ function genComponentConf() {
       this.pendingPublishing = false;
       this.details = { is: [], seeks: [] };
       this.isNew = true;
-
-      this.defaultContext = this.$ngRedux
-        .getState()
-        .getIn(["config", "theme", "defaultContext"]);
-      this.tempMatchingContext = this.defaultContext
-        ? this.defaultContext.toJS()
-        : [];
-      this.tempMatchingString = this.tempMatchingContext
-        ? this.tempMatchingContext.join(" ")
-        : "";
 
       const selectFromState = state => {
         const showCreateView = getIn(state, [
@@ -244,35 +218,9 @@ function genComponentConf() {
     updateDraft(updatedDraft, isSeeks) {
       if (this.isNew) {
         this.isNew = false;
-        if (!this.defaultContext) {
-          this.defaultContext = this.$ngRedux
-            .getState()
-            .getIn(["config", "theme", "defaultContext"]);
-          this.tempMatchingContext = this.defaultContext
-            ? this.defaultContext.toJS()
-            : [];
-          this.tempMatchingString = this.tempMatchingContext
-            ? this.tempMatchingContext.join(" ")
-            : "";
-        }
       }
 
       this.draftObject[isSeeks] = updatedDraft;
-    }
-
-    mergeMatchingContext() {
-      const list = this.tempMatchingString
-        ? this.tempMatchingString.match(/(\S+)/gi)
-        : [];
-
-      return list.reduce(function(a, b) {
-        if (a.indexOf(b) < 0) a.push(b);
-        return a;
-      }, []);
-    }
-
-    addMatchingContext() {
-      this.tempMatchingContext = this.mergeMatchingContext();
     }
 
     publish() {
@@ -287,10 +235,6 @@ function genComponentConf() {
         };
 
         for (const tmp of tmpList) {
-          if (this.tempMatchingContext.length > 0) {
-            newObject[tmp].matchingContext = this.tempMatchingContext;
-          }
-
           if (newObject[tmp].title === "") {
             delete newObject[tmp];
           }
@@ -331,6 +275,7 @@ angular
     imageDropzoneModule,
     descriptionPickerModule,
     locationPickerModule,
+    matchingContextPicker,
     routePickerModule,
     tagsPickerModule,
     ttlPickerModule,
