@@ -43,18 +43,19 @@ function genTopnavConf() {
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
             <div class="si__text">
-                This Website demonstrates the output of an ongoing research project. We are doing our best to make it secure and protect your privacy. Please keep in mind:
+                This is the demonstrator of an ongoing research project. Please keep in mind:
                 <ul>
-                	<li> Your postings are public. Do not post anyhting you are not comfortable with everyone seeing. </li>
-                	<li> The information which posts your posts are connected to is public. </li>
-                	<li> Your conversation messages with others are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
+                	<li> Your posts are public. Do not post anything you are not comfortable with everyone seeing. </li>
+			<li> Your user account is not publicly linked to your posts, to give you some privacy.</li>
+                	<li> The connections of your posts (i.e. the other posts you see, and their status) are public.</li>
+                	<li> Your conversations are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
                 </ul>     
                 <a target="_blank"
                    href="{{ self.absHRef(self.$state, 'about', {'#': 'privacyPolicy'}) }}">
                    See Privacy Policy.
                 </a>
                 <br />
-                We use cookies for tracking your session, if you choose to be logged in automatically, you will receive another cookie to do that. Furthermore, we use Piwik on our own servers to track your visit an improve the application, which also identifies you with a cookie.
+                We track your session with a cookie, and log you in automatically with another one, if you want that. We use an analytics tool (on our own servers) to improve the application, which also identifies you with a cookie.
                 <a target="_blank"
                    href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
                    Suppress tracking.
