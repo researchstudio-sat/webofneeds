@@ -231,7 +231,7 @@ export function login(credentials) {
     method: "post",
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     },
     body: params,
     credentials: "include",
