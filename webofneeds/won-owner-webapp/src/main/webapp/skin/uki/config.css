@@ -1,10 +1,9 @@
 :root {
-  --skinning-test-var: rgb(165, 14, 185);
-  --won-primary-color: #326191;
-  --won-primary-color-light: #7395b8;
-  --won-secondary-color: #012f2d;
-  --won-secondary-color-light: #35bcb2;
-  --won-secondary-color-lighter: #76c1ac;
+  --won-primary-color: #0073ce;
+  --won-primary-color-light: #66ade6;
+  --won-secondary-color: #7a1616;
+  --won-secondary-color-light: #ad3a3a;
+  --won-secondary-color-lighter: #e37b7b;
   --won-disabled-color: #ccd2d2;
 
   --won-light-gray: #f0f2f4; /*used for headings*/

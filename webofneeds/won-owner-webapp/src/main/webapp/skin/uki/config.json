@@ -1,6 +1,6 @@
 {
-  "title": "UKI-Line",
-  "adminEmail": "office@uki.or.at",
+  "title": "MEi:CogSci Conf'18'",
+  "adminEmail": "office.sat@researchstudio.at",
   "imprintTemplate": "imprint.html",
-  "defaultContext": ["uki"]
+  "defaultContext": ["meicogsci"]
 }
