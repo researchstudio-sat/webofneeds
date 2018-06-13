@@ -16,6 +16,12 @@
   justify-content: center;
   align-items: center;
 
+  box-sizing: border-box;
+
+  &.visible {
+    max-height: 100vh;
+  }
+
   @media (max-width: $responsivenessBreakPoint) {
     flex-direction: column;
   }
@@ -37,6 +43,8 @@
       margin: 0;
       text-align: center;
     }
+
+    overflow-y: auto;
 
     @media (min-width: $responsivenessBreakPoint) {
       margin-left: 0.5rem;
