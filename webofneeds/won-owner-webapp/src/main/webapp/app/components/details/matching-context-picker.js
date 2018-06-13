@@ -5,18 +5,21 @@ import { DomCache } from "../../cstm-ng-utils.js";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-
       <div class="mcp__checkboxes">
         <label ng-repeat="context in self.defaultBoxes">
             <input type="checkbox" ng-model="context.selected" ng-change="self.updateMatchingContext()"/> {{context.name}} 
         </label>
       </div>
 
+      <div class="mcp__helptext">
+        <span>use whitespace to separate context names</span>
+      </div>
+
       <div class="mcp__input">
         <input 
           class="mcp__input__inner"
           type="text"
-          placeholder="self.defaultPlaceholder"
+          placeholder="e.g. 'sports fitness'"
           ng-keyup="::self.updateMatchingContext()"
           ng-class="{'mcp__input__inner--withreset' : self.showResetButton}"
         />
@@ -28,16 +31,16 @@ function genComponentConf() {
         </svg>
       </div>
       
-      <div class="mcp__helptext">
-        <span>use whitespace to separate context names</span>
-      </div>
-
       <div class="mcp__contextlist">
           <span class="mcp__contextlist__context" ng-repeat="context in self.addedContext">{{context}}</span>
       </div>
 
       <!-- TODO: style this -->
-      <span class="clickable" ng-click="self.restoreDefault()">Restore Default</span>
+      <button type="submit" class="won-button--outlined red mcp__restore-button"
+          ng-if="self.defaultMatchingContext && self.defaultMatchingContext.length > 0"
+          ng-click="::self.restoreDefault()">
+          <span>Restore Default</span>
+      </button>
     `;
 
   class Controller {
@@ -49,7 +52,6 @@ function genComponentConf() {
 
       this.addedContext = [];
       // this.suggestedContext = this.suggestedMatchingContext;
-      this.defaultPlaceholder = "e.g. 'sports fitness'";
       this.defaultBoxes = [];
       // this.suggestedBoxes = [];
 
@@ -59,14 +61,6 @@ function genComponentConf() {
     }
 
     showInitialMatchingContext() {
-      // set placeholder:
-      if (
-        this.defaultMatchingContext &&
-        this.defaultMatchingContext.length > 0
-      ) {
-        this.defaultPlaceholder = this.defaultMatchingContext.join(" ");
-      }
-
       if (this.initialMatchingContext) {
         let tempContext = [...this.initialMatchingContext];
         this.addedContext = this.initialMatchingContext;
