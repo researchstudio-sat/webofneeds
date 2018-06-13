@@ -13,6 +13,7 @@ import {
   logout,
   parseCredentials,
   generatePrivateId,
+  checkLoginStatus,
 } from "../won-utils.js";
 import {
   clearPrivateId,
@@ -396,5 +397,22 @@ export function accountAcceptDisclaimer() {
   return dispatch => {
     setDisclaimerAccepted();
     dispatch({ type: actionTypes.acceptDisclaimerSuccess });
+  };
+}
+
+export function reconnect() {
+  return dispatch => {
+    return checkLoginStatus()
+      .then(() => {
+        dispatch({ type: actionTypes.reconnect });
+      })
+      .catch(e => {
+        if (e.message == "Unauthorized") {
+          dispatch({ type: actionTypes.logout });
+        } else {
+          dispatch(actionCreators.lostConnection());
+        }
+        console.warn(e);
+      });
   };
 }
