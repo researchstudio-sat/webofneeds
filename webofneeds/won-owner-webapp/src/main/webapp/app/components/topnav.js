@@ -45,7 +45,7 @@ function genTopnavConf() {
             <div class="si__text">
                 This is the demonstrator of an ongoing research project. Please keep in mind:
                 <ul>
-                	<li> Your postings are public. Do not post anyhting you are not comfortable with everyone seeing. </li>
+                	<li> Your postings are public. Do not post anything you are not comfortable with everyone seeing. </li>
                 	<li> Your posts will be connected to other posts by matchers. That information is public. </li>
                 	<li> Your conversation messages with others are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
                 </ul>     
