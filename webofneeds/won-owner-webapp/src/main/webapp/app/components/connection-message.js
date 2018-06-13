@@ -47,7 +47,12 @@ function genComponentConf() {
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
-    			      ng-class="{'agreement' : 	!self.isNormalMessage(), 'info' : self.isInfoMessage()}">
+    			      ng-class="{
+    			        'agreement' : 	!self.isNormalMessage(),
+    			        'info' : self.isInfoMessage(),
+                  'pending': self.message.get('outgoingMessage') && (!self.message.get('isReceivedByOwn') && !self.message.get('isReceivedByRemote')),
+                  'partiallyLoaded': self.message.get('outgoingMessage') && (!(self.message.get('isReceivedByOwn') && self.message.get('isReceivedByRemote')) && (self.message.get('isReceivedByOwn') || self.message.get('isReceivedByRemote')))
+    			      }">
                     <span class="won-cm__center__bubble__text">
                       <span ng-show="self.headerText">
                         <h3>
@@ -172,11 +177,24 @@ function genComponentConf() {
                 class="won-cm__center__time">
                     Pending&nbsp;&hellip;
             </div>
-            <div
-                ng-hide="self.message.get('unconfirmed')"
-                class="won-cm__center__time">
+            <div class="won-cm__center__status">
+                <div class="won-cm__center__status__icons"
+                    ng-if="self.message.get('outgoingMessage')">
+                    <svg class="won-cm__center__status__icons__icon" ng-class="{'received' : self.message.get('isReceivedByOwn')}">
+                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                    </svg>
+                    <svg class="won-cm__center__status__icons__icon" ng-class="{'received' : self.message.get('isReceivedByRemote')}">
+                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                    </svg>
+                </div>
+                <div class="won-cm__center__status__time" ng-show="!self.message.get('outgoingMessage') || (self.message.get('isReceivedByRemote') && self.message.get('isReceivedByOwn'))">
                     {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
+                </div>
+                <div class="won-cm__center__status__time" ng-show="self.message.get('outgoingMessage') && (!self.message.get('isReceivedByRemote') || !self.message.get('isReceivedByOwn'))">
+                    Sending&nbsp;&hellip;
+                </div>
             </div>
+
             <a ng-show="self.rdfLinkURL"
                 target="_blank"
                 href="{{self.rdfLinkURL}}">

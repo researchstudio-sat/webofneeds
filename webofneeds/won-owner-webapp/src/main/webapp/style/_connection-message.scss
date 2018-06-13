@@ -93,6 +93,13 @@ won-connection-message {
     .won-cm__center__bubble {
       background-color: $won-light-gray; // like the error toast-notifications
       color: black;
+
+      &.pending {
+        opacity: 0.33;
+      }
+      &.partiallyLoaded {
+        opacity: 0.66;
+      }
     }
     &__trig {
       max-width: 100%;
@@ -107,8 +114,24 @@ won-connection-message {
         white-space: pre-wrap;
       }
     }
-    &__time {
-      color: $won-line-gray;
+    &__status {
+      &__time {
+        display: inline-block;
+        color: $won-line-gray;
+      }
+      &__icons {
+        display: inline-block;
+        &__icon {
+          display: inline-block;
+          @include fixed-square(0.5rem);
+
+          --local-primary: #{$won-line-gray};
+
+          &.received {
+            --local-primary: #{$won-secondary-color};
+          }
+        }
+      }
     }
     &__carret {
       @include fixed-square(1rem); // visually center icon on line
