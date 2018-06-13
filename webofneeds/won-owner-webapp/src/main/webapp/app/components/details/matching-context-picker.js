@@ -6,7 +6,7 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
 	  <div class="mcp__helptext">
-        <span>Set matching context(s): Restricts matches to posts with any of these contexts</span>
+        <span>Restrict matching to posts with any of these 'matching contexts':</span>
       </div>
       
       <div class="mcp__checkboxes">
@@ -16,7 +16,7 @@ function genComponentConf() {
       </div>
 
       <div class="mcp__helptext">
-        <span>Custom context(s) (Use spaces to separate contexts):</span>
+        <span>Add custom context(s), separated by spaces:</span>
       </div>
 
       <div class="mcp__input">
