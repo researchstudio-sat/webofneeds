@@ -1,9 +1,9 @@
 :root {
   --won-primary-color: #0073ce;
   --won-primary-color-light: #66ade6;
-  --won-secondary-color: #7a1616;
-  --won-secondary-color-light: #ad3a3a;
-  --won-secondary-color-lighter: #e37b7b;
+  --won-secondary-color: #707070;
+  --won-secondary-color-light: #a8a8a8;
+  --won-secondary-color-lighter: #e4e4e4;
   --won-disabled-color: #ccd2d2;
 
   --won-light-gray: #f0f2f4; /*used for headings*/
