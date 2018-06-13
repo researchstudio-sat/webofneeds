@@ -5,6 +5,13 @@ import { DomCache } from "../../cstm-ng-utils.js";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
+
+      <div class="mcp__checkboxes">
+        <label ng-repeat="context in self.defaultBoxes">
+            <input type="checkbox" ng-model="context.selected" ng-change="self.updateMatchingContext()"/> {{context.name}} 
+        </label>
+      </div>
+
       <div class="mcp__input">
         <input 
           class="mcp__input__inner"
@@ -26,12 +33,13 @@ function genComponentConf() {
       </div>
 
       <div class="mcp__contextlist">
-          <span class="mcp__contextlist__context" ng-repeat="context in self.addedContexts">{{context}}</span>
+          <span class="mcp__contextlist__context" ng-repeat="context in self.addedContext">{{context}}</span>
       </div>
+
+      <!-- TODO: style this -->
+      <span class="clickable" ng-click="self.restoreDefault()">Restore Default</span>
     `;
 
-  // TODO: check how hard checkboxes would be to implement
-  // TODO: "restore default" - thingy?
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
@@ -39,9 +47,11 @@ function genComponentConf() {
 
       window.mcp4dbg = this;
 
-      this.addedContexts = this.initialMatchingContext;
-      this.defaultContexts = this.defaultMatchingContext;
+      this.addedContext = [];
+      // this.suggestedContext = this.suggestedMatchingContext;
       this.defaultPlaceholder = "e.g. 'sports fitness'";
+      this.defaultBoxes = [];
+      // this.suggestedBoxes = [];
 
       this.showResetButton = false;
 
@@ -49,26 +59,37 @@ function genComponentConf() {
     }
 
     showInitialMatchingContext() {
-      this.addedContexts = this.initialMatchingContext;
-      this.defaultContexts = this.defaultMatchingContext;
-      this.defaultPlaceholder =
-        this.defaultContexts && this.defaultContexts.length > 0
-          ? this.defaultContexts.join(" ")
-          : "e.g. 'sports fitness'";
-
+      // set placeholder:
       if (
-        this.initialMatchingContext &&
-        this.initialMatchingContext.length > 0
+        this.defaultMatchingContext &&
+        this.defaultMatchingContext.length > 0
       ) {
-        this.textfield().value = this.initialMatchingContext.join(" ");
-        this.showResetButton = true;
-      } else if (
-        !this.initialMatchingContext &&
-        this.defaultContexts.length > 0
-      ) {
-        this.textfield().value = this.defaultContexts.join(" ");
-        this.addedContexts = this.defaultContexts;
-        this.showResetButton = true;
+        this.defaultPlaceholder = this.defaultMatchingContext.join(" ");
+      }
+
+      if (this.initialMatchingContext) {
+        let tempContext = [...this.initialMatchingContext];
+        this.addedContext = this.initialMatchingContext;
+
+        // deal with default contexts
+        if (
+          this.defaultMatchingContext &&
+          this.defaultMatchingContext.length > 0
+        ) {
+          for (let context of this.defaultMatchingContext) {
+            let isPresent = !!this.initialMatchingContext.includes(context);
+            this.defaultBoxes.push({ name: context, selected: isPresent });
+          }
+
+          tempContext = this.initialMatchingContext.filter(
+            context => !this.defaultMatchingContext.includes(context)
+          );
+        }
+
+        if (tempContext.length > 0) {
+          this.textfield().value = tempContext.join(" ");
+          this.showResetButton = true;
+        }
       }
 
       this.$scope.$apply();
@@ -76,29 +97,56 @@ function genComponentConf() {
 
     updateMatchingContext() {
       const text = this.textfield().value;
-
+      let checkboxContext = [];
+      let textfieldContext = [];
+      // get values from checkboxes
+      for (let box of this.defaultBoxes) {
+        if (box && box.selected) checkboxContext.push(box.name);
+      }
+      // get values from text field
       if (text && text.trim().length > 0) {
-        // split on whitespace
-        let contextArray = text.trim().split(/\s+/);
-        // remove duplicates
-        this.addedContexts = contextArray.reduce(function(a, b) {
+        this.showResetButton = true;
+        textfieldContext = text.trim().split(/\s+/);
+      }
+      // - if textfield is empty -> hide resetbutton
+      else {
+        this.showResetButton = false;
+      }
+      // join & reduce
+      let combinedContext = [...checkboxContext, ...textfieldContext].reduce(
+        function(a, b) {
           if (a.indexOf(b) < 0) a.push(b);
           return a;
-        }, []);
-        this.onMatchingContextUpdated({
-          matchingContext: this.addedContexts,
-        });
-        this.showResetButton = true;
+        },
+        []
+      );
+      // if empty -> reset, else callback
+      if (combinedContext.length > 0) {
+        this.addedContext = combinedContext;
+        this.onMatchingContextUpdated({ matchingContext: combinedContext });
       } else {
         this.resetMatchingContext();
       }
     }
 
     resetMatchingContext() {
-      this.addedContexts = [];
+      this.addedContext = [];
       this.textfield().value = "";
       this.onMatchingContextUpdated({ matchingContext: [] });
       this.showResetButton = false;
+    }
+
+    restoreDefault() {
+      this.addedContext = this.defaultMatchingContext || [];
+      this.textfield().value = "";
+      this.showResetButton = false;
+      this.onMatchingContextUpdated({
+        matchingContext: this.addedContext,
+      });
+
+      for (let box of this.defaultBoxes) {
+        box.selected = true;
+      }
     }
 
     textfieldNg() {

@@ -226,6 +226,15 @@ function genComponentConf() {
 
       this.reset();
 
+      if (
+        this.defaultMatchingContext &&
+        this.defaultMatchingContext.length > 0
+      ) {
+        this.details.add("matching-context");
+        this.draftObject.matchingContext = this.defaultMatchingContext;
+        //this.updateDraft();
+      }
+
       //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
       const selectFromState = () => ({});
 
