@@ -100,6 +100,11 @@ won-connection-message {
       &.partiallyLoaded {
         opacity: 0.66;
       }
+
+      &.failure {
+        color: #ff0000;
+        //TODO: FAILURE MESSAGE STYLING
+      }
     }
     &__trig {
       max-width: 100%;
@@ -118,6 +123,16 @@ won-connection-message {
       &__time {
         display: inline-block;
         color: $won-line-gray;
+        --local-primary: #{$won-secondary-color};
+
+        &--pending {
+          display: inline-block;
+          color: $won-line-gray;
+        }
+        &--failure {
+          display: inline-block;
+          //TODO: FAILURE MESSAGE STYLING
+        }
       }
       &__icons {
         display: inline-block;

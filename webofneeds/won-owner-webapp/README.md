@@ -114,6 +114,7 @@ $ngRedux.getState();
                        uri: string //unique identifier of this message
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
+                       failedToSend: true|false //whether the sent message failed for whatever reason (default: false, only relevant in outgoingMessages)
                    }
                    ...
                },

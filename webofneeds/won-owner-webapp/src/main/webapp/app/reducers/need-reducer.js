@@ -451,13 +451,34 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState;
     }
 
+    case actionTypes.messages.chatMessage.failure: {
+      const wonMessage = getIn(action, ["payload"]);
+      const eventUri = wonMessage.isFromExternal()
+        ? wonMessage.getIsRemoteResponseTo()
+        : wonMessage.getIsResponseTo();
+      const needUri = wonMessage.getReceiverNeed();
+      const connectionUri = wonMessage.getReceiver();
+
+      allNeedsInState = allNeedsInState.setIn(
+        [
+          needUri,
+          "connections",
+          connectionUri,
+          "messages",
+          eventUri,
+          "failedToSend",
+        ],
+        true
+      );
+      return allNeedsInState;
+    }
+
     case actionTypes.messages.chatMessage.successRemote: {
       const wonMessage = getIn(action, ["payload"]);
       const eventUri = wonMessage.getIsRemoteResponseTo();
       const needUri = wonMessage.getReceiverNeed();
       const connectionUri = wonMessage.getReceiver();
-      // we want to use the response date to update the original message
-      // date
+
       allNeedsInState = allNeedsInState.setIn(
         [
           needUri,
@@ -1139,6 +1160,7 @@ function parseMessage(wonMessage, alreadyProcessed = false) {
       clauses: clauses,
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      failedToSend: false,
       isProposeMessage: wonMessage.isProposeMessage(),
       isAcceptMessage: wonMessage.isAcceptMessage(),
       isProposeToCancel: wonMessage.isProposeToCancel(),
