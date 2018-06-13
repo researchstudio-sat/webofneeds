@@ -50,7 +50,7 @@ function genTopnavConf() {
                 	<li> Your conversation messags with others are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
                 </ul>     
                 <a target="_blank"
-                   href="{{ self.absHRef(self.$state, 'about#imprint', {'#': 'imprint'}) }}">
+                   href="{{ self.absHRef(self.$state, 'about', {'#': 'privacyPolicy'}) }}">
                    See Privacy Policy.
                 </a>
                 <br />
