@@ -8,7 +8,8 @@
 won-connection-selection-item {
   $triangleCutoutSize: $speechBubbleTailSize;
   $padding: 0.5rem;
-  display: block;
+  display: grid;
+  grid-auto-flow: column;
   position: relative; // to allow positioning the contextmenu in relation to this component-root
   padding-left: $padding + $triangleCutoutSize;
   padding-right: $padding;
