@@ -38,6 +38,24 @@ function genTopnavConf() {
                 ng-show="self.reconnecting"
                 class="hspinner"/>
         </div>
+        <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
+            </svg>
+            <div class="si__text">
+                This is Webapp is in development. Lorem Ipsum dolor blablabla whatever i dont know lets see
+                <a target="_blank"
+                   href="{{ self.absHRef(self.$state, 'about') }}">
+                   Terms Of Use and Stuff
+                </a>
+                If you do not agree with this. Please leave now!
+            </div>
+            <button
+                ng-click="self.acceptDisclaimer()"
+                class="si__button">
+                    Accept
+            </button>
+        </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 
         <nav class="topnav" ng-class="{'hide-in-responsive': self.connectionOrPostDetailOpen}">
@@ -167,6 +185,7 @@ function genTopnavConf() {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           WON: won.WON,
           loggedIn: state.getIn(["user", "loggedIn"]),
+          acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
           email: state.getIn(["user", "email"]),
           isPrivateIdUser: !!privateId,
           connectionOrPostDetailOpen:

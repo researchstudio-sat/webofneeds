@@ -43,6 +43,13 @@
       margin-right: 1rem;
       text-align: left;
     }
+
+    a {
+      color: $won-primary-color;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   & > .si__button {
