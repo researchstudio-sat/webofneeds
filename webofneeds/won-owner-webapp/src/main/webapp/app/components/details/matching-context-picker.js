@@ -124,10 +124,20 @@ function genComponentConf() {
     }
 
     resetMatchingContext() {
-      this.addedContext = [];
+      this.addedContext = this.showOnlyCheckedContexts();
       this.textfield().value = "";
       this.onMatchingContextUpdated({ matchingContext: [] });
       this.showResetButton = false;
+    }
+
+    showOnlyCheckedContexts() {
+      let checkedContext = [];
+      for (let box of this.defaultBoxes) {
+        if (box.selected) {
+          checkedContext.push(box.name);
+        }
+      }
+      return checkedContext;
     }
 
     restoreDefault() {
