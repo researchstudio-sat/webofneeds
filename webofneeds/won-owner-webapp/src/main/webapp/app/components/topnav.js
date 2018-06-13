@@ -55,7 +55,7 @@ function genTopnavConf() {
                    See Privacy Policy.
                 </a>
                 <br />
-                We tracking your session with a cookie, and log you in automatically with another one, if you want that. We use an analytics tool (on our own servers) to improve the application, which also identifies you with a cookie.
+                We track your session with a cookie, and log you in automatically with another one, if you want that. We use an analytics tool (on our own servers) to improve the application, which also identifies you with a cookie.
                 <a target="_blank"
                    href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
                    Suppress tracking.
