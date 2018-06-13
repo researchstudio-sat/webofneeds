@@ -43,13 +43,23 @@ function genTopnavConf() {
                 <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
             </svg>
             <div class="si__text">
-                This is Webapp is in development. Lorem Ipsum dolor blablabla whatever i dont know lets see
+                This Website demonstrates the output of an ongoing research project. We are doing our best to make it secure and protect your privacy. Please keep in mind:
+                <ul>
+                	<li> Your postings are public. Do not post anyhting you are not comfortable with if everyone sees it. </li>
+                	<li> The information which posts your posts are connected to is public. </li>
+                	<li> Your conversation messags with others are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
+                </ul>     
                 <a target="_blank"
                    href="{{ self.absHRef(self.$state, 'about#imprint', {'#': 'imprint'}) }}">
-                   Terms Of Use and Stuff
+                   See Privacy Policy.
                 </a>
-                If you do not agree with this. Please leave now!
-            </div>
+                <br />
+                We use cookies for tracking your session, if you choose to be logged in automatically, you will receive another cookie to do that. Furthermore, we use Piwik on our own servers to track your visit an improve the application, which also identifies you with a cookie.
+                <a target="_blank"
+                   href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
+                   Suppress tracking.
+                </a>
+	  		</div>
             <button
                 ng-click="self.acceptDisclaimer()"
                 class="si__button">
