@@ -45,9 +45,10 @@ function genTopnavConf() {
             <div class="si__text">
                 This is the demonstrator of an ongoing research project. Please keep in mind:
                 <ul>
-                	<li> Your postings are public. Do not post anything you are not comfortable with everyone seeing. </li>
-                	<li> Your posts will be connected to other posts by matchers. That information is public. </li>
-                	<li> Your conversation messages with others are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
+                	<li> Your posts are public. Do not post anything you are not comfortable with everyone seeing. </li>
+			<li> Your user account is not publicly linked to your posts, to give you some privacy.</li>
+                	<li> The connections of your posts (i.e. the other posts you see, and their status) are public.</li>
+                	<li> Your conversations are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
                 </ul>     
                 <a target="_blank"
                    href="{{ self.absHRef(self.$state, 'about', {'#': 'privacyPolicy'}) }}">
