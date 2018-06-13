@@ -2,6 +2,6 @@
   "title": "MEi:CogSci Conference 2018",
   "adminEmail": "office.sat@researchstudio.at",
   "imprintTemplate": "imprint.html",
-  "defaultContext": ["meicogsci", "poster", "talk", "event", "collab" ],
+  "defaultContext": ["mcs18", "poster", "talk", "event", "collab", "social", "project" ],
   "privacyPolicyTemplate": "privacyPolicy.html"  
 }
