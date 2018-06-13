@@ -409,6 +409,7 @@ export function reconnect() {
       .catch(e => {
         if (e.message == "Unauthorized") {
           dispatch({ type: actionTypes.logout });
+          dispatch({ type: actionTypes.showMainMenuDisplay });
         } else {
           dispatch(actionCreators.lostConnection());
         }
