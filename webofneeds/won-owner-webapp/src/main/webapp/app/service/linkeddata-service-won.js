@@ -111,6 +111,8 @@ import won from "./won.js";
     privateData.store.setPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
     privateData.store.setPrefix("won", "http://purl.org/webofneeds/model#");
 
+    window.store4dbg = privateData.store;
+
     privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
     privateData.cacheStatus = {}; //uri -> {timestamp, cacheItemState}
     privateData.documentToGraph = {}; // document-uri -> Set<uris of contained graphs>
