@@ -5,6 +5,10 @@ import { DomCache } from "../../cstm-ng-utils.js";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
+	  <div class="mcp__helptext">
+        <span>Set matching context(s): Restricts matches to posts with any of these contexts</span>
+      </div>
+      
       <div class="mcp__checkboxes">
         <label ng-repeat="context in self.defaultBoxes">
             <input type="checkbox" ng-model="context.selected" ng-change="self.updateMatchingContext()"/> {{context.name}} 
@@ -12,7 +16,7 @@ function genComponentConf() {
       </div>
 
       <div class="mcp__helptext">
-        <span>use whitespace to separate context names</span>
+        <span>Custom context(s) (Use spaces to separate contexts):</span>
       </div>
 
       <div class="mcp__input">
