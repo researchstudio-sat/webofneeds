@@ -90,7 +90,7 @@
   }
 
   .topnav__signupbtn {
-    @include won-button--filled(white, $won-secondary-color-lighter);
+    @include won-button--filled(white, $won-primary-color);
     @extend .topnav__button;
   }
 }
