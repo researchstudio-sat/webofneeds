@@ -14,7 +14,11 @@ import {
   parseCredentials,
   generatePrivateId,
 } from "../won-utils.js";
-import { clearPrivateId, savePrivateId } from "../won-localstorage.js";
+import {
+  clearPrivateId,
+  savePrivateId,
+  setDisclaimerAccepted,
+} from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -386,4 +390,11 @@ export function accountTransfer(credentials) {
         console.error(registerError, error);
         dispatch(actionCreators.registerFailed({ registerError, error }));
       });
+}
+
+export function accountAcceptDisclaimer() {
+  return dispatch => {
+    setDisclaimerAccepted();
+    dispatch({ type: actionTypes.acceptDisclaimerSuccess });
+  };
 }

@@ -24,6 +24,9 @@ import {
   clearReadUris,
   clearClosedConnUris,
   getClosedConnUris,
+  clearDisclaimerAccepted,
+  isDisclaimerAccepted,
+  setDisclaimerAccepted,
 } from "../won-localstorage.js";
 import jsonld from "jsonld";
 
@@ -44,6 +47,9 @@ won.clearPrivateId = clearPrivateId;
 won.clearReadUris = clearReadUris;
 won.clearClosedConnUris = clearClosedConnUris;
 won.getClosedConnUris = getClosedConnUris;
+won.isDisclaimerAccepted = isDisclaimerAccepted;
+won.clearDisclaimerAccepted = clearDisclaimerAccepted;
+won.setDisclaimerAccepted = setDisclaimerAccepted;
 
 won.WON = {};
 won.WON.baseUri = "http://purl.org/webofneeds/model#";

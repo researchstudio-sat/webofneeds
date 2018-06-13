@@ -10,24 +10,17 @@
             <span class="wd__text">A need helps you find people who can help you - or who share your interest.</span>
             <span class="wd__more clickable" ng-click="::self.toggleMoreInfo()">Read more</span>
 
-            <svg style="--local-primary:var(--won-primary-color);"
-                class="wd__arrow clickable" 
-                ng-click="::self.toggleMoreInfo()" 
-                ng-show="!self.moreInfo">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+            <svg style="--local-primary:var(--won-primary-color);" class="wd__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="!self.moreInfo">
+                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
             </svg>
 
-            <svg style="--local-primary:var(--won-primary-color);"
-                class="wd__arrow clickable" 
-                ng-click="::self.toggleMoreInfo()" 
-                ng-show="self.moreInfo">
-                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+            <svg style="--local-primary:var(--won-primary-color);" class="wd__arrow clickable" ng-click="::self.toggleMoreInfo()" ng-show="self.moreInfo">
+                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
             </svg>
 
-            <span class="wd__text"  ng-show="self.moreInfo" >A need is much like an automatic classified ad. You say
-                what you are looking for, and other such ads will be matched with yours. You could think of it as
-            of a long-lived search query that can itself be found by others. Once you found a useful match, you can
-	    connect to it and start to chat.</span>
+            <span class="wd__text" ng-show="self.moreInfo">A need is much like an automatic classified ad. You say what you are looking for, and other such ads will be
+                matched with yours. You could think of it as of a long-lived search query that can itself be found by others.
+                Once you found a useful match, you can connect to it and start to chat.</span>
         </div>
     </section>
     <section>
@@ -35,14 +28,20 @@
             <div class="title">How it works</div>
             <won-flex-grid class="fourimgs" items="::self.workGrid"></won-flex-grid>
         </div>
-        <hr class="splitter-within-section"/>
+        <hr class="splitter-within-section" />
         <div class="faq">
             <div class="title">FAQs</div>
             <won-accordion items="::self.questions"></won-accordion>
         </div>
     </section>
     <section class="imprint">
+        <a id="imprint"></a>
         <div class="title">Imprint</div>
         <div class="sub title" ng-include="self.imprintTemplate"></div>
+    </section>
+    <section class="privacyPolicy">
+        <a id="privacyPolicy"></a>
+        <div class="title">Privacy Policy</div>
+        <div ng-include="self.privacyPolicyTemplate"></div>
     </section>
 </main>

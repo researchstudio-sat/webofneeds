@@ -2,5 +2,6 @@
   "title": "UKI-Line",
   "adminEmail": "office@uki.or.at",
   "imprintTemplate": "imprint.html",
+  "privacyPolicyTemplate": "privacyPolicy.html",  
   "defaultContext": ["uki"]
 }

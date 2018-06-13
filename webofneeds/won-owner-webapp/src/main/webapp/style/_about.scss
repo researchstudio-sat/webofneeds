@@ -123,8 +123,6 @@ main.about {
   .imprint {
     background-color: $won-primary-color;
     .title {
-      position: relative;
-      z-index: 101;
       color: white;
     }
     .sub {
@@ -133,6 +131,23 @@ main.about {
     a {
       text-decoration: none;
       color: white;
+    }
+    p {
+      margin-bottom: 1em;
+    }
+  }
+  .privacyPolicy {
+    background-color: $won-lighter-gray;
+    max-width: $maxContentWidth;
+    margin: 0 auto;
+
+    h2 {
+      margin-top: 2em;
+      margin-bottom: 1em;
+    }
+    a {
+      text-decoration: none;
+      color: $won-primary-color;
     }
     p {
       margin-bottom: 1em;

@@ -72,6 +72,7 @@ import {
   accountLogout,
   accountRegister,
   accountTransfer,
+  accountAcceptDisclaimer,
 } from "./account-actions.js";
 
 import * as cnct from "./connections-actions.js";
@@ -223,6 +224,8 @@ const actionHierarchy = {
   logout: accountLogout,
   register: accountRegister,
   transfer: accountTransfer,
+  acceptDisclaimer: accountAcceptDisclaimer,
+  acceptDisclaimerSuccess: INJ_DEFAULT,
   typedAtLoginCredentials: INJ_DEFAULT,
   registerReset: INJ_DEFAULT,
   registerFailed: INJ_DEFAULT,
