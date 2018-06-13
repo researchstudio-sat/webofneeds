@@ -138,4 +138,21 @@ main.about {
       margin-bottom: 1em;
     }
   }
+  .privacyPolicy {
+    background-color: $won-lighter-gray;
+    .title {
+      position: relative;
+      z-index: 101;
+    }
+    .sub {
+      font-size: $normalFontSize;
+    }
+    a {
+      text-decoration: none;
+      color: $won-primary-color;
+    }
+    p {
+      margin-bottom: 1em;
+    }
+  }
 }
