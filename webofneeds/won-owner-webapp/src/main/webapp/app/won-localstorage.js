@@ -4,6 +4,7 @@
 const READ_URIS = "wonReadUris";
 const CLOSED_CONN_URIS = "wonClosedConnectionUris";
 const INACTIVE_NEED_URIS = "inactiveNeedUris";
+const DISCLAIMER_ACCEPTED = "disclaimerAccepted";
 
 export function markUriAsRead(uri) {
   //TODO: BETTER IMPL
@@ -142,4 +143,16 @@ export function getInactiveNeedUris() {
 
 export function clearInactiveNeedUris() {
   localStorage.removeItem(INACTIVE_NEED_URIS);
+}
+
+export function isDisclaimerAccepted() {
+  return !!localStorage.getItem(DISCLAIMER_ACCEPTED);
+}
+
+export function setDisclaimerAccepted() {
+  localStorage.setItem(DISCLAIMER_ACCEPTED, true);
+}
+
+export function clearDisclaimerAccepted() {
+  localStorage.removeItem(DISCLAIMER_ACCEPTED);
 }
