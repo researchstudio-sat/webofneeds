@@ -239,6 +239,21 @@ export default function(allNeedsInState = initialState, action = {}) {
       const remoteConnectionUri = wonMessage.getSender();
 
       if (allNeedsInState.getIn([needUri, "connections", connectionUri])) {
+        const eventUri = wonMessage.getIsRemoteResponseTo();
+        // we want to use the response date to update the original message
+        // date
+        allNeedsInState = allNeedsInState.setIn(
+          [
+            needUri,
+            "connections",
+            connectionUri,
+            "messages",
+            eventUri,
+            "isReceivedByRemote",
+          ],
+          true
+        );
+
         return allNeedsInState.setIn(
           [needUri, "connections", connectionUri, "remoteConnectionUri"],
           remoteConnectionUri
@@ -256,6 +271,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       // TODO SRP; split in isSuccessOfAdHocConnect, addAddHoc(?) and
       // changeConnectionState
       const wonMessage = action.payload;
+      const eventUri = wonMessage.getIsResponseTo();
       const tmpConnectionUri = "connectionFrom:" + wonMessage.getIsResponseTo();
       const connectionUri = wonMessage.getReceiver();
       const needForTmpCnct = selectNeedByConnectionUri(
@@ -280,19 +296,54 @@ export default function(allNeedsInState = initialState, action = {}) {
           .delete("usingTemporaryUri")
           .set("uri", connectionUri);
 
-        return allNeedsInState
+        allNeedsInState = allNeedsInState
           .deleteIn([needUri, "connections", tmpConnectionUri])
           .mergeDeepIn(
             [needUri, "connections", connectionUri],
             properConnection
           );
+
+        allNeedsInState = allNeedsInState.setIn(
+          [
+            needUri,
+            "connections",
+            connectionUri,
+            "messages",
+            eventUri,
+            "isReceivedByOwn",
+          ],
+          true
+        );
+
+        return allNeedsInState;
       } else {
         // connection has been stored as match first
-        return changeConnectionState(
+        allNeedsInState = changeConnectionState(
           allNeedsInState,
           connectionUri,
           won.WON.RequestSent
         );
+
+        const needFromConnection = selectNeedByConnectionUri(
+          allNeedsInState,
+          connectionUri
+        );
+
+        if (needFromConnection) {
+          allNeedsInState = allNeedsInState.setIn(
+            [
+              needFromConnection.get("uri"),
+              "connections",
+              connectionUri,
+              "messages",
+              eventUri,
+              "isReceivedByOwn",
+            ],
+            true
+          );
+        }
+
+        return allNeedsInState;
       }
     }
 
@@ -385,7 +436,39 @@ export default function(allNeedsInState = initialState, action = {}) {
           [needUri, "connections", connectionUri, "messages", eventUri, "date"],
           responseDateOnServer
         );
+        allNeedsInState = allNeedsInState.setIn(
+          [
+            needUri,
+            "connections",
+            connectionUri,
+            "messages",
+            eventUri,
+            "isReceivedByOwn",
+          ],
+          true
+        );
       }
+      return allNeedsInState;
+    }
+
+    case actionTypes.messages.chatMessage.successRemote: {
+      const wonMessage = getIn(action, ["payload"]);
+      const eventUri = wonMessage.getIsRemoteResponseTo();
+      const needUri = wonMessage.getReceiverNeed();
+      const connectionUri = wonMessage.getReceiver();
+      // we want to use the response date to update the original message
+      // date
+      allNeedsInState = allNeedsInState.setIn(
+        [
+          needUri,
+          "connections",
+          connectionUri,
+          "messages",
+          eventUri,
+          "isReceivedByRemote",
+        ],
+        true
+      );
       return allNeedsInState;
     }
 
@@ -404,7 +487,7 @@ export default function(allNeedsInState = initialState, action = {}) {
 
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
-        allNeedsInState = addMessages(allNeedsInState, loadedMessages);
+        allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);
         allNeedsInState = setConnectionLoading(
           allNeedsInState,
           connectionUri,
@@ -608,11 +691,15 @@ function addConnectionFull(state, connection) {
   return state;
 }
 
-function addMessage(state, wonMessage) {
+/*
+ "alreadyProcessed" flag, which indicates that we do not care about the
+ sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
+ */
+function addMessage(state, wonMessage, alreadyProcessed = false) {
   if (wonMessage.getContentGraphs().length > 0) {
     // we only want to add messages to the state that actually contain text
     // content. (no empty connect messages, for example)
-    let parsedMessage = parseMessage(wonMessage);
+    let parsedMessage = parseMessage(wonMessage, alreadyProcessed);
 
     if (parsedMessage) {
       const connectionUri = parsedMessage.get("belongsToUri");
@@ -661,10 +748,15 @@ function addMessage(state, wonMessage) {
   return state;
 }
 
-function addMessages(state, wonMessages) {
+/*
+ This method should only be called to for messages that are already stored on the server (reload, initial login etc)
+ because we will add all the messages with the "alreadyProcessed" flag, which indicates that we do not care about the
+ sent status anymore and assume that it has been successfully sent to each server (incl. the remote)
+ */
+function addExistingMessages(state, wonMessages) {
   if (wonMessages && wonMessages.size > 0) {
     wonMessages.map(wonMessage => {
-      state = addMessage(state, wonMessage);
+      state = addMessage(state, wonMessage, true);
     });
   } else {
     console.log("no messages to add");
@@ -992,7 +1084,7 @@ function parseConnection(jsonldConnection) {
   }
 }
 
-function parseMessage(wonMessage) {
+function parseMessage(wonMessage, alreadyProcessed = false) {
   const contentGraphTrigLines = (wonMessage.contentGraphTrig || "").split("\n");
 
   //seperating off header/@prefix-statements, so they can be folded in
@@ -1045,6 +1137,8 @@ function parseMessage(wonMessage) {
       connectMessage: wonMessage.isConnectMessage(),
       //TODO: add all different types
       clauses: clauses,
+      isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isProposeMessage: wonMessage.isProposeMessage(),
       isAcceptMessage: wonMessage.isAcceptMessage(),
       isProposeToCancel: wonMessage.isProposeToCancel(),
