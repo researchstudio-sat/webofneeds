@@ -180,10 +180,10 @@ const questions = [
     unsafeHtmlEnabled: true,
   },
   {
-	    title: "Is there a native mobile app?",
-	    detail:
-	      "No. The system is open source though. You can make one if" +
-	      " you like. Maybe one that talks to your own server? Contact us if you would like support in doing that!",
+    title: "Is there a native mobile app?",
+    detail:
+      "No. The system is open source though. You can make one if" +
+      " you like. Maybe one that talks to your own server? Contact us if you would like support in doing that!",
   },
 ];
 
