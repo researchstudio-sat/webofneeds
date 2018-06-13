@@ -94,19 +94,6 @@ function genComponentConf() {
                         </svg>
                         <span>Location</span>
                 </div>
-                
-                <!-- MATCHING CONTEXT PICKER -->
-                <div class="cis__detail__items__item matching-context"
-                    ng-click="self.toggleOpenDetail('matching-context')"
-                    ng-class="{'picked' : self.openDetail === 'matching-context'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('matching-context')">
-                            <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
-                        </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('matching-context')">
-                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                        </svg>
-                        <span>Matching Context</span>
-                </div>
 
                 <!-- ROUTE PICKER -->
                 <div class="cis__detail__items__item route"
@@ -167,14 +154,6 @@ function genComponentConf() {
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
-            <!-- MATCHING CONTEXT -->
-            <won-matching-context-picker
-              ng-if="self.openDetail === 'matching-context'"
-              default-matching-context="::self.defaultMatchingContext"
-              initial-matching-context="::self.draftObject.matchingContext"
-              on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
-            </won-matching-context-picker>
-
             <!-- ROUTE -->
             <won-route-picker
               ng-if="self.openDetail === 'route'"
@@ -197,13 +176,29 @@ function genComponentConf() {
             </won-ttl-picker>
         </div>
         <!-- /DETAILS/ -->
-
-        <!-- 
-            TODO: put matching context picker in new element: "Tune Matching Behaviour" 
-            TODO: differentiate between matching context was never added & matching context purposefully left blank
-            TODO: use default matching context in draft by default! - if user never opens matching context, this should be set      
-        -->
-`;
+        
+        <!-- MATCHING CONTEXT PICKER -->
+        <div class="cis__addDetail">
+            <div class="cis__addDetail__header detailPicker clickable"
+                ng-click="self.toggleMatchingContext()"
+                ng-class="{'closedDetailPicker': !self.showMatchingContext}">
+                <span>Tune Matching Behaviour</span>
+                <svg class="cis__addDetail__header__carret" ng-show="!self.showMatchingContext">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                </svg>
+                <svg class="cis__addDetail__header__carret" ng-show="self.showMatchingContext">
+                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                </svg>
+            </div>
+            <div class="cis__detail__matching-context">
+            <won-matching-context-picker
+              ng-if="self.showMatchingContext"
+              default-matching-context="::self.defaultMatchingContext"
+              initial-matching-context="::self.draftObject.matchingContext"
+              on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
+            </won-matching-context-picker>
+            </div>
+        </div>`;
 
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
@@ -292,6 +287,7 @@ function genComponentConf() {
       this.details = new Set(); // remove all detail-cards
 
       this.showDetail = false; // and close selector
+      this.showMatchingContext = false;
     }
 
     updateDraft() {
@@ -428,6 +424,13 @@ function genComponentConf() {
         this.updateScroll();
       }
       this.showDetail = !this.showDetail;
+    }
+
+    toggleMatchingContext() {
+      // if (!this.showMatchingContext) {
+      //   this.updateScroll;
+      // }
+      this.showMatchingContext = !this.showMatchingContext;
     }
 
     toggleOpenDetail(detail) {

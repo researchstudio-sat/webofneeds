@@ -55,6 +55,11 @@ won-create-isseeks {
         }
       }
     }
+
+    .cis__detail__matching-context {
+      @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
+      padding: 0.3rem 0 0 0;
+    }
   }
 
   // details components
