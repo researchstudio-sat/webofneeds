@@ -73,18 +73,6 @@ const peopleGrid = ({ theme }) => [
 
 const questions = [
   {
-    title: "Do I need to register?",
-    detail:
-      "Currently, you have to register, but we're working on a feature to" +
-      " let you use the site without registering. You can also run your own server if you don't want to register here.",
-  },
-  {
-    title: "Is there a native mobile app?",
-    detail:
-      "No. The system is open source though. You can make one if" +
-      " you like. Maybe one that talks to your own server? Contact us if you would like support in doing that!",
-  },
-  {
     title: "Who can view my posts?",
     detail:
       "Anyone can view your posts. (That's the idea!) Post-level access" +
@@ -187,9 +175,15 @@ const questions = [
       " If you have an idea for an integration, or if you would like to help with one, let us know.",
   },
   {
-    title: "What is behind the scenes?",
+    title: "What is going on behind the scenes?",
     detail: "You may go " + behindScenesLink + " for an explanation.",
     unsafeHtmlEnabled: true,
+  },
+  {
+    title: "Is there a native mobile app?",
+    detail:
+      "No. The system is open source though. You can make one if" +
+      " you like. Maybe one that talks to your own server? Contact us if you would like support in doing that!",
   },
 ];
 
