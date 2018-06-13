@@ -19,7 +19,7 @@
   box-sizing: border-box;
 
   &.visible {
-    max-height: 100vh;
+    max-height: 100%;
   }
 
   @media (max-width: $responsivenessBreakPoint) {
