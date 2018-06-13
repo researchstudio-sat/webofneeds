@@ -45,7 +45,7 @@ function genTopnavConf() {
             <div class="si__text">
                 This is Webapp is in development. Lorem Ipsum dolor blablabla whatever i dont know lets see
                 <a target="_blank"
-                   href="{{ self.absHRef(self.$state, 'about') }}">
+                   href="{{ self.absHRef(self.$state, 'about#imprint', {'#': 'imprint'}) }}">
                    Terms Of Use and Stuff
                 </a>
                 If you do not agree with this. Please leave now!
