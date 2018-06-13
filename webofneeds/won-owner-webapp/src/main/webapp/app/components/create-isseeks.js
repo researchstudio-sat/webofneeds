@@ -154,7 +154,7 @@ function genComponentConf() {
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
-            <!-- FROM A TO B -->
+            <!-- ROUTE -->
             <won-route-picker
               ng-if="self.openDetail === 'route'"
               initial-travel-action="::self.draftObject.travelAction"
@@ -176,7 +176,29 @@ function genComponentConf() {
             </won-ttl-picker>
         </div>
         <!-- /DETAILS/ -->
-`;
+        
+        <!-- MATCHING CONTEXT PICKER -->
+        <div class="cis__addDetail">
+            <div class="cis__addDetail__header detailPicker clickable"
+                ng-click="self.toggleMatchingContext()"
+                ng-class="{'closedDetailPicker': !self.showMatchingContext}">
+                <span>Tune Matching Behaviour</span>
+                <svg class="cis__addDetail__header__carret" ng-show="!self.showMatchingContext">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                </svg>
+                <svg class="cis__addDetail__header__carret" ng-show="self.showMatchingContext">
+                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                </svg>
+            </div>
+            <div class="cis__detail__matching-context">
+            <won-matching-context-picker
+              ng-if="self.showMatchingContext"
+              default-matching-context="::self.defaultMatchingContext"
+              initial-matching-context="::self.draftObject.matchingContext"
+              on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
+            </won-matching-context-picker>
+            </div>
+        </div>`;
 
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
@@ -187,10 +209,26 @@ function genComponentConf() {
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
+      // TODO: check if this is a good way to do this.
+      this.defaultMatchingContextList = this.$ngRedux
+        .getState()
+        .getIn(["config", "theme", "defaultContext"]);
+      this.defaultMatchingContext = this.defaultMatchingContextList
+        ? this.defaultMatchingContextList.toJS()
+        : [];
 
       this.openDetail = undefined;
 
       this.reset();
+
+      if (
+        this.defaultMatchingContext &&
+        this.defaultMatchingContext.length > 0
+      ) {
+        this.details.add("matching-context");
+        this.draftObject.matchingContext = this.defaultMatchingContext;
+        //this.updateDraft();
+      }
 
       //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
       const selectFromState = () => ({});
@@ -249,23 +287,27 @@ function genComponentConf() {
       this.details = new Set(); // remove all detail-cards
 
       this.showDetail = false; // and close selector
+      this.showMatchingContext = false;
     }
 
     updateDraft() {
+      if (!this.details.has("description")) {
+        this.draftObject.description = undefined;
+      }
       if (!this.details.has("location")) {
         this.draftObject.location = undefined;
+      }
+      if (!this.details.has("matching-context")) {
+        this.draftObject.matchingContext = undefined;
+      }
+      if (!this.details.has("route")) {
+        this.draftObject.travelAction = undefined;
       }
       if (!this.details.has("tags")) {
         this.draftObject.tags = [];
       }
       if (!this.details.has("ttl")) {
         this.draftObject.ttl = undefined;
-      }
-      if (!this.details.has("description")) {
-        this.draftObject.description = undefined;
-      }
-      if (!this.details.has("route")) {
-        this.draftObject.travelAction = undefined;
       }
 
       this.onUpdate({ draft: this.draftObject });
@@ -308,6 +350,21 @@ function genComponentConf() {
       } else if (this.details.has("location")) {
         this.details.delete("location");
         this.draftObject.location = undefined;
+      }
+
+      this.updateDraft();
+    }
+
+    updateMatchingContext(matchingContext) {
+      // also accepts []!
+      if (matchingContext) {
+        if (!this.details.has("matching-context")) {
+          this.details.add("matching-context");
+        }
+        this.draftObject.matchingContext = matchingContext;
+      } else if (this.details.has("matching-context")) {
+        this.details.delete("matching-context");
+        this.draftObject.matchingContext = undefined;
       }
 
       this.updateDraft();
@@ -367,6 +424,13 @@ function genComponentConf() {
         this.updateScroll();
       }
       this.showDetail = !this.showDetail;
+    }
+
+    toggleMatchingContext() {
+      // if (!this.showMatchingContext) {
+      //   this.updateScroll;
+      // }
+      this.showMatchingContext = !this.showMatchingContext;
     }
 
     toggleOpenDetail(detail) {

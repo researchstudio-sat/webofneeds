@@ -13,8 +13,13 @@ import {
   logout,
   parseCredentials,
   generatePrivateId,
+  checkLoginStatus,
 } from "../won-utils.js";
-import { clearPrivateId, savePrivateId } from "../won-localstorage.js";
+import {
+  clearPrivateId,
+  savePrivateId,
+  setDisclaimerAccepted,
+} from "../won-localstorage.js";
 import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
@@ -386,4 +391,29 @@ export function accountTransfer(credentials) {
         console.error(registerError, error);
         dispatch(actionCreators.registerFailed({ registerError, error }));
       });
+}
+
+export function accountAcceptDisclaimer() {
+  return dispatch => {
+    setDisclaimerAccepted();
+    dispatch({ type: actionTypes.acceptDisclaimerSuccess });
+  };
+}
+
+export function reconnect() {
+  return dispatch => {
+    return checkLoginStatus()
+      .then(() => {
+        dispatch({ type: actionTypes.reconnect });
+      })
+      .catch(e => {
+        if (e.message == "Unauthorized") {
+          dispatch({ type: actionTypes.logout });
+          dispatch({ type: actionTypes.showMainMenuDisplay });
+        } else {
+          dispatch(actionCreators.lostConnection());
+        }
+        console.warn(e);
+      });
+  };
 }

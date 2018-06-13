@@ -208,6 +208,11 @@ class AboutController {
           theme +
           "/" +
           getIn(state, ["config", "theme", "imprintTemplate"]),
+        privacyPolicyTemplate:
+          "./skin/" +
+          theme +
+          "/" +
+          getIn(state, ["config", "theme", "privacyPolicyTemplate"]),
         peopleGrid: peopleGrid({ theme }),
       };
     };

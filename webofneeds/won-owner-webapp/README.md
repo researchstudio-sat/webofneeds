@@ -112,6 +112,9 @@ $ngRedux.getState();
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
                        text: string, //message text
                        uri: string //unique identifier of this message
+                       isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
+                       isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
+                       failedToSend: true|false //whether the sent message failed for whatever reason (default: false, only relevant in outgoingMessages)
                    }
                    ...
                },
@@ -213,7 +216,10 @@ $ngRedux.getState();
    prevState: {...}
  },
  toasts: {...},
- user: {...},
+ user: {
+    ...,
+    acceptedDisclaimer: true|false, //flag whether the user has accepted the ToS etc. already. (default is false)
+ },
  showRdf: true|false, //flag that is true if rawData mode is on (enables rdf view and rdf links) (default is false)
  showClosedNeeds: true|false, //flag whether the drawer of the closedNeeds is open or closed (default is false)
  showMainMenu: true|false, //flag whether the mainmenu dropdown is open or closed (default is false)

@@ -38,6 +38,34 @@ function genTopnavConf() {
                 ng-show="self.reconnecting"
                 class="hspinner"/>
         </div>
+        <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
+            <svg class="si__icon" style="--local-primary:white;">
+                <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_info"></use>
+            </svg>
+            <div class="si__text">
+                This Website demonstrates the output of an ongoing research project. We are doing our best to make it secure and protect your privacy. Please keep in mind:
+                <ul>
+                	<li> Your postings are public. Do not post anyhting you are not comfortable with everyone seeing. </li>
+                	<li> The information which posts your posts are connected to is public. </li>
+                	<li> Your conversation messages with others are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
+                </ul>     
+                <a target="_blank"
+                   href="{{ self.absHRef(self.$state, 'about', {'#': 'privacyPolicy'}) }}">
+                   See Privacy Policy.
+                </a>
+                <br />
+                We use cookies for tracking your session, if you choose to be logged in automatically, you will receive another cookie to do that. Furthermore, we use Piwik on our own servers to track your visit an improve the application, which also identifies you with a cookie.
+                <a target="_blank"
+                   href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
+                   Suppress tracking.
+                </a>
+	  		</div>
+            <button
+                ng-click="self.acceptDisclaimer()"
+                class="si__button">
+                    Accept
+            </button>
+        </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 
         <nav class="topnav" ng-class="{'hide-in-responsive': self.connectionOrPostDetailOpen}">
@@ -167,6 +195,7 @@ function genTopnavConf() {
           adminEmail: getIn(state, ["config", "theme", "adminEmail"]),
           WON: won.WON,
           loggedIn: state.getIn(["user", "loggedIn"]),
+          acceptedDisclaimer: state.getIn(["user", "acceptedDisclaimer"]),
           email: state.getIn(["user", "email"]),
           isPrivateIdUser: !!privateId,
           connectionOrPostDetailOpen:

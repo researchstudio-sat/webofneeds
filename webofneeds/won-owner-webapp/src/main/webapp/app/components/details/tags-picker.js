@@ -46,7 +46,7 @@ function genComponentConf() {
     showInitialTags() {
       this.addedTags = this.initialTags;
       let _tagsForTextfield = "";
-      if (this.initialTags) {
+      if (this.initialTags && this.initialTags.length > 0) {
         this.initialTags.forEach(function(tag) {
           _tagsForTextfield += "#" + tag + " ";
         });
