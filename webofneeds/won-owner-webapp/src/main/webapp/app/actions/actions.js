@@ -73,6 +73,7 @@ import {
   accountRegister,
   accountTransfer,
   accountAcceptDisclaimer,
+  reconnect,
 } from "./account-actions.js";
 
 import * as cnct from "./connections-actions.js";
@@ -231,7 +232,7 @@ const actionHierarchy = {
   registerFailed: INJ_DEFAULT,
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
-  reconnect: INJ_DEFAULT,
+  reconnect: reconnect,
   reconnectSuccess: INJ_DEFAULT,
 
   toggleRdfDisplay: INJ_DEFAULT,
