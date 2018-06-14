@@ -54,7 +54,9 @@ function genComponentConf() {
       window.ctfs4dbg = this;
 
       const selectFromState = state => ({
-        connectionHasBeenLost: state.getIn(["messages", "lostConnection"]),
+        connectionHasBeenLost:
+          state.getIn(["messages", "reconnecting"]) ||
+          state.getIn(["messages", "lostConnection"]),
       });
       const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
         this
