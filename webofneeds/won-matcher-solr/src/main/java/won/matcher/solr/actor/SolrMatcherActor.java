@@ -195,8 +195,10 @@ public class SolrMatcherActor extends UntypedActor {
         filterQueries.add(new NeedStateQueryFactory(dataset).createQuery());
         filterQueries.add(new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery());
         filterQueries.add(new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.NOT, new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.NO_HINT_FOR_ME)).createQuery());
-        filterQueries.add(new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND).createQuery());
-        filterQueries.add(new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW).createQuery());
+        filterQueries.add(
+        		new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR, 
+        				new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_AROUND),
+        				new HasFlagQueryFactory(HasFlagQueryFactory.FLAGS.WHATS_NEW)).createQuery());
         if (needModelWrapper.getMatchingContexts() != null && needModelWrapper.getMatchingContexts().size() > 0) {
             filterQueries.add(new MatchingContextQueryFactory(needModelWrapper.getMatchingContexts()).createQuery());
         }
