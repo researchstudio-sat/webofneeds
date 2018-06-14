@@ -154,6 +154,7 @@ function genComponentConf() {
         const isPost = showCreateView && !isSearch;
 
         return {
+          connectionHasBeenLost: state.getIn(["messages", "lostConnection"]),
           showCreateView,
           isSearch,
           isPost,
@@ -207,6 +208,7 @@ function genComponentConf() {
 
     isValid() {
       return (
+        !this.connectionHasBeenLost &&
         (this.draftObject[this.is] || this.draftObject[this.seeks]) &&
         (this.draftObject[this.is].title ||
           this.draftObject[this.seeks].title) &&
