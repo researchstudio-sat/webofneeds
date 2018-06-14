@@ -7,7 +7,7 @@ import won from "../won-es6.js";
 import "ng-redux";
 import { labels } from "../won-label-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { selectAllOwnNeeds } from "../selectors.js";
+import { selectAllOwnNeeds, selectAllNeeds } from "../selectors.js";
 
 import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
@@ -81,21 +81,38 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const ownNeeds = selectAllOwnNeeds(state);
+        const allNeeds = selectAllNeeds(state);
         const need = ownNeeds && ownNeeds.get(this.needUri);
         const allConnectionsByNeedUri = need && need.get("connections");
 
         const matches =
           allConnectionsByNeedUri &&
-          allConnectionsByNeedUri.filter(
-            conn => conn.get("state") === won.WON.Suggested
-          );
+          allConnectionsByNeedUri.filter(conn => {
+            const remoteNeedUri = conn.get("remoteNeedUri");
+            const remoteNeedActive =
+              remoteNeedUri &&
+              allNeeds.get(remoteNeedUri) &&
+              allNeeds.getIn(remoteNeedUri, "state") ===
+                won.WON.ActiveCompacted;
+
+            return remoteNeedActive && conn.get("state") === won.WON.Suggested;
+          });
         const connected =
           allConnectionsByNeedUri &&
-          allConnectionsByNeedUri.filter(
-            conn =>
+          allConnectionsByNeedUri.filter(conn => {
+            const remoteNeedUri = conn.get("remoteNeedUri");
+            const remoteNeedActive =
+              remoteNeedUri &&
+              allNeeds.get(remoteNeedUri) &&
+              allNeeds.getIn(remoteNeedUri, "state") ===
+                won.WON.ActiveCompacted;
+
+            return (
+              remoteNeedActive &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed
-          );
+            );
+          });
 
         const unreadMatches =
           matches && matches.filter(conn => conn.get("unread"));
