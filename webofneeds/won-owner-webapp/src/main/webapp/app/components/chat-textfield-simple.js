@@ -6,12 +6,12 @@
  * Created by ksinger on 16.02.2018.
  */
 
-// import Medium from '../mediumjs-es6.js';
 import angular from "angular";
-// import 'ng-redux';
+import "ng-redux";
 import "angular-sanitize";
 import { dispatchEvent, attach, delay } from "../utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
+import { actionCreators } from "../actions/actions.js";
 
 function genComponentConf() {
   let template = `
@@ -44,7 +44,8 @@ function genComponentConf() {
 
   const serviceDependencies = [
     "$scope",
-    "$element" /*'$ngRedux',/*injections as strings here*/,
+    "$element",
+    "$ngRedux" /*injections as strings here*/,
   ];
 
   class Controller {
@@ -52,13 +53,13 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.ctfs4dbg = this;
 
-      /*
-            const selectFromState = (state) => ({
-                draftId: state.getIn(['router', 'currentParams', 'draftId'])
-            })
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
-            */
+      const selectFromState = state => ({
+        connectionHasBeenLost: state.getIn(["messages", "lostConnection"]),
+      });
+      const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(
+        this
+      );
+      this.$scope.$on("$destroy", disconnect);
 
       this.textFieldNg().bind("input", () => {
         this.input();
@@ -126,6 +127,7 @@ function genComponentConf() {
     }
     valid() {
       return (
+        !this.connectionHasBeenLost &&
         (this.allowEmptySubmit || this.value().length > 0) &&
         this.belowMaxLength()
       );
