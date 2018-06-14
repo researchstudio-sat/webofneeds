@@ -33,7 +33,7 @@ function genComponentConf() {
       <div class="ch__right">
         <div class="ch__right__topline">
           <div class="ch__right__topline__title" title="{{ self.theirNeed.get('title') }}">
-            {{ self.theirNeed.get('title') }}
+            {{ self.theirNeed.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.theirNeed.get('title') }}
           </div>
           <div class="ch__right__topline__date">
             {{ self.friendlyTimestamp }}

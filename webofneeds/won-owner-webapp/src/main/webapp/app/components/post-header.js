@@ -25,7 +25,7 @@ function genComponentConf() {
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated')">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title">
-          {{ self.need.get('title') }}
+         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('title') }}
         </div>
         <div class="ph__right__topline__date">
           {{ self.friendlyTimestamp }}
