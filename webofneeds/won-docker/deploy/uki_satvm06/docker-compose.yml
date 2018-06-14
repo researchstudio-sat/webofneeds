@@ -63,6 +63,7 @@ services:
       - "5432:5432"
 
   # owner with nginx proxy (https://line.uki.or.at/owner)
+  # TODO change the node uri from node.matchat.org/won to the new meicogsci node url once it is there
   owner:
     build: ../../image/owner
     environment:
@@ -71,7 +72,7 @@ services:
       - "http.port=8082"
       - "node.default.http.port=443"
       - "uri.prefix=https://meicogsci.matchat.org/owner"
-      - "uri.prefix.node.default=https://meicogsci.matchat.org/won"
+      - "uri.prefix.node.default=https://node.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5432/won_owner"
       - "db.ddl.strategy=validate"
