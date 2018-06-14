@@ -215,6 +215,22 @@ export function accountLogin(credentials, options) {
          */
         dispatch(actionCreators.reconnect())
       )
+      .then(() => {
+        if ("geolocation" in navigator && navigator.permissions) {
+          navigator.permissions
+            .query({
+              name: "geolocation",
+            })
+            .then(
+              permission =>
+                permission.state === "granted"
+                  ? dispatch(actionCreators.needs__whatsAround())
+                  : dispatch(actionCreators.needs__whatsNew())
+            );
+        } else {
+          dispatch(actionCreators.needs__whatsNew());
+        }
+      })
       .catch(error => {
         console.error("accountLogin ErrorObject", error);
         return Promise.resolve()
@@ -247,22 +263,6 @@ export function accountLogin(credentials, options) {
       })
       .then(() => {
         _loginInProcessFor = undefined;
-      })
-      .then(() => {
-        if ("geolocation" in navigator && navigator.permissions) {
-          navigator.permissions
-            .query({
-              name: "geolocation",
-            })
-            .then(
-              permission =>
-                permission.state === "granted"
-                  ? dispatch(actionCreators.needs__whatsAround())
-                  : dispatch(actionCreators.needs__whatsNew())
-            );
-        } else {
-          dispatch(actionCreators.needs__whatsNew());
-        }
       })
       .then(() => {
         if (credentials.privateId) {
