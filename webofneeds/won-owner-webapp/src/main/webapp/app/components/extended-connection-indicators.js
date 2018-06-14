@@ -93,8 +93,9 @@ function genComponentConf() {
           allConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
             const remoteNeedActive =
+              allNeeds &&
               allNeeds.get(remoteNeedUri) &&
-              allNeeds.getIn(remoteNeedUri, "state") ===
+              allNeeds.getIn([remoteNeedUri, "state"]) ===
                 won.WON.ActiveCompacted;
 
             return remoteNeedActive && conn.get("state") === won.WON.Suggested;
@@ -104,8 +105,9 @@ function genComponentConf() {
           allConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
             const remoteNeedActive =
+              allNeeds &&
               allNeeds.get(remoteNeedUri) &&
-              allNeeds.getIn(remoteNeedUri, "state") ===
+              allNeeds.getIn([remoteNeedUri, "state"]) ===
                 won.WON.ActiveCompacted;
 
             return (

@@ -301,8 +301,10 @@ function genComponentConf() {
           const remoteNeedUri = conn.get("remoteNeedUri");
           const remoteNeedActive =
             remoteNeedUri &&
+            allNeeds &&
             allNeeds.get(remoteNeedUri) &&
-            allNeeds.getIn(remoteNeedUri, "state") === won.WON.ActiveCompacted;
+            allNeeds.getIn([remoteNeedUri, "state"]) ===
+              won.WON.ActiveCompacted;
 
           return remoteNeedActive && conn.get("state") !== won.WON.Closed;
         }).size > 0
@@ -315,8 +317,10 @@ function genComponentConf() {
           const remoteNeedUri = conn.get("remoteNeedUri");
           const remoteNeedActive =
             remoteNeedUri &&
+            allNeeds &&
             allNeeds.get(remoteNeedUri) &&
-            allNeeds.getIn(remoteNeedUri, "state") === won.WON.ActiveCompacted;
+            allNeeds.getIn([remoteNeedUri, "state"]) ===
+              won.WON.ActiveCompacted;
 
           return remoteNeedActive && conn.get("state") !== won.WON.Closed;
         })
