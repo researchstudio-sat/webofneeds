@@ -19,7 +19,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     isWhatsAround: false,
     isWhatsNew: false,
     matchingContexts: undefined,
-    jsonld: Immutable.Map(),
+    jsonld: jsonldNeed,
   };
 
   if (jsonldNeedImm) {
