@@ -49,19 +49,23 @@ function genComponentConf() {
             <won-post-is-info is-part="::self.isPart" ng-if="self.isPart"></won-post-is-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
             <won-post-seeks-info seeks-part="::self.seeksPart" ng-if="self.seeksPart"></won-post-seeks-info>
-            <a class="rdflink clickable"
-               ng-if="self.shouldShowRdf"
-               target="_blank"
-               href="{{self.post.get('uri')}}">
-                    <svg class="rdflink__small">
-                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
-                    </svg>
-                    <span class="rdflink__label">RDF on Server</span>
-            </a>
-            <won-trig
-              ng-if="self.shouldShowRdf && self.post.get('jsonld')"
-              jsonld="self.post.get('jsonld')">
-            </won-trig>
+            <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
+              <h2 class="post-info__heading">
+                  RDF
+              </h2>
+              <a class="rdflink clickable"
+                target="_blank"
+                href="{{self.post.get('uri')}}">
+                      <svg class="rdflink__small">
+                          <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
+                      </svg>
+                      <span class="rdflink__label">RDF on Server</span>
+              </a>
+              <won-trig
+                ng-if="self.post.get('jsonld')"
+                jsonld="self.post.get('jsonld')">
+              </won-trig>
+            </div>
         </div>
         <div class="post-info__footer">
             <won-post-share-link

@@ -8,16 +8,10 @@ function genComponentConf() {
     <div 
       ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
       ng-show="self.trigBody"
-    >
-      <div
-        class="trig"
-        ng-show="self.trigPrefixes">
-          <code class="trig__prefixes--prewrap" ng-show="!self.showTrigPrefixes">@prefix ...</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-          <code class="trig__prefixes--prewrap" ng-show="self.showTrigPrefixes">{{ self.trigPrefixes }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-      </div>
-      <div class="trig">
-        <code class="trig__contentgraph--prewrap">{{ self.trigBody }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-      </div>
+      class="trig">
+        <code class="trig__prefixes" ng-show="!self.showTrigPrefixes">@prefix ...</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <code class="trig__prefixes" ng-show="self.showTrigPrefixes">{{ self.trigPrefixes }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <code class="trig__contentgraph">{{ self.trigBody }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
     </div>
   `;
 
