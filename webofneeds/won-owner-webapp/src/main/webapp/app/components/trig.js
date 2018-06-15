@@ -29,34 +29,22 @@ function genComponentConf() {
       );
     }
     updatedTrig(newTrig, prevTrig) {
-      if (newTrig) {
-        console.log("NOT YET IMPLEMENTED: ", newTrig, prevTrig);
+      // generate new trig body and prefixes, if the trig-input has changed or it hasn't been generated before
+      if (newTrig && (newTrig != prevTrig || !this.trigBody)) {
+        this.setTrig(newTrig);
       }
     }
     async updatedJsonld(newJsonld, prevJsonld) {
-      // generate new trig, if the json-ld has changed or it hasn't been generated before
-      if (newJsonld && (newJsonld != prevJsonld || !this.trig)) {
-        // console.log("NOT YET IMPLEMENTED: ", newJsonld, prevJsonld);
-
-        window.newJsonld = newJsonld;
-        window.won4deleteme = won;
-
-        // TODO parse to trig if possible, otherwise to ttl
-
+      // generate new trig body and prefixes, if the json-ld has changed or it hasn't been generated before
+      if (newJsonld && (newJsonld != prevJsonld || !this.trigBody)) {
         const trigString = await won.jsonLdToTrig(newJsonld.toJS());
-        const { trigPrefixes, trigBody } = trigPrefixesAndBody(trigString);
-        this.trigPrefixes = trigPrefixes;
-        this.trigBody = trigBody;
-
-        console.log(
-          "parsed trig in <won-trig>: ",
-          trigPrefixes,
-          "\n\n\n",
-          trigBody,
-          newJsonld,
-          prevJsonld
-        );
+        this.setTrig(trigString);
       }
+    }
+    setTrig(trigString) {
+      const { trigPrefixes, trigBody } = trigPrefixesAndBody(trigString);
+      this.trigPrefixes = trigPrefixes;
+      this.trigBody = trigBody;
     }
   }
   Controller.$inject = serviceDependencies;
