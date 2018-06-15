@@ -98,6 +98,9 @@ function config(env, argv): Configuration {
               },
             },
             {
+              loader: "postcss-loader",
+            },
+            {
               loader: "sass-loader",
               options: {
                 sourceMap: mode == "development",
