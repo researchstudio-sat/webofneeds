@@ -22,13 +22,17 @@ const emptyDraft = deepFreeze({
 });
 
 // const availableDetails = {
-//   description: {},
-//   location : {
-//     detailName: "location",
-//     detailTitle: "Location",
-//     detailIcon: "ico36_location_circle",
-//     detailComponent: "won-location-picker",
+//   description: {
+//     name: "description",
 //   },
+//   location: {
+//     name: "location",
+//     title: "Location",
+//     icon: "ico36_location_circle",
+//     component: "won-location-picker", // put all the html here?
+//   },
+//   person: {},
+//   route: {},
 //   tags: {},
 //   ttl: {},
 // };
@@ -95,6 +99,20 @@ function genComponentConf() {
                         <span>Location</span>
                 </div>
 
+                <!-- PERSON PICKER -->
+                <div class="cis__detail__items__item person"
+                ng-click="self.toggleOpenDetail('person')"
+                ng-class="{'picked' : self.openDetail === 'person'}">
+                    <svg class="cis__circleicon" ng-show="!self.details.has('person')">
+                        <!-- TODO: create and use a better icon -->
+                        <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
+                    </svg>
+                    <svg class="cis__circleicon" ng-show="self.details.has('person')">
+                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                    </svg>
+                    <span>Person</span>
+                </div>
+
                 <!-- ROUTE PICKER -->
                 <div class="cis__detail__items__item route"
                     ng-click="self.toggleOpenDetail('route')"
@@ -153,6 +171,13 @@ function genComponentConf() {
                 initial-location="::self.draftObject.location"
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
+
+            <!-- PERSON -->
+            <won-person-picker 
+              ng-if="self.openDetail === 'person'"
+              initial-person="::self.draftObject.person"
+              on-person-updated="::self.updatePerson(person)">
+            </won-person-picker>
 
             <!-- ROUTE -->
             <won-route-picker
@@ -300,6 +325,9 @@ function genComponentConf() {
       if (!this.details.has("matching-context")) {
         this.draftObject.matchingContext = undefined;
       }
+      if (!this.details.has("person")) {
+        this.draftObject.person = undefined;
+      }
       if (!this.details.has("route")) {
         this.draftObject.travelAction = undefined;
       }
@@ -368,6 +396,24 @@ function genComponentConf() {
       }
 
       this.updateDraft();
+    }
+
+    updatePerson(person) {
+      if (person && person.length > 0 && !this.isEmptyPerson(person)) {
+        if (!this.details.has("person")) {
+          this.details.add("person");
+        }
+        this.draftObject.person = person;
+      } else if (this.details.has("person")) {
+        this.details.delete("person");
+        this.draftObject.person = undefined;
+      }
+
+      this.updateDraft();
+    }
+
+    isEmptyPerson(person) {
+      return Array.from(person.values()).every(x => x === null || x === "");
     }
 
     updateRoute(travelAction) {
