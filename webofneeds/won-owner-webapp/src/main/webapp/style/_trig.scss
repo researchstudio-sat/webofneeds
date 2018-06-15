@@ -1,0 +1,17 @@
+won-trig {
+  display: block;
+  position: relative;
+  .trig {
+    max-width: 100%;
+    &__prefixes {
+      display: inline-block;
+      padding-bottom: 1rem;
+      &--prewrap {
+        white-space: pre-wrap;
+      }
+    }
+    &__contentgraph--prewrap {
+      white-space: pre-wrap;
+    }
+  }
+}

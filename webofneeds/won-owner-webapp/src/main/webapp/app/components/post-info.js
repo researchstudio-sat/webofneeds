@@ -9,6 +9,7 @@ import postHeaderModule from "./post-header.js";
 import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
+import trigModule from "./trig.js";
 import { attach } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
@@ -55,8 +56,12 @@ function genComponentConf() {
                     <svg class="rdflink__small">
                         <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
                     </svg>
-                    <span class="rdflink__label">Post</span>
+                    <span class="rdflink__label">RDF on Server</span>
             </a>
+            <won-trig
+              ng-if="self.shouldShowRdf && self.post.get('jsonld')"
+              jsonld="self.post.get('jsonld')">
+            </won-trig>
         </div>
         <div class="post-info__footer">
             <won-post-share-link
@@ -84,6 +89,8 @@ function genComponentConf() {
       this.seeks = "seeks";
 
       this.pendingPublishing = false;
+
+      window.pi4dbg = this;
 
       this.defaultContext = this.$ngRedux
         .getState()
@@ -181,5 +188,6 @@ export default angular
     postShareLinkModule,
     labelledHrModule,
     postContextDropdownModule,
+    trigModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;
