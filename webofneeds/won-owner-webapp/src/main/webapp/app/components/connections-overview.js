@@ -21,6 +21,7 @@ import { actionCreators } from "../actions/actions.js";
 
 import {
   selectAllOwnNeeds,
+  selectAllNeeds,
   selectRouterParams,
   selectNeedByConnectionUri,
 } from "../selectors.js";
@@ -44,7 +45,7 @@ function genComponentConf() {
             </div>
         </div>
         <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
-            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenConnections(need)}">
+            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenConnections(need, self.allNeeds)}">
             <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
@@ -91,9 +92,9 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && self.hasOpenConnections(need)">
+                ng-if="self.isOpen(need.get('uri')) && self.hasOpenConnections(need, self.allNeeds)">
                 <won-connection-selection-item
-                    ng-repeat="conn in self.getOpenConnectionsArraySorted(need)"
+                    ng-repeat="conn in self.getOpenConnectionsArraySorted(need, self.allNeeds)"
                     on-selected-connection="self.selectConnection(connectionUri)"
                     connection-uri="conn.get('uri')"
                     ng-class="{'won-unread': conn.get('unread')}">
@@ -176,6 +177,7 @@ function genComponentConf() {
 
       const self = this;
       const selectFromState = state => {
+        const allNeeds = selectAllNeeds(state);
         const allOwnNeeds = selectAllOwnNeeds(state); //FILTER ALL CLOSED WHATS AROUNDS
 
         const openNeeds =
@@ -218,6 +220,7 @@ function genComponentConf() {
         );
 
         return {
+          allNeeds,
           isLoading: !state.get("initialLoadFinished"),
           showClosedNeeds: state.get("showClosedNeeds"),
           showCreateView,
@@ -291,20 +294,36 @@ function genComponentConf() {
       this.onSelectedNeed({ needUri }); //trigger callback with scope-object
     }
 
-    hasOpenConnections(need) {
+    hasOpenConnections(need, allNeeds) {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
-        need
-          .get("connections")
-          .filter(conn => conn.get("state") !== won.WON.Closed).size > 0
+        need.get("connections").filter(conn => {
+          const remoteNeedUri = conn.get("remoteNeedUri");
+          const remoteNeedActive =
+            remoteNeedUri &&
+            allNeeds &&
+            allNeeds.get(remoteNeedUri) &&
+            allNeeds.getIn([remoteNeedUri, "state"]) ===
+              won.WON.ActiveCompacted;
+
+          return remoteNeedActive && conn.get("state") !== won.WON.Closed;
+        }).size > 0
       );
     }
 
-    getOpenConnectionsArraySorted(need) {
+    getOpenConnectionsArraySorted(need, allNeeds) {
       return sortByDate(
-        need
-          .get("connections")
-          .filter(conn => conn.get("state") !== won.WON.Closed)
+        need.get("connections").filter(conn => {
+          const remoteNeedUri = conn.get("remoteNeedUri");
+          const remoteNeedActive =
+            remoteNeedUri &&
+            allNeeds &&
+            allNeeds.get(remoteNeedUri) &&
+            allNeeds.getIn([remoteNeedUri, "state"]) ===
+              won.WON.ActiveCompacted;
+
+          return remoteNeedActive && conn.get("state") !== won.WON.Closed;
+        })
       );
     }
   }
@@ -317,9 +336,9 @@ function genComponentConf() {
     scope: {
       open: "=",
       /*
-             * Usage:
-             *  on-selected-connection="myCallback(connectionUri)"
-             */
+       * Usage:
+       *  on-selected-connection="myCallback(connectionUri)"
+       */
       onSelectedConnection: "&",
       onSelectedNeed: "&",
     },
