@@ -63,6 +63,7 @@ function config(env, argv): Configuration {
           "angular-ui-router/release/stateEvents.js"
         ),
         config$: path.resolve(__dirname, "config", `${nodeEnv}.js`),
+        jsonld$: require.resolve("jsonld/dist/jsonld.js"), // This is needed because `jsonld`s entrypoint is not compiled to compatible js (uses spread operators). With this resolve hook we instead use the compiled version.
       },
     },
     module: {
