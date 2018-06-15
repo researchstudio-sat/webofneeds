@@ -21,13 +21,13 @@ function genComponentConf() {
           <svg class="pp__detail__icon clickable" 
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton(detail.name)"
-            ng-click="self.reset(detail)">
+            ng-click="self.resetPersonDetail(detail.name)">
               <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
       </div>
     `;
 
-  // TODO: rewrite this from tag picker to person picker
+  // DONE rewrite this from tag picker to person picker
   // DONE -> Map decide on some sort of data structure
   // DONE add to create-isseeks
   // TODO: styling
@@ -53,22 +53,25 @@ function genComponentConf() {
         { name: "value7", value: undefined },
       ];
       this.visibleResetButtons = new Set();
-      // this.showResetButton = false;
 
       delay(0).then(() => this.showInitialPerson());
     }
 
     showInitialPerson() {
-      // let _tagsForTextfield = "";
-
-      // TODO: if person is an object, go through all values and display them
-      // TODO: add textfields for every single detail?
       if (this.initialPerson && this.initialPerson.size > 0) {
         for (let [detail, value] of this.initialPerson.entries()) {
           this.addedPerson.set(detail, value);
+          let personIndex = this.personDetails.findIndex(
+            personDetail => personDetail.name === detail
+          );
+          if (personIndex !== -1) {
+            this.personDetails[personIndex].value = value;
+          }
+          if (value && value.length > 0) {
+            this.visibleResetButtons.add(detail);
+          }
         }
       }
-      //this.textfield().value = _tagsForTextfield.trim();
 
       this.$scope.$apply();
     }
@@ -78,39 +81,33 @@ function genComponentConf() {
         this.addedPerson.set(detail.name, detail.value);
         this.onPersonUpdated({ person: this.addedPerson });
 
-        console.log("detail name: ", detail.name);
-        console.log("detail value: ", detail.value);
-        console.log("detail.value.length: ", detail.value.length);
         if (detail.value.length > 0) {
           this.visibleResetButtons.add(detail.name);
-          console.log(this.visibleResetButtons);
         } else {
           this.visibleResetButtons.delete(detail.name);
         }
+      } else {
+        this.addedPerson.set(detail.name, undefined);
+        this.onPersonUpdated({ person: this.addedPerson });
+        this.visibleResetButtons.delete(detail.name);
       }
     }
-
-    // updateTags() {
-    //   // TODO: do something with text that does not start with #
-    //   const text = this.textfield().value;
-
-    //   if (text && text.trim().length > 0) {
-    //     this.addedPerson = extractHashtags(text);
-    //     this.onPersonUpdated({ person: this.addedPerson });
-    //     this.showResetButton = true;
-    //   } else {
-    //     this.resetPerson();
-    //   }
-    // }
 
     showResetButton(detail) {
       return this.visibleResetButtons.has(detail);
     }
 
-    resetPerson() {
-      this.addedPerson = undefined;
+    resetPersonDetail(detail) {
+      this.addedPerson.set(detail, undefined);
+      this.visibleResetButtons.delete(detail);
+      let personIndex = this.personDetails.findIndex(
+        personDetail => personDetail.name === detail
+      );
+      if (personIndex !== -1) {
+        this.personDetails[personIndex].value = "";
+      }
       //this.textfield().value = "";
-      this.onPersonUpdated({ person: undefined });
+      this.onPersonUpdated({ person: this.addedPerson });
       //this.showResetButton = false;
     }
 

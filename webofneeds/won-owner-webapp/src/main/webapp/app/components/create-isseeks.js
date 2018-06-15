@@ -399,7 +399,7 @@ function genComponentConf() {
     }
 
     updatePerson(person) {
-      if (person && person.length > 0 && !this.isEmptyPerson(person)) {
+      if (person && !this.isEmptyPerson(person)) {
         if (!this.details.has("person")) {
           this.details.add("person");
         }
