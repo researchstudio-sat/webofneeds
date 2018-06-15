@@ -1,6 +1,8 @@
 won-trig {
   display: block;
   position: relative;
+  font-size: $smallFontSize;
+
   .trig {
     max-width: 100%; // necessary for `white-space: pre-wrap` in childs
     display: flex;
