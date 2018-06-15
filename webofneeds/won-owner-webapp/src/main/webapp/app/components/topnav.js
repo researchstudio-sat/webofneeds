@@ -86,7 +86,7 @@ function genTopnavConf() {
                     <ul class="topnav__list">
                         <li ng-show="!self.isSignUp && (self.isPrivateIdUser || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
-                                class="topnav__signupbtn hide-in-responsive">
+                                class="topnav__signupbtn">
                                     Sign up
                             </a>
                         </li>
