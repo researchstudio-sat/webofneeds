@@ -7,7 +7,7 @@ import Immutable from "immutable";
 import { combineReducersStable } from "../redux-utils.js";
 import { messagesReducer } from "./message-reducers.js";
 import reduceReducers from "reduce-reducers";
-import needReducer from "./need-reducer.js";
+import needReducer from "./need-reducer/need-reducer-main.js";
 import userReducer from "./user-reducer.js";
 import toastReducer from "./toast-reducer.js";
 import { getIn } from "../utils.js";
