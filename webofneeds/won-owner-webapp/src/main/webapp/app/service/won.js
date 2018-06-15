@@ -966,18 +966,6 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
  *   `jsonldData` that's always used.)
  */
 won.jsonLdToTrig = async function(jsonldData, addDefaultContext = true) {
-  if (
-    !jsonldData ||
-    !(
-      (is("Array", jsonldData) && jsonldData.length > 0) ||
-      (is("Object", jsonldData) && jsonldData["@graph"])
-    )
-  ) {
-    const msg =
-      "Couldn't parse the following json-ld to trig: " +
-      JSON.stringify(jsonldData);
-    return Promise.reject(msg);
-  }
   const quadString = await jsonld.promises.toRDF(jsonldData, {
     format: "application/nquads",
   });
@@ -987,7 +975,7 @@ won.jsonLdToTrig = async function(jsonldData, addDefaultContext = true) {
 
   const prefixes_ = addDefaultContext
     ? Object.assign(clone(won.defaultContext), jsonldData["@context"])
-    : jsonldData["@context"];
+    : jsonldData["@context"] || {};
   const trig = await won.n3Write(quads, {
     format: "application/trig",
     prefixes: prefixes_,
