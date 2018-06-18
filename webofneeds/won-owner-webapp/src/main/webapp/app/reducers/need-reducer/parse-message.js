@@ -1,27 +1,12 @@
 import Immutable from "immutable";
-import { msStringToDate } from "../../utils.js";
+import { msStringToDate, trigPrefixesAndBody } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
 export function parseMessage(wonMessage, alreadyProcessed = false) {
-  const contentGraphTrigLines = (wonMessage.contentGraphTrig || "").split("\n");
-
   //seperating off header/@prefix-statements, so they can be folded in
-  const contentGraphTrigPrefixes = contentGraphTrigLines
-    .filter(line => line.startsWith("@prefix"))
-    .join("\n");
-
-  const contentGraphTrigBody = contentGraphTrigLines
-    .filter(line => !line.startsWith("@prefix"))
-    .map(line =>
-      line
-        // add some extra white-space between statements, so they stay readable even when they wrap.
-        .replace(/\.$/, ".\n")
-        .replace(/;$/, ";\n")
-        .replace(/\{$/, "{\n")
-        .replace(/^\}$/, "\n}")
-    )
-    .join("\n")
-    .trim();
+  const { trigPrefixes, trigBody } = trigPrefixesAndBody(
+    wonMessage.contentGraphTrig
+  );
 
   let clauses = undefined;
 
@@ -65,8 +50,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       isRetractMessage: wonMessage.isRetractMessage(),
       isRelevant: true,
       contentGraphTrig: {
-        prefixes: contentGraphTrigPrefixes,
-        body: contentGraphTrigBody,
+        prefixes: trigPrefixes,
+        body: trigBody,
       },
       contentGraphTrigRaw: wonMessage.contentGraphTrig,
       contentGraphTrigError: wonMessage.contentGraphTrigError,

@@ -5,6 +5,7 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 import squareImageModule from "./square-image.js";
 import labelledHrModule from "./labelled-hr.js";
+import trigModule from "./trig.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn, deepFreeze } from "../utils.js";
@@ -102,21 +103,10 @@ function genComponentConf() {
                     <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
                     <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
 
-                    <div 
-                        class="clickable"
-                        ng-click="self.showTrigPrefixes = !self.showTrigPrefixes" 
-                        ng-show="self.shouldShowRdf && self.contentGraphTrig"
-                    >
-                        <div
-                            class="won-cm__center__trig"
-                            ng-show="self.contentGraphTrigPrefixes">
-                                <code class="won-cm__center__trig__prefixes--prewrap" ng-show="!self.showTrigPrefixes">@prefix ...</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-                                <code class="won-cm__center__trig__prefixes--prewrap" ng-show="self.showTrigPrefixes">{{ self.contentGraphTrigPrefixes }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-                        </div>
-                        <div class="won-cm__center__trig">
-                            <code class="won-cm__center__trig__contentgraph--prewrap">{{ self.contentGraphTrig }}</code> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-                        </div>
-                    </div>
+                    <won-trig
+                        trig="self.contentGraphTrig"
+                        ng-show="self.shouldShowRdf && self.contentGraphTrig">
+                    </won-trig>
 
                     <!--
                     <div class="won-cm__center__button" 
@@ -306,11 +296,7 @@ function genComponentConf() {
           showText: this.isInfoMessage(message) ? false : isRelevant,
           text: text ? text : message ? message.get("text") : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
-          contentGraphTrigPrefixes: getIn(message, [
-            "contentGraphTrig",
-            "prefixes",
-          ]),
-          contentGraphTrig: getIn(message, ["contentGraphTrig", "body"]),
+          contentGraphTrig: get(message, "contentGraphTrigRaw"),
           lastUpdateTime: state.get("lastUpdateTime"),
           shouldShowRdf,
           rdfLinkURL,
@@ -548,5 +534,6 @@ export default angular
     squareImageModule,
     labelledHrModule,
     inviewModule.name,
+    trigModule,
   ])
   .directive("wonConnectionMessage", genComponentConf).name;

@@ -1,0 +1,20 @@
+won-trig {
+  display: block;
+  position: relative;
+  font-size: $smallFontSize;
+
+  .trig {
+    max-width: 100%; // necessary for `white-space: pre-wrap` in childs
+    display: flex;
+    flex-direction: column;
+
+    &__prefixes {
+      display: inline-block;
+      padding-bottom: 1rem;
+      white-space: pre-wrap;
+    }
+    &__contentgraph {
+      white-space: pre-wrap;
+    }
+  }
+}

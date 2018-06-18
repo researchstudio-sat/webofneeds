@@ -1,5 +1,6 @@
 @import "speech-bubble";
 @import "square-image";
+@import "trig";
 
 won-connection-message {
   &.won-unread {
@@ -104,19 +105,6 @@ won-connection-message {
       &.failure {
         color: #ff0000;
         //TODO: FAILURE MESSAGE STYLING
-      }
-    }
-    &__trig {
-      max-width: 100%;
-      &__prefixes {
-        display: inline-block;
-        padding-bottom: 1rem;
-        &--prewrap {
-          white-space: pre-wrap;
-        }
-      }
-      &__contentgraph--prewrap {
-        white-space: pre-wrap;
       }
     }
     &__status {
