@@ -54,6 +54,14 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.lostConnection:
       return messages.set("lostConnection", true).set("reconnecting", false);
 
+    case actionTypes.initialPageLoad: {
+      const initialLoadFinished =
+        action && action.getIn(["payload", "initialLoadFinished"]);
+      return initialLoadFinished
+        ? messages.set("lostConnection", false).set("reconnecting", false)
+        : messages;
+    }
+
     case actionTypes.reconnect:
       return messages.set("reconnecting", true);
 
