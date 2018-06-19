@@ -36,10 +36,10 @@ export function parseNeed(jsonldNeed, ownNeed) {
       : seeksPresent
         ? seeks.get("dc:title")
         : undefined;
-    parsedNeed.title = title;
 
     if (uri) {
       parsedNeed.uri = uri;
+      parsedNeed.title = title || `post:${uri.slice(-12)}`; // "<no title>"; // `<${uri}>`; //`<post …${uri.slice(-13)}>`;
     } else {
       return undefined;
     }
