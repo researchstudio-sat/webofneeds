@@ -16,7 +16,7 @@ import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import { getIn, attach } from "../utils.js";
+import { getIn, attach, deepFreeze } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
@@ -57,6 +57,18 @@ const serviceDependencies = [
   "$scope",
   "$element" /*'$routeParams' /*injections as strings here*/,
 ];
+
+//All deatils, except tags, because tags are saved in an array
+const keySet = deepFreeze(
+  new Set([
+    "description",
+    "location",
+    "matchingContext",
+    "thumbnail",
+    "travelAction",
+    "ttl",
+  ])
+);
 
 function genComponentConf() {
   const template = `
@@ -232,7 +244,7 @@ function genComponentConf() {
         this.pendingPublishing = true;
 
         const tmpList = [this.is, this.seeks];
-        const newObject = {
+        let newObject = {
           is: this.draftObject.is,
           seeks: this.draftObject.seeks,
         };
@@ -243,11 +255,32 @@ function genComponentConf() {
           }
         }
 
+        if (this.hasSearchString(newObject)) {
+          newObject.seeks["searchString"] = newObject.seeks.title;
+        }
+
         this.needs__create(
           newObject,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
+    }
+
+    hasSearchString(object) {
+      if (object.is || !object.seeks) {
+        return false;
+      } else {
+        for (const key of keySet) {
+          if (object.seeks[key]) {
+            return false;
+          }
+        }
+        // Handle tags list
+        if (object.seeks.tags.length > 0) {
+          return false;
+        }
+      }
+      return true;
     }
 
     createWhatsNew() {
@@ -257,6 +290,7 @@ function genComponentConf() {
       }
     }
   }
+
   Controller.$inject = serviceDependencies;
 
   return {

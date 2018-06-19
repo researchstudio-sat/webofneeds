@@ -135,6 +135,9 @@ export function parseNeed(jsonldNeed, ownNeed) {
         description: seeks.get("dc:description")
           ? seeks.get("dc:description")
           : undefined,
+        searchString: seeks.get("won:hasSearchString")
+          ? seeks.get("won:hasSearchString")
+          : undefined,
         tags: tags
           ? Immutable.List.isList(tags)
             ? tags

@@ -142,6 +142,7 @@ import { getIn } from "../utils.js";
       "dc:title": isOrSeeksData.title,
       "dc:description": isOrSeeksData.description,
       "won:hasTag": isOrSeeksData.tags,
+      "won:hasSearchString": isOrSeeksData.searchString,
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
