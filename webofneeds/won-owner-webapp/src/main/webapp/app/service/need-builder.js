@@ -94,7 +94,7 @@ import { getIn } from "../utils.js";
     if (!args.is && !args.seeks) {
       throw new Error(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
-          args
+          JSON.stringify(args)
       );
     }
 
