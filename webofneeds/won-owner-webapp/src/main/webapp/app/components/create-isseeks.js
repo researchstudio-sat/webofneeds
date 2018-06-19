@@ -105,7 +105,7 @@ function genComponentConf() {
                 ng-class="{'picked' : self.openDetail === 'person'}">
                     <svg class="cis__circleicon" ng-show="!self.details.has('person')">
                         <!-- TODO: create and use a better icon -->
-                        <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
+                        <use xlink:href="#ico36_person_single_circle" href="#ico36_person_single_circle"></use>
                     </svg>
                     <svg class="cis__circleicon" ng-show="self.details.has('person')">
                         <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
