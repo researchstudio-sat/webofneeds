@@ -36,10 +36,10 @@ export function parseNeed(jsonldNeed, ownNeed) {
       : seeksPresent
         ? seeks.get("dc:title")
         : undefined;
+    parsedNeed.title = title;
 
-    if (!!uri && !!title) {
+    if (uri) {
       parsedNeed.uri = uri;
-      parsedNeed.title = title;
     } else {
       return undefined;
     }
