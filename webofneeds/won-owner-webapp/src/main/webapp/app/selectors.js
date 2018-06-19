@@ -117,3 +117,7 @@ export const selectOpenPostUri = createSelector(
     return decodeUriComponentProperly(encodedPostUri);
   }
 );
+
+export function isPrivateUser(state) {
+  return !!getIn(state, ["router", "currentParams", "privateId"]);
+}

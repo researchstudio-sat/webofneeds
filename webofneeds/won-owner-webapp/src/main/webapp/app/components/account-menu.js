@@ -12,6 +12,7 @@ import loginFormModule from "./login-form.js";
 import loggedInMenuModule from "./logged-in-menu.js";
 
 import * as srefUtils from "../sref-utils.js";
+import { isPrivateUser } from "../selectors.js";
 
 function genLogoutConf() {
   let template = `
@@ -71,13 +72,14 @@ function genLogoutConf() {
       const logout = state => ({
         loggedIn: state.getIn(["user", "loggedIn"]),
         email: state.getIn(["user", "email"]),
+        isPrivateUser: isPrivateUser(state),
       });
 
       connect2Redux(logout, actionCreators, [], this);
     }
 
     getEmail() {
-      if (this.email.endsWith("matchat.org")) {
+      if (this.isPrivateUser) {
         return "Anonymous";
       } else {
         return ellipsizeString(this.email, this.maxEmailLength);
