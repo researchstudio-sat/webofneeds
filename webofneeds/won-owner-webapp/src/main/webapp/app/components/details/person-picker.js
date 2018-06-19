@@ -1,6 +1,7 @@
 import angular from "angular";
 import { attach, delay } from "../../utils.js";
 import { DomCache } from "../../cstm-ng-utils.js";
+import Immutable from "immutable";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -8,7 +9,7 @@ function genComponentConf() {
       <h1>Person Detail Picker</h1>
       <div ng-repeat="detail in self.personDetails" class="pp__detail">
           <div class="pp__detail__label">
-              {{detail.name}}
+              {{detail.fieldname}}
           </div>
           <input
             type="text"
@@ -32,7 +33,7 @@ function genComponentConf() {
   // DONE add to create-isseeks
   // TODO: styling
   // DONE add details to draft
-  // TODO: add details to RDF
+  // DONE add details to RDF
   // TODO: display details in info
 
   class Controller {
@@ -42,15 +43,23 @@ function genComponentConf() {
 
       window.pp4dbg = this;
 
-      this.addedPerson = new Map();
+      // TODO: require name!
+      this.addedPerson = Immutable.Map();
+      // Map([
+      //   ["name", undefined],
+      //   ["title", undefined],
+      //   ["company", undefined],
+      //   ["position", undefined],
+      //   ["skills", undefined],
+      //   ["bio", undefined],
+      // ]);
       this.personDetails = [
-        { name: "value1", value: undefined },
-        { name: "value2", value: undefined },
-        { name: "value3", value: undefined },
-        { name: "value4", value: undefined },
-        { name: "value5", value: undefined },
-        { name: "value6", value: undefined },
-        { name: "value7", value: undefined },
+        { fieldname: "Name", name: "name", value: undefined }, // s:name
+        { fieldname: "Academic Title", name: "title", value: undefined },
+        { fieldname: "Company", name: "company", value: undefined },
+        { fieldname: "Position", name: "position", value: undefined },
+        { fieldname: "Skills Title", name: "skills", value: undefined },
+        { fieldname: "Bio", name: "bio", value: undefined },
       ];
       this.visibleResetButtons = new Set();
 
@@ -60,7 +69,9 @@ function genComponentConf() {
     showInitialPerson() {
       if (this.initialPerson && this.initialPerson.size > 0) {
         for (let [detail, value] of this.initialPerson.entries()) {
-          this.addedPerson.set(detail, value);
+          this.addedPerson = this.addedPerson.set(detail, value);
+
+          // TODO: how does this die when skills is an array?
           let personIndex = this.personDetails.findIndex(
             personDetail => personDetail.name === detail
           );
@@ -77,8 +88,15 @@ function genComponentConf() {
     }
 
     updateDetails(detail) {
+      // split between skills and everything else because skills should be a list
       if (detail.value) {
-        this.addedPerson.set(detail.name, detail.value);
+        if (detail.name !== "skills") {
+          this.addedPerson = this.addedPerson.set(detail.name, detail.value);
+        } else if (detail.value.length > 0) {
+          const skills = Immutable.fromJS(detail.value.split(/[\s,]+/) || []); // TODO: maybe split just for ,
+          this.addedPerson = this.addedPerson.set(detail.name, skills);
+        }
+
         this.onPersonUpdated({ person: this.addedPerson });
 
         if (detail.value.length > 0) {
@@ -87,7 +105,7 @@ function genComponentConf() {
           this.visibleResetButtons.delete(detail.name);
         }
       } else {
-        this.addedPerson.set(detail.name, undefined);
+        this.addedPerson = this.addedPerson.set(detail.name, undefined);
         this.onPersonUpdated({ person: this.addedPerson });
         this.visibleResetButtons.delete(detail.name);
       }
@@ -98,7 +116,7 @@ function genComponentConf() {
     }
 
     resetPersonDetail(detail) {
-      this.addedPerson.set(detail, undefined);
+      this.addedPerson = this.addedPerson.set(detail, undefined);
       this.visibleResetButtons.delete(detail);
       let personIndex = this.personDetails.findIndex(
         personDetail => personDetail.name === detail
@@ -106,16 +124,16 @@ function genComponentConf() {
       if (personIndex !== -1) {
         this.personDetails[personIndex].value = "";
       }
-      //this.textfield().value = "";
+      //this.textfieldna().value = "";
       this.onPersonUpdated({ person: this.addedPerson });
       //this.showResetButton = false;
     }
 
-    // textfieldNg() {
+    // textfieldnNg() {
     //   return this.domCache.ng(".tp__input__inner");
     // }
 
-    // textfield() {
+    // textfieldn() {
     //   return this.domCache.dom(".tp__input__inner");
     // }
   }

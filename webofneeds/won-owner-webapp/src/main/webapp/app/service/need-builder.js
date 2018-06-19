@@ -6,6 +6,7 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
+import { getIn } from "../utils.js";
 
 (function() {
   // <need-builder-js> scope
@@ -144,6 +145,32 @@ import won from "./won.js";
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
+      "won:hasPerson": !isOrSeeksData.person
+        ? undefined
+        : {
+            "@type": "foaf:Person",
+            "foaf:title": getIn(isOrSeeksData, ["person", "title"])
+              ? getIn(isOrSeeksData, ["person", "title"])
+              : undefined,
+            "foaf:name": getIn(isOrSeeksData, ["person", "name"])
+              ? getIn(isOrSeeksData, ["person", "name"])
+              : undefined,
+            "s:worksFor": getIn(isOrSeeksData, ["person", "company"])
+              ? {
+                  "@type": "s:Organization",
+                  "s:name": getIn(isOrSeeksData, ["person", "company"]),
+                }
+              : undefined,
+            "s:jobTitle": getIn(isOrSeeksData, ["person", "position"])
+              ? getIn(isOrSeeksData, ["person", "position"])
+              : undefined,
+            "s:knowsAbout": getIn(isOrSeeksData, ["person", "skills"])
+              ? getIn(isOrSeeksData, ["person", "skills"]).toJS()
+              : undefined,
+            "dc:description": getIn(isOrSeeksData, ["person", "bio"])
+              ? getIn(isOrSeeksData, ["person", "bio"])
+              : undefined,
+          },
       "won:hasLocation": !isOrSeeksData.location
         ? undefined
         : {
@@ -299,6 +326,7 @@ import won from "./won.js";
       "@graph": graph,
       "@context": {
         s: "http://schema.org/",
+        foaf: "http://xmlns.com/foaf/0.1/",
         /*
                  TODO add following datatypes to context
                  TODO only add the ones that are required?
