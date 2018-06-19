@@ -16,7 +16,7 @@ import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import { getIn, attach, deepFreeze } from "../utils.js";
+import { get, getIn, attach, deepFreeze } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
@@ -84,8 +84,8 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, 'is')" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, 'seeks')" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
             <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
@@ -123,7 +123,7 @@ function genComponentConf() {
 
       this.focusedElement = null;
       //TODO debug; deleteme
-      window.cnc = this;
+      window.cnc4dbg = this;
 
       this.postTypeTexts = postTypeTexts;
       this.characterLimit = postTitleCharacterLimit;
@@ -153,9 +153,6 @@ function genComponentConf() {
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
       this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
-
-      this.is = "is";
-      this.seeks = "seeks";
 
       this.pendingPublishing = false;
       this.details = { is: [], seeks: [] };
@@ -220,13 +217,15 @@ function genComponentConf() {
     }
 
     isValid() {
+      const draft = this.draftObject;
+      const hasContent = get(draft, "is") || get(draft, "seeks");
+      const title =
+        getIn(draft, ["is", "title"]) || getIn(draft, ["seeks", "title"]);
+      const hasValidTitle = title && title.length < this.characterLimit;
+      const hasTTL =
+        getIn(draft, ["is", "ttl"]) || getIn(draft, ["seeks", "ttl"]);
       return (
-        !this.connectionHasBeenLost &&
-        (this.draftObject[this.is] || this.draftObject[this.seeks]) &&
-        (this.draftObject[this.is].title ||
-          this.draftObject[this.seeks].title) &&
-        (this.draftObject[this.is].title.length < this.characterLimit ||
-          this.draftObject[this.seeks].title.length < this.characterLimit)
+        !this.connectionHasBeenLost && hasContent && (hasValidTitle || hasTTL)
       );
     }
 
@@ -243,8 +242,8 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        const tmpList = [this.is, this.seeks];
-        let newObject = {
+        const tmpList = ["is", "seeks"];
+        const newObject = {
           is: this.draftObject.is,
           seeks: this.draftObject.seeks,
         };
