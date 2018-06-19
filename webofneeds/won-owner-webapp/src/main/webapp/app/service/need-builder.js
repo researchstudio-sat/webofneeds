@@ -91,7 +91,7 @@ import won from "./won.js";
    */
   won.buildNeedRdf = function(args) {
     if (!args.is && !args.seeks) {
-      throw new Exception(
+      throw new Error(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
           args
       );

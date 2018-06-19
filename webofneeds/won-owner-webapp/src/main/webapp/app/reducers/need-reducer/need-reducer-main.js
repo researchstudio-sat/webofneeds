@@ -130,7 +130,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       let changedState;
 
       if (!ownNeedFromState) {
-        throw new Exception(
+        throw new Error(
           "Would need to call addNeed with ownNeed, but it is not defined!"
         );
       } else {
@@ -299,7 +299,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         // (see connectAdHoc)
         const needUri = needForTmpCnct.get("uri");
         if (!needForTmpCnct.get("ownNeed")) {
-          throw new Exception(
+          throw new Error(
             'Trying to add/change connection for need that\'s not an "ownNeed".'
           );
         }

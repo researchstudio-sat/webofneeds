@@ -19,10 +19,11 @@ window.jsonld4dbg = jsonld;
 
 export function initLeaflet(mapMount) {
   if (!L) {
-    throw new Exception(
+    throw new Error(
       "Tried to initialize a leaflet widget while leaflet wasn't loaded."
     );
   }
+  Error;
 
   const baseMaps = initLeafletBaseMaps();
 
@@ -48,7 +49,7 @@ export function initLeaflet(mapMount) {
 
 export function initLeafletBaseMaps() {
   if (!L) {
-    throw new Exception(
+    throw new Error(
       "Tried to initialize leaflet map-sources while leaflet wasn't loaded."
     );
   }
@@ -79,7 +80,7 @@ export function selectTimestamp(event) {
      * container. The receivedTimestamp there
      * should have been placed by our own node.
      *
-     * The exception are events that haven't
+     * The error are events that haven't
      * been confirmed yet. They don't have a
      * received timestamp, as these are optimistic
      * assumptions with only sent timestamps.

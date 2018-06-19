@@ -243,7 +243,7 @@ export function buildChatMessage({
           chatMessage
         );
       } else {
-        throw new Exception(
+        throw new Error(
           "No textmessage or valid graph as payload of chat message:" +
             JSON.stringify(chatMessage) +
             " " +
