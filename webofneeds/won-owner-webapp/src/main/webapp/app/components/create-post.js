@@ -241,25 +241,8 @@ function genComponentConf() {
       // Post both needs
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
-
-        const tmpList = ["is", "seeks"];
-        const newObject = {
-          is: this.draftObject.is,
-          seeks: this.draftObject.seeks,
-        };
-
-        for (const tmp of tmpList) {
-          if (newObject[tmp].title === "") {
-            delete newObject[tmp];
-          }
-        }
-
-        if (this.hasSearchString(newObject)) {
-          newObject.seeks["searchString"] = newObject.seeks.title;
-        }
-
         this.needs__create(
-          newObject,
+          this.draftObject,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
