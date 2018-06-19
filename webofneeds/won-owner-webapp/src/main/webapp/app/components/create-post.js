@@ -171,7 +171,10 @@ function genComponentConf() {
       //console.log("ResizeEvent: ", window.screen.height);
       if (this.focusedElement) {
         if (this.windowHeight < window.screen.height) {
+          this.windowHeight < window.screen.height;
           this.scrollToBottom(this.focusedElement);
+        } else {
+          this.windowHeight = window.screen.height;
         }
       }
     }
