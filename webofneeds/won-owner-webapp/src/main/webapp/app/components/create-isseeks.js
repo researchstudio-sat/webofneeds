@@ -142,7 +142,7 @@ function genComponentConf() {
         <div class="cis__details" ng-if="self.showDetail">
             <!-- DESCRIPTION -->
             <won-description-picker
-              ng-click="self.onScroll({element: '.dp__input'})"
+              ng-click="self.onScroll({element: '.cis__details'})"
               ng-if="self.openDetail === 'description'"
               initial-description="::self.draftObject.description"
               on-description-updated="::self.updateDescription(description)">
@@ -403,7 +403,8 @@ function genComponentConf() {
         this.openDetail = undefined;
       } else {
         this.openDetail = detail;
-        this.onScroll({ element: ".cis__addDetail__header.a" });
+        //this.onScroll({ element: ".cis__addDetail__header.a" });
+        this.onScroll({ element: ".cis__details" });
       }
     }
 

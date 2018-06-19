@@ -108,6 +108,7 @@ function genComponentConf() {
       this.SEARCH = "search";
       this.POST = "post";
 
+      this.focusedElement = null;
       //TODO debug; deleteme
       window.cnc = this;
 
@@ -134,7 +135,8 @@ function genComponentConf() {
         matchingContext: undefined,
       };
 
-      //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
+      this.windowHeight = window.screen.height;
+      this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
       this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
 
       this.is = "is";
@@ -164,25 +166,28 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
+    onResize() {
+      //TODO: delete
+      //console.log("ResizeEvent: ", window.screen.height);
+      if (this.focusedElement) {
+        if (this.windowHeight < window.screen.height) {
+          this.scrollToBottom(this.focusedElement);
+        }
+      }
+    }
+
     scrollToBottom(element) {
       this._programmaticallyScrolling = true;
 
-      //this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
       if (element) {
-        this.scrollContainer().scrollTop = this.$element[0].querySelector(
-          element
-        ).offsetTop;
-        //this.$element[0].querySelector(element).offsetWidth;
-        //this.$element[0].querySelector(element)().scrollTop = 0;
-        console.log(
-          "offsetTop: ",
-          this.$element[0].querySelector(element).offsetTop
-        );
-        console.log(
-          "offsetWidth: : ",
-          this.$element[0].querySelector(element).offsetWidth
-        );
-        console.log("ScrollTop: ", this.scrollContainer().scrollTop);
+        let heightHeader =
+          this.$element[0].querySelector(".cp__header").offsetHeight + 10;
+        let scrollTop = this.$element[0].querySelector(element).offsetTop;
+        this.scrollContainer().scrollTop = scrollTop - heightHeader;
+
+        this.focusedElement = element;
+        //TODO: debug: delete me
+        //console.log("ScrollTop: ", this.scrollContainer().scrollTop);
       }
     }
 
