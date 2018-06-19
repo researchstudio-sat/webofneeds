@@ -77,7 +77,11 @@ function genLogoutConf() {
     }
 
     getEmail() {
-      return ellipsizeString(this.email, this.maxEmailLength);
+      if (this.email.endsWith("matchat.org")) {
+        return "Anonymous";
+      } else {
+        return ellipsizeString(this.email, this.maxEmailLength);
+      }
     }
   }
   Controller.$inject = serviceDependencies;
