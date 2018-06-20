@@ -235,7 +235,7 @@ function generateResponseNeedTo(theirNeed) {
 function generateResponseContentNodeTo(contentNode) {
   const theirTitle = get(contentNode, "title");
   return {
-    title: "Re: " + theirTitle,
+    title: theirTitle ? "Re: " + theirTitle : undefined,
     description: "Direct response to : " + theirTitle,
     //type: reNeedType,
     tags: cloneAsMutable(get(contentNode, "tags")),
