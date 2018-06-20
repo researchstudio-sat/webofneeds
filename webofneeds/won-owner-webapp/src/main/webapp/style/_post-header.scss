@@ -64,13 +64,17 @@ won-post-header {
       grid-template-columns: 1fr min-content;
       min-width: 0;
 
+      &__notitle,
       &__title {
         grid-area: title;
+        min-width: 0;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
         font-weight: 400;
-        min-width: 0;
+      }
+      &__notitle {
+        color: $won-subtitle-gray;
       }
 
       &__date {
