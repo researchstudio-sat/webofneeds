@@ -9,6 +9,7 @@ import {
   addOwnActiveNeedsInLoading,
   addOwnInactiveNeedsInLoading,
   addOwnInactiveNeedsToLoad,
+  addTheirNeedsInLoading,
   addNeed,
   addNeedInCreation,
   changeNeedState,
@@ -56,6 +57,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       let inactiveNeedUrisLoading = action.payload.get(
         "inactiveNeedUrisLoading"
       );
+      let theirNeedUrisInLoading = action.payload.get("theirNeedUrisInLoading");
 
       let ownNeeds = action.payload.get("ownNeeds");
       ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
@@ -81,9 +83,15 @@ export default function(allNeedsInState = initialState, action = {}) {
         (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
         stateWithOwnNeedUrisInLoading
       );
+
+      const stateWithOwnNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
+        stateWithOwnNeeds,
+        theirNeedUrisInLoading
+      );
+
       const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
         (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnNeeds
+        stateWithOwnNeedsAndTheirNeedsInLoading
       );
 
       return storeConnectionsData(
