@@ -8,8 +8,8 @@ import needMapModule from "./need-map.js";
 import personDetailsModule from "./person-details.js";
 
 import { attach } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
+// import { actionCreators } from "../actions/actions.js";
+// import { connect2Redux } from "../won-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
@@ -21,45 +21,45 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
             <h2 class="post-info__heading"
-                ng-show="self.isPart.is.get('title')">
+                ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
                 Title
             </h2>
             <p class="post-info__details"
-                ng-show="self.isPart.is.get('title')">
-                {{ self.isPart.is.get('title')}}
+                ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
+                {{ self.isOrSeeksPart.isOrSeeks.get('title')}}
             </p>
 
             <h2 class="post-info__heading"
-                ng-if="self.isPart.person">
+                ng-if="self.person">
                 Person Details
             </h2>
             <won-person-details 
-              ng-if="self.isPart.person"
-              person="::self.person">
+              ng-if="self.person"
+              person="self.person">
             </won-person-details>
 
            	<h2 class="post-info__heading"
-                ng-show="self.isPart.is.get('description')">
+                ng-show="self.isOrSeeksPart.isOrSeeks.get('description')">
                 Description
             </h2>
-            <p class="post-info__details--prewrap" ng-show="self.isPart.is.get('description')">{{ self.isPart.is.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+            <p class="post-info__details--prewrap" ng-show="self.isOrSeeksPart.isOrSeeks.get('description')">{{ self.isOrSeeksPart.isOrSeeks.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
 
             <h2 class="post-info__heading"
-                ng-show="self.isPart.is.get('tags')">
+                ng-show="self.isOrSeeksPart.isOrSeeks.get('tags')">
                 Tags
             </h2>
             <div class="post-info__details post-info__tags"
-                ng-show="self.isPart.is.get('tags')">
-                    <span class="post-info__tags__tag" ng-repeat="tag in self.isPart.is.get('tags').toJS()">#{{tag}}</span>
+                ng-show="self.isOrSeeksPart.isOrSeeks.get('tags')">
+                    <span class="post-info__tags__tag" ng-repeat="tag in self.isOrSeeksPart.isOrSeeks.get('tags').toJS()">#{{tag}}</span>
             </div>
 
             <h2 class="post-info__heading"
-                ng-show="self.isPart.location">
+                ng-show="self.isOrSeeksPart.location">
                 Location
             </h2>
             <p class="post-info__details clickable"
-               ng-show="self.isPart.address" ng-click="self.toggleMap()">
-                {{ self.isPart.address }}
+               ng-show="self.isOrSeeksPart.address" ng-click="self.toggleMap()">
+                {{ self.isOrSeeksPart.address }}
 				        <svg class="post-info__carret">
                   <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
                 </svg>
@@ -71,24 +71,24 @@ function genComponentConf() {
                 </svg>
             </p>                
             <won-need-map 
-              locations="[self.location]"
-              ng-if="self.isPart.location && self.showMap">
+              locations="[self.isOrSeeksPart.location]"
+              ng-if="self.isOrSeeksPart.location && self.showMap">
             </won-need-map>
 
             <h2 class="post-info__heading"
-                ng-show="self.isPart.travelAction">
+                ng-show="self.isOrSeeksPart.travelAction">
                 Route
             </h2>
             <p class="post-info__details clickable"
-               ng-show="self.isPart.travelAction"
+               ng-show="self.isOrSeeksPart.travelAction"
                ng-click="self.toggleRouteMap()">
 
-              <span ng-if="self.isPart.fromAddress">
-                <strong>From: </strong>{{ self.isPart.fromAddress }}
+              <span ng-if="self.isOrSeeksPart.fromAddress">
+                <strong>From: </strong>{{ self.isOrSeeksPart.fromAddress }}
               </span>
               </br>
-              <span ng-if="self.isPart.toAddress">
-              <strong>To: </strong>{{ self.isPart.toAddress }}
+              <span ng-if="self.isOrSeeksPart.toAddress">
+              <strong>To: </strong>{{ self.isOrSeeksPart.toAddress }}
               </span>
 
               <svg class="post-info__carret">
@@ -103,7 +103,7 @@ function genComponentConf() {
             </p>
             <won-need-map
               locations="self.travelLocations"
-              ng-if="self.isPart.travelAction && self.showRouteMap">
+              ng-if="self.isOrSeeksPart.travelAction && self.showRouteMap">
             </won-need-map>
     	`;
 
@@ -112,38 +112,50 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       //TODO debug; deleteme
-      window.cis4dbg = this;
+      window.isis4dbg = this;
 
       this.showMap = false;
       this.showRouteMap = false;
 
+      const self = this;
+
+      this.$scope.$watch("self.isOrSeeksPart.isOrSeeks", newIs => {
+        self.person = newIs && newIs.get("person");
+      });
+
+      this.$scope.$watch("self.isOrSeeksPart.travelAction", newValue => {
+        self.travelLocations = newValue && [
+          newValue.get("fromLocation"),
+          newValue.get("toLocation"),
+        ];
+      });
       // const selectFromState = () => {
       //   return {};
       // };
-      const selectFromState = state => {
-        const post =
-          this.isPart &&
-          this.isPart.postUri &&
-          state.getIn(["needs", this.isPart.postUri]);
-        const isSeeksPart = post && post.get(this.isPart.isString);
+      // const selectFromState = state => {
+      //   const post =
+      //     this.isOrSeeksPart &&
+      //     this.isOrSeeksPart.postUri &&
+      //     state.getIn(["needs", this.isOrSeeksPart.postUri]);
+      //   const isSeeksPart = post && post.get(this.isOrSeeksPart.isOrSeeksString);
 
-        const person = isSeeksPart && isSeeksPart.get("person");
-        const location = isSeeksPart && isSeeksPart.get("location");
-        const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
+      //   const person = isSeeksPart && isSeeksPart.get("person");
+      //   const location = isSeeksPart && isSeeksPart.get("location");
+      //   const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
 
-        return {
-          person: person,
-          location: location,
-          travelAction: travelAction,
-          travelLocations: travelAction && [
-            travelAction.get("fromLocation"),
-            travelAction.get("toLocation"),
-          ],
-        };
-      };
+      //   return {
+      //     person: person,
+      //     location: location,
+      //     travelAction: travelAction,
+      //     travelLocations: travelAction && [
+      //       travelAction.get("fromLocation"),
+      //       travelAction.get("toLocation"),
+      //     ],
+      //   };
+      // };
 
       // Using actionCreators like this means that every action defined there is available in the template.
-      connect2Redux(selectFromState, actionCreators, ["self.isPart"], this);
+      // connect2Redux(selectFromState, actionCreators, ["self.isOrSeeksPart"], this);
     }
 
     toggleMap() {
@@ -163,7 +175,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      isPart: "=",
+      isOrSeeksPart: "=",
     },
     template: template,
   };

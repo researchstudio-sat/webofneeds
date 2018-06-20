@@ -46,9 +46,9 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
-            <won-post-is-info is-part="::self.isPart" ng-if="self.isPart"></won-post-is-info>
+            <won-post-is-info is-or-seeks-part="self.isPart" ng-if="self.isPart"></won-post-is-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
-            <won-post-seeks-info seeks-part="::self.seeksPart" ng-if="self.seeksPart"></won-post-seeks-info>
+            <won-post-is-info is-or-seeks-part="self.seeksPart" ng-if="self.seeksPart"></won-post-is-info>
             <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
               <h2 class="post-info__heading">
                   RDF
@@ -116,7 +116,7 @@ function genComponentConf() {
           isPart: is
             ? {
                 postUri: postUri,
-                is: is,
+                isOrSeeks: is,
                 isString: "is",
                 person: is && is.get("person"),
                 location: is && is.get("location"),
@@ -134,7 +134,7 @@ function genComponentConf() {
           seeksPart: seeks
             ? {
                 postUri: postUri,
-                seeks: seeks,
+                isOrSeeks: seeks,
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
                 person: seeks && seeks.get("person"),

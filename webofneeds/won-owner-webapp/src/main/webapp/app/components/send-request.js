@@ -52,12 +52,12 @@ function genComponentConf() {
             </p>
             <!-- IS Part -->
             <div ng-show="self.isPart">
-                <won-post-is-info is-part="::self.isPart"></won-post-is-info>
+                <won-post-is-info is-or-seeks-part="self.isPart"></won-post-is-info>
             </div>
             </br>
             <!-- SEEKS Part -->
             <div ng-show="self.seeksPart">
-                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
+                <won-post-is-info is-or-seeks-part="self.seeksPart"></won-post-is-info>
             </div>
             </br>
             <a class="rdflink clickable"
@@ -134,7 +134,7 @@ function genComponentConf() {
           isPart: is
             ? {
                 postUri: postUriToConnectTo,
-                is: is,
+                isOrSeeks: is,
                 isString: "is",
                 location: is && is.get("location"),
                 address:
@@ -144,7 +144,7 @@ function genComponentConf() {
           seeksPart: seeks
             ? {
                 postUri: postUriToConnectTo,
-                seeks: seeks,
+                isOrSeeks: seeks,
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
                 address:
