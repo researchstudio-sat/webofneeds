@@ -4,6 +4,7 @@
 
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
+import { getIn } from "../utils.js";
 
 /* TODO this fragment is part of an attempt to sketch a different
  * approach to asynchronity (Remove it or the thunk-based
@@ -53,6 +54,16 @@ export function messagesReducer(messages = initialState, action = {}) {
 
     case actionTypes.lostConnection:
       return messages.set("lostConnection", true).set("reconnecting", false);
+
+    case actionTypes.initialPageLoad: {
+      const initialLoadFinished = getIn(action, [
+        "payload",
+        "initialLoadFinished",
+      ]);
+      return initialLoadFinished
+        ? messages.set("lostConnection", false).set("reconnecting", false)
+        : messages;
+    }
 
     case actionTypes.reconnect:
       return messages.set("reconnecting", true);
