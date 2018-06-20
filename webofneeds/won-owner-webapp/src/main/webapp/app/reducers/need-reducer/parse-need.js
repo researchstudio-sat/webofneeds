@@ -107,7 +107,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     });
 
     if (isPresent) {
-      type = seeksPresent
+      const type = seeksPresent
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeSupplyCompacted;
       isPart = genIsSeeksPart(is, type);
