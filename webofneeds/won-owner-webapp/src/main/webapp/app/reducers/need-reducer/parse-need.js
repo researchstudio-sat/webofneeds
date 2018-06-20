@@ -1,5 +1,6 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
+import { is } from "../../utils.js";
 
 export function parseNeed(jsonldNeed, ownNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -95,62 +96,25 @@ export function parseNeed(jsonldNeed, ownNeed) {
     let seeksPart = undefined;
     let type = undefined;
 
-    /*
-         let description = undefined;
-         let tags = undefined;
-         let location = undefined;
-         */
-    //TODO: Type concept?
+    const genIsSeeksPart = (isSeeks, type) => ({
+      title: isSeeks.get("dc:title"),
+      type: type,
+      description: isSeeks.get("dc:description"),
+      tags: parseTags(isSeeks.get("won:hasTag")),
+      person: parsePerson(isSeeks),
+      location: parseLocation(isSeeks.get("won:hasLocation")),
+      travelAction: parseTravelAction(isSeeks.get("won:travelAction")),
+    });
+
     if (isPresent) {
-      type = seeksPresent
+      const type = seeksPresent
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeSupplyCompacted;
-      let tags = is.get("won:hasTag") ? is.get("won:hasTag") : undefined;
-      isPart = {
-        title: is.get("dc:title"),
-        type: type,
-        description: is.get("dc:description")
-          ? is.get("dc:description")
-          : undefined,
-        tags: tags
-          ? Immutable.List.isList(tags)
-            ? tags
-            : Immutable.List.of(tags)
-          : undefined,
-        person: parsePerson(is),
-        location: is.get("won:hasLocation")
-          ? parseLocation(is.get("won:hasLocation"))
-          : undefined,
-        travelAction: is.get("won:travelAction")
-          ? parseTravelAction(is.get("won:travelAction"))
-          : undefined,
-      };
+      isPart = genIsSeeksPart(is, type);
     }
     if (seeksPresent) {
-      type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
-      let tags = seeks.get("won:hasTag") ? seeks.get("won:hasTag") : undefined;
-      seeksPart = {
-        title: seeks.get("dc:title"),
-        type: type,
-        description: seeks.get("dc:description")
-          ? seeks.get("dc:description")
-          : undefined,
-        searchString: seeks.get("won:hasSearchString")
-          ? seeks.get("won:hasSearchString")
-          : undefined,
-        tags: tags
-          ? Immutable.List.isList(tags)
-            ? tags
-            : Immutable.List.of(tags)
-          : undefined,
-        person: parsePerson(seeks),
-        location: seeks.get("won:hasLocation")
-          ? parseLocation(seeks.get("won:hasLocation"))
-          : undefined,
-        travelAction: seeks.get("won:travelAction")
-          ? parseTravelAction(seeks.get("won:travelAction"))
-          : undefined,
-      };
+      const type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
+      seeksPart = genIsSeeksPart(seeks, type);
     }
 
     parsedNeed.is = isPart;
@@ -224,6 +188,25 @@ function parsePerson(isOrSeeks) {
   //   isOrSeeksImm.toJS()
   // );
   return undefined;
+}
+
+function parseTags(tags) {
+  if (!tags) {
+    return undefined;
+  } else if (is("String", tags)) {
+    return Immutable.fromJS([tags]);
+  } else if (is("Array", tags)) {
+    return Immutable.fromJS(tags);
+  } else if (Immutable.List.isList(tags)) {
+    return tags; // id; it is already in the format we want
+  } else {
+    console.error(
+      "Found unexpected format of tags (should be Array, " +
+        "Immutable.List, or a single tag as string): " +
+        JSON.stringify(tags)
+    );
+    return undefined;
+  }
 }
 
 function parseLocation(jsonldLocation) {
