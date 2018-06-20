@@ -43,7 +43,7 @@ function genComponentConf() {
 
       window.pp4dbg = this;
 
-      // TODO: require name!
+      // TODO: require name & skills!
       this.addedPerson = Immutable.Map();
       // Map([
       //   ["name", undefined],
@@ -75,8 +75,11 @@ function genComponentConf() {
           let personIndex = this.personDetails.findIndex(
             personDetail => personDetail.name === detail
           );
-          if (personIndex !== -1) {
+          if (personIndex !== -1 && detail !== "skills") {
             this.personDetails[personIndex].value = value;
+          } else if (personIndex !== -1 && detail === "skills") {
+            let valueText = value.size > 0 ? value.toJS() : [];
+            this.personDetails[personIndex].value = valueText.toString();
           }
           if (value && value.length > 0) {
             this.visibleResetButtons.add(detail);
@@ -93,7 +96,7 @@ function genComponentConf() {
         if (detail.name !== "skills") {
           this.addedPerson = this.addedPerson.set(detail.name, detail.value);
         } else if (detail.value.length > 0) {
-          const skills = Immutable.fromJS(detail.value.split(/[\s,]+/) || []); // TODO: maybe split just for ,
+          const skills = Immutable.fromJS(detail.value.split(/(,\s|,)/) || []);
           this.addedPerson = this.addedPerson.set(detail.name, skills);
         }
 

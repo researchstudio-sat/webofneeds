@@ -413,7 +413,9 @@ function genComponentConf() {
     }
 
     isEmptyPerson(person) {
-      return Array.from(person.values()).every(x => x === null || x === "");
+      return Array.from(person.values()).every(
+        x => x === undefined || x === "" || (x && x.size === 0)
+      );
     }
 
     updateRoute(travelAction) {
