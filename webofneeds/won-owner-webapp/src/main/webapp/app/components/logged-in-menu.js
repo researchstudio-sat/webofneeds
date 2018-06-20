@@ -2,15 +2,16 @@
  * Created by ksinger on 20.08.2015.
  */
 import angular from "angular";
-import { attach, getIn } from "../utils.js";
+import { attach, ellipsizeString } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
 import * as srefUtils from "../sref-utils.js";
+import { isPrivateUser } from "../selectors.js";
 
 function genComponentConf() {
   let template = `
-    <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.email }}">{{ self.email }}</span>
+    <span class="dd__userlabel show-in-responsive" ng-if="self.loggedIn" title="{{ self.getEmail() }}">{{ self.getEmail() }}</span>
     <hr class="show-in-responsive"/>
     <a
         ng-if="self.isPrivateIdUser"
@@ -66,21 +67,23 @@ function genComponentConf() {
       this.password = "";
 
       const logout = state => {
-        const privateId = getIn(state, [
-          "router",
-          "currentParams",
-          "privateId",
-        ]);
-
         return {
           loggedIn: state.getIn(["user", "loggedIn"]),
           shouldShowRdf: state.get("showRdf"),
           email: state.getIn(["user", "email"]),
-          isPrivateIdUser: !!privateId,
+          isPrivateIdUser: isPrivateUser(state),
         };
       };
 
       connect2Redux(logout, actionCreators, [], this);
+    }
+
+    getEmail() {
+      if (this.isPrivateIdUser) {
+        return "Anonymous";
+      } else {
+        return ellipsizeString(this.email, this.maxEmailLength);
+      }
     }
   }
   Controller.$inject = serviceDependencies;
