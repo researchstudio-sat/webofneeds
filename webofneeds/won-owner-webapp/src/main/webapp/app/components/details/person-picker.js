@@ -34,7 +34,8 @@ function genComponentConf() {
   // TODO: styling
   // DONE add details to draft
   // DONE add details to RDF
-  // TODO: display details in info
+  // DONE display details in info
+  // TODO: test matching
 
   class Controller {
     constructor() {
@@ -45,21 +46,14 @@ function genComponentConf() {
 
       // TODO: require name & skills!
       this.addedPerson = Immutable.Map();
-      // Map([
-      //   ["name", undefined],
-      //   ["title", undefined],
-      //   ["company", undefined],
-      //   ["position", undefined],
-      //   ["skills", undefined],
-      //   ["bio", undefined],
-      // ]);
+
       this.personDetails = [
-        { fieldname: "Name", name: "name", value: undefined }, // s:name
+        { fieldname: "Name", name: "name", value: undefined },
         { fieldname: "Academic Title", name: "title", value: undefined },
         { fieldname: "Company", name: "company", value: undefined },
         { fieldname: "Position", name: "position", value: undefined },
-        { fieldname: "Skills Title", name: "skills", value: undefined },
-        { fieldname: "Bio", name: "bio", value: undefined },
+        { fieldname: "Skills", name: "skills", value: undefined },
+        //{ fieldname: "Bio", name: "bio", value: undefined },
       ];
       this.visibleResetButtons = new Set();
 
@@ -71,7 +65,6 @@ function genComponentConf() {
         for (let [detail, value] of this.initialPerson.entries()) {
           this.addedPerson = this.addedPerson.set(detail, value);
 
-          // TODO: how does this die when skills is an array?
           let personIndex = this.personDetails.findIndex(
             personDetail => personDetail.name === detail
           );
@@ -81,7 +74,7 @@ function genComponentConf() {
             let valueText = value.size > 0 ? value.toJS() : [];
             this.personDetails[personIndex].value = valueText.toString();
           }
-          if (value && value.length > 0) {
+          if (value && value.size > 0) {
             this.visibleResetButtons.add(detail);
           }
         }
@@ -96,7 +89,8 @@ function genComponentConf() {
         if (detail.name !== "skills") {
           this.addedPerson = this.addedPerson.set(detail.name, detail.value);
         } else if (detail.value.length > 0) {
-          const skills = Immutable.fromJS(detail.value.split(/(,\s|,)/) || []);
+          let skills = Immutable.fromJS(detail.value.trim().split(/\s*,\s*/));
+          skills = skills.filter(skill => skill.length > 0);
           this.addedPerson = this.addedPerson.set(detail.name, skills);
         }
 
