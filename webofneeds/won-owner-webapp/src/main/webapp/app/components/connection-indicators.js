@@ -89,28 +89,33 @@ function genComponentConf() {
           allConnectionsByNeedUri &&
           allConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
-            const remoteNeedActive =
+            const remoteNeedActiveOrLoading =
               remoteNeedUri &&
               allNeeds &&
               allNeeds.get(remoteNeedUri) &&
-              allNeeds.getIn([remoteNeedUri, "state"]) ===
-                won.WON.ActiveCompacted;
+              (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+                allNeeds.getIn([remoteNeedUri, "state"]) ===
+                  won.WON.ActiveCompacted);
 
-            return remoteNeedActive && conn.get("state") === won.WON.Suggested;
+            return (
+              remoteNeedActiveOrLoading &&
+              conn.get("state") === won.WON.Suggested
+            );
           });
         const connected =
           allConnectionsByNeedUri &&
           allConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
-            const remoteNeedActive =
+            const remoteNeedActiveOrLoading =
               remoteNeedUri &&
               allNeeds &&
               allNeeds.get(remoteNeedUri) &&
-              allNeeds.getIn([remoteNeedUri, "state"]) ===
-                won.WON.ActiveCompacted;
+              (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+                allNeeds.getIn([remoteNeedUri, "state"]) ===
+                  won.WON.ActiveCompacted);
 
             return (
-              remoteNeedActive &&
+              remoteNeedActiveOrLoading &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed
             );
