@@ -117,6 +117,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
             ? tags
             : Immutable.List.of(tags)
           : undefined,
+        person: parsePerson(is),
         location: is.get("won:hasLocation")
           ? parseLocation(is.get("won:hasLocation"))
           : undefined,
@@ -139,6 +140,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
             ? tags
             : Immutable.List.of(tags)
           : undefined,
+        person: parsePerson(seeks),
         location: seeks.get("won:hasLocation")
           ? parseLocation(seeks.get("won:hasLocation"))
           : undefined,
@@ -176,6 +178,44 @@ export function parseNeed(jsonldNeed, ownNeed) {
   }
 
   return Immutable.fromJS(parsedNeed);
+}
+
+function parsePerson(isOrSeeks) {
+  if (!isOrSeeks) return undefined;
+
+  const isOrSeeksImm = Immutable.fromJS(isOrSeeks);
+
+  let person = {
+    name: undefined,
+    title: undefined,
+    company: undefined,
+    position: undefined,
+    skills: undefined,
+    // bio: undefined,
+  };
+
+  person.name = isOrSeeksImm.get("foaf:name");
+  person.title = isOrSeeksImm.get("foaf:title");
+  person.company = isOrSeeksImm.get("s:worksFor");
+  person.position = isOrSeeksImm.get("s:jobTitle");
+  person.skills = isOrSeeksImm.get("s:knowsAbout")
+    ? Immutable.List.isList(isOrSeeksImm.get("s:knowsAbout"))
+      ? isOrSeeksImm.get("s:knowsAbout")
+      : Immutable.List.of(isOrSeeksImm.get("s:knowsAbout"))
+    : undefined;
+  //person.bio = isOrSeeksImm.get("dc:description");
+
+  // name gets required because having a person without identifier is pointless
+  // skills gets required because this is what's used for matching
+  if (person.name && person.skills) {
+    return Immutable.fromJS(person);
+  }
+
+  // console.error(
+  //   "Cant parse person, data does not contain enough information: ",
+  //   isOrSeeksImm.toJS()
+  // );
+  return undefined;
 }
 
 function parseLocation(jsonldLocation) {
