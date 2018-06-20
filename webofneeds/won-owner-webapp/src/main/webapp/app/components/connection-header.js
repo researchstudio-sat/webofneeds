@@ -16,8 +16,9 @@ import {
   selectAllTheirNeeds,
 } from "../selectors.js";
 import connectionStateModule from "./connection-state.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="ch__icon">
@@ -94,6 +95,17 @@ function genComponentConf() {
         actionCreators,
         ["self.connectionUri", "self.timestamp"],
         this
+      );
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return (
+        !this.theirNeed ||
+        !this.ownNeed ||
+        this.ownNeed.get("isLoading") ||
+        this.theirNeed.get("isLoading")
       );
     }
 
