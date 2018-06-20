@@ -5,6 +5,7 @@ import angular from "angular";
 
 import "ng-redux";
 import needMapModule from "./need-map.js";
+import personDetailsModule from "./person-details.js";
 
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -27,11 +28,22 @@ function genComponentConf() {
                 ng-show="self.seeksPart.seeks.get('title')">
                 {{ self.seeksPart.seeks.get('title')}}
             </p>
+
+            <h2 class="post-info__heading"
+                ng-if="self.seeksPart.person">
+                Person Details
+            </h2>
+            <won-person-details 
+              ng-if="self.seeksPart.person"
+              person="::self.person">
+            </won-person-details>
+
             <h2 class="post-info__heading"
                 ng-show="self.seeksPart.seeks.get('description')">
                 Description
             </h2>
             <p class="post-info__details--prewrap" ng-show="self.seeksPart.seeks.get('description')">{{ self.seeksPart.seeks.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+            
             <h2 class="post-info__heading"
                 ng-show="self.seeksPart.seeks.get('tags')">
                 Tags
@@ -112,10 +124,12 @@ function genComponentConf() {
           state.getIn(["needs", this.seeksPart.postUri]);
         const isSeeksPart = post && post.get(this.seeksPart.seeksString);
 
+        const person = isSeeksPart && isSeeksPart.get("person");
         const location = isSeeksPart && isSeeksPart.get("location");
         const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
 
         return {
+          person: person,
           location: location,
           travelAction: travelAction,
           travelLocations: travelAction && [
@@ -154,5 +168,8 @@ function genComponentConf() {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.postSeeksInfo", [needMapModule])
+  .module("won.owner.components.postSeeksInfo", [
+    needMapModule,
+    personDetailsModule,
+  ])
   .directive("wonPostSeeksInfo", genComponentConf).name;

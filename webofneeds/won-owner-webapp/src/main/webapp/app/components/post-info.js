@@ -118,6 +118,7 @@ function genComponentConf() {
                 postUri: postUri,
                 is: is,
                 isString: "is",
+                person: is && is.get("person"),
                 location: is && is.get("location"),
                 address:
                   is.get("location") && is.get("location").get("address"),
@@ -136,6 +137,7 @@ function genComponentConf() {
                 seeks: seeks,
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
+                person: seeks && seeks.get("person"),
                 address:
                   seeks.get("location") && seeks.get("location").get("address"),
                 travelAction: seeks && seeks.get("travelAction"),

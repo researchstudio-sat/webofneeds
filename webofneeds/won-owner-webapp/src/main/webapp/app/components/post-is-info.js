@@ -5,6 +5,7 @@ import angular from "angular";
 
 import "ng-redux";
 import needMapModule from "./need-map.js";
+import personDetailsModule from "./person-details.js";
 
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -27,6 +28,16 @@ function genComponentConf() {
                 ng-show="self.isPart.is.get('title')">
                 {{ self.isPart.is.get('title')}}
             </p>
+
+            <h2 class="post-info__heading"
+                ng-if="self.isPart.person">
+                Person Details
+            </h2>
+            <won-person-details 
+              ng-if="self.isPart.person"
+              person="::self.person">
+            </won-person-details>
+
            	<h2 class="post-info__heading"
                 ng-show="self.isPart.is.get('description')">
                 Description
@@ -47,11 +58,8 @@ function genComponentConf() {
                 Location
             </h2>
             <p class="post-info__details clickable"
-               ng-show="self.isPart.address"
-               ng-click="self.toggleMap()">
-               
+               ng-show="self.isPart.address" ng-click="self.toggleMap()">
                 {{ self.isPart.address }}
-
 				        <svg class="post-info__carret">
                   <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
                 </svg>
@@ -119,10 +127,12 @@ function genComponentConf() {
           state.getIn(["needs", this.isPart.postUri]);
         const isSeeksPart = post && post.get(this.isPart.isString);
 
+        const person = isSeeksPart && isSeeksPart.get("person");
         const location = isSeeksPart && isSeeksPart.get("location");
         const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
 
         return {
+          person: person,
           location: location,
           travelAction: travelAction,
           travelLocations: travelAction && [
@@ -161,5 +171,8 @@ function genComponentConf() {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.postIsInfo", [needMapModule])
+  .module("won.owner.components.postIsInfo", [
+    needMapModule,
+    personDetailsModule,
+  ])
   .directive("wonPostIsInfo", genComponentConf).name;
