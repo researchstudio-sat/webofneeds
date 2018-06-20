@@ -298,14 +298,17 @@ function genComponentConf() {
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
           const remoteNeedUri = conn.get("remoteNeedUri");
-          const remoteNeedActive =
+          const remoteNeedActiveOrLoading =
             remoteNeedUri &&
             allNeeds &&
             allNeeds.get(remoteNeedUri) &&
-            allNeeds.getIn([remoteNeedUri, "state"]) ===
-              won.WON.ActiveCompacted;
+            (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+              allNeeds.getIn([remoteNeedUri, "state"]) ===
+                won.WON.ActiveCompacted);
 
-          return remoteNeedActive && conn.get("state") !== won.WON.Closed;
+          return (
+            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+          );
         }).size > 0
       );
     }
@@ -314,14 +317,17 @@ function genComponentConf() {
       return sortByDate(
         need.get("connections").filter(conn => {
           const remoteNeedUri = conn.get("remoteNeedUri");
-          const remoteNeedActive =
+          const remoteNeedActiveOrLoading =
             remoteNeedUri &&
             allNeeds &&
             allNeeds.get(remoteNeedUri) &&
-            allNeeds.getIn([remoteNeedUri, "state"]) ===
-              won.WON.ActiveCompacted;
+            (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+              allNeeds.getIn([remoteNeedUri, "state"]) ===
+                won.WON.ActiveCompacted);
 
-          return remoteNeedActive && conn.get("state") !== won.WON.Closed;
+          return (
+            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+          );
         })
       );
     }
