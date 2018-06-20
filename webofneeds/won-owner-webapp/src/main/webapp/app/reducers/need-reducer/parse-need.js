@@ -107,13 +107,13 @@ export function parseNeed(jsonldNeed, ownNeed) {
     });
 
     if (isPresent) {
-      const type = seeksPresent
+      type = seeksPresent
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeSupplyCompacted;
       isPart = genIsSeeksPart(is, type);
     }
     if (seeksPresent) {
-      const type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
+      type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
       seeksPart = genIsSeeksPart(seeks, type);
     }
 
