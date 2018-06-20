@@ -8,8 +8,6 @@ import needMapModule from "./need-map.js";
 import personDetailsModule from "./person-details.js";
 
 import { attach } from "../utils.js";
-// import { actionCreators } from "../actions/actions.js";
-// import { connect2Redux } from "../won-utils.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
@@ -129,33 +127,6 @@ function genComponentConf() {
           newValue.get("toLocation"),
         ];
       });
-      // const selectFromState = () => {
-      //   return {};
-      // };
-      // const selectFromState = state => {
-      //   const post =
-      //     this.isOrSeeksPart &&
-      //     this.isOrSeeksPart.postUri &&
-      //     state.getIn(["needs", this.isOrSeeksPart.postUri]);
-      //   const isSeeksPart = post && post.get(this.isOrSeeksPart.isOrSeeksString);
-
-      //   const person = isSeeksPart && isSeeksPart.get("person");
-      //   const location = isSeeksPart && isSeeksPart.get("location");
-      //   const travelAction = isSeeksPart && isSeeksPart.get("travelAction");
-
-      //   return {
-      //     person: person,
-      //     location: location,
-      //     travelAction: travelAction,
-      //     travelLocations: travelAction && [
-      //       travelAction.get("fromLocation"),
-      //       travelAction.get("toLocation"),
-      //     ],
-      //   };
-      // };
-
-      // Using actionCreators like this means that every action defined there is available in the template.
-      // connect2Redux(selectFromState, actionCreators, ["self.isOrSeeksPart"], this);
     }
 
     toggleMap() {
@@ -183,8 +154,8 @@ function genComponentConf() {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.postIsInfo", [
+  .module("won.owner.components.postIsOrSeeksInfo", [
     needMapModule,
     personDetailsModule,
   ])
-  .directive("wonPostIsInfo", genComponentConf).name;
+  .directive("wonPostIsOrSeeksInfo", genComponentConf).name;

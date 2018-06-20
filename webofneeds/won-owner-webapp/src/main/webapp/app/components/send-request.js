@@ -2,8 +2,7 @@ import angular from "angular";
 import "ng-redux";
 import connectionHeaderModule from "./connection-header.js";
 import feedbackGridModule from "./feedback-grid.js";
-import postSeeksInfoModule from "./post-seeks-info.js";
-import postIsInfoModule from "./post-is-info.js";
+import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
@@ -52,12 +51,12 @@ function genComponentConf() {
             </p>
             <!-- IS Part -->
             <div ng-show="self.isPart">
-                <won-post-is-info is-or-seeks-part="self.isPart"></won-post-is-info>
+                <won-post-is-or-seeks-info is-or-seeks-part="self.isPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <!-- SEEKS Part -->
             <div ng-show="self.seeksPart">
-                <won-post-is-info is-or-seeks-part="self.seeksPart"></won-post-is-info>
+                <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <a class="rdflink clickable"
@@ -217,8 +216,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.sendRequest", [
-    postIsInfoModule,
-    postSeeksInfoModule,
+    postIsOrSeeksInfoModule,
     connectionHeaderModule,
     feedbackGridModule,
     labelledHrModule,
