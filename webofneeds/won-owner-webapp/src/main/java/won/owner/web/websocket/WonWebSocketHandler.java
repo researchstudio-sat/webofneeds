@@ -44,6 +44,7 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.model.NeedState;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.WonRdfUtils;
 
@@ -377,22 +378,49 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			logger.debug("session {} is closed, can't send message", session.getId());
 			return;
 		}
-		if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
-				&& WonMessageType.CREATE_NEED == wonMessage.getIsResponseToMessageType()) {
+		if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
+            if(WonMessageType.CREATE_NEED == wonMessage.getIsResponseToMessageType()){
 
-			try {
-				saveNeedUriWithUser(wonMessage, session);
-			} catch (Exception e) {
-				logger.warn("could not associate need {} with currently logged in user, cannot send message", needUri,
-						e);
-				if (user != null) {
-					webSocketSessionService.removeMapping(user, session);
-				}
-				if (needUri != null) {
-					webSocketSessionService.removeMapping(needUri, session);
-				}
-				return;
-			}
+                try {
+                    saveNeedUriWithUser(wonMessage, session);
+                } catch (Exception e) {
+                    logger.warn("could not associate need {} with currently logged in user, cannot send message", needUri,
+                            e);
+                    if (user != null) {
+                        webSocketSessionService.removeMapping(user, session);
+                    }
+                    if (needUri != null) {
+                        webSocketSessionService.removeMapping(needUri, session);
+                    }
+                    return;
+                }
+            } else if (WonMessageType.DEACTIVATE == wonMessage.getIsResponseToMessageType()){
+                try {
+                    deactivateNeedUri(wonMessage, session);
+                } catch (Exception e) {
+                    logger.warn("could not deactivate need {}, cannot send message", needUri, e);
+                    if (user != null) {
+                        webSocketSessionService.removeMapping(user, session);
+                    }
+                    if (needUri != null) {
+                        webSocketSessionService.removeMapping(needUri, session);
+                    }
+                    return;
+                }
+            } else if (WonMessageType.ACTIVATE == wonMessage.getIsResponseToMessageType()){
+                try {
+                    activateNeedUri(wonMessage, session);
+                } catch (Exception e) {
+                    logger.warn("could not activate need {}, cannot send message", needUri, e);
+                    if (user != null) {
+                        webSocketSessionService.removeMapping(user, session);
+                    }
+                    if (needUri != null) {
+                        webSocketSessionService.removeMapping(needUri, session);
+                    }
+                    return;
+                }
+            }
 		}
 		try {
 			logger.debug("OA Server - sending WebSocket message: {}", webSocketMessage);
@@ -421,6 +449,24 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		user.addNeedUri(userNeed);
 		userRepository.save(user);
 	}
+
+    private void deactivateNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
+        updateNeedUriState(wonMessage, session, NeedState.INACTIVE);
+    }
+
+    private void activateNeedUri(final WonMessage wonMessage, final WebSocketSession session) {
+        updateNeedUriState(wonMessage, session, NeedState.ACTIVE);
+    }
+
+    private void updateNeedUriState(final WonMessage wonMessage, final WebSocketSession session, NeedState newState) {
+        User user = getUserForSession(session);
+        URI needURI = wonMessage.getReceiverNeedURI();
+        UserNeed userNeed = userNeedRepository.findByNeedUri(needURI);
+        userNeed.setState(newState);
+        // reload the user so we can save it
+        // (the user object we get from getUserForSession is detached)
+        userNeedRepository.save(userNeed);
+    }
 
 	private User getUserForSession(final WebSocketSession session) {
 		if (session == null) {
