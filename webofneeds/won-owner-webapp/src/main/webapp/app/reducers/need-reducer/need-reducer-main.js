@@ -5,7 +5,14 @@ import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { msStringToDate, getIn } from "../../utils.js";
-import { addNeed, addNeedInCreation, changeNeedState } from "./reduce-needs.js";
+import {
+  addOwnActiveNeedsInLoading,
+  addOwnInactiveNeedsInLoading,
+  addOwnInactiveNeedsToLoad,
+  addNeed,
+  addNeedInCreation,
+  changeNeedState,
+} from "./reduce-needs.js";
 import {
   addMessage,
   addExistingMessages,
@@ -44,13 +51,35 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.login: {
+      let activeNeedUris = action.payload.get("activeNeedUris");
+      let inactiveNeedUris = action.payload.get("inactiveNeedUris");
+      let inactiveNeedUrisLoading = action.payload.get(
+        "inactiveNeedUrisLoading"
+      );
+
       let ownNeeds = action.payload.get("ownNeeds");
       ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
       let theirNeeds = action.payload.get("theirNeeds");
       theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
+
+      const stateWithOwnInactiveNeedUrisToLoad = addOwnInactiveNeedsToLoad(
+        allNeedsInState,
+        inactiveNeedUris
+      );
+
+      const stateWithOwnInactiveNeedUrisInLoading = addOwnInactiveNeedsInLoading(
+        stateWithOwnInactiveNeedUrisToLoad,
+        inactiveNeedUrisLoading
+      );
+
+      const stateWithOwnNeedUrisInLoading = addOwnActiveNeedsInLoading(
+        stateWithOwnInactiveNeedUrisInLoading,
+        activeNeedUris
+      );
+
       const stateWithOwnNeeds = ownNeeds.reduce(
         (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-        allNeedsInState
+        stateWithOwnNeedUrisInLoading
       );
       const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
         (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),

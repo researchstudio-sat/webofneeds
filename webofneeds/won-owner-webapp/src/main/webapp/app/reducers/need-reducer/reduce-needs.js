@@ -1,7 +1,6 @@
 import { parseNeed } from "./parse-need.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { addInactiveNeed, removeInactiveNeed } from "../../won-localstorage.js";
 
 export function addNeed(needs, jsonldNeed, ownNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -10,32 +9,27 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
   let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
   if (parsedNeed && parsedNeed.get("uri")) {
-    if (ownNeed) {
-      switch (parsedNeed.get("state")) {
-        case won.WON.InactiveCompacted:
-          addInactiveNeed(parsedNeed.get("uri"));
-          break;
-        case won.WON.ActiveCompacted:
-          removeInactiveNeed(parsedNeed.get("uri"));
-          break;
-      }
-    }
+    console.log("addNeed: ", parsedNeed.get("uri"));
     let existingNeed = needs.get(parsedNeed.get("uri"));
-    if (ownNeed && existingNeed) {
+    const isExistingOwnNeed = existingNeed && existingNeed.get("ownNeed");
+
+    if ((ownNeed || isExistingOwnNeed) && existingNeed) {
       // If need is already present and the
       // need is claimed as an own need we set
       // have to set it
       const isBeingCreated = existingNeed.get("isBeingCreated");
-      if (isBeingCreated) {
+      const isLoading = existingNeed.get("isLoading");
+      const toLoad = existingNeed.get("toLoad");
+
+      if (isBeingCreated || isLoading || toLoad) {
         // replace it
-        parsedNeed = parsedNeed.set(
-          "connections",
-          existingNeed.get("connections")
-        );
+        parsedNeed = parsedNeed
+          .set("connections", existingNeed.get("connections"))
+          .set("ownNeed", true);
         return needs.setIn([parsedNeed.get("uri")], parsedNeed);
       } else {
         // just be sure we mark it as own need
-        return needs.setIn([parsedNeed.get("uri"), "ownNeed"], ownNeed);
+        return needs.setIn([parsedNeed.get("uri"), "ownNeed"], true);
       }
     } else {
       return setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
@@ -46,6 +40,92 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
   }
 
   return newState;
+}
+
+export function addNeedInLoading(needs, needUri, state, ownNeed) {
+  console.log("addNeedInLoading: ", needUri);
+  const oldNeed = needs.get(needUri);
+  if (oldNeed && !oldNeed.get("isLoading")) {
+    return needs;
+  } else {
+    let need = Immutable.fromJS({
+      uri: needUri,
+      toLoad: false,
+      isLoading: true,
+      ownNeed: ownNeed,
+      state: state,
+      connections: Immutable.Map(),
+    });
+    return needs.setIn([needUri], need);
+  }
+}
+
+export function addOwnActiveNeedsInLoading(needs, needUris) {
+  needUris &&
+    needUris.size > 0 &&
+    console.log("addOwnActiveNeedsInLoading: ", needUris);
+  let newState = needs;
+  needUris &&
+    needUris.forEach(needUri => {
+      newState = addNeedInLoading(
+        newState,
+        needUri,
+        won.WON.ActiveCompacted,
+        true
+      );
+    });
+  return newState;
+}
+
+export function addOwnInactiveNeedsInLoading(needs, needUris) {
+  needUris &&
+    needUris.size > 0 &&
+    console.log("addOwnInactiveNeedsInLoading: ", needUris);
+  let newState = needs;
+  needUris &&
+    needUris.forEach(needUri => {
+      newState = addNeedInLoading(
+        newState,
+        needUri,
+        won.WON.InactiveCompacted,
+        true
+      );
+    });
+  return newState;
+}
+
+export function addOwnInactiveNeedsToLoad(needs, needUris) {
+  needUris &&
+    needUris.size > 0 &&
+    console.log("addOwnInactiveNeedsToLoad: ", needUris);
+  let newState = needs;
+  needUris &&
+    needUris.forEach(needUri => {
+      newState = addNeedToLoad(
+        newState,
+        needUri,
+        won.WON.InactiveCompacted,
+        true
+      );
+    });
+  return newState;
+}
+
+export function addNeedToLoad(needs, needUri, state, ownNeed) {
+  console.log("addNeedToLoad: ", needUri);
+  if (needs.get(needUri)) {
+    return needs;
+  } else {
+    let need = Immutable.fromJS({
+      uri: needUri,
+      toLoad: true,
+      isLoading: false,
+      ownNeed: ownNeed,
+      state: state,
+      connections: Immutable.Map(),
+    });
+    return needs.setIn([needUri], need);
+  }
 }
 
 export function addNeedInCreation(needs, needInCreation, needUri) {
@@ -128,13 +208,5 @@ export function markNeedAsRead(state, needUri) {
 }
 
 export function changeNeedState(state, needUri, newState) {
-  switch (newState) {
-    case won.WON.InactiveCompacted:
-      addInactiveNeed(needUri);
-      break;
-    case won.WON.ActiveCompacted:
-      removeInactiveNeed(needUri);
-      break;
-  }
   return state.setIn([needUri, "state"], newState);
 }
