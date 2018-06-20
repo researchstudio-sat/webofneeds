@@ -11,13 +11,14 @@ import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors.js";
 import won from "../won-es6.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
 
-    <won-square-image ng-if="!self.need.get('isBeingCreated')"
-        ng-class="{'bigger' : self.biggerImage, 'inactive' : self.need.get('state') === self.WON.InactiveCompacted}"
+    <won-square-image
+        ng-class="{'bigger' : self.biggerImage, 'inactive' : !self.need.get('isBeingCreated') && self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
@@ -39,8 +40,6 @@ function genComponentConf() {
           class="piu__header__title__subtitle__group__icon">
             <use xlink:href="#ico36_group" href="#ico36_group"></use>
         </svg>
-
-
           {{self.need.get('group')}}
           <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
         </span>
@@ -51,12 +50,6 @@ function genComponentConf() {
       </div>
     </div>
     
-    <won-square-image ng-if="self.need.get('isBeingCreated')"
-      ng-class="{'bigger' : self.biggerImage}"
-      src="self.need.get('TODO')"
-      uri="self.needUri"
-      ng-show="!self.hideImage">
-    </won-square-image>
     <div class="ph__right" ng-if="self.need.get('isBeingCreated')">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title">
@@ -97,6 +90,16 @@ function genComponentConf() {
         ["self.needUri", "self.timestamp"],
         this
       );
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+      classOnComponentRoot("won-is-toload", () => this.isToLoad(), this);
+    }
+
+    isLoading() {
+      return !this.need || this.need.get("isLoading");
+    }
+    isToLoad() {
+      return !this.need || this.need.get("toLoad");
     }
   }
   Controller.$inject = serviceDependencies;
