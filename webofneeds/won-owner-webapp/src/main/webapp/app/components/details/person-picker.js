@@ -6,7 +6,6 @@ import Immutable from "immutable";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <h1>Person Detail Picker</h1>
       <div ng-repeat="detail in self.personDetails" class="pp__detail">
           <div class="pp__detail__label">
               {{detail.fieldname}}
@@ -28,15 +27,6 @@ function genComponentConf() {
       </div>
     `;
 
-  // DONE rewrite this from tag picker to person picker
-  // DONE -> Map decide on some sort of data structure
-  // DONE add to create-isseeks
-  // TODO: styling
-  // DONE add details to draft
-  // DONE add details to RDF
-  // DONE display details in info
-  // TODO: test matching
-
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
@@ -44,12 +34,11 @@ function genComponentConf() {
 
       window.pp4dbg = this;
 
-      // TODO: require name & skills!
       this.addedPerson = Immutable.Map();
 
       this.personDetails = [
+        { fieldname: "Title", name: "title", value: undefined },
         { fieldname: "Name", name: "name", value: undefined },
-        { fieldname: "Academic Title", name: "title", value: undefined },
         { fieldname: "Company", name: "company", value: undefined },
         { fieldname: "Position", name: "position", value: undefined },
         { fieldname: "Skills", name: "skills", value: undefined },
@@ -121,18 +110,8 @@ function genComponentConf() {
       if (personIndex !== -1) {
         this.personDetails[personIndex].value = "";
       }
-      //this.textfieldna().value = "";
       this.onPersonUpdated({ person: this.addedPerson });
-      //this.showResetButton = false;
     }
-
-    // textfieldnNg() {
-    //   return this.domCache.ng(".tp__input__inner");
-    // }
-
-    // textfieldn() {
-    //   return this.domCache.dom(".tp__input__inner");
-    // }
   }
   Controller.$inject = serviceDependencies;
 

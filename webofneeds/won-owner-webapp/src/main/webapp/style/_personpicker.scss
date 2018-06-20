@@ -4,6 +4,7 @@
 won-person-picker {
   .pp__detail {
     position: relative;
+    padding: 0.3rem 0;
 
     .pp__detail__label {
       @include default-font;

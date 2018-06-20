@@ -205,9 +205,14 @@ function parsePerson(isOrSeeks) {
     : undefined;
   //person.bio = isOrSeeksImm.get("dc:description");
 
-  // name gets required because having a person without identifier is pointless
-  // skills gets required because this is what's used for matching
-  if (person.name && person.skills) {
+  // if there's anything, use it
+  if (
+    person.name ||
+    person.title ||
+    person.company ||
+    person.position ||
+    person.skills
+  ) {
     return Immutable.fromJS(person);
   }
 
