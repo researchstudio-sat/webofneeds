@@ -25,10 +25,10 @@ export function parseNeed(jsonldNeed, ownNeed) {
   if (jsonldNeedImm) {
     const uri = jsonldNeedImm.get("@id");
     const nodeUri = jsonldNeedImm.getIn(["won:hasWonNode", "@id"]);
-    const isPresent = !!jsonldNeedImm.getIn(["won:is", "dc:title"]);
-    const seeksPresent = !!jsonldNeedImm.getIn(["won:seeks", "dc:title"]);
     const is = jsonldNeedImm.get("won:is");
     const seeks = jsonldNeedImm.get("won:seeks");
+    const isPresent = is && is.size > 0;
+    const seeksPresent = seeks && seeks.size > 0;
 
     //TODO We need to decide which is the main title? Or combine?
     const title = isPresent
