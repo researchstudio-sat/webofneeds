@@ -2,7 +2,7 @@
  * Created by ksinger on 20.08.2015.
  */
 import angular from "angular";
-import { attach, ellipsizeString } from "../utils.js";
+import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
@@ -82,7 +82,7 @@ function genComponentConf() {
       if (this.isPrivateIdUser) {
         return "Anonymous";
       } else {
-        return ellipsizeString(this.email, this.maxEmailLength);
+        return this.email;
       }
     }
   }
