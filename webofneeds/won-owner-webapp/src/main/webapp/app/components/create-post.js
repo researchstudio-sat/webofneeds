@@ -10,6 +10,7 @@ import imageDropzoneModule from "./image-dropzone.js";
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
 import matchingContextPicker from "./details/matching-context-picker.js";
+import personPickerModule from "./details/person-picker.js";
 import routePickerModule from "./details/route-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
@@ -118,6 +119,7 @@ function genComponentConf() {
         type: postTypeTexts[3].type,
         description: "",
         tags: undefined,
+        person: undefined,
         location: undefined,
         travelAction: undefined,
         thumbnail: undefined,
@@ -128,6 +130,7 @@ function genComponentConf() {
         type: postTypeTexts[3].type,
         description: "",
         tags: undefined,
+        person: undefined,
         location: undefined,
         travelAction: undefined,
         thumbnail: undefined,
@@ -280,6 +283,7 @@ angular
     descriptionPickerModule,
     locationPickerModule,
     matchingContextPicker,
+    personPickerModule,
     routePickerModule,
     tagsPickerModule,
     ttlPickerModule,

@@ -3,8 +3,7 @@
  */
 
 import angular from "angular";
-import postSeeksInfoModule from "./post-seeks-info.js";
-import postIsInfoModule from "./post-is-info.js";
+import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postHeaderModule from "./post-header.js";
 import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
@@ -46,9 +45,9 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
-            <won-post-is-info is-part="::self.isPart" ng-if="self.isPart"></won-post-is-info>
+            <won-post-is-or-seeks-info is-or-seeks-part="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
-            <won-post-seeks-info seeks-part="::self.seeksPart" ng-if="self.seeksPart"></won-post-seeks-info>
+            <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
             <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
               <h2 class="post-info__heading">
                   RDF
@@ -116,8 +115,9 @@ function genComponentConf() {
           isPart: is
             ? {
                 postUri: postUri,
-                is: is,
+                isOrSeeks: is,
                 isString: "is",
+                person: is && is.get("person"),
                 location: is && is.get("location"),
                 address:
                   is.get("location") && is.get("location").get("address"),
@@ -133,9 +133,10 @@ function genComponentConf() {
           seeksPart: seeks
             ? {
                 postUri: postUri,
-                seeks: seeks,
+                isOrSeeks: seeks,
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
+                person: seeks && seeks.get("person"),
                 address:
                   seeks.get("location") && seeks.get("location").get("address"),
                 travelAction: seeks && seeks.get("travelAction"),
@@ -186,8 +187,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.postInfo", [
-    postIsInfoModule,
-    postSeeksInfoModule,
+    postIsOrSeeksInfoModule,
     postHeaderModule,
     postShareLinkModule,
     labelledHrModule,
