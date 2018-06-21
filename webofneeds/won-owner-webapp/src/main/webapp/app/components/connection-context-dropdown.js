@@ -16,8 +16,14 @@ import { connect2Redux } from "../won-utils.js";
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
+            <svg class="cdd__icon__small"
+                ng-if="self.isLoading()"
+                style="--local-primary:var(--won-skeleton-color);">
+                    <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
+            </svg>
             <svg class="cdd__icon__small clickable"
-                style="--local-primary:#var(--won-secondary-color);"
+                ng-if="!self.isLoading()"
+                style="--local-primary:var(--won-secondary-color);"
                 ng-click="self.contextMenuOpen = true">
                     <use xlink:href="#ico16_contextmenu" href="#ico16_contextmenu"></use>
             </svg>
@@ -99,6 +105,10 @@ function genComponentConf() {
       });
 
       window.document.addEventListener("click", callback);
+    }
+
+    isLoading() {
+      return !this.post || this.post.get("isLoading");
     }
 
     closeConnection() {
