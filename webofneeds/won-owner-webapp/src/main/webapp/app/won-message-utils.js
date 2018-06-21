@@ -246,7 +246,7 @@ export function buildChatMessage({
           chatMessage
         );
       } else {
-        throw new Exception(
+        throw new Error(
           "No textmessage or valid graph as payload of chat message:" +
             JSON.stringify(chatMessage) +
             " " +
@@ -345,7 +345,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     });
   }
 
-  //if type === create -> use needBuilder as well
+  //if type  create -> use needBuilder as well
   const prepareContentNodeData = async needDataIsOrSeeks => ({
     // Adds all fields from needDataIsOrSeeks:
     // title, description, tags, matchingContext, location,...

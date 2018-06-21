@@ -22,13 +22,17 @@ const emptyDraft = deepFreeze({
 });
 
 // const availableDetails = {
-//   description: {},
-//   location : {
-//     detailName: "location",
-//     detailTitle: "Location",
-//     detailIcon: "ico36_location_circle",
-//     detailComponent: "won-location-picker",
+//   description: {
+//     name: "description",
 //   },
+//   location: {
+//     name: "location",
+//     title: "Location",
+//     icon: "ico36_location_circle",
+//     component: "won-location-picker", // put all the html here?
+//   },
+//   person: {},
+//   route: {},
 //   tags: {},
 //   ttl: {},
 // };
@@ -56,7 +60,7 @@ function genComponentConf() {
 
         <!-- DETAILS Picker -->
         <div class="cis__addDetail">
-            <div class="cis__addDetail__header detailPicker clickable"
+            <div class="cis__addDetail__header a detailPicker clickable"
                 ng-click="self.toggleDetail()"
                 ng-class="{'closedDetailPicker': !self.showDetail}">
                     <span>Add more detail</span>
@@ -93,6 +97,20 @@ function genComponentConf() {
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Location</span>
+                </div>
+
+                <!-- PERSON PICKER -->
+                <div class="cis__detail__items__item person"
+                ng-click="self.toggleOpenDetail('person')"
+                ng-class="{'picked' : self.openDetail === 'person'}">
+                    <svg class="cis__circleicon" ng-show="!self.details.has('person')">
+                        <!-- TODO: create and use a better icon -->
+                        <use xlink:href="#ico36_person_single_circle" href="#ico36_person_single_circle"></use>
+                    </svg>
+                    <svg class="cis__circleicon" ng-show="self.details.has('person')">
+                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                    </svg>
+                    <span>Person</span>
                 </div>
 
                 <!-- ROUTE PICKER -->
@@ -141,21 +159,31 @@ function genComponentConf() {
         <!-- TODO: move details into the div opened by the detail picker? -->
         <div class="cis__details" ng-if="self.showDetail">
             <!-- DESCRIPTION -->
-            <won-description-picker 
+            <won-description-picker
+              ng-click="self.onScroll({element: '.cis__details'})"
               ng-if="self.openDetail === 'description'"
               initial-description="::self.draftObject.description"
               on-description-updated="::self.updateDescription(description)">
             </won-description-picker>
 
             <!-- LOCATION -->
-            <won-location-picker 
+            <won-location-picker
+                ng-click="self.onScroll({element: '.cis__details'})"
                 ng-if="self.openDetail === 'location'"
                 initial-location="::self.draftObject.location"
                 on-location-picked="::self.updateLocation(location)">
             </won-location-picker>
 
+            <!-- PERSON -->
+            <won-person-picker 
+              ng-if="self.openDetail === 'person'"
+              initial-person="::self.draftObject.person"
+              on-person-updated="::self.updatePerson(person)">
+            </won-person-picker>
+
             <!-- ROUTE -->
             <won-route-picker
+              ng-click="self.onScroll({element: '.cis__details'})"
               ng-if="self.openDetail === 'route'"
               initial-travel-action="::self.draftObject.travelAction"
               on-route-updated="::self.updateRoute(travelAction)">
@@ -163,6 +191,8 @@ function genComponentConf() {
 
             <!-- TAGS -->
             <won-tags-picker
+                ng-click="self.onScroll({element: '.cis__details'})"
+                ng-click="self.onScroll()"
                 ng-if="self.openDetail === 'tags'"
                 initial-tags="::self.draftObject.tags"
                 on-tags-updated="::self.updateTags(tags)">
@@ -170,6 +200,8 @@ function genComponentConf() {
 
             <!-- TTL -->
             <won-ttl-picker
+              ng-click="self.onScroll({element: '.cis__details'})"
+              ng-click="self.onScroll()"
               ng-if="self.openDetail === 'ttl'"
               initial-ttl="::self.draftObject.ttl"
               on-ttl-updated="::self.updateTTL(ttl)">
@@ -179,7 +211,7 @@ function genComponentConf() {
         
         <!-- MATCHING CONTEXT PICKER -->
         <div class="cis__addDetail">
-            <div class="cis__addDetail__header detailPicker clickable"
+            <div class="cis__addDetail__header b detailPicker clickable"
                 ng-click="self.toggleMatchingContext()"
                 ng-class="{'closedDetailPicker': !self.showMatchingContext}">
                 <span>Tune Matching Behaviour</span>
@@ -191,12 +223,13 @@ function genComponentConf() {
                 </svg>
             </div>
             <div class="cis__detail__matching-context">
-            <won-matching-context-picker
-              ng-if="self.showMatchingContext"
-              default-matching-context="::self.defaultMatchingContext"
-              initial-matching-context="::self.draftObject.matchingContext"
-              on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
-            </won-matching-context-picker>
+              <won-matching-context-picker
+                ng-click="self.onScroll({element: '.cis__detail__matching-context'})"
+                ng-if="self.showMatchingContext"
+                default-matching-context="::self.defaultMatchingContext"
+                initial-matching-context="::self.draftObject.matchingContext"
+                on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
+              </won-matching-context-picker>
             </div>
         </div>`;
 
@@ -237,51 +270,6 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    /*
-    snapToBottom() {
-      this._snapBottom = true;
-      this.scrollToBottom();
-    }
-    unsnapFromBottom() {
-      this._snapBottom = false;
-    }
-    updateScrollposition() {
-      if (this._snapBottom) {
-        this.scrollToBottom();
-      }
-    }
-    scrollToBottom() {
-      this._programmaticallyScrolling = true;
-
-      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
-    }
-    onScroll() {
-      if (!this._programmaticallyScrolling) {
-        //only unsnap if the user scrolled themselves
-        this.unsnapFromBottom();
-      }
-
-      const sc = this.scrollContainer();
-      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
-      if (isAtBottom) {
-        this.snapToBottom();
-      }
-
-      this._programmaticallyScrolling = false;
-    }
-    scrollContainerNg() {
-      return angular.element(this.scrollContainer());
-    }
-    scrollContainer() {
-      if (!this._scrollContainer) {
-        this._scrollContainer = this.$element[0].querySelector(
-          ".won-create-isseeks"
-        );
-      }
-      return this._scrollContainer;
-    }
-    */
-
     reset() {
       this.draftObject = clone(emptyDraft);
       this.details = new Set(); // remove all detail-cards
@@ -300,6 +288,9 @@ function genComponentConf() {
       if (!this.details.has("matching-context")) {
         this.draftObject.matchingContext = undefined;
       }
+      if (!this.details.has("person")) {
+        this.draftObject.person = undefined;
+      }
       if (!this.details.has("route")) {
         this.draftObject.travelAction = undefined;
       }
@@ -312,10 +303,6 @@ function genComponentConf() {
 
       this.onUpdate({ draft: this.draftObject });
       dispatchEvent(this.$element[0], "update", { draft: this.draftObject });
-    }
-
-    updateScroll() {
-      this.onScroll();
     }
 
     setDraft(updatedDraft) {
@@ -370,6 +357,26 @@ function genComponentConf() {
       this.updateDraft();
     }
 
+    updatePerson(person) {
+      if (person && !this.isEmptyPerson(person)) {
+        if (!this.details.has("person")) {
+          this.details.add("person");
+        }
+        this.draftObject.person = person;
+      } else if (this.details.has("person")) {
+        this.details.delete("person");
+        this.draftObject.person = undefined;
+      }
+
+      this.updateDraft();
+    }
+
+    isEmptyPerson(person) {
+      return Array.from(person.values()).every(
+        x => x === undefined || x === "" || (x && x.size === 0)
+      );
+    }
+
     updateRoute(travelAction) {
       if (
         travelAction &&
@@ -415,21 +422,26 @@ function genComponentConf() {
       this.updateDraft();
     }
 
+    updateScroll() {
+      console.log("Scoll activity");
+      this.onScroll();
+    }
+
     pickImage(image) {
       this.draftObject.thumbnail = image;
     }
 
     toggleDetail() {
       if (!this.showDetail) {
-        this.updateScroll();
+        this.onScroll({ element: ".cis__addDetail__header.a" });
       }
       this.showDetail = !this.showDetail;
     }
 
     toggleMatchingContext() {
-      // if (!this.showMatchingContext) {
-      //   this.updateScroll;
-      // }
+      if (!this.showMatchingContext) {
+        this.onScroll({ element: ".cis__addDetail__header.b" });
+      }
       this.showMatchingContext = !this.showMatchingContext;
     }
 
@@ -439,6 +451,8 @@ function genComponentConf() {
         this.openDetail = undefined;
       } else {
         this.openDetail = detail;
+        //this.onScroll({ element: ".cis__addDetail__header.a" });
+        this.onScroll({ element: ".cis__details" });
       }
     }
 

@@ -2,8 +2,7 @@ import angular from "angular";
 import "ng-redux";
 import connectionHeaderModule from "./connection-header.js";
 import feedbackGridModule from "./feedback-grid.js";
-import postSeeksInfoModule from "./post-seeks-info.js";
-import postIsInfoModule from "./post-is-info.js";
+import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
@@ -17,7 +16,7 @@ import {
   selectLastUpdateTime,
 } from "../selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { relativeTime } from "../won-label-utils.js";
+import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -65,14 +64,20 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
+            <h2 class="post-info__heading" ng-show="self.suggestedPost.get('type')">
+                Type
+            </h2>
+            <p class="post-info__details" ng-show="self.suggestedPost.get('type')">
+                {{self.labels.type[self.suggestedPost.get('type')]}}{{self.suggestedPost.get('matchingContexts')? ' in '+ self.suggestedPost.get('matchingContexts').join(', ') : '' }}
+            </p>
             <!-- IS Part -->
             <div ng-show="self.isPart">
-                <won-post-is-info is-part="::self.isPart"></won-post-is-info>
+                <won-post-is-or-seeks-info is-or-seeks-part="self.isPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <!-- SEEKS Part -->
             <div ng-show="self.seeksPart">
-                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
+                <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <a class="rdflink clickable"
@@ -119,6 +124,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.maxThumbnails = 9;
       this.message = "";
+      this.labels = labels;
       this.WON = won.WON;
       window.openMatch4dbg = this;
 
@@ -149,7 +155,7 @@ function genComponentConf() {
           isPart: is
             ? {
                 postUri: postUriToConnectTo,
-                is: is,
+                isOrSeeks: is,
                 isString: "is",
                 location: is && is.get("location"),
                 address:
@@ -159,7 +165,7 @@ function genComponentConf() {
           seeksPart: seeks
             ? {
                 postUri: postUriToConnectTo,
-                seeks: seeks,
+                isOrSeeks: seeks,
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
                 address:
@@ -245,8 +251,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.sendRequest", [
-    postIsInfoModule,
-    postSeeksInfoModule,
+    postIsOrSeeksInfoModule,
     connectionHeaderModule,
     feedbackGridModule,
     labelledHrModule,

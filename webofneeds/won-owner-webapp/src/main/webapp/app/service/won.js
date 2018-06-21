@@ -705,6 +705,7 @@ won.defaultContext = {
   cert: "http://www.w3.org/ns/auth/cert#",
   woncrypt: "http://purl.org/webofneeds/woncrypt#",
   s: "http://schema.org/",
+  foaf: "http://xmlns.com/foaf/0.1/",
   "msg:hasMessageType": {
     "@id": "http://purl.org/webofneeds/message#hasMessageType",
     "@type": "@id",
@@ -941,7 +942,7 @@ won.toWonMessage = function(message) {
   } else if (message instanceof WonMessage) {
     return Promise.resolve(message);
   } else {
-    throw new Exception(
+    throw new Error(
       "Couldn't convert the following to a WonMessage: ",
       message
     );

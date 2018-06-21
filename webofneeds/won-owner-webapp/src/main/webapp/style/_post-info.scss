@@ -84,8 +84,7 @@ won-post-info {
       background-color: white;
     }
 
-    won-post-is-info,
-    won-post-seeks-info {
+    won-post-is-or-seeks-info {
       .post-info__details {
         &--prewrap {
           white-space: pre-wrap;
