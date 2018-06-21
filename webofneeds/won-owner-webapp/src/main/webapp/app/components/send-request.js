@@ -9,6 +9,7 @@ import labelledHrModule from "./labelled-hr.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import won from "../won-es6.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import {
   selectOpenPostUri,
@@ -39,7 +40,21 @@ function genComponentConf() {
             </won-connection-header>
             <won-connection-context-dropdown ng-if="self.connection && self.connection.get('isRated')"></won-connection-context-dropdown>
         </div>
-        <div class="post-info__content">
+        <div class="post-info__content" ng-if="self.isLoading()">
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <div class="post-info__details"></div>
+        </div>
+        <div class="post-info__content" ng-if="!self.isLoading()">
             <won-gallery ng-show="self.suggestedPost.get('hasImages')">
             </won-gallery>
 
@@ -79,7 +94,7 @@ function genComponentConf() {
                     <span class="rdflink__label">Post</span>
             </a>
         </div>
-        <div class="post-info__footer">
+        <div class="post-info__footer" ng-if="!self.isLoading()">
             <won-post-share-link
                 ng-if="self.suggestedPost.get('state') !== self.WON.InactiveCompacted"
                 post-uri="self.suggestedPost && self.suggestedPost.get('uri')">
@@ -165,6 +180,20 @@ function genComponentConf() {
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return (
+        true ||
+        !this.connection ||
+        !this.suggestedPost ||
+        !this.ownNeed ||
+        this.ownNeed.get("isLoading") ||
+        this.suggestedPost.get("isLoading") ||
+        this.connection.get("isLoading")
+      );
     }
 
     sendRequest(message) {

@@ -108,7 +108,7 @@ function genComponentConf() {
     }
 
     isLoading() {
-      return !this.post || this.post.get("isLoading");
+      return !this.connection || this.connection.get("isLoading");
     }
 
     closeConnection() {

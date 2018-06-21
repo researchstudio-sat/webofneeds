@@ -22,6 +22,7 @@ import {
   selectNeedByConnectionUri,
 } from "../selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
@@ -170,7 +171,7 @@ function genComponentConf() {
             >
             </chat-textfield-simple>
         </div>
-        <div class="pm__footer" ng-show="self.isSentRequest">
+        <div class="pm__footer" ng-if="self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
@@ -322,6 +323,20 @@ function genComponentConf() {
             // scroll to bottom directly after rendering, if snapped
             this.updateScrollposition()
           )
+      );
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return (
+        true ||
+        !this.connection ||
+        !this.theirNeed ||
+        !this.ownNeed ||
+        this.ownNeed.get("isLoading") ||
+        this.theirNeed.get("isLoading") ||
+        this.connection.get("isLoading")
       );
     }
 

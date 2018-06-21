@@ -6,6 +6,20 @@
 
 won-send-request,
 won-post-info {
+  &.won-is-loading {
+    .post-info__details {
+      height: $normalFontSize;
+      width: 100%;
+      background-color: $won-skeleton-color;
+      margin-top: 0.25rem;
+    }
+    .post-info__heading {
+      height: $normalFontSize;
+      width: 5rem;
+      background-color: $won-skeleton-color;
+    }
+  }
+
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
