@@ -167,7 +167,7 @@ function genComponentConf() {
     }
 
     isLoading() {
-      return true || !this.need || this.need.get("isLoading");
+      return !this.need || this.need.get("isLoading");
     }
 
     /**
