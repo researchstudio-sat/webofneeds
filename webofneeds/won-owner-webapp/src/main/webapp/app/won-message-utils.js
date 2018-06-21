@@ -10,7 +10,7 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
-import { getClosedConnUris } from "./won-localstorage.js";
+import { isConnUriClosed } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -20,6 +20,7 @@ export const emptyDataset = Immutable.fromJS({
   inactiveNeedUris: [],
   activeNeedUris: [],
   inactiveNeedUrisLoading: [],
+  needUriForConnections: {},
   activeConnectionUrisLoading: [],
   inactiveConnectionUris: [],
   theirNeedUrisInLoading: [],
@@ -559,13 +560,17 @@ function fetchAllAccessibleAndRelevantData(
       Promise.all(
         ownNeedUris.map(uri =>
           won.getConnectionUrisOfNeed(uri, uri, true).then(connectionUris => {
-            curriedDispatch(
-              wellFormedPayload({ activeConnectionUris: connectionUris })
+            const activeConnectionUris = connectionUris.filter(
+              connUri => !isConnUriClosed(connUri)
             );
-            return urisToLookupMap(
-              connectionUris,
-              uri => fetchConnectionAndDispatch(uri, curriedDispatch),
-              getClosedConnUris()
+            curriedDispatch(
+              wellFormedPayload({
+                needUriForConnections: uri,
+                activeConnectionUrisLoading: activeConnectionUris,
+              })
+            );
+            return urisToLookupMap(activeConnectionUris, uri =>
+              fetchConnectionAndDispatch(uri, curriedDispatch)
             );
           })
         )
