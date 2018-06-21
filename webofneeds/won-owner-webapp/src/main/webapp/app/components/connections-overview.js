@@ -323,16 +323,18 @@ function genComponentConf() {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
-          if (conn.get("isLoading")) return true;
+          if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
+          const remoteNeedPresent =
+            remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
+
+          if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
+
           const remoteNeedActiveOrLoading =
-            remoteNeedUri &&
-            allNeeds &&
-            allNeeds.get(remoteNeedUri) &&
-            (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
-              allNeeds.getIn([remoteNeedUri, "state"]) ===
-                won.WON.ActiveCompacted);
+            allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+            allNeeds.getIn([remoteNeedUri, "state"]) ===
+              won.WON.ActiveCompacted;
 
           return (
             remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
@@ -344,16 +346,18 @@ function genComponentConf() {
     getOpenConnectionsArraySorted(need, allNeeds) {
       return sortByDate(
         need.get("connections").filter(conn => {
-          if (conn.get("isLoading")) return true;
+          if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
 
           const remoteNeedUri = conn.get("remoteNeedUri");
+          const remoteNeedPresent =
+            remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
+
+          if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
+
           const remoteNeedActiveOrLoading =
-            remoteNeedUri &&
-            allNeeds &&
-            allNeeds.get(remoteNeedUri) &&
-            (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
-              allNeeds.getIn([remoteNeedUri, "state"]) ===
-                won.WON.ActiveCompacted);
+            allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+            allNeeds.getIn([remoteNeedUri, "state"]) ===
+              won.WON.ActiveCompacted;
 
           return (
             remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
