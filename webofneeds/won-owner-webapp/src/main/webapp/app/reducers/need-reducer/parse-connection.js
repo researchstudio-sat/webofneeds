@@ -20,6 +20,7 @@ export function parseConnection(jsonldConnection) {
       lastUpdateDate: undefined,
       unread: undefined,
       isRated: false,
+      isLoadingMessages: false,
       isLoading: false,
       showAgreementData: false,
     },

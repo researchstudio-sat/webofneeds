@@ -4,6 +4,11 @@
 @import "flex-layout";
 
 won-connection-indicators {
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+    pointer-events: none;
+  }
+
   display: flex;
   flex-direction: row;
 

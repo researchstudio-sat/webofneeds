@@ -1,7 +1,36 @@
 @import "sizing-utils";
 @import "square-image";
+@import "animate";
 
 won-connection-header {
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+    pointer-events: none;
+
+    .ch__icon__skeleton {
+      @include fixed-square($postIconSize);
+      background-color: $won-skeleton-color;
+    }
+
+    .ch__right__subtitle__type {
+      height: $smallFontSize;
+      width: 5rem;
+      background-color: $won-skeleton-color;
+    }
+
+    .ch__right__topline__title {
+      height: $normalFontSize;
+      width: 7rem;
+      background-color: $won-skeleton-color;
+    }
+
+    .ch__right__topline__date {
+      height: $smallFontSize;
+      width: 3rem;
+      background-color: $won-skeleton-color;
+    }
+  }
+
   color: black;
   //padding: 0.5rem;
 

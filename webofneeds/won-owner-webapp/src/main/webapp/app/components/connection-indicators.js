@@ -11,13 +11,14 @@ import { selectAllOwnNeeds, selectAllNeeds } from "../selectors.js";
 
 import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <a
             class="indicators__item clickable"
-            ng-show="self.latestConnectedUri"
+            ng-show="!self.isLoading() && self.latestConnectedUri"
             ng-click="self.setOpen(self.latestConnectedUri)">
                 <svg class="indicators__item__icon"
                     title="Show latest message/request"
@@ -37,7 +38,7 @@ function genComponentConf() {
                     {{ self.getCountLimited(self.unreadConnectedCount)}}
                 </span>
         </a>
-        <div class="indicators__item" ng-show="!self.latestConnectedUri" title="No chats in this post">
+        <div class="indicators__item" ng-show="!self.isLoading() && !self.latestConnectedUri" title="No chats in this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -46,7 +47,7 @@ function genComponentConf() {
         </div>
         <a
             class="indicators__item clickable"
-            ng-show="self.latestMatchUri"
+            ng-show="!self.isLoading() && self.latestMatchUri"
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="indicators__item__icon"
@@ -64,14 +65,29 @@ function genComponentConf() {
                     {{ self.getCountLimited(self.unreadMatchesCount) }}
                 </span>
         </a>
-        <div class="indicators__item" ng-show="!self.latestMatchUri" title="No matches for this post">
+        <div class="indicators__item" ng-show="!self.isLoading() && !self.latestMatchUri" title="No matches for this post">
             <svg class="indicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <span class="indicators__item__caption"></span>
         </div>
-        <span class="mobile__indicator" ng-show="self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
+        <span class="mobile__indicator" ng-show="!self.isLoading() && self.unreadCountSum">{{ self.getCountLimited(self.unreadCountSum) }}</span>
+
+        <div class="indicators__item" ng-if="self.isLoading()">
+            <svg class="indicators__item__icon"
+                style="--local-primary:var(--won-skeleton-color);">
+                    <use xlink:href="#ico36_message" href="#ico36_message"></use>
+            </svg>
+            <span class="indicators__item__caption"></span>
+        </div>
+        <div class="indicators__item" ng-if="self.isLoading()">
+            <svg class="indicators__item__icon"
+                style="--local-primary:var(--won-skeleton-color);">
+                    <use xlink:href="#ico36_message" href="#ico36_match"></use>
+            </svg>
+            <span class="indicators__item__caption"></span>
+        </div>
     `;
 
   class Controller {
@@ -89,28 +105,33 @@ function genComponentConf() {
           allConnectionsByNeedUri &&
           allConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
-            const remoteNeedActive =
+            const remoteNeedActiveOrLoading =
               remoteNeedUri &&
               allNeeds &&
               allNeeds.get(remoteNeedUri) &&
-              allNeeds.getIn([remoteNeedUri, "state"]) ===
-                won.WON.ActiveCompacted;
+              (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+                allNeeds.getIn([remoteNeedUri, "state"]) ===
+                  won.WON.ActiveCompacted);
 
-            return remoteNeedActive && conn.get("state") === won.WON.Suggested;
+            return (
+              remoteNeedActiveOrLoading &&
+              conn.get("state") === won.WON.Suggested
+            );
           });
         const connected =
           allConnectionsByNeedUri &&
           allConnectionsByNeedUri.filter(conn => {
             const remoteNeedUri = conn.get("remoteNeedUri");
-            const remoteNeedActive =
+            const remoteNeedActiveOrLoading =
               remoteNeedUri &&
               allNeeds &&
               allNeeds.get(remoteNeedUri) &&
-              allNeeds.getIn([remoteNeedUri, "state"]) ===
-                won.WON.ActiveCompacted;
+              (allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
+                allNeeds.getIn([remoteNeedUri, "state"]) ===
+                  won.WON.ActiveCompacted);
 
             return (
-              remoteNeedActive &&
+              remoteNeedActiveOrLoading &&
               conn.get("state") !== won.WON.Suggested &&
               conn.get("state") !== won.WON.Closed
             );
@@ -141,6 +162,12 @@ function genComponentConf() {
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return !this.need || this.need.get("isLoading");
     }
 
     /**

@@ -10,7 +10,7 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
-import { getClosedConnUris } from "./won-localstorage.js";
+import { isConnUriClosed } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
@@ -20,6 +20,10 @@ export const emptyDataset = Immutable.fromJS({
   inactiveNeedUris: [],
   activeNeedUris: [],
   inactiveNeedUrisLoading: [],
+  needUriForConnections: {},
+  activeConnectionUrisLoading: [],
+  inactiveConnectionUris: [],
+  theirNeedUrisInLoading: [],
 });
 
 export function wellFormedPayload(payload) {
@@ -341,7 +345,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     });
   }
 
-  //if type === create -> use needBuilder as well
+  //if type  create -> use needBuilder as well
   const prepareContentNodeData = async needDataIsOrSeeks => ({
     // Adds all fields from needDataIsOrSeeks:
     // title, description, tags, matchingContext, location,...
@@ -555,15 +559,20 @@ function fetchAllAccessibleAndRelevantData(
     .then(() =>
       Promise.all(
         ownNeedUris.map(uri =>
-          won
-            .getConnectionUrisOfNeed(uri, uri, true)
-            .then(connectionUris =>
-              urisToLookupMap(
-                connectionUris,
-                uri => fetchConnectionAndDispatch(uri, curriedDispatch),
-                getClosedConnUris()
-              )
-            )
+          won.getConnectionUrisOfNeed(uri, uri, true).then(connectionUris => {
+            const activeConnectionUris = connectionUris.filter(
+              connUri => !isConnUriClosed(connUri)
+            );
+            curriedDispatch(
+              wellFormedPayload({
+                needUriForConnections: uri,
+                activeConnectionUrisLoading: activeConnectionUris,
+              })
+            );
+            return urisToLookupMap(activeConnectionUris, uri =>
+              fetchConnectionAndDispatch(uri, curriedDispatch)
+            );
+          })
         )
       )
     )
@@ -579,11 +588,14 @@ function fetchAllAccessibleAndRelevantData(
 
       return Immutable.Set(theirNeedUris).toArray();
     })
-    .then(theirNeedUris =>
-      urisToLookupMap(theirNeedUris, uri =>
+    .then(theirNeedUris => {
+      curriedDispatch(
+        wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris })
+      );
+      return urisToLookupMap(theirNeedUris, uri =>
         fetchTheirNeedAndDispatch(uri, curriedDispatch)
-      )
-    );
+      );
+    });
 
   const allDataRawPromise = Promise.all([
     allOwnNeedsPromise,

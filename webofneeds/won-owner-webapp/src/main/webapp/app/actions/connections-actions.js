@@ -436,10 +436,10 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
       .then(() => {
         if (!hasChanged) {
           dispatch({
-            type: actionCreators.connections__setLoading,
+            type: actionCreators.connections__setLoadingMessages,
             payload: {
               connectionUri: connectionUri,
-              isLoading: false,
+              isLoadingMessages: false,
             },
           });
         }
@@ -447,10 +447,10 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
       .catch(error => {
         console.error("Error:", error);
         dispatch({
-          type: actionCreators.connections__setLoading,
+          type: actionCreators.connections__setLoadingMessages,
           payload: {
             connectionUri: connectionUri,
-            isLoading: false,
+            isLoadingMessages: false,
           },
         });
       });
@@ -554,7 +554,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
 
     const connectionMessages = connection.get("messages");
     if (
-      connection.get("isLoading") ||
+      connection.get("isLoadingMessages") ||
       !connectionMessages ||
       connectionMessages.size > 0
     )
@@ -562,7 +562,7 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
 
     dispatch({
       type: actionTypes.connections.showLatestMessages,
-      payload: Immutable.fromJS({ connectionUri, isLoading: true }),
+      payload: Immutable.fromJS({ connectionUri, isLoadingMessages: true }),
     });
 
     won
@@ -645,7 +645,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
     const connection = need && need.getIn(["connections", connectionUri]);
     const connectionMessages = connection && connection.get("messages");
 
-    if (connection.get("isLoading")) return; // only start loading once.
+    if (connection.get("isLoadingMessages")) return; // only start loading once.
 
     // determine the oldest loaded event
     const sortedConnectionMessages = connectionMessages
@@ -658,7 +658,7 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
       oldestMessage.get("uri").replace(/.*\/event\/(.*)/, "$1"); // everything following the `/event/`
     dispatch({
       type: actionTypes.connections.showMoreMessages,
-      payload: Immutable.fromJS({ connectionUri, isLoading: true }),
+      payload: Immutable.fromJS({ connectionUri, isLoadingMessages: true }),
     });
 
     won

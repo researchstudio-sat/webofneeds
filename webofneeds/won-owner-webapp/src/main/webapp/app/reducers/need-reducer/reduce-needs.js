@@ -9,7 +9,6 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
   let parsedNeed = parseNeed(jsonldNeed, ownNeed);
 
   if (parsedNeed && parsedNeed.get("uri")) {
-    console.log("addNeed: ", parsedNeed.get("uri"));
     let existingNeed = needs.get(parsedNeed.get("uri"));
     const isExistingOwnNeed = existingNeed && existingNeed.get("ownNeed");
 
@@ -26,12 +25,36 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
         parsedNeed = parsedNeed
           .set("connections", existingNeed.get("connections"))
           .set("ownNeed", true);
+        console.log(
+          "updateOwnNeed after load or creation: ",
+          parsedNeed.get("uri")
+        );
         return needs.setIn([parsedNeed.get("uri")], parsedNeed);
       } else {
         // just be sure we mark it as own need
+        console.log("updateOwnNeed just in case: ", parsedNeed.get("uri"));
         return needs.setIn([parsedNeed.get("uri"), "ownNeed"], true);
       }
+    } else if (!ownNeed && existingNeed) {
+      // If need is already present and the
+      // need is claimed as a non own need
+      const isLoading = existingNeed.get("isLoading");
+      const toLoad = existingNeed.get("toLoad");
+
+      if (isLoading || toLoad) {
+        // replace it
+        parsedNeed = parsedNeed
+          .set("connections", existingNeed.get("connections"))
+          .set("ownNeed", false);
+        console.log("updateTheirNeed after load: ", parsedNeed.get("uri"));
+        return needs.setIn([parsedNeed.get("uri")], parsedNeed);
+      } else {
+        // just be sure we mark it as non own need
+        console.log("updateTheirNeed just in case: ", parsedNeed.get("uri"));
+        return needs.setIn([parsedNeed.get("uri"), "ownNeed"], false);
+      }
     } else {
+      console.log("addNeed if new: ", parsedNeed.get("uri"));
       return setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
     }
   } else {
@@ -54,6 +77,23 @@ export function addNeedInLoading(needs, needUri, state, ownNeed) {
       isLoading: true,
       ownNeed: ownNeed,
       state: state,
+      connections: Immutable.Map(),
+    });
+    return needs.setIn([needUri], need);
+  }
+}
+
+export function addTheirNeedInLoading(needs, needUri) {
+  console.log("addTheirNeedInLoading: ", needUri);
+  const oldNeed = needs.get(needUri);
+  if (oldNeed && (oldNeed.get("ownNeed") || !oldNeed.get("isLoading"))) {
+    return needs;
+  } else {
+    let need = Immutable.fromJS({
+      uri: needUri,
+      toLoad: false,
+      isLoading: true,
+      ownNeed: false,
       connections: Immutable.Map(),
     });
     return needs.setIn([needUri], need);
@@ -90,6 +130,18 @@ export function addOwnInactiveNeedsInLoading(needs, needUris) {
         won.WON.InactiveCompacted,
         true
       );
+    });
+  return newState;
+}
+
+export function addTheirNeedsInLoading(needs, needUris) {
+  needUris &&
+    needUris.size > 0 &&
+    console.log("addOwnInactiveNeedsInLoading: ", needUris);
+  let newState = needs;
+  needUris &&
+    needUris.forEach(needUri => {
+      newState = addTheirNeedInLoading(newState, needUri);
     });
   return newState;
 }

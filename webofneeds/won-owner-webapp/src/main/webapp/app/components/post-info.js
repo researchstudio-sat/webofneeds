@@ -15,6 +15,7 @@ import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectOpenPostUri, selectLastUpdateTime } from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -34,7 +35,21 @@ function genComponentConf() {
             </won-post-header>
             <won-post-context-dropdown ng-if="self.post.get('ownNeed')"></won-post-context-dropdown>
         </div>
-        <div class="post-info__content">
+        <div class="post-info__content" ng-if="self.isLoading()">
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <div class="post-info__details"></div>
+        </div>
+        <div class="post-info__content" ng-if="!self.isLoading()">
             <won-gallery ng-show="self.post.get('hasImages')">
             </won-gallery>
 
@@ -66,7 +81,7 @@ function genComponentConf() {
               </won-trig>
             </div>
         </div>
-        <div class="post-info__footer">
+        <div class="post-info__footer" ng-if="!self.isLoading()">
             <won-post-share-link
                 ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
                 post-uri="self.post.get('uri')">
@@ -162,6 +177,12 @@ function genComponentConf() {
         ["self.includeHeader"],
         this
       );
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return !this.post || this.post.get("isLoading");
     }
 
     createWhatsAround() {

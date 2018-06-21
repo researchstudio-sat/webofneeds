@@ -9,6 +9,7 @@ import {
   addOwnActiveNeedsInLoading,
   addOwnInactiveNeedsInLoading,
   addOwnInactiveNeedsToLoad,
+  addTheirNeedsInLoading,
   addNeed,
   addNeedInCreation,
   changeNeedState,
@@ -21,8 +22,9 @@ import {
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
+  addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
-  setConnectionLoading,
+  setConnectionLoadingMessages,
   markConnectionAsRead,
   selectNeedByConnectionUri,
   changeConnectionState,
@@ -51,10 +53,18 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.login: {
-      let activeNeedUris = action.payload.get("activeNeedUris");
-      let inactiveNeedUris = action.payload.get("inactiveNeedUris");
-      let inactiveNeedUrisLoading = action.payload.get(
+      const activeNeedUris = action.payload.get("activeNeedUris");
+      const inactiveNeedUris = action.payload.get("inactiveNeedUris");
+      const inactiveNeedUrisLoading = action.payload.get(
         "inactiveNeedUrisLoading"
+      );
+      const theirNeedUrisInLoading = action.payload.get(
+        "theirNeedUrisInLoading"
+      );
+
+      const needUriForConnections = action.payload.get("needUriForConnections");
+      const activeConnectionUrisLoading = action.payload.get(
+        "activeConnectionUrisLoading"
       );
 
       let ownNeeds = action.payload.get("ownNeeds");
@@ -81,13 +91,25 @@ export default function(allNeedsInState = initialState, action = {}) {
         (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
         stateWithOwnNeedUrisInLoading
       );
+
+      const stateWithOwnNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
+        stateWithOwnNeeds,
+        theirNeedUrisInLoading
+      );
+
       const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
         (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnNeeds
+        stateWithOwnNeedsAndTheirNeedsInLoading
+      );
+
+      const stateWithConnectionsToLoad = addActiveConnectionsToNeedInLoading(
+        stateWithOwnAndTheirNeeds,
+        needUriForConnections,
+        activeConnectionUrisLoading
       );
 
       return storeConnectionsData(
-        stateWithOwnAndTheirNeeds,
+        stateWithConnectionsToLoad,
         action.payload.get("connections")
       );
     }
@@ -420,11 +442,11 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri
       );
-    case actionTypes.connections.setLoading:
-      return setConnectionLoading(
+    case actionTypes.connections.setLoadingMessages:
+      return setConnectionLoadingMessages(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.isLoading
+        action.payload.isLoadingMessages
       );
 
     case actionTypes.connections.updateAgreementData:
@@ -536,11 +558,11 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.connections.showLatestMessages:
     case actionTypes.connections.showMoreMessages: {
-      const isLoading = action.payload.get("isLoading");
+      const isLoadingMessages = action.payload.get("isLoadingMessages");
       const connectionUri = action.payload.get("connectionUri");
 
-      if (isLoading && connectionUri) {
-        allNeedsInState = setConnectionLoading(
+      if (isLoadingMessages && connectionUri) {
+        allNeedsInState = setConnectionLoadingMessages(
           allNeedsInState,
           connectionUri,
           true
@@ -550,7 +572,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
         allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);
-        allNeedsInState = setConnectionLoading(
+        allNeedsInState = setConnectionLoadingMessages(
           allNeedsInState,
           connectionUri,
           false
@@ -559,7 +581,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const error = action.payload.get("error");
 
       if (error && connectionUri) {
-        allNeedsInState = setConnectionLoading(
+        allNeedsInState = setConnectionLoadingMessages(
           allNeedsInState,
           connectionUri,
           false

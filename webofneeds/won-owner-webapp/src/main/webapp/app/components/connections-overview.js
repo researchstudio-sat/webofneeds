@@ -38,20 +38,20 @@ function genComponentConf() {
                         need-uri="need.get('uri')"
                         timestamp="'TODOlatestOfThatType'"
                         ng-click="self.toggleDetails(need.get('uri'))"
-                        class="clickable">
+                        ng-class="{ 'clickable' : !self.isLoading(need) }">
                     </won-post-header>
                 </div>
             </div>
         </div>
         <div ng-repeat="need in self.sortedOpenNeeds" class="co__item"
-            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenConnections(need, self.allNeeds)}">
+            ng-class="{'co__item--withconn' : self.isOpen(need.get('uri')) && self.hasOpenOrLoadingConnections(need, self.allNeeds)}">
             <div class="co__item__need" ng-class="{'won-unread': need.get('unread'), 'selected' : need.get('uri') === self.needUriInRoute}">
                 <div class="co__item__need__header">
                     <won-post-header
                         need-uri="need.get('uri')"
                         timestamp="'TODOlatestOfThatType'"
                         ng-click="self.toggleDetails(need.get('uri'))"
-                        class="clickable">
+                        ng-class="{ 'clickable' : !self.isLoading(need) }">
                     </won-post-header>
                     <won-connection-indicators
                         on-selected-connection="self.selectConnection(connectionUri)"
@@ -68,15 +68,30 @@ function genComponentConf() {
                         }">
                         Details
                     </button>
-                    <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))">
+                    <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
                             class="co__item__need__header__carret__icon clickable"
                             ng-if="self.isOpen(need.get('uri'))">
                                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                         </svg>
-                        <svg style="--local-primary:var(--won-secondary-color);"
+                        <svg
+                            style="--local-primary:var(--won-secondary-color);"
                             class="co__item__need__header__carret__icon clickable"
+                            ng-if="!self.isOpen(need.get('uri'))">
+                                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                        </svg>
+                    </div>
+                    <div class="co__item__need__header__carret" ng-if="self.isLoading(need)">
+                        <svg
+                            style="--local-primary:var(--won-skeleton-color);"
+                            class="co__item__need__header__carret__icon"
+                            ng-if="self.isOpen(need.get('uri'))">
+                                <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                        </svg>
+                        <svg
+                            style="--local-primary:var(--won-skeleton-color);"
+                            class="co__item__need__header__carret__icon"
                             ng-if="!self.isOpen(need.get('uri'))">
                                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
@@ -91,7 +106,7 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="co__item__connections"
-                ng-if="self.isOpen(need.get('uri')) && self.hasOpenConnections(need, self.allNeeds)">
+                ng-if="self.isOpen(need.get('uri')) && self.hasOpenOrLoadingConnections(need, self.allNeeds)">
                 <won-connection-selection-item
                     ng-repeat="conn in self.getOpenConnectionsArraySorted(need, self.allNeeds)"
                     on-selected-connection="self.selectConnection(connectionUri)"
@@ -122,7 +137,7 @@ function genComponentConf() {
                             need-uri="need.get('uri')"
                             timestamp="'TODOlatestOfThatType'"
                             ng-click="self.toggleDetails(need.get('uri'))"
-                            class="clickable">
+                            ng-class="{ 'clickable' : !self.isLoading(need) }">
                         </won-post-header>
                         <button
                             class="co__item__need__header__button red"
@@ -134,7 +149,7 @@ function genComponentConf() {
                             }">
                             Details
                         </button>
-                        <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))">
+                        <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
                             <svg
                                 style="--local-primary:var(--won-secondary-color);"
                                 class="co__item__need__header__carret__icon clickable"
@@ -143,6 +158,20 @@ function genComponentConf() {
                             </svg>
                             <svg style="--local-primary:var(--won-secondary-color);"
                                 class="co__item__need__header__carret__icon clickable"
+                                ng-if="!self.isOpen(need.get('uri'))">
+                                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                            </svg>
+                        </div>
+                        <div class="co__item__need__header__carret" ng-if="self.isLoading(need)">
+                            <svg
+                                style="--local-primary:var(--won-skeleton-color);"
+                                class="co__item__need__header__carret__icon"
+                                ng-if="self.isOpen(need.get('uri'))">
+                                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                            </svg>
+                            <svg
+                                style="--local-primary:var(--won-skeleton-color);"
+                                class="co__item__need__header__carret__icon"
                                 ng-if="!self.isOpen(need.get('uri'))">
                                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                             </svg>
@@ -157,12 +186,6 @@ function genComponentConf() {
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="co__loadspinner"
-            ng-if="self.isLoading">
-            <img src="images/spinner/on_white.gif"
-                alt="Loading&hellip;"
-                class="hspinner"/>
         </div>
     `;
 
@@ -218,7 +241,6 @@ function genComponentConf() {
 
         return {
           allNeeds,
-          isLoading: !state.get("initialLoadFinished"),
           showClosedNeeds: state.get("showClosedNeeds"),
           showCreateView,
           needUriInRoute,
@@ -282,6 +304,10 @@ function genComponentConf() {
       return this.isOpenByConnection(ownNeedUri) || !!this.open[ownNeedUri];
     }
 
+    isLoading(ownNeed) {
+      return ownNeed.get("isLoading");
+    }
+
     isOpenByConnection(ownNeedUri) {
       return this.needUriImpliedInRoute === ownNeedUri;
     }
@@ -293,19 +319,26 @@ function genComponentConf() {
       this.onSelectedNeed({ needUri }); //trigger callback with scope-object
     }
 
-    hasOpenConnections(need, allNeeds) {
+    hasOpenOrLoadingConnections(need, allNeeds) {
       return (
         need.get("state") === won.WON.ActiveCompacted &&
         need.get("connections").filter(conn => {
+          if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
+
           const remoteNeedUri = conn.get("remoteNeedUri");
-          const remoteNeedActive =
-            remoteNeedUri &&
-            allNeeds &&
-            allNeeds.get(remoteNeedUri) &&
+          const remoteNeedPresent =
+            remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
+
+          if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
+
+          const remoteNeedActiveOrLoading =
+            allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
             allNeeds.getIn([remoteNeedUri, "state"]) ===
               won.WON.ActiveCompacted;
 
-          return remoteNeedActive && conn.get("state") !== won.WON.Closed;
+          return (
+            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+          );
         }).size > 0
       );
     }
@@ -313,15 +346,22 @@ function genComponentConf() {
     getOpenConnectionsArraySorted(need, allNeeds) {
       return sortByDate(
         need.get("connections").filter(conn => {
+          if (conn.get("isLoading")) return true; //if connection is currently loading we assume its a connection we want to show
+
           const remoteNeedUri = conn.get("remoteNeedUri");
-          const remoteNeedActive =
-            remoteNeedUri &&
-            allNeeds &&
-            allNeeds.get(remoteNeedUri) &&
+          const remoteNeedPresent =
+            remoteNeedUri && allNeeds && !!allNeeds.get(remoteNeedUri);
+
+          if (!remoteNeedPresent) return true; //if the remoteNeed is not present yet we assume its a connection we want
+
+          const remoteNeedActiveOrLoading =
+            allNeeds.getIn([remoteNeedUri, "isLoading"]) ||
             allNeeds.getIn([remoteNeedUri, "state"]) ===
               won.WON.ActiveCompacted;
 
-          return remoteNeedActive && conn.get("state") !== won.WON.Closed;
+          return (
+            remoteNeedActiveOrLoading && conn.get("state") !== won.WON.Closed
+          );
         })
       );
     }

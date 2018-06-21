@@ -18,12 +18,13 @@ function genComponentConf() {
   let template = `
 
     <won-square-image
+        ng-if="!self.isLoading()"
         ng-class="{'bigger' : self.biggerImage, 'inactive' : !self.need.get('isBeingCreated') && self.need.get('state') === self.WON.InactiveCompacted}"
         src="self.need.get('TODO')"
         uri="self.needUri"
         ng-show="!self.hideImage">
     </won-square-image>
-    <div class="ph__right" ng-if="!self.need.get('isBeingCreated')">
+    <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.isLoading()">
       <div class="ph__right__topline">
         <div class="ph__right__topline__title">
          {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('title') }}
@@ -60,6 +61,15 @@ function genComponentConf() {
         <span class="ph__right__subtitle__type">
           {{self.labels.type[self.need.get('type')]}}
         </span>
+      </div>
+    </div>
+    <div class="ph__icon__skeleton" ng-if="self.isLoading()"></div>
+    <div class="ph__right" ng-if="self.isLoading()">
+      <div class="ph__right__topline">
+        <div class="ph__right__topline__title"></div>
+      </div>
+      <div class="ph__right__subtitle">
+        <span class="ph__right__subtitle__type"></span>
       </div>
     </div>
     `;
