@@ -330,7 +330,6 @@ function genComponentConf() {
 
     isLoading() {
       return (
-        true ||
         !this.connection ||
         !this.theirNeed ||
         !this.ownNeed ||
