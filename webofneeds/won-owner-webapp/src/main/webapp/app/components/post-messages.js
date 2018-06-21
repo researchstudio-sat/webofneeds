@@ -58,13 +58,13 @@ function genComponentConf() {
         </div>
         <div class="pm__content">
             <div class="pm__content__loadspinner"
-                ng-if="self.connection.get('isLoading')">
+                ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
                     alt="Loading&hellip;"
                     class="hspinner"/>
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.connection.get('isLoading') && !self.allLoaded"
+                ng-if="!self.connection.get('isLoadingMessages') && !self.allLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -92,16 +92,16 @@ function genComponentConf() {
                 
                 <!-- Loading Text -->
                 <div class="pm__content__agreement__title" ng-if="self.showLoadingInfo  && !self.agreementDataIsValid()"> 
-	            		<span class="ng-hide" ng-show="self.connection.get('isLoading')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!self.connection.get('isLoading')">No Agreement Data found</span>
+	            		<span class="ng-hide" ng-show="self.connection.get('isLoadingMessages')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
+	            		<span class="ng-hide" ng-show="!self.connection.get('isLoadingMessages')">No Agreement Data found</span>
             	</div>
 	            <!-- /LoadingText -->
                 
                 <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
-            		<span ng-show="self.connection.get('isLoading')"> (loading...)</span>
-            		<span ng-if="!self.connection.get('isLoading')"> (up-to-date)</span>
+            		<span ng-show="self.connection.get('isLoadingMessages')"> (loading...)</span>
+            		<span ng-if="!self.connection.get('isLoadingMessages')"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
@@ -132,8 +132,8 @@ function genComponentConf() {
             		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		Proposals
-    				<span ng-show="self.connection.get('isLoading')"> (loading...)</span>
-            		<span ng-if="!self.connection.get('isLoading')"> (up-to-date)</span>
+    				<span ng-show="self.connection.get('isLoadingMessages')"> (loading...)</span>
+            		<span ng-if="!self.connection.get('isLoadingMessages')"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
@@ -291,7 +291,7 @@ function genComponentConf() {
           connection,
           agreementStateData,
           chatMessages: sortedMessages,
-          isLoading: connection && connection.get("isLoading"),
+          isLoadingMessages: connection && connection.get("isLoadingMessages"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
@@ -331,7 +331,7 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
-          !this.connection.get("isLoading") &&
+          !this.connection.get("isLoadingMessages") &&
           !(this.allLoaded || this.connection.get("messages").size > 0)
         ) {
           this.connections__showLatestMessages(
@@ -345,7 +345,7 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.connection.get("isLoading")) {
+        if (this.connection && !this.connection.get("isLoadingMessages")) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT
@@ -439,7 +439,7 @@ function genComponentConf() {
       } else {
         this.connections__setLoading({
           connectionUri: this.connectionUri,
-          isLoading: true,
+          isLoadingMessages: true,
         });
       }
 
@@ -513,7 +513,7 @@ function genComponentConf() {
           if (!hasChanged) {
             this.connections__setLoading({
               connectionUri: this.connectionUri,
-              isLoading: false,
+              isLoadingMessages: false,
             });
           }
         })
@@ -521,7 +521,7 @@ function genComponentConf() {
           console.error("Error:", error);
           this.connections__setLoading({
             connectionUri: this.connectionUri,
-            isLoading: false,
+            isLoadingMessages: false,
           });
         });
     }
