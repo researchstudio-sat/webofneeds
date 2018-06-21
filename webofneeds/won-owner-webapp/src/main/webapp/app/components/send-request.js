@@ -15,7 +15,7 @@ import {
   selectLastUpdateTime,
 } from "../selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { relativeTime } from "../won-label-utils.js";
+import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -48,6 +48,12 @@ function genComponentConf() {
             </h2>
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
+            </p>
+            <h2 class="post-info__heading" ng-show="self.suggestedPost.get('type')">
+                Type
+            </h2>
+            <p class="post-info__details" ng-show="self.suggestedPost.get('type')">
+                {{self.labels.type[self.suggestedPost.get('type')]}}{{self.suggestedPost.get('matchingContexts')? ' in '+ self.suggestedPost.get('matchingContexts').join(', ') : '' }}
             </p>
             <!-- IS Part -->
             <div ng-show="self.isPart">
@@ -103,6 +109,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.maxThumbnails = 9;
       this.message = "";
+      this.labels = labels;
       this.WON = won.WON;
       window.openMatch4dbg = this;
 
