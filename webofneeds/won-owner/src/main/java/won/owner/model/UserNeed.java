@@ -52,6 +52,7 @@ public class UserNeed
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
 
+  @Enumerated(EnumType.STRING)
   @Column( name = "state" )
   private NeedState state;
 
