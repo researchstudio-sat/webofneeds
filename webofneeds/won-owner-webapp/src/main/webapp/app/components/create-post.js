@@ -72,8 +72,8 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.snapToBottom"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.snapToBottom"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
             <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
@@ -109,6 +109,7 @@ function genComponentConf() {
       this.SEARCH = "search";
       this.POST = "post";
 
+      this.focusedElement = null;
       //TODO debug; deleteme
       window.cnc = this;
 
@@ -137,7 +138,8 @@ function genComponentConf() {
         matchingContext: undefined,
       };
 
-      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
+      this.windowHeight = window.screen.height;
+      this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
       this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
 
       this.is = "is";
@@ -170,40 +172,34 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    snapToBottom() {
-      this._snapBottom = true;
-      this.scrollToBottom();
-    }
-    unsnapFromBottom() {
-      this._snapBottom = false;
-    }
-    updateScrollposition() {
-      if (this._snapBottom) {
-        this.scrollToBottom();
+    onResize() {
+      //TODO: delete
+      //console.log("ResizeEvent: ", window.screen.height);
+      if (this.focusedElement) {
+        if (this.windowHeight < window.screen.height) {
+          this.windowHeight < window.screen.height;
+          this.scrollToBottom(this.focusedElement);
+        } else {
+          this.windowHeight = window.screen.height;
+        }
       }
     }
-    scrollToBottom() {
+
+    scrollToBottom(element) {
       this._programmaticallyScrolling = true;
 
-      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
-    }
-    onScroll() {
-      if (!this._programmaticallyScrolling) {
-        //only unsnap if the user scrolled themselves
-        this.unsnapFromBottom();
-      }
+      if (element) {
+        let heightHeader =
+          this.$element[0].querySelector(".cp__header").offsetHeight + 10;
+        let scrollTop = this.$element[0].querySelector(element).offsetTop;
+        this.scrollContainer().scrollTop = scrollTop - heightHeader;
 
-      const sc = this.scrollContainer();
-      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
-      if (isAtBottom) {
-        this.snapToBottom();
+        this.focusedElement = element;
+        //TODO: debug: delete me
+        //console.log("ScrollTop: ", this.scrollContainer().scrollTop);
       }
+    }
 
-      this._programmaticallyScrolling = false;
-    }
-    scrollContainerNg() {
-      return angular.element(this.scrollContainer());
-    }
     scrollContainer() {
       if (!this._scrollContainer) {
         this._scrollContainer = this.$element[0].querySelector(".cp__content");
