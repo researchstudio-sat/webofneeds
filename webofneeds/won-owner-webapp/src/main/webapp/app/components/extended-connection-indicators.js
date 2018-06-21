@@ -12,13 +12,16 @@ import { selectAllOwnNeeds, selectAllNeeds } from "../selectors.js";
 import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
+
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <a
             class="extendedindicators__item clickable"
             ng-show="self.latestConnectedUri"
-            ng-click="self.setOpen(self.latestConnectedUri)">
+            ng-click="self.setOpen(self.latestConnectedUri)"
+            ng-if="!self.isLoading()">
                 <svg class="extendedindicators__item__icon"
                     title="Show latest message/request"
                     style="--local-primary:var(--won-primary-color-light);"
@@ -38,7 +41,8 @@ function genComponentConf() {
                     {{ self.connectedCount }} Chats
                 </span>
         </a>
-        <div class="extendedindicators__item" ng-show="!self.latestConnectedUri">
+        <div class="extendedindicators__item" ng-show="!self.latestConnectedUri"
+            ng-if="!self.isLoading()">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_message" href="#ico36_message"></use>
@@ -48,6 +52,7 @@ function genComponentConf() {
         <a
             class="extendedindicators__item clickable"
             ng-show="self.latestMatchUri"
+            ng-if="!self.isLoading()"
             ng-click="self.setOpen(self.latestMatchUri)">
 
                 <svg class="extendedindicators__item__icon"
@@ -68,12 +73,53 @@ function genComponentConf() {
                     {{ self.matchesCount }} Matches
                 </span>
         </a>
-        <div class="extendedindicators__item" ng-show="!self.latestMatchUri">
+        <div class="extendedindicators__item" ng-show="!self.latestMatchUri"
+            ng-if="!self.isLoading()">
             <svg class="extendedindicators__item__icon"
                 style="--local-primary:var(--won-disabled-color);">
                     <use xlink:href="#ico36_match" href="#ico36_match"></use>
             </svg>
             <span class="extendedindicators__item__caption">No Matches</span>
+        </div>
+        <a
+            class="extendedindicators__item clickable"
+            ng-show="self.latestConnectedUri"
+            ng-click="self.setOpen(self.latestConnectedUri)"
+            ng-if="self.isLoading()">
+                <svg class="extendedindicators__item__icon"
+                    title="Show latest message/request"
+                    style="--local-primary:var(--won-primary-color-light);"
+                    ng-show="!self.unreadConnectedCount">
+                        <use xlink:href="#ico36_message" href="#ico36_message"></use>
+                </svg>
+                <svg style="--local-primary:var(--won-primary-color);"
+                     title="Show latest unread message/request"
+                     ng-show="self.unreadConnectedCount"
+                     class="extendedindicators__item__icon">
+                        <use xlink:href="#ico36_message" href="#ico36_message"></use>
+                </svg>
+                <span class="extendedindicators__item__caption" ng-if="self.unreadConnectedCount != 0">
+                    {{ self.connectedCount }} Chats - {{ self.unreadConnectedCount }} unread
+                </span>
+                <span class="extendedindicators__item__caption" ng-if="self.unreadConnectedCount == 0">
+                    {{ self.connectedCount }} Chats
+                </span>
+        </a>
+        <div class="extendedindicators__item"
+            ng-if="self.isLoading()">
+            <svg class="extendedindicators__item__icon"
+                style="--local-primary:var(--won-skeleton-color);">
+                    <use xlink:href="#ico36_message" href="#ico36_message"></use>
+            </svg>
+             <span class="extendedindicators__item__caption"></span>
+        </div>
+        <div class="extendedindicators__item"
+            ng-if="self.isLoading()">
+            <svg class="extendedindicators__item__icon"
+                style="--local-primary:var(--won-skeleton-color);">
+                    <use xlink:href="#ico36_match" href="#ico36_match"></use>
+            </svg>
+            <span class="extendedindicators__item__caption"></span>
         </div>
     `;
 
@@ -145,6 +191,12 @@ function genComponentConf() {
       };
 
       connect2Redux(selectFromState, actionCreators, ["self.needUri"], this);
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return !this.need || this.need.get("isLoading");
     }
 
     /**

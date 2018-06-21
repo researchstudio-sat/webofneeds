@@ -4,6 +4,10 @@
 @import "flex-layout";
 
 won-connection-indicators {
+  &.won-is-loading {
+    pointer-events: none;
+  }
+
   display: flex;
   flex-direction: row;
 

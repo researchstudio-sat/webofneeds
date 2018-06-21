@@ -4,6 +4,16 @@
 @import "flex-layout";
 
 won-extended-connection-indicators {
+  &.won-is-loading {
+    pointer-events: none;
+
+    .extendedindicators__item__caption {
+      background-color: $won-skeleton-color;
+      height: $smallFontSize;
+      width: 3rem;
+    }
+  }
+
   display: flex;
   flex-direction: row;
 
@@ -25,7 +35,7 @@ won-extended-connection-indicators {
     &__caption {
       font-size: $smallFontSize;
       line-height: $iconSize;
-      padding-left: 0.25em;
+      margin-left: 0.25em;
       color: black;
       white-space: nowrap;
     }
