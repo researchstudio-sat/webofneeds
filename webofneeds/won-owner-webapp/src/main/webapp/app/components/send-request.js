@@ -186,7 +186,6 @@ function genComponentConf() {
 
     isLoading() {
       return (
-        true ||
         !this.connection ||
         !this.suggestedPost ||
         !this.ownNeed ||

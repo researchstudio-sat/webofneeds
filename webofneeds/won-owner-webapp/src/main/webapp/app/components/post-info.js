@@ -181,7 +181,7 @@ function genComponentConf() {
     }
 
     isLoading() {
-      return true || !this.post || this.post.get("isLoading");
+      return !this.post || this.post.get("isLoading");
     }
 
     createWhatsAround() {
