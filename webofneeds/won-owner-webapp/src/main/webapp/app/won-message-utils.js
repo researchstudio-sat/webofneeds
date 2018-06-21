@@ -10,17 +10,16 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { getRandomWonId } from "./won-utils.js";
-import {
-  getClosedConnUris,
-  getInactiveNeedUris,
-  removeInactiveNeed,
-} from "./won-localstorage.js";
+import { getClosedConnUris } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
   ownNeeds: {},
   connections: {},
   events: {},
   theirNeeds: {},
+  inactiveNeedUris: [],
+  activeNeedUris: [],
+  inactiveNeedUrisLoading: [],
 });
 
 export function wellFormedPayload(payload) {
@@ -435,21 +434,23 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
 
 export function fetchUnloadedData(curriedDispatch) {
   console.log("fetchUnloadedData");
-  return fetchOwnedNeedUris().then(needUris => {
-    const unloadedNeedUris = getInactiveNeedUris();
-    return fetchDataForOwnedNeeds(
-      needUris.filter(uri => unloadedNeedUris.includes(uri)),
-      curriedDispatch,
-      []
-    );
+
+  return fetchOwnedInactiveNeedUris().then(needUris => {
+    curriedDispatch(wellFormedPayload({ inactiveNeedUrisLoading: needUris }));
+    return fetchDataForOwnedNeeds(needUris, curriedDispatch, []);
   });
 }
 
 export function fetchOwnedData(email, curriedDispatch) {
   console.log("fetchOwnedData");
-  return fetchOwnedNeedUris().then(needUris =>
-    fetchDataForOwnedNeeds(needUris, curriedDispatch)
-  );
+  return fetchOwnedInactiveNeedUris().then(inactiveNeedUris => {
+    curriedDispatch(wellFormedPayload({ inactiveNeedUris: inactiveNeedUris }));
+
+    return fetchOwnedActiveNeedUris().then(needUris => {
+      curriedDispatch(wellFormedPayload({ activeNeedUris: needUris }));
+      return fetchDataForOwnedNeeds(needUris, curriedDispatch);
+    });
+  });
 }
 //export function fetchDataForOwnedNeeds(needUris, curriedDispatch) {
 //    return fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
@@ -457,9 +458,37 @@ export function fetchOwnedData(email, curriedDispatch) {
 //            throw({msg: 'user needlist retrieval failed', error});
 //        });
 //}
-function fetchOwnedNeedUris() {
-  console.log("fetchOwnedNeedUris");
-  return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
+//function fetchOwnedNeedUris() {
+//  console.log("fetchOwnedNeedUris");
+//  return fetch(urljoin(ownerBaseUrl, "/rest/needs/"), {
+//    method: "get",
+//    headers: {
+//      Accept: "application/json",
+//      "Content-Type": "application/json",
+//    },
+//    credentials: "include",
+//  })
+//    .then(checkHttpStatus)
+//    .then(response => response.json());
+//}
+
+function fetchOwnedInactiveNeedUris() {
+  console.log("fetchOwnedInactiveNeedUris");
+  return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=INACTIVE"), {
+    method: "get",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
+function fetchOwnedActiveNeedUris() {
+  console.log("fetchOwnedActiveNeedUris");
+  return fetch(urljoin(ownerBaseUrl, "/rest/needs?state=ACTIVE"), {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -511,23 +540,14 @@ window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(
   ownNeedUris,
-  curriedDispatch = () => undefined,
-  filterUris = getInactiveNeedUris()
+  curriedDispatch = () => undefined
 ) {
   if (!is("Array", ownNeedUris) || ownNeedUris.length === 0) {
     return Promise.resolve(emptyDataset);
   }
 
-  filterUris.forEach(uri => {
-    if (!ownNeedUris.includes(uri)) {
-      removeInactiveNeed(uri);
-    }
-  });
-
-  const allOwnNeedsPromise = urisToLookupMap(
-    ownNeedUris,
-    uri => fetchOwnNeedAndDispatch(uri, curriedDispatch),
-    filterUris
+  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
+    fetchOwnNeedAndDispatch(uri, curriedDispatch)
   );
 
   // wait for the own needs to be dispatched then load connections

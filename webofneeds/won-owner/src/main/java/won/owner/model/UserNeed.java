@@ -16,19 +16,12 @@
 
 package won.owner.model;
 
+import won.protocol.model.NeedState;
+import won.protocol.model.URIConverter;
+
+import javax.persistence.*;
 import java.net.URI;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import won.protocol.model.URIConverter;
 
 /**
  * Entity wrapping a uri identifying a user's need.
@@ -59,14 +52,17 @@ public class UserNeed
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
 
-
+  @Enumerated(EnumType.STRING)
+  @Column( name = "state" )
+  private NeedState state;
 
   public UserNeed() {
   }
 
   @PrePersist
   protected void onCreate() {
-    creationDate = new Date();
+      creationDate = new Date();
+      state = NeedState.ACTIVE;
   }
 
   public UserNeed(URI uri) {
@@ -119,5 +115,13 @@ public class UserNeed
 
   public void setCreationDate(final Date creationDate) {
     this.creationDate = creationDate;
+  }
+
+  public NeedState getState() {
+    return state;
+  }
+
+  public void setState(NeedState state) {
+    this.state = state;
   }
 }

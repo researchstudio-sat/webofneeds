@@ -25,7 +25,6 @@ import {
   selectRouterParams,
   selectNeedByConnectionUri,
 } from "../selectors.js";
-import { getInactiveNeedUris } from "../won-localstorage.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
@@ -215,9 +214,7 @@ function genComponentConf() {
         let sortedOpenNeeds = sortByDate(openNeeds);
         let sortedClosedNeeds = sortByDate(closedNeeds);
 
-        const unloadedNeeds = getInactiveNeedUris().filter(uri =>
-          (allOwnNeeds || []).every(need => need.get("uri") != uri)
-        );
+        const unloadedNeeds = closedNeeds.filter(need => need.get("toLoad"));
 
         return {
           allNeeds,
@@ -229,7 +226,7 @@ function genComponentConf() {
           beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
           sortedOpenNeeds,
           sortedClosedNeeds,
-          unloadedNeedsSize: unloadedNeeds.length,
+          unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
           closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
         };
       };
@@ -259,7 +256,7 @@ function genComponentConf() {
     }
 
     hasClosedNeeds() {
-      return this.unloadedNeedsSize + this.closedNeedsSize > 0;
+      return this.closedNeedsSize > 0;
     }
 
     getClosedNeedsText() {
@@ -271,11 +268,13 @@ function genComponentConf() {
         output.push(`${this.unloadedNeedsSize} unloaded`);
       }
 
-      return output.join(" + ");
+      return output.join(" - ");
     }
 
     toggleClosedNeeds() {
-      this.needs__fetchUnloadedNeeds();
+      if (this.unloadedNeedsSize > 0) {
+        this.needs__fetchUnloadedNeeds();
+      }
       this.toggleClosedNeedsDisplay();
     }
 

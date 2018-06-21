@@ -3,7 +3,6 @@
  */
 const READ_URIS = "wonReadUris";
 const CLOSED_CONN_URIS = "wonClosedConnectionUris";
-const INACTIVE_NEED_URIS = "inactiveNeedUris";
 const DISCLAIMER_ACCEPTED = "disclaimerAccepted";
 
 export function markUriAsRead(uri) {
@@ -104,45 +103,6 @@ export function isConnUriClosed(uri) {
 
 export function clearClosedConnUris() {
   localStorage.removeItem(CLOSED_CONN_URIS);
-}
-
-export function addInactiveNeed(needUri) {
-  const inactiveNeeds = getInactiveNeedUris();
-  if (inactiveNeeds.includes(needUri)) {
-    return false;
-  } else {
-    localStorage.setItem(
-      INACTIVE_NEED_URIS,
-      JSON.stringify(inactiveNeeds.concat([needUri]))
-    );
-    return true;
-  }
-}
-
-export function removeInactiveNeed(needUri) {
-  localStorage.setItem(
-    INACTIVE_NEED_URIS,
-    JSON.stringify(getInactiveNeedUris().filter(uri => uri != needUri))
-  );
-}
-
-export function getInactiveNeedUris() {
-  try {
-    const needUris = JSON.parse(localStorage.getItem(INACTIVE_NEED_URIS)) || [];
-    if (Array.isArray(needUris)) {
-      return needUris;
-    } else {
-      return [];
-    }
-  } catch (e) {
-    console.warn(e);
-    clearInactiveNeedUris();
-    return [];
-  }
-}
-
-export function clearInactiveNeedUris() {
-  localStorage.removeItem(INACTIVE_NEED_URIS);
 }
 
 export function isDisclaimerAccepted() {

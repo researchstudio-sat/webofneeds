@@ -138,6 +138,8 @@ $ngRedux.getState();
        nodeUri: string, //identifier of this need's server
        ownNeed: true|false, //whether this need is owned or not
        isBeingCreated: true|false, //whether or not the creation of this need was successfully completed yet
+       isLoading: true|false, //whether or not the need is currently in the process of being loaded
+       toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
        isWhatsAround: true|false, //whether or not the need is a whatsaround need
        isWhatsNew: true|false, //whether or not this need is a whatsnew need
        state: "won:Active" | "won:Inactive", //state of the need
