@@ -3,10 +3,13 @@
 @import "animate";
 @import "responsiveness-utils";
 @import "trig";
+@import "animate";
 
 won-send-request,
 won-post-info {
   &.won-is-loading {
+    @include animateOpacityHeartBeat();
+
     .post-info__details {
       height: $normalFontSize;
       width: 100%;

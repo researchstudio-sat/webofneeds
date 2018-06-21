@@ -1,8 +1,10 @@
 @import "sizing-utils";
 @import "square-image";
+@import "animate";
 
 won-post-header {
   &.won-is-loading {
+    @include animateOpacityHeartBeat();
     pointer-events: none;
 
     .ph__icon__skeleton {

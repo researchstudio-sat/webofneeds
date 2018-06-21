@@ -2,9 +2,11 @@
 @import "sizing-utils";
 @import "fonts";
 @import "flex-layout";
+@import "animate";
 
 won-extended-connection-indicators {
   &.won-is-loading {
+    @include animateOpacityHeartBeat();
     pointer-events: none;
 
     .extendedindicators__item__caption {

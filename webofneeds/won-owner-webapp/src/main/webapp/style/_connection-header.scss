@@ -1,8 +1,10 @@
 @import "sizing-utils";
 @import "square-image";
+@import "animate";
 
 won-connection-header {
   &.won-is-loading {
+    @include animateOpacityHeartBeat();
     pointer-events: none;
 
     .ch__icon__skeleton {

@@ -5,6 +5,7 @@
 
 won-connection-indicators {
   &.won-is-loading {
+    @include animateOpacityHeartBeat();
     pointer-events: none;
   }
 
