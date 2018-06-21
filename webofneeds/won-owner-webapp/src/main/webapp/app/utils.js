@@ -740,7 +740,7 @@ export function get(obj, property) {
 
 /**
  * Tries to look up a property-path on a nested object-structure.
- * Where `obj.x.y` would throw an exception if `x` wasn't defined
+ * Where `obj.x.y` would throw an error if `x` wasn't defined
  * `get(obj, ['x','y'])` would return undefined.
  * @param obj
  * @param path
@@ -872,7 +872,7 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
           default: {
             const split = k.split(":");
             if (split.length !== 2) {
-              throw new Exception(
+              throw new Error(
                 'encountered unexpected predicate when parsing json-ld. it doesn\'t follow the "<prefix>:<postfix> structure: "' +
                   k
               );
@@ -886,7 +886,7 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
       return newObj;
     }
   } else {
-    throw new Exception(
+    throw new Error(
       "Encountered unexpected value while parsing json-ld: ",
       jsonldObj
     );
@@ -983,7 +983,7 @@ export function inlineSVGSpritesheet(path, id) {
     .then(xmlString => parseSVG(xmlString))
     .then(svgDocumentFragment => {
       if (!svgDocumentFragment)
-        throw new Exception("Couldn't parse icon-spritesheet.");
+        throw new Error("Couldn't parse icon-spritesheet.");
       document.body.appendChild(svgDocumentFragment);
       const svgNode = document.body.lastChild; // the node resulting from the fragment we just appended
       if (svgNode && svgNode.style) {
@@ -1001,7 +1001,7 @@ export function inlineSVGSpritesheet(path, id) {
 /**
  * Optionally prepends a string, and then throws
  * whatever it gets as proper javascript error.
- * Note, that throwing an exception will also
+ * Note, that throwing an error will also
  * reject in a `Promise`-constructor-callback.
  * @param {*} e
  * @param {*} prependedMsg

@@ -941,7 +941,7 @@ won.toWonMessage = function(message) {
   } else if (message instanceof WonMessage) {
     return Promise.resolve(message);
   } else {
-    throw new Exception(
+    throw new Error(
       "Couldn't convert the following to a WonMessage: ",
       message
     );
