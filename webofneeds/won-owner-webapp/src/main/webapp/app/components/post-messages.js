@@ -451,7 +451,7 @@ function genComponentConf() {
       if (connection) {
         this.connection = connection;
       } else {
-        this.connections__setLoading({
+        this.connections__setLoadingMessages({
           connectionUri: this.connectionUri,
           isLoadingMessages: true,
         });
@@ -525,7 +525,7 @@ function genComponentConf() {
         })
         .then(() => {
           if (!hasChanged) {
-            this.connections__setLoading({
+            this.connections__setLoadingMessages({
               connectionUri: this.connectionUri,
               isLoadingMessages: false,
             });
@@ -533,7 +533,7 @@ function genComponentConf() {
         })
         .catch(error => {
           console.error("Error:", error);
-          this.connections__setLoading({
+          this.connections__setLoadingMessages({
             connectionUri: this.connectionUri,
             isLoadingMessages: false,
           });

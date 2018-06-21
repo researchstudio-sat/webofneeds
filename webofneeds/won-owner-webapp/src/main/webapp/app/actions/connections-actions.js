@@ -436,7 +436,7 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
       .then(() => {
         if (!hasChanged) {
           dispatch({
-            type: actionCreators.connections__setLoading,
+            type: actionCreators.connections__setLoadingMessages,
             payload: {
               connectionUri: connectionUri,
               isLoadingMessages: false,
@@ -447,7 +447,7 @@ export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
       .catch(error => {
         console.error("Error:", error);
         dispatch({
-          type: actionCreators.connections__setLoading,
+          type: actionCreators.connections__setLoadingMessages,
           payload: {
             connectionUri: connectionUri,
             isLoadingMessages: false,
