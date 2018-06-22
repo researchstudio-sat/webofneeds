@@ -293,7 +293,7 @@ services:
     - "node.host=satvm01.researchstudio.at"
     - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
     - "cluster.local.port=2564"
-    - "matcher.sparql.uri.sparql.endpoint=http://satvm01.researchstudio.at:9999/bigdata/namespace/kb/sparql"
+    - "matcher.sparql.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/bigdata/namespace/kb/sparql"
     - "matcher.sparql.uri.public=http://satvm01.researchstudio.at/sparql/"
     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
