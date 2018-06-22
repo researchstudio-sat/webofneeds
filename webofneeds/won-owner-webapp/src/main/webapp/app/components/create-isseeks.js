@@ -311,7 +311,7 @@ function genComponentConf() {
     }
 
     updateTitle() {
-      const titleString = (this.titleInput() || {}).value || "";
+      const titleString = ((this.titleInput() || {}).value || "").trim();
       this.draftObject.title = titleString;
       this.updateDraft();
     }
