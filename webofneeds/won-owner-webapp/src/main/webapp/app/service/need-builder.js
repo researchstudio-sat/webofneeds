@@ -94,7 +94,7 @@ import { getIn } from "../utils.js";
     if (!args.is && !args.seeks) {
       throw new Error(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
-          args
+          JSON.stringify(args)
       );
     }
 
@@ -329,12 +329,7 @@ import { getIn } from "../utils.js";
     return {
       "@graph": graph,
       "@context": {
-        s: "http://schema.org/",
-        foaf: "http://xmlns.com/foaf/0.1/",
-        /*
-                 TODO add following datatypes to context
-                 TODO only add the ones that are required?
-                 */
+        ...won.defaultContext, // needed for the arbitrary rdf
 
         //TODO probably an alias instead of an type declaration as it's intended here
         "won:hasCurrency": "xsd:string",

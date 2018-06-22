@@ -31,10 +31,7 @@ won-connections-overview {
         display: grid;
         grid-template-columns: 1fr auto auto;
         min-width: 0;
-
-        won-connection-indicators {
-          padding-left: 0.5rem;
-        }
+        grid-column-gap: 1rem;
 
         &__button {
           font-size: $smallFontSize;
@@ -43,7 +40,12 @@ won-connections-overview {
         &__carret {
           // results in a clickable area as large as indicators
           // TODO: make the value less rigid
-          padding: 0.625em;
+          // parents grid-gap takes care of margin-left
+          $padding: 0.625rem;
+          padding-top: $padding;
+          padding-bottom: $padding;
+          padding-right: $padding;
+
           &__icon {
             @include carretSized;
           }

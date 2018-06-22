@@ -64,6 +64,7 @@ won-connection-header {
       grid-template-areas: "title date";
       grid-template-columns: 1fr min-content;
       min-width: 0;
+      &__notitle,
       &__title {
         grid-area: title;
         white-space: nowrap;
@@ -71,6 +72,9 @@ won-connection-header {
         overflow: hidden;
         font-weight: 400;
         min-width: 0;
+      }
+      &__notitle {
+        color: $won-subtitle-gray;
       }
       &__date {
         grid-area: date;

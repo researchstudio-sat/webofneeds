@@ -961,23 +961,37 @@ import won from "./won.js";
 
     // usually the need-data will be in a single object in the '@graph' array.
     // We can flatten this and still have valid json-ld
-    const simplified = needJsonLd["@graph"][0];
-    if (!simplified) {
-      if (!needJsonLd || needJsonLd["@graph"].length === 0) {
-        console.error(
-          "Received empty graph ",
-          needJsonLd,
-          " for need ",
-          needUri
-        );
-      }
+    const flattenedNeedJsonLd = getIn(needJsonLd, ["@graph", 0])
+      ? getIn(needJsonLd, ["@graph", 0])
+      : needJsonLd;
+    flattenedNeedJsonLd["@context"] = needJsonLd["@context"]; // keep context
 
-      //doesn't contain graph. probably already simplified.
-      return needJsonLd;
-    } else {
-      simplified["@context"] = needJsonLd["@context"];
-      return simplified;
+    if (
+      !flattenedNeedJsonLd ||
+      getIn(flattenedNeedJsonLd, ["@graph", "length"]) === 0
+    ) {
+      console.error("Received empty graph ", needJsonLd, " for need ", needUri);
+      return { "@context": flattenedNeedJsonLd["@context"] };
     }
+
+    // some needs point to the same blank node for `won:is` and `won:seeks`
+    // e.g. "what's around" needs. the framing algorithm emits one of these
+    // just as `{ "@id": ... }`. for improved usefulness of the results the
+    // the full node is assigned to the other predicate.
+    const isNode = get(flattenedNeedJsonLd, "won:is");
+    const seeksNode = get(flattenedNeedJsonLd, "won:seeks");
+
+    if (get(isNode, "@id") && get(isNode, "@id") === get(seeksNode, "@id")) {
+      if (Object.keys(isNode).length > Object.keys(seeksNode).length) {
+        // "is" has all the content, use it for both
+        flattenedNeedJsonLd["won:seeks"] = isNode;
+      } else {
+        // "seeks" has all the content, use it for both
+        flattenedNeedJsonLd["won:is"] = seeksNode;
+      }
+    }
+
+    return flattenedNeedJsonLd;
   };
 
   //taken from https://www.w3.org/TR/rdf-interfaces/#triple-filters

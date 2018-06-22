@@ -38,9 +38,9 @@ export function relativeTime(now, previous) {
     return undefined;
   }
 
-  now = new Date(now);
-  previous = new Date(previous);
-  const elapsed = now - previous; // in ms
+  const now_ = new Date(now);
+  const previous_ = new Date(previous);
+  const elapsed = now_ - previous_; // in ms
 
   if (isNaN(elapsed)) {
     // one of two dates was invalid
