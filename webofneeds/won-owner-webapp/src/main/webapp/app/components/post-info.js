@@ -152,6 +152,7 @@ function genComponentConf() {
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
                 person: seeks && seeks.get("person"),
+                hasSearchString: !!seeks && seeks.get("searchString"),
                 address:
                   seeks.get("location") && seeks.get("location").get("address"),
                 travelAction: seeks && seeks.get("travelAction"),

@@ -20,13 +20,13 @@ function genComponentConf() {
   const template = `
             <h2 class="post-info__heading"
                 ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
-                Title
+                <span ng-show="!self.isOrSeeksPart.hasSearchString">Title</span>
+                <span ng-show="self.isOrSeeksPart.hasSearchString">Searching for</span>
             </h2>
             <p class="post-info__details"
                 ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
                 {{ self.isOrSeeksPart.isOrSeeks.get('title')}}
             </p>
-
             <h2 class="post-info__heading"
                 ng-if="self.person">
                 Person Details
@@ -137,7 +137,6 @@ function genComponentConf() {
       this.showRouteMap = !this.showRouteMap;
     }
   }
-
   Controller.$inject = serviceDependencies;
 
   return {

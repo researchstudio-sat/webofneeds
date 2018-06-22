@@ -142,6 +142,7 @@ import { getIn } from "../utils.js";
       "dc:title": isOrSeeksData.title,
       "dc:description": isOrSeeksData.description,
       "won:hasTag": isOrSeeksData.tags,
+      "won:hasSearchString": isOrSeeksData.searchString,
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
@@ -274,7 +275,13 @@ import { getIn } from "../utils.js";
     const matchingContext = args.is
       ? args.is.matchingContext
       : args.seeks.matchingContext;
-
+    const noHintForCounterpart = isWhatsAround
+      ? true
+      : isWhatsNew
+        ? true
+        : args.seeks
+          ? true
+          : false;
     let isContentUri, seeksContentUri;
     if (isWhatsAround) {
       isContentUri = won.WON.contentNodeBlankUri.whatsAround;
@@ -302,7 +309,7 @@ import { getIn } from "../utils.js";
 
           isWhatsAround ? "won:WhatsAround" : undefined,
           isWhatsNew ? "won:WhatsNew" : undefined,
-          isWhatsAround || isWhatsNew ? "won:NoHintForCounterpart" : undefined,
+          noHintForCounterpart ? "won:NoHintForCounterpart" : undefined,
 
           noHints ? "won:NoHintForMe" : undefined,
           noHints ? "won:NoHintForCounterpart" : undefined,
