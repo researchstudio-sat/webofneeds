@@ -244,7 +244,6 @@ export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
 }
 
 export function addActiveConnectionToNeed(state, needUri, connUri) {
-  console.log("addActiveConnectionToNeed: ", connUri, "toNeed: ", needUri);
   const storedNeed = state.get(needUri);
   const isConnectionPresent =
     storedNeed && !!storedNeed.getIn(["connections", connUri]);

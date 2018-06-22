@@ -84,7 +84,6 @@ export function addNeedInLoading(needs, needUri, state, ownNeed) {
 }
 
 export function addTheirNeedInLoading(needs, needUri) {
-  console.log("addTheirNeedInLoading: ", needUri);
   const oldNeed = needs.get(needUri);
   if (oldNeed && (oldNeed.get("ownNeed") || !oldNeed.get("isLoading"))) {
     return needs;
