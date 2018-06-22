@@ -1,34 +1,27 @@
 package won.matcher.sparql.actor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelExtract;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StatementBoundary;
-import org.apache.jena.rdf.model.StatementBoundaryBase;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueString;
+import org.apache.jena.sparql.path.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -128,7 +121,7 @@ public class SparqlMatcherActor extends UntypedActor {
 			}
 			
 			return new Triple(newSubject, triple.getPredicate(), newObject);
-		}).forEach(pattern::add);
+		}).filter(p -> p != null).forEach(pattern::add);
 		
 		return pattern;
 	}
@@ -169,8 +162,48 @@ public class SparqlMatcherActor extends UntypedActor {
 		BasicPattern pattern = createDetailsQuery(subModel);
 		
 		pattern.add(new Triple(resultName.asNode(), newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
-		
+
 		return new OpBGP(pattern);
+	}
+
+	private static Op createSearchQuery(String searchString) {
+
+		Node blank = NodeFactory.createURI("");
+		P_Link blankPath = new P_Link(blank);
+		P_NegPropSet negation = new P_NegPropSet();
+		negation.add(blankPath);
+		P_Alt any = new P_Alt(blankPath, negation);
+
+		P_Link isPath = new P_Link(NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
+		P_Link seeksPath = new P_Link(NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
+
+		Path searchPath = Collections.<Path>nCopies(5, new P_ZeroOrOne(any)).stream().reduce(new P_Alt(isPath,seeksPath), P_Seq::new);
+
+		Var textSearchTarget = Var.alloc("textSearchTarget");
+
+		Op pathOp = new OpPath(new TriplePath(
+				resultName.asNode(),
+				searchPath,
+				textSearchTarget.asNode()));
+
+		Expr filterExpression = Arrays.stream(searchString.toLowerCase().split(" "))
+				.<Expr>map(searchPart ->
+					new E_StrContains(
+							new E_StrLowerCase(new ExprVar(textSearchTarget)),
+							new NodeValueString(searchPart)
+					)
+				)
+				.reduce((left, right) ->  new E_LogicalOr(left, right))
+				.orElse(new NodeValueBoolean(true));
+
+
+
+		return OpFilter.filterBy(
+				new ExprList(
+						filterExpression
+				),
+				pathOp
+				);
 	}
 
 	protected void processActiveNeedEvent(NeedEvent needEvent) throws IOException, JsonLdError {
@@ -189,8 +222,14 @@ public class SparqlMatcherActor extends UntypedActor {
 		
 		if(seeks != null) {
 			Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
-			
+
 			queries.add(seeksQuery);
+
+			Statement searchStatement = model.getProperty(seeks.getObject().asResource(), model.createProperty("http://purl.org/webofneeds/model#hasSearchString"));
+			if(searchStatement != null) {
+				String searchString = searchStatement.getString();
+				queries.add(createSearchQuery(searchString));
+			}
 		}
 		
 		Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
@@ -200,7 +239,7 @@ public class SparqlMatcherActor extends UntypedActor {
 			
 			queries.add(isQuery);
 		}
-		
+
 		queries.stream().reduce((left, right) -> new OpUnion(left, right))
 		.ifPresent((union) -> {
 			BasicPattern nodeUriBGP = new BasicPattern();
