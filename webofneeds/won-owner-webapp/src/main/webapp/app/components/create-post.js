@@ -128,9 +128,9 @@ function genComponentConf() {
       this.postTypeTexts = postTypeTexts;
       this.characterLimit = postTitleCharacterLimit;
       this.draftIs = {
-        title: "",
+        title: undefined,
         type: postTypeTexts[3].type,
-        description: "",
+        description: undefined,
         tags: undefined,
         person: undefined,
         location: undefined,
@@ -139,9 +139,9 @@ function genComponentConf() {
         matchingContext: undefined,
       };
       this.draftSeeks = {
-        title: "",
+        title: undefined,
         type: postTypeTexts[3].type,
-        description: "",
+        description: undefined,
         tags: undefined,
         person: undefined,
         location: undefined,
@@ -241,6 +241,11 @@ function genComponentConf() {
       // Post both needs
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
+
+        if (this.hasSearchString(this.draftObject)) {
+          this.draftObject.seeks["searchString"] = this.draftObject.seeks.title;
+        }
+
         this.needs__create(
           this.draftObject,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
@@ -249,9 +254,14 @@ function genComponentConf() {
     }
 
     hasSearchString(object) {
-      if (object.is || !object.seeks) {
+      if (!object.seeks) {
         return false;
       } else {
+        for (const key of keySet) {
+          if (object.is[key]) {
+            return false;
+          }
+        }
         for (const key of keySet) {
           if (object.seeks[key]) {
             return false;
