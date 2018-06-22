@@ -550,6 +550,7 @@ function fetchAllAccessibleAndRelevantData(
     return Promise.resolve(emptyDataset);
   }
 
+  console.log("fetchOwnNeedAndDispatch for: ", ownNeedUris);
   const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
     fetchOwnNeedAndDispatch(uri, curriedDispatch)
   );
@@ -568,6 +569,10 @@ function fetchAllAccessibleAndRelevantData(
                 needUriForConnections: uri,
                 activeConnectionUrisLoading: activeConnectionUris,
               })
+            );
+            console.log(
+              "fetchConnectionAndDispatch for: ",
+              activeConnectionUris
             );
             return urisToLookupMap(activeConnectionUris, uri =>
               fetchConnectionAndDispatch(uri, curriedDispatch)
@@ -592,6 +597,7 @@ function fetchAllAccessibleAndRelevantData(
       curriedDispatch(
         wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris })
       );
+      console.log("fetchTheirNeedAndDispatch for: ", theirNeedUris);
       return urisToLookupMap(theirNeedUris, uri =>
         fetchTheirNeedAndDispatch(uri, curriedDispatch)
       );
@@ -653,7 +659,6 @@ function fetchAllAccessibleAndRelevantData(
 }
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-  console.log("fetchOwnNeedAndDispatch: ", needUri);
   const needP = won
     .ensureLoaded(needUri, { requesterWebId: needUri }) //ensure loaded does net seem to be necessary as it is called within getNeed also the requesterWebId is not necessary for need requests
     .then(() => won.getNeed(needUri));
@@ -667,7 +672,6 @@ function fetchConnectionAndDispatch(
   cnctUri,
   curriedDispatch = () => undefined
 ) {
-  console.log("fetchConnectionAndDispatch: ", cnctUri);
   const cnctP = won.getNode(cnctUri);
   cnctP.then(connection =>
     curriedDispatch(
@@ -678,7 +682,6 @@ function fetchConnectionAndDispatch(
 }
 
 function fetchTheirNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
-  console.log("fetchTheirNeedAndDispatch: ", needUri);
   const needP = won.getNeed(needUri);
   needP.then(need =>
     curriedDispatch(wellFormedPayload({ theirNeeds: { [needUri]: need } }))
