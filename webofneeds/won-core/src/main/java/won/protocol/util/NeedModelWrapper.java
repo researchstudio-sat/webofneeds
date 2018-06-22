@@ -331,6 +331,19 @@ public class NeedModelWrapper {
 
         return null;
     }
+    
+    public String getShapesGraphName(Resource goalNode) {
+
+        if (goalNode != null) {
+            NodeIterator nodeIter = getNeedModel().listObjectsOfProperty(goalNode, WON.HAS_SHAPES_GRAPH);
+            if (nodeIter.hasNext()) {
+                String shapesGraphUri = nodeIter.next().asResource().getURI();
+                return shapesGraphUri;
+            }
+        }
+
+        return null;
+    }
 
     public Model getDataGraph(Resource goalNode) {
         if (goalNode != null) {
@@ -338,6 +351,18 @@ public class NeedModelWrapper {
             if (nodeIter.hasNext()) {
                 String dataGraphUri = nodeIter.next().asResource().getURI();
                 return needDataset.getNamedModel(dataGraphUri);
+            }
+        }
+
+        return null;
+    }
+    
+    public String getDataGraphName(Resource goalNode) {
+        if (goalNode != null) {
+            NodeIterator nodeIter = getNeedModel().listObjectsOfProperty(goalNode, WON.HAS_DATA_GRAPH);
+            if (nodeIter.hasNext()) {
+                String dataGraphUri = nodeIter.next().asResource().getURI();
+                return dataGraphUri;
             }
         }
 
