@@ -96,14 +96,14 @@ export function parseNeed(jsonldNeed, ownNeed) {
     let seeksPart = undefined;
     let type = undefined;
 
-    const genIsSeeksPart = (isSeeks, type) => ({
-      title: isSeeks.get("dc:title"),
+    const genIsSeeksPart = (isOrSeeks, type) => ({
+      title: isOrSeeks.get("dc:title"),
       type: type,
-      description: isSeeks.get("dc:description"),
-      tags: parseTags(isSeeks.get("won:hasTag")),
-      person: parsePerson(isSeeks),
-      location: parseLocation(isSeeks.get("won:hasLocation")),
-      travelAction: parseTravelAction(isSeeks.get("won:travelAction")),
+      description: isOrSeeks.get("dc:description"),
+      tags: parseTags(isOrSeeks.get("won:hasTag")),
+      person: parsePerson(isOrSeeks),
+      location: parseLocation(isOrSeeks.get("won:hasLocation")),
+      travelAction: parseTravelAction(isOrSeeks.get("won:travelAction")),
     });
 
     if (isPresent) {
