@@ -5,7 +5,15 @@ import { actionTypes } from "../../actions/actions.js";
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { msStringToDate, getIn } from "../../utils.js";
-import { addNeed, addNeedInCreation, changeNeedState } from "./reduce-needs.js";
+import {
+  addOwnActiveNeedsInLoading,
+  addOwnInactiveNeedsInLoading,
+  addOwnInactiveNeedsToLoad,
+  addTheirNeedsInLoading,
+  addNeed,
+  addNeedInCreation,
+  changeNeedState,
+} from "./reduce-needs.js";
 import {
   addMessage,
   addExistingMessages,
@@ -14,8 +22,9 @@ import {
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
+  addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
-  setConnectionLoading,
+  setConnectionLoadingMessages,
   markConnectionAsRead,
   selectNeedByConnectionUri,
   changeConnectionState,
@@ -44,21 +53,63 @@ export default function(allNeedsInState = initialState, action = {}) {
     case actionTypes.initialPageLoad:
     case actionTypes.needs.fetchUnloadedNeeds:
     case actionTypes.login: {
+      const activeNeedUris = action.payload.get("activeNeedUris");
+      const inactiveNeedUris = action.payload.get("inactiveNeedUris");
+      const inactiveNeedUrisLoading = action.payload.get(
+        "inactiveNeedUrisLoading"
+      );
+      const theirNeedUrisInLoading = action.payload.get(
+        "theirNeedUrisInLoading"
+      );
+
+      const needUriForConnections = action.payload.get("needUriForConnections");
+      const activeConnectionUrisLoading = action.payload.get(
+        "activeConnectionUrisLoading"
+      );
+
       let ownNeeds = action.payload.get("ownNeeds");
       ownNeeds = ownNeeds ? ownNeeds : Immutable.Set();
       let theirNeeds = action.payload.get("theirNeeds");
       theirNeeds = theirNeeds ? theirNeeds : Immutable.Set();
+
+      const stateWithOwnInactiveNeedUrisToLoad = addOwnInactiveNeedsToLoad(
+        allNeedsInState,
+        inactiveNeedUris
+      );
+
+      const stateWithOwnInactiveNeedUrisInLoading = addOwnInactiveNeedsInLoading(
+        stateWithOwnInactiveNeedUrisToLoad,
+        inactiveNeedUrisLoading
+      );
+
+      const stateWithOwnNeedUrisInLoading = addOwnActiveNeedsInLoading(
+        stateWithOwnInactiveNeedUrisInLoading,
+        activeNeedUris
+      );
+
       const stateWithOwnNeeds = ownNeeds.reduce(
         (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-        allNeedsInState
+        stateWithOwnNeedUrisInLoading
       );
+
+      const stateWithOwnNeedsAndTheirNeedsInLoading = addTheirNeedsInLoading(
+        stateWithOwnNeeds,
+        theirNeedUrisInLoading
+      );
+
       const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
         (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
-        stateWithOwnNeeds
+        stateWithOwnNeedsAndTheirNeedsInLoading
+      );
+
+      const stateWithConnectionsToLoad = addActiveConnectionsToNeedInLoading(
+        stateWithOwnAndTheirNeeds,
+        needUriForConnections,
+        activeConnectionUrisLoading
       );
 
       return storeConnectionsData(
-        stateWithOwnAndTheirNeeds,
+        stateWithConnectionsToLoad,
         action.payload.get("connections")
       );
     }
@@ -130,7 +181,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       let changedState;
 
       if (!ownNeedFromState) {
-        throw new Exception(
+        throw new Error(
           "Would need to call addNeed with ownNeed, but it is not defined!"
         );
       } else {
@@ -299,7 +350,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         // (see connectAdHoc)
         const needUri = needForTmpCnct.get("uri");
         if (!needForTmpCnct.get("ownNeed")) {
-          throw new Exception(
+          throw new Error(
             'Trying to add/change connection for need that\'s not an "ownNeed".'
           );
         }
@@ -391,11 +442,11 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri
       );
-    case actionTypes.connections.setLoading:
-      return setConnectionLoading(
+    case actionTypes.connections.setLoadingMessages:
+      return setConnectionLoadingMessages(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.isLoading
+        action.payload.isLoadingMessages
       );
 
     case actionTypes.connections.updateAgreementData:
@@ -507,11 +558,11 @@ export default function(allNeedsInState = initialState, action = {}) {
 
     case actionTypes.connections.showLatestMessages:
     case actionTypes.connections.showMoreMessages: {
-      const isLoading = action.payload.get("isLoading");
+      const isLoadingMessages = action.payload.get("isLoadingMessages");
       const connectionUri = action.payload.get("connectionUri");
 
-      if (isLoading && connectionUri) {
-        allNeedsInState = setConnectionLoading(
+      if (isLoadingMessages && connectionUri) {
+        allNeedsInState = setConnectionLoadingMessages(
           allNeedsInState,
           connectionUri,
           true
@@ -521,7 +572,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const loadedMessages = action.payload.get("events");
       if (loadedMessages) {
         allNeedsInState = addExistingMessages(allNeedsInState, loadedMessages);
-        allNeedsInState = setConnectionLoading(
+        allNeedsInState = setConnectionLoadingMessages(
           allNeedsInState,
           connectionUri,
           false
@@ -530,7 +581,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       const error = action.payload.get("error");
 
       if (error && connectionUri) {
-        allNeedsInState = setConnectionLoading(
+        allNeedsInState = setConnectionLoadingMessages(
           allNeedsInState,
           connectionUri,
           false

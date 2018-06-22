@@ -104,7 +104,7 @@ const actionHierarchy = {
     showMoreMessages: cnct.showMoreMessages,
     markAsRead: INJ_DEFAULT,
     markAsRated: INJ_DEFAULT,
-    setLoading: INJ_DEFAULT,
+    setLoadingMessages: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
   },

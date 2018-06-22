@@ -54,6 +54,16 @@ export function selectAllConnections(state) {
   return connections;
 }
 
+/**
+ * Get all connections stored within your own needs as a map with a status of Connected
+ * @returns Immutable.Map with all connections
+ */
+export function selectAllConnectionsInStateConnected(state) {
+  return selectAllConnections(state).filter(
+    conn => conn.get("state") === won.WON.Connected
+  );
+}
+
 export function selectAllMessages(state) {
   const connections = selectAllConnections(state);
   let messages = Immutable.Map();
@@ -117,3 +127,7 @@ export const selectOpenPostUri = createSelector(
     return decodeUriComponentProperly(encodedPostUri);
   }
 );
+
+export function isPrivateUser(state) {
+  return !!getIn(state, ["router", "currentParams", "privateId"]);
+}

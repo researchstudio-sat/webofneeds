@@ -1,4 +1,5 @@
 import won from "../../won-es6.js";
+import Immutable from "immutable";
 import { parseConnection } from "./parse-connection.js";
 import { markUriAsRead, markConnUriAsClosed } from "../../won-localstorage.js";
 
@@ -95,7 +96,11 @@ export function markConnectionAsRead(state, connectionUri, needUri) {
   return state;
 }
 
-export function setConnectionLoading(state, connectionUri, isLoading) {
+export function setConnectionLoadingMessages(
+  state,
+  connectionUri,
+  isLoadingMessages
+) {
   const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
   const needUri = need && need.get("uri");
   const connection = need && need.getIn(["connections", connectionUri]);
@@ -112,8 +117,8 @@ export function setConnectionLoading(state, connectionUri, isLoading) {
   }
 
   return state.setIn(
-    [needUri, "connections", connectionUri, "isLoading"],
-    isLoading
+    [needUri, "connections", connectionUri, "isLoadingMessages"],
+    isLoadingMessages
   );
 }
 
@@ -205,7 +210,7 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
       [needUri, "connections", connectionUri, "agreementData"],
       agreementData
     )
-    .setIn([needUri, "connections", connectionUri, "isLoading"], false);
+    .setIn([needUri, "connections", connectionUri, "isLoadingMessages"], false);
 }
 
 export function setShowAgreementData(state, connectionUri, showAgreementData) {
@@ -222,4 +227,46 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
     [needUri, "connections", connectionUri, "showAgreementData"],
     showAgreementData
   );
+}
+
+export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
+  needUri &&
+    connUris &&
+    connUris.size > 0 &&
+    console.log("addActiveConnectionsToNeedInLoading: ", connUris);
+  let newState = state;
+  needUri &&
+    connUris &&
+    connUris.forEach(connUri => {
+      newState = addActiveConnectionToNeed(newState, needUri, connUri);
+    });
+  return newState;
+}
+
+export function addActiveConnectionToNeed(state, needUri, connUri) {
+  const storedNeed = state.get(needUri);
+  const isConnectionPresent =
+    storedNeed && !!storedNeed.getIn(["connections", connUri]);
+
+  if (storedNeed && !isConnectionPresent) {
+    const connection = Immutable.fromJS({
+      uri: connUri,
+      state: undefined,
+      messages: Immutable.Map(),
+      agreementData: undefined,
+      remoteNeedUri: undefined,
+      remoteConnectionUri: undefined,
+      creationDate: undefined,
+      lastUpdateDate: undefined,
+      unread: undefined,
+      isRated: false,
+      isLoadingMessages: false,
+      isLoading: true,
+      showAgreementData: false,
+    });
+
+    return state.mergeDeepIn([needUri, "connections", connUri], connection);
+  }
+
+  return state;
 }

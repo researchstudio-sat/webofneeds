@@ -2,13 +2,13 @@ import angular from "angular";
 import "ng-redux";
 import connectionHeaderModule from "./connection-header.js";
 import feedbackGridModule from "./feedback-grid.js";
-import postSeeksInfoModule from "./post-seeks-info.js";
-import postIsInfoModule from "./post-is-info.js";
+import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import won from "../won-es6.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import {
   selectOpenPostUri,
@@ -16,7 +16,7 @@ import {
   selectLastUpdateTime,
 } from "../selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { relativeTime } from "../won-label-utils.js";
+import { labels, relativeTime } from "../won-label-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -39,8 +39,22 @@ function genComponentConf() {
             </won-connection-header>
             <won-connection-context-dropdown ng-if="self.connection && self.connection.get('isRated')"></won-connection-context-dropdown>
         </div>
-        <div class="post-info__content">
-            <won-gallery ng-show="self.suggestedPost.get('hasImages')">
+        <div class="post-info__content" ng-if="self.isLoading()">
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <p class="post-info__details"></p>
+            <h2 class="post-info__heading"></h2>
+            <div class="post-info__details"></div>
+        </div>
+        <div class="post-info__content" ng-if="!self.isLoading()">
+            <won-gallery ng-show="self.displayedPost.get('hasImages')">
             </won-gallery>
 
             <!-- GENERAL Part -->
@@ -50,14 +64,20 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
+            <h2 class="post-info__heading" ng-show="self.displayedPost.get('type')">
+                Type
+            </h2>
+            <p class="post-info__details" ng-show="self.displayedPost.get('type')">
+                {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
+            </p>
             <!-- IS Part -->
             <div ng-show="self.isPart">
-                <won-post-is-info is-part="::self.isPart"></won-post-is-info>
+                <won-post-is-or-seeks-info is-or-seeks-part="self.isPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <!-- SEEKS Part -->
             <div ng-show="self.seeksPart">
-                <won-post-seeks-info seeks-part="::self.seeksPart"></won-post-seeks-info>
+                <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <a class="rdflink clickable"
@@ -79,10 +99,10 @@ function genComponentConf() {
                     <span class="rdflink__label">Post</span>
             </a>
         </div>
-        <div class="post-info__footer">
+        <div class="post-info__footer" ng-if="!self.isLoading()">
             <won-post-share-link
-                ng-if="self.suggestedPost.get('state') !== self.WON.InactiveCompacted"
-                post-uri="self.suggestedPost && self.suggestedPost.get('uri')">
+                ng-if="self.displayedPost.get('state') !== self.WON.InactiveCompacted"
+                post-uri="self.displayedPost && self.displayedPost.get('uri')">
             </won-post-share-link>
             <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
 
@@ -102,14 +122,12 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.maxThumbnails = 9;
       this.message = "";
+      this.labels = labels;
       this.WON = won.WON;
       window.openMatch4dbg = this;
 
       const selectFromState = state => {
-        //const sendAdHocRequest = getIn(state, ['router', 'currentParams', 'sendAdHocRequest']); //if this parameter is set we will not have a connection to send this request to
-
         const connectionUri = decodeURIComponent(
           getIn(state, ["router", "currentParams", "connectionUri"])
         );
@@ -121,11 +139,11 @@ function genComponentConf() {
           ? selectOpenPostUri(state)
           : connection && connection.get("remoteNeedUri");
 
-        const suggestedPost = state.getIn(["needs", postUriToConnectTo]);
+        const displayedPost = state.getIn(["needs", postUriToConnectTo]);
 
-        const is = suggestedPost ? suggestedPost.get("is") : undefined;
+        const is = displayedPost ? displayedPost.get("is") : undefined;
         //TODO it will be possible to have more than one seeks
-        const seeks = suggestedPost ? suggestedPost.get("seeks") : undefined;
+        const seeks = displayedPost ? displayedPost.get("seeks") : undefined;
 
         return {
           connection,
@@ -134,7 +152,7 @@ function genComponentConf() {
           isPart: is
             ? {
                 postUri: postUriToConnectTo,
-                is: is,
+                isOrSeeks: is,
                 isString: "is",
                 location: is && is.get("location"),
                 address:
@@ -144,41 +162,44 @@ function genComponentConf() {
           seeksPart: seeks
             ? {
                 postUri: postUriToConnectTo,
-                seeks: seeks,
+                isOrSeeks: seeks,
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
                 address:
                   seeks.get("location") && seeks.get("location").get("address"),
               }
             : undefined,
-          suggestedPost,
+          displayedPost,
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           postUriToConnectTo,
           friendlyTimestamp:
-            suggestedPost &&
+            displayedPost &&
             relativeTime(
               selectLastUpdateTime(state),
-              suggestedPost.get("creationDate")
+              displayedPost.get("creationDate")
             ),
           shouldShowRdf: state.get("showRdf"),
-          createdTimestamp: suggestedPost && suggestedPost.get("creationDate"),
+          createdTimestamp: displayedPost && displayedPost.get("creationDate"),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return !this.displayedPost || this.displayedPost.get("isLoading");
     }
 
     sendRequest(message) {
-      if (
-        !this.connection ||
-        (this.ownNeed &&
-          (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew")))
-      ) {
+      const isOwnNeedWhatsX =
+        this.ownNeed &&
+        (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"));
+
+      if (!this.connection || isOwnNeedWhatsX) {
         this.router__stateGoResetParams("connections");
 
-        if (
-          this.ownNeed &&
-          (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"))
-        ) {
+        if (isOwnNeedWhatsX) {
           //Close the connection if there was a present connection for a whatsaround need
           this.connections__close(this.connectionUri);
         }
@@ -217,8 +238,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.sendRequest", [
-    postIsInfoModule,
-    postSeeksInfoModule,
+    postIsOrSeeksInfoModule,
     connectionHeaderModule,
     feedbackGridModule,
     labelledHrModule,

@@ -10,6 +10,7 @@ import imageDropzoneModule from "./image-dropzone.js";
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
 import matchingContextPicker from "./details/matching-context-picker.js";
+import personPickerModule from "./details/person-picker.js";
 import routePickerModule from "./details/route-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
@@ -71,8 +72,8 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.snapToBottom"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.snapToBottom"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, self.is)" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
+            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, self.seeks)" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
             <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
@@ -108,6 +109,7 @@ function genComponentConf() {
       this.SEARCH = "search";
       this.POST = "post";
 
+      this.focusedElement = null;
       //TODO debug; deleteme
       window.cnc = this;
 
@@ -118,6 +120,7 @@ function genComponentConf() {
         type: postTypeTexts[3].type,
         description: "",
         tags: undefined,
+        person: undefined,
         location: undefined,
         travelAction: undefined,
         thumbnail: undefined,
@@ -128,13 +131,15 @@ function genComponentConf() {
         type: postTypeTexts[3].type,
         description: "",
         tags: undefined,
+        person: undefined,
         location: undefined,
         travelAction: undefined,
         thumbnail: undefined,
         matchingContext: undefined,
       };
 
-      this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
+      this.windowHeight = window.screen.height;
+      this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
       this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
 
       this.is = "is";
@@ -154,6 +159,9 @@ function genComponentConf() {
         const isPost = showCreateView && !isSearch;
 
         return {
+          connectionHasBeenLost:
+            state.getIn(["messages", "reconnecting"]) ||
+            state.getIn(["messages", "lostConnection"]),
           showCreateView,
           isSearch,
           isPost,
@@ -164,40 +172,34 @@ function genComponentConf() {
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    snapToBottom() {
-      this._snapBottom = true;
-      this.scrollToBottom();
-    }
-    unsnapFromBottom() {
-      this._snapBottom = false;
-    }
-    updateScrollposition() {
-      if (this._snapBottom) {
-        this.scrollToBottom();
+    onResize() {
+      //TODO: delete
+      //console.log("ResizeEvent: ", window.screen.height);
+      if (this.focusedElement) {
+        if (this.windowHeight < window.screen.height) {
+          this.windowHeight < window.screen.height;
+          this.scrollToBottom(this.focusedElement);
+        } else {
+          this.windowHeight = window.screen.height;
+        }
       }
     }
-    scrollToBottom() {
+
+    scrollToBottom(element) {
       this._programmaticallyScrolling = true;
 
-      this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
-    }
-    onScroll() {
-      if (!this._programmaticallyScrolling) {
-        //only unsnap if the user scrolled themselves
-        this.unsnapFromBottom();
-      }
+      if (element) {
+        let heightHeader =
+          this.$element[0].querySelector(".cp__header").offsetHeight + 10;
+        let scrollTop = this.$element[0].querySelector(element).offsetTop;
+        this.scrollContainer().scrollTop = scrollTop - heightHeader;
 
-      const sc = this.scrollContainer();
-      const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
-      if (isAtBottom) {
-        this.snapToBottom();
+        this.focusedElement = element;
+        //TODO: debug: delete me
+        //console.log("ScrollTop: ", this.scrollContainer().scrollTop);
       }
+    }
 
-      this._programmaticallyScrolling = false;
-    }
-    scrollContainerNg() {
-      return angular.element(this.scrollContainer());
-    }
     scrollContainer() {
       if (!this._scrollContainer) {
         this._scrollContainer = this.$element[0].querySelector(".cp__content");
@@ -207,6 +209,7 @@ function genComponentConf() {
 
     isValid() {
       return (
+        !this.connectionHasBeenLost &&
         (this.draftObject[this.is] || this.draftObject[this.seeks]) &&
         (this.draftObject[this.is].title ||
           this.draftObject[this.seeks].title) &&
@@ -276,6 +279,7 @@ angular
     descriptionPickerModule,
     locationPickerModule,
     matchingContextPicker,
+    personPickerModule,
     routePickerModule,
     tagsPickerModule,
     ttlPickerModule,

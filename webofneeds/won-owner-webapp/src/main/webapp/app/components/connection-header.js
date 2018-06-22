@@ -16,11 +16,12 @@ import {
   selectAllTheirNeeds,
 } from "../selectors.js";
 import connectionStateModule from "./connection-state.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="ch__icon">
+      <div class="ch__icon" ng-if="!self.isLoading()">
           <won-square-image
             class="ch__icon__theirneed"
             ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
@@ -30,7 +31,7 @@ function genComponentConf() {
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
-      <div class="ch__right">
+      <div class="ch__right" ng-if="!self.isLoading()">
         <div class="ch__right__topline">
           <div class="ch__right__topline__title" title="{{ self.theirNeed.get('title') }}">
             {{ self.theirNeed.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.theirNeed.get('title') }}
@@ -58,6 +59,18 @@ function genComponentConf() {
             </won-connection-state>
             {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
           </span>
+        </div>
+      </div>
+      <div class="ch__icon" ng-if="self.isLoading()">
+          <div class="ch__icon__skeleton"></div>
+      </div>
+      <div class="ch__right" ng-if="self.isLoading()">
+        <div class="ch__right__topline">
+          <div class="ch__right__topline__title"></div>
+          <div class="ch__right__topline__date"></div>
+        </div>
+        <div class="ch__right__subtitle">
+          <span class="ch__right__subtitle__type"></span>
         </div>
       </div>
     `;
@@ -94,6 +107,19 @@ function genComponentConf() {
         actionCreators,
         ["self.connectionUri", "self.timestamp"],
         this
+      );
+
+      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
+    }
+
+    isLoading() {
+      return (
+        !this.connection ||
+        !this.theirNeed ||
+        !this.ownNeed ||
+        this.ownNeed.get("isLoading") ||
+        this.theirNeed.get("isLoading") ||
+        this.connection.get("isLoading")
       );
     }
 
