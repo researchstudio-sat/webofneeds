@@ -38,6 +38,8 @@ import won from "./won.js";
 (function() {
   const NEWLINE_REPLACEMENT_STRING = "#%§%#§";
   const NEWLINE_REPLACEMENT_PATTERN = /#%§%#§/gm;
+  const DOUBLEQUOTE_REPLACEMENT_STRING = "§#%§%#";
+  const DOUBLEQUOTE_REPLACEMENT_PATTERN = /§#%§%#/gm;
   /**
    * paging parameters as found
    * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
@@ -1110,10 +1112,9 @@ import won from "./won.js";
         case "NamedNode":
           return `<${x.nominalValue}>`;
         case "Literal":
-          return `"${x.nominalValue.replace(
-            /(\r\n|\n|\r)/gm,
-            NEWLINE_REPLACEMENT_STRING
-          )}"`; //TODO: REMOVE FUGLY FIX ONCE n3.js is not having issues with newlines anymore
+          return `"${x.nominalValue
+            .replace(/(\r\n|\n|\r)/gm, NEWLINE_REPLACEMENT_STRING)
+            .replace(/"/gm, DOUBLEQUOTE_REPLACEMENT_STRING)}"`; //TODO: REMOVE FUGLY FIX ONCE n3.js is not having issues with newlines or doublequotes anymore
         case "BlankNode":
           return x.nominalValue;
         default:
@@ -1418,10 +1419,9 @@ import won from "./won.js";
         } else {
           parsedJsonLd = parsedJsonLd[0];
         }
-        let jsonLdString = JSON.stringify(parsedJsonLd).replace(
-          NEWLINE_REPLACEMENT_PATTERN,
-          "\\n"
-        );
+        let jsonLdString = JSON.stringify(parsedJsonLd)
+          .replace(NEWLINE_REPLACEMENT_PATTERN, "\\n")
+          .replace(DOUBLEQUOTE_REPLACEMENT_PATTERN, '\\"');
 
         return JSON.parse(jsonLdString); //TODO: REMOVE FUGLY FIX AND JUST RETURN parsedJsonLd ONCE n3.js is not having issues with newlines anymore
       })
