@@ -166,3 +166,19 @@ services:
     depends_on:
       - bigdata
       - matcher_service
+
+
+  matcher_sparql:
+    build: ../../image/matcher-sparql
+    image: webofneeds/matcher_sparql:int
+    environment:
+    - "node.host=$deploy_host"
+    - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2563"
+    - "cluster.local.port=2564"
+    - "matcher.sparql.uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
+    - "matcher.sparql.uri.public=http://$deploy_host/sparql/"
+    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+    - "2564:2564"
+    depends_on:
+    - matcher_service
