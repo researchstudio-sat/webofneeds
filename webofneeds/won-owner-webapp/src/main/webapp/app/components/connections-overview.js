@@ -15,7 +15,7 @@ import extendedConnectionIndicatorsModule from "./extended-connection-indicators
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
-import { attach, sortByDate, getIn } from "../utils.js";
+import { attach, delay, sortByDate, getIn } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -24,6 +24,7 @@ import {
   selectAllNeeds,
   selectRouterParams,
   selectNeedByConnectionUri,
+  selectAllConnectionsInStateConnected,
 } from "../selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -219,6 +220,9 @@ function genComponentConf() {
         const beingCreatedNeeds =
           allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
 
+        const connectionsInStateConnected =
+          openNeeds && selectAllConnectionsInStateConnected(state);
+
         const routerParams = selectRouterParams(state);
         const showCreateView = getIn(state, [
           "router",
@@ -248,6 +252,8 @@ function genComponentConf() {
           beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
           sortedOpenNeeds,
           sortedClosedNeeds,
+          connectionsInStateConnected,
+          hasConnectionsInStateConnected: !!connectionsInStateConnected,
           unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
           closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
         };
@@ -262,6 +268,28 @@ function genComponentConf() {
       this.$scope.$watch("self.needUriImpliedInRoute", (newValue, oldValue) => {
         if (newValue && !oldValue) {
           self.open[newValue] = true;
+        }
+      });
+
+      this.$scope.$watchGroup(["self.connectionsInStateConnected"], () =>
+        this.ensureUnreadMessagesAreLoaded()
+      );
+    }
+
+    ensureUnreadMessagesAreLoaded() {
+      delay(0).then(() => {
+        const INITIAL_MESSAGECOUNT = 15;
+
+        if (this.hasConnectionsInStateConnected) {
+          this.connectionsInStateConnected.map(conn => {
+            // make sure latest messages are loaded
+            if (!conn.get("isLoadingMessages")) {
+              this.connections__showLatestMessages(
+                conn.get("uri"),
+                INITIAL_MESSAGECOUNT
+              );
+            }
+          });
         }
       });
     }
