@@ -177,3 +177,19 @@ services:
     depends_on:
       - wonnode
       - mongodb
+
+
+  matcher_sparql:
+    build: ../../image/matcher-sparql
+    image: webofneeds/matcher_sparql:int
+    environment:
+    - "node.host=satvm06.researchstudio.at"
+    - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
+    - "cluster.local.port=2563"
+    - "matcher.sparql.uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+    - "matcher.sparql.uri.public=http://satvm06.researchstudio.at/sparql/"
+    - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+    - "2563:2563"
+    depends_on:
+    - matcher_service
