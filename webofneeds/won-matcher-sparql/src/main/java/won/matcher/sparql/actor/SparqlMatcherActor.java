@@ -186,13 +186,21 @@ public class SparqlMatcherActor extends UntypedActor {
 				searchPath,
 				textSearchTarget.asNode()));
 
+		Expr filterExpression = Arrays.stream(searchString.toLowerCase().split(" "))
+				.<Expr>map(searchPart ->
+					new E_StrContains(
+							new E_StrLowerCase(new ExprVar(textSearchTarget)),
+							new NodeValueString(searchPart)
+					)
+				)
+				.reduce((left, right) ->  new E_LogicalOr(left, right))
+				.orElse(new NodeValueBoolean(true));
+
+
 
 		return OpFilter.filterBy(
 				new ExprList(
-						new E_StrContains(
-								new ExprVar(textSearchTarget),
-								new NodeValueString(searchString)
-						)
+						filterExpression
 				),
 				pathOp
 				);
@@ -214,7 +222,7 @@ public class SparqlMatcherActor extends UntypedActor {
 		
 		if(seeks != null) {
 			Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
-			
+
 			queries.add(seeksQuery);
 
 			Statement searchStatement = model.getProperty(seeks.getObject().asResource(), model.createProperty("http://purl.org/webofneeds/model#hasSearchString"));
