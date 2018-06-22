@@ -7,6 +7,7 @@
 
 import won from "../won-es6.js";
 import angular from "angular";
+import Immutable from "immutable";
 import ngAnimate from "angular-animate";
 import squareImageModule from "./square-image.js";
 import postHeaderModule from "./post-header.js";
@@ -223,6 +224,19 @@ function genComponentConf() {
         const connectionsInStateConnected =
           openNeeds && selectAllConnectionsInStateConnected(state);
 
+        const connectionsWithoutConnectMessage =
+          connectionsInStateConnected &&
+          connectionsInStateConnected.filter(
+            conn =>
+              !conn.get("messages") ||
+              conn.get("messages").filter(msg => msg.get("connectMessage"))
+                .size == 0
+          );
+
+        const connectionsToCrawl = connectionsWithoutConnectMessage
+          ? connectionsWithoutConnectMessage
+          : Immutable.Map();
+
         const routerParams = selectRouterParams(state);
         const showCreateView = getIn(state, [
           "router",
@@ -252,8 +266,7 @@ function genComponentConf() {
           beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
           sortedOpenNeeds,
           sortedClosedNeeds,
-          connectionsInStateConnected,
-          hasConnectionsInStateConnected: !!connectionsInStateConnected,
+          connectionsToCrawl,
           unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
           closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
         };
@@ -271,26 +284,60 @@ function genComponentConf() {
         }
       });
 
-      this.$scope.$watchGroup(["self.connectionsInStateConnected"], () =>
+      this.$scope.$watchGroup(["self.connectionsToCrawl"], () =>
         this.ensureUnreadMessagesAreLoaded()
       );
     }
 
     ensureUnreadMessagesAreLoaded() {
       delay(0).then(() => {
-        const INITIAL_MESSAGECOUNT = 15;
+        const MESSAGECOUNT = 10;
 
-        if (this.hasConnectionsInStateConnected) {
-          this.connectionsInStateConnected.map(conn => {
-            // make sure latest messages are loaded
-            if (!conn.get("isLoadingMessages")) {
-              this.connections__showLatestMessages(
-                conn.get("uri"),
-                INITIAL_MESSAGECOUNT
-              );
-            }
-          });
+        if (this.connectionsToCrawl.size == 0) {
+          console.log("ensureUnreadMessagesAreLoaded - nothing to crawl");
         }
+
+        this.connectionsToCrawl.map(conn => {
+          if (conn.get("isLoadingMessages")) return;
+          const messages = conn.get("messages");
+          const messageCount = messages ? messages.size : 0;
+
+          if (messageCount == 0) {
+            console.log(
+              "ensureUnreadMessagesAreLoaded - Getting Latest Messages for connection: ",
+              conn.get("uri"),
+              " already loaded: ",
+              messageCount,
+              " messages"
+            );
+            this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
+          } else {
+            const receivedMessages = messages.filter(
+              msg => !msg.get("outgoingMessage")
+            );
+            const receivedMessagesReadPresent =
+              receivedMessages.filter(msg => !msg.get("unread")).size > 0;
+
+            if (receivedMessagesReadPresent) {
+              console.log(
+                "ensureUnreadMessagesAreLoaded - At least one Received Message already read in connection: ",
+                conn.get("uri"),
+                ", stop crawling further, already loaded: ",
+                messageCount,
+                " messages"
+              );
+            } else {
+              console.log(
+                "ensureUnreadMessagesAreLoaded - Only unread received Messages in connection: ",
+                conn.get("uri"),
+                ", crawl further, already loaded: ",
+                messageCount,
+                " messages"
+              );
+              this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
+            }
+          }
+        });
       });
     }
 
