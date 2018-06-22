@@ -3,6 +3,7 @@ package won.bot.framework.eventbot.behaviour;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import won.bot.framework.bot.context.BotContext;
@@ -30,6 +31,7 @@ import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.NeedModelWrapper;
+import won.protocol.util.WonConversationUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -38,6 +40,11 @@ import won.utils.goals.GoalInstantiationResult;
 
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -236,6 +243,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
             for (Resource goal : goalsInNeed) {
                 String preconditionUri = getUniqueGoalId(goal, needDataset, connectionUri);
+//                preconditionUri = connectionUri.toString();
 
                 logger.trace("\tPreconditionUri: "+preconditionUri);
 
@@ -245,7 +253,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
                     logger.trace("\t\tPrecondition already met by a pending proposal that does not exist yet");
                 } else {
                     logger.trace("\t\tPrecondition not yet met in a proposal/agreement");
-                    conversationDataset = getConversationDatasetLazyInit(conversationDataset, connectionUri);
+                    conversationDataset = WonConversationUtils.getAgreementProtocolState(connectionUri, linkedDataSource).getConversationDataset();
                     goalInstantiationProducer = getGoalInstantiationProducerLazyInit(goalInstantiationProducer, needDataset, remoteNeedDataset, conversationDataset);
 
                     GoalInstantiationResult result = goalInstantiationProducer.findInstantiationForGoal(goal);
@@ -287,7 +295,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
 
         private GoalInstantiationProducer getGoalInstantiationProducerLazyInit(GoalInstantiationProducer goalInstantiationProducer, Dataset needDataset, Dataset remoteNeedDataset, Dataset conversationDataset){
             if(goalInstantiationProducer == null){
-                return new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
+            	return new GoalInstantiationProducer(needDataset, remoteNeedDataset, conversationDataset, "http://example.org/", "http://example.org/blended/");
             }else{
                 return goalInstantiationProducer;
             }
@@ -311,21 +319,55 @@ public class AnalyzeBehaviour extends BotBehaviour {
             return goal.getURI();
         }else{
             NeedModelWrapper needWrapper = new NeedModelWrapper(needDataset);
-
-            StringWriter writer = new StringWriter();
-            Model shapesModel = needWrapper.getShapesGraph(goal);
-            if(shapesModel != null) {
-                shapesModel.write(writer, "TRIG");
-            }
+            
             Model dataModel = needWrapper.getDataGraph(goal);
-            if(dataModel != null) {
-                dataModel.write(writer, "TRIG");
+            Model shapesModel = needWrapper.getShapesGraph(goal);
+            String strGraphs = "";
+            
+            if (dataModel != null) {
+            	StringWriter sw = new StringWriter();
+            	RDFDataMgr.write(sw, dataModel, Lang.NQUADS);
+            	String content = sw.toString();
+            	String dataGraphName = needWrapper.getDataGraphName(goal);
+            	strGraphs += replaceBlankNode(content, dataGraphName);
             }
-
-            return connectionURI +"#"+ writer.toString().replaceAll("\\R", " ");
+            
+            if (shapesModel != null) {
+            	StringWriter sw = new StringWriter();
+            	RDFDataMgr.write(sw, shapesModel, Lang.NQUADS);
+            	String content = sw.toString();
+            	String shapesGraphName = needWrapper.getShapesGraphName(goal);
+            	strGraphs += replaceBlankNode(content, shapesGraphName);
+            }
+            
+            String[] statements = strGraphs.split("\n");
+            Arrays.sort(statements);
+            String strStatements = Arrays.toString(statements);
+            //java.security.MessageDigest -> SHA256
+            
+			try {
+				MessageDigest digest = MessageDigest.getInstance("SHA-256");
+				byte[] hash = digest.digest(strStatements.getBytes(StandardCharsets.UTF_8));
+	            String strHash = new String(Base64.getEncoder().encode(hash));
+	            return strHash;
+			} catch (NoSuchAlgorithmException e) {
+				return strStatements;
+			}
+            
         }
     }
-
+    
+    private static String replaceBlankNode(String strModel, String replaceUri) {
+    	
+    	while (strModel.contains("_:")) {
+    		int pos = strModel.indexOf("_:");
+    		int end = pos + 35;
+    		strModel = strModel.substring(0, pos) + replaceUri + strModel.substring(end);
+    	}
+    	
+    	return strModel;
+    }
+    
     private static String getWonMessageString(WonMessage wonMessage, Lang lang) {
         StringWriter writer = new StringWriter();
         RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), lang);
