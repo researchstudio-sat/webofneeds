@@ -1112,7 +1112,6 @@ import won from "./won.js";
         case "NamedNode":
           return `<${x.nominalValue}>`;
         case "Literal":
-          console.log("nominalValue: ", x.nominalValue);
           return `"${x.nominalValue
             .replace(/(\r\n|\n|\r)/gm, NEWLINE_REPLACEMENT_STRING)
             .replace(/"/gm, DOUBLEQUOTE_REPLACEMENT_STRING)}"`; //TODO: REMOVE FUGLY FIX ONCE n3.js is not having issues with newlines or doublequotes anymore
