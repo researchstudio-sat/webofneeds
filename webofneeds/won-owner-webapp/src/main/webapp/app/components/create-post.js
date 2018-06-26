@@ -242,36 +242,52 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        if (this.hasSearchString(this.draftObject)) {
-          this.draftObject.seeks["searchString"] = this.draftObject.seeks.title;
+        //Check for is, or seeks
+        let draft = this.getPublishObject(this.draftObject);
+
+        if (this.hasSearchString(draft)) {
+          draft.seeks["searchString"] = draft.seeks.title;
         }
 
         this.needs__create(
-          this.draftObject,
+          draft,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
     }
 
-    hasSearchString(object) {
-      if (!object.seeks) {
+    getPublishObject(draft) {
+      if (!this.checkType(draft.is)) {
+        delete draft.is;
+      }
+      if (!this.checkType(draft.seeks)) {
+        delete draft.seeks;
+      }
+      return draft;
+    }
+
+    checkType(object) {
+      const title = get(object, "title");
+      const hasValidTitle = title && title.length < this.characterLimit;
+      const hasTTL = get(object, "ttl");
+      return !!(hasValidTitle || hasTTL);
+    }
+
+    hasSearchString(draft) {
+      if (draft.is || !draft.seeks) {
         return false;
       } else {
         for (const key of keySet) {
-          if (object.is[key]) {
-            return false;
-          }
-        }
-        for (const key of keySet) {
-          if (object.seeks[key]) {
+          if (draft.seeks[key]) {
             return false;
           }
         }
         // Handle tags list
-        if (object.seeks.tags.length > 0) {
+        if (draft.seeks.tags && draft.seeks.tags.length > 0) {
           return false;
         }
       }
+      //A seeks object only with a title
       return true;
     }
 

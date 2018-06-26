@@ -107,7 +107,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     });
 
     if (isPresent) {
-      const type = seeksPresent
+      type = seeksPresent
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeSupplyCompacted;
       isPart = genIsSeeksPart(is, type);
@@ -115,6 +115,9 @@ export function parseNeed(jsonldNeed, ownNeed) {
     if (seeksPresent) {
       type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
       seeksPart = genIsSeeksPart(seeks, type);
+      if (seeks.get("won:hasSearchString")) {
+        seeksPart.searchString = seeks.get("won:hasSearchString");
+      }
     }
 
     parsedNeed.is = isPart;
