@@ -9,24 +9,20 @@ import { selectIsConnected } from "../selectors.js";
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-            <a class="feedback clickable" ng-click="self.rateMatch(self.WON.binaryRatingGood); self.router__stateGoCurrent({connectionUri : self.connectionUri})">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="feedback__icon unselected">
-                        <use xlink:href="#ico36_feedback_good" href="#ico36_feedback_good"></use>
-                </svg>
-                <svg style="--local-primary:white;"
-                    class="feedback__icon selected">
-                        <use xlink:href="#ico36_feedback_good" href="#ico36_feedback_good"></use>
+            <div ng-class="{'feedback--good': self.isConnected, 'feedback--disabled': !self.isConnected}"
+              class="clickable" 
+              ng-click="self.rateMatch(self.WON.binaryRatingGood); self.router__stateGoCurrent({connectionUri : self.connectionUri})">
+                <svg class="feedback__icon unselected">
+                  <use xlink:href="#ico36_feedback_good" href="#ico36_feedback_good"></use>
                 </svg>
                 <span class="feedback__text">Good match - connect!</span>
-            </a>
-            <div class="feedback clickable" ng-click="self.rateMatch(self.WON.binaryRatingBad)">
-                <svg class="feedback__icon unselected" style="--local-primary:black;">
+            </div>
+            <div
+              ng-class="{'feedback--bad': self.isConnected, 'feedback--disabled': !self.isConnected}"
+              class="clickable" 
+              ng-click="self.rateMatch(self.WON.binaryRatingBad)">
+                <svg class="feedback__icon unselected">
                     <use xlink:href="#ico36_feedback_notatall" href="#ico36_feedback_notatall"></use>
-                </svg>
-                <svg style="--local-primary:white;"
-                    class="feedback__icon selected">
-                        <use xlink:href="#ico36_feedback_notatall" href="#ico36_feedback_notatall"></use>
                 </svg>
                 <span class="feedback__text">Bad match - remove!</span>
             </div>
@@ -36,6 +32,7 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       this.WON = won.WON;
+      window.fgrd4dbg = this;
 
       const selectFromState = state => ({
         isConnected: selectIsConnected(state),
@@ -44,6 +41,9 @@ function genComponentConf() {
     }
 
     rateMatch(rating) {
+      if (!this.isConnected) {
+        return;
+      }
       switch (rating) {
         case won.WON.binaryRatingGood:
           console.log("RATE GOOD");
