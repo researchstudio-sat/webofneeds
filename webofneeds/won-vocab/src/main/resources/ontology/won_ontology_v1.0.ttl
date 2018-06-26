@@ -266,6 +266,21 @@ sought to fulfill the need in contrast to the part that is available.""" ;
               rdfs:comment "The start time as an xsd:dateTimeStamp."@en ;
               rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+###  http://purl.org/webofneeds/model#doNotMatchBefore
+:hasEndTime rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Need ;
+            rdfs:range xsd:dateTimeStamp ;
+            rdfs:comment "Indicates that matchers should not use this need for matching before the specified xsd:dateTimeStamp."@en ;
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+###  http://purl.org/webofneeds/model#doNotMatchAfter
+:hasEndTime rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Need ;
+            rdfs:range xsd:dateTimeStamp ;
+            rdfs:comment "Indicates that matchers should not use this need for matching after the specified xsd:dateTimeStamp."@en ;
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#hasTag
 :hasTag rdf:type owl:DatatypeProperty .
