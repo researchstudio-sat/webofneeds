@@ -246,7 +246,21 @@ public class SparqlMatcherActor extends UntypedActor {
 			Var wonNodeVar = Var.alloc("wonNode");
 			nodeUriBGP.add(new Triple(resultName.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#hasWonNode"), wonNodeVar.asNode()));
 
-			Op query = new OpDistinct(new OpProject(createHintQuery(OpJoin.create(new OpBGP(nodeUriBGP), union), need.hasFlag(WON.NO_HINT_FOR_ME), need.hasFlag(WON.NO_HINT_FOR_COUNTERPART)), Arrays.asList(new Var[]{resultName, wonNodeVar, hint1, hint2})));
+			Op query = new OpSlice(
+					new OpDistinct(
+							new OpProject(
+									createHintQuery(
+											OpJoin.create(
+													new OpBGP(nodeUriBGP),
+													union),
+											need.hasFlag(WON.NO_HINT_FOR_ME),
+											need.hasFlag(WON.NO_HINT_FOR_COUNTERPART)
+									),
+									Arrays.asList(new Var[]{resultName, wonNodeVar, hint1, hint2})
+							)
+					),
+					0,
+					config.getLimitResults());
 			QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(query));
 			
 			ResultSet result = execution.execSelect();

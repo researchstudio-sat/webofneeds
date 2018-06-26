@@ -18,6 +18,13 @@ public class SparqlMatcherConfig
 	 
 	 @Value("${matcher.sparql.uri.public}")
 	 private String matcherUri;
+
+	 @Value("${matcher.sparql.limitResults}")
+	 private long limitResults;
+
+	 public long getLimitResults() {
+	 	return limitResults;
+	 }
 	 
 	 public String getSparqlEndpoint() {
 		 return sparqlEndpoint;
