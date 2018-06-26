@@ -46,21 +46,14 @@ function genComponentConf() {
       }
       switch (rating) {
         case won.WON.binaryRatingGood:
-          console.log("RATE GOOD");
           this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
           this.connections__markAsRated({ connectionUri: this.connectionUri });
           break;
-        /*case 1:
-                    //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE
-                    console.log("RATE OK");
-                    this.connections__rate(this.item, 1);
-                    break;*/
+
         case won.WON.binaryRatingBad:
-          console.log("RATE BAD");
           this.connections__close(this.connectionUri);
           this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
           this.router__stateGoCurrent({ connectionUri: null });
-          //TODO: ADD A BAD RATING, CLOSE MATCH
           break;
       }
     }
