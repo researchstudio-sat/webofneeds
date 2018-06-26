@@ -70,16 +70,16 @@ function genComponentConf() {
                         }">
                         Details
                     </button>
-                    <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
+                    <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
-                            class="co__item__need__header__carret__icon clickable"
+                            class="co__item__need__header__carret__icon"
                             ng-if="self.isOpen(need.get('uri'))">
                                 <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                         </svg>
                         <svg
                             style="--local-primary:var(--won-secondary-color);"
-                            class="co__item__need__header__carret__icon clickable"
+                            class="co__item__need__header__carret__icon"
                             ng-if="!self.isOpen(need.get('uri'))">
                                 <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                         </svg>
@@ -151,15 +151,15 @@ function genComponentConf() {
                             }">
                             Details
                         </button>
-                        <div class="co__item__need__header__carret" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
+                        <div class="co__item__need__header__carret clickable" ng-click="self.toggleDetails(need.get('uri'))" ng-if="!self.isLoading(need)">
                             <svg
                                 style="--local-primary:var(--won-secondary-color);"
-                                class="co__item__need__header__carret__icon clickable"
+                                class="co__item__need__header__carret__icon"
                                 ng-if="self.isOpen(need.get('uri'))">
                                     <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                             </svg>
                             <svg style="--local-primary:var(--won-secondary-color);"
-                                class="co__item__need__header__carret__icon clickable"
+                                class="co__item__need__header__carret__icon"
                                 ng-if="!self.isOpen(need.get('uri'))">
                                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                             </svg>
