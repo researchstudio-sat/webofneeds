@@ -1,6 +1,7 @@
 @import "speech-bubble";
 @import "square-image";
 @import "trig";
+@import "connection-message-status";
 
 won-connection-message {
   &.won-unread {
@@ -107,35 +108,7 @@ won-connection-message {
         //TODO: FAILURE MESSAGE STYLING
       }
     }
-    &__status {
-      &__time {
-        display: inline-block;
-        color: $won-line-gray;
-        --local-primary: #{$won-secondary-color};
 
-        &--pending {
-          display: inline-block;
-          color: $won-line-gray;
-        }
-        &--failure {
-          display: inline-block;
-          //TODO: FAILURE MESSAGE STYLING
-        }
-      }
-      &__icons {
-        display: inline-block;
-        &__icon {
-          display: inline-block;
-          @include fixed-square(0.5rem);
-
-          --local-primary: #{$won-line-gray};
-
-          &.received {
-            --local-primary: #{$won-secondary-color};
-          }
-        }
-      }
-    }
     &__carret {
       @include fixed-square(1rem); // visually center icon on line
       position: relative;

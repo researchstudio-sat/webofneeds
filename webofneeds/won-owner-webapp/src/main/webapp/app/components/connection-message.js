@@ -5,8 +5,8 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 import squareImageModule from "./square-image.js";
 import labelledHrModule from "./labelled-hr.js";
+import connectionMessageStatusModule from "./connection-message-status.js";
 import trigModule from "./trig.js";
-import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn, deepFreeze } from "../utils.js";
 import {
@@ -39,12 +39,11 @@ function genComponentConf() {
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
-            ng-show="!self.message.get('outgoingMessage')">
+            ng-if="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__center"
                 ng-class="{'won-cm__center--nondisplayable': !self.text}"
                 in-view="$inview && self.markAsRead()">
-
             <div 
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
@@ -55,143 +54,99 @@ function genComponentConf() {
                   'partiallyLoaded': self.message.get('outgoingMessage') && !self.message.get('failedToSend') && (!(self.message.get('isReceivedByOwn') && self.message.get('isReceivedByRemote')) && (self.message.get('isReceivedByOwn') || self.message.get('isReceivedByRemote'))),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
-                    <span class="won-cm__center__bubble__text">
-                      <span ng-show="self.headerText">
-                        <h3>
-                          {{ self.headerText }}
-                          <svg class="won-cm__center__carret clickable"
-                                  ng-if="!self.showText && (self.isInfoMessage() || !self.isRelevant)"
-                                  ng-click="self.showText = true">
-                              <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                          </svg>
-                          <svg class="won-cm__center__carret clickable"
-                                  ng-if="self.showText && (self.isInfoMessage() || !self.isRelevant)"
-                                  ng-click="self.showText = false">
-                              <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                          </svg>
-                         </h3>
-                        </span>	
-                        <span class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</span> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-                        <span class="won-cm__center__button" ng-if="self.isNormalMessage()">
-	                        <svg class="won-cm__center__carret clickable"
-	                                ng-click="self.showDetail = !self.showDetail"
-	                                ng-if="self.allowProposals"
-	                                ng-show="!self.showDetail && self.isRelevant">
-	                            <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-	                        </svg>
-	                        <span class="won-cm__center__carret clickable"
-	                            ng-click="self.showDetail = !self.showDetail"
-	                            ng-show="self.showDetail  && self.isRelevant">
-	                        	<won-labelled-hr arrow="'up'" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>   
-                    		</span>
-                    	</span>
-                      <!-- <span ng-show="self.showDetail"><br /></span> -->
-                      <div class="won-cm__center__bubble__button-area" ng-show="self.showDetail && self.isRelevant">
-                    	  <button class="won-button--filled thin black"
-                        		ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
-                            ng-show="self.showDetail">
-                          Propose <span ng-show="self.clicked">(again)</span>
-                        </button>
-                        <button class="won-button--filled thin black"
-                        		ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
-                        		ng-show="self.showDetail && self.message.get('outgoingMessage')">
-                        		Retract
-                        </button>
-                      </div>
-                    </span>
-
-                    <br ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
-                    <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
-
-                    <won-trig
-                        trig="self.contentGraphTrig"
-                        ng-show="self.shouldShowRdf && self.contentGraphTrig">
-                    </won-trig>
-
-                    <!--
-                    <div class="won-cm__center__button" 
-                        ng-if="!self.message.get('isProposeMessage')
-                            && !self.message.get('outgoingMessage')
-                            && self.message.get('isAcceptMessage')
-                            && !self.clicked"
-                            && self.isRelevant>
-                        <button class="won-button--filled thin black" ng-click="self.proposeToCancel()">
-                        	Cancel
-                       	</button>
-                    </div>
-                    -->
-                    <div class="won-cm__center__bubble__button-area" 
-                        ng-if="self.message.get('isProposeMessage')
-                            && !self.message.get('isAcceptMessage')
-                            && !self.clicked
-                            && self.isRelevant ">
-                        <button class="won-button--filled thin red" 
-                        		ng-show="!self.message.get('outgoingMessage') && !self.clicked" 
-    							          ng-click="self.acceptProposal()">
-    						          Accept
-    					          </button>
-                        <button class="won-button--filled thin black"
-    							          ng-show="!self.message.get('outgoingMessage')"
-                            ng-click="self.rejectMessage()">
-    						          Reject
-    					          </button>
-    					          <button class="won-button--filled thin black"
-                            ng-show="self.message.get('outgoingMessage')"
-                            ng-click="self.retractMessage()">
-    					            	Retract
-    					          </button>
-                    </div>
-                    <div class="won-cm__center__bubble__button-area" 
-                        ng-if="self.message.get('isProposeToCancel')
-                            && !self.message.get('isAcceptMessage')
-                            && !self.clicked
-                            && self.isRelevant">
-                        <button class="won-button--filled thin red" 
-                        		ng-show="!self.message.get('outgoingMessage')" 
-                        		ng-click="self.acceptProposeToCancel()">
-                        	Accept
-                        </button>
-                        <button class="won-button--filled thin black"
-                        		ng-show="!self.message.get('outgoingMessage')"
-    							          ng-click="self.rejectMessage()">
-    						          Reject
-    					          </button>
-                        <button class="won-button--filled thin black"
-                            ng-show="self.message.get('outgoingMessage')"
-                            ng-click="self.retractMessage()">
-                          Retract
-                        </button>
-                    </div>
-              </div>
-            <div
-                ng-show="self.message.get('unconfirmed')"
-                class="won-cm__center__time">
-                    Pending&nbsp;&hellip;
-            </div>
-            <div class="won-cm__center__status">
-                <div class="won-cm__center__status__icons"
-                    ng-if="self.message.get('outgoingMessage')">
-                    <svg class="won-cm__center__status__icons__icon" ng-if="!self.message.get('failedToSend')" ng-class="{'received' : self.message.get('isReceivedByOwn')}">
-                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                <div class="won-cm__center__bubble__text">
+                  <div ng-if="self.headerText">
+                    <h3>
+                      {{ self.headerText }}
+                      <svg class="won-cm__center__carret clickable"
+                              ng-if="!self.showText && (self.isInfoMessage() || !self.isRelevant)"
+                              ng-click="self.showText = true">
+                          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                      </svg>
+                      <svg class="won-cm__center__carret clickable"
+                              ng-if="self.showText && (self.isInfoMessage() || !self.isRelevant)"
+                              ng-click="self.showText = false">
+                          <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                      </svg>
+                    </h3>
+                  </div>
+                  <div class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                  <div class="won-cm__center__button" ng-if="self.isNormalMessage()">
+                    <svg class="won-cm__center__carret clickable"
+                              ng-click="self.showDetail = !self.showDetail"
+                              ng-if="self.allowProposals"
+                              ng-show="!self.showDetail && self.isRelevant">
+                          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
-                    <svg class="won-cm__center__status__icons__icon" ng-if="!self.message.get('failedToSend')" ng-class="{'received' : self.message.get('isReceivedByRemote')}">
-                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                    </svg>
-                    <svg class="won-cm__center__status__icons__icon" ng-if="self.message.get('failedToSend')" style="--local-primary: red;">
-                        <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
-                    </svg>
+                    <div class="won-cm__center__carret clickable"
+                          ng-click="self.showDetail = !self.showDetail"
+                          ng-show="self.showDetail  && self.isRelevant">
+                        <won-labelled-hr arrow="'up'" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>
+                    </div>
+                  </div>
+                  <div class="won-cm__center__bubble__button-area" ng-show="self.showDetail && self.isRelevant">
+                    <button class="won-button--filled thin black"
+                        ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
+                        ng-show="self.showDetail">
+                      Propose <span ng-show="self.clicked">(again)</span>
+                    </button>
+                    <button class="won-button--filled thin black"
+                        ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
+                        ng-show="self.showDetail && self.message.get('outgoingMessage')">
+                        Retract
+                    </button>
+                  </div>
                 </div>
-                <div class="won-cm__center__status__time" ng-show="!self.message.get('outgoingMessage') || (!self.message.get('failedToSend') && (self.message.get('isReceivedByRemote') && self.message.get('isReceivedByOwn')))">
-                    {{ self.relativeTime(self.lastUpdateTime, self.message.get('date')) }}
+                <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
+                <won-trig
+                    trig="self.contentGraphTrig"
+                    ng-show="self.shouldShowRdf && self.contentGraphTrig">
+                </won-trig>
+                <div class="won-cm__center__bubble__button-area"
+                    ng-if="self.message.get('isProposeMessage')
+                        && !self.message.get('isAcceptMessage')
+                        && !self.clicked
+                        && self.isRelevant ">
+                    <button class="won-button--filled thin red"
+                        ng-show="!self.message.get('outgoingMessage') && !self.clicked"
+                        ng-click="self.acceptProposal()">
+                      Accept
+                    </button>
+                    <button class="won-button--filled thin black"
+                        ng-show="!self.message.get('outgoingMessage')"
+                        ng-click="self.rejectMessage()">
+                      Reject
+                    </button>
+                    <button class="won-button--filled thin black"
+                        ng-show="self.message.get('outgoingMessage')"
+                        ng-click="self.retractMessage()">
+                        Retract
+                    </button>
                 </div>
-                <div class="won-cm__center__status__time--pending" ng-show="self.message.get('outgoingMessage') && !self.message.get('failedToSend') && (!self.message.get('isReceivedByRemote') || !self.message.get('isReceivedByOwn'))">
-                    Sending&nbsp;&hellip;
-                </div>
-                <div class="won-cm__center__status__time--failure" ng-show="self.message.get('outgoingMessage') && self.message.get('failedToSend')">
-                    Sending failed
+                <div class="won-cm__center__bubble__button-area"
+                    ng-if="self.message.get('isProposeToCancel')
+                        && !self.message.get('isAcceptMessage')
+                        && !self.clicked
+                        && self.isRelevant">
+                    <button class="won-button--filled thin red"
+                        ng-show="!self.message.get('outgoingMessage')"
+                        ng-click="self.acceptProposeToCancel()">
+                      Accept
+                    </button>
+                    <button class="won-button--filled thin black"
+                        ng-show="!self.message.get('outgoingMessage')"
+                        ng-click="self.rejectMessage()">
+                      Reject
+                    </button>
+                    <button class="won-button--filled thin black"
+                        ng-show="self.message.get('outgoingMessage')"
+                        ng-click="self.retractMessage()">
+                      Retract
+                    </button>
                 </div>
             </div>
-
+            <won-connection-message-status message-uri="self.message.get('uri')" connection-uri="self.connection.get('uri')">
+            </won-connection-messages-status>
             <a ng-show="self.rdfLinkURL"
                 target="_blank"
                 href="{{self.rdfLinkURL}}">
@@ -205,7 +160,6 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
-      this.relativeTime = relativeTime;
       this.clicked = false;
       this.showDetail = false;
 
@@ -219,10 +173,6 @@ function genComponentConf() {
         'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
 
       const selectFromState = state => {
-        /*
-                const connectionUri = selectOpenConnectionUri(state);
-                */
-
         const ownNeed =
           this.connectionUri &&
           selectNeedByConnectionUri(state, this.connectionUri);
@@ -281,8 +231,6 @@ function genComponentConf() {
             `&uri=${this.encodeParam(message.get("uri"))}`,
             message.get("outgoingMessage") ? "&deep=true" : ""
           );
-          //TODO delete me
-          console.log("why: ", ownerBaseUrl, rdfLinkURL);
         }
 
         const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
@@ -297,14 +245,12 @@ function genComponentConf() {
           text: text ? text : message ? message.get("text") : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
-          lastUpdateTime: state.get("lastUpdateTime"),
           shouldShowRdf,
           rdfLinkURL,
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
             message.get("text"), //allow showing details only when the connection is already present
-          //isLoading: isLoading,
         };
       };
 
@@ -314,23 +260,6 @@ function genComponentConf() {
         ["self.connectionUri", "self.messageUri"],
         this
       );
-
-      // gotta do this via a $watch, as the whole message parsing before
-      // this point happens synchronously but jsonLdToTrig needs to be async.
-      /*
-            this.$scope.$watch(
-                () => this.contentGraphs,
-                (newVal, oldVal) => {
-                    won.jsonLdToTrig(newVal.toJS())
-                    .then(trig => {
-                        this.contentGraphTrig = trig;
-                    })
-                    .catch(e => {
-                        this.contentGraphTrig = JSON.stringify(e);
-                    })
-                }
-            )
-            */
     }
 
     getHeaderText(message) {
@@ -517,10 +446,7 @@ function genComponentConf() {
       messageUri: "=",
       connectionUri: "=",
       hideOption: "=",
-      /*
-             * Usage:
-             *  on-update="::myCallback(draft)"
-             */
+      // Usage: on-update="::myCallback(draft)"
       onUpdate: "&",
       onSendProposal: "&",
       onRemoveData: "&",
@@ -533,6 +459,7 @@ export default angular
   .module("won.owner.components.connectionMessage", [
     squareImageModule,
     labelledHrModule,
+    connectionMessageStatusModule,
     inviewModule.name,
     trigModule,
   ])
