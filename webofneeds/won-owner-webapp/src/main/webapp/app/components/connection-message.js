@@ -147,12 +147,10 @@ function genComponentConf() {
             </div>
             <won-connection-message-status message-uri="self.message.get('uri')" connection-uri="self.connection.get('uri')">
             </won-connection-messages-status>
-            <a ng-show="self.rdfLinkURL"
-                target="_blank"
-                href="{{self.rdfLinkURL}}">
-                    <svg class="rdflink__small clickable">
-                            <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
-                    </svg>
+            <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
+                <svg class="rdflink__small clickable">
+                    <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
+                </svg>
             </a>
         </div>
     `;
