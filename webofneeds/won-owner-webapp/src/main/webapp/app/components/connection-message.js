@@ -50,8 +50,8 @@ function genComponentConf() {
     			      ng-class="{
     			        'agreement' : 	!self.isNormalMessage(),
     			        'info' : self.isInfoMessage(),
-                  'pending': self.message.get('outgoingMessage') && !self.message.get('failedToSend') && (!self.message.get('isReceivedByOwn') && !self.message.get('isReceivedByRemote')),
-                  'partiallyLoaded': self.message.get('outgoingMessage') && !self.message.get('failedToSend') && (!(self.message.get('isReceivedByOwn') && self.message.get('isReceivedByRemote')) && (self.message.get('isReceivedByOwn') || self.message.get('isReceivedByRemote'))),
+                  'pending': self.isPending(),
+                  'partiallyLoaded': self.isPartiallyLoaded(),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
                 <div class="won-cm__center__bubble__text">
@@ -428,6 +428,34 @@ function genComponentConf() {
         this.message.get("isAcceptMessage") ||
         this.message.get("isRetractMessage") ||
         this.message.get("isRejectMessage")
+      );
+    }
+
+    /**
+     * determines if the sent message is not received by any of the servers yet but not failed either
+     */
+    isPending() {
+      return (
+        this.message.get("outgoingMessage") &&
+        !this.message.get("failedToSend") &&
+        !this.message.get("isReceivedByOwn") &&
+        !this.message.get("isReceivedByRemote")
+      );
+    }
+
+    /**
+     * determines if the sent message is received by any of the servers yet but not failed either
+     */
+    isPartiallyLoaded() {
+      return (
+        this.message.get("outgoingMessage") &&
+        !this.message.get("failedToSend") &&
+        (!(
+          this.message.get("isReceivedByOwn") &&
+          this.message.get("isReceivedByRemote")
+        ) &&
+          (this.message.get("isReceivedByOwn") ||
+            this.message.get("isReceivedByRemote")))
       );
     }
 
