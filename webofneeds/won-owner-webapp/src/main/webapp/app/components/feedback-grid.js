@@ -47,7 +47,6 @@ function genComponentConf() {
       switch (rating) {
         case won.WON.binaryRatingGood:
           this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
-          this.connections__markAsRated({ connectionUri: this.connectionUri });
           break;
 
         case won.WON.binaryRatingBad:

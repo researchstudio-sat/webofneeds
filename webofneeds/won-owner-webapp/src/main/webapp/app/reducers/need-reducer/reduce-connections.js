@@ -131,7 +131,7 @@ export function markConnectionAsRated(state, connectionUri) {
       "no connection with connectionUri: <",
       connectionUri,
       "> found within needUri: <",
-      need.get("uri"),
+      need && need.get("uri"),
       ">"
     );
     return state;
