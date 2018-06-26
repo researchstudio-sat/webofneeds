@@ -14,7 +14,7 @@ const emptyDraft = deepFreeze({
   title: "",
   type: won.WON.BasicNeedTypeCombined,
   description: "",
-  tags: [],
+  tags: undefined,
   location: undefined,
   travelAction: undefined,
   thumbnail: undefined,
@@ -171,7 +171,7 @@ function genComponentConf() {
                 ng-click="self.onScroll({element: '.cis__details'})"
                 ng-if="self.openDetail === 'location'"
                 initial-location="::self.draftObject.location"
-                on-location-picked="::self.updateLocation(location)">
+                on-location-updated="::self.updateLocation(location)">
             </won-location-picker>
 
             <!-- PERSON -->
@@ -295,7 +295,7 @@ function genComponentConf() {
         this.draftObject.travelAction = undefined;
       }
       if (!this.details.has("tags")) {
-        this.draftObject.tags = [];
+        this.draftObject.tags = undefined;
       }
       if (!this.details.has("ttl")) {
         this.draftObject.ttl = undefined;
@@ -317,7 +317,7 @@ function genComponentConf() {
     }
 
     updateDescription(description) {
-      if (description && description.length > 0) {
+      if (description) {
         if (!this.details.has("description")) {
           this.details.add("description");
         }
@@ -342,6 +342,7 @@ function genComponentConf() {
       this.updateDraft();
     }
 
+    // works differently to other details and should not be lumped in with them
     updateMatchingContext(matchingContext) {
       // also accepts []!
       if (matchingContext) {
@@ -358,7 +359,7 @@ function genComponentConf() {
     }
 
     updatePerson(person) {
-      if (person && !this.isEmptyPerson(person)) {
+      if (person) {
         if (!this.details.has("person")) {
           this.details.add("person");
         }
@@ -371,17 +372,8 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    isEmptyPerson(person) {
-      return Array.from(person.values()).every(
-        x => x === undefined || x === "" || (x && x.size === 0)
-      );
-    }
-
     updateRoute(travelAction) {
-      if (
-        travelAction &&
-        (travelAction.fromLocation || travelAction.toLocation)
-      ) {
+      if (travelAction) {
         if (!this.details.has("route")) {
           this.details.add("route");
         }
@@ -395,21 +387,21 @@ function genComponentConf() {
     }
 
     updateTags(tags) {
-      if (tags && tags.length > 0) {
+      if (tags) {
         if (!this.details.has("tags")) {
           this.details.add("tags");
         }
         this.draftObject.tags = tags;
       } else if (this.details.has("tags")) {
         this.details.delete("tags");
-        this.draftObject.tags = [];
+        this.draftObject.tags = undefined; // TODO: does this break anything?
       }
 
       this.updateDraft();
     }
 
     updateTTL(ttl) {
-      if (ttl && ttl.length > 0) {
+      if (ttl) {
         if (!this.details.has("ttl")) {
           this.details.add("ttl");
         }
