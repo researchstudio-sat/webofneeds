@@ -19,7 +19,7 @@ function genComponentConf() {
                 </svg>
                 <span class="feedback__text">Good match - connect!</span>
             </a>
-            <!--div class="feedback" ng-click="self.rateMatch(1)">
+            <!--div class="feedback" ng-click="self.rateMatch(self.WON.binaryRatingGood)">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="feedback__icon unselected">
                         <use xlink:href="#ico36_feedback_ok" href="#ico36_feedback_ok"></use>
@@ -30,7 +30,7 @@ function genComponentConf() {
                 </svg>
                 <span class="feedback__text">OK - request conversation</span>
             </div-->
-            <div class="feedback clickable" ng-click="self.rateMatch(2)">
+            <div class="feedback clickable" ng-click="self.rateMatch(self.WON.binaryRatingBad)">
                 <svg class="feedback__icon unselected" style="--local-primary:black;">
                     <use xlink:href="#ico36_feedback_notatall" href="#ico36_feedback_notatall"></use>
                 </svg>
@@ -45,13 +45,15 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
+      this.WON = won.WON;
+
       const selectFromState = () => ({});
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
     rateMatch(rating) {
       switch (rating) {
-        case 0:
+        case won.WON.binaryRatingGood:
           console.log("RATE GOOD");
           this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
           this.connections__markAsRated({ connectionUri: this.connectionUri });
@@ -61,7 +63,7 @@ function genComponentConf() {
                     console.log("RATE OK");
                     this.connections__rate(this.item, 1);
                     break;*/
-        case 2:
+        case won.WON.binaryRatingBad:
           console.log("RATE BAD");
           this.connections__close(this.connectionUri);
           this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
