@@ -1,10 +1,10 @@
 @import "won-config";
 @import "square-image";
 
-won-connection-messages-status {
+won-connection-message-status {
   display: block;
 
-  msgstatus__time {
+  .msgstatus__time {
     display: inline-block;
     color: $won-line-gray;
     --local-primary: #{$won-secondary-color};
@@ -18,7 +18,7 @@ won-connection-messages-status {
       //TODO: FAILURE MESSAGE STYLING
     }
   }
-  msgstatus__icons {
+  .msgstatus__icons {
     display: inline-block;
     &__icon {
       display: inline-block;
