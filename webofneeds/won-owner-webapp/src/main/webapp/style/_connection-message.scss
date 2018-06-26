@@ -30,11 +30,21 @@ won-connection-message {
         $thinBorderWidth,
         0.8rem
       );
+
+      &.agreement,
+      &.info {
+        @include speech-bubble-left(
+          $won-light-gray,
+          $thinDarkBorder,
+          $speechBubbleTailSize/2,
+          $thinBorderWidth,
+          0.8rem
+        );
+      }
     }
   }
   &.won-cm--right {
     justify-content: flex-end;
-    color: red !important;
     & .won-cm__center__bubble {
       @include speech-bubble-right(
         $won-light-gray,
@@ -43,6 +53,17 @@ won-connection-message {
         $thinBorderWidth,
         0.8rem
       );
+
+      &.agreement,
+      &.info {
+        @include speech-bubble-right(
+          $won-light-gray,
+          $thinDarkBorder,
+          $speechBubbleTailSize/2,
+          $thinBorderWidth,
+          0.8rem
+        );
+      }
     }
   }
   &.won-not-relevant {
@@ -56,12 +77,42 @@ won-connection-message {
     grid-area: content;
     font-size: $smallFontSize;
     max-width: 100%;
+
     .won-cm__center__bubble {
       padding: 0.5rem;
       border: $thinGrayBorder;
       word-break: break-word;
       min-height: 2.5rem;
       box-sizing: border-box; // background: $won-light-gray;
+      background-color: $won-light-gray; // like the error toast-notifications
+      color: black;
+
+      &__carret {
+        svg {
+          @include fixed-square(1rem); // visually center icon on line
+        }
+      }
+
+      &__text__message--prewrap {
+        white-space: pre-wrap;
+      }
+
+      &__button-area {
+        border-top: $thinGrayBorder;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 0.5rem;
+      }
+
+      won-trig {
+        border-top: $thinGrayBorder;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      //Message Type Styling
       &.agreement {
         padding: 0.5rem;
         border: $thinDarkBorder;
@@ -73,14 +124,17 @@ won-connection-message {
         border: $thinDarkBorder;
         background: $won-light-gray;
       }
-      &__text__message--prewrap {
-        white-space: pre-wrap;
+
+      //Message Sent Status styling
+      &.pending {
+        opacity: 0.33;
       }
-      &__button-area {
-        padding-top: 0.5rem;
-        display: grid;
-        grid-auto-flow: column;
-        grid-gap: 0.5rem;
+      &.partiallyLoaded {
+        opacity: 0.66;
+      }
+      &.failure {
+        color: #ff0000;
+        //TODO: FAILURE MESSAGE STYLING
       }
     }
     &.won-cm__center--nondisplayable {
@@ -91,28 +145,6 @@ won-connection-message {
         background-color: white; // like the error toast-notifications
         color: #8f8f8f;
       }
-    }
-    .won-cm__center__bubble {
-      background-color: $won-light-gray; // like the error toast-notifications
-      color: black;
-
-      &.pending {
-        opacity: 0.33;
-      }
-      &.partiallyLoaded {
-        opacity: 0.66;
-      }
-
-      &.failure {
-        color: #ff0000;
-        //TODO: FAILURE MESSAGE STYLING
-      }
-    }
-
-    &__carret {
-      @include fixed-square(1rem); // visually center icon on line
-      position: relative;
-      top: 0.1em;
     }
   }
 }

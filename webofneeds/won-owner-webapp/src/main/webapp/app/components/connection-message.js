@@ -15,6 +15,7 @@ import {
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { selectNeedByConnectionUri } from "../selectors.js";
+import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -55,53 +56,46 @@ function genComponentConf() {
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
                 <div class="won-cm__center__bubble__text">
-                  <div ng-if="self.headerText">
-                    <h3>
-                      {{ self.headerText }}
-                      <svg class="won-cm__center__carret clickable"
-                              ng-if="!self.showText && (self.isInfoMessage() || !self.isRelevant)"
-                              ng-click="self.showText = true">
-                          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                      </svg>
-                      <svg class="won-cm__center__carret clickable"
-                              ng-if="self.showText && (self.isInfoMessage() || !self.isRelevant)"
-                              ng-click="self.showText = false">
-                          <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                      </svg>
-                    </h3>
-                  </div>
-                  <div class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-                  <div class="won-cm__center__button" ng-if="self.isNormalMessage()">
-                    <svg class="won-cm__center__carret clickable"
-                              ng-click="self.showDetail = !self.showDetail"
-                              ng-if="self.allowProposals"
-                              ng-show="!self.showDetail && self.isRelevant">
-                          <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                    <h3 ng-if="self.headerText">{{ self.headerText }}</h3>
+                    <div class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                </div>
+                <div class="won-cm__center__bubble__carret clickable"
+                    ng-if="self.headerText && (self.isInfoMessage() || !self.isRelevant)"
+                    ng-click="self.showText = !self.showText">
+                    <svg ng-show="!self.showText">
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                     </svg>
-                    <div class="won-cm__center__carret clickable"
-                          ng-click="self.showDetail = !self.showDetail"
-                          ng-show="self.showDetail  && self.isRelevant">
-                        <won-labelled-hr arrow="'up'" style="margin-top: .5rem; margin-bottom: .5rem;"></won-labelled-hr>
-                    </div>
-                  </div>
-                  <div class="won-cm__center__bubble__button-area" ng-show="self.showDetail && self.isRelevant">
+                    <svg ng-show="self.showText">
+                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                    </svg>
+                </div>
+                <div class="won-cm__center__bubble__carret clickable"
+                    ng-if="self.isRelevant && self.isNormalMessage() && self.allowProposals"
+                    ng-click="self.showDetail = !self.showDetail">
+                    <svg ng-show="!self.showDetail">
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                    </svg>
+                    <svg ng-show="self.showDetail">
+                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                    </svg>
+                </div>
+                <won-trig
+                    trig="self.contentGraphTrig"
+                    ng-show="self.shouldShowRdf && self.contentGraphTrig">
+                </won-trig>
+                <div class="won-cm__center__bubble__button-area"
+                    ng-if="self.showDetail && self.isRelevant">
                     <button class="won-button--filled thin black"
                         ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
                         ng-show="self.showDetail">
-                      Propose <span ng-show="self.clicked">(again)</span>
+                        Propose <span ng-show="self.clicked">(again)</span>
                     </button>
                     <button class="won-button--filled thin black"
                         ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
                         ng-show="self.showDetail && self.message.get('outgoingMessage')">
                         Retract
                     </button>
-                  </div>
                 </div>
-                <hr ng-show="self.shouldShowRdf && self.contentGraphTrig"/>
-                <won-trig
-                    trig="self.contentGraphTrig"
-                    ng-show="self.shouldShowRdf && self.contentGraphTrig">
-                </won-trig>
                 <div class="won-cm__center__bubble__button-area"
                     ng-if="self.message.get('isProposeMessage')
                         && !self.message.get('isAcceptMessage')
@@ -258,6 +252,39 @@ function genComponentConf() {
         ["self.connectionUri", "self.messageUri"],
         this
       );
+
+      classOnComponentRoot(
+        "won-cm--left",
+        () => this.isReceivedMessage(),
+        this
+      );
+      classOnComponentRoot(
+        "won-cm--right",
+        () => this.isOutgoingMessage(),
+        this
+      );
+      classOnComponentRoot(
+        "won-cm--system",
+        () => this.isSystemMessage(),
+        this
+      );
+      classOnComponentRoot("won-unread", () => this.isUnread(), this);
+    }
+
+    isReceivedMessage() {
+      return this.message && !this.message.get("outgoingMessage");
+    }
+
+    isSystemMessage() {
+      return false;
+    }
+
+    isOutgoingMessage() {
+      return this.message && this.message.get("outgoingMessage");
+    }
+
+    isUnread() {
+      return this.message && this.message.get("unread");
     }
 
     getHeaderText(message) {

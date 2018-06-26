@@ -75,10 +75,7 @@ function genComponentConf() {
                 message-uri="msg.get('uri')"
                 hide-option="msg.hide"
                 ng-class="{
-                    'won-unread' : msg.get('unread'),
                     'won-not-relevant': !msg.get('isRelevant') || msg.hide,
-                    'won-cm--left' : !msg.get('outgoingMessage'),
-                    'won-cm--right' : msg.get('outgoingMessage')
                 }"
                 on-update="self.setShowAgreementData(false)"
                 on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
