@@ -62,7 +62,7 @@
 
       &__icon {
         @include fixed-square(1em);
-        --local-primary: $won-primary-color;
+        --local-primary: #{$won-primary-color};
       }
     }
 
