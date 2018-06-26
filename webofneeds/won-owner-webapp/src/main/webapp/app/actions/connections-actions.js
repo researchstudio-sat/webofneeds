@@ -271,16 +271,14 @@ export function connectionsClose(connectionUri) {
       ownNeed.get("nodeUri"),
       theirNeed.get("nodeUri"),
       theirConnectionUri
-    ).then(closeMessage => {
-      dispatch(
-        actionCreators.messages__send({
-          eventUri: closeMessage.eventUri,
-          message: closeMessage.message,
-        })
-      );
+    ).then(({ eventUri, message }) => {
       dispatch({
         type: actionTypes.connections.close,
-        payload: { connectionUri },
+        payload: {
+          connectionUri,
+          eventUri,
+          message,
+        },
       });
     });
   };
