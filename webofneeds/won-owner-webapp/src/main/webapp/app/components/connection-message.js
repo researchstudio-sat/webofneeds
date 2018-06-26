@@ -55,9 +55,9 @@ function genComponentConf() {
                   'partiallyLoaded': self.isPartiallyLoaded(),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
-                <div class="won-cm__center__bubble__text">
+                <div class="won-cm__center__bubble__content">
                     <h3 ng-if="self.headerText">{{ self.headerText }}</h3>
-                    <div class="won-cm__center__bubble__text__message--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                    <div class="won-cm__center__bubble__content__text--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                 </div>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="self.headerText && (self.isInfoMessage() || !self.isRelevant)"

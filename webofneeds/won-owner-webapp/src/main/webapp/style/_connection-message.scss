@@ -79,6 +79,9 @@ won-connection-message {
     max-width: 100%;
 
     .won-cm__center__bubble {
+      display: grid;
+      grid-template-areas: "content carret" "trig trig" "actions actions";
+      grid-template-columns: 1fr min-content;
       padding: 0.5rem;
       border: $thinGrayBorder;
       word-break: break-word;
@@ -88,16 +91,22 @@ won-connection-message {
       color: black;
 
       &__carret {
+        grid-area: carret;
         svg {
           @include fixed-square(1rem); // visually center icon on line
         }
       }
 
-      &__text__message--prewrap {
-        white-space: pre-wrap;
+      &__content {
+        grid-area: content;
+
+        &__content__text--prewrap {
+          white-space: pre-wrap;
+        }
       }
 
       &__button-area {
+        grid-area: actions;
         border-top: $thinGrayBorder;
         padding-top: 0.5rem;
         margin-top: 0.5rem;
@@ -107,6 +116,7 @@ won-connection-message {
       }
 
       won-trig {
+        grid-area: trig;
         border-top: $thinGrayBorder;
         padding-top: 0.5rem;
         margin-top: 0.5rem;
