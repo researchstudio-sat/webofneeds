@@ -115,12 +115,12 @@ function genComponentConf() {
 
                 <!-- ROUTE PICKER -->
                 <div class="cis__detail__items__item route"
-                    ng-click="self.toggleOpenDetail('route')"
-                    ng-class="{'picked' : self.openDetail === 'route'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('route')">
+                    ng-click="self.toggleOpenDetail('travelAction')"
+                    ng-class="{'picked' : self.openDetail === 'travelAction'}">
+                        <svg class="cis__circleicon" ng-show="!self.details.has('travelAction')">
                             <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
                         </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('route')">
+                        <svg class="cis__circleicon" ng-show="self.details.has('travelAction')">
                             <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                         </svg>
                         <span>Route (From - To)</span>
@@ -163,7 +163,7 @@ function genComponentConf() {
               ng-click="self.onScroll({element: '.cis__details'})"
               ng-if="self.openDetail === 'description'"
               initial-description="::self.draftObject.description"
-              on-description-updated="::self.updateDescription(description)">
+              on-description-updated="::self.updateDetail('description', description)">
             </won-description-picker>
 
             <!-- LOCATION -->
@@ -171,22 +171,22 @@ function genComponentConf() {
                 ng-click="self.onScroll({element: '.cis__details'})"
                 ng-if="self.openDetail === 'location'"
                 initial-location="::self.draftObject.location"
-                on-location-updated="::self.updateLocation(location)">
+                on-location-updated="::self.updateDetail('location', location)">
             </won-location-picker>
 
             <!-- PERSON -->
             <won-person-picker 
               ng-if="self.openDetail === 'person'"
               initial-person="::self.draftObject.person"
-              on-person-updated="::self.updatePerson(person)">
+              on-person-updated="::self.updateDetail('person', person)">
             </won-person-picker>
 
             <!-- ROUTE -->
             <won-route-picker
               ng-click="self.onScroll({element: '.cis__details'})"
-              ng-if="self.openDetail === 'route'"
+              ng-if="self.openDetail === 'travelAction'"
               initial-travel-action="::self.draftObject.travelAction"
-              on-route-updated="::self.updateRoute(travelAction)">
+              on-route-updated="::self.updateDetail('travelAction', travelAction)">
             </won-route-picker>
 
             <!-- TAGS -->
@@ -195,7 +195,7 @@ function genComponentConf() {
                 ng-click="self.onScroll()"
                 ng-if="self.openDetail === 'tags'"
                 initial-tags="::self.draftObject.tags"
-                on-tags-updated="::self.updateTags(tags)">
+                on-tags-updated="::self.updateDetail('tags', tags)">
             </won-tags-picker>
 
             <!-- TTL -->
@@ -204,7 +204,7 @@ function genComponentConf() {
               ng-click="self.onScroll()"
               ng-if="self.openDetail === 'ttl'"
               initial-ttl="::self.draftObject.ttl"
-              on-ttl-updated="::self.updateTTL(ttl)">
+              on-ttl-updated="::self.updateDetail('ttl', ttl)">
             </won-ttl-picker>
         </div>
         <!-- /DETAILS/ -->
@@ -279,6 +279,7 @@ function genComponentConf() {
     }
 
     updateDraft() {
+      // TODO: this should use a detail list instead
       if (!this.details.has("description")) {
         this.draftObject.description = undefined;
       }
@@ -291,7 +292,7 @@ function genComponentConf() {
       if (!this.details.has("person")) {
         this.draftObject.person = undefined;
       }
-      if (!this.details.has("route")) {
+      if (!this.details.has("travelAction")) {
         this.draftObject.travelAction = undefined;
       }
       if (!this.details.has("tags")) {
@@ -316,27 +317,15 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    updateDescription(description) {
-      if (description) {
-        if (!this.details.has("description")) {
-          this.details.add("description");
+    updateDetail(name, value) {
+      if (value) {
+        if (!this.details.has(name)) {
+          this.details.add(name);
         }
-        this.draftObject.description = description;
-      } else if (this.details.has("description")) {
-        this.details.delete("description");
-        this.draftObject.description = undefined;
-      }
-    }
-
-    updateLocation(location) {
-      if (location) {
-        if (!this.details.has("location")) {
-          this.details.add("location");
-        }
-        this.draftObject.location = location;
-      } else if (this.details.has("location")) {
-        this.details.delete("location");
-        this.draftObject.location = undefined;
+        this.draftObject[name] = value;
+      } else if (this.details.has(name)) {
+        this.details.delete(name);
+        this.draftObject[name] = undefined;
       }
 
       this.updateDraft();
@@ -353,62 +342,6 @@ function genComponentConf() {
       } else if (this.details.has("matching-context")) {
         this.details.delete("matching-context");
         this.draftObject.matchingContext = undefined;
-      }
-
-      this.updateDraft();
-    }
-
-    updatePerson(person) {
-      if (person) {
-        if (!this.details.has("person")) {
-          this.details.add("person");
-        }
-        this.draftObject.person = person;
-      } else if (this.details.has("person")) {
-        this.details.delete("person");
-        this.draftObject.person = undefined;
-      }
-
-      this.updateDraft();
-    }
-
-    updateRoute(travelAction) {
-      if (travelAction) {
-        if (!this.details.has("route")) {
-          this.details.add("route");
-        }
-        this.draftObject.travelAction = travelAction;
-      } else if (this.details.has("route")) {
-        this.details.delete("route");
-        this.draftObject.travelAction = undefined;
-      }
-
-      this.updateDraft();
-    }
-
-    updateTags(tags) {
-      if (tags) {
-        if (!this.details.has("tags")) {
-          this.details.add("tags");
-        }
-        this.draftObject.tags = tags;
-      } else if (this.details.has("tags")) {
-        this.details.delete("tags");
-        this.draftObject.tags = undefined; // TODO: does this break anything?
-      }
-
-      this.updateDraft();
-    }
-
-    updateTTL(ttl) {
-      if (ttl) {
-        if (!this.details.has("ttl")) {
-          this.details.add("ttl");
-        }
-        this.draftObject.ttl = ttl;
-      } else if (this.details.has("ttl")) {
-        this.details.delete("ttl");
-        this.draftObject.ttl = undefined;
       }
 
       this.updateDraft();
