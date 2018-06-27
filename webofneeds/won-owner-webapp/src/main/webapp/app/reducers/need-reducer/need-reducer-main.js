@@ -257,6 +257,10 @@ export default function(allNeedsInState = initialState, action = {}) {
             [eventUri]: {
               uri: eventUri,
               text: optimisticEvent.getTextMessage(),
+              content: {
+                text: optimisticEvent.getTextMessage(),
+              },
+              isParsable: !!optimisticEvent.getTextMessage(),
               date: msStringToDate(optimisticEvent.getSentTimestamp()),
               outgoingMessage: true,
               unread: true,

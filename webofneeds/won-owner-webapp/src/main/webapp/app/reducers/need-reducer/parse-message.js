@@ -33,13 +33,22 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
         ? wonMessage.getRemoteMessageUri()
         : undefined,
       text: wonMessage.getTextMessage(),
+      content: {
+        text: wonMessage.getTextMessage(),
+        matchScore: wonMessage.getMatchScore(),
+        proposes: wonMessage.getProposedMessages(),
+        proposesToCancel: wonMessage.getProposedToCancelMessages(),
+        accepts: wonMessage.getAcceptedMessages(),
+        rejects: wonMessage.getRejectsMessages(),
+        retracts: wonMessage.getRetractMessages(),
+      },
+      isParsable: false, //will be determined by the hasParsableContent function
       contentGraphs: wonMessage.getContentGraphs(),
       date: msStringToDate(wonMessage.getTimestamp()),
       outgoingMessage: wonMessage.isFromOwner(),
       unread:
         !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
       messageType: wonMessage.getMessageType(),
-      //TODO: add all different types
       clauses: clauses,
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
@@ -65,6 +74,10 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
+  parsedMessage.data.isParsable = hasParsableContent(
+    parsedMessage.data.content
+  );
+
   if (
     !parsedMessage.data.uri ||
     !parsedMessage.belongsToUri ||
@@ -78,4 +91,15 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   } else {
     return Immutable.fromJS(parsedMessage);
   }
+}
+
+function hasParsableContent(content) {
+  for (let prop in content) {
+    if (content[prop] !== undefined && content[prop] != null) {
+      console.log("message has parsable content");
+      return true;
+    }
+  }
+  console.log("message has NO parsable content");
+  return false;
 }
