@@ -1,0 +1,14 @@
+won-message-content {
+  display: block;
+
+  .msgcontent__text--prewrap {
+    white-space: pre-wrap;
+  }
+
+  .msgcontent__text {
+  }
+
+  .msgcontent__type {
+    font-weight: bold;
+  }
+}

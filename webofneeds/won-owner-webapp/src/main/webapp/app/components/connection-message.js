@@ -6,6 +6,7 @@ import Immutable from "immutable";
 import squareImageModule from "./square-image.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
+import messageContentModule from "./message-content.js";
 import trigModule from "./trig.js";
 import { connect2Redux } from "../won-utils.js";
 import { attach, get, getIn, deepFreeze } from "../utils.js";
@@ -55,10 +56,15 @@ function genComponentConf() {
                   'partiallyLoaded': self.isPartiallyLoaded(),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
-                <div class="won-cm__center__bubble__content">
-                    <h3 ng-if="self.headerText">{{ self.headerText }}</h3>
-                    <div class="won-cm__center__bubble__content__text--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noTextPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+                <div class="won-cm__center__bubble__content" ng-if="self.headerText">
+                    <h3>{{ self.headerText }}</h3>
+                    <div class="won-cm__center__bubble__content__text--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noParsableContentPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
                 </div>
+                <won-message-content
+                    ng-if="!self.headerText"
+                    message-uri="self.message.get('uri')"
+                    connection-uri="self.connection.get('uri')">
+                </won-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="self.headerText && (self.isInfoMessage() || !self.isRelevant)"
                     ng-click="self.showText = !self.showText">
@@ -97,32 +103,18 @@ function genComponentConf() {
                     </button>
                 </div>
                 <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.message.get('isProposeMessage')
+                    ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel'))
                         && !self.message.get('isAcceptMessage')
                         && !self.clicked
                         && self.isRelevant ">
                     <button class="won-button--filled thin red"
+                        ng-if="self.message.get('isProposeMessage')"
                         ng-show="!self.message.get('outgoingMessage') && !self.clicked"
                         ng-click="self.acceptProposal()">
                       Accept
                     </button>
-                    <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage')"
-                        ng-click="self.rejectMessage()">
-                      Reject
-                    </button>
-                    <button class="won-button--filled thin black"
-                        ng-show="self.message.get('outgoingMessage')"
-                        ng-click="self.retractMessage()">
-                        Retract
-                    </button>
-                </div>
-                <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.message.get('isProposeToCancel')
-                        && !self.message.get('isAcceptMessage')
-                        && !self.clicked
-                        && self.isRelevant">
                     <button class="won-button--filled thin red"
+                      ng-if="self.message.get('isProposeToCancel')"
                         ng-show="!self.message.get('outgoingMessage')"
                         ng-click="self.acceptProposeToCancel()">
                       Accept
@@ -135,7 +127,7 @@ function genComponentConf() {
                     <button class="won-button--filled thin black"
                         ng-show="self.message.get('outgoingMessage')"
                         ng-click="self.retractMessage()">
-                      Retract
+                        Retract
                     </button>
                 </div>
             </div>
@@ -154,13 +146,11 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.clicked = false;
       this.showDetail = false;
+      this.won = won;
 
-      window.cmsg4dbg = this;
-
-      const self = this;
-
-      self.noTextPlaceholder =
-        "«This message couldn't be displayed as it didn't contain text! " +
+      this.noParsableContentPlaceholder =
+        "«This message couldn't be displayed as it didn't contain," +
+        "any parsable content! " +
         'Click on the "Show raw RDF data"-button in ' +
         'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
 
@@ -225,15 +215,15 @@ function genComponentConf() {
           );
         }
 
-        const isRelevant = message.get("isRelevant") ? !this.hideOption : false;
-
         return {
           ownNeed,
           theirNeed,
           connection,
           message,
-          isRelevant: isRelevant,
-          showText: this.isInfoMessage(message) ? false : isRelevant,
+          isRelevant: message.get("isRelevant") || !this.hideOption,
+          showText: this.isInfoMessage(message)
+            ? false
+            : message.get("isRelevant") || !this.hideOption,
           text: text ? text : message ? message.get("text") : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
@@ -438,10 +428,8 @@ function genComponentConf() {
       }
       return !(
         this.message.get("isProposeMessage") ||
-        this.message.get("isAcceptMessage") ||
         this.message.get("isProposeToCancel") ||
-        this.message.get("isRetractMessage") ||
-        this.message.get("isRejectMessage")
+        this.isInfoMessage(message)
       );
     }
 
@@ -513,6 +501,7 @@ export default angular
     squareImageModule,
     labelledHrModule,
     connectionMessageStatusModule,
+    messageContentModule,
     inviewModule.name,
     trigModule,
   ])

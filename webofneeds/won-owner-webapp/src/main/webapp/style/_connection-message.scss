@@ -2,6 +2,7 @@
 @import "square-image";
 @import "trig";
 @import "connection-message-status";
+@import "message-content";
 
 won-connection-message {
   &.won-unread {
@@ -97,9 +98,12 @@ won-connection-message {
         }
       }
 
+      won-message-content,
       &__content {
         grid-area: content;
+      }
 
+      &__content {
         &__text--prewrap {
           white-space: pre-wrap;
         }
