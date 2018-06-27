@@ -224,7 +224,11 @@ function genComponentConf() {
           showText: this.isInfoMessage(message)
             ? false
             : message.get("isRelevant") || !this.hideOption,
-          text: text ? text : message ? message.get("text") : undefined,
+          text: text
+            ? text
+            : message
+              ? message.getIn(["content", "text"])
+              : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf,
@@ -232,7 +236,7 @@ function genComponentConf() {
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
-            message.get("text"), //allow showing details only when the connection is already present
+            message.getIn(["content", "text"]), //allow showing details only when the connection is already present
         };
       };
 
@@ -298,7 +302,7 @@ function genComponentConf() {
         ) {
           //Get through the caluses "chain" and add the original text
           if (!msg[1].get("clauses")) {
-            return msg[1].get("text");
+            return msg[1].getIn(["content", "text"]);
           } else {
             //TODO: Mutliple clauses
             return this.getClausesText(
@@ -346,7 +350,7 @@ function genComponentConf() {
       const trimmedMsg = buildProposalMessage(
         uri,
         "proposes",
-        this.message.get("text")
+        this.message.getIn(["content", "text"])
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 

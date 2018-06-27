@@ -256,7 +256,6 @@ export default function(allNeedsInState = initialState, action = {}) {
           messages: {
             [eventUri]: {
               uri: eventUri,
-              text: optimisticEvent.getTextMessage(),
               content: {
                 text: optimisticEvent.getTextMessage(),
               },

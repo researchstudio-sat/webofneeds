@@ -31,7 +31,6 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       remoteUri: !wonMessage.isFromOwner()
         ? wonMessage.getRemoteMessageUri()
         : undefined,
-      text: wonMessage.getTextMessage(),
       content: {
         text: wonMessage.getTextMessage(),
         matchScore: wonMessage.getMatchScore(),
