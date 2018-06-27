@@ -21,22 +21,6 @@ const emptyDraft = deepFreeze({
   matchingContext: undefined,
 });
 
-// const availableDetails = {
-//   description: {
-//     name: "description",
-//   },
-//   location: {
-//     name: "location",
-//     title: "Location",
-//     icon: "ico36_location_circle",
-//     component: "won-location-picker", // put all the html here?
-//   },
-//   person: {},
-//   route: {},
-//   tags: {},
-//   ttl: {},
-// };
-
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
@@ -71,85 +55,18 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
             </div>
-            <div class="cis__detail__items" ng-if="self.showDetail" >
-                <!-- DESCRIPTION PICKER -->
-                <div class="cis__detail__items__item description"
-                    ng-click="self.toggleOpenDetail('description')"
-                    ng-class="{'picked' : self.openDetail === 'description'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('description')">
-                            <use xlink:href="#ico36_description_circle" href="#ico36_description_circle"></use>
-                        </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('description')">
-                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                        </svg>
-                        <span>Description</span>
-                </div>
-
-                
-                <!-- LOCATION PICKER -->
-                <div class="cis__detail__items__item location"
-                    ng-click="self.toggleOpenDetail('location')"
-                    ng-class="{'picked' : self.openDetail === 'location'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('location')">
-                            <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
-                        </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('location')">
-                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                        </svg>
-                        <span>Location</span>
-                </div>
-
-                <!-- PERSON PICKER -->
-                <div class="cis__detail__items__item person"
-                ng-click="self.toggleOpenDetail('person')"
-                ng-class="{'picked' : self.openDetail === 'person'}">
-                    <svg class="cis__circleicon" ng-show="!self.details.has('person')">
-                        <!-- TODO: create and use a better icon -->
-                        <use xlink:href="#ico36_person_single_circle" href="#ico36_person_single_circle"></use>
+            <!-- DETAIL TOGGLES -->
+            <div class="cis__detail__items" ng-if="self.showDetail" ng-repeat="detail in self.availableDetails">
+                <div class="cis__detail__items__item"
+                    ng-click="self.toggleOpenDetail(detail.identifier)"
+                    ng-class="{'picked' : self.openDetail === detail.identifier}">
+                    <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
+                        <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
                     </svg>
-                    <svg class="cis__circleicon" ng-show="self.details.has('person')">
+                    <svg class="cis__circleicon" ng-show="self.details.has(detail.identifier)">
                         <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                     </svg>
-                    <span>Person</span>
-                </div>
-
-                <!-- ROUTE PICKER -->
-                <div class="cis__detail__items__item route"
-                    ng-click="self.toggleOpenDetail('travelAction')"
-                    ng-class="{'picked' : self.openDetail === 'travelAction'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('travelAction')">
-                            <use xlink:href="#ico36_location_circle" href="#ico36_location_circle"></use>
-                        </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('travelAction')">
-                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                        </svg>
-                        <span>Route (From - To)</span>
-                </div>
-
-                <!-- TAGS PICKER -->
-                <div class="cis__detail__items__item tags"
-                    ng-click="self.toggleOpenDetail('tags')"
-                    ng-class="{'picked' : self.openDetail === 'tags'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('tags')">
-                            <use xlink:href="#ico36_tags_circle" href="#ico36_tags_circle"></use>
-                        </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('tags')">
-                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                        </svg>
-                        <span>Tags</span>
-                </div>
-
-                <!-- TTL PICKER -->
-                <div class="cis__detail__items__item ttl"
-                    ng-click="self.toggleOpenDetail('ttl')"
-                    ng-class="{'picked' : self.openDetail === 'ttl'}">
-                        <svg class="cis__circleicon" ng-show="!self.details.has('ttl')">
-                            <use xlink:href="#ico36_rdf_logo_circle" href="#ico36_rdf_logo_circle"></use>
-                        </svg>
-                        <svg class="cis__circleicon" ng-show="self.details.has('ttl')">
-                            <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                        </svg>
-                        <span>Turtle (TTL)</span>
+                    <span>{{detail.label}}</span>
                 </div>
             </div>
         </div>
@@ -237,6 +154,53 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       this.won = won;
+
+      // TODO: read this from config, see #1969 and subissues
+      this.availableDetails = {
+        description: {
+          identifier: "description",
+          label: "Description",
+          icon: "#ico36_description_circle",
+          component: "won-description-picker",
+          initialValue: undefined,
+        },
+        location: {
+          identifier: "location",
+          label: "Location",
+          icon: "#ico36_location_circle",
+          component: "won-location-picker", // put all the html here?
+          initialValue: undefined,
+        },
+        person: {
+          identifier: "person",
+          label: "Person",
+          icon: "#ico36_person_single_circle",
+          component: "won-person-picker",
+          initialValue: undefined,
+        },
+        route: {
+          identifier: "travelAction",
+          label: "Route (From - To)",
+          icon: "#ico36_location_circle", // TODO: find/create better icon
+          component: "won-route-picker",
+          initialValue: undefined,
+        },
+        tags: {
+          identifier: "tags",
+          label: "Tags",
+          icon: "#ico36_tags_circle",
+          component: "won-tags-picker",
+          initialValue: undefined,
+        },
+        ttl: {
+          identifier: "ttl",
+          label: "Turtle (TTL)",
+          icon: "#ico36_rdf_logo_circle",
+          component: "won-ttl-picker",
+          initialValue: undefined,
+        },
+      };
+      console.log(this.availableDetails);
 
       //TODO: debug; deleteme
       window.cis4dbg = this;
@@ -379,6 +343,8 @@ function genComponentConf() {
         //this.onScroll({ element: ".cis__addDetail__header.a" });
         this.onScroll({ element: ".cis__details" });
       }
+
+      console.log("toggled ", detail);
     }
 
     titleInputNg() {
