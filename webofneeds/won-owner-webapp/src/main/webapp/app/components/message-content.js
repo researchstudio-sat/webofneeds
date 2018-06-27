@@ -12,10 +12,15 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msgcontent__type" ng-if="self.isConnectMessage() || self.isOpenMessage()"> {{ self.labels.messageType[self.message.get('messageType')] }}</div>
-      <div class="msgcontent__type" ng-if="self.isOtherMessage()"> {{ self.message.get('messageType') }}</div>
-      <div class="msgcontent__text--prewrap" ng-if="self.message.get('text')">{{ self.message.get('text') }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-      <div class="msgcontent__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('text')">{{ self.noParsableContentPlaceholder }}</div>
+      <div class="msgcontent__header" ng-if="!self.isConnectionMessage()">
+        <div class="msgcontent__header__type" ng-if="self.isConnectMessage() || self.isOpenMessage()"> {{ self.labels.messageType[self.message.get('messageType')] }}</div>
+        <div class="msgcontent__header__type" ng-if="self.isOtherMessage()"> {{ self.message.get('messageType') }}</div>
+      </div>
+      <div class="msgcontent__body">
+        <div class="msgcontent__body__text--prewrap" ng-if="self.message.getIn(['content', 'text'])">{{ self.message.getIn(['content', 'text']) }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <div class="msgcontent__body__matchScore" ng-if="self.message.getIn(['content', 'matchScore'])">MatchScore: {{self.message.getIn(['content', 'matchScore']) }}</div>
+        <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
+      </div>
     `;
 
   class Controller {

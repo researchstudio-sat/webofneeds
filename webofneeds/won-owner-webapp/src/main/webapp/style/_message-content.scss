@@ -1,14 +1,21 @@
 won-message-content {
   display: block;
 
-  .msgcontent__text--prewrap {
-    white-space: pre-wrap;
+  .msgcontent__body {
+    &__text--prewrap {
+      white-space: pre-wrap;
+    }
+
+    &__text {
+    }
+
+    &__matchScore {
+    }
   }
 
-  .msgcontent__text {
-  }
-
-  .msgcontent__type {
-    font-weight: bold;
+  .msgcontent__header {
+    &__type {
+      font-weight: bold;
+    }
   }
 }
