@@ -229,8 +229,11 @@ function genComponentConf() {
           connectionsInStateConnected.filter(
             conn =>
               !conn.get("messages") ||
-              conn.get("messages").filter(msg => msg.get("connectMessage"))
-                .size == 0
+              conn
+                .get("messages")
+                .filter(
+                  msg => msg.get("messageType") === won.WONMSG.connectMessage
+                ).size == 0
           );
 
         const connectionsToCrawl = connectionsWithoutConnectMessage
