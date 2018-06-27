@@ -3,6 +3,7 @@ import { msStringToDate, trigPrefixesAndBody } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
 export function parseMessage(wonMessage, alreadyProcessed = false) {
+  console.log("parseMessage: ", wonMessage);
   //seperating off header/@prefix-statements, so they can be folded in
   const { trigPrefixes, trigBody } = trigPrefixesAndBody(
     wonMessage.contentGraphTrig
@@ -37,7 +38,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       outgoingMessage: wonMessage.isFromOwner(),
       unread:
         !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
-      connectMessage: wonMessage.isConnectMessage(),
+      messageType: wonMessage.getMessageType(),
       //TODO: add all different types
       clauses: clauses,
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway

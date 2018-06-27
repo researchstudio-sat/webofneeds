@@ -260,7 +260,7 @@ export default function(allNeedsInState = initialState, action = {}) {
               date: msStringToDate(optimisticEvent.getSentTimestamp()),
               outgoingMessage: true,
               unread: true,
-              connectMessage: true,
+              messageType: won.WONMSG.connectMessage,
               isRelevant: true,
             },
           },
