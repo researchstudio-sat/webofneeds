@@ -229,7 +229,9 @@ function genComponentConf() {
         const chatMessages = connection && connection.get("messages");
         const allLoaded =
           chatMessages &&
-          chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
+          chatMessages.filter(
+            msg => msg.get("messageType") === won.WONMSG.connectMessage
+          ).size > 0;
 
         let agreementStateData = connection && connection.get("agreementData");
 
