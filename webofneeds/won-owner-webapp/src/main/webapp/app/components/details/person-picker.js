@@ -49,6 +49,29 @@ function genComponentConf() {
       delay(0).then(() => this.showInitialPerson());
     }
 
+    /**
+     * Checks validity and uses callback method
+     */
+    update(person) {
+      let isEmpty = true;
+      // check if person is empty
+      if (person) {
+        //check validity
+        const personArray = Array.from(person.values());
+        isEmpty = personArray.every(
+          detail =>
+            detail === undefined ||
+            detail === "" ||
+            (detail && detail.size === 0)
+        );
+      }
+      if (person && !isEmpty) {
+        this.onPersonUpdated({ person: person });
+      } else {
+        this.onPersonUpdated({ person: undefined });
+      }
+    }
+
     showInitialPerson() {
       if (this.initialPerson && this.initialPerson.size > 0) {
         for (let [detail, value] of this.initialPerson.entries()) {
@@ -63,7 +86,7 @@ function genComponentConf() {
             let valueText = value.size > 0 ? value.toJS() : [];
             this.personDetails[personIndex].value = valueText.toString();
           }
-          if (value && value.size > 0) {
+          if (value && value.length > 0) {
             this.visibleResetButtons.add(detail);
           }
         }
@@ -83,7 +106,7 @@ function genComponentConf() {
           this.addedPerson = this.addedPerson.set(detail.name, skills);
         }
 
-        this.onPersonUpdated({ person: this.addedPerson });
+        this.update(this.addedPerson);
 
         if (detail.value.length > 0) {
           this.visibleResetButtons.add(detail.name);
@@ -92,7 +115,7 @@ function genComponentConf() {
         }
       } else {
         this.addedPerson = this.addedPerson.set(detail.name, undefined);
-        this.onPersonUpdated({ person: this.addedPerson });
+        this.update(this.addedPerson);
         this.visibleResetButtons.delete(detail.name);
       }
     }
@@ -110,7 +133,7 @@ function genComponentConf() {
       if (personIndex !== -1) {
         this.personDetails[personIndex].value = "";
       }
-      this.onPersonUpdated({ person: this.addedPerson });
+      this.update(this.addedPerson);
     }
   }
   Controller.$inject = serviceDependencies;

@@ -167,6 +167,21 @@ function genComponentConf() {
       });
     }
 
+    /**
+     * Checks validity and uses callback method
+     */
+    update(travelAction) {
+      if (
+        travelAction &&
+        (travelAction.fromLocation || travelAction.toLocation)
+      ) {
+        // add some sort of validitycheck for locations?
+        this.onRouteUpdated({ travelAction: travelAction });
+      } else {
+        this.onRouteUpdated({ travelAction: undefined });
+      }
+    }
+
     showInitialLocations() {
       if (this.initialTravelAction) {
         this.fromAddedLocation = this.initialTravelAction.fromLocation;
@@ -209,9 +224,7 @@ function genComponentConf() {
       // save new location value
       this.travelAction.fromLocation = location;
       this.travelAction.toLocation = this.toAddedLocation;
-      this.onRouteUpdated({
-        travelAction: this.travelAction,
-      });
+      this.update(this.travelAction);
       this.fromAddedLocation = location;
 
       // represent new value to user
@@ -240,9 +253,7 @@ function genComponentConf() {
       // save new location value
       this.travelAction.fromLocation = this.fromAddedLocation;
       this.travelAction.toLocation = location;
-      this.onRouteUpdated({
-        travelAction: this.travelAction,
-      });
+      this.update(this.travelAction);
       this.toAddedLocation = location;
 
       // represent new value to user
@@ -374,9 +385,7 @@ function genComponentConf() {
 
       this.travelAction.fromLocation = undefined;
       this.travelAction.toLocation = this.toAddedLocation;
-      this.onRouteUpdated({
-        travelAction: this.travelAction,
-      });
+      this.update(this.travelAction);
 
       this.checkValidity();
     }
@@ -396,9 +405,7 @@ function genComponentConf() {
 
       this.travelAction.fromLocation = this.fromAddedLocation;
       this.travelAction.toLocation = undefined;
-      this.onRouteUpdated({
-        travelAction: this.travelAction,
-      });
+      this.update(this.travelAction);
 
       this.checkValidity();
     }

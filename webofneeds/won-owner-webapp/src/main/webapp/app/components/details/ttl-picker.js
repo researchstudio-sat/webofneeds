@@ -63,6 +63,18 @@ function genComponentConf() {
       delay(0).then(() => this.showInitialTTL());
     }
 
+    /**
+     * Checks validity and uses callback method
+     */
+    update(ttlString) {
+      if (ttlString && ttlString.trim().length > 0) {
+        // TODO: currently ignores if TTL is valid, see #1825
+        this.onTtlUpdated({ ttl: ttlString });
+      } else {
+        this.onTtlUpdated({ ttl: undefined });
+      }
+    }
+
     showInitialTTL() {
       if (this.initialTtl && this.initialTtl.trim().length > 0) {
         this.textfield().value = this.initialTtl || "";
@@ -86,10 +98,9 @@ function genComponentConf() {
     updateTTL() {
       const ttlString = this.textfield().value;
       if (ttlString && ttlString.trim().length > 0) {
-        this.onTtlUpdated({ ttl: ttlString });
+        this.update(ttlString);
       } else {
-        this.showResetButton = false;
-        this.ttlParseError = undefined;
+        this.resetTTL();
       }
 
       this.checkTTLparsability();
@@ -116,7 +127,7 @@ function genComponentConf() {
     resetTTL() {
       this.ttlParseError = undefined;
       this.textfield().value = "";
-      this.onTtlUpdated({ ttl: undefined });
+      this.update(undefined);
       this.showResetButton = false;
       // make sure that the textfield updates its size:
       this.textfield().dispatchEvent(new Event("input"));

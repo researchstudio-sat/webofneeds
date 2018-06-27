@@ -33,6 +33,17 @@ function genComponentConf() {
       delay(0).then(() => this.showInitialDescription());
     }
 
+    /**
+     * Checks validity and uses callback method
+     */
+    update(description) {
+      if (description && description.trim().length > 0) {
+        this.onDescriptionUpdated({ description: description });
+      } else {
+        this.onDescriptionUpdated({ description: undefined });
+      }
+    }
+
     showInitialDescription() {
       this.addedDescription = this.initialDescription;
 
@@ -52,7 +63,7 @@ function genComponentConf() {
 
       if (text && text.trim().length > 0) {
         this.addedDescription = text;
-        this.onDescriptionUpdated({ description: this.addedDescription });
+        this.update(this.addedDescription);
         this.showResetButton = true;
       } else {
         this.resetDescription();
@@ -62,7 +73,7 @@ function genComponentConf() {
     resetDescription() {
       this.addedDescription = undefined;
       this.textfield().value = "";
-      this.onDescriptionUpdated({ description: undefined });
+      this.update(undefined);
       this.showResetButton = false;
     }
 
