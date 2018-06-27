@@ -106,7 +106,7 @@ $ngRedux.getState();
                lastUpdateDate: date, //date of lastUpdate of this connection (last date of the message that was added)
                messages: { //Immutable.Map() of all the TextMessages sent over this connection
                    [messageUri]: {
-                       connectMessage: true|false, //whether or not this was the connectMessage(a.k.a firstMessage)
+                       messageType: //no default but is always set to the specific message type of the received/sent wonMessage
                        date: date, //creation Date of this message
                        unread: true|false, //whether or not this message is new (or already seen if you will)
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
