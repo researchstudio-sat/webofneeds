@@ -1327,6 +1327,12 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/agreement#proposesToCancel"
     );
   },
+  getRejectsMessages: function() {
+    return this.getProperty("https://purl.org/webofneeds/agreement#rejects");
+  },
+  getRetractMessages: function() {
+    return this.getProperty("http://purl.org/webofneeds/modification#retracts");
+  },
 
   isProposeMessage: function() {
     return !!this.getProperty("http://purl.org/webofneeds/agreement#proposes");
