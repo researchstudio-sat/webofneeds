@@ -44,7 +44,7 @@ function genComponentConf() {
             ng-if="!self.message.get('outgoingMessage')">
         </won-square-image>
         <div class="won-cm__center"
-                ng-class="{'won-cm__center--nondisplayable': !self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')}"
+                ng-class="{'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable')}"
                 in-view="$inview && self.markAsRead()">
             <div 
                 class="won-cm__center__bubble" 

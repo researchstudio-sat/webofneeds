@@ -3,7 +3,6 @@ import { msStringToDate, trigPrefixesAndBody } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
 
 export function parseMessage(wonMessage, alreadyProcessed = false) {
-  console.log("parseMessage: ", wonMessage);
   //seperating off header/@prefix-statements, so they can be folded in
   const { trigPrefixes, trigBody } = trigPrefixesAndBody(
     wonMessage.contentGraphTrig
@@ -96,10 +95,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
 function hasParsableContent(content) {
   for (let prop in content) {
     if (content[prop] !== undefined && content[prop] != null) {
-      console.log("message has parsable content");
       return true;
     }
   }
-  console.log("message has NO parsable content");
   return false;
 }

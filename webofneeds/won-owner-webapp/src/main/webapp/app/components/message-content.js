@@ -13,7 +13,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
       <div class="msgcontent__header" ng-if="!self.isConnectionMessage()">
-        <div class="msgcontent__header__type" ng-if="self.isConnectMessage() || self.isOpenMessage()"> {{ self.labels.messageType[self.message.get('messageType')] }}</div>
+        <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()"> {{ self.labels.messageType[self.message.get('messageType')] }}</div>
         <div class="msgcontent__header__type" ng-if="self.isOtherMessage()"> {{ self.message.get('messageType') }}</div>
       </div>
       <div class="msgcontent__body">
@@ -72,8 +72,18 @@ function genComponentConf() {
       return this.message.get("messageType") === won.WONMSG.openMessage;
     }
 
+    isHintMessage() {
+      return this.message.get("messageType") === won.WONMSG.hintMessage;
+    }
+
+    isHintFeedbackMessage() {
+      return this.message.get("messageType") === won.WONMSG.hintFeedbackMessage;
+    }
+
     isOtherMessage() {
       return !(
+        this.isHintMessage() ||
+        this.isHintFeedbackMessage() ||
         this.isOpenMessage() ||
         this.isConnectMessage() ||
         this.isConnectionMessage()
