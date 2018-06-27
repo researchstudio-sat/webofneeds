@@ -68,63 +68,19 @@ function genComponentConf() {
                     </svg>
                     <span>{{detail.label}}</span>
                 </div>
+
+                <!-- COMPONENT -->
+                <div 
+                  ng-click="self.onScroll({element: '.cis__details'})"
+                  ng-if="self.openDetail === detail.identifier"
+                  detail-element="{{detail.component}}"
+                  on-update="::self.updateDetail(identifier, value)"
+                  initial-value="::self.draftObject[detail.identifier]"
+                  identifier="detail.identifier">
+                </div>
             </div>
         </div>
         <!-- /DETAIL Picker/ -->
-
-        <!-- DETAILS -->
-        <!-- TODO: move details into the div opened by the detail picker? -->
-        <div class="cis__details" ng-if="self.showDetail">
-            <!-- DESCRIPTION -->
-            <won-description-picker
-              ng-click="self.onScroll({element: '.cis__details'})"
-              ng-if="self.openDetail === 'description'"
-              initial-description="::self.draftObject.description"
-              on-description-updated="::self.updateDetail('description', description)">
-            </won-description-picker>
-
-            <!-- LOCATION -->
-            <won-location-picker
-                ng-click="self.onScroll({element: '.cis__details'})"
-                ng-if="self.openDetail === 'location'"
-                initial-location="::self.draftObject.location"
-                on-location-updated="::self.updateDetail('location', location)">
-            </won-location-picker>
-
-            <!-- PERSON -->
-            <won-person-picker 
-              ng-if="self.openDetail === 'person'"
-              initial-person="::self.draftObject.person"
-              on-person-updated="::self.updateDetail('person', person)">
-            </won-person-picker>
-
-            <!-- ROUTE -->
-            <won-route-picker
-              ng-click="self.onScroll({element: '.cis__details'})"
-              ng-if="self.openDetail === 'travelAction'"
-              initial-travel-action="::self.draftObject.travelAction"
-              on-route-updated="::self.updateDetail('travelAction', travelAction)">
-            </won-route-picker>
-
-            <!-- TAGS -->
-            <won-tags-picker
-                ng-click="self.onScroll({element: '.cis__details'})"
-                ng-click="self.onScroll()"
-                ng-if="self.openDetail === 'tags'"
-                initial-tags="::self.draftObject.tags"
-                on-tags-updated="::self.updateDetail('tags', tags)">
-            </won-tags-picker>
-
-            <!-- TTL -->
-            <won-ttl-picker
-              ng-click="self.onScroll({element: '.cis__details'})"
-              ng-click="self.onScroll()"
-              ng-if="self.openDetail === 'ttl'"
-              initial-ttl="::self.draftObject.ttl"
-              on-ttl-updated="::self.updateDetail('ttl', ttl)">
-            </won-ttl-picker>
-        </div>
-        <!-- /DETAILS/ -->
         
         <!-- MATCHING CONTEXT PICKER -->
         <div class="cis__addDetail">
@@ -162,13 +118,13 @@ function genComponentConf() {
           label: "Description",
           icon: "#ico36_description_circle",
           component: "won-description-picker",
-          initialValue: undefined,
+          initialValue: undefined, // TODO: is initialValue needed?
         },
         location: {
           identifier: "location",
           label: "Location",
           icon: "#ico36_location_circle",
-          component: "won-location-picker", // put all the html here?
+          component: "won-location-picker",
           initialValue: undefined,
         },
         person: {
@@ -383,4 +339,35 @@ function genComponentConf() {
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
   .module("won.owner.components.createIsseek", [])
+  // this directive creates detail picker components with callbacks
+  .directive("detailElement", [
+    "$compile",
+    function($compile) {
+      return {
+        restrict: "A",
+        scope: {
+          onUpdate: "&",
+          initialValue: "=",
+          identifier: "=",
+        },
+        link: function(scope, element, attrs) {
+          const customTag = attrs.detailElement;
+          if (!customTag) return;
+
+          const customElem = angular.element(
+            `<${customTag} initial-value="initialValue" on-update="internalUpdate(value)"></${customTag}>`
+          );
+          //customElem.attr("on-update", scope.onUpdate);
+
+          scope.internalUpdate = function(value) {
+            scope.onUpdate({
+              identifier: scope.identifier,
+              value: value,
+            });
+          };
+          element.append($compile(customElem)(scope));
+        },
+      };
+    },
+  ])
   .directive("wonCreateIsseeks", genComponentConf).name;
