@@ -18,7 +18,6 @@ const emptyDraft = deepFreeze({
   location: undefined,
   travelAction: undefined,
   thumbnail: undefined,
-  matchingContext: undefined,
 });
 
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
@@ -30,81 +29,58 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-        <!-- Mandatory Input Fields -->
-        <div class="cis__mandatory">
-            <input
-                type="text"
-                maxlength="{{self.characterLimit}}"
-                class="cis__mandatory__title won-txt"
-                placeholder="What? - Short title shown in lists"
-                ng-blur="::self.updateTitle()"
-                ng-keyup="::self.updateTitle()"/>
-        </div>
-        <!-- Mandatory Input Fields -->
+    <!-- Mandatory Input Fields -->
+    <div class="cis__mandatory">
+        <input
+            type="text"
+            maxlength="{{self.characterLimit}}"
+            class="cis__mandatory__title won-txt"
+            placeholder="What? - Short title shown in lists"
+            ng-blur="::self.updateTitle()"
+            ng-keyup="::self.updateTitle()"/>
+    </div>
+    <!-- Mandatory Input Fields -->
 
-        <!-- DETAILS Picker -->
-        <div class="cis__addDetail">
-            <div class="cis__addDetail__header a detailPicker clickable"
-                ng-click="self.toggleDetail()"
-                ng-class="{'closedDetailPicker': !self.showDetail}">
-                    <span>Add more detail</span>
-                    <svg class="cis__addDetail__header__carret" ng-show="!self.showDetail">
-                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                    </svg>
-                    <svg class="cis__addDetail__header__carret" ng-show="self.showDetail">
-                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                    </svg>
-            </div>
-            <!-- DETAIL TOGGLES -->
-            <div class="cis__detail__items" ng-if="self.showDetail" ng-repeat="detail in self.availableDetails">
-                <div class="cis__detail__items__item"
-                    ng-click="self.toggleOpenDetail(detail.identifier)"
-                    ng-class="{'picked' : self.openDetail === detail.identifier}">
-                    <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
-                        <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
-                    </svg>
-                    <svg class="cis__circleicon" ng-show="self.details.has(detail.identifier)">
-                        <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                    </svg>
-                    <span>{{detail.label}}</span>
-                </div>
-
-                <!-- COMPONENT -->
-                <div 
-                  ng-click="self.onScroll({element: '.cis__details'})"
-                  ng-if="self.openDetail === detail.identifier"
-                  detail-element="{{detail.component}}"
-                  on-update="::self.updateDetail(identifier, value)"
-                  initial-value="::self.draftObject[detail.identifier]"
-                  identifier="detail.identifier">
-                </div>
-            </div>
-        </div>
-        <!-- /DETAIL Picker/ -->
-        
-        <!-- MATCHING CONTEXT PICKER -->
-        <div class="cis__addDetail">
-            <div class="cis__addDetail__header b detailPicker clickable"
-                ng-click="self.toggleMatchingContext()"
-                ng-class="{'closedDetailPicker': !self.showMatchingContext}">
-                <span>Tune Matching Behaviour</span>
-                <svg class="cis__addDetail__header__carret" ng-show="!self.showMatchingContext">
+    <!-- DETAILS Picker -->
+    <div class="cis__addDetail">
+        <div class="cis__addDetail__header a detailPicker clickable"
+            ng-click="self.toggleDetail()"
+            ng-class="{'closedDetailPicker': !self.showDetail}">
+                <span>Add more detail</span>
+                <svg class="cis__addDetail__header__carret" ng-show="!self.showDetail">
                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                 </svg>
-                <svg class="cis__addDetail__header__carret" ng-show="self.showMatchingContext">
+                <svg class="cis__addDetail__header__carret" ng-show="self.showDetail">
                     <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
+        </div>
+        <!-- DETAIL TOGGLES -->
+        <div class="cis__detail__items" ng-if="self.showDetail" ng-repeat="detail in self.availableDetails">
+            <div class="cis__detail__items__item"
+                ng-click="self.toggleOpenDetail(detail.identifier)"
+                ng-class="{'picked' : self.openDetail === detail.identifier}">
+                <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
+                    <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
+                </svg>
+                <svg class="cis__circleicon" ng-show="self.details.has(detail.identifier)">
+                    <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                </svg>
+                <span>{{detail.label}}</span>
             </div>
-            <div class="cis__detail__matching-context">
-              <won-matching-context-picker
-                ng-click="self.onScroll({element: '.cis__detail__matching-context'})"
-                ng-if="self.showMatchingContext"
-                default-matching-context="::self.defaultMatchingContext"
-                initial-matching-context="::self.draftObject.matchingContext"
-                on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
-              </won-matching-context-picker>
+
+            <!-- COMPONENT -->
+            <div 
+              ng-click="self.onScroll({element: '.cis__details'})"
+              ng-if="self.openDetail === detail.identifier"
+              detail-element="{{detail.component}}"
+              on-update="::self.updateDetail(identifier, value)"
+              initial-value="::self.draftObject[detail.identifier]"
+              identifier="detail.identifier">
             </div>
-        </div>`;
+        </div>
+    </div>
+    <!-- /DETAIL Picker/ -->
+  `;
 
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
@@ -118,42 +94,36 @@ function genComponentConf() {
           label: "Description",
           icon: "#ico36_description_circle",
           component: "won-description-picker",
-          initialValue: undefined, // TODO: is initialValue needed?
         },
         location: {
           identifier: "location",
           label: "Location",
           icon: "#ico36_location_circle",
           component: "won-location-picker",
-          initialValue: undefined,
         },
         person: {
           identifier: "person",
           label: "Person",
           icon: "#ico36_person_single_circle",
           component: "won-person-picker",
-          initialValue: undefined,
         },
         route: {
           identifier: "travelAction",
           label: "Route (From - To)",
           icon: "#ico36_location_circle", // TODO: find/create better icon
           component: "won-route-picker",
-          initialValue: undefined,
         },
         tags: {
           identifier: "tags",
           label: "Tags",
           icon: "#ico36_tags_circle",
           component: "won-tags-picker",
-          initialValue: undefined,
         },
         ttl: {
           identifier: "ttl",
           label: "Turtle (TTL)",
           icon: "#ico36_rdf_logo_circle",
           component: "won-ttl-picker",
-          initialValue: undefined,
         },
       };
       console.log(this.availableDetails);
@@ -162,26 +132,10 @@ function genComponentConf() {
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
-      // TODO: check if this is a good way to do this.
-      this.defaultMatchingContextList = this.$ngRedux
-        .getState()
-        .getIn(["config", "theme", "defaultContext"]);
-      this.defaultMatchingContext = this.defaultMatchingContextList
-        ? this.defaultMatchingContextList.toJS()
-        : [];
 
       this.openDetail = undefined;
 
       this.reset();
-
-      if (
-        this.defaultMatchingContext &&
-        this.defaultMatchingContext.length > 0
-      ) {
-        this.details.add("matching-context");
-        this.draftObject.matchingContext = this.defaultMatchingContext;
-        //this.updateDraft();
-      }
 
       //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
       const selectFromState = () => ({});
@@ -195,7 +149,6 @@ function genComponentConf() {
       this.details = new Set(); // remove all detail-cards
 
       this.showDetail = false; // and close selector
-      this.showMatchingContext = false;
     }
 
     updateDraft() {
@@ -205,9 +158,6 @@ function genComponentConf() {
       }
       if (!this.details.has("location")) {
         this.draftObject.location = undefined;
-      }
-      if (!this.details.has("matching-context")) {
-        this.draftObject.matchingContext = undefined;
       }
       if (!this.details.has("person")) {
         this.draftObject.person = undefined;
@@ -251,22 +201,6 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    // works differently to other details and should not be lumped in with them
-    updateMatchingContext(matchingContext) {
-      // also accepts []!
-      if (matchingContext) {
-        if (!this.details.has("matching-context")) {
-          this.details.add("matching-context");
-        }
-        this.draftObject.matchingContext = matchingContext;
-      } else if (this.details.has("matching-context")) {
-        this.details.delete("matching-context");
-        this.draftObject.matchingContext = undefined;
-      }
-
-      this.updateDraft();
-    }
-
     updateScroll() {
       console.log("Scoll activity");
       this.onScroll();
@@ -283,13 +217,6 @@ function genComponentConf() {
       this.showDetail = !this.showDetail;
     }
 
-    toggleMatchingContext() {
-      if (!this.showMatchingContext) {
-        this.onScroll({ element: ".cis__addDetail__header.b" });
-      }
-      this.showMatchingContext = !this.showMatchingContext;
-    }
-
     toggleOpenDetail(detail) {
       // open clicked detail
       if (this.openDetail === detail) {
@@ -299,8 +226,6 @@ function genComponentConf() {
         //this.onScroll({ element: ".cis__addDetail__header.a" });
         this.onScroll({ element: ".cis__details" });
       }
-
-      console.log("toggled ", detail);
     }
 
     titleInputNg() {

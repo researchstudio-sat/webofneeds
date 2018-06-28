@@ -272,9 +272,7 @@ import { getIn } from "../utils.js";
       : args.seeks.whatsAround;
     const isWhatsNew = args.is ? args.is.whatsNew : args.seeks.whatsNew;
     const noHints = args.is ? args.is.noHints : args.seeks.noHints;
-    const matchingContext = args.is
-      ? args.is.matchingContext
-      : args.seeks.matchingContext;
+    const matchingContext = args.matchingContext;
     const noHintForCounterpart = isWhatsAround
       ? true
       : isWhatsNew

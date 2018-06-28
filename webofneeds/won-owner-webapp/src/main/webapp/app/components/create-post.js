@@ -7,20 +7,21 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
+import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
+import createIsseeksModule from "./create-isseeks.js";
+import { postTitleCharacterLimit } from "config";
+import { get, getIn, attach, deepFreeze, delay } from "../utils.js";
+import { actionCreators } from "../actions/actions.js";
+import won from "../won-es6.js";
+import { connect2Redux } from "../won-utils.js";
+
+// TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
-import matchingContextPicker from "./details/matching-context-picker.js";
 import personPickerModule from "./details/person-picker.js";
 import routePickerModule from "./details/route-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
-import createIsseeksModule from "./create-isseeks.js";
-import { postTitleCharacterLimit } from "config";
-import { get, getIn, attach, deepFreeze } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-import won from "../won-es6.js";
-import { connect2Redux } from "../won-utils.js";
-import { selectIsConnected } from "../selectors.js";
 
 const postTypeTexts = [
   {
@@ -85,9 +86,49 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, 'is')" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, 'seeks')" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
-            <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
+
+            <!-- ADD TITLE AND DETAILS -->
+            <won-create-isseeks 
+                ng-if="self.isPost" 
+                is-or-seeks="::'Description'" 
+                on-update="::self.updateDraft(draft, 'is')" 
+                on-scroll="::self.scrollToBottom(element)">
+            </won-create-isseeks>
+            <won-create-isseeks 
+                ng-if="self.isSearch" 
+                is-or-seeks="::'Search'" 
+                on-update="::self.updateDraft(draft, 'seeks')" 
+                on-scroll="::self.scrollToBottom(element)">
+            </won-create-isseeks>
+
+            <!-- TUNE MATCHING -->
+            <!-- 
+              <won-labelled-hr label="::'tune matching?'" class="cp__content__labelledhr">
+              </won-labelled-hr>
+            -->
+            <div class="cp__content__tuning">
+                <div class="cp__content__tuning__title b detailPicker clickable"
+                    ng-click="self.toggleTuningOptions()"
+                    ng-class="{'closedDetailPicker': !self.showTuningOptions}">
+                    <span>Tune Matching Behaviour</span>
+                    <svg class="cp__content__tuning__title__carret" ng-show="!self.showTuningOptions">
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                    </svg>
+                    <svg class="cp__content__tuning__title__carret" ng-show="self.showTuningOptions">
+                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                    </svg>
+                </div>
+                <div class="cp__content__tuning_matching-context">
+                    <won-matching-context-picker
+                      ng-if="self.showTuningOptions"
+                      default-matching-context="::self.defaultMatchingContext"
+                      initial-matching-context="::self.draftObject.matchingContext"
+                      on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
+                    </won-matching-context-picker>
+                </div>
+            </div>
+
+            <!-- PUBLISH BUTTON - RESPONSIVE MODE -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
                     ng-disabled="!self.isValid()"
@@ -100,6 +141,7 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
+        <!-- PUBLISH BUTTON - NON-RESPONSIVE MODE -->
         <div class="cp__footer hide-in-responsive" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__footer__publish"
@@ -153,7 +195,13 @@ function genComponentConf() {
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
-      this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
+      this.draftObject = {
+        is: this.draftIs,
+        seeks: this.draftSeeks,
+        matchingContext: undefined,
+      };
+
+      this.showTuningOptions = false;
 
       this.pendingPublishing = false;
       this.details = { is: [], seeks: [] };
@@ -168,13 +216,30 @@ function genComponentConf() {
         const isSearch = showCreateView === this.SEARCH;
         const isPost = showCreateView && !isSearch;
 
+        // needed to be able to reset matching context to default
+        // TODO: is there an easier way to do this?
+        const defaultMatchingContextList = getIn(state, [
+          "config",
+          "theme",
+          "defaultContext",
+        ]);
+        const defaultMatchingContext = defaultMatchingContextList
+          ? defaultMatchingContextList.toJS()
+          : [];
+
         return {
           connectionHasBeenLost: !selectIsConnected(state),
           showCreateView,
           isSearch,
           isPost,
+          defaultMatchingContext: defaultMatchingContext,
         };
       };
+
+      // TODO: think about how to deal with contexts predefined in usecases
+      delay(0).then(() =>
+        this.updateMatchingContext(this.defaultMatchingContext)
+      );
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -215,6 +280,13 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
+    toggleTuningOptions() {
+      // if (!this.showTuningOptions) {
+      //   this.onScroll({ element: ".cis__addDetail__header.b" });
+      // }
+      this.showTuningOptions = !this.showTuningOptions;
+    }
+
     isValid() {
       const draft = this.draftObject;
       const hasContent = get(draft, "is") || get(draft, "seeks");
@@ -226,6 +298,15 @@ function genComponentConf() {
       return (
         !this.connectionHasBeenLost && hasContent && (hasValidTitle || hasTTL)
       );
+    }
+
+    updateMatchingContext(matchingContext) {
+      // also accepts []!
+      if (matchingContext) {
+        this.draftObject.matchingContext = matchingContext;
+      } else {
+        this.draftObject.matchingContext = undefined;
+      }
     }
 
     updateDraft(updatedDraft, isSeeks) {
@@ -319,12 +400,12 @@ angular
     imageDropzoneModule,
     descriptionPickerModule,
     locationPickerModule,
-    matchingContextPicker,
     personPickerModule,
     routePickerModule,
     tagsPickerModule,
     ttlPickerModule,
     createIsseeksModule,
+    matchingContextModule,
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;
