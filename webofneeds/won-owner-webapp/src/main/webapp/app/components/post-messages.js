@@ -42,7 +42,7 @@ const keySet = deepFreeze(
 
 function genComponentConf() {
   let template = `
-        <div class="pm__header">
+        <div class="pm__header" ng-if="!self.showAgreementData">
             <a class="pm__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -55,6 +55,19 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+        </div>
+        <div class="pm__header" ng-if="self.showAgreementData">
+            <a class="pm__header__back clickable"
+                ng-click="self.setShowAgreementData(false)">
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="pm__header__back__icon clickable">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                </svg>
+            </a>
+            <div class="pm__header__title">
+              Showing Agreement Data
+            </div>
             <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__content">
@@ -70,6 +83,7 @@ function genComponentConf() {
                 Load previous messages
             </button>
             <won-connection-message
+                ng-if="!self.showAgreementData"
                 ng-repeat="msg in self.chatMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
@@ -81,25 +95,24 @@ function genComponentConf() {
                 on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
                 on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
+            <won-connection-message
+                ng-if="self.showAgreementData"
+                ng-repeat="msg in self.agreementMessages"
+                connection-uri="self.connectionUri"
+                message-uri="msg.get('uri')"
+                hide-option="msg.hide"
+                ng-class="{
+                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
+                }"
+                on-update="self.setShowAgreementData(false)"
+                on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
+
             <div class="pm__content__agreement" ng-if="self.showAgreementData">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="pm__content__agreement__icon clickable"
-                    ng-click="self.setShowAgreementData(false) && (self.showLoadingInfo = false)"">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
-                </svg>
-                
-                <!-- Loading Text -->
-                <div class="pm__content__agreement__title" ng-if="self.showLoadingInfo  && !self.agreementDataIsValid()"> 
-	            		<span class="ng-hide" ng-show="self.connection.get('isLoadingMessages')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!self.connection.get('isLoadingMessages')">No Agreement Data found</span>
-            	</div>
-	            <!-- /LoadingText -->
-                
                 <!-- Agreements-->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
             		Agreements
-            		<span ng-show="self.connection.get('isLoadingMessages')"> (loading...)</span>
-            		<span ng-if="!self.connection.get('isLoadingMessages')"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
@@ -110,7 +123,6 @@ function genComponentConf() {
 	                on-update="self.setShowAgreementData(false)"
 	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
 	            </won-connection-agreement>
-	            <!-- /Agreements -->
 	            <!-- ProposeToCancel -->
 	            <won-connection-agreement
 	            	ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
@@ -124,14 +136,9 @@ function genComponentConf() {
 	                on-update="[self.setShowAgreementData(false), self.filterMessages(draft)]"
 	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
 	            </won-connection-agreement>
-	            <!-- /ProposeToCancel -->           	
             	<!-- PROPOSALS -->
             	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.pendingProposalUris.size">
-            		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
-            		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
             		Proposals
-    				<span ng-show="self.connection.get('isLoadingMessages')"> (loading...)</span>
-            		<span ng-if="!self.connection.get('isLoadingMessages')"> (up-to-date)</span>
             	</div>
 	            <won-connection-agreement
 	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
@@ -142,8 +149,6 @@ function genComponentConf() {
 	                on-update="self.setShowAgreementData(false);"
 	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
 	            </won-connection-agreement>
-	            <!-- /PROPOSALS -->
-	            
             </div>
             
             <a class="rdflink clickable"
@@ -193,17 +198,10 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
 
-      this.reload = true;
-
-      this.showLoadingInfo = false;
-
       this.declarations = clone(declarations);
 
       this.agreementHeadData = this.cloneDefaultData();
-      //this.agreementStateData = this.cloneDefaultStateData();
       this.agreementLoadingData = this.cloneDefaultStateData();
-
-      //this.showAgreementData = false;
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -279,10 +277,9 @@ function genComponentConf() {
             return a.get("date").getTime() - b.get("date").getTime();
           });
         }
-        if (this.reload && connection) {
-          this.getAgreementData(connection, ownNeed);
-          this.reload = false;
-        }
+
+        let agreementMessages =
+          chatMessages && chatMessages.filter(msg => msg.get("hasReferences"));
 
         return {
           ownNeed,
@@ -291,6 +288,7 @@ function genComponentConf() {
           connection,
           agreementStateData,
           chatMessages: sortedMessages,
+          agreementMessages: agreementMessages && agreementMessages.toArray(),
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -353,6 +351,55 @@ function genComponentConf() {
           );
         }
       });
+    }
+
+    /*getAgreementData() {
+      delay(0).then(() => {
+        if (
+          this.connection &&
+          !(this.allLoaded)
+        ){
+          this.connections__setLoadingMessages({
+            connectionUri: this.connectionUri,
+            isLoadingMessages: true,
+          });
+
+          this.agreementLoadingData = this.cloneDefaultStateData();
+          if (!this.agreementStateData) {
+            this.agreementStateData = this.cloneDefaultStateData();
+          }
+
+          this.getAgreementDataUris();
+        }
+      });
+    }*/
+
+    getAgreementData() {
+      const agreementDataUris = this.getAgreementDataUris();
+      console.log("agreementDataUris: ", agreementDataUris);
+
+      /*delay(0).then(() => {
+        if (this.connection &&
+            !this.allLoaded &&
+            !this.connection.get("isLoadingMessages")) {
+          const MESSAGECOUNT = 10;
+          const messages = this.connection.get("messages");
+          const messageCount = messages ? messages.size : 0;
+
+          if (messageCount == 0) {
+            console.log(
+              "getAgreementData - Getting Latest Messages for connection: ",
+              conn.get("uri"),
+              " already loaded: ",
+              messageCount,
+              " messages"
+            );
+            ensureMessagesAreLoaded();
+          } else {
+            loadPreviousMessages();
+          }
+        }
+      });*/
     }
 
     loadPreviousMessages() {
@@ -422,7 +469,6 @@ function genComponentConf() {
 
     showAgreementDataField() {
       this.getAgreementData();
-      this.showLoadingInfo = true;
       this.setShowAgreementData(true);
     }
 
@@ -446,29 +492,15 @@ function genComponentConf() {
       return false;
     }
 
-    getAgreementData(connection) {
-      if (connection) {
-        this.connection = connection;
-      } else {
-        this.connections__setLoadingMessages({
-          connectionUri: this.connectionUri,
-          isLoadingMessages: true,
-        });
-      }
-
-      this.agreementLoadingData = this.cloneDefaultStateData();
-      if (!this.agreementStateData) {
-        this.agreementStateData = this.cloneDefaultStateData();
-      }
-
-      this.getAgreementDataUris();
+    encodeParam(param) {
+      return encodeURIComponent(param);
     }
 
     getAgreementDataUris() {
       const url = urljoin(
         ownerBaseUrl,
         "/rest/agreement/getAgreementProtocolUris",
-        `?connectionUri=${this.connection.get("uri")}`
+        `?connectionUri=${this.encodeParam(this.connection.get("uri"))}`
       );
       let hasChanged = false;
       callAgreementsFetch(url)
