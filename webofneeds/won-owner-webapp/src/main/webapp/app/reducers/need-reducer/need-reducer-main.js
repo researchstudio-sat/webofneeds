@@ -260,6 +260,8 @@ export default function(allNeedsInState = initialState, action = {}) {
                 text: optimisticEvent.getTextMessage(),
               },
               isParsable: !!optimisticEvent.getTextMessage(),
+              hasContent: !!optimisticEvent.getTextMessage(),
+              hasReferences: false,
               date: msStringToDate(optimisticEvent.getSentTimestamp()),
               outgoingMessage: true,
               unread: true,
