@@ -75,6 +75,7 @@
         }
       }
 
+      &__title,
       won-connection-header {
         grid-area: header_title;
       }
@@ -126,12 +127,7 @@
         font-size: $smallFontSize;
         border: $thinDarkBorder;
         background: $won-light-gray;
-        &__title {
-          font-size: 0.85rem;
-          font-weight: 550;
-          padding-left: 0.5rem;
-          padding-right: 0.5rem;
-        }
+
         &__loading {
           font-size: 0.85rem;
           font-weight: 550;
