@@ -1,7 +1,6 @@
 import angular from "angular";
 
 import won from "../won-es6.js";
-import Immutable from "immutable";
 import { connect2Redux } from "../won-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -12,14 +11,17 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msgcontent__header" ng-if="!self.isConnectionMessage()">
+      <div class="msgcontent__header" ng-if="self.message && !self.isConnectionMessage()">
         <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()"> {{ self.labels.messageType[self.message.get('messageType')] }}</div>
         <div class="msgcontent__header__type" ng-if="self.isOtherMessage()"> {{ self.message.get('messageType') }}</div>
       </div>
-      <div class="msgcontent__body">
+      <div class="msgcontent__body" ng-if="self.message">
         <div class="msgcontent__body__text--prewrap" ng-if="self.message.getIn(['content', 'text'])">{{ self.message.getIn(['content', 'text']) }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
         <div class="msgcontent__body__matchScore" ng-if="self.message.getIn(['content', 'matchScore'])">MatchScore: {{self.message.getIn(['content', 'matchScore']) }}</div>
         <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
+      </div>
+      <div class="msgcontent__body" ng-if="!self.message">
+        <div class="msgcontent__body__text">«Message not (yet) loaded»</div>
       </div>
     `;
 
@@ -42,9 +44,9 @@ function genComponentConf() {
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
         const message =
-          connection && this.messageUri
-            ? getIn(connection, ["messages", this.messageUri])
-            : Immutable.Map();
+          connection &&
+          this.messageUri &&
+          getIn(connection, ["messages", this.messageUri]);
 
         return {
           connection,

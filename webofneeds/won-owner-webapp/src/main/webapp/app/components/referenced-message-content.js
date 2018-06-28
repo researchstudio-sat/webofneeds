@@ -164,11 +164,6 @@ function genComponentConf() {
         if (foundMessages && foundMessages.size > 0) {
           return foundMessages.first();
         } else {
-          console.warn(
-            "could not find the message (",
-            messageUri,
-            ") in the connection"
-          );
           return undefined;
         }
       }
