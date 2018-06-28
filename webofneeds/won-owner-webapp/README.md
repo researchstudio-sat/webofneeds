@@ -113,13 +113,18 @@ $ngRedux.getState();
                        content: {
                            text: wonMessage.getTextMessage(),
                            matchScore: wonMessage.getMatchScore(),
+                       },
+                       references: {
+                           //These references are parsed in a way that it will always be a list no matter if there is only a single element or an array
                            proposes: wonMessage.getProposedMessages(),
                            proposesToCancel: wonMessage.getProposedToCancelMessages(),
                            accepts: wonMessage.getAcceptedMessages(),
                            rejects: wonMessage.getRejectsMessages(),
                            retracts: wonMessage.getRetractMessages(),
-                       },
-                       isParsable: true|false //whether it contains any non-null/non-undefined content within the content block of the message
+                       }
+                       hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
+                       hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
+                       isParsable: true|false //true if hasReferences or hasContent is true
                        uri: string //unique identifier of this message
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
