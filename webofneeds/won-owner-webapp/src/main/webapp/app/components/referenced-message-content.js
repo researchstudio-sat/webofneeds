@@ -153,30 +153,15 @@ function genComponentConf() {
     }
 
     getReferencedMessage(messageUri) {
-      console.log(
-        "trying to find the message (",
-        messageUri,
-        ") in the connection"
-      );
       let referencedMessage =
         this.chatMessages && this.chatMessages.get(messageUri);
       if (referencedMessage) {
-        console.log(
-          "found message (",
-          messageUri,
-          ") in the connection - IS YOUR OWN MESSAGE"
-        );
         return referencedMessage;
       } else {
         const foundMessages =
           this.chatMessages &&
           this.chatMessages.filter(msg => msg.get("remoteUri") === messageUri);
         if (foundMessages && foundMessages.size > 0) {
-          console.log(
-            "found message (",
-            messageUri,
-            ") in the connection - IS SOMEONE ELSES OWN MESSAGE"
-          );
           return foundMessages.first();
         } else {
           console.warn(
