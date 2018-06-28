@@ -10,7 +10,13 @@ import imageDropzoneModule from "./image-dropzone.js";
 import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import { get, getIn, attach, deepFreeze, delay } from "../utils.js";
+import {
+  get,
+  getIn,
+  attach,
+  //  deepFreeze,
+  delay,
+} from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
@@ -61,16 +67,16 @@ const serviceDependencies = [
 ];
 
 //All deatils, except tags, because tags are saved in an array
-const keySet = deepFreeze(
-  new Set([
-    "description",
-    "location",
-    "matchingContext",
-    "thumbnail",
-    "travelAction",
-    "ttl",
-  ])
-);
+// const keySet = deepFreeze(
+//   new Set([
+//     "description",
+//     "location",
+//     "matchingContext",
+//     "thumbnail",
+//     "travelAction",
+//     "ttl",
+//   ])
+// );
 
 function genComponentConf() {
   const template = `
@@ -172,25 +178,23 @@ function genComponentConf() {
       this.characterLimit = postTitleCharacterLimit;
       this.draftIs = {
         title: undefined,
-        type: postTypeTexts[3].type,
-        description: undefined,
-        tags: undefined,
-        person: undefined,
-        location: undefined,
-        travelAction: undefined,
-        thumbnail: undefined,
-        matchingContext: undefined,
+        type: postTypeTexts[3].type, // TODO: do we use this information anywhere?
+        // description: undefined,
+        // tags: undefined,
+        // person: undefined,
+        // location: undefined,
+        // travelAction: undefined,
+        // thumbnail: undefined,
       };
       this.draftSeeks = {
         title: undefined,
         type: postTypeTexts[3].type,
-        description: undefined,
-        tags: undefined,
-        person: undefined,
-        location: undefined,
-        travelAction: undefined,
-        thumbnail: undefined,
-        matchingContext: undefined,
+        // description: undefined,
+        // tags: undefined,
+        // person: undefined,
+        // location: undefined,
+        // travelAction: undefined,
+        // thumbnail: undefined,
       };
 
       this.windowHeight = window.screen.height;
@@ -322,12 +326,15 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        //Check for is, or seeks
-        let draft = this.getPublishObject(this.draftObject);
-
-        if (this.hasSearchString(draft)) {
-          draft.seeks["searchString"] = draft.seeks.title;
+        // TODO: This should be a usecase/done via a different component
+        // Check if this is a search
+        const searchString = this.checkForSearchString(this.draftObject);
+        if (searchString) {
+          this.draftObject.searchString = searchString;
+          //delete this.draftObject.is;
         }
+
+        const draft = this.getPublishObject(this.draftObject);
 
         this.needs__create(
           draft,
@@ -337,38 +344,50 @@ function genComponentConf() {
     }
 
     getPublishObject(draft) {
-      if (!this.checkType(draft.is)) {
+      if (!this.isOrSeeksIsValid(draft.is)) {
         delete draft.is;
       }
-      if (!this.checkType(draft.seeks)) {
+      if (!this.isOrSeeksIsValid(draft.seeks)) {
         delete draft.seeks;
       }
       return draft;
     }
 
-    checkType(object) {
-      const title = get(object, "title");
+    // returns true if the part has a valid title or any other detail
+    isOrSeeksIsValid(isOrSeeks) {
+      // TODO: title should be either in the root part of the need or in a detail-picker
+      const title = get(isOrSeeks, "title");
       const hasValidTitle = title && title.length < this.characterLimit;
-      const hasTTL = get(object, "ttl");
-      return !!(hasValidTitle || hasTTL);
-    }
 
-    hasSearchString(draft) {
-      if (draft.is || !draft.seeks) {
-        return false;
-      } else {
-        for (const key of keySet) {
-          if (draft.seeks[key]) {
-            return false;
-          }
-        }
-        // Handle tags list
-        if (draft.seeks.tags && draft.seeks.tags.length > 0) {
-          return false;
+      let hasDetail = false;
+      const details = Object.keys(isOrSeeks);
+      for (let d of details) {
+        if (details[d] && d !== "type") {
+          hasDetail = true;
         }
       }
-      //A seeks object only with a title
-      return true;
+      //const hasTTL = get(isOrSeeks, "ttl");
+      return !!(hasValidTitle || hasDetail);
+    }
+
+    checkForSearchString(draft) {
+      // draft has an is part -> not a pure search
+      if (this.isOrSeeksIsValid(draft.is)) {
+        return undefined;
+      }
+
+      // draft has no valid seeks part -> not a pure search
+      if (!draft.seeks || !draft.seeks.title) {
+        return undefined;
+      }
+
+      for (let detail of Object.keys(draft.seeks)) {
+        if (detail !== "title" && detail !== "type" && draft.seeks[detail]) {
+          return undefined;
+        }
+      }
+
+      return draft.seeks.title;
     }
 
     createWhatsNew() {

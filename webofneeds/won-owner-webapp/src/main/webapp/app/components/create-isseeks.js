@@ -202,8 +202,9 @@ function genComponentConf() {
     }
 
     updateScroll() {
-      console.log("Scoll activity");
-      this.onScroll();
+      // FIXME: broken due to HTML changes
+      // console.log("Scoll activity");
+      // this.onScroll();
     }
 
     pickImage(image) {

@@ -369,6 +369,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
     matchingContext: needData.matchingContext
       ? needData.matchingContext
       : undefined,
+    searchString: needData.searchString ? needData.searchString : undefined,
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory

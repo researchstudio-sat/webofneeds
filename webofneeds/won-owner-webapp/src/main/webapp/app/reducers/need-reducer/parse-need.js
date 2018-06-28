@@ -20,6 +20,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     isWhatsAround: false,
     isWhatsNew: false,
     matchingContexts: undefined,
+    searchString: undefined,
     jsonld: jsonldNeed,
   };
 
@@ -30,6 +31,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
     const seeks = jsonldNeedImm.get("won:seeks");
     const isPresent = is && is.size > 0;
     const seeksPresent = seeks && seeks.size > 0;
+
+    const searchString = jsonldNeedImm.get("won:hasSearchString");
 
     //TODO We need to decide which is the main title? Or combine?
     const title = isPresent
@@ -115,9 +118,10 @@ export function parseNeed(jsonldNeed, ownNeed) {
     if (seeksPresent) {
       type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
       seeksPart = genIsSeeksPart(seeks, type);
-      if (seeks.get("won:hasSearchString")) {
-        seeksPart.searchString = seeks.get("won:hasSearchString");
-      }
+    }
+    if (searchString) {
+      parsedNeed.searchString = searchString;
+      type = seeksPresent ? type : won.WON.BasicNeedTypeDemandCompacted; // TODO: check type
     }
 
     parsedNeed.is = isPart;
