@@ -110,13 +110,6 @@ function genComponentConf() {
 
       window.pi4dbg = this;
 
-      this.defaultContext = this.$ngRedux
-        .getState()
-        .getIn(["config", "theme", "defaultContext"]);
-      this.tempMatchingContext = this.defaultContext
-        ? this.defaultContext.toJS()
-        : [];
-
       const selectFromState = state => {
         const postUri = selectOpenPostUri(state);
         const post = state.getIn(["needs", postUri]);
