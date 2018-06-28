@@ -1,0 +1,53 @@
+@import "won-config";
+@import "sizing-utils";
+@import "message-content";
+@import "speech-bubble";
+
+won-referenced-message-content {
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-auto-flow: row;
+
+  .refmsgcontent__fragment {
+    background-color: white;
+    border: $thinGrayBorder;
+    padding: 0.25rem;
+
+    &__header {
+      font-weight: bold;
+      border-bottom: $thinGrayBorder;
+      padding-bottom: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    &__body {
+      display: grid;
+      grid-gap: 0.25rem;
+      grid-auto-flow: row;
+
+      won-message-content {
+        padding: 0.25rem 0.5rem;
+        border: $thinGrayBorder;
+
+        &.won-cm--left {
+          @include speech-bubble-left(
+            $won-light-gray,
+            $won-line-gray,
+            $speechBubbleTailSizeSmall/2,
+            $thinBorderWidth,
+            0.25rem
+          );
+        }
+        &.won-cm--right {
+          @include speech-bubble-right(
+            $won-light-gray,
+            $won-line-gray,
+            $speechBubbleTailSizeSmall/2,
+            $thinBorderWidth,
+            0.25rem
+          );
+        }
+      }
+    }
+  }
+}
