@@ -1,3 +1,14 @@
+// TODO: import detail-picker components here
+// TODO: each detail picker should know it's own rdf template
+// --> current goal: detail-pickers don't learn to speak RDF
+// --> instead, each picker has a RDF template telling us how it would look
+// --> and TODO: exposes a toRDF() method that converts whatever JSON the picker returns to RDF
+// --> reasoning: we want JSON objects in the state, because RDF is harder to handle
+// --> we want the need-reducer to work with arbitrary details, without required edits for each new detail
+// --> so need-reducer can't be the part that knows how to convert a detail
+// TODO: define RDF template *inside* the detail-pickers and link it here, so the linter doesn't complain
+// --> alternatively, if we don't need a template, refer something else.
+
 export const details = {
   description: {
     identifier: "description",
