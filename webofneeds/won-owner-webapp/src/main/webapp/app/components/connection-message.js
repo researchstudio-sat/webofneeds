@@ -77,39 +77,32 @@ function genComponentConf() {
                     ng-if="self.showDetail && self.isRelevant">
                     <button class="won-button--filled thin black"
                         ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
-                        ng-show="self.showDetail">
+                        ng-if="self.showDetail">
                         Propose <span ng-show="self.clicked">(again)</span>
                     </button>
                     <button class="won-button--filled thin black"
                         ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
-                        ng-show="self.showDetail && self.message.get('outgoingMessage')">
+                        ng-if="self.showDetail && self.message.get('outgoingMessage')">
                         Retract
                     </button>
                 </div>
                 <div class="won-cm__center__bubble__button-area"
-                    ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel'))
-                        && !self.message.get('isAcceptMessage')
-                        && !self.clicked
-                        && self.isRelevant ">
+                    ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel')) && self.isRelevant ">
                     <button class="won-button--filled thin red"
-                        ng-if="self.message.get('isProposeMessage')"
-                        ng-show="!self.message.get('outgoingMessage') && !self.clicked"
-                        ng-click="self.acceptProposal()">
-                      Accept
-                    </button>
-                    <button class="won-button--filled thin red"
-                      ng-if="self.message.get('isProposeToCancel')"
-                        ng-show="!self.message.get('outgoingMessage')"
-                        ng-click="self.acceptProposeToCancel()">
+                      ng-if="!self.message.get('outgoingMessage')"
+                        ng-disabled="self.clicked"
+                        ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
                         ng-show="!self.message.get('outgoingMessage')"
+                        ng-disabled="self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="self.message.get('outgoingMessage')"
+                        ng-if="self.message.get('outgoingMessage') && !self.message.get('isAcceptMessage')
+                        ng-disabled="self.clicked"
                         ng-click="self.retractMessage()">
                         Retract
                     </button>
@@ -131,12 +124,6 @@ function genComponentConf() {
       this.clicked = false;
       this.showDetail = false;
       this.won = won;
-
-      this.noParsableContentPlaceholder =
-        "«This message couldn't be displayed as it didn't contain," +
-        "any parsable content! " +
-        'Click on the "Show raw RDF data"-button in ' +
-        'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
 
       const selectFromState = state => {
         const ownNeed =
@@ -273,20 +260,6 @@ function genComponentConf() {
       this.onSendProposal({ proposalUri: uri });
     }
 
-    acceptProposal() {
-      this.clicked = true;
-      const msg = "Accepted proposal : " + this.message.get("remoteUri");
-      const trimmedMsg = buildProposalMessage(
-        this.message.get("remoteUri"),
-        "accepts",
-        msg
-      );
-      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
-
-      this.markAsRelevant(false);
-      this.onRemoveData({ proposalUri: this.messageUri });
-    }
-
     proposeToCancel() {
       this.clicked = true;
       const uri = this.isOwn
@@ -299,10 +272,9 @@ function genComponentConf() {
       this.onUpdate();
     }
 
-    acceptProposeToCancel() {
+    sendAccept() {
       this.clicked = true;
-      const msg =
-        "Accepted propose to cancel : " + this.message.get("remoteUri");
+      const msg = "Send Accept for message : " + this.message.get("remoteUri");
       const trimmedMsg = buildProposalMessage(
         this.message.get("remoteUri"),
         "accepts",
