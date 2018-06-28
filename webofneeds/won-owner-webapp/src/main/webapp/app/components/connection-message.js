@@ -7,9 +7,10 @@ import squareImageModule from "./square-image.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import messageContentModule from "./message-content.js";
+import referencedMessageContentModule from "./referenced-message-content.js";
 import trigModule from "./trig.js";
 import { connect2Redux } from "../won-utils.js";
-import { attach, get, getIn, deepFreeze } from "../utils.js";
+import { attach, get, getIn } from "../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
@@ -24,15 +25,6 @@ import urljoin from "url-join";
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
-
-const messageHeaders = deepFreeze({
-  proposal: "Propose",
-  accept: "Accept proposal",
-  acceptCancel: "Accept to cancel",
-  proposeCancel: "Propose to cancel",
-  retract: "Retract message",
-  reject: "Reject message",
-});
 
 function genComponentConf() {
   let template = `
@@ -50,33 +42,25 @@ function genComponentConf() {
                 class="won-cm__center__bubble" 
                 title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
     			      ng-class="{
-    			        'agreement' : 	!self.isNormalMessage(),
-    			        'info' : self.isInfoMessage(),
+    			        'references' : 	self.message.get('hasReferences'),
                   'pending': self.isPending(),
                   'partiallyLoaded': self.isPartiallyLoaded(),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
-                <div class="won-cm__center__bubble__content" ng-if="self.headerText">
-                    <h3>{{ self.headerText }}</h3>
-                    <div class="won-cm__center__bubble__content__text--prewrap" ng-show="self.showText">{{ self.text? self.text : self.noParsableContentPlaceholder }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-                </div>
-                <won-message-content
-                    ng-if="!self.headerText"
-                    message-uri="self.message.get('uri')"
-                    connection-uri="self.connection.get('uri')">
-                </won-message-content>
-                <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="self.headerText && (self.isInfoMessage() || !self.isRelevant)"
-                    ng-click="self.showText = !self.showText">
-                    <svg ng-show="!self.showText">
-                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                    </svg>
-                    <svg ng-show="self.showText">
-                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                    </svg>
+    			      <div class="won-cm__center__bubble__content">
+                  <won-message-content
+                      ng-if="self.message.get('hasContent')"
+                      message-uri="self.message.get('uri')"
+                      connection-uri="self.connection.get('uri')">
+                  </won-message-content>
+                  <won-referenced-message-content
+                      ng-if="self.message.get('hasReferences')"
+                      message-uri="self.message.get('uri')"
+                      connection-uri="self.connection.get('uri')">
+                  </won-referenced-message-content>
                 </div>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="self.isRelevant && self.isNormalMessage() && self.allowProposals"
+                    ng-if="self.allowProposals"
                     ng-click="self.showDetail = !self.showDetail">
                     <svg ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -160,7 +144,6 @@ function genComponentConf() {
           selectNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
-        const chatMessages = connection && connection.get("messages");
         const theirNeed =
           connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
         const message =
@@ -168,40 +151,7 @@ function genComponentConf() {
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
-        if (message && !this.isNormalMessage(message)) {
-          this.headerText = this.getHeaderText(message);
-        }
-
         let text = undefined;
-        if (
-          chatMessages &&
-          message &&
-          (message.get("isProposeMessage") ||
-            message.get("isAcceptMessage") ||
-            message.get("isProposeToCancel"))
-        ) {
-          const clauses = message.get("clauses");
-          //TODO: delete me
-          //console.log("clauses: " + clauses);
-
-          if (clauses) {
-            //TODO: Array from clauses
-            //now just one message proposed at a time
-            text = this.getClausesText(chatMessages, message, clauses);
-            if (message.get("isAcceptMessage")) {
-              for (const msg of chatMessages.toArray()) {
-                if (
-                  (msg.get("uri") === clauses ||
-                    msg.get("remoteUri") === clauses) &&
-                  msg.get("isProposeToCancel")
-                ) {
-                  this.headerText = messageHeaders.acceptCancel;
-                }
-              }
-            }
-          }
-        }
-
         const shouldShowRdf = state.get("showRdf");
 
         let rdfLinkURL;
@@ -221,9 +171,6 @@ function genComponentConf() {
           connection,
           message,
           isRelevant: message.get("isRelevant") || !this.hideOption,
-          showText: this.isInfoMessage(message)
-            ? false
-            : message.get("isRelevant") || !this.hideOption,
           text: text
             ? text
             : message
@@ -236,7 +183,9 @@ function genComponentConf() {
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
-            message.getIn(["content", "text"]), //allow showing details only when the connection is already present
+            message.get("isRelevant") &&
+            !message.get("hasReferences") &&
+            message.get("hasContent"), //allow showing details only when the connection is already present
         };
       };
 
@@ -270,6 +219,7 @@ function genComponentConf() {
     }
 
     isSystemMessage() {
+      //TODO: IMPLEMENT THIS METHOD
       return false;
     }
 
@@ -279,40 +229,6 @@ function genComponentConf() {
 
     isUnread() {
       return this.message && this.message.get("unread");
-    }
-
-    getHeaderText(message) {
-      if (message.get("isProposeMessage")) {
-        return messageHeaders.proposal;
-      } else if (message.get("isAcceptMessage")) {
-        return messageHeaders.accept;
-      } else if (message.get("isProposeToCancel")) {
-        return messageHeaders.proposeCancel;
-      } else if (message.get("isRetractMessage")) {
-        return messageHeaders.retract;
-      } else if (message.get("isRejectMessage")) {
-        return messageHeaders.reject;
-      }
-    }
-    getClausesText(chatMessages, message, clausesUri) {
-      for (let msg of Array.from(chatMessages)) {
-        if (
-          msg[1].get("uri") === clausesUri ||
-          msg[1].get("remoteUri") === clausesUri
-        ) {
-          //Get through the caluses "chain" and add the original text
-          if (!msg[1].get("clauses")) {
-            return msg[1].getIn(["content", "text"]);
-          } else {
-            //TODO: Mutliple clauses
-            return this.getClausesText(
-              chatMessages,
-              msg,
-              msg[1].get("clauses")
-            );
-          }
-        }
-      }
     }
 
     markAsRead() {
@@ -426,28 +342,6 @@ function genComponentConf() {
       return JSON.stringify(jsonld);
     }
 
-    isNormalMessage(message) {
-      if (message) {
-        this.message = message;
-      }
-      return !(
-        this.message.get("isProposeMessage") ||
-        this.message.get("isProposeToCancel") ||
-        this.isInfoMessage(message)
-      );
-    }
-
-    isInfoMessage(message) {
-      if (message) {
-        this.message = message;
-      }
-      return !!(
-        this.message.get("isAcceptMessage") ||
-        this.message.get("isRetractMessage") ||
-        this.message.get("isRejectMessage")
-      );
-    }
-
     /**
      * determines if the sent message is not received by any of the servers yet but not failed either
      */
@@ -506,6 +400,7 @@ export default angular
     labelledHrModule,
     connectionMessageStatusModule,
     messageContentModule,
+    referencedMessageContentModule,
     inviewModule.name,
     trigModule,
   ])
