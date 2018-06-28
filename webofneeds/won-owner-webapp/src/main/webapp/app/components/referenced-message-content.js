@@ -126,7 +126,6 @@ function genComponentConf() {
         const hasRejectUris = rejectUris && rejectUris.size > 0;
 
         return {
-          headerText: "Special Message",
           chatMessages: chatMessages,
           connection,
           hasProposeUris,
