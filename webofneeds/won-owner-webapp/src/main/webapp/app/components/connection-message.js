@@ -89,7 +89,7 @@ function genComponentConf() {
                 <div class="won-cm__center__bubble__button-area"
                     ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel')) && self.isRelevant ">
                     <button class="won-button--filled thin red"
-                      ng-if="!self.message.get('outgoingMessage')"
+                        ng-if="!self.message.get('outgoingMessage')"
                         ng-disabled="self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
@@ -101,10 +101,10 @@ function genComponentConf() {
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.message.get('isAcceptMessage')
+                        ng-if="self.message.get('outgoingMessage') && !self.message.get('isAcceptMessage')"
                         ng-disabled="self.clicked"
                         ng-click="self.retractMessage()">
-                        Retract
+                      Retract
                     </button>
                 </div>
             </div>
@@ -138,7 +138,6 @@ function genComponentConf() {
             ? getIn(connection, ["messages", this.messageUri])
             : Immutable.Map();
 
-        let text = undefined;
         const shouldShowRdf = state.get("showRdf");
 
         let rdfLinkURL;
@@ -158,11 +157,6 @@ function genComponentConf() {
           connection,
           message,
           isRelevant: message.get("isRelevant") || !this.hideOption,
-          text: text
-            ? text
-            : message
-              ? message.getIn(["content", "text"])
-              : undefined,
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf,
@@ -253,7 +247,7 @@ function genComponentConf() {
       const trimmedMsg = buildProposalMessage(
         uri,
         "proposes",
-        this.message.getIn(["content", "text"])
+        "Ok, I am hereby making a proposal"
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
@@ -274,11 +268,10 @@ function genComponentConf() {
 
     sendAccept() {
       this.clicked = true;
-      const msg = "Send Accept for message : " + this.message.get("remoteUri");
       const trimmedMsg = buildProposalMessage(
         this.message.get("remoteUri"),
         "accepts",
-        msg
+        "I accept the following proposition"
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
@@ -291,7 +284,11 @@ function genComponentConf() {
       const uri = this.message.get("remoteUri")
         ? this.message.get("remoteUri")
         : this.message.get("uri");
-      const trimmedMsg = buildModificationMessage(uri, "retracts", this.text);
+      const trimmedMsg = buildModificationMessage(
+        uri,
+        "retracts",
+        "Retracting the message"
+      );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
@@ -303,7 +300,11 @@ function genComponentConf() {
       const uri = this.message.get("remoteUri")
         ? this.message.get("remoteUri")
         : this.message.get("uri");
-      const trimmedMsg = buildProposalMessage(uri, "rejects", this.text);
+      const trimmedMsg = buildProposalMessage(
+        uri,
+        "rejects",
+        "Rejecting the message"
+      );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRelevant(false);
