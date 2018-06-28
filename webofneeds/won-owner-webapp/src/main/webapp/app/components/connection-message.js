@@ -49,7 +49,7 @@ function genComponentConf() {
     			      }">
     			      <div class="won-cm__center__bubble__content">
                   <won-message-content
-                      ng-if="self.message.get('hasContent')"
+                      ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
                       message-uri="self.message.get('uri')"
                       connection-uri="self.connection.get('uri')">
                   </won-message-content>
@@ -345,6 +345,10 @@ function genComponentConf() {
 
     encodeParam(param) {
       return encodeURIComponent(param);
+    }
+
+    isConnectionMessage() {
+      return this.message.get("messageType") === won.WONMSG.connectionMessage;
     }
   }
   Controller.$inject = serviceDependencies;
