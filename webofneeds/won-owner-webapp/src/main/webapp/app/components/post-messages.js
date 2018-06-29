@@ -86,7 +86,7 @@ function genComponentConf() {
             </button>
             <won-connection-message
                 ng-if="!self.showAgreementData"
-                ng-repeat="msg in self.chatMessages"
+                ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
                 hide-option="msg.hide"
@@ -102,22 +102,22 @@ function genComponentConf() {
             		-- Agreements
             	</div>
 	            <div class="pm__content__agreement__title"
-            	  ng-repeat="agreement in self.agreementUrisArray track by $index">
-            	    StateUri: {{ agreement.stateUri }}
+            	  ng-repeat="agreement in self.agreementUrisArray">
+            	    StateUri: {{ agreement.get("stateUri") }}
             	</div>
 	            <div class="pm__content__agreement__title">
             		-- ProposeToCancel
             	</div>
 	            <div class="pm__content__agreement__title"
-            	  ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray track by $index">
-            	    StateUri: {{ proposeToCancel.stateUri }}
+            	  ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray">
+            	    StateUri: {{ proposeToCancel.get("stateUri") }}
             	</div>
             	<div class="pm__content__agreement__title">
             		-- Proposals
             	</div>
             	<div class="pm__content__agreement__title"
-            	  ng-repeat="proposal in self.pendingProposalUrisArray track by $index">
-            	    StateUri: {{ proposal.stateUri }}
+            	  ng-repeat="proposal in self.pendingProposalUrisArray">
+            	    StateUri: {{ proposal.get("stateUri") }}
             	</div>
             </div>
             
@@ -263,7 +263,8 @@ function genComponentConf() {
           connectionUri,
           connection,
 
-          chatMessages: sortedMessages,
+          sortedMessages: sortedMessages,
+          chatMessages,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -298,7 +299,7 @@ function genComponentConf() {
       );
 
       this.$scope.$watch(
-        () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
+        () => this.sortedMessages && this.sortedMessages.length, // trigger if there's messages added (or removed)
         () =>
           delay(0).then(() =>
             // scroll to bottom directly after rendering, if snapped
@@ -618,20 +619,24 @@ function genComponentConf() {
     }
 
     checkObject(key, agreementObject, del) {
-      const data = this.agreementStateJS;
-      for (const object of data[key]) {
-        if (object.stateUri === agreementObject.stateUri) {
-          if (del.value) {
-            data[key].delete(object);
-            this.connections__updateAgreementData({
-              connectionUri: this.connectionUri,
-              agreementData: Immutable.fromJS(data),
-            });
-          }
-          return true;
-        }
+      const foundKeys = this.agreementData.get(key);
+
+      const foundObjects =
+        foundKeys &&
+        foundKeys.filter(
+          object => object.get("stateUri") === agreementObject.get("stateUri")
+        );
+
+      if (foundKeys && del) {
+        this.agreementData = this.agreementData.set(
+          key,
+          foundKeys.filter(
+            object => object.get("stateUri") !== agreementObject.get("stateUri")
+          )
+        );
       }
-      return false;
+
+      return foundObjects && foundObjects.size > 0;
     }
 
     filterMessages(stateUri) {
@@ -640,10 +645,7 @@ function genComponentConf() {
         headUri: undefined,
       };
 
-      const del = {
-        value: true,
-      };
-      this.filterAgreementStateData(object, del);
+      this.filterAgreementStateData(object, true);
     }
 
     getCancelUri(agreementUri) {
