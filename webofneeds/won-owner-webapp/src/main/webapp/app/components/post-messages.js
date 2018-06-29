@@ -64,29 +64,39 @@ function genComponentConf() {
                     alt="Loading&hellip;"
                     class="hspinner"/>
             </div>
-            <div class="pm__content__agreement" ng-if="!self.connection.get('isLoadingMessages')">
-              <div class="pm__content__agreement__title">
-            		-- Agreements
-            	</div>
-	            <div class="pm__content__agreement__title"
-            	  ng-repeat="agreement in self.agreementUrisArray">
-            	    StateUri: {{ agreement.get("stateUri") }}
-            	</div>
-	            <div class="pm__content__agreement__title">
-            		-- ProposeToCancel
-            	</div>
-	            <div class="pm__content__agreement__title"
-            	  ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray">
-            	    StateUri: {{ proposeToCancel.get("stateUri") }}
-            	</div>
-            	<div class="pm__content__agreement__title">
-            		-- Proposals
-            	</div>
-            	<div class="pm__content__agreement__title"
-            	  ng-repeat="proposal in self.pendingProposalUrisArray">
-            	    StateUri: {{ proposal.get("stateUri") }}
-            	</div>
+            <div class="pm__content__agreement__title" ng-if="self.hasAgreementUris">
+              Agreements
             </div>
+            <won-connection-message
+              ng-repeat="agreement in self.agreementUrisArray"
+              connection-uri="self.connectionUri"
+              message-uri="agreement.get('stateUri')"
+              on-update="self.setShowAgreementData(false)"
+              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
+            <div class="pm__content__agreement__title" ng-if="self.hasCancellationPendingAgreementUris">
+              Agreements with Pending Cancellation
+            </div>
+            <won-connection-message
+              ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
+              connection-uri="self.connectionUri"
+              message-uri="proposeToCancel.get('stateUri')"
+              on-update="self.setShowAgreementData(false)"
+              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
+            <div class="pm__content__agreement__title" ng-if="self.hasPendingProposalUris">
+              Open Proposals
+            </div>
+            <won-connection-message
+              ng-repeat="proposal in self.pendingProposalUrisArray"
+              connection-uri="self.connectionUri"
+              message-uri="proposal.get('stateUri')"
+              on-update="self.setShowAgreementData(false)"
+              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
         </div>
         <div class="pm__content" ng-if="!self.showAgreementData">
             <div class="pm__content__loadspinner"
@@ -257,6 +267,12 @@ function genComponentConf() {
           allLoaded,
           //agreementUrisToDisplay
           agreementData,
+          hasAgreementUris: agreementUris && agreementUris.size > 0,
+          hasCancellationPendingAgreementUris:
+            cancellationPendingAgreementUris &&
+            cancellationPendingAgreementUris.size > 0,
+          hasPendingProposalUris:
+            pendingProposalUris && pendingProposalUris.size > 0,
           agreementUrisArray: agreementUris && agreementUris.toArray(),
           cancellationPendingAgreementUrisArray:
             cancellationPendingAgreementUris &&
