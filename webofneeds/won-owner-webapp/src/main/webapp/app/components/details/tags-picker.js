@@ -26,7 +26,7 @@ function genComponentConf() {
       <!-- TODO: make tags individually deletable -->
       <!-- TODO: add # to tag text -->
       <div class="tp__taglist">
-        <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">#{{tag}}</span>
+        <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">{{tag}}</span>
       </div>
     `;
 
@@ -60,7 +60,7 @@ function genComponentConf() {
       let _tagsForTextfield = "";
       if (this.initialTags && this.initialTags.length > 0) {
         this.initialTags.forEach(function(tag) {
-          _tagsForTextfield += "#" + tag + " ";
+          _tagsForTextfield += tag + " ";
         });
         this.showResetButton = true;
       }
