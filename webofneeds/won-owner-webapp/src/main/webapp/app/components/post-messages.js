@@ -170,9 +170,8 @@ function genComponentConf() {
 
       this.declarations = clone(declarations);
 
-      this.agreementHeadJS = this.cloneDefaultData().toJS();
-      this.agreementHead = this.cloneDefaultStateData();
-      this.agreementLoadingJS = this.cloneDefaultStateData().toJS();
+      this.agreementHead = this.cloneDefaultData();
+      this.agreementLoading = this.cloneDefaultStateData();
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -238,7 +237,7 @@ function genComponentConf() {
                   relevant: false,
                 });
               }
-            } else if (this.agreementHeadJS["retractedMessageUris"].size) {
+            } else if (this.agreementHead.get("retractedMessageUris").size) {
               //TODO: filter out retracted messages faster
               if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
                 msg.hide = true;
@@ -437,16 +436,32 @@ function genComponentConf() {
       let hasChanged = false;
       callAgreementsFetch(url)
         .then(response => {
-          this.agreementHeadJS = this.transformDataToSet(response);
+          this.agreementHead = this.transformDataToSet(response);
 
-          for (const key of keySet) {
-            if (this.agreementHeadJS.hasOwnProperty(key)) {
-              for (const data of this.agreementHeadJS[key]) {
-                this.addAgreementDataToSate(data, key);
-                hasChanged = true;
-              }
-            }
-          }
+          const agreementUris = this.agreementHead.get("agreementUris");
+          const pendingProposalUris = this.agreementHead.get(
+            "pendingProposalUris"
+          );
+          const cancellationPendingAgreementUris = this.agreementHead.get(
+            "cancellationPendingAgreementUris"
+          );
+
+          agreementUris.map(data => {
+            this.addAgreementDataToSate(data, "agreementUris");
+            hasChanged = true;
+          });
+          pendingProposalUris.map(data => {
+            this.addAgreementDataToSate(data, "pendingProposalUris");
+            hasChanged = true;
+          });
+          cancellationPendingAgreementUris.map(data => {
+            this.addAgreementDataToSate(
+              data,
+              "cancellationPendingAgreementUris"
+            );
+            hasChanged = true;
+          });
+
           //no data found for keyset: no relevant agreementData to show in GUI - clean state data
           if (!hasChanged) {
             this.connections__clearAgreementData({
@@ -456,12 +471,12 @@ function genComponentConf() {
           //Remove all retracted/rejected messages
           else if (
             this.agreementStateJS &&
-            (this.agreementHeadJS["rejectedMessageUris"] ||
-              this.agreementHeadJS["retractedMessageUris"])
+            (this.agreementHead.get("rejectedMessageUris") ||
+              this.agreementHead.get("retractedMessageUris"))
           ) {
             let removalSet = new Set([
-              ...this.agreementHeadJS["rejectedMessageUris"],
-              ...this.agreementHeadJS["retractedMessageUris"],
+              ...this.agreementHead.get("rejectedMessageUris").toJS(),
+              ...this.agreementHead.get("retractedMessageUris").toJS(),
             ]);
 
             const data = this.agreementStateJS;
@@ -501,33 +516,34 @@ function genComponentConf() {
     }
 
     transformDataToSet(response) {
-      const tmpAgreementData = {
-        agreementUris: new Set(response.agreementUris),
-        pendingProposalUris: new Set(response.pendingProposalUris),
-        pendingProposals: new Set(response.pendingProposals),
-        acceptedCancellationProposalUris: new Set(
+      const tmpAgreementData = Immutable.fromJS({
+        agreementUris: Immutable.Set(response.agreementUris),
+        pendingProposalUris: Immutable.Set(response.pendingProposalUris),
+        pendingProposals: Immutable.Set(response.pendingProposals),
+        acceptedCancellationProposalUris: Immutable.Set(
           response.acceptedCancellationProposalUris
         ),
-        cancellationPendingAgreementUris: new Set(
+        cancellationPendingAgreementUris: Immutable.Set(
           response.cancellationPendingAgreementUris
         ),
-        pendingCancellationProposalUris: new Set(
+        pendingCancellationProposalUris: Immutable.Set(
           response.pendingCancellationProposalUris
         ),
-        cancelledAgreementUris: new Set(response.cancelledAgreementUris),
-        rejectedMessageUris: new Set(response.rejectedMessageUris),
-        retractedMessageUris: new Set(response.retractedMessageUris),
-      };
+        cancelledAgreementUris: Immutable.Set(response.cancelledAgreementUris),
+        rejectedMessageUris: Immutable.Set(response.rejectedMessageUris),
+        retractedMessageUris: Immutable.Set(response.retractedMessageUris),
+      });
 
       return this.filterAgreementSet(tmpAgreementData);
     }
 
     filterAgreementSet(tmpAgreementData) {
-      for (const prop of tmpAgreementData.cancellationPendingAgreementUris) {
+      //TODO: IMPL THIS METHOD NEW
+      /*for (const prop of tmpAgreementData.cancellationPendingAgreementUris) {
         if (tmpAgreementData.agreementUris.has(prop)) {
           tmpAgreementData.agreementUris.delete(prop);
         }
-      }
+      }*/
 
       return tmpAgreementData;
     }
@@ -548,7 +564,10 @@ function genComponentConf() {
                 headUri: undefined,
               });
             }
-            agreementObject.headUri = msg.getMessageUri();
+            agreementObject = agreementObject.set(
+              "headUri",
+              msg.getMessageUri()
+            );
             this.addAgreementDataToSate(
               msg.getRemoteMessageUri(),
               key,
@@ -560,26 +579,32 @@ function genComponentConf() {
                 stateUri: undefined,
                 headUri: undefined,
               });
-              agreementObject.set("headUri", msg.getMessageUri());
+              agreementObject = agreementObject.set(
+                "headUri",
+                msg.getMessageUri()
+              );
             }
-            agreementObject.set("stateUri", msg.getMessageUri());
-            this.agreementLoadingJS[key].add(agreementObject);
+            agreementObject = agreementObject.set(
+              "stateUri",
+              msg.getMessageUri()
+            );
 
-            //Dont load in state again!
-            let found = false;
-            for (const chatMessage of this.chatMessages) {
-              if (agreementObject.get("stateUri") === chatMessage.get("uri")) {
-                found = true;
-              }
-            }
-            if (!found) {
+            //this.agreementLoadingJS[key].add(agreementObject);
+            //TODO: does the line below do the same?
+            this.agreementLoading = this.agreementLoading.set(
+              key,
+              this.agreementLoading.get(key).add(agreementObject)
+            );
+
+            //If message isnt in the state we add it
+            if (this.chatMessages.get(agreementObject.get("stateUri"))) {
               this.messages__connectionMessageReceived(msg);
             }
 
             //Update agreementData in State
             this.connections__updateAgreementData({
               connectionUri: this.connectionUri,
-              agreementData: Immutable.fromJS(this.agreementLoadingJS),
+              agreementData: this.agreementLoading,
             });
           }
         });
@@ -622,8 +647,8 @@ function genComponentConf() {
     }
 
     getCancelUri(agreementUri) {
-      const pendingProposals = this.agreementHeadJS.pendingProposals;
-      for (const prop of pendingProposals) {
+      const pendingProposals = this.agreementHead.get("pendingProposals");
+      for (const prop of pendingProposals.toJS()) {
         if (prop.proposesToCancel.includes(agreementUri)) {
           return prop.uri;
         }
@@ -632,8 +657,8 @@ function genComponentConf() {
     }
 
     checkOwnCancel(headUri) {
-      const pendingProposals = this.agreementHeadJS.pendingProposals;
-      for (const prop of pendingProposals) {
+      const pendingProposals = this.agreementHead.get("pendingProposals");
+      for (const prop of pendingProposals.toJS()) {
         if (prop.proposesToCancel.includes(headUri)) {
           if (prop.proposingNeedUri === this.ownNeed.get("uri")) {
             return true;
@@ -644,20 +669,44 @@ function genComponentConf() {
     }
 
     isOldAgreementMsg(msg) {
-      const aD = this.agreementHeadJS;
       if (
-        aD.agreementUris.has(msg.get("uri")) ||
-        aD.agreementUris.has(msg.get("remoteUri")) ||
-        aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
-        aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
-        aD.cancelledAgreementUris.has(msg.get("uri")) ||
-        aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
-        aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
-        aD.acceptedCancellationProposalUris.has(msg.get("remoteUri")) ||
-        aD.retractedMessageUris.has(msg.get("uri")) ||
-        aD.retractedMessageUris.has(msg.get("remoteUri")) ||
-        aD.rejectedMessageUris.has(msg.get("uri")) ||
-        aD.rejectedMessageUris.has(msg.get("remoteUri"))
+        !this.agreementHead &&
+        (this.agreementHead.getIn(["agreementUris", msg.get("uri")]) ||
+          this.agreementHead.getIn(["agreementUris", msg.get("remotUri")]) ||
+          this.agreementHead.getIn([
+            "cancellationPendingAgreementUris",
+            msg.get("uri"),
+          ]) ||
+          this.agreementHead.getIn([
+            "cancellationPendingAgreementUris",
+            msg.get("remotUri"),
+          ]) ||
+          this.agreementHead.getIn([
+            "cancelledAgreementUris",
+            msg.get("uri"),
+          ]) ||
+          this.agreementHead.getIn([
+            "cancelledAgreementUris",
+            msg.get("remotUri"),
+          ]) ||
+          this.agreementHead.getIn([
+            "acceptedCancellationProposalUris",
+            msg.get("uri"),
+          ]) ||
+          this.agreementHead.getIn([
+            "acceptedCancellationProposalUris",
+            msg.get("remotUri"),
+          ]) ||
+          this.agreementHead.getIn(["retractedMessageUris", msg.get("uri")]) ||
+          this.agreementHead.getIn([
+            "retractedMessageUris",
+            msg.get("remotUri"),
+          ]) ||
+          this.agreementHead.getIn(["rejectedMessageUris", msg.get("uri")]) ||
+          this.agreementHead.getIn([
+            "rejectedMessageUris",
+            msg.get("remotUri"),
+          ]))
       ) {
         return true;
       }
