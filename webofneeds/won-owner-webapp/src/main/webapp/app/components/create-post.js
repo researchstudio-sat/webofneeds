@@ -295,13 +295,12 @@ function genComponentConf() {
     isValid() {
       const draft = this.draftObject;
       const hasContent = get(draft, "is") || get(draft, "seeks");
-      const title =
-        getIn(draft, ["is", "title"]) || getIn(draft, ["seeks", "title"]);
-      const hasValidTitle = title && title.length < this.characterLimit;
-      const hasTTL =
-        getIn(draft, ["is", "ttl"]) || getIn(draft, ["seeks", "ttl"]);
+      const hasValidIs = this.isOrSeeksIsValid(get(draft, "is"));
+      const hasValidSeeks = this.isOrSeeksIsValid(get(draft, "seeks"));
       return (
-        !this.connectionHasBeenLost && hasContent && (hasValidTitle || hasTTL)
+        !this.connectionHasBeenLost &&
+        hasContent &&
+        (hasValidIs || hasValidSeeks)
       );
     }
 
@@ -356,7 +355,10 @@ function genComponentConf() {
 
     // returns true if the part has a valid title or any other detail
     isOrSeeksIsValid(isOrSeeks) {
-      // TODO: title should be either in the root part of the need or in a detail-picker
+      if (!isOrSeeks) {
+        return false;
+      }
+
       const title = get(isOrSeeks, "title");
       const hasValidTitle = title && title.length < this.characterLimit;
 
@@ -367,7 +369,6 @@ function genComponentConf() {
           hasDetail = true;
         }
       }
-      //const hasTTL = get(isOrSeeks, "ttl");
       return !!(hasValidTitle || hasDetail);
     }
 
