@@ -95,7 +95,7 @@ function genComponentConf() {
                 on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
             <won-connection-message
-                ng-if="self.showAgreementData"
+                ng-if="self.showAgreementData && self.connection.get('isLoadingMessages')"
                 ng-repeat="msg in self.agreementMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
@@ -113,21 +113,21 @@ function genComponentConf() {
             		-- Agreements
             	</div>
 	            <div class="pm__content__agreement__title"
-            	  ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index">
+            	  ng-repeat="agreement in self.getArrayFromSet(self.agreementUris) track by $index">
             	    StateUri: {{ agreement.stateUri }}
             	</div>
 	            <div class="pm__content__agreement__title">
             		-- ProposeToCancel
             	</div>
 	            <div class="pm__content__agreement__title"
-            	  ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index">
+            	  ng-repeat="proposeToCancel in self.getArrayFromSet(self.cancellationPendingAgreementUris) track by $index">
             	    StateUri: {{ proposeToCancel.stateUri }}
             	</div>
             	<div class="pm__content__agreement__title">
             		-- Proposals
             	</div>
             	<div class="pm__content__agreement__title"
-            	  ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index">
+            	  ng-repeat="proposal in self.getArrayFromSet(self.pendingProposalUris) track by $index">
             	    StateUri: {{ proposal.stateUri }}
             	</div>
             </div>
@@ -283,6 +283,18 @@ function genComponentConf() {
           shouldShowRdf: state.get("showRdf"),
           // if the connect-message is here, everything else should be as well
           allLoaded,
+          //agreementUrisToDisplay
+          agreementUris:
+            connection && connection.getIn(["agreementData", "agreementUris"]),
+          cancellationPendingAgreementUris:
+            connection &&
+            connection.getIn([
+              "agreementData",
+              "cancellationPendingAgreementUris",
+            ]),
+          pendingProposalUris:
+            connection &&
+            connection.getIn(["agreementData", "pendingProposalUris"]),
         };
       };
 
