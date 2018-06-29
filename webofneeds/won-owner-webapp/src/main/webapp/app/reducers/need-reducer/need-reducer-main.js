@@ -461,7 +461,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.agreementData
       );
-    case actionTypes.connection.clearAgreementData:
+    case actionTypes.connections.clearAgreementData:
       return clearAgreementStateData(
         allNeedsInState,
         action.payload.connectionUri
