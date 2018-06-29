@@ -129,18 +129,13 @@ $ngRedux.getState();
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
                        failedToSend: true|false //whether the sent message failed for whatever reason (default: false, only relevant in outgoingMessages)
-                       agreementData: {
-                            pendingProposalUris: Immutable.Set(),
-                            agreementUris: Immutable.Set(),
-                            cancellationPendingAgreementUris: Immutable.Set(),
-                       }
                    }
                    ...
                },
                agreementData: { //contains agreementData that is necessary to display for the user
-                   agreementUris: Set(), //agreementUris with the current state uris of the connection
-                   cancellationPendingAgreementUris: Set(), ///proposeToCancelUris with the current state uris of the connection
-                   pendingProposalUris: Set(), //pendingProposalUris with the current state uris of the connection
+                   agreementUris: Immutable.Set(), //agreementUris with the current state uris of the connection
+                   cancellationPendingAgreementUris: Immutable.Set(), ///proposeToCancelUris with the current state uris of the connection
+                   pendingProposalUris: Immutable.Set(), //pendingProposalUris with the current state uris of the connection
                },
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
