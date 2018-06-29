@@ -2,7 +2,6 @@ import won from "../won-es6.js";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./connection-message.js";
-import connectionAgreementModule from "./connection-agreement.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
@@ -78,7 +77,7 @@ function genComponentConf() {
                     class="hspinner"/>
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.connection.get('isLoadingMessages') && !self.allLoaded"
+                ng-if="!self.connection.get('isLoadingMessages') && !self.allLoaded && !self.showAgreementData"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -110,45 +109,27 @@ function genComponentConf() {
             </won-connection-message>
 
             <div class="pm__content__agreement" ng-if="self.showAgreementData">
-                <!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
-            		Agreements
+              <div class="pm__content__agreement__title">
+            		-- Agreements
             	</div>
-	            <won-connection-agreement
-	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
-	                state-Uri="agreement.stateUri"
-	                agreement-number="$index"
-	                agreement-declaration="self.declarations.agreement"
-	                connection-uri="self.connectionUri"
-	                on-update="self.setShowAgreementData(false)"
-	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-	            </won-connection-agreement>
-	            <!-- ProposeToCancel -->
-	            <won-connection-agreement
-	            	ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
-	                state-uri="proposeToCancel.stateUri"
-	                head-uri="proposeToCancel.headUri"
-	                cancel-uri="self.getCancelUri(proposeToCancel.headUri)"
-	                own-cancel="self.checkOwnCancel(proposeToCancel.headUri)"
-	                agreement-number="self.agreementStateData.agreementUris.size + $index"
-	                agreement-declaration="self.declarations.proposeToCancel"
-	                connection-uri="self.connectionUri"
-	                on-update="[self.setShowAgreementData(false), self.filterMessages(draft)]"
-	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-	            </won-connection-agreement>
-            	<!-- PROPOSALS -->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.pendingProposalUris.size">
-            		Proposals
+	            <div class="pm__content__agreement__title"
+            	  ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index">
+            	    StateUri: {{ agreement.stateUri }}
             	</div>
-	            <won-connection-agreement
-	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
-	                state-Uri="proposal.stateUri"
-	                agreement-number="$index"
-	                agreement-declaration="self.declarations.proposal"
-	                connection-uri="self.connectionUri"
-	                on-update="self.setShowAgreementData(false);"
-	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-	            </won-connection-agreement>
+	            <div class="pm__content__agreement__title">
+            		-- ProposeToCancel
+            	</div>
+	            <div class="pm__content__agreement__title"
+            	  ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index">
+            	    StateUri: {{ proposeToCancel.stateUri }}
+            	</div>
+            	<div class="pm__content__agreement__title">
+            		-- Proposals
+            	</div>
+            	<div class="pm__content__agreement__title"
+            	  ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index">
+            	    StateUri: {{ proposal.stateUri }}
+            	</div>
             </div>
             
             <a class="rdflink clickable"
@@ -375,6 +356,11 @@ function genComponentConf() {
     }*/
 
     getAgreementData() {
+      this.connections__setLoadingMessages({
+        connectionUri: this.connectionUri,
+        isLoadingMessages: true,
+      });
+
       this.getAgreementDataUris();
 
       /*delay(0).then(() => {
@@ -760,8 +746,8 @@ function genComponentConf() {
 
     cloneDefaultAgreementObject() {
       return {
-        stateUri: undefined,
-        headUri: undefined,
+        stateUri: undefined, //the messageUri of the message from me
+        headUri: undefined, //the headUri is the originalUri that could be the remoteUri or the uri of the message in the state
       };
     }
 
@@ -791,7 +777,6 @@ export default angular
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
     connectionMessageModule,
-    connectionAgreementModule,
     connectionHeaderModule,
     labelledHrModule,
     connectionContextDropdownModule,
