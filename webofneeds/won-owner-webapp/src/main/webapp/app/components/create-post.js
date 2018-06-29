@@ -365,7 +365,7 @@ function genComponentConf() {
       let hasDetail = false;
       const details = Object.keys(isOrSeeks);
       for (let d of details) {
-        if (details[d] && d !== "type") {
+        if (isOrSeeks[d] && d !== "type") {
           hasDetail = true;
         }
       }
