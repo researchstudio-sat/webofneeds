@@ -375,8 +375,7 @@ function genComponentConf() {
     }*/
 
     getAgreementData() {
-      const agreementDataUris = this.getAgreementDataUris();
-      console.log("agreementDataUris: ", agreementDataUris);
+      this.getAgreementDataUris();
 
       /*delay(0).then(() => {
         if (this.connection &&
