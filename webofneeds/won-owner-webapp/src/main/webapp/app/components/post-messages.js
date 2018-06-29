@@ -615,10 +615,10 @@ function genComponentConf() {
     }
 
     filterMessages(stateUri) {
-      const object = {
+      const object = Immutable.fromJS({
         stateUri: stateUri,
         headUri: undefined,
-      };
+      });
 
       this.checkObject("agreementUris", object, true);
       this.checkObject("pendingProposalUris", object, true);
