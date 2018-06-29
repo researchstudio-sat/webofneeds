@@ -46,6 +46,7 @@ export function messagesReducer(messages = initialState, action = {}) {
 
     case actionTypes.connections.open:
     case actionTypes.connections.sendChatMessage:
+    case actionTypes.connections.rate:
     case actionTypes.messages.send:
       return messages.setIn(
         ["enqueued", action.payload.eventUri],

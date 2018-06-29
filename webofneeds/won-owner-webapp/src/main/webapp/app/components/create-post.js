@@ -20,6 +20,7 @@ import { get, getIn, attach, deepFreeze } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
+import { selectIsConnected } from "../selectors.js";
 
 const postTypeTexts = [
   {
@@ -168,9 +169,7 @@ function genComponentConf() {
         const isPost = showCreateView && !isSearch;
 
         return {
-          connectionHasBeenLost:
-            state.getIn(["messages", "reconnecting"]) ||
-            state.getIn(["messages", "lostConnection"]),
+          connectionHasBeenLost: !selectIsConnected(state),
           showCreateView,
           isSearch,
           isPost,

@@ -271,16 +271,14 @@ export function connectionsClose(connectionUri) {
       ownNeed.get("nodeUri"),
       theirNeed.get("nodeUri"),
       theirConnectionUri
-    ).then(closeMessage => {
-      dispatch(
-        actionCreators.messages__send({
-          eventUri: closeMessage.eventUri,
-          message: closeMessage.message,
-        })
-      );
+    ).then(({ eventUri, message }) => {
       dispatch({
         type: actionTypes.connections.close,
-        payload: { connectionUri },
+        payload: {
+          connectionUri,
+          eventUri,
+          message,
+        },
       });
     });
   };
@@ -317,28 +315,30 @@ export function connectionsRate(connectionUri, rating) {
   return (dispatch, getState) => {
     const state = getState();
 
+    const ownNeed = state
+      .get("needs")
+      .filter(need => need.getIn(["connections", connectionUri]))
+      .first();
+    const theirNeedUri = state.getIn([
+      "needs",
+      ownNeed.get("uri"),
+      "connections",
+      connectionUri,
+      "remoteNeedUri",
+    ]);
+    const theirNeed = state.getIn(["needs", theirNeedUri]);
+    const theirConnectionUri = ownNeed.getIn([
+      "connections",
+      connectionUri,
+      "remoteConnectionUri",
+    ]);
+
     won
-      .getConnectionWithEventUris(connectionUri)
+      .getConnectionWithEventUris(connectionUri, {
+        requesterWebId: ownNeed.get("uri"),
+      })
       .then(connection => {
         let msgToRateFor = { connection: connection };
-
-        const ownNeed = state
-          .get("needs")
-          .filter(need => need.getIn(["connections", connectionUri]))
-          .first();
-        const theirNeedUri = state.getIn([
-          "needs",
-          ownNeed.get("uri"),
-          "connections",
-          connectionUri,
-          "remoteNeedUri",
-        ]);
-        const theirNeed = state.getIn(["needs", theirNeedUri]);
-        const theirConnectionUri = ownNeed.getIn([
-          "connections",
-          connectionUri,
-          "remoteConnectionUri",
-        ]);
 
         return buildRateMessage(
           msgToRateFor,
@@ -350,13 +350,16 @@ export function connectionsRate(connectionUri, rating) {
           rating
         );
       })
-      .then(action =>
-        dispatch(
-          actionCreators.messages__send({
-            eventUri: action.eventUri,
-            message: action.message,
-          })
-        )
+      .then(({ eventUri, message }) =>
+        dispatch({
+          type: actionTypes.connections.rate,
+          payload: {
+            connectionUri,
+            rating,
+            eventUri,
+            message,
+          },
+        })
       );
   };
 }

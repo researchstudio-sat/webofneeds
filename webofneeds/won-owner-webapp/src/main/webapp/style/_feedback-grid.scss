@@ -12,7 +12,9 @@ won-feedback-grid {
     text-decoration: none;
   }
 
-  .feedback {
+  .feedback--bad,
+  .feedback--good,
+  .feedback--disabled {
     display: flex;
     cursor: pointer;
     flex-grow: 1;
@@ -20,41 +22,69 @@ won-feedback-grid {
     padding: 0.25rem;
     flex-direction: column;
 
-    &__icon {
+    .feedback__icon {
       flex-grow: 1;
       align-self: center;
       width: 1.5rem;
       height: 1.5rem;
       background-size: 1.5rem;
-
-      &.selected {
-        display: none;
-      }
-      &.unselected {
-        display: block;
-      }
     }
 
-    &__text {
+    .feedback__text {
       font-size: $smallFontSize;
-      color: black;
       align-self: center;
       text-align: center;
     }
+  }
 
+  /* ------- conditional coloring -------- */
+
+  .feedback--bad,
+  .feedback--good,
+  .feedback--disabled {
     &:hover {
       .feedback__text {
-        color: white;
+        color: $won-secondary-text-color;
       }
 
-      .feedback__icon.selected {
-        display: block;
+      .feedback__icon {
+        --local-primary: #{$won-secondary-text-color};
       }
-      .feedback__icon.unselected {
-        display: none;
-      }
-
+    }
+  }
+  .feedback--good {
+    .feedback__icon {
+      --local-primary: #{$won-primary-color};
+    }
+    .feedback__text {
+      color: $won-primary-text-color;
+    }
+  }
+  .feedback--bad {
+    .feedback__icon {
+      --local-primary: #{$won-primary-text-color};
+    }
+    .feedback__text {
+      color: $won-primary-text-color;
+    }
+  }
+  .feedback--disabled {
+    .feedback__icon {
+      --local-primary: #{$won-disabled-color};
+    }
+    .feedback__text {
+      color: $won-disabled-color;
+    }
+  }
+  .feedback--bad,
+  .feedback--good {
+    &:hover {
       background: $won-primary-color;
+    }
+  }
+  .feedback--disabled {
+    &:hover {
+      background: $won-disabled-color;
     }
   }
 }

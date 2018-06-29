@@ -437,7 +437,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri
       );
-    case actionTypes.connections.markAsRated:
+    case actionTypes.connections.rate:
       return markConnectionAsRated(
         allNeedsInState,
         action.payload.connectionUri
