@@ -232,13 +232,6 @@ won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix + ":EnvelopeGraph";
 won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
 won.WONMSG.hasContentCompacted = won.WONMSG.prefix + ":hasContent";
 
-won.WONMSG.unsetRelevantMessage =
-  won.WONMSG.baseUri + "hasUnsetRelevantMessage";
-won.WONMSG.unsetRelevantMessageCompacted =
-  won.WONMSG.prefix + ":hasUnsetRelevantMessage";
-won.WONMSG.isRelevant = won.WONMSG.baseUri + "isRelevant";
-won.WONMSG.isRelevantCompacted = won.WONMSG.prefix + ":isRelevant";
-
 won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
 won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
 won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
@@ -1358,19 +1351,6 @@ WonMessage.prototype = {
   isRetractMessage: function() {
     return !!this.getProperty(
       "http://purl.org/webofneeds/modification#retracts"
-    );
-  },
-
-  isRelevant: function() {
-    return (
-      !!this.getMessageType() ===
-      "http://purl.org/webofneeds/message#isRelevant"
-    );
-  },
-
-  isUnsetRelevantMessage: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#hasUnsetRelevantMessage"
     );
   },
 
