@@ -156,7 +156,7 @@ function genComponentConf() {
           theirNeed,
           connection,
           message,
-          isRelevant: message.get("isRelevant") || !this.hideOption,
+          isRelevant: message.get("isRelevant"),
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf,
@@ -192,6 +192,7 @@ function genComponentConf() {
         () => this.isSystemMessage(),
         this
       );
+      classOnComponentRoot("won-not-relevant", () => !this.isRelevant, this);
       classOnComponentRoot("won-unread", () => this.isUnread(), this);
     }
 
@@ -361,7 +362,6 @@ function genComponentConf() {
     scope: {
       messageUri: "=",
       connectionUri: "=",
-      hideOption: "=",
       // Usage: on-update="::myCallback(draft)"
       onUpdate: "&",
       onSendProposal: "&",

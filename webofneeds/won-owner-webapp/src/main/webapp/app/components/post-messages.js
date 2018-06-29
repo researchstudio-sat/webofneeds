@@ -104,10 +104,6 @@ function genComponentConf() {
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
-                hide-option="msg.hide"
-                ng-class="{
-                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
-                }"
                 on-update="self.setShowAgreementData(false)"
                 on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
                 on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
@@ -212,7 +208,6 @@ function genComponentConf() {
               msg.get("isAcceptMessage")
             ) {
               if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                msg.hide = true;
                 this.messages__markAsRelevant({
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
@@ -223,7 +218,6 @@ function genComponentConf() {
             } else if (this.agreementHead.get("retractedMessageUris").size) {
               //TODO: filter out retracted messages faster
               if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                msg.hide = true;
                 this.messages__markAsRelevant({
                   messageUri: msg.get("uri"),
                   connectionUri: connectionUri,
