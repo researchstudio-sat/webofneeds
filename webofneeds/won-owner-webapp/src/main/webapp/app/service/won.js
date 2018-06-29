@@ -1328,7 +1328,7 @@ WonMessage.prototype = {
     );
   },
   getRejectsMessages: function() {
-    return this.getProperty("https://purl.org/webofneeds/agreement#rejects");
+    return this.getProperty("http://purl.org/webofneeds/agreement#rejects");
   },
   getRetractMessages: function() {
     return this.getProperty("http://purl.org/webofneeds/modification#retracts");
