@@ -104,6 +104,10 @@
       overflow: auto;
       flex-grow: 1;
 
+      &.won-agreement-content {
+        background: $won-lighter-gray;
+      }
+
       &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
       &__loadspinner {
         width: 100%;

@@ -1,4 +1,5 @@
 import won from "../won-es6.js";
+import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./connection-message.js";
@@ -64,12 +65,14 @@ function genComponentConf() {
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
-            <div class="pm__header__title">
+            <div class="pm__header__title clickable"
+                ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
             </div>
             <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
-        <div class="pm__content">
+        <div class="pm__content"
+            ng-class="{'won-agreement-content': self.showAgreementData}">
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
@@ -94,40 +97,26 @@ function genComponentConf() {
                 on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
                 on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
-            <won-connection-message
-                ng-if="self.showAgreementData && self.connection.get('isLoadingMessages')"
-                ng-repeat="msg in self.agreementMessages"
-                connection-uri="self.connectionUri"
-                message-uri="msg.get('uri')"
-                hide-option="msg.hide"
-                ng-class="{
-                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
-                }"
-                on-update="self.setShowAgreementData(false)"
-                on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
-                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-            </won-connection-message>
-
-            <div class="pm__content__agreement" ng-if="self.showAgreementData">
+            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')">
               <div class="pm__content__agreement__title">
             		-- Agreements
             	</div>
 	            <div class="pm__content__agreement__title"
-            	  ng-repeat="agreement in self.getArrayFromSet(self.agreementUris) track by $index">
+            	  ng-repeat="agreement in self.agreementUrisArray track by $index">
             	    StateUri: {{ agreement.stateUri }}
             	</div>
 	            <div class="pm__content__agreement__title">
             		-- ProposeToCancel
             	</div>
 	            <div class="pm__content__agreement__title"
-            	  ng-repeat="proposeToCancel in self.getArrayFromSet(self.cancellationPendingAgreementUris) track by $index">
+            	  ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray track by $index">
             	    StateUri: {{ proposeToCancel.stateUri }}
             	</div>
             	<div class="pm__content__agreement__title">
             		-- Proposals
             	</div>
             	<div class="pm__content__agreement__title"
-            	  ng-repeat="proposal in self.getArrayFromSet(self.pendingProposalUris) track by $index">
+            	  ng-repeat="proposal in self.pendingProposalUrisArray track by $index">
             	    StateUri: {{ proposal.stateUri }}
             	</div>
             </div>
@@ -181,8 +170,9 @@ function genComponentConf() {
 
       this.declarations = clone(declarations);
 
-      this.agreementHeadData = this.cloneDefaultData();
-      this.agreementLoadingData = this.cloneDefaultStateData();
+      this.agreementHeadJS = this.cloneDefaultData().toJS();
+      this.agreementHead = this.cloneDefaultStateData();
+      this.agreementLoadingJS = this.cloneDefaultStateData().toJS();
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -212,10 +202,19 @@ function genComponentConf() {
             msg => msg.get("messageType") === won.WONMSG.connectMessage
           ).size > 0;
 
-        let agreementStateData = connection && connection.get("agreementData");
+        const agreementData = connection && connection.get("agreementData");
+        const agreementUris =
+          agreementData && agreementData.get("agreementUris");
+        const cancellationPendingAgreementUris =
+          agreementData &&
+          agreementData.get("cancellationPendingAgreementUris");
+        const pendingProposalUris =
+          agreementData && agreementData.get("pendingProposalUris");
 
-        if (agreementStateData && !agreementStateData.agreementUris) {
-          agreementStateData = this.cloneDefaultStateData();
+        let agreementStateJS = agreementData && agreementData.toJS();
+
+        if (agreementStateJS && !agreementStateJS.agreementUris) {
+          agreementStateJS = this.cloneDefaultStateData().toJS();
         }
 
         //Filter already accepted proposals
@@ -239,7 +238,7 @@ function genComponentConf() {
                   relevant: false,
                 });
               }
-            } else if (this.agreementHeadData.retractedMessageUris.size) {
+            } else if (this.agreementHeadJS["retractedMessageUris"].size) {
               //TODO: filter out retracted messages faster
               if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
                 msg.hide = true;
@@ -259,17 +258,13 @@ function genComponentConf() {
           });
         }
 
-        let agreementMessages =
-          chatMessages && chatMessages.filter(msg => msg.get("hasReferences"));
-
         return {
           ownNeed,
           theirNeed,
           connectionUri,
           connection,
-          agreementStateData,
+
           chatMessages: sortedMessages,
-          agreementMessages: agreementMessages && agreementMessages.toArray(),
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -284,17 +279,14 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allLoaded,
           //agreementUrisToDisplay
-          agreementUris:
-            connection && connection.getIn(["agreementData", "agreementUris"]),
-          cancellationPendingAgreementUris:
-            connection &&
-            connection.getIn([
-              "agreementData",
-              "cancellationPendingAgreementUris",
-            ]),
-          pendingProposalUris:
-            connection &&
-            connection.getIn(["agreementData", "pendingProposalUris"]),
+          agreementStateJS,
+          agreementData,
+          agreementUrisArray: agreementUris && agreementUris.toArray(),
+          cancellationPendingAgreementUrisArray:
+            cancellationPendingAgreementUris &&
+            cancellationPendingAgreementUris.toArray(),
+          pendingProposalUrisArray:
+            pendingProposalUris && pendingProposalUris.toArray(),
         };
       };
 
@@ -346,27 +338,6 @@ function genComponentConf() {
       });
     }
 
-    /*getAgreementData() {
-      delay(0).then(() => {
-        if (
-          this.connection &&
-          !(this.allLoaded)
-        ){
-          this.connections__setLoadingMessages({
-            connectionUri: this.connectionUri,
-            isLoadingMessages: true,
-          });
-
-          this.agreementLoadingData = this.cloneDefaultStateData();
-          if (!this.agreementStateData) {
-            this.agreementStateData = this.cloneDefaultStateData();
-          }
-
-          this.getAgreementDataUris();
-        }
-      });
-    }*/
-
     getAgreementData() {
       this.connections__setLoadingMessages({
         connectionUri: this.connectionUri,
@@ -374,29 +345,6 @@ function genComponentConf() {
       });
 
       this.getAgreementDataUris();
-
-      /*delay(0).then(() => {
-        if (this.connection &&
-            !this.allLoaded &&
-            !this.connection.get("isLoadingMessages")) {
-          const MESSAGECOUNT = 10;
-          const messages = this.connection.get("messages");
-          const messageCount = messages ? messages.size : 0;
-
-          if (messageCount == 0) {
-            console.log(
-              "getAgreementData - Getting Latest Messages for connection: ",
-              conn.get("uri"),
-              " already loaded: ",
-              messageCount,
-              " messages"
-            );
-            ensureMessagesAreLoaded();
-          } else {
-            loadPreviousMessages();
-          }
-        }
-      });*/
     }
 
     loadPreviousMessages() {
@@ -476,19 +424,6 @@ function genComponentConf() {
       });
     }
 
-    agreementDataIsValid() {
-      const aD = this.agreementStateData;
-      if (
-        aD &&
-        (aD.agreementUris.size ||
-          aD.pendingProposalUris.size ||
-          aD.cancellationPendingAgreementUris.size)
-      ) {
-        return true;
-      }
-      return false;
-    }
-
     encodeParam(param) {
       return encodeURIComponent(param);
     }
@@ -502,11 +437,11 @@ function genComponentConf() {
       let hasChanged = false;
       callAgreementsFetch(url)
         .then(response => {
-          this.agreementHeadData = this.transformDataToSet(response);
+          this.agreementHeadJS = this.transformDataToSet(response);
 
           for (const key of keySet) {
-            if (this.agreementHeadData.hasOwnProperty(key)) {
-              for (const data of this.agreementHeadData[key]) {
+            if (this.agreementHeadJS.hasOwnProperty(key)) {
+              for (const data of this.agreementHeadJS[key]) {
                 this.addAgreementDataToSate(data, key);
                 hasChanged = true;
               }
@@ -514,23 +449,22 @@ function genComponentConf() {
           }
           //no data found for keyset: no relevant agreementData to show in GUI - clean state data
           if (!hasChanged) {
-            this.connections__updateAgreementData({
+            this.connections__clearAgreementData({
               connectionUri: this.connectionUri,
-              agreementData: this.cloneDefaultStateData(),
             });
           }
           //Remove all retracted/rejected messages
           else if (
-            this.agreementStateData &&
-            (this.agreementHeadData["rejectedMessageUris"] ||
-              this.agreementHeadData["retractedMessageUris"])
+            this.agreementStateJS &&
+            (this.agreementHeadJS["rejectedMessageUris"] ||
+              this.agreementHeadJS["retractedMessageUris"])
           ) {
             let removalSet = new Set([
-              ...this.agreementHeadData["rejectedMessageUris"],
-              ...this.agreementHeadData["retractedMessageUris"],
+              ...this.agreementHeadJS["rejectedMessageUris"],
+              ...this.agreementHeadJS["retractedMessageUris"],
             ]);
 
-            const data = this.agreementStateData;
+            const data = this.agreementStateJS;
 
             for (const uri of removalSet) {
               const key = "pendingProposalUris";
@@ -543,10 +477,8 @@ function genComponentConf() {
               }
             }
             if (hasChanged) {
-              this.agreementStateData = this.cloneDefaultStateData();
-              this.connections__updateAgreementData({
+              this.connections__clearAgreementData({
                 connectionUri: this.connectionUri,
-                agreementData: data,
               });
             }
           }
@@ -611,7 +543,10 @@ function genComponentConf() {
                          need we will call the method again but this time with the correct eventUri
                          */
             if (!agreementObject) {
-              agreementObject = this.cloneDefaultAgreementObject();
+              agreementObject = Immutable.fromJS({
+                stateUri: undefined,
+                headUri: undefined,
+              });
             }
             agreementObject.headUri = msg.getMessageUri();
             this.addAgreementDataToSate(
@@ -621,17 +556,19 @@ function genComponentConf() {
             );
           } else {
             if (!agreementObject) {
-              agreementObject = this.cloneDefaultAgreementObject();
-              agreementObject.headUri = msg.getMessageUri();
+              agreementObject = Immutable.fromJS({
+                stateUri: undefined,
+                headUri: undefined,
+              });
+              agreementObject.set("headUri", msg.getMessageUri());
             }
-
-            agreementObject.stateUri = msg.getMessageUri();
-            this.agreementLoadingData[key].add(agreementObject);
+            agreementObject.set("stateUri", msg.getMessageUri());
+            this.agreementLoadingJS[key].add(agreementObject);
 
             //Dont load in state again!
             let found = false;
             for (const chatMessage of this.chatMessages) {
-              if (agreementObject.stateUri === chatMessage.get("uri")) {
+              if (agreementObject.get("stateUri") === chatMessage.get("uri")) {
                 found = true;
               }
             }
@@ -642,7 +579,7 @@ function genComponentConf() {
             //Update agreementData in State
             this.connections__updateAgreementData({
               connectionUri: this.connectionUri,
-              agreementData: this.agreementLoadingData,
+              agreementData: Immutable.fromJS(this.agreementLoadingJS),
             });
           }
         });
@@ -656,14 +593,14 @@ function genComponentConf() {
     }
 
     checkObject(key, agreementObject, del) {
-      const data = this.agreementStateData;
+      const data = this.agreementStateJS;
       for (const object of data[key]) {
         if (object.stateUri === agreementObject.stateUri) {
           if (del.value) {
             data[key].delete(object);
             this.connections__updateAgreementData({
               connectionUri: this.connectionUri,
-              agreementData: data,
+              agreementData: Immutable.fromJS(data),
             });
           }
           return true;
@@ -685,7 +622,7 @@ function genComponentConf() {
     }
 
     getCancelUri(agreementUri) {
-      const pendingProposals = this.agreementHeadData.pendingProposals;
+      const pendingProposals = this.agreementHeadJS.pendingProposals;
       for (const prop of pendingProposals) {
         if (prop.proposesToCancel.includes(agreementUri)) {
           return prop.uri;
@@ -695,7 +632,7 @@ function genComponentConf() {
     }
 
     checkOwnCancel(headUri) {
-      const pendingProposals = this.agreementHeadData.pendingProposals;
+      const pendingProposals = this.agreementHeadJS.pendingProposals;
       for (const prop of pendingProposals) {
         if (prop.proposesToCancel.includes(headUri)) {
           if (prop.proposingNeedUri === this.ownNeed.get("uri")) {
@@ -707,7 +644,7 @@ function genComponentConf() {
     }
 
     isOldAgreementMsg(msg) {
-      const aD = this.agreementHeadData;
+      const aD = this.agreementHeadJS;
       if (
         aD.agreementUris.has(msg.get("uri")) ||
         aD.agreementUris.has(msg.get("remoteUri")) ||
@@ -727,40 +664,26 @@ function genComponentConf() {
       return false;
     }
 
-    getArrayFromSet(set) {
-      if (!set) {
-        set = new Set();
-      }
-      return Array.from(set);
-    }
-
     cloneDefaultData() {
-      return {
-        agreementUris: new Set(),
-        pendingProposalUris: new Set(),
-        pendingProposals: new Set(),
-        acceptedCancellationProposalUris: new Set(),
-        cancellationPendingAgreementUris: new Set(),
-        pendingCancellationProposalUris: new Set(),
-        cancelledAgreementUris: new Set(),
-        rejectedMessageUris: new Set(),
-        retractedMessageUris: new Set(),
-      };
+      return Immutable.fromJS({
+        agreementUris: Immutable.Set(),
+        pendingProposalUris: Immutable.Set(),
+        pendingProposals: Immutable.Set(),
+        acceptedCancellationProposalUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+        pendingCancellationProposalUris: Immutable.Set(),
+        cancelledAgreementUris: Immutable.Set(),
+        rejectedMessageUris: Immutable.Set(),
+        retractedMessageUris: Immutable.Set(),
+      });
     }
 
     cloneDefaultStateData() {
-      return {
-        pendingProposalUris: new Set(),
-        agreementUris: new Set(),
-        cancellationPendingAgreementUris: new Set(),
-      };
-    }
-
-    cloneDefaultAgreementObject() {
-      return {
-        stateUri: undefined, //the messageUri of the message from me
-        headUri: undefined, //the headUri is the originalUri that could be the remoteUri or the uri of the message in the state
-      };
+      return Immutable.fromJS({
+        pendingProposalUris: Immutable.Set(),
+        agreementUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+      });
     }
 
     openRequest(message) {
