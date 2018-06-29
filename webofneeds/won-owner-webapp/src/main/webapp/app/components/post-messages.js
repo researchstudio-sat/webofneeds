@@ -79,11 +79,11 @@ function genComponentConf() {
                 on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
 
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.connection.get('isLoadingMessages')">
               Agreements
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData"
+              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
               ng-repeat="agreement in self.agreementUrisArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('stateUri')"
@@ -91,11 +91,11 @@ function genComponentConf() {
               on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
               on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris && !self.connection.get('isLoadingMessages')">
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData"
+              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
               ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
               connection-uri="self.connectionUri"
               message-uri="proposeToCancel.get('stateUri')"
@@ -103,11 +103,11 @@ function genComponentConf() {
               on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
               on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris && !self.connection.get('isLoadingMessages')">
               Open Proposals
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData"
+              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
               ng-repeat="proposal in self.pendingProposalUrisArray"
               connection-uri="self.connectionUri"
               message-uri="proposal.get('stateUri')"
