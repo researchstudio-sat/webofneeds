@@ -8,22 +8,6 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     wonMessage.contentGraphTrig
   );
 
-  let clauses = undefined;
-
-  if (
-    wonMessage.isProposeMessage() ||
-    wonMessage.isAcceptMessage() ||
-    wonMessage.isProposeToCancel()
-  ) {
-    if (wonMessage.isProposeMessage()) {
-      clauses = wonMessage.getProposedMessages();
-    } else if (wonMessage.isAcceptMessage()) {
-      clauses = wonMessage.getAcceptedMessages();
-    } else {
-      clauses = wonMessage.getProposedToCancelMessages();
-    }
-  }
-
   const proposedMessages = wonMessage.getProposedMessages();
   const proposedToCancelMessages = wonMessage.getProposedToCancelMessages();
   const acceptedMessages = wonMessage.getAcceptedMessages();
@@ -74,7 +58,6 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       date: msStringToDate(wonMessage.getTimestamp()),
       outgoingMessage: wonMessage.isFromOwner(),
       messageType: wonMessage.getMessageType(),
-      clauses: clauses,
       isRelevant: true,
       contentGraphTrig: {
         prefixes: trigPrefixes,
