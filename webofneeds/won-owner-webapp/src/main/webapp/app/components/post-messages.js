@@ -672,14 +672,14 @@ function genComponentConf() {
       if (
         !this.agreementHead &&
         (this.agreementHead.getIn(["agreementUris", msg.get("uri")]) ||
-          this.agreementHead.getIn(["agreementUris", msg.get("remotUri")]) ||
+          this.agreementHead.getIn(["agreementUris", msg.get("remoteUri")]) ||
           this.agreementHead.getIn([
             "cancellationPendingAgreementUris",
             msg.get("uri"),
           ]) ||
           this.agreementHead.getIn([
             "cancellationPendingAgreementUris",
-            msg.get("remotUri"),
+            msg.get("remoteUri"),
           ]) ||
           this.agreementHead.getIn([
             "cancelledAgreementUris",
@@ -687,7 +687,7 @@ function genComponentConf() {
           ]) ||
           this.agreementHead.getIn([
             "cancelledAgreementUris",
-            msg.get("remotUri"),
+            msg.get("remoteUri"),
           ]) ||
           this.agreementHead.getIn([
             "acceptedCancellationProposalUris",
@@ -695,17 +695,17 @@ function genComponentConf() {
           ]) ||
           this.agreementHead.getIn([
             "acceptedCancellationProposalUris",
-            msg.get("remotUri"),
+            msg.get("remoteUri"),
           ]) ||
           this.agreementHead.getIn(["retractedMessageUris", msg.get("uri")]) ||
           this.agreementHead.getIn([
             "retractedMessageUris",
-            msg.get("remotUri"),
+            msg.get("remoteUri"),
           ]) ||
           this.agreementHead.getIn(["rejectedMessageUris", msg.get("uri")]) ||
           this.agreementHead.getIn([
             "rejectedMessageUris",
-            msg.get("remotUri"),
+            msg.get("remoteUri"),
           ]))
       ) {
         return true;
