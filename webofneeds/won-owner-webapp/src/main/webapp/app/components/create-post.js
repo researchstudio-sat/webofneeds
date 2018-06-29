@@ -20,6 +20,7 @@ import {
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
+import { selectIsConnected } from "../selectors.js";
 
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/description-picker.js";
