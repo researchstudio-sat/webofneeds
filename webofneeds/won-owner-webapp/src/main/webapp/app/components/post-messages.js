@@ -57,33 +57,14 @@ function genComponentConf() {
             </div>
             <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
-        <div class="pm__content"
-            ng-class="{'won-agreement-content': self.showAgreementData}">
+        <div class="pm__content won-agreement-content" ng-if="self.showAgreementData">
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
                     alt="Loading&hellip;"
                     class="hspinner"/>
             </div>
-            <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.connection.get('isLoadingMessages') && !self.allLoaded && !self.showAgreementData"
-                ng-click="self.loadPreviousMessages()">
-                Load previous messages
-            </button>
-            <won-connection-message
-                ng-if="!self.showAgreementData"
-                ng-repeat="msg in self.sortedMessages"
-                connection-uri="self.connectionUri"
-                message-uri="msg.get('uri')"
-                hide-option="msg.hide"
-                ng-class="{
-                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
-                }"
-                on-update="self.setShowAgreementData(false)"
-                on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
-                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-            </won-connection-message>
-            <div class="pm__content__agreement" ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement" ng-if="!self.connection.get('isLoadingMessages')">
               <div class="pm__content__agreement__title">
             		-- Agreements
             	</div>
@@ -106,7 +87,31 @@ function genComponentConf() {
             	    StateUri: {{ proposal.get("stateUri") }}
             	</div>
             </div>
-            
+        </div>
+        <div class="pm__content" ng-if="!self.showAgreementData">
+            <div class="pm__content__loadspinner"
+                ng-if="self.connection.get('isLoadingMessages')">
+                <img src="images/spinner/on_white.gif"
+                    alt="Loading&hellip;"
+                    class="hspinner"/>
+            </div>
+            <button class="pm__content__loadbutton won-button--outlined thin red"
+                ng-if="!self.connection.get('isLoadingMessages') && !self.allLoaded"
+                ng-click="self.loadPreviousMessages()">
+                Load previous messages
+            </button>
+            <won-connection-message
+                ng-repeat="msg in self.sortedMessages"
+                connection-uri="self.connectionUri"
+                message-uri="msg.get('uri')"
+                hide-option="msg.hide"
+                ng-class="{
+                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
+                }"
+                on-update="self.setShowAgreementData(false)"
+                on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
