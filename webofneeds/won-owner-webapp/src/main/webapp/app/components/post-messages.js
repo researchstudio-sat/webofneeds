@@ -11,7 +11,7 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { connect2Redux } from "../won-utils.js";
-import { attach, delay, deepFreeze, clone } from "../utils.js";
+import { attach, delay } from "../utils.js";
 import {
   callAgreementsFetch,
   callAgreementEventFetch,
@@ -25,20 +25,6 @@ import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
-
-const declarations = deepFreeze({
-  proposal: "proposal",
-  agreement: "agreement",
-  proposeToCancel: "proposeToCancel",
-});
-
-const keySet = deepFreeze(
-  new Set([
-    "agreementUris",
-    "pendingProposalUris",
-    "cancellationPendingAgreementUris",
-  ])
-);
 
 function genComponentConf() {
   let template = `
@@ -168,8 +154,6 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
 
-      this.declarations = clone(declarations);
-
       this.agreementHead = this.cloneDefaultData();
       this.agreementLoading = this.cloneDefaultStateData();
 
@@ -209,12 +193,6 @@ function genComponentConf() {
           agreementData.get("cancellationPendingAgreementUris");
         const pendingProposalUris =
           agreementData && agreementData.get("pendingProposalUris");
-
-        let agreementStateJS = agreementData && agreementData.toJS();
-
-        if (agreementStateJS && !agreementStateJS.agreementUris) {
-          agreementStateJS = this.cloneDefaultStateData().toJS();
-        }
 
         //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
@@ -279,7 +257,6 @@ function genComponentConf() {
           // if the connect-message is here, everything else should be as well
           allLoaded,
           //agreementUrisToDisplay
-          agreementStateJS,
           agreementData,
           agreementUrisArray: agreementUris && agreementUris.toArray(),
           cancellationPendingAgreementUrisArray:
@@ -448,15 +425,15 @@ function genComponentConf() {
           );
 
           agreementUris.map(data => {
-            this.addAgreementDataToSate(data, "agreementUris");
+            this.addAgreementDataToState(data, "agreementUris");
             hasChanged = true;
           });
           pendingProposalUris.map(data => {
-            this.addAgreementDataToSate(data, "pendingProposalUris");
+            this.addAgreementDataToState(data, "pendingProposalUris");
             hasChanged = true;
           });
           cancellationPendingAgreementUris.map(data => {
-            this.addAgreementDataToSate(
+            this.addAgreementDataToState(
               data,
               "cancellationPendingAgreementUris"
             );
@@ -471,28 +448,30 @@ function genComponentConf() {
           }
           //Remove all retracted/rejected messages
           else if (
-            this.agreementStateJS &&
+            this.agreementData &&
             (this.agreementHead.get("rejectedMessageUris") ||
               this.agreementHead.get("retractedMessageUris"))
           ) {
-            let removalSet = new Set([
-              ...this.agreementHead.get("rejectedMessageUris").toJS(),
-              ...this.agreementHead.get("retractedMessageUris").toJS(),
-            ]);
+            const pendingProposalUris = this.agreementData.get(
+              "pendingProposalUris"
+            );
+            const pendingProposalUrisWithout =
+              pendingProposalUris &&
+              pendingProposalUris
+                .subtract(this.agreementHead.get("rejectedMessageUris"))
+                .subtract(this.agreementHead.get("retractedMessageUris"));
 
-            const data = this.agreementStateJS;
+            this.agreementData = this.agreementData.set(
+              "pendingProposalUris",
+              pendingProposalUrisWithout
+            );
 
-            for (const uri of removalSet) {
-              const key = "pendingProposalUris";
-              for (const obj of data[key]) {
-                if (obj.stateUri === uri || obj.headUri === uri) {
-                  console.log("Message " + uri + " was removed");
-                  data[key].delete(obj);
-                  hasChanged = true;
-                }
-              }
-            }
-            if (hasChanged) {
+            if (
+              pendingProposalUris &&
+              pendingProposalUrisWithout &&
+              pendingProposalUris.size != pendingProposalUrisWithout.size
+            ) {
+              hasChanged = true;
               this.connections__clearAgreementData({
                 connectionUri: this.connectionUri,
               });
@@ -539,17 +518,19 @@ function genComponentConf() {
     }
 
     filterAgreementSet(tmpAgreementData) {
-      //TODO: IMPL THIS METHOD NEW
-      /*for (const prop of tmpAgreementData.cancellationPendingAgreementUris) {
-        if (tmpAgreementData.agreementUris.has(prop)) {
-          tmpAgreementData.agreementUris.delete(prop);
-        }
-      }*/
+      const cancellationPendingAgreementUris =
+        tmpAgreementData &&
+        tmpAgreementData.get("cancellationPendingAgreementUris");
+      const agreementUrisWithout =
+        tmpAgreementData &&
+        tmpAgreementData
+          .get("agreementUris")
+          .subtract(cancellationPendingAgreementUris);
 
-      return tmpAgreementData;
+      return tmpAgreementData.set("agreementUris", agreementUrisWithout);
     }
 
-    addAgreementDataToSate(eventUri, key, obj) {
+    addAgreementDataToState(eventUri, key, obj) {
       const ownNeedUri = this.ownNeed.get("uri");
       return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
@@ -569,7 +550,7 @@ function genComponentConf() {
               "headUri",
               msg.getMessageUri()
             );
-            this.addAgreementDataToSate(
+            this.addAgreementDataToState(
               msg.getRemoteMessageUri(),
               key,
               agreementObject
@@ -612,12 +593,6 @@ function genComponentConf() {
       });
     }
 
-    filterAgreementStateData(agreementObject, del) {
-      for (const key of keySet) {
-        this.checkObject(key, agreementObject, del);
-      }
-    }
-
     checkObject(key, agreementObject, del) {
       const foundKeys = this.agreementData.get(key);
 
@@ -645,29 +620,9 @@ function genComponentConf() {
         headUri: undefined,
       };
 
-      this.filterAgreementStateData(object, true);
-    }
-
-    getCancelUri(agreementUri) {
-      const pendingProposals = this.agreementHead.get("pendingProposals");
-      for (const prop of pendingProposals.toJS()) {
-        if (prop.proposesToCancel.includes(agreementUri)) {
-          return prop.uri;
-        }
-      }
-      return undefined;
-    }
-
-    checkOwnCancel(headUri) {
-      const pendingProposals = this.agreementHead.get("pendingProposals");
-      for (const prop of pendingProposals.toJS()) {
-        if (prop.proposesToCancel.includes(headUri)) {
-          if (prop.proposingNeedUri === this.ownNeed.get("uri")) {
-            return true;
-          }
-        }
-      }
-      return false;
+      this.checkObject("agreementUris", object, true);
+      this.checkObject("pendingProposalUris", object, true);
+      this.checkObject("cancellationPendingAgreementUris", object, true);
     }
 
     isOldAgreementMsg(msg) {
