@@ -107,6 +107,7 @@ const actionHierarchy = {
     setLoadingMessages: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
+    clearAgreementData: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,

@@ -213,6 +213,28 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
     .setIn([needUri, "connections", connectionUri, "isLoadingMessages"], false);
 }
 
+export function clearAgreementStateData(state, connectionUri) {
+  const need = selectNeedByConnectionUri(state, connectionUri);
+
+  if (!need) {
+    console.error("no need found for connectionUri", connectionUri);
+    return state;
+  }
+
+  const needUri = need.get("uri");
+
+  return state
+    .setIn(
+      [needUri, "connections", connectionUri, "agreementData"],
+      Immutable.fromJS({
+        pendingProposalUris: Immutable.Set(),
+        agreementUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+      })
+    )
+    .setIn([needUri, "connections", connectionUri, "isLoadingMessages"], false);
+}
+
 export function setShowAgreementData(state, connectionUri, showAgreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
