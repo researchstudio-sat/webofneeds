@@ -1110,7 +1110,9 @@ export function extractHashtags(str) {
   if (!is("String", str)) {
     "utils.js: extractHashtags expects a string but got: " + str;
   }
-  const tags = (str.match(/#(\S+)/gi) || []).map(str => str.substr(1)); // remove leading `#`-character
+  const tags = (str.match(/#?(\S+)/gi) || []).map(
+    str => (str.startsWith("#") ? str.substring(1) : str)
+  ); // remove leading `#`-character
 
   return Array.from(new Set(tags)); // filter out duplicates and return
 }
