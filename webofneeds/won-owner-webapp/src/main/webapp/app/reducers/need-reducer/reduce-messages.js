@@ -114,12 +114,12 @@ export function markMessageAsRead(state, messageUri, connectionUri, needUri) {
   );
 }
 
-export function markMessageAsRelevant(
+export function markMessageAsRejected(
   state,
   messageUri,
   connectionUri,
   needUri,
-  relevant
+  rejected
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -144,8 +144,157 @@ export function markMessageAsRelevant(
       connectionUri,
       "messages",
       messageUri,
-      "isRelevant",
+      "messageStatus",
+      "isRejected",
     ],
-    relevant
+    rejected
+  );
+}
+
+export function markMessageAsRetracted(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  retracted
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isRetracted",
+    ],
+    retracted
+  );
+}
+
+export function markMessageAsAccepted(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  accepted
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isAccepted",
+    ],
+    accepted
+  );
+}
+
+export function markMessageAsCancelled(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  cancelled
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isCancelled",
+    ],
+    cancelled
+  );
+}
+
+export function markMessageAsCancellationPending(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  cancellationPending
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isCancellationPending",
+    ],
+    cancellationPending
   );
 }

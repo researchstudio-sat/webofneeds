@@ -18,7 +18,11 @@ import {
   addMessage,
   addExistingMessages,
   markMessageAsRead,
-  markMessageAsRelevant,
+  markAsRejected,
+  markAsRetracted,
+  markAsAccepted,
+  markAsCancelled,
+  markAsCancellationPending,
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
@@ -267,7 +271,13 @@ export default function(allNeedsInState = initialState, action = {}) {
               outgoingMessage: true,
               unread: true,
               messageType: won.WONMSG.connectMessage,
-              isRelevant: true,
+              messageStatus: {
+                isRetracted: false,
+                isRejected: false,
+                isAccepted: false,
+                isCancelled: false,
+                isCancellationPending: false,
+              },
             },
           },
         });
@@ -429,13 +439,45 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri
       );
-    case actionTypes.messages.markAsRelevant:
-      return markMessageAsRelevant(
+    case actionTypes.messages.messageStatus.markAsRejected:
+      return markAsRejected(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
-        action.payload.relevant
+        action.payload.rejected
+      );
+    case actionTypes.messages.messageStatus.markAsRetracted:
+      return markAsRetracted(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.retracted
+      );
+    case actionTypes.messages.messageStatus.markAsAccepted:
+      return markAsAccepted(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.accepted
+      );
+    case actionTypes.messages.messageStatus.markAsCancelled:
+      return markAsCancelled(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.cancelled
+      );
+    case actionTypes.messages.messageStatus.markAsCancellationPending:
+      return markAsCancellationPending(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.cancellationPending
       );
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
