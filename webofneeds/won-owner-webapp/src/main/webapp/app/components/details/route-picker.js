@@ -176,29 +176,29 @@ function genComponentConf() {
         (travelAction.fromLocation || travelAction.toLocation)
       ) {
         // add some sort of validitycheck for locations?
-        this.onRouteUpdated({ travelAction: travelAction });
+        this.onUpdate({ value: travelAction });
       } else {
-        this.onRouteUpdated({ travelAction: undefined });
+        this.onUpdate({ value: undefined });
       }
     }
 
     showInitialLocations() {
-      if (this.initialTravelAction) {
-        this.fromAddedLocation = this.initialTravelAction.fromLocation;
-        this.toAddedLocation = this.initialTravelAction.toLocation;
+      if (this.initialValue) {
+        this.fromAddedLocation = this.initialValue.fromLocation;
+        this.toAddedLocation = this.initialValue.toLocation;
 
         let markedLocations = [];
 
-        if (this.initialTravelAction.fromLocation) {
-          markedLocations.push(this.initialTravelAction.fromLocation);
+        if (this.initialValue.fromLocation) {
+          markedLocations.push(this.initialValue.fromLocation);
           this.fromShowResetButton = true;
-          this.fromTextfield().value = this.initialTravelAction.fromLocation.name;
+          this.fromTextfield().value = this.initialValue.fromLocation.name;
         }
 
-        if (this.initialTravelAction.toLocation) {
-          markedLocations.push(this.initialTravelAction.toLocation);
+        if (this.initialValue.toLocation) {
+          markedLocations.push(this.initialValue.toLocation);
           this.toShowResetButton = true;
-          this.toTextfield().value = this.initialTravelAction.toLocation.name;
+          this.toTextfield().value = this.initialValue.toLocation.name;
         }
 
         this.placeMarkers(markedLocations);
@@ -468,7 +468,7 @@ function genComponentConf() {
             const geoZoom = 13; // TODO: use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
             // center map around geolocation only if there's no initial location
-            if (!this.initialTravelAction) {
+            if (!this.initialValue) {
               this.map.setZoom(geoZoom);
               this.map.panTo([geoLat, geoLng]);
             }
@@ -551,8 +551,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onRouteUpdated: "&",
-      initialTravelAction: "=",
+      onUpdate: "&",
+      initialValue: "=",
     },
     template: template,
   };

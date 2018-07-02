@@ -56,11 +56,6 @@ won-create-isseeks {
         }
       }
     }
-
-    .cis__detail__matching-context {
-      @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
-      padding: 0.3rem 0 0 0;
-    }
   }
 
   // details components
@@ -86,6 +81,7 @@ won-create-isseeks {
     font-weight: 400;
     &.tags {
       padding-bottom: 1rem;
+      font-size: $normalFontSize + 0.25rem;
     } // ttl and description uses grid and grid-gap
     &.location {
       padding-bottom: 1rem;
@@ -95,44 +91,11 @@ won-create-isseeks {
       padding-left: 0.5rem;
     }
 
-    svg.hover,
-    span.hover {
-      display: none;
-    }
-
-    svg.nonHover,
-    span.nonHover {
-      display: inline;
-    }
-
-    &:hover {
-      cursor: pointer;
-
-      svg.hover,
-      span.hover {
-        display: inline;
-      }
-
-      span.nonHover,
-      svg.nonHover {
-        display: none;
-      }
-    }
-
-    &.tags {
-      font-size: $normalFontSize + 0.25rem;
-    }
-
     &.detailPicker {
       font-size: $normalFontSize + 0.25rem;
       padding: 0.5rem 0;
       color: $won-primary-color;
       --local-primary: #{$won-primary-color}; // for the svg-icons
-
-      &:hover {
-        color: black;
-        --local-primary: black; // for the svg-icons
-      }
     }
 
     .cis__addDetail__header__carret {

@@ -69,6 +69,32 @@ won-create-post {
       background-color: white;
     }
 
+    .cp__content__tuning {
+      padding: 0 0 0 0;
+      @include appearAnimation(0.5s, linear);
+
+      .cp__content__tuning__title {
+        display: flex;
+        font-weight: 400;
+        font-size: $normalFontSize + 0.25rem;
+        padding: 0.5rem 0;
+        color: $won-primary-color;
+
+        .cp__content__tuning__title__carret {
+          @include fixed-square(1rem);
+
+          // visually center icon on line
+          position: relative;
+          top: 0.1em;
+        }
+      }
+
+      .cp__content__tuning_matching-context {
+        @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
+        padding: 0.3rem 0 0 0;
+      }
+    }
+
     .cp__content__publish {
       width: 100%;
       margin-top: 1rem;

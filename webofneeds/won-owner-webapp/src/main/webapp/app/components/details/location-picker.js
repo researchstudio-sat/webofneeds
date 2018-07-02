@@ -89,8 +89,8 @@ function genComponentConf() {
       this.map = initLeaflet(this.mapMount());
       this.map.on("click", e => onMapClick(e, this));
 
-      this.locationIsSaved = !!this.initialLocation;
-      this.pickedLocation = this.initialLocation;
+      this.locationIsSaved = !!this.initialValue;
+      this.pickedLocation = this.initialValue;
       this.previousLocation = undefined;
       this.showResetButton = false;
 
@@ -109,9 +109,9 @@ function genComponentConf() {
     update(location) {
       if (location) {
         // check validity?
-        this.onLocationUpdated({ location: location });
+        this.onUpdate({ value: location });
       } else {
-        this.onLocationUpdated({ location: undefined });
+        this.onUpdate({ value: undefined });
       }
     }
 
@@ -219,10 +219,10 @@ function genComponentConf() {
 
     determineCurrentLocation() {
       // check if there's any saved location to display instead
-      if (this.initialLocation) {
+      if (this.initialValue) {
         // constructor may not be done in time, so set values here again.
         this.locationIsSaved = true;
-        this.pickedLocation = this.initialLocation;
+        this.pickedLocation = this.initialValue;
 
         const initialLat = this.pickedLocation.lat;
         const initialLng = this.pickedLocation.lng;
@@ -247,7 +247,7 @@ function genComponentConf() {
             const geoZoom = 13; // TODO: use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
             // center map around geolocation only if there's no initial location
-            if (!this.initialLocation) {
+            if (!this.initialValue) {
               this.map.setZoom(geoZoom);
               this.map.panTo([geoLat, geoLng]);
             }
@@ -324,8 +324,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onLocationUpdated: "&",
-      initialLocation: "=",
+      onUpdate: "&",
+      initialValue: "=",
     },
     template: template,
   };

@@ -7,20 +7,28 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
-import descriptionPickerModule from "./details/description-picker.js";
-import locationPickerModule from "./details/location-picker.js";
-import matchingContextPicker from "./details/matching-context-picker.js";
-import personPickerModule from "./details/person-picker.js";
-import routePickerModule from "./details/route-picker.js";
-import tagsPickerModule from "./details/tags-picker.js";
-import ttlPickerModule from "./details/ttl-picker.js";
+import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import { get, getIn, attach, deepFreeze } from "../utils.js";
+import {
+  get,
+  getIn,
+  attach,
+  //  deepFreeze,
+  delay,
+} from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
+
+// TODO: these should be replaced by importing defintions from config
+import descriptionPickerModule from "./details/description-picker.js";
+import locationPickerModule from "./details/location-picker.js";
+import personPickerModule from "./details/person-picker.js";
+import routePickerModule from "./details/route-picker.js";
+import tagsPickerModule from "./details/tags-picker.js";
+import ttlPickerModule from "./details/ttl-picker.js";
 
 const postTypeTexts = [
   {
@@ -60,16 +68,16 @@ const serviceDependencies = [
 ];
 
 //All deatils, except tags, because tags are saved in an array
-const keySet = deepFreeze(
-  new Set([
-    "description",
-    "location",
-    "matchingContext",
-    "thumbnail",
-    "travelAction",
-    "ttl",
-  ])
-);
+// const keySet = deepFreeze(
+//   new Set([
+//     "description",
+//     "location",
+//     "matchingContext",
+//     "thumbnail",
+//     "travelAction",
+//     "ttl",
+//   ])
+// );
 
 function genComponentConf() {
   const template = `
@@ -85,9 +93,49 @@ function genComponentConf() {
             <span class="cp__header__title" ng-if="self.isSearch">Search</span>
         </div>
         <div class="cp__content">
-            <won-create-isseeks ng-if="self.isPost" is-or-seeks="::'Description'" on-update="::self.updateDraft(draft, 'is')" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
-            <won-create-isseeks ng-if="self.isSearch" is-or-seeks="::'Search'" on-update="::self.updateDraft(draft, 'seeks')" on-scroll="::self.scrollToBottom(element)"></won-create-isseeks>
-            <!-- TODO: decide on whether to re-add stuff like an additional search/description window -->
+
+            <!-- ADD TITLE AND DETAILS -->
+            <won-create-isseeks 
+                ng-if="self.isPost" 
+                is-or-seeks="::'Description'" 
+                on-update="::self.updateDraft(draft, 'is')" 
+                on-scroll="::self.scrollToBottom(element)">
+            </won-create-isseeks>
+            <won-create-isseeks 
+                ng-if="self.isSearch" 
+                is-or-seeks="::'Search'" 
+                on-update="::self.updateDraft(draft, 'seeks')" 
+                on-scroll="::self.scrollToBottom(element)">
+            </won-create-isseeks>
+
+            <!-- TUNE MATCHING -->
+            <!-- 
+              <won-labelled-hr label="::'tune matching?'" class="cp__content__labelledhr">
+              </won-labelled-hr>
+            -->
+            <div class="cp__content__tuning">
+                <div class="cp__content__tuning__title b detailPicker clickable"
+                    ng-click="self.toggleTuningOptions()"
+                    ng-class="{'closedDetailPicker': !self.showTuningOptions}">
+                    <span>Tune Matching Behaviour</span>
+                    <svg class="cp__content__tuning__title__carret" ng-show="!self.showTuningOptions">
+                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                    </svg>
+                    <svg class="cp__content__tuning__title__carret" ng-show="self.showTuningOptions">
+                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                    </svg>
+                </div>
+                <div class="cp__content__tuning_matching-context">
+                    <won-matching-context-picker
+                      ng-if="self.showTuningOptions"
+                      default-matching-context="::self.defaultMatchingContext"
+                      initial-matching-context="::self.draftObject.matchingContext"
+                      on-matching-context-updated="::self.updateMatchingContext(matchingContext)">
+                    </won-matching-context-picker>
+                </div>
+            </div>
+
+            <!-- PUBLISH BUTTON - RESPONSIVE MODE -->
             <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
                     ng-disabled="!self.isValid()"
@@ -100,6 +148,7 @@ function genComponentConf() {
                 </span>
             </button>
         </div>
+        <!-- PUBLISH BUTTON - NON-RESPONSIVE MODE -->
         <div class="cp__footer hide-in-responsive" >
             <won-labelled-hr label="::'done?'" class="cp__footer__labelledhr"></won-labelled-hr>
             <button type="submit" class="won-button--filled red cp__footer__publish"
@@ -130,30 +179,34 @@ function genComponentConf() {
       this.characterLimit = postTitleCharacterLimit;
       this.draftIs = {
         title: undefined,
-        type: postTypeTexts[3].type,
-        description: undefined,
-        tags: undefined,
-        person: undefined,
-        location: undefined,
-        travelAction: undefined,
-        thumbnail: undefined,
-        matchingContext: undefined,
+        type: postTypeTexts[3].type, // TODO: do we use this information anywhere?
+        // description: undefined,
+        // tags: undefined,
+        // person: undefined,
+        // location: undefined,
+        // travelAction: undefined,
+        // thumbnail: undefined,
       };
       this.draftSeeks = {
         title: undefined,
         type: postTypeTexts[3].type,
-        description: undefined,
-        tags: undefined,
-        person: undefined,
-        location: undefined,
-        travelAction: undefined,
-        thumbnail: undefined,
-        matchingContext: undefined,
+        // description: undefined,
+        // tags: undefined,
+        // person: undefined,
+        // location: undefined,
+        // travelAction: undefined,
+        // thumbnail: undefined,
       };
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
-      this.draftObject = { is: this.draftIs, seeks: this.draftSeeks };
+      this.draftObject = {
+        is: this.draftIs,
+        seeks: this.draftSeeks,
+        matchingContext: undefined,
+      };
+
+      this.showTuningOptions = false;
 
       this.pendingPublishing = false;
       this.details = { is: [], seeks: [] };
@@ -168,13 +221,30 @@ function genComponentConf() {
         const isSearch = showCreateView === this.SEARCH;
         const isPost = showCreateView && !isSearch;
 
+        // needed to be able to reset matching context to default
+        // TODO: is there an easier way to do this?
+        const defaultMatchingContextList = getIn(state, [
+          "config",
+          "theme",
+          "defaultContext",
+        ]);
+        const defaultMatchingContext = defaultMatchingContextList
+          ? defaultMatchingContextList.toJS()
+          : [];
+
         return {
           connectionHasBeenLost: !selectIsConnected(state),
           showCreateView,
           isSearch,
           isPost,
+          defaultMatchingContext: defaultMatchingContext,
         };
       };
+
+      // TODO: think about how to deal with contexts predefined in usecases
+      delay(0).then(() =>
+        this.updateMatchingContext(this.defaultMatchingContext)
+      );
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -215,17 +285,32 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
+    toggleTuningOptions() {
+      // if (!this.showTuningOptions) {
+      //   this.onScroll({ element: ".cis__addDetail__header.b" });
+      // }
+      this.showTuningOptions = !this.showTuningOptions;
+    }
+
     isValid() {
       const draft = this.draftObject;
       const hasContent = get(draft, "is") || get(draft, "seeks");
-      const title =
-        getIn(draft, ["is", "title"]) || getIn(draft, ["seeks", "title"]);
-      const hasValidTitle = title && title.length < this.characterLimit;
-      const hasTTL =
-        getIn(draft, ["is", "ttl"]) || getIn(draft, ["seeks", "ttl"]);
+      const hasValidIs = this.isOrSeeksIsValid(get(draft, "is"));
+      const hasValidSeeks = this.isOrSeeksIsValid(get(draft, "seeks"));
       return (
-        !this.connectionHasBeenLost && hasContent && (hasValidTitle || hasTTL)
+        !this.connectionHasBeenLost &&
+        hasContent &&
+        (hasValidIs || hasValidSeeks)
       );
+    }
+
+    updateMatchingContext(matchingContext) {
+      // also accepts []!
+      if (matchingContext) {
+        this.draftObject.matchingContext = matchingContext;
+      } else {
+        this.draftObject.matchingContext = undefined;
+      }
     }
 
     updateDraft(updatedDraft, isSeeks) {
@@ -241,12 +326,15 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        //Check for is, or seeks
-        let draft = this.getPublishObject(this.draftObject);
-
-        if (this.hasSearchString(draft)) {
-          draft.seeks["searchString"] = draft.seeks.title;
+        // TODO: This should be a usecase/done via a different component
+        // Check if this is a search
+        const searchString = this.checkForSearchString(this.draftObject);
+        if (searchString) {
+          this.draftObject.searchString = searchString;
+          //delete this.draftObject.is;
         }
+
+        const draft = this.getPublishObject(this.draftObject);
 
         this.needs__create(
           draft,
@@ -256,38 +344,52 @@ function genComponentConf() {
     }
 
     getPublishObject(draft) {
-      if (!this.checkType(draft.is)) {
+      if (!this.isOrSeeksIsValid(draft.is)) {
         delete draft.is;
       }
-      if (!this.checkType(draft.seeks)) {
+      if (!this.isOrSeeksIsValid(draft.seeks)) {
         delete draft.seeks;
       }
       return draft;
     }
 
-    checkType(object) {
-      const title = get(object, "title");
-      const hasValidTitle = title && title.length < this.characterLimit;
-      const hasTTL = get(object, "ttl");
-      return !!(hasValidTitle || hasTTL);
-    }
-
-    hasSearchString(draft) {
-      if (draft.is || !draft.seeks) {
+    // returns true if the part has a valid title or any other detail
+    isOrSeeksIsValid(isOrSeeks) {
+      if (!isOrSeeks) {
         return false;
-      } else {
-        for (const key of keySet) {
-          if (draft.seeks[key]) {
-            return false;
-          }
-        }
-        // Handle tags list
-        if (draft.seeks.tags && draft.seeks.tags.length > 0) {
-          return false;
+      }
+
+      const title = get(isOrSeeks, "title");
+      const hasValidTitle = title && title.length < this.characterLimit;
+
+      let hasDetail = false;
+      const details = Object.keys(isOrSeeks);
+      for (let d of details) {
+        if (isOrSeeks[d] && d !== "type") {
+          hasDetail = true;
         }
       }
-      //A seeks object only with a title
-      return true;
+      return !!(hasValidTitle || hasDetail);
+    }
+
+    checkForSearchString(draft) {
+      // draft has an is part -> not a pure search
+      if (this.isOrSeeksIsValid(draft.is)) {
+        return undefined;
+      }
+
+      // draft has no valid seeks part -> not a pure search
+      if (!draft.seeks || !draft.seeks.title) {
+        return undefined;
+      }
+
+      for (let detail of Object.keys(draft.seeks)) {
+        if (detail !== "title" && detail !== "type" && draft.seeks[detail]) {
+          return undefined;
+        }
+      }
+
+      return draft.seeks.title;
     }
 
     createWhatsNew() {
@@ -319,12 +421,12 @@ angular
     imageDropzoneModule,
     descriptionPickerModule,
     locationPickerModule,
-    matchingContextPicker,
     personPickerModule,
     routePickerModule,
     tagsPickerModule,
     ttlPickerModule,
     createIsseeksModule,
+    matchingContextModule,
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;
