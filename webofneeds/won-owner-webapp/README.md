@@ -125,6 +125,13 @@ $ngRedux.getState();
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
                        isParsable: true|false //true if hasReferences or hasContent is true
+                       messageStatus: {
+                           isRetracted: true|false
+                           isRejected: true|false
+                           isAccepted: true|false
+                           isCancellationPending: true|false
+                           isCancelled: true|false
+                       }
                        uri: string //unique identifier of this message
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
