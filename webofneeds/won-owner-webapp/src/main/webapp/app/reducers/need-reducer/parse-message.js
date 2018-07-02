@@ -50,11 +50,6 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       hasReferences: false, //will be determined by the hasReferences function
       hasContent: false, //will be determined by the hasContent function
       isParsable: false, //will be determined by the clause (hasReferences || hasContent) function
-      isProposeMessage: wonMessage.isProposeMessage(),
-      isAcceptMessage: wonMessage.isAcceptMessage(),
-      isProposeToCancel: wonMessage.isProposeToCancel(),
-      isRejectMessage: wonMessage.isRejectMessage(),
-      isRetractMessage: wonMessage.isRetractMessage(),
       date: msStringToDate(wonMessage.getTimestamp()),
       outgoingMessage: wonMessage.isFromOwner(),
       messageType: wonMessage.getMessageType(),

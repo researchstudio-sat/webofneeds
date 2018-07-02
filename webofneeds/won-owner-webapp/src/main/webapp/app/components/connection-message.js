@@ -48,6 +48,7 @@ function genComponentConf() {
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
     			      <div class="won-cm__center__bubble__content">
+    			        <div class="stati">{{ self.message.get("messageStatus").toJS() }}</div>
                   <won-message-content
                       ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
                       message-uri="self.message.get('uri')"
@@ -85,24 +86,35 @@ function genComponentConf() {
                         Retract
                     </button>
                 </div>
-                <div class="won-cm__center__bubble__button-area" ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel'))">
+                <div class="won-cm__center__bubble__button-area" ng-if="(self.hasProposesReferences() || self.hasProposesToCancelReferences())">
                     <button class="won-button--filled thin red"
-                        ng-if="!self.message.get('outgoingMessage')"
+                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
                         ng-disabled="self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage')"
+                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
                         ng-disabled="self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.message.get('isAcceptMessage')"
+                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
                         ng-disabled="self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
+                        ng-disabled="self.clicked"
+                        ng-click="self.proposeToCancel()">
+                      Propose To Cancel
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isAccepted() && self.isCancellationPending()"
+                        ng-disabled="true">
+                      Cancellation Pending...
                     </button>
                 </div>
             </div>
@@ -236,6 +248,23 @@ function genComponentConf() {
     isCancellationPending() {
       const messageStatus = this.message && this.message.get("messageStatus");
       return messageStatus && messageStatus.get("isCancellationPending");
+    }
+
+    hasProposesReferences() {
+      const references = this.message && this.message.get("references");
+      return (
+        references &&
+        references.get("proposes") &&
+        references.get("proposes").size > 0
+      );
+    }
+    hasProposesToCancelReferences() {
+      const references = this.message && this.message.get("references");
+      return (
+        references &&
+        references.get("proposesToCancel") &&
+        references.get("proposesToCancel").size > 0
+      );
     }
 
     markAsRead() {

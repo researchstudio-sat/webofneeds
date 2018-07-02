@@ -248,7 +248,7 @@ export function markMessageAsCancelled(
     );
     return state;
   }
-  return state.setIn(
+  state = state.setIn(
     [
       needUri,
       "connections",
@@ -259,6 +259,32 @@ export function markMessageAsCancelled(
       "isCancelled",
     ],
     cancelled
+  );
+
+  state = state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isAccepted",
+    ],
+    false
+  );
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "messageStatus",
+      "isCancellationPending",
+    ],
+    false
   );
 }
 
