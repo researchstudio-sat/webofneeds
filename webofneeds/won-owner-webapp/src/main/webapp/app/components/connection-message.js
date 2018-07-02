@@ -48,7 +48,6 @@ function genComponentConf() {
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
     			      <div class="won-cm__center__bubble__content">
-    			        <div class="stati">{{ self.message.get("messageStatus").toJS() }}</div>
                   <won-message-content
                       ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
                       message-uri="self.message.get('uri')"
