@@ -58,7 +58,13 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       date: msStringToDate(wonMessage.getTimestamp()),
       outgoingMessage: wonMessage.isFromOwner(),
       messageType: wonMessage.getMessageType(),
-      isRelevant: true,
+      messageStatus: {
+        isRetracted: false,
+        isRejected: false,
+        isAccepted: false,
+        isCancellationPending: false,
+        isCancelled: false,
+      },
       contentGraphTrig: {
         prefixes: trigPrefixes,
         body: trigBody,
