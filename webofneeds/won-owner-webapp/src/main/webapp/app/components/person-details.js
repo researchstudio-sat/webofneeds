@@ -16,7 +16,7 @@ function genComponentConf() {
         <p class="post-info__details" ng-if="self.company && !self.position">
           {{self.company}}
         </p>
-        <p class="post-info__details">Skills: {{self.skills}}</p>
+        <p class="post-info__details" ng-if="self.skills">Skills: {{self.skills}}</p>
     `;
 
   class Controller {

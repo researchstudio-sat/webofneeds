@@ -75,9 +75,9 @@ export function relativeTime(now, previous) {
   } else if (elapsed < msPerMonth) {
     return labelGen(msPerDay, "day");
   } else if (elapsed < msPerYear) {
-    return "approximately " + labelGen(msPerMonth, "month");
+    return labelGen(msPerMonth, "month");
   } else {
-    return "approximately " + labelGen(msPerYear, "year");
+    return labelGen(msPerYear, "year");
   }
 }
 

@@ -43,6 +43,18 @@ function genComponentConf() {
       delay(0).then(() => this.showInitialTags());
     }
 
+    /**
+     * Checks validity and uses callback method
+     */
+    update(tags) {
+      // check if there are tags
+      if (tags && tags.length > 0) {
+        this.onTagsUpdated({ tags: tags });
+      } else {
+        this.onTagsUpdated({ tags: undefined });
+      }
+    }
+
     showInitialTags() {
       this.addedTags = this.initialTags;
       let _tagsForTextfield = "";
@@ -63,7 +75,7 @@ function genComponentConf() {
 
       if (text && text.trim().length > 0) {
         this.addedTags = extractHashtags(text);
-        this.onTagsUpdated({ tags: this.addedTags });
+        this.update(this.addedTags);
         this.showResetButton = true;
       } else {
         this.resetTags();
@@ -73,7 +85,7 @@ function genComponentConf() {
     resetTags() {
       this.addedTags = undefined;
       this.textfield().value = "";
-      this.onTagsUpdated({ tags: undefined });
+      this.update(undefined);
       this.showResetButton = false;
     }
 

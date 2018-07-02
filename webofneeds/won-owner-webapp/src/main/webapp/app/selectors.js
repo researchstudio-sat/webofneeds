@@ -17,6 +17,10 @@ export const selectAllOwnNeeds = state =>
 export const selectAllTheirNeeds = state =>
   selectAllNeeds(state).filter(need => !need.get("ownNeed"));
 
+export const selectIsConnected = state =>
+  !state.getIn(["messages", "reconnecting"]) &&
+  !state.getIn(["messages", "lostConnection"]);
+
 /**
  * Get the need for a given connectionUri
  * @param state to retrieve data from

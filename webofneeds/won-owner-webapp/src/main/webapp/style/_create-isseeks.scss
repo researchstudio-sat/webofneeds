@@ -49,7 +49,7 @@ won-create-isseeks {
         &.picked,
         &.picked .cis__circleicon {
           //color: $won-line-gray;
-          //--local-primary: $won-line-gray; // for the svg-icons
+          //--local-primary: #{$won-line-gray}; // for the svg-icons
           color: $won-primary-color;
           --local-primary: #{$won-primary-color};
           cursor: default;
@@ -127,7 +127,7 @@ won-create-isseeks {
       font-size: $normalFontSize + 0.25rem;
       padding: 0.5rem 0;
       color: $won-primary-color;
-      --local-primary: $won-primary-color; // for the svg-icons
+      --local-primary: #{$won-primary-color}; // for the svg-icons
 
       &:hover {
         color: black;

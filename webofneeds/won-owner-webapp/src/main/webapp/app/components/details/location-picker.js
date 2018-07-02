@@ -104,6 +104,18 @@ function genComponentConf() {
     }
 
     /**
+     * Checks validity and uses callback method
+     */
+    update(location) {
+      if (location) {
+        // check validity?
+        this.onLocationUpdated({ location: location });
+      } else {
+        this.onLocationUpdated({ location: undefined });
+      }
+    }
+
+    /**
      * Taken from <http://stackoverflow.com/questions/15519713/highlighting-a-filtered-result-in-angularjs>
      * @param text
      * @param search
@@ -160,12 +172,12 @@ function genComponentConf() {
       this.placeMarkers([]);
       this.showResetButton = false;
 
-      this.onLocationPicked({ location: undefined });
+      this.update(undefined);
     }
 
     selectedLocation(location) {
       // callback to update location in isseeks
-      this.onLocationPicked({ location: location });
+      this.update(location);
       this.locationIsSaved = true;
       this.pickedLocation = location;
 
@@ -312,7 +324,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onLocationPicked: "&",
+      onLocationUpdated: "&",
       initialLocation: "=",
     },
     template: template,
