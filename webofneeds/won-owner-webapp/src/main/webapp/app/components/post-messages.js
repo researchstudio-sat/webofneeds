@@ -213,7 +213,7 @@ function genComponentConf() {
               !msg.getIn(["messageStatus", "isAccepted"]) &&
               this.isOldAcceptedMsg(msg)
             ) {
-              this.messages__markAsAccepted({
+              this.messages__messageStatus__markAsAccepted({
                 messageUri: msg.get("uri"),
                 connectionUri: connectionUri,
                 needUri: ownNeed.get("uri"),
@@ -221,9 +221,9 @@ function genComponentConf() {
               });
             } else if (
               !msg.getIn(["messageStatus", "isRejected"]) &&
-              this.isOldAcceptedMsg(msg)
+              this.isOldRejectedMsg(msg)
             ) {
-              this.messages__markAsRejected({
+              this.messages__messageStatus__markAsRejected({
                 messageUri: msg.get("uri"),
                 connectionUri: connectionUri,
                 needUri: ownNeed.get("uri"),
@@ -231,9 +231,9 @@ function genComponentConf() {
               });
             } else if (
               !msg.getIn(["messageStatus", "isRetracted"]) &&
-              this.isOldAcceptedMsg(msg)
+              this.isOldRetractedMsg(msg)
             ) {
-              this.messages__markAsRetracted({
+              this.messages__messageStatus__markAsRetracted({
                 messageUri: msg.get("uri"),
                 connectionUri: connectionUri,
                 needUri: ownNeed.get("uri"),
@@ -241,9 +241,9 @@ function genComponentConf() {
               });
             } else if (
               !msg.getIn(["messageStatus", "isCancelled"]) &&
-              this.isOldAcceptedMsg(msg)
+              this.isOldCancelledMsg(msg)
             ) {
-              this.messages__markAsCancelled({
+              this.messages__messageStatus__markAsCancelled({
                 messageUri: msg.get("uri"),
                 connectionUri: connectionUri,
                 needUri: ownNeed.get("uri"),
@@ -251,9 +251,9 @@ function genComponentConf() {
               });
             } else if (
               !msg.getIn(["messageStatus", "isCancellationPending"]) &&
-              this.isOldAcceptedMsg(msg)
+              this.isOldCancellationPendingMsg(msg)
             ) {
-              this.messages__markAsCancellationPending({
+              this.messages__messageStatus__markAsCancellationPending({
                 messageUri: msg.get("uri"),
                 connectionUri: connectionUri,
                 needUri: ownNeed.get("uri"),

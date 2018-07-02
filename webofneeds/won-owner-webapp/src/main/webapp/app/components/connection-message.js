@@ -74,20 +74,18 @@ function genComponentConf() {
                     ng-show="self.shouldShowRdf && self.contentGraphTrig">
                 </won-trig>
                 <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.showDetail && self.isRelevant">
+                    ng-if="self.showDetail">
                     <button class="won-button--filled thin black"
-                        ng-click="self.sendProposal(); self.showDetail = !self.showDetail"
-                        ng-if="self.showDetail">
+                        ng-click="self.sendProposal(); self.showDetail = !self.showDetail">
                         Propose <span ng-show="self.clicked">(again)</span>
                     </button>
                     <button class="won-button--filled thin black"
                         ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
-                        ng-if="self.showDetail && self.message.get('outgoingMessage')">
+                        ng-if="self.message.get('outgoingMessage')">
                         Retract
                     </button>
                 </div>
-                <div class="won-cm__center__bubble__button-area"
-                    ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel')) && self.isRelevant ">
+                <div class="won-cm__center__bubble__button-area" ng-if="(self.message.get('isProposeMessage') || self.message.get('isProposeToCancel'))">
                     <button class="won-button--filled thin red"
                         ng-if="!self.message.get('outgoingMessage')"
                         ng-disabled="self.clicked"
@@ -156,7 +154,6 @@ function genComponentConf() {
           theirNeed,
           connection,
           message,
-          isRelevant: message.get("isRelevant"),
           contentGraphs: get(message, "contentGraphs") || Immutable.List(),
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf,
@@ -164,7 +161,6 @@ function genComponentConf() {
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
-            message.get("isRelevant") &&
             !message.get("hasReferences") &&
             message.get("hasContent"), //allow showing details only when the connection is already present
         };
@@ -192,7 +188,15 @@ function genComponentConf() {
         () => this.isSystemMessage(),
         this
       );
-      classOnComponentRoot("won-not-relevant", () => !this.isRelevant, this);
+      classOnComponentRoot("won-is-rejected", () => this.isRejected(), this);
+      classOnComponentRoot("won-is-retracted", () => this.isRetracted(), this);
+      classOnComponentRoot("won-is-accepted", () => this.isAccepted(), this);
+      classOnComponentRoot("won-is-cancelled", () => this.isCancelled(), this);
+      classOnComponentRoot(
+        "won-is-cancellationPending",
+        () => this.isCancellationPending(),
+        this
+      );
       classOnComponentRoot("won-unread", () => this.isUnread(), this);
     }
 
@@ -213,6 +217,27 @@ function genComponentConf() {
       return this.message && this.message.get("unread");
     }
 
+    isRejected() {
+      const messageStatus = this.message && this.message.get("messageStatus");
+      return messageStatus && messageStatus.get("isRejected");
+    }
+    isAccepted() {
+      const messageStatus = this.message && this.message.get("messageStatus");
+      return messageStatus && messageStatus.get("isAccepted");
+    }
+    isRetracted() {
+      const messageStatus = this.message && this.message.get("messageStatus");
+      return messageStatus && messageStatus.get("isRetracted");
+    }
+    isCancelled() {
+      const messageStatus = this.message && this.message.get("messageStatus");
+      return messageStatus && messageStatus.get("isCancelled");
+    }
+    isCancellationPending() {
+      const messageStatus = this.message && this.message.get("messageStatus");
+      return messageStatus && messageStatus.get("isCancellationPending");
+    }
+
     markAsRead() {
       if (this.message && this.message.get("unread")) {
         const payload = {
@@ -229,15 +254,59 @@ function genComponentConf() {
       }
     }
 
-    markAsRelevant(relevant) {
+    markAsAccepted(accepted) {
       const payload = {
         messageUri: this.message.get("uri"),
         connectionUri: this.connectionUri,
         needUri: this.ownNeed.get("uri"),
-        relevant: relevant,
+        accepted: accepted,
       };
 
-      this.messages__markAsRelevant(payload);
+      this.messages__messageStatus__markAsAccepted(payload);
+    }
+
+    markAsRejected(rejected) {
+      const payload = {
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        rejected: rejected,
+      };
+
+      this.messages__messageStatus__markAsRejected(payload);
+    }
+
+    markAsRetracted(retracted) {
+      const payload = {
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        retracted: retracted,
+      };
+
+      this.messages__messageStatus__markAsRetracted(payload);
+    }
+
+    markAsCancelled(cancelled) {
+      const payload = {
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        cancelled: cancelled,
+      };
+
+      this.messages__messageStatus__markAsCancelled(payload);
+    }
+
+    markAsCancellationPending(cancellationPending) {
+      const payload = {
+        messageUri: this.message.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.ownNeed.get("uri"),
+        cancellationPending: cancellationPending,
+      };
+
+      this.messages__messageStatus__markAsCancellationPending(payload);
     }
 
     sendProposal() {
@@ -276,7 +345,7 @@ function genComponentConf() {
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
-      this.markAsRelevant(false);
+      this.markAsAccepted(true);
       this.onRemoveData({ proposalUri: this.messageUri });
     }
 
@@ -292,7 +361,7 @@ function genComponentConf() {
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
-      this.markAsRelevant(false);
+      this.markAsRetracted(true);
       this.onUpdate();
     }
 
@@ -308,7 +377,7 @@ function genComponentConf() {
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
-      this.markAsRelevant(false);
+      this.markAsRejected(true);
       this.onUpdate();
     }
 

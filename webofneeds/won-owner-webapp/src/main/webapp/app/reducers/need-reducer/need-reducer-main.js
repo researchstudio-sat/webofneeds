@@ -18,11 +18,11 @@ import {
   addMessage,
   addExistingMessages,
   markMessageAsRead,
-  markAsRejected,
-  markAsRetracted,
-  markAsAccepted,
-  markAsCancelled,
-  markAsCancellationPending,
+  markMessageAsRejected,
+  markMessageAsRetracted,
+  markMessageAsAccepted,
+  markMessageAsCancelled,
+  markMessageAsCancellationPending,
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
@@ -440,7 +440,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.needUri
       );
     case actionTypes.messages.messageStatus.markAsRejected:
-      return markAsRejected(
+      return markMessageAsRejected(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
@@ -448,7 +448,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.rejected
       );
     case actionTypes.messages.messageStatus.markAsRetracted:
-      return markAsRetracted(
+      return markMessageAsRetracted(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
@@ -456,7 +456,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.retracted
       );
     case actionTypes.messages.messageStatus.markAsAccepted:
-      return markAsAccepted(
+      return markMessageAsAccepted(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
@@ -464,7 +464,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.accepted
       );
     case actionTypes.messages.messageStatus.markAsCancelled:
-      return markAsCancelled(
+      return markMessageAsCancelled(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
@@ -472,7 +472,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.cancelled
       );
     case actionTypes.messages.messageStatus.markAsCancellationPending:
-      return markAsCancellationPending(
+      return markMessageAsCancellationPending(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
