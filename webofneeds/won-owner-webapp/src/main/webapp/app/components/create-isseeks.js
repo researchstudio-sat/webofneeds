@@ -55,28 +55,31 @@ function genComponentConf() {
                 </svg>
         </div>
         <!-- DETAIL TOGGLES -->
-        <div class="cis__detail__items" ng-if="self.showDetail" ng-repeat="detail in self.availableDetails">
-            <div class="cis__detail__items__item"
-                ng-click="self.toggleOpenDetail(detail.identifier)"
-                ng-class="{'picked' : self.openDetail === detail.identifier}">
-                <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
-                    <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
-                </svg>
-                <svg class="cis__circleicon" ng-show="self.details.has(detail.identifier)">
-                    <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                </svg>
-                <span>{{detail.label}}</span>
-            </div>
+        <div class="cis__detail__items" ng-if="self.showDetail">
+          <div class="cis__detail__items__item" ng-repeat="detail in self.availableDetails">
+              <!-- HEADER -->
+              <div class="cis__detail__items__item__header"
+                  ng-click="self.toggleOpenDetail(detail.identifier)"
+                  ng-class="{'picked' : self.openDetail === detail.identifier}">
+                  <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
+                      <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
+                  </svg>
+                  <svg class="cis__circleicon" ng-show="self.details.has(detail.identifier)">
+                      <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                  </svg>
+                  <span>{{detail.label}}</span>
+              </div>
 
-            <!-- COMPONENT -->
-            <div 
-              ng-click="self.onScroll({element: '.cis__details'})"
-              ng-if="self.openDetail === detail.identifier"
-              detail-element="{{detail.component}}"
-              on-update="::self.updateDetail(identifier, value)"
-              initial-value="::self.draftObject[detail.identifier]"
-              identifier="detail.identifier">
-            </div>
+              <!-- COMPONENT -->
+              <div class="cis__detail__items__item__component"
+                ng-click="self.onScroll({element: '.cis__details'})"
+                ng-if="self.openDetail === detail.identifier"
+                detail-element="{{detail.component}}"
+                on-update="::self.updateDetail(identifier, value)"
+                initial-value="::self.draftObject[detail.identifier]"
+                identifier="detail.identifier">
+              </div>
+          </div>
         </div>
     </div>
     <!-- /DETAIL Picker/ -->
