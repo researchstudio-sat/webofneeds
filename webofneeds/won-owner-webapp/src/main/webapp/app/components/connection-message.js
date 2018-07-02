@@ -94,13 +94,13 @@ function genComponentConf() {
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
+                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted()"
                         ng-disabled="self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
+                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted()"
                         ng-disabled="self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
