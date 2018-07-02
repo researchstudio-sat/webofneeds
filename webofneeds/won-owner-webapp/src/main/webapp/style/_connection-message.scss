@@ -66,13 +66,26 @@ won-connection-message {
       }
     }
   }
-  &.won-not-relevant {
+  &.won-is-accepted {
+    //TODO: STYLING
+  }
+  &.won-is-cancelled {
+    //TODO: STYLING
+  }
+  &.won-is-cancellationPending {
+    //TODO: STYLING
+  }
+  &.won-is-rejected {
+    //TODO: STYLING
+  }
+  &.won-is-retracted {
     opacity: 0.35;
     .won-cm__center__bubble {
       text-decoration: line-through;
       text-decoration-color: black;
     }
   }
+
   .won-cm__center {
     grid-area: content;
     font-size: $smallFontSize;
