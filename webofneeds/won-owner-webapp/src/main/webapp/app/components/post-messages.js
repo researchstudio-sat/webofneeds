@@ -210,28 +210,55 @@ function genComponentConf() {
           // TODO: Optimization
           for (const msg of msgSet) {
             if (
-              msg.get("isProposeMessage") ||
-              msg.get("isProposeToCancel") ||
-              msg.get("isAcceptMessage")
+              !msg.getIn(["messageStatus", "isAccepted"]) &&
+              this.isOldAcceptedMsg(msg)
             ) {
-              if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                this.messages__markAsRelevant({
-                  messageUri: msg.get("uri"),
-                  connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
-                  relevant: false,
-                });
-              }
-            } else if (this.agreementHead.get("retractedMessageUris").size) {
-              //TODO: filter out retracted messages faster
-              if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                this.messages__markAsRelevant({
-                  messageUri: msg.get("uri"),
-                  connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
-                  relevant: false,
-                });
-              }
+              this.messages__markAsAccepted({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                accepted: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isRejected"]) &&
+              this.isOldAcceptedMsg(msg)
+            ) {
+              this.messages__markAsRejected({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                rejected: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isRetracted"]) &&
+              this.isOldAcceptedMsg(msg)
+            ) {
+              this.messages__markAsRetracted({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                retracted: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isCancelled"]) &&
+              this.isOldAcceptedMsg(msg)
+            ) {
+              this.messages__markAsCancelled({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                cancelled: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isCancellationPending"]) &&
+              this.isOldAcceptedMsg(msg)
+            ) {
+              this.messages__markAsCancellationPending({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                cancellationPending: true,
+              });
             }
           }
 
@@ -637,41 +664,66 @@ function genComponentConf() {
       this.checkObject("cancellationPendingAgreementUris", object, true);
     }
 
-    isOldAgreementMsg(msg) {
+    isOldCancelledMsg(msg) {
       if (
-        !this.agreementHead &&
+        this.agreementHead &&
+        (this.agreementHead.getIn([
+          "acceptedCancellationProposalUris",
+          msg.get("uri"),
+        ]) ||
+          this.agreementHead.getIn([
+            "acceptedCancellationProposalUris",
+            msg.get("remoteUri"),
+          ]))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    isOldCancellationPendingMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["cancelledAgreementUris", msg.get("uri")]) ||
+          this.agreementHead.getIn([
+            "cancelledAgreementUris",
+            msg.get("remoteUri"),
+          ]))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    isOldAcceptedMsg(msg) {
+      if (
+        this.agreementHead &&
         (this.agreementHead.getIn(["agreementUris", msg.get("uri")]) ||
-          this.agreementHead.getIn(["agreementUris", msg.get("remoteUri")]) ||
-          this.agreementHead.getIn([
-            "cancellationPendingAgreementUris",
-            msg.get("uri"),
-          ]) ||
-          this.agreementHead.getIn([
-            "cancellationPendingAgreementUris",
-            msg.get("remoteUri"),
-          ]) ||
-          this.agreementHead.getIn([
-            "cancelledAgreementUris",
-            msg.get("uri"),
-          ]) ||
-          this.agreementHead.getIn([
-            "cancelledAgreementUris",
-            msg.get("remoteUri"),
-          ]) ||
-          this.agreementHead.getIn([
-            "acceptedCancellationProposalUris",
-            msg.get("uri"),
-          ]) ||
-          this.agreementHead.getIn([
-            "acceptedCancellationProposalUris",
-            msg.get("remoteUri"),
-          ]) ||
-          this.agreementHead.getIn(["retractedMessageUris", msg.get("uri")]) ||
+          this.agreementHead.getIn(["agreementUris", msg.get("remoteUri")]))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    isOldRetractedMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["retractedMessageUris", msg.get("uri")]) ||
           this.agreementHead.getIn([
             "retractedMessageUris",
             msg.get("remoteUri"),
-          ]) ||
-          this.agreementHead.getIn(["rejectedMessageUris", msg.get("uri")]) ||
+          ]))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    isOldRejectedMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["rejectedMessageUris", msg.get("uri")]) ||
           this.agreementHead.getIn([
             "rejectedMessageUris",
             msg.get("remoteUri"),
