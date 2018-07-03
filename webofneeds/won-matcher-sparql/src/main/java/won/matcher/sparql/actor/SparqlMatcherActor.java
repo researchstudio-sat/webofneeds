@@ -245,12 +245,6 @@ public class SparqlMatcherActor extends UntypedActor {
 			Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
 
 			queries.add(seeksQuery);
-
-			Statement searchStatement = model.getProperty(seeks.getObject().asResource(), model.createProperty("http://purl.org/webofneeds/model#hasSearchString"));
-			if(searchStatement != null) {
-				String searchString = searchStatement.getString();
-				queries.add(createSearchQuery(searchString));
-			}
 		}
 		
 		Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
@@ -259,6 +253,13 @@ public class SparqlMatcherActor extends UntypedActor {
 			Op isQuery = createNeedQuery(model, is, NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
 			
 			queries.add(isQuery);
+		}
+
+		Statement search = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#hasSearchString"));
+
+		if(search != null) {
+			String searchString = search.getString();
+			queries.add(createSearchQuery(searchString));
 		}
 
 		queries.stream().reduce((left, right) -> new OpUnion(left, right))
