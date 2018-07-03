@@ -64,6 +64,7 @@ function genComponentConf() {
         connectionUri: undefined,
         postUri: undefined,
         showCreateView: type,
+        useCase: undefined,
       });
     }
   }

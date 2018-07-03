@@ -39,6 +39,8 @@ class ConnectionsController {
         "showCreateView",
       ]);
 
+      const useCase = getIn(state, ["router", "currentParams", "useCase"]);
+
       const isSearch = showCreateView === this.SEARCH;
       const isPost = showCreateView && !isSearch;
 
@@ -73,6 +75,7 @@ class ConnectionsController {
         selectedPost,
         connection,
         connectionType,
+        useCase,
         isSearch,
         isPost,
         hasConnections: connections && connections.size > 0,
