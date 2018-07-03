@@ -75,13 +75,6 @@ won-connections-overview {
       @include slideWithOpacityAnimation(0.5s, linear, 250rem);
     }
   }
-  .co__loadspinner {
-    width: 100%;
-    height: 3rem;
-    padding: 0.66em 2em;
-    text-align: center;
-    box-sizing: border-box;
-  }
   .co__separator {
     margin-top: 1.5rem;
     padding: 0 0.5rem;
