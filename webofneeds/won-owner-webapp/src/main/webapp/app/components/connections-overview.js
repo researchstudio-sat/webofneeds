@@ -287,20 +287,20 @@ function genComponentConf() {
         }
       });
 
-      this.$scope.$watchGroup(["self.connectionsToCrawl"], () =>
-        this.ensureUnreadMessagesAreLoaded()
+      this.$scope.$watch("self.connectionsToCrawl", cnctToCrawl =>
+        this.ensureUnreadMessagesAreLoaded(cnctToCrawl)
       );
     }
 
-    ensureUnreadMessagesAreLoaded() {
+    ensureUnreadMessagesAreLoaded(connectionsToCrawl) {
       delay(0).then(() => {
         const MESSAGECOUNT = 10;
 
-        if (this.connectionsToCrawl.size == 0) {
+        if (connectionsToCrawl.size == 0) {
           console.log("ensureUnreadMessagesAreLoaded - nothing to crawl");
         }
 
-        this.connectionsToCrawl.map(conn => {
+        connectionsToCrawl.map(conn => {
           if (conn.get("isLoadingMessages")) return;
           const messages = conn.get("messages");
           const messageCount = messages ? messages.size : 0;
