@@ -1,28 +1,13 @@
-/**
- * Created by ksinger on 24.08.2015.
- */
 import angular from "angular";
 
 import "ng-redux";
 import won from "../won-es6.js";
 import { postTitleCharacterLimit } from "config";
-import { attach, deepFreeze, clone, dispatchEvent } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-
-const emptyDraft = deepFreeze({
-  title: "",
-  type: won.WON.BasicNeedTypeCombined,
-  description: "",
-  tags: undefined,
-  location: undefined,
-  travelAction: undefined,
-  thumbnail: undefined,
-});
+import { attach, clone, delay, dispatchEvent } from "../utils.js";
 
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
-  "$ngRedux",
+  //"$ngRedux",
   "$scope",
   "$element" /*, '$routeParams' /*injections as strings here*/,
 ];
@@ -94,44 +79,27 @@ function genComponentConf() {
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
+      this.details = new Set();
 
+      this.showDetail = false;
       this.openDetail = undefined;
 
-      this.reset();
-
-      //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
-      const selectFromState = () => ({});
-
-      // Using actionCreators like this means that every action defined there is available in the template.
-      connect2Redux(selectFromState, actionCreators, [], this);
+      delay(0).then(() => this.loadInitialDraft());
     }
 
-    reset() {
-      this.draftObject = clone(emptyDraft);
-      this.details = new Set(); // remove all detail-cards
-
-      this.showDetail = false; // and close selector
+    loadInitialDraft() {
+      this.draftObject = clone(this.initialDraft);
+      for (const draftDetail in this.initialDraft) {
+        this.details.add(draftDetail);
+        this.draftObject[draftDetail] = this.initialDraft[draftDetail];
+      }
     }
 
     updateDraft() {
-      // TODO: this should use a detail list instead
-      if (!this.details.has("description")) {
-        this.draftObject.description = undefined;
-      }
-      if (!this.details.has("location")) {
-        this.draftObject.location = undefined;
-      }
-      if (!this.details.has("person")) {
-        this.draftObject.person = undefined;
-      }
-      if (!this.details.has("travelAction")) {
-        this.draftObject.travelAction = undefined;
-      }
-      if (!this.details.has("tags")) {
-        this.draftObject.tags = undefined;
-      }
-      if (!this.details.has("ttl")) {
-        this.draftObject.ttl = undefined;
+      for (const detail in this.detailList) {
+        if (!this.details.has(detail)) {
+          this.draftObject[detail] = undefined;
+        }
       }
 
       this.onUpdate({ draft: this.draftObject });
@@ -213,11 +181,8 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       detailList: "=",
-      /*
-             * Usage:
-             *  on-update="::myCallback(draft)"
-             */
-      onUpdate: "&",
+      initialDraft: "=",
+      onUpdate: "&", // Usage: on-update="::myCallback(draft)"
       onScroll: "&",
     },
     template: template,

@@ -46,7 +46,8 @@ const socialUseCases = {
     draft: {
       ...emptyDraft,
       usecase: "lunch",
-      seeks: { title: "lunch" }, // TODO: this should not be title.
+      is: { tags: ["essen", "food"] },
+      searchString: "lunch",
     },
     isDetails: {
       description: { ...details.description },

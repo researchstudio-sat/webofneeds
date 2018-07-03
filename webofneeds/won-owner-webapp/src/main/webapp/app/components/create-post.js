@@ -83,6 +83,7 @@ function genComponentConf() {
                 ng-if="self.useCase.isDetails" 
                 is-or-seeks="::'Description'"
                 detail-list="self.useCase.isDetails"
+                initial-draft="self.useCase.draft.is"
                 on-update="::self.updateDraft(draft, 'is')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
@@ -90,6 +91,7 @@ function genComponentConf() {
                 ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
                 detail-list="self.useCase.seeksDetails"
+                initial-draft="self.useCase.draft.seeks"
                 on-update="::self.updateDraft(draft, 'seeks')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
@@ -165,22 +167,11 @@ function genComponentConf() {
 
       this.postTypeTexts = postTypeTexts;
       this.characterLimit = postTitleCharacterLimit;
-      this.draftIs = {
-        title: undefined,
-        type: postTypeTexts[3].type, // TODO: do we use this information anywhere?
-      };
-      this.draftSeeks = {
-        title: undefined,
-        type: postTypeTexts[3].type,
-      };
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
-      this.draftObject = {
-        is: this.draftIs,
-        seeks: this.draftSeeks,
-        matchingContext: undefined,
-      };
+
+      this.draftObject = {};
 
       this.showTuningOptions = false;
 
@@ -225,9 +216,10 @@ function genComponentConf() {
       };
 
       // TODO: think about how to deal with contexts predefined in usecases
-      delay(0).then(() =>
-        this.updateMatchingContext(this.defaultMatchingContext)
-      );
+      delay(0).then(() => {
+        this.updateMatchingContext(this.defaultMatchingContext);
+        this.loadInitialDraft(this.useCase.draft);
+      });
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -298,12 +290,27 @@ function genComponentConf() {
       );
     }
 
+    loadInitialDraft(draft) {
+      if (draft) {
+        // deep clone of draft
+        this.draftObject = JSON.parse(JSON.stringify(draft));
+      }
+    }
+
     updateMatchingContext(matchingContext) {
       // also accepts []!
-      if (matchingContext) {
+      if (matchingContext && this.draftObject.matchingContext) {
+        const combinedContext = [
+          ...matchingContext,
+          ...this.draftObject.matchingContext,
+        ].reduce(function(a, b) {
+          if (a.indexOf(b) < 0) a.push(b);
+          return a;
+        }, []);
+
+        this.draftObject.matchingContext = combinedContext;
+      } else if (matchingContext) {
         this.draftObject.matchingContext = matchingContext;
-      } else {
-        this.draftObject.matchingContext = undefined;
       }
     }
 
