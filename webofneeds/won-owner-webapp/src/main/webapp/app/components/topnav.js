@@ -28,7 +28,7 @@ function genTopnavConf() {
             </span>
             <button
                 ng-show="self.connectionHasBeenLost && !self.reconnecting"
-                ng-click="self.reconnect()"
+                ng-click="self.reconnect__start()"
                 class="si__button">
                     Reconnect
             </button>

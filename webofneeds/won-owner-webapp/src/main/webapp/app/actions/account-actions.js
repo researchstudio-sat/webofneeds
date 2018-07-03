@@ -24,6 +24,8 @@ import { stateGoCurrent } from "./cstm-router-actions.js";
 import { checkAccessToCurrentRoute } from "../configRouting.js";
 
 import { getIn } from "../utils.js";
+import { selectAllConnectionUris } from "../selectors.js";
+import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 
 /**
  * @param privateId
@@ -213,7 +215,7 @@ export function accountLogin(credentials, options) {
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
-        dispatch(actionCreators.reconnect())
+        dispatch(actionCreators.reconnect__start())
       )
       .then(() => {
         if ("geolocation" in navigator && navigator.permissions) {
@@ -334,7 +336,7 @@ export function accountLogout(options) {
            * TODO this action is part of the session-upgrade hack documented in:
            * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
            */
-          dispatch(actionCreators.reconnect());
+          dispatch(actionCreators.reconnect__start());
         })
         .then(
           () =>
@@ -401,19 +403,43 @@ export function accountAcceptDisclaimer() {
 }
 
 export function reconnect() {
-  return dispatch => {
-    return checkLoginStatus()
-      .then(() => {
-        dispatch({ type: actionTypes.reconnect });
-      })
-      .catch(e => {
-        if (e.message == "Unauthorized") {
-          dispatch({ type: actionTypes.logout });
-          dispatch({ type: actionTypes.showMainMenuDisplay });
-        } else {
-          dispatch(actionCreators.lostConnection());
-        }
-        console.warn(e);
+  return async (dispatch, getState) => {
+    dispatch({ type: actionTypes.reconnect.start });
+    try {
+      await checkLoginStatus();
+      dispatch({ type: actionTypes.reconnect.success });
+
+      /* 
+       * -- loading latest messages for all connections (we might have missed some during the dc) --
+       */
+      const state = getState();
+      const connectionUris = selectAllConnectionUris(state);
+      connectionUris.forEach(async connectionUri => {
+        console.log("in reconnect; deletme; ", connectionUri);
+        await loadLatestMessagesOfConnection({
+          connectionUri,
+          numberOfEvents: 10, //TODO magic number :|
+          state,
+          curriedDispatch: payload => {
+            console.log(
+              "in reconnect 2; deletme; ",
+              connectionUri /*, payload*/
+            );
+            dispatch({
+              type: actionTypes.reconnect.receivedConnectionData,
+              payload,
+            });
+          },
+        });
       });
+    } catch (e) {
+      if (e.message == "Unauthorized") {
+        dispatch({ type: actionTypes.logout });
+        dispatch({ type: actionTypes.showMainMenuDisplay });
+      } else {
+        dispatch(actionCreators.lostConnection());
+      }
+      console.warn(e);
+    }
   };
 }

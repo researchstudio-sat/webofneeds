@@ -238,8 +238,13 @@ const actionHierarchy = {
   registerFailed: INJ_DEFAULT,
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
-  reconnect: reconnect,
-  reconnectSuccess: INJ_DEFAULT,
+
+  reconnect: {
+    start: reconnect,
+    success: INJ_DEFAULT,
+    receivedConnectionData: INJ_DEFAULT,
+  },
+
   mainViewScrolled: INJ_DEFAULT,
 
   toggleRdfDisplay: INJ_DEFAULT,

@@ -67,10 +67,10 @@ export function messagesReducer(messages = initialState, action = {}) {
         : messages;
     }
 
-    case actionTypes.reconnect:
+    case actionTypes.reconnect.start:
       return messages.set("reconnecting", true);
 
-    case actionTypes.reconnectSuccess:
+    case actionTypes.reconnect.success:
       return messages.set("lostConnection", false).set("reconnecting", false);
 
     case actionTypes.messages.dispatchActionOn.registerSuccessOwn: {

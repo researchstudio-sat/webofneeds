@@ -362,54 +362,70 @@ export function connectionsRate(connectionUri, rating) {
  * @return {Function}
  */
 export function showLatestMessages(connectionUriParam, numberOfEvents) {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const state = getState();
-    const connectionUri = connectionUriParam || selectOpenConnectionUri(state);
-    const need =
-      connectionUri && selectNeedByConnectionUri(state, connectionUri);
-    const needUri = need && need.get("uri");
-    const connection = connectionUri && selectConnection(state, connectionUri);
-    if (!connectionUri || !connection) return;
+    await loadLatestMessagesOfConnection({
+      connectionUri: connectionUriParam,
+      numberOfEvents,
+      state,
+      curriedDispatch: payload =>
+        dispatch({
+          type: actionTypes.connections.showLatestMessages,
+          payload,
+        }),
+    });
+  };
+}
 
-    const connectionMessages = connection.get("messages");
-    if (
-      connection.get("isLoadingMessages") ||
-      !connectionMessages ||
-      connectionMessages.size > 0
-    )
-      return; // only start loading once.
+export async function loadLatestMessagesOfConnection({
+  connectionUri,
+  numberOfEvents,
+  state,
+  curriedDispatch,
+}) {
+  const connectionUri_ = connectionUri || selectOpenConnectionUri(state);
+  const need =
+    connectionUri_ && selectNeedByConnectionUri(state, connectionUri_);
+  const needUri = need && need.get("uri");
+  const connection = connectionUri_ && selectConnection(state, connectionUri_);
+  if (!connectionUri_ || !connection) {
+    return;
+  }
 
-    dispatch({
-      type: actionTypes.connections.showLatestMessages,
-      payload: Immutable.fromJS({ connectionUri, isLoadingMessages: true }),
+  const connectionMessages = connection.get("messages");
+  if (
+    connection.get("isLoadingMessages") ||
+    !connectionMessages ||
+    connectionMessages.size > 0
+  ) {
+    return; // only start loading once.
+  }
+
+  curriedDispatch(
+    Immutable.fromJS({ connectionUri_, isLoadingMessages: true })
+  );
+
+  try {
+    const events = await won.getWonMessagesOfConnection(connectionUri_, {
+      requesterWebId: needUri,
+      pagingSize: numOfEvts2pageSize(numberOfEvents),
+      deep: true,
     });
 
-    won
-      .getWonMessagesOfConnection(connectionUri, {
-        requesterWebId: needUri,
-        pagingSize: numOfEvts2pageSize(numberOfEvents),
-        deep: true,
+    curriedDispatch(
+      Immutable.fromJS({
+        connectionUri: connectionUri_,
+        events: events,
       })
-      .then(events =>
-        dispatch({
-          type: actionTypes.connections.showLatestMessages,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            events: events,
-          }),
-        })
-      )
-      .catch(error => {
-        console.error("Failed loading the latest events: ", error);
-        dispatch({
-          type: actionTypes.connections.showLatestMessages,
-          payload: Immutable.fromJS({
-            connectionUri: connectionUri,
-            error: error,
-          }),
-        });
-      });
-  };
+    );
+  } catch (error) {
+    curriedDispatch(
+      Immutable.fromJS({
+        connectionUri: connectionUri_,
+        error: error,
+      })
+    );
+  }
 }
 
 //TODO replace the won.getEventsOfConnection with this version (and make sure it works for all previous uses).

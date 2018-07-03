@@ -77,6 +77,11 @@ export function selectAllConnections(state) {
   return connections;
 }
 
+export function selectAllConnectionUris(state) {
+  const connections = selectAllConnections(state);
+  return connections && connections.keySeq().toSet();
+}
+
 /**
  * Get all connections stored within your own needs as a map with a status of Connected
  * @returns Immutable.Map with all connections

@@ -610,6 +610,7 @@ export default function(allNeedsInState = initialState, action = {}) {
       return allNeedsInState;
     }
 
+    case actionTypes.reconnect.receivedConnectionData:
     case actionTypes.connections.showLatestMessages:
     case actionTypes.connections.showMoreMessages: {
       const isLoadingMessages = action.payload.get("isLoadingMessages");
