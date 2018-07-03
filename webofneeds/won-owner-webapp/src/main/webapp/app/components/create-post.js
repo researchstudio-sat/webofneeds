@@ -73,8 +73,7 @@ function genComponentConf() {
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
-            <span class="cp__header__title" ng-if="self.isPost">Post</span>
-            <span class="cp__header__title" ng-if="self.isSearch">Search</span>
+            <span class="cp__header__title">{{self.useCase.label}}</span>
         </div>
         <div class="cp__content">
 
@@ -218,7 +217,7 @@ function genComponentConf() {
       // TODO: think about how to deal with contexts predefined in usecases
       delay(0).then(() => {
         this.updateMatchingContext(this.defaultMatchingContext);
-        this.loadInitialDraft(this.useCase.draft);
+        this.loadInitialDraft();
       });
 
       // Using actionCreators like this means that every action defined there is available in the template.
@@ -290,10 +289,15 @@ function genComponentConf() {
       );
     }
 
-    loadInitialDraft(draft) {
-      if (draft) {
+    loadInitialDraft() {
+      // just to be sure this is loaded already
+      if (!this.useCase) {
+        this.getUseCase(this.useCaseString);
+      }
+
+      if (this.useCase && this.useCase.draft) {
         // deep clone of draft
-        this.draftObject = JSON.parse(JSON.stringify(draft));
+        this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
       }
     }
 

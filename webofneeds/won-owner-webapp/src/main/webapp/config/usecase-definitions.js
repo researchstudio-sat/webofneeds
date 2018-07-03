@@ -34,6 +34,17 @@ const allDetailsUseCase = {
   },
 };
 
+const pureSearchUseCase = {
+  pureSearch: {
+    identifier: "pureSearch",
+    label: "Search Posts",
+    icon: "#ico36_search",
+    draft: { ...emptyDraft, usecase: "pureSearch" },
+    isDetails: undefined,
+    seeksDetails: {},
+  },
+};
+
 // TODO: roles?
 // note: if no details are to be added for is or seeks,
 // there won't be an is or seeks part unless defined in the draft
@@ -47,6 +58,7 @@ const socialUseCases = {
       ...emptyDraft,
       usecase: "lunch",
       is: { tags: ["essen", "food"] },
+      seeks: { title: "lunch" },
       searchString: "lunch",
     },
     isDetails: {
@@ -61,8 +73,26 @@ const socialUseCases = {
     },
     seeksDetails: undefined,
   },
-  // afterparty: {},
-  // sightseeing: {},
+  afterparty: {
+    identifier: "afterparty",
+    label: "Afterparty",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    seeksDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  sightseeing: {
+    identifier: "sightseeing",
+    label: "Sight Seeing",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    seeksDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
   // carsharing: {},
   // meetSomeone: {},
   // activity: {},
@@ -70,7 +100,26 @@ const socialUseCases = {
 
 const professionalUseCases = {
   // getToKnow: {},
-  // phd: {},
+  phdIs: {
+    identifier: "phdIs",
+    label: "Offer a PhD position",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  phdSeeks: {
+    identifier: "phdSeeks",
+    label: "Search for a PhD position",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
   // postdoc: {},
   // consortium: {},
 };
@@ -86,6 +135,7 @@ export const useCases = {
   ...socialUseCases,
   ...professionalUseCases,
   ...allDetailsUseCase,
+  ...pureSearchUseCase,
 };
 
 export const useCaseGroups = {
@@ -105,6 +155,6 @@ export const useCaseGroups = {
     identifier: "othergroup",
     label: "And now for something completely different",
     icon: "#ico36_plus",
-    useCases: { ...allDetailsUseCase },
+    useCases: { ...allDetailsUseCase, ...pureSearchUseCase },
   },
 };

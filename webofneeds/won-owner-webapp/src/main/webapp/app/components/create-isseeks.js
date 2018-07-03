@@ -27,7 +27,7 @@ function genComponentConf() {
     <!-- Mandatory Input Fields -->
 
     <!-- DETAILS Picker -->
-    <div class="cis__addDetail">
+    <div class="cis__addDetail" ng-if="self.detailList && self.detailList !== {}">
         <div class="cis__addDetail__header a detailPicker clickable"
             ng-click="self.toggleDetail()"
             ng-class="{'closedDetailPicker': !self.showDetail}">
