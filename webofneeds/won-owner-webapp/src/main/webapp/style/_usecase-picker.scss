@@ -1,0 +1,118 @@
+@import "won-config";
+@import "animate";
+@import "sizing-utils";
+@import "responsiveness-utils";
+
+won-usecase-picker {
+  display: grid;
+  grid-template-areas: "header" "main";
+  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
+  grid-row-gap: $gridRowGap;
+  width: 100%;
+  max-width: $maxContentWidth;
+  height: 100%;
+  box-sizing: border-box;
+  padding: $gridRowGap;
+
+  /*
+  &.create-post-mobile {
+    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
+  }*/
+
+  .ucp__header {
+    grid-area: header;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "header_back header_title";
+    font-size: $normalFontSize;
+    text-align: left;
+    min-width: 0;
+    align-items: center;
+
+    // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
+    padding-left: 0.5rem;
+    @media (max-width: $responsivenessBreakPoint) {
+      padding-left: 0;
+    }
+
+    &__title {
+      grid-area: header_title;
+      color: $won-subtitle-gray;
+      font-size: $mediumFontSize;
+      font-weight: 400;
+    }
+
+    &__back {
+      grid-area: header_back;
+      &__icon {
+        /*@media (max-width: $responsivenessBreakPoint) {
+          @include fixed-square(2.5rem);
+        }*/
+        @include fixed-square($backIconSize);
+      }
+    }
+  }
+
+  .ucp__content {
+    grid-area: main;
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-gap: 1rem;
+    border-top: $thinGrayBorder;
+    padding-top: 1rem;
+    overflow: auto;
+
+    &__usecasegroup {
+      display: grid;
+      grid-auto-flow: row;
+      grid-gap: 0.5rem;
+
+      &__header {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        width: 100%;
+        border-bottom: $thinGrayBorder;
+        color: $won-primary-text-color;
+
+        &__icon {
+          @include fixed-square($iconSize);
+          --local-primary: #{$won-primary-text-color};
+        }
+
+        &__label {
+          font-size: $mediumFontSize;
+          font-weight: bold;
+        }
+      }
+
+      &__usecases {
+        display: grid;
+        grid-gap: 0.5rem;
+        grid-auto-flow: column;
+
+        &__usecase {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          padding: 0.5rem;
+          border-radius: 0.19rem;
+          width: 10rem;
+          background: $won-secondary-color;
+
+          &:hover {
+            filter: brightness(85%);
+          }
+
+          &__icon {
+            @include fixed-square($iconSize);
+            --local-primary: #{$won-secondary-text-color};
+          }
+          &__label {
+            color: $won-secondary-text-color;
+          }
+        }
+      }
+    }
+  }
+}
