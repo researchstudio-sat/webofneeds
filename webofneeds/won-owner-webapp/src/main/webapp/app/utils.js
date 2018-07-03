@@ -1206,3 +1206,14 @@ export function trigPrefixesAndBody(trigString) {
 
   return { trigPrefixes: prefixes, trigBody: body };
 }
+
+export function callBuffer(fn, delay = 1000) {
+  let timeout = undefined;
+  const buffer = (...args) => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+  return buffer;
+}
