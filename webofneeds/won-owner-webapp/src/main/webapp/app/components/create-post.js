@@ -10,18 +10,13 @@ import imageDropzoneModule from "./image-dropzone.js";
 import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import {
-  get,
-  getIn,
-  attach,
-  //  deepFreeze,
-  delay,
-} from "../utils.js";
+import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 
+// import { details } from "detailDefinitions";
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
@@ -67,18 +62,6 @@ const serviceDependencies = [
   "$element" /*'$routeParams' /*injections as strings here*/,
 ];
 
-//All deatils, except tags, because tags are saved in an array
-// const keySet = deepFreeze(
-//   new Set([
-//     "description",
-//     "location",
-//     "matchingContext",
-//     "thumbnail",
-//     "travelAction",
-//     "ttl",
-//   ])
-// );
-
 function genComponentConf() {
   const template = `
         <div class="cp__header">
@@ -96,14 +79,16 @@ function genComponentConf() {
 
             <!-- ADD TITLE AND DETAILS -->
             <won-create-isseeks 
-                ng-if="self.isPost" 
-                is-or-seeks="::'Description'" 
+                ng-if="self.useCase.isDetails" 
+                is-or-seeks="::'Description'"
+                detail-list="self.useCase.isDetails"
                 on-update="::self.updateDraft(draft, 'is')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
             <won-create-isseeks 
-                ng-if="self.isSearch" 
+                ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
+                detail-list="self.useCase.seeksDetails"
                 on-update="::self.updateDraft(draft, 'seeks')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
@@ -113,7 +98,9 @@ function genComponentConf() {
               <won-labelled-hr label="::'tune matching?'" class="cp__content__labelledhr">
               </won-labelled-hr>
             -->
-            <div class="cp__content__tuning">
+            <!-- TODO: when should this be shown as an option? --> 
+            <div class="cp__content__tuning"
+            ng-if="self.useCase.isDetails || self.useCase.seeksDetails">
                 <div class="cp__content__tuning__title b detailPicker clickable"
                     ng-click="self.toggleTuningOptions()"
                     ng-class="{'closedDetailPicker': !self.showTuningOptions}">
@@ -168,6 +155,27 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
+      // this.useCase = {
+      //   identifier: "lunch",
+      //   label: "Get Lunch Together",
+      //   icon: "#ico36_plus_circle",
+      //   draft: {
+      //     usecase: "lunch",
+      //     searchString: "lunch",
+      //   },
+      //   isDetails: {
+      //     description: { ...details.description },
+      //     foodAllergies: {
+      //       ...details.description,
+      //       identifier: "foodallergies",
+      //       label: "Food Allergies",
+      //     },
+      //     location: { ...details.location },
+      //     tags: { ...details.tags },s
+      //   },
+      //   seeksDetails: undefined,
+      // };
+
       this.SEARCH = "search";
       this.POST = "post";
 
@@ -180,22 +188,10 @@ function genComponentConf() {
       this.draftIs = {
         title: undefined,
         type: postTypeTexts[3].type, // TODO: do we use this information anywhere?
-        // description: undefined,
-        // tags: undefined,
-        // person: undefined,
-        // location: undefined,
-        // travelAction: undefined,
-        // thumbnail: undefined,
       };
       this.draftSeeks = {
         title: undefined,
         type: postTypeTexts[3].type,
-        // description: undefined,
-        // tags: undefined,
-        // person: undefined,
-        // location: undefined,
-        // travelAction: undefined,
-        // thumbnail: undefined,
       };
 
       this.windowHeight = window.screen.height;
@@ -408,6 +404,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
+      useCase: "=",
       /*scope-isolation*/
     },
     template: template,
