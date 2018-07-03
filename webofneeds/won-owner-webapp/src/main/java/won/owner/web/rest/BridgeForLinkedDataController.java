@@ -236,11 +236,11 @@ public class BridgeForLinkedDataController implements InitializingBean {
 			final HttpServletResponse toResponse) {
 		for (String headerName : fromHeaders.keySet()) {
 			for (String headerValue : fromHeaders.get(headerName)) {
-
-				if ((headerName != "Transfer-Encoding") || (headerValue != "chunked")) {
+				
+				if ((headerName != "Transfer-Encoding") || (headerValue != "chunked") && ! toResponse.containsHeader(headerName)) {
 					// we allow all transfer codings except chunked, because we don't do chunking
 					// here!
-					toResponse.addHeader(headerName, headerValue);
+					toResponse.setHeader(headerName, headerValue);
 				}
 			}
 		}

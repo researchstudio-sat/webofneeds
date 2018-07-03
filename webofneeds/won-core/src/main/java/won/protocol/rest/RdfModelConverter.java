@@ -22,6 +22,7 @@ import org.apache.jena.atlas.web.ContentType;
 import org.apache.jena.riot.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -29,6 +30,7 @@ import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -69,7 +71,11 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     @Override
     protected void writeInternal(Model model, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
       Lang rdfLanguage = mimeTypeToJenaLanguage(httpOutputMessage.getHeaders().getContentType(), Lang.N3);
-      RDFDataMgr.write(httpOutputMessage.getBody(), model, rdfLanguage);
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      RDFDataMgr.write(out, model, rdfLanguage);
+      byte[] outBytes = out.toByteArray();
+      httpOutputMessage.getHeaders().add(HttpHeaders.CONTENT_LENGTH, Integer.toString(out.size()));
+      httpOutputMessage.getBody().write(outBytes);
       httpOutputMessage.getBody().flush();
     }
 
