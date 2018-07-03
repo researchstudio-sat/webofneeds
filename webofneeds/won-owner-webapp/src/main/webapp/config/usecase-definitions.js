@@ -81,6 +81,12 @@ const professionalUseCases = {
   // job: {},
 };*/
 
+export const useCases = {
+  ...socialUseCases,
+  ...professionalUseCases,
+  ...allDetailsUseCase,
+};
+
 export const useCaseGroups = {
   social: {
     identifier: "socialgroup",

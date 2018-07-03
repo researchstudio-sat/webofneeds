@@ -17,6 +17,7 @@ import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 
 // import { details } from "detailDefinitions";
+import { useCases } from "useCaseDefinitions";
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
@@ -155,27 +156,6 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
-      // this.useCase = {
-      //   identifier: "lunch",
-      //   label: "Get Lunch Together",
-      //   icon: "#ico36_plus_circle",
-      //   draft: {
-      //     usecase: "lunch",
-      //     searchString: "lunch",
-      //   },
-      //   isDetails: {
-      //     description: { ...details.description },
-      //     foodAllergies: {
-      //       ...details.description,
-      //       identifier: "foodallergies",
-      //       label: "Food Allergies",
-      //     },
-      //     location: { ...details.location },
-      //     tags: { ...details.tags },s
-      //   },
-      //   seeksDetails: undefined,
-      // };
-
       this.SEARCH = "search";
       this.POST = "post";
 
@@ -214,6 +194,11 @@ function genComponentConf() {
           "currentParams",
           "showCreateView",
         ]);
+        const useCaseString = getIn(state, [
+          "router",
+          "currentParams",
+          "useCase",
+        ]);
         const isSearch = showCreateView === this.SEARCH;
         const isPost = showCreateView && !isSearch;
 
@@ -231,6 +216,8 @@ function genComponentConf() {
         return {
           connectionHasBeenLost: !selectIsConnected(state),
           showCreateView,
+          useCaseString,
+          useCase: this.getUseCase(useCaseString),
           isSearch,
           isPost,
           defaultMatchingContext: defaultMatchingContext,
@@ -279,6 +266,17 @@ function genComponentConf() {
         this._scrollContainer = this.$element[0].querySelector(".cp__content");
       }
       return this._scrollContainer;
+    }
+
+    getUseCase(useCaseString) {
+      if (useCaseString) {
+        for (const useCaseName in useCases) {
+          if (useCaseString === useCases[useCaseName]["identifier"]) {
+            return useCases[useCaseName];
+          }
+        }
+      }
+      return undefined;
     }
 
     toggleTuningOptions() {
@@ -404,7 +402,6 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      useCase: "=",
       /*scope-isolation*/
     },
     template: template,
