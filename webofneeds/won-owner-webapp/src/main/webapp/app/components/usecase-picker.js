@@ -9,6 +9,7 @@ import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
+import { useCases } from "useCaseDefinitions";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -38,6 +39,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       window.ucp4dbg = this;
+      this.useCases = useCases;
 
       const selectFromState = state => {
         return {

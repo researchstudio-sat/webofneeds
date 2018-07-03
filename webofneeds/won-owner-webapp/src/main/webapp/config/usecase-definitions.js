@@ -1,14 +1,4 @@
-import details from "detail-definitions.js";
-
-export const useCases = {
-  allDetailsUseCase,
-  ...socialUseCases,
-  ...professionalUseCases,
-  ...otherUseCases,
-};
-
-// identifier have to be unique across all use cases!
-export const useCaseList = useCases.map(useCase => useCase.identifier);
+import { details } from "detailDefinitions";
 
 // don't put detail placeholders in the draft, this only makes it harder to handle.
 // if we want to set a initial value (can be changed/deleted unless hidden), the draft
@@ -90,4 +80,11 @@ const otherUseCases = {
   // transport: {},
   // realEstate: {},
   // job: {},
+};
+
+export const useCases = {
+  allDetailsUseCase,
+  ...socialUseCases,
+  ...professionalUseCases,
+  ...otherUseCases,
 };
