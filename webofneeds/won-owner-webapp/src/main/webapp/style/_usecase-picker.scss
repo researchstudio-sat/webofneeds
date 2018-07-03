@@ -89,7 +89,9 @@ won-usecase-picker {
       &__usecases {
         display: grid;
         grid-gap: 0.5rem;
-        grid-auto-flow: column;
+        grid-template-columns: repeat(auto-fill, 10rem);
+        grid-auto-rows: min-content;
+        grid-auto-flow: row dense;
 
         &__usecase {
           display: flex;
@@ -97,8 +99,8 @@ won-usecase-picker {
           flex-direction: column;
           padding: 0.5rem;
           border-radius: 0.19rem;
-          width: 10rem;
-          background: $won-secondary-color;
+          //width: 10rem;
+          background: $won-secondary-color-light;
 
           &:hover {
             filter: brightness(85%);
