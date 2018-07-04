@@ -8,7 +8,7 @@ import { connect2Redux } from "../won-utils.js";
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `
-        <div class="cpi__item clickable"
+        <!--div class="cpi__item clickable"
             ng-click="self.selectCreate(self.SEARCH)"
             ng-class="{'selected': self.isSearch}">
             <svg class="cpi__item__icon"
@@ -19,7 +19,7 @@ function genComponentConf() {
             <div class="cpi__item__text">
                 Search
             </div>
-        </div>
+        </div-->
         <div class="cpi__item clickable"
             ng-click="self.selectCreate(self.POST)"
             ng-class="{'selected': self.isPost}">
