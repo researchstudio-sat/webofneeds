@@ -139,6 +139,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 	@Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
 		logger.debug("OA Server - WebSocket message received: {}", message.getPayload());
+
 		updateSession(session);
 
 		if (!message.isLast()) {
@@ -171,6 +172,20 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 				// next part
 				return;
 			}
+		}
+
+		// Handle pings from client ('e') and respond with 'r'
+		// Also silently handle responses from client
+
+		final String ECHO_STRING = "e";
+		final String RESPONSE_STRING = "r";
+
+		if(completePayload.equals(RESPONSE_STRING)) {
+			return;
+		}
+		if(completePayload.equals(ECHO_STRING)) {
+			session.sendMessage(new TextMessage(RESPONSE_STRING));
+			return;
 		}
 
 		WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(completePayload);

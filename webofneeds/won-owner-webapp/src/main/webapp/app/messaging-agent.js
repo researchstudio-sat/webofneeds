@@ -26,6 +26,9 @@ import { actionTypes, actionCreators } from "./actions/actions.js";
 //import './message-service.js'; //TODO still uses es5
 import SockJS from "sockjs-client";
 
+const ECHO_STRING = "e";
+const RESPONSE_STRING = "r";
+
 export function runMessagingAgent(redux) {
   /**
    * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
@@ -287,6 +290,15 @@ export function runMessagingAgent(redux) {
     //reset the heartbeat counter when we receive a message.
     missedHeartbeats = 0;
 
+    if (receivedMsg.data == ECHO_STRING) {
+      ws.send(RESPONSE_STRING);
+      return;
+    }
+
+    if (receivedMsg.data == RESPONSE_STRING) {
+      return;
+    }
+
     const data = JSON.parse(receivedMsg.data);
 
     won.wonMessageFromJsonLd(data).then(message => {
@@ -327,7 +339,6 @@ export function runMessagingAgent(redux) {
      */
 
   let ws = newSock();
-  window.ws4dbg = ws; //TODO deletme
   let unsubscribeWatches = [];
 
   let reconnectAttempts = 0; // should be increased when a socket is opened, reset to 0 after opening was successful
@@ -335,6 +346,12 @@ export function runMessagingAgent(redux) {
 
   let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
   setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
+
+  document.addEventListener("visibilitychange", function() {
+    if (!document.hidden) {
+      onVisible();
+    }
+  });
 
   function newSock() {
     const ws = new SockJS(urljoin(ownerBaseUrl, "/msg"), null, { debug: true });
@@ -347,6 +364,7 @@ export function runMessagingAgent(redux) {
 
     reconnectAttempts++;
 
+    window.ws4dbg = ws; //TODO deletme
     return ws;
   }
 
@@ -462,36 +480,20 @@ export function runMessagingAgent(redux) {
         "messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n",
         e.reason
       );
-      // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
-      // TODO recovery from timed out session
-      //redux.dispatch(actionCreators.logout())
       redux.dispatch(actionCreators.lostConnection());
-      /*
-            fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
-                .then(checkHttpStatus) // will reject if not logged in
-                .then(() => {
-                    // session is still valid -- reopen the socket
-                    ws = newSock();
-                }).catch(error => {
-                    // cleanup - unsubscribe all watches and empty the array
-                    for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
-                        if(unsubscribe && is("Function", unsubscribe))
-                            unsubscribe();
-                    }
-
-                    console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
-                    // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
-                    //redux.dispatch(actionCreators.logout())
-                    redux.dispatch(actionCreators.lostConnection())
-                });
-                */
     } else {
       /*
-             * first reconnect happens immediately (to facilitate
-             * anonymous posting and the reset-hack necessary for
-             * login atm)
-             */
+       * first reconnect happens immediately (to facilitate
+       * anonymous posting and the reset-hack necessary for
+       * login atm)
+       */
       ws = newSock();
     }
+  }
+
+  /* Check is connection is still alive when page becomes visible
+   */
+  function onVisible() {
+    ws.send(ECHO_STRING);
   }
 }
