@@ -30,9 +30,14 @@ function genComponentConf() {
             <p class="psl__text" ng-if="(self.post.get('connections').size != 0 && self.post.get('ownNeed')) || !self.post.get('ownNeed')">
                 Know someone who might also be interested in this posting? Consider sharing the link below in social media.
             </p>
-            <input class="psl__link" value="{{self.linkToPost}}" readonly type="text" ng-click="self.selectLink()">
-            <p class="psl__info" ng-if="!self.isCopied">Click the Link above to copy it to the clipboard.</p>
-            <p class="psl__info" ng-if="self.isCopied">Link copied to the clipboard.</p>
+            <div class="psl__inputline">
+              <input class="psl__link" value="{{self.linkToPost}}" readonly type="text" ng-focus="self.selectLink()" ng-blur="self.clearSelection()">
+              <button class="red won-button--filled psl__copy-button" ng-click="self.copyLink()">
+                <svg class="psl__button-icon" style="--local-primary:white;">
+                  <use xlink:href="{{ self.copied === true ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}" href="{{ self.copied ? '#ico16_checkmark' : '#ico16_copy_to_clipboard'}}"></use>
+                </svg>
+              </button>
+            </div>
         </div>
     `;
 
@@ -68,18 +73,37 @@ function genComponentConf() {
     selectLink() {
       const linkEl = this.getLinkField();
       if (linkEl) {
-        linkEl.setSelectionRange(0, linkEl.value.length); //refocus so people can keep writing
-
-        try {
-          const successful = document.execCommand("copy");
-          if (!successful) throw successful;
-          this.isCopied = true;
-          linkEl.setSelectionRange(0, 0);
-          //prompt that it has been copied to the clipboard otherwise and remove the selection
-        } catch (err) {
-          window.prompt("Copy to clipboard: Ctrl+C, Enter", linkEl.value);
-        }
+        linkEl.setSelectionRange(0, linkEl.value.length);
       }
+    }
+
+    clearSelection() {
+      const linkEl = this.getLinkField();
+      if (linkEl) {
+        linkEl.setSelectionRange(0, 0);
+      }
+    }
+
+    copyLink() {
+      const linkEl = this.getLinkField();
+      if (linkEl) {
+        linkEl.focus();
+        linkEl.setSelectionRange(0, linkEl.value.length);
+        if (!document.execCommand("copy")) {
+          window.prompt("Copy to clipboard: Ctrl+C", linkEl.value);
+        } else {
+          linkEl.setSelectionRange(0, 0);
+        }
+        linkEl.blur();
+      }
+
+      this.copied = true;
+
+      const self = this;
+      setTimeout(() => {
+        self.copied = false;
+        self.$scope.$digest();
+      }, 1000);
     }
   }
   Controller.$inject = serviceDependencies;
