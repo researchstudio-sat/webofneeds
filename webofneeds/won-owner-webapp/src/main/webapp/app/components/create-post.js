@@ -78,6 +78,7 @@ function genComponentConf() {
         <div class="cp__content">
 
             <!-- ADD TITLE AND DETAILS -->
+            <won-labelled-hr label="::'Post'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
             <won-create-isseeks 
                 ng-if="self.useCase.isDetails" 
                 is-or-seeks="::'Description'"
@@ -86,6 +87,7 @@ function genComponentConf() {
                 on-update="::self.updateDraft(draft, 'is')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
+            <won-labelled-hr label="::'Search'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
             <won-create-isseeks 
                 ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
@@ -96,10 +98,8 @@ function genComponentConf() {
             </won-create-isseeks>
 
             <!-- TUNE MATCHING -->
-            <!-- 
-              <won-labelled-hr label="::'tune matching?'" class="cp__content__labelledhr">
-              </won-labelled-hr>
-            -->
+            <won-labelled-hr label="::'Match'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
+            
             <!-- TODO: when should this be shown as an option? --> 
             <div class="cp__content__tuning"
             ng-if="self.useCase.isDetails || self.useCase.seeksDetails">
