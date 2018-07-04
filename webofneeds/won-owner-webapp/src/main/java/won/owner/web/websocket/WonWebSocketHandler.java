@@ -247,8 +247,13 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		eagerlyCachePopulatingProcessor.process(wonMessage);
 		
 		// send to owner webapp
+		int successfullySent = 0;
 		for (WebSocketSession session : webSocketSessions) {
-			sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user);
+			successfullySent += sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user) ? 1 : 0;
+		}
+		if (successfullySent == 0) {
+			//we did not manage to send the message via the websocket, send it by email.
+			notifyPerEmail(user, needUri, wonMessage);
 		}
 		return wonMessage;
 	}
@@ -372,11 +377,21 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 		return null;
 	}
 
-	private synchronized void sendMessageForSession(final WonMessage wonMessage,
+	/**
+	 * Sends the specified message over the socket unless it is a successresponse to create, deactivate, activate.
+	 * @param wonMessage
+	 * @param webSocketMessage
+	 * @param session
+	 * @param needUri
+	 * @param user
+	 * @return true if a message was sent (or suppressed as planned), false if something went wrong and the message
+	 * could not be sent
+	 */
+	private synchronized boolean sendMessageForSession(final WonMessage wonMessage,
 			final WebSocketMessage<String> webSocketMessage, final WebSocketSession session, URI needUri, User user) {
 		if (!session.isOpen()) {
 			logger.debug("session {} is closed, can't send message", session.getId());
-			return;
+			return false;
 		}
 		if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE) {
             if(WonMessageType.CREATE_NEED == wonMessage.getIsResponseToMessageType()){
@@ -392,7 +407,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     if (needUri != null) {
                         webSocketSessionService.removeMapping(needUri, session);
                     }
-                    return;
+                    return true;
                 }
             } else if (WonMessageType.DEACTIVATE == wonMessage.getIsResponseToMessageType()){
                 try {
@@ -405,7 +420,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     if (needUri != null) {
                         webSocketSessionService.removeMapping(needUri, session);
                     }
-                    return;
+                    return true;
                 }
             } else if (WonMessageType.ACTIVATE == wonMessage.getIsResponseToMessageType()){
                 try {
@@ -418,7 +433,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
                     if (needUri != null) {
                         webSocketSessionService.removeMapping(needUri, session);
                     }
-                    return;
+                    return true;
                 }
             }
 		}
@@ -435,7 +450,9 @@ public class WonWebSocketHandler extends TextWebSocketHandler implements WonMess
 			if (needUri != null) {
 				webSocketSessionService.removeMapping(needUri, session);
 			}
+			return false;
 		}
+		return true;
 	}
 
 	private void saveNeedUriWithUser(final WonMessage wonMessage, final WebSocketSession session) {
