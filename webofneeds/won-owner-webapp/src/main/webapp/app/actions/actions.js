@@ -242,7 +242,9 @@ const actionHierarchy = {
   reconnect: {
     start: reconnect,
     success: INJ_DEFAULT,
+    startingToLoadConnectionData: INJ_DEFAULT,
     receivedConnectionData: INJ_DEFAULT,
+    connectionFailedToLoad: INJ_DEFAULT,
   },
 
   mainViewScrolled: INJ_DEFAULT,

@@ -414,24 +414,21 @@ export function reconnect() {
        */
       const state = getState();
       const connectionUris = selectAllConnectionUris(state);
-      connectionUris.forEach(async connectionUri => {
-        console.log("in reconnect; deletme; ", connectionUri);
-        await loadLatestMessagesOfConnection({
-          connectionUri,
-          numberOfEvents: 10, //TODO magic number :|
-          state,
-          curriedDispatch: payload => {
-            console.log(
-              "in reconnect 2; deletme; ",
-              connectionUri /*, payload*/
-            );
-            dispatch({
-              type: actionTypes.reconnect.receivedConnectionData,
-              payload,
-            });
-          },
-        });
-      });
+      await Promise.all(
+        connectionUris.map(async connectionUri => {
+          await loadLatestMessagesOfConnection({
+            connectionUri,
+            numberOfEvents: 10, //TODO magic number :|
+            state,
+            dispatch,
+            actionTypesToDispatch: {
+              start: actionTypes.reconnect.startingToLoadConnectionData,
+              success: actionTypes.reconnect.receivedConnectionData,
+              failure: actionTypes.reconnect.connectionFailedToLoad,
+            },
+          });
+        })
+      );
     } catch (e) {
       if (e.message == "Unauthorized") {
         dispatch({ type: actionTypes.logout });

@@ -368,11 +368,12 @@ export function showLatestMessages(connectionUriParam, numberOfEvents) {
       connectionUri: connectionUriParam,
       numberOfEvents,
       state,
-      curriedDispatch: payload =>
-        dispatch({
-          type: actionTypes.connections.showLatestMessages,
-          payload,
-        }),
+      actionTypesToDispatch: {
+        start: actionTypes.connections.showLatestMessages,
+        success: actionTypes.connections.showLatestMessages,
+        failure: actionTypes.connections.showLatestMessages,
+      },
+      dispatch,
     });
   };
 }
@@ -381,29 +382,28 @@ export async function loadLatestMessagesOfConnection({
   connectionUri,
   numberOfEvents,
   state,
-  curriedDispatch,
+  actionTypesToDispatch,
+  dispatch,
 }) {
   const connectionUri_ = connectionUri || selectOpenConnectionUri(state);
   const need =
     connectionUri_ && selectNeedByConnectionUri(state, connectionUri_);
   const needUri = need && need.get("uri");
   const connection = connectionUri_ && selectConnection(state, connectionUri_);
-  if (!connectionUri_ || !connection) {
+  if (
+    !connectionUri_ ||
+    !connection ||
+    connection.get("isLoadingMessages") // only start loading once.
+  ) {
     return;
   }
 
-  const connectionMessages = connection.get("messages");
-  if (
-    connection.get("isLoadingMessages") ||
-    !connectionMessages ||
-    connectionMessages.size > 0
-  ) {
-    return; // only start loading once.
+  if (actionTypesToDispatch.start) {
+    dispatch({
+      type: actionTypesToDispatch.start,
+      payload: Immutable.fromJS({ connectionUri_, isLoadingMessages: true }),
+    });
   }
-
-  curriedDispatch(
-    Immutable.fromJS({ connectionUri_, isLoadingMessages: true })
-  );
 
   try {
     const events = await won.getWonMessagesOfConnection(connectionUri_, {
@@ -412,19 +412,25 @@ export async function loadLatestMessagesOfConnection({
       deep: true,
     });
 
-    curriedDispatch(
-      Immutable.fromJS({
-        connectionUri: connectionUri_,
-        events: events,
-      })
-    );
+    if (actionTypesToDispatch.success) {
+      dispatch({
+        type: actionTypesToDispatch.success,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri_,
+          events: events,
+        }),
+      });
+    }
   } catch (error) {
-    curriedDispatch(
-      Immutable.fromJS({
-        connectionUri: connectionUri_,
-        error: error,
-      })
-    );
+    if (actionTypesToDispatch.failure) {
+      dispatch({
+        type: actionTypesToDispatch.failure,
+        payload: Immutable.fromJS({
+          connectionUri: connectionUri_,
+          error: error,
+        }),
+      });
+    }
   }
 }
 
