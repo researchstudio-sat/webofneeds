@@ -45,9 +45,26 @@ won-post-share-link {
     .psl__info {
       padding-top: 0.5rem;
     }
+  }
+
+  .psl__inputline {
+    display: flex;
 
     .psl__link {
       width: 100%;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right: none;
+    }
+
+    .psl__copy-button {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      width: 2rem;
+    }
+
+    .psl__button-icon {
+      @include fixed-square(1.5rem);
     }
   }
 }
