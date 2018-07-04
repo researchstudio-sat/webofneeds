@@ -28,7 +28,7 @@ const allDetailsUseCase = {
     identifier: "allDetails",
     label: "All Details",
     icon: "#ico36_plus",
-    draft: { ...emptyDraft, usecase: "allDetails" },
+    draft: { ...emptyDraft },
     isDetails: details,
     seeksDetails: details,
   },
@@ -39,7 +39,7 @@ const pureSearchUseCase = {
     identifier: "pureSearch",
     label: "Search Posts",
     icon: "#ico36_search",
-    draft: { ...emptyDraft, usecase: "pureSearch" },
+    draft: { ...emptyDraft },
     isDetails: undefined,
     seeksDetails: {},
   },
@@ -56,7 +56,6 @@ const socialUseCases = {
     icon: "#ico36_plus",
     draft: {
       ...emptyDraft,
-      usecase: "lunch",
       is: { tags: ["essen", "food"] },
       seeks: { title: "lunch" },
       searchString: "lunch",
@@ -115,7 +114,7 @@ const professionalUseCases = {
     label: "Search for a PhD position",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
-    isDetails: {
+    seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
