@@ -93,17 +93,17 @@ function genComponentConf() {
           window.prompt("Copy to clipboard: Ctrl+C", linkEl.value);
         } else {
           linkEl.setSelectionRange(0, 0);
+          linkEl.blur();
+
+          //Temprorarily show checkmark
+          this.copied = true;
+          const self = this;
+          setTimeout(() => {
+            self.copied = false;
+            self.$scope.$digest();
+          }, 1000);
         }
-        linkEl.blur();
       }
-
-      this.copied = true;
-
-      const self = this;
-      setTimeout(() => {
-        self.copied = false;
-        self.$scope.$digest();
-      }, 1000);
     }
   }
   Controller.$inject = serviceDependencies;
