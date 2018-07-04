@@ -65,6 +65,14 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
+
+            <h2 class="post-info__heading" ng-if="self.useCase">
+                Selected Use Case
+            </h2>
+            <p class="post-info__details" ng-if="self.useCase">
+                {{ self.useCase }}
+            </p>
+
             <won-post-is-or-seeks-info is-or-seeks-part="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
             <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
@@ -119,12 +127,13 @@ function genComponentConf() {
         const postUri = selectOpenPostUri(state);
         const openConnectionUri = selectOpenConnectionUri(state);
         const post = state.getIn(["needs", postUri]);
-        const is = post ? post.get("is") : undefined;
 
+        const is = post ? post.get("is") : undefined;
         //TODO it will be possible to have more than one seeks
         const seeks = post ? post.get("seeks") : undefined;
 
         const searchString = post ? post.get("searchString") : undefined;
+        const useCase = post ? post.get("useCase") : undefined;
 
         return {
           WON: won.WON,
@@ -166,6 +175,7 @@ function genComponentConf() {
               }
             : undefined,
           post,
+          useCase,
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),

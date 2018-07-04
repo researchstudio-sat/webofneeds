@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
 import { is } from "../../utils.js";
+import { useCases } from "useCaseDefinitions";
 
 export function parseNeed(jsonldNeed, ownNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -21,6 +22,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     isWhatsNew: false,
     matchingContexts: undefined,
     searchString: undefined,
+    useCase: undefined,
     jsonld: jsonldNeed,
   };
 
@@ -108,6 +110,14 @@ export function parseNeed(jsonldNeed, ownNeed) {
       location: parseLocation(isOrSeeks.get("won:hasLocation")),
       travelAction: parseTravelAction(isOrSeeks.get("won:travelAction")),
     });
+
+    const useCase = jsonldNeedImm.get("won:hasUseCase");
+    if (useCase) {
+      const foundUseCase = useCases[useCase];
+      if (foundUseCase) {
+        parsedNeed.useCase = foundUseCase.label;
+      }
+    }
 
     if (isPresent) {
       type = seeksPresent
