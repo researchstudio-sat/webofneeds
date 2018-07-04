@@ -203,6 +203,8 @@ export default reduceReducers(
       case actionTypes.messages.hintMessageReceived:
         return deleteConnectionsBetweenOwnNeeds(state);
 
+      case actionTypes.mainViewScrolled:
+        return state.set("mainViewScroll", action.payload);
       /*
               * TODO try to resolve a lot of the AC-dispatching so only
               * high-level actions are left there. avoid actions that
