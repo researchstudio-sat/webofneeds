@@ -4,7 +4,7 @@
 <main class="connectionscontent">
 
     <!-- LEFT SIDE -->
-    <div class="conn__list" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView || !!self.useCase}">
+    <div class="conn__list" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.isPost || self.isSearch || !!self.useCase}">
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)"
             on-selected-need="self.selectedNeed(needUri)"
