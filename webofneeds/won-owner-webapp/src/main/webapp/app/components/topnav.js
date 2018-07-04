@@ -69,7 +69,7 @@ function genTopnavConf() {
         </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 
-        <nav class="topnav" ng-class="{'hide-in-responsive': self.connectionOrPostDetailOpen}">
+        <nav class="topnav" ng-class="{'hide-in-responsive': !self.isPostView || self.connectionOrPostDetailOpen}">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a href="{{ self.defaultRouteHRef(self.$state) }}"
@@ -84,7 +84,7 @@ function genTopnavConf() {
                 <div class="topnav__inner__center"></div>
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
-                        <li ng-show="!self.isSignUp && (self.isPrivateIdUser || !self.loggedIn)">
+                        <li ng-show="!self.isSignUpView && (self.isPrivateIdUser || !self.loggedIn)">
                             <a  ui-sref="{{ self.absSRef('signup') }}"
                                 class="topnav__signupbtn">
                                     Sign up
@@ -205,7 +205,8 @@ function genTopnavConf() {
           connectionHasBeenLost: state.getIn(["messages", "lostConnection"]), // name chosen to avoid name-clash with the action-creator
           reconnecting: state.getIn(["messages", "reconnecting"]),
           showModalDialog: state.get("showModalDialog"),
-          isSignUp: currentRoute === "signup",
+          isSignUpView: currentRoute === "signup",
+          isPostView: currentRoute === "post",
         };
       };
 
