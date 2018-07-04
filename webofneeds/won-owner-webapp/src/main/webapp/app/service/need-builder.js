@@ -273,6 +273,7 @@ import { getIn } from "../utils.js";
     const noHints = args.is ? args.is.noHints : args.seeks.noHints;
     const matchingContext = args.matchingContext;
     const searchString = args.searchString;
+    const useCase = args.useCase;
     const noHintForCounterpart = isWhatsAround
       ? true
       : isWhatsNew
@@ -314,6 +315,7 @@ import { getIn } from "../utils.js";
         ]), ///.toArray().filter(f => f),
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
+        "won:hasUseCase": useCase ? useCase : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
       args.is ? buildContentNode(isContentUri, args.is, true) : {},
