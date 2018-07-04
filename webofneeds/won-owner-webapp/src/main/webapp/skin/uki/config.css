@@ -1,10 +1,10 @@
 :root {
-  --won-primary-color: #0073ce;
-  --won-primary-color-light: #66ade6;
-  --won-secondary-color: #707070;
-  --won-secondary-color-light: #a8a8a8;
-  --won-secondary-color-lighter: #e4e4e4;
-  --won-disabled-color: #ccd2d2;
+  --won-primary-color: #006DA6;
+  --won-primary-color-light: #73afce;
+  --won-secondary-color: #e8b97d;
+  --won-secondary-color-light: #f4dfc3;
+  --won-secondary-color-lighter: #f8ead8;
+  --won-disabled-color: #d3d2d1;
 
   --won-light-gray: #f0f2f4; /*used for headings*/
   --won-lighter-gray: #f8f9f9; /*used for background*/
