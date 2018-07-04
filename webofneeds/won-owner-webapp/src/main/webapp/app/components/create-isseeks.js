@@ -27,7 +27,7 @@ function genComponentConf() {
     <!-- Mandatory Input Fields -->
 
     <!-- DETAILS Picker -->
-    <div class="cis__addDetail" ng-if="self.detailList && self.detailList !== {}">
+    <div class="cis__addDetail" ng-if="self.hasDetails()">
         <div class="cis__addDetail__header a detailPicker clickable"
             ng-click="self.toggleDetail()"
             ng-class="{'closedDetailPicker': !self.showDetail}">
@@ -85,6 +85,14 @@ function genComponentConf() {
       this.openDetail = undefined;
 
       delay(0).then(() => this.loadInitialDraft());
+    }
+
+    hasDetails() {
+      return (
+        this.detailList &&
+        this.detailList !== {} &&
+        Object.keys(this.detailList).length > 0
+      );
     }
 
     loadInitialDraft() {
