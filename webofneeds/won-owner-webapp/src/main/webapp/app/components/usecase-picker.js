@@ -21,7 +21,7 @@ function genComponentConf() {
   const template = `
         <div class="ucp__header">
             <a class="ucp__header__back clickable"
-                ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
+                ng-click="self.router__stateGoCurrent({showCreateView: undefined, useCase: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="ucp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
