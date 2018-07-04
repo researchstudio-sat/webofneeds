@@ -69,7 +69,7 @@ function genTopnavConf() {
         </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
 
-        <nav class="topnav" ng-class="{'hide-in-responsive': !self.isPostView || self.connectionOrPostDetailOpen}">
+        <nav class="topnav" ng-class="{'hide-in-responsive': !self.isPostView && self.connectionOrPostDetailOpen}">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a href="{{ self.defaultRouteHRef(self.$state) }}"
