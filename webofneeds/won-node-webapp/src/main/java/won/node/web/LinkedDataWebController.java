@@ -552,7 +552,7 @@ public class LinkedDataWebController {
 
 	/**
 	 * If the request URI is the URI of a list page (list of needs, list of
-	 * connections) it gets the header that says 'already expired' so that crawlers
+	 * connections), or a need uri, it gets the header that says 'already expired' so that crawlers
 	 * re-download these data. For other URIs, the 'never expires' header is added.
 	 *
 	 * @param headers
@@ -565,7 +565,7 @@ public class LinkedDataWebController {
 		// these data
 		URI requestUriAsURI = URI.create(requestUri);
 		String requestPath = requestUriAsURI.getPath();
-		if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isNeedEventsURI(requestUriAsURI)) {
+		if (uriService.isConnectionEventsURI(requestUriAsURI) || uriService.isNeedEventsURI(requestUriAsURI) || uriService.isNeedURI(requestUriAsURI)) {
 			addMutableResourceHeaders(headers);
 		} else {
 			addImmutableResourceHeaders(headers);
@@ -780,7 +780,6 @@ public class LinkedDataWebController {
 			public void addHeaders(final HttpHeaders headers) {
 				addCORSHeader(headers);
 				addPublicHeaders(headers);
-				addHeadersForShortTermCaching(headers);
 			}
 		});
 	}
@@ -883,7 +882,6 @@ public class LinkedDataWebController {
 			public void addHeaders(final HttpHeaders headers) {
 				addCORSHeader(headers);
 				addPublicHeaders(headers);
-				addHeadersForShortTermCaching(headers);
 			}
 		});
 	}

@@ -27,120 +27,69 @@ won-create-isseeks {
     padding: 0 0 0 0;
     @include appearAnimation(0.5s, linear);
 
-    .cis__detail__items {
-      @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.5rem 0);
+    .cis__addDetail__header {
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      padding: 0.5rem 0;
+      font-size: $mediumFontSize;
+      font-weight: 400;
 
-      .cis__detail__items__item {
-        display: flex;
-        align-items: center;
-        min-width: 0.5rem;
-        margin: 0.3rem;
-        font-size: $normalFontSize;
-        //padding: .5rem 0;
-        cursor: pointer;
+      &.detailPicker {
+        font-size: $normalFontSize + 0.25rem;
+        padding: 0.5rem 0;
+        color: $won-primary-color;
+        --local-primary: #{$won-primary-color}; // for the svg-icons
+      }
 
-        color: black;
-        --local-primary: black; // for the svg-icons
+      .cis__addDetail__header__carret {
+        @include fixed-square(1rem);
 
-        &.picked,
-        &.picked .cis__circleicon {
-          //color: $won-line-gray;
-          //--local-primary: #{$won-line-gray}; // for the svg-icons
-          color: $won-primary-color;
-          --local-primary: #{$won-primary-color};
-          cursor: default;
+        // visually center icon on line
+        position: relative;
+        top: 0.1em;
+      }
+    }
+
+    .cis__detail__items {
+      display: grid;
+      grid-auto-flow: row;
+      grid-gap: 0.5rem;
+
+      &__item {
+        display: grid;
+        grid-auto-flow: row;
+        grid-gap: 0.5rem;
+
+        &__header {
+          display: flex;
+          align-items: center;
+          font-size: $normalFontSize;
+          cursor: pointer;
+
+          color: black;
+          --local-primary: black; // for the svg-icons
+
+          .cis__circleicon {
+            @include fixed-height(2rem);
+            @include fixed-width(2rem);
+          }
+
+          &.picked,
+          &.picked .cis__circleicon {
+            //color: $won-line-gray;
+            //--local-primary: #{$won-line-gray}; // for the svg-icons
+            color: $won-primary-color;
+            --local-primary: #{$won-primary-color};
+          }
+        }
+
+        &__component {
+          .cis__details {
+            border-top: $thinBorderWidth solid $won-line-gray;
+
+            color: black;
+            --local-primary: black; // for the svg-icons
+          }
         }
       }
-    }
-
-    .cis__detail__matching-context {
-      @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
-      padding: 0.3rem 0 0 0;
-    }
-  }
-
-  // details components
-  .cis__details {
-    //@include slideWithOpacityAnimation(.5s, linear, 60rem, 0.5rem, 0.75rem);
-    @include slideWithOpacityAnimation(0.5s, linear, 20rem);
-
-    border-top: $thinBorderWidth solid $won-line-gray;
-    padding: 0.5rem 0;
-
-    color: black;
-    --local-primary: black; // for the svg-icons
-  }
-
-  .cis__circleicon {
-    @include fixed-height(2rem);
-    @include fixed-width(2.5rem);
-  }
-
-  .cis__addDetail__header {
-    display: flex;
-    font-size: $mediumFontSize;
-    font-weight: 400;
-    &.tags {
-      padding-bottom: 1rem;
-    } // ttl and description uses grid and grid-gap
-    &.location {
-      padding-bottom: 1rem;
-    } // ttl and description uses grid and grid-gap
-
-    span {
-      padding-left: 0.5rem;
-    }
-
-    svg.hover,
-    span.hover {
-      display: none;
-    }
-
-    svg.nonHover,
-    span.nonHover {
-      display: inline;
-    }
-
-    &:hover {
-      cursor: pointer;
-
-      svg.hover,
-      span.hover {
-        display: inline;
-      }
-
-      span.nonHover,
-      svg.nonHover {
-        display: none;
-      }
-    }
-
-    &.tags {
-      font-size: $normalFontSize + 0.25rem;
-    }
-
-    &.detailPicker {
-      font-size: $normalFontSize + 0.25rem;
-      padding: 0.5rem 0;
-      color: $won-primary-color;
-      --local-primary: #{$won-primary-color}; // for the svg-icons
-
-      &:hover {
-        color: black;
-        --local-primary: black; // for the svg-icons
-      }
-    }
-
-    .cis__addDetail__header__carret {
-      @include fixed-square(1rem);
-
-      // visually center icon on line
-      position: relative;
-      top: 0.1em;
     }
   }
 

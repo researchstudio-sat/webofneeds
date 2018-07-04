@@ -1,15 +1,24 @@
 package won.matcher.sparql.actor;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.StreamSupport;
-
+import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
+import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import com.github.jsonldjava.core.JsonLdError;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.*;
@@ -25,20 +34,7 @@ import org.apache.jena.sparql.path.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import com.github.jsonldjava.core.JsonLdError;
-
-import akka.actor.ActorRef;
-import akka.actor.OneForOneStrategy;
-import akka.actor.SupervisorStrategy;
-import akka.actor.UntypedActor;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import akka.japi.Function;
 import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.HintEvent;
@@ -46,6 +42,11 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -166,6 +167,26 @@ public class SparqlMatcherActor extends UntypedActor {
 		return new OpBGP(pattern);
 	}
 
+	private static Op relevantTimeFilter(Op op) {
+		Var time1 = Var.alloc("time1");
+		Var time2 = Var.alloc("time2");
+
+		Expr currentTime = new NodeValueNode(NodeFactory.createLiteral(Instant.now().toString(), XSDDatatype.XSDdateTime));
+		Op noMatchBefore = OpLeftJoin.create(op, new OpTriple(new Triple(
+				resultName.asNode(),
+				NodeFactory.createURI("http://purl.org/webofneeds/model#doNotMatchBefore"),
+				time1.asNode())),
+				new ExprList(new E_LessThan(currentTime, new ExprVar(time1.asNode()))));
+
+		Op noMatchAfter = OpLeftJoin.create(noMatchBefore, new OpTriple(new Triple(
+				resultName.asNode(),
+				NodeFactory.createURI("http://purl.org/webofneeds/model#doNotMatchAfter"),
+				time2.asNode())),
+				new ExprList(new E_GreaterThan(currentTime, new ExprVar(time2.asNode()))));
+
+		return OpFilter.filter(new E_LogicalNot(new E_LogicalOr(new E_Bound(new ExprVar(time1)), new E_Bound(new ExprVar(time2)))), noMatchAfter);
+	}
+
 	private static Op createSearchQuery(String searchString) {
 
 		Node blank = NodeFactory.createURI("");
@@ -249,12 +270,14 @@ public class SparqlMatcherActor extends UntypedActor {
 			Op query = new OpSlice(
 					new OpDistinct(
 							new OpProject(
-									createHintQuery(
-											OpJoin.create(
-													new OpBGP(nodeUriBGP),
-													union),
-											need.hasFlag(WON.NO_HINT_FOR_ME),
-											need.hasFlag(WON.NO_HINT_FOR_COUNTERPART)
+									relevantTimeFilter(
+										createHintQuery(
+												OpJoin.create(
+														new OpBGP(nodeUriBGP),
+														union),
+												need.hasFlag(WON.NO_HINT_FOR_ME),
+												need.hasFlag(WON.NO_HINT_FOR_COUNTERPART)
+										)
 									),
 									Arrays.asList(new Var[]{resultName, wonNodeVar, hint1, hint2})
 							)

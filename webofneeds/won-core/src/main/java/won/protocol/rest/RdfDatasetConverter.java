@@ -4,6 +4,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.StopWatch;
 import won.protocol.util.RdfUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -63,8 +65,12 @@ public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
     stopWatch.start();
     MediaType contentType = httpOutputMessage.getHeaders().getContentType();
     Lang rdfLanguage = mimeTypeToJenaLanguage(contentType, Lang.TRIG);
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
     WonEtagHelper.setMediaTypeForEtagHeaderIfPresent(contentType, httpOutputMessage.getHeaders());
-    RDFDataMgr.write(httpOutputMessage.getBody(), dataset, rdfLanguage);
+    RDFDataMgr.write(out, dataset, rdfLanguage);
+    byte[] outBytes = out.toByteArray();
+    httpOutputMessage.getHeaders().add(HttpHeaders.CONTENT_LENGTH, Integer.toString(out.size()));
+    httpOutputMessage.getBody().write(outBytes);
     //append content type to ETAG header to avoid confusing different representations of the same resource
     httpOutputMessage.getBody().flush();
     stopWatch.stop();

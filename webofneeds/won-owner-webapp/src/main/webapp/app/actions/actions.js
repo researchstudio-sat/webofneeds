@@ -240,6 +240,7 @@ const actionHierarchy = {
   lostConnection: INJ_DEFAULT,
   reconnect: reconnect,
   reconnectSuccess: INJ_DEFAULT,
+  mainViewScrolled: INJ_DEFAULT,
 
   toggleRdfDisplay: INJ_DEFAULT,
   toggleClosedNeedsDisplay: INJ_DEFAULT,

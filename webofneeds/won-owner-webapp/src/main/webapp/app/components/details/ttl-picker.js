@@ -69,15 +69,15 @@ function genComponentConf() {
     update(ttlString) {
       if (ttlString && ttlString.trim().length > 0) {
         // TODO: currently ignores if TTL is valid, see #1825
-        this.onTtlUpdated({ ttl: ttlString });
+        this.onUpdate({ value: ttlString });
       } else {
-        this.onTtlUpdated({ ttl: undefined });
+        this.onUpdate({ value: undefined });
       }
     }
 
     showInitialTTL() {
-      if (this.initialTtl && this.initialTtl.trim().length > 0) {
-        this.textfield().value = this.initialTtl || "";
+      if (this.initialValue && this.initialValue.trim().length > 0) {
+        this.textfield().value = this.initialValue || "";
         this.showResetButton = true;
       }
 
@@ -149,8 +149,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onTtlUpdated: "&",
-      initialTtl: "=",
+      onUpdate: "&",
+      initialValue: "=",
     },
     template: template,
   };

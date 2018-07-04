@@ -26,7 +26,7 @@ function genComponentConf() {
       <!-- TODO: make tags individually deletable -->
       <!-- TODO: add # to tag text -->
       <div class="tp__taglist">
-        <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">#{{tag}}</span>
+        <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">{{tag}}</span>
       </div>
     `;
 
@@ -37,7 +37,7 @@ function genComponentConf() {
 
       window.tp4dbg = this;
 
-      this.addedTags = this.initialTags;
+      this.addedTags = this.initialValue;
       this.showResetButton = false;
 
       delay(0).then(() => this.showInitialTags());
@@ -49,18 +49,18 @@ function genComponentConf() {
     update(tags) {
       // check if there are tags
       if (tags && tags.length > 0) {
-        this.onTagsUpdated({ tags: tags });
+        this.onUpdate({ value: tags });
       } else {
-        this.onTagsUpdated({ tags: undefined });
+        this.onUpdate({ value: undefined });
       }
     }
 
     showInitialTags() {
-      this.addedTags = this.initialTags;
+      this.addedTags = this.initialValue;
       let _tagsForTextfield = "";
-      if (this.initialTags && this.initialTags.length > 0) {
-        this.initialTags.forEach(function(tag) {
-          _tagsForTextfield += "#" + tag + " ";
+      if (this.initialValue && this.initialValue.length > 0) {
+        this.initialValue.forEach(function(tag) {
+          _tagsForTextfield += tag + " ";
         });
         this.showResetButton = true;
       }
@@ -105,8 +105,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onTagsUpdated: "&",
-      initialTags: "=",
+      onUpdate: "&",
+      initialValue: "=",
     },
     template: template,
   };

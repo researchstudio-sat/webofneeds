@@ -5,7 +5,9 @@ import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
-import { attach, getIn } from "../../utils.js";
+import createPostModule from "../create-post.js";
+import usecasePickerModule from "../usecase-picker.js";
+import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
   selectNeedByConnectionUri,
@@ -13,14 +15,28 @@ import {
 } from "../../selectors.js";
 import { resetParams } from "../../configRouting.js";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$element", "$ngRedux", "$scope"];
 
 class ConnectionsController {
   constructor() {
     attach(this, serviceDependencies, arguments);
+    const self = this;
     this.WON = won.WON;
     this.resetParams = resetParams;
     this.open = {};
+
+    this.SEARCH = "search";
+    this.POST = "post";
+
+    const scrollArea = this.$element[0].querySelector(".connectionscontent");
+
+    this.scrollBuffer = callBuffer(scrollPosition => {
+      self.mainViewScrolled(scrollPosition);
+    }, 100);
+
+    scrollArea.addEventListener("scroll", () => {
+      self.scrollBuffer(scrollArea.scrollTop);
+    });
 
     const selectFromState = state => {
       const selectedPostUri = decodeURIComponent(
@@ -33,6 +49,12 @@ class ConnectionsController {
         "currentParams",
         "showCreateView",
       ]);
+
+      const useCase = getIn(state, ["router", "currentParams", "useCase"]);
+
+      const isSearch = showCreateView === this.SEARCH;
+      const isPost = showCreateView && !isSearch;
+
       const connectionUri = decodeURIComponent(
         getIn(state, ["router", "currentParams", "connectionUri"])
       );
@@ -64,10 +86,13 @@ class ConnectionsController {
         selectedPost,
         connection,
         connectionType,
-        showCreateView,
+        useCase,
+        isSearch,
+        isPost,
         hasConnections: connections && connections.size > 0,
         hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
         open,
+        mainViewScroll: state.get("mainViewScroll"),
       };
     };
 
@@ -75,6 +100,11 @@ class ConnectionsController {
       this
     );
     this.$scope.$on("$destroy", disconnect);
+
+    this.$scope.$watch("self.mainViewScroll", newValue => {
+      if (newValue !== undefined)
+        requestAnimationFrame(() => (scrollArea.scrollTop = newValue));
+    });
   }
 
   selectedNeed(needUri) {
@@ -137,6 +167,8 @@ export default angular
     sendRequestModule,
     postMessagesModule,
     postInfoModule,
+    usecasePickerModule,
+    createPostModule,
     connectionsOverviewModule,
   ])
   .controller("ConnectionsController", [

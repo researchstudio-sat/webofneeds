@@ -66,15 +66,15 @@ function genComponentConf() {
         );
       }
       if (person && !isEmpty) {
-        this.onPersonUpdated({ person: person });
+        this.onUpdate({ value: person });
       } else {
-        this.onPersonUpdated({ person: undefined });
+        this.onUpdate({ value: undefined });
       }
     }
 
     showInitialPerson() {
-      if (this.initialPerson && this.initialPerson.size > 0) {
-        for (let [detail, value] of this.initialPerson.entries()) {
+      if (this.initialValue && this.initialValue.size > 0) {
+        for (let [detail, value] of this.initialValue.entries()) {
           this.addedPerson = this.addedPerson.set(detail, value);
 
           let personIndex = this.personDetails.findIndex(
@@ -144,8 +144,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onPersonUpdated: "&",
-      initialPerson: "=",
+      onUpdate: "&",
+      initialValue: "=",
     },
     template: template,
   };

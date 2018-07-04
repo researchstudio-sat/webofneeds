@@ -226,8 +226,8 @@ sought to fulfill the need in contrast to the part that is available.""" ;
 :hasEndTime rdf:type owl:DatatypeProperty ,
                      owl:FunctionalProperty ;
             rdfs:domain :TimeSpecification ;
-            rdfs:range xsd:dateTimeStamp ;
-            rdfs:comment "The end time as an xsd:dateTimeStamp."@en ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "The end time as an xsd:dateTime."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -262,10 +262,25 @@ sought to fulfill the need in contrast to the part that is available.""" ;
 :hasStartTime rdf:type owl:DatatypeProperty ,
                        owl:FunctionalProperty ;
               rdfs:domain :TimeSpecification ;
-              rdfs:range xsd:dateTimeStamp ;
-              rdfs:comment "The start time as an xsd:dateTimeStamp."@en ;
+              rdfs:range xsd:dateTime ;
+              rdfs:comment "The start time as an xsd:dateTime."@en ;
               rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+###  http://purl.org/webofneeds/model#doNotMatchBefore
+:doNotMatchBefore rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Need ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "Indicates that matchers should not use this need for matching before the specified xsd:dateTime."@en ;
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+###  http://purl.org/webofneeds/model#doNotMatchAfter
+:doNotMatchAfter rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Need ;
+            rdfs:range xsd:dateTime ;
+            rdfs:comment "Indicates that matchers should not use this need for matching after the specified xsd:dateTime."@en ;
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#hasTag
 :hasTag rdf:type owl:DatatypeProperty .
@@ -274,7 +289,7 @@ sought to fulfill the need in contrast to the part that is available.""" ;
 ###  http://purl.org/webofneeds/model#hasTimeStamp
 :hasTimeStamp rdf:type owl:DatatypeProperty ,
                        owl:FunctionalProperty ;
-              rdfs:range xsd:dateTimeStamp ;
+              rdfs:range xsd:dateTime ;
               rdfs:comment "The time and date when the event occurred."@en ;
               rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 

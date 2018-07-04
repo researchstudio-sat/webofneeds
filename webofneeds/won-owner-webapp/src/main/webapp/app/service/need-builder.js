@@ -142,7 +142,6 @@ import { getIn } from "../utils.js";
       "dc:title": isOrSeeksData.title,
       "dc:description": isOrSeeksData.description,
       "won:hasTag": isOrSeeksData.tags,
-      "won:hasSearchString": isOrSeeksData.searchString,
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
@@ -272,14 +271,13 @@ import { getIn } from "../utils.js";
       : args.seeks.whatsAround;
     const isWhatsNew = args.is ? args.is.whatsNew : args.seeks.whatsNew;
     const noHints = args.is ? args.is.noHints : args.seeks.noHints;
-    const matchingContext = args.is
-      ? args.is.matchingContext
-      : args.seeks.matchingContext;
+    const matchingContext = args.matchingContext;
+    const searchString = args.searchString;
     const noHintForCounterpart = isWhatsAround
       ? true
       : isWhatsNew
         ? true
-        : args.seeks
+        : args.searchString
           ? true
           : false;
     let isContentUri, seeksContentUri;
@@ -315,6 +313,7 @@ import { getIn } from "../utils.js";
           noHints ? "won:NoHintForCounterpart" : undefined,
         ]), ///.toArray().filter(f => f),
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
+        "won:hasSearchString": searchString ? searchString : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
       args.is ? buildContentNode(isContentUri, args.is, true) : {},

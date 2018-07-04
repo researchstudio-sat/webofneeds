@@ -115,13 +115,6 @@ function genComponentConf() {
 
       window.pi4dbg = this;
 
-      this.defaultContext = this.$ngRedux
-        .getState()
-        .getIn(["config", "theme", "defaultContext"]);
-      this.tempMatchingContext = this.defaultContext
-        ? this.defaultContext.toJS()
-        : [];
-
       const selectFromState = state => {
         const postUri = selectOpenPostUri(state);
         const openConnectionUri = selectOpenConnectionUri(state);
@@ -130,6 +123,8 @@ function genComponentConf() {
 
         //TODO it will be possible to have more than one seeks
         const seeks = post ? post.get("seeks") : undefined;
+
+        const searchString = post ? post.get("searchString") : undefined;
 
         return {
           WON: won.WON,
@@ -158,7 +153,6 @@ function genComponentConf() {
                 seeksString: "seeks",
                 location: seeks && seeks.get("location"),
                 person: seeks && seeks.get("person"),
-                hasSearchString: !!seeks && seeks.get("searchString"),
                 address:
                   seeks.get("location") && seeks.get("location").get("address"),
                 travelAction: seeks && seeks.get("travelAction"),
@@ -168,6 +162,7 @@ function genComponentConf() {
                 toAddress:
                   seeks.get("travelAction") &&
                   seeks.get("travelAction").get("toAddress"),
+                hasSearchString: searchString, // WORKAROUND - because only seeksPart is send to child component
               }
             : undefined,
           post,

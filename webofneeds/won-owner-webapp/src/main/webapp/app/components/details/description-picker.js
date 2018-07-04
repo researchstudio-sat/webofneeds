@@ -27,7 +27,7 @@ function genComponentConf() {
 
       window.dp4dbg = this;
 
-      this.addedDescription = this.initialDescription;
+      this.addedDescription = this.initialValue;
       this.showResetButton = false;
 
       delay(0).then(() => this.showInitialDescription());
@@ -38,20 +38,19 @@ function genComponentConf() {
      */
     update(description) {
       if (description && description.trim().length > 0) {
-        this.onDescriptionUpdated({ description: description });
+        this.onUpdate({ value: description });
       } else {
-        this.onDescriptionUpdated({ description: undefined });
+        this.onUpdate({ value: undefined });
       }
     }
 
     showInitialDescription() {
-      this.addedDescription = this.initialDescription;
+      this.addedDescription = this.initialValue;
 
-      if (
-        this.initialDescription &&
-        this.initialDescription.trim().length > 0
-      ) {
-        this.textfield().value = this.initialDescription.trim();
+      console.log(this.initialValue);
+
+      if (this.initialValue && this.initialValue.trim().length > 0) {
+        this.textfield().value = this.initialValue.trim();
         this.showResetButton = true;
       }
 
@@ -93,8 +92,8 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      onDescriptionUpdated: "&",
-      initialDescription: "=",
+      onUpdate: "&",
+      initialValue: "=",
     },
     template: template,
   };
