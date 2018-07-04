@@ -114,7 +114,7 @@ const professionalUseCases = {
     label: "Search for a PhD position",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
-    isDetails: {
+    seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
