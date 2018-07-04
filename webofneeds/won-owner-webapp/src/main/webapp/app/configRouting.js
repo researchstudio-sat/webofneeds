@@ -31,6 +31,7 @@ export const resetParams = Object.freeze({
   connectionUri: undefined,
   postUri: undefined,
   showCreateView: undefined,
+  useCase: undefined,
   //sendAdHocRequest: undefined,
   // privateId: undefined,  // global parameter that we don't want to lose. never reset this one.
 });
@@ -82,7 +83,8 @@ export const configRouting = [
       { path: "/signup?privateId", component: "signup" },
       { path: "/landingpage?privateId", component: "landingpage" },
       {
-        path: "/connections?privateId?postUri?connectionUri?showCreateView",
+        path:
+          "/connections?privateId?postUri?connectionUri?showCreateView?useCase",
         component: "connections",
         as: "connections",
       },

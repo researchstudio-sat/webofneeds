@@ -4,20 +4,23 @@
 <main class="connectionscontent">
 
     <!-- LEFT SIDE -->
-    <div class="conn__list" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.showCreateView}">
-        <won-connections-overview on-selected-connection="self.selectedConnection(connectionUri)" , on-selected-need="self.selectedNeed(needUri)"
-            , open="self.open">
+    <div class="conn__list" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.isPost || self.isSearch || !!self.useCase}">
+        <won-connections-overview
+            on-selected-connection="self.selectedConnection(connectionUri)"
+            on-selected-need="self.selectedNeed(needUri)"
+            open="self.open">
         </won-connections-overview>
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="conn__content conn__content--empty hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.showCreateView">
+    <div class="conn__content conn__content--empty hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.isPost && !self.isSearch && !self.useCase">
         <span class="conn__content__description__text">
             No element selected
         </span>
     </div>
-    <div class="conn__content" ng-if="self.showCreateView || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
-        <won-create-post ng-if="self.showCreateView && !self.selectedPost && !self.connection"></won-create-post>
+    <div class="conn__content" ng-if="self.useCase || self.isPost || self.isSearch || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
+        <won-usecase-picker ng-if="!self.useCase && self.isPost && !self.selectedPost && !self.connection"></won-usecase-picker>
+        <won-create-post ng-if="(self.isSearch || !!self.useCase) && !self.selectedPost && !self.connection"></won-create-post>
         <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showCreateView && self.connectionType === self.WON.Suggested"></won-send-request>
         <won-post-messages ng-if="!self.selectedPost && !self.showCreateView && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent)"></won-post-messages>
         <won-post-info include-header="true" ng-if="self.selectedPost && !self.showCreateView"></won-post-info>

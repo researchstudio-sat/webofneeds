@@ -47,5 +47,3 @@ export const details = {
     component: "won-ttl-picker",
   },
 };
-
-export const detailList = details.map(detail => detail.identifier);

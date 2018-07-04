@@ -10,18 +10,14 @@ import imageDropzoneModule from "./image-dropzone.js";
 import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import { postTitleCharacterLimit } from "config";
-import {
-  get,
-  getIn,
-  attach,
-  //  deepFreeze,
-  delay,
-} from "../utils.js";
+import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 
+// import { details } from "detailDefinitions";
+import { useCases } from "useCaseDefinitions";
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
@@ -67,43 +63,34 @@ const serviceDependencies = [
   "$element" /*'$routeParams' /*injections as strings here*/,
 ];
 
-//All deatils, except tags, because tags are saved in an array
-// const keySet = deepFreeze(
-//   new Set([
-//     "description",
-//     "location",
-//     "matchingContext",
-//     "thumbnail",
-//     "travelAction",
-//     "ttl",
-//   ])
-// );
-
 function genComponentConf() {
   const template = `
         <div class="cp__header">
-            <a class="cp__header__back clickable show-in-responsive"
-                ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
+            <a class="cp__header__back clickable"
+                ng-click="self.router__stateGoCurrent({useCase: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="cp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
-            <span class="cp__header__title" ng-if="self.isPost">Post</span>
-            <span class="cp__header__title" ng-if="self.isSearch">Search</span>
+            <span class="cp__header__title">{{self.useCase.label}}</span>
         </div>
         <div class="cp__content">
 
             <!-- ADD TITLE AND DETAILS -->
             <won-create-isseeks 
-                ng-if="self.isPost" 
-                is-or-seeks="::'Description'" 
+                ng-if="self.useCase.isDetails" 
+                is-or-seeks="::'Description'"
+                detail-list="self.useCase.isDetails"
+                initial-draft="self.useCase.draft.is"
                 on-update="::self.updateDraft(draft, 'is')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
             <won-create-isseeks 
-                ng-if="self.isSearch" 
+                ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
+                detail-list="self.useCase.seeksDetails"
+                initial-draft="self.useCase.draft.seeks"
                 on-update="::self.updateDraft(draft, 'seeks')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
@@ -113,7 +100,9 @@ function genComponentConf() {
               <won-labelled-hr label="::'tune matching?'" class="cp__content__labelledhr">
               </won-labelled-hr>
             -->
-            <div class="cp__content__tuning">
+            <!-- TODO: when should this be shown as an option? --> 
+            <div class="cp__content__tuning"
+            ng-if="self.useCase.isDetails || self.useCase.seeksDetails">
                 <div class="cp__content__tuning__title b detailPicker clickable"
                     ng-click="self.toggleTuningOptions()"
                     ng-class="{'closedDetailPicker': !self.showTuningOptions}">
@@ -177,34 +166,11 @@ function genComponentConf() {
 
       this.postTypeTexts = postTypeTexts;
       this.characterLimit = postTitleCharacterLimit;
-      this.draftIs = {
-        title: undefined,
-        type: postTypeTexts[3].type, // TODO: do we use this information anywhere?
-        // description: undefined,
-        // tags: undefined,
-        // person: undefined,
-        // location: undefined,
-        // travelAction: undefined,
-        // thumbnail: undefined,
-      };
-      this.draftSeeks = {
-        title: undefined,
-        type: postTypeTexts[3].type,
-        // description: undefined,
-        // tags: undefined,
-        // person: undefined,
-        // location: undefined,
-        // travelAction: undefined,
-        // thumbnail: undefined,
-      };
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
-      this.draftObject = {
-        is: this.draftIs,
-        seeks: this.draftSeeks,
-        matchingContext: undefined,
-      };
+
+      this.draftObject = {};
 
       this.showTuningOptions = false;
 
@@ -217,6 +183,11 @@ function genComponentConf() {
           "router",
           "currentParams",
           "showCreateView",
+        ]);
+        const useCaseString = getIn(state, [
+          "router",
+          "currentParams",
+          "useCase",
         ]);
         const isSearch = showCreateView === this.SEARCH;
         const isPost = showCreateView && !isSearch;
@@ -235,6 +206,8 @@ function genComponentConf() {
         return {
           connectionHasBeenLost: !selectIsConnected(state),
           showCreateView,
+          useCaseString,
+          useCase: this.getUseCase(useCaseString),
           isSearch,
           isPost,
           defaultMatchingContext: defaultMatchingContext,
@@ -242,9 +215,10 @@ function genComponentConf() {
       };
 
       // TODO: think about how to deal with contexts predefined in usecases
-      delay(0).then(() =>
-        this.updateMatchingContext(this.defaultMatchingContext)
-      );
+      delay(0).then(() => {
+        this.updateMatchingContext(this.defaultMatchingContext);
+        this.loadInitialDraft();
+      });
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -285,6 +259,17 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
+    getUseCase(useCaseString) {
+      if (useCaseString) {
+        for (const useCaseName in useCases) {
+          if (useCaseString === useCases[useCaseName]["identifier"]) {
+            return useCases[useCaseName];
+          }
+        }
+      }
+      return undefined;
+    }
+
     toggleTuningOptions() {
       // if (!this.showTuningOptions) {
       //   this.onScroll({ element: ".cis__addDetail__header.b" });
@@ -304,12 +289,32 @@ function genComponentConf() {
       );
     }
 
+    loadInitialDraft() {
+      // just to be sure this is loaded already
+      if (!this.useCase) {
+        this.getUseCase(this.useCaseString);
+      }
+
+      if (this.useCase && this.useCase.draft) {
+        // deep clone of draft
+        this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
+      }
+    }
+
     updateMatchingContext(matchingContext) {
       // also accepts []!
-      if (matchingContext) {
+      if (matchingContext && this.draftObject.matchingContext) {
+        const combinedContext = [
+          ...matchingContext,
+          ...this.draftObject.matchingContext,
+        ].reduce(function(a, b) {
+          if (a.indexOf(b) < 0) a.push(b);
+          return a;
+        }, []);
+
+        this.draftObject.matchingContext = combinedContext;
+      } else if (matchingContext) {
         this.draftObject.matchingContext = matchingContext;
-      } else {
-        this.draftObject.matchingContext = undefined;
       }
     }
 

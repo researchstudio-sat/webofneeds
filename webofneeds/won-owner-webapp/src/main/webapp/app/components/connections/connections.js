@@ -5,6 +5,8 @@ import sendRequestModule from "../send-request.js";
 import postMessagesModule from "../post-messages.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
+import createPostModule from "../create-post.js";
+import usecasePickerModule from "../usecase-picker.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
@@ -22,6 +24,9 @@ class ConnectionsController {
     this.WON = won.WON;
     this.resetParams = resetParams;
     this.open = {};
+
+    this.SEARCH = "search";
+    this.POST = "post";
 
     const scrollArea = this.$element[0].querySelector(".connectionscontent");
 
@@ -44,6 +49,12 @@ class ConnectionsController {
         "currentParams",
         "showCreateView",
       ]);
+
+      const useCase = getIn(state, ["router", "currentParams", "useCase"]);
+
+      const isSearch = showCreateView === this.SEARCH;
+      const isPost = showCreateView && !isSearch;
+
       const connectionUri = decodeURIComponent(
         getIn(state, ["router", "currentParams", "connectionUri"])
       );
@@ -75,7 +86,9 @@ class ConnectionsController {
         selectedPost,
         connection,
         connectionType,
-        showCreateView,
+        useCase,
+        isSearch,
+        isPost,
         hasConnections: connections && connections.size > 0,
         hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
         open,
@@ -154,6 +167,8 @@ export default angular
     sendRequestModule,
     postMessagesModule,
     postInfoModule,
+    usecasePickerModule,
+    createPostModule,
     connectionsOverviewModule,
   ])
   .controller("ConnectionsController", [

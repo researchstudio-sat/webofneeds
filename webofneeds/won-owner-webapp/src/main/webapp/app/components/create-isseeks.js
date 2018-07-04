@@ -1,28 +1,13 @@
-/**
- * Created by ksinger on 24.08.2015.
- */
 import angular from "angular";
 
 import "ng-redux";
 import won from "../won-es6.js";
 import { postTitleCharacterLimit } from "config";
-import { attach, deepFreeze, clone, dispatchEvent } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { connect2Redux } from "../won-utils.js";
-
-const emptyDraft = deepFreeze({
-  title: "",
-  type: won.WON.BasicNeedTypeCombined,
-  description: "",
-  tags: undefined,
-  location: undefined,
-  travelAction: undefined,
-  thumbnail: undefined,
-});
+import { attach, clone, delay, dispatchEvent } from "../utils.js";
 
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
-  "$ngRedux",
+  //"$ngRedux",
   "$scope",
   "$element" /*, '$routeParams' /*injections as strings here*/,
 ];
@@ -42,7 +27,7 @@ function genComponentConf() {
     <!-- Mandatory Input Fields -->
 
     <!-- DETAILS Picker -->
-    <div class="cis__addDetail">
+    <div class="cis__addDetail" ng-if="self.hasDetails()">
         <div class="cis__addDetail__header a detailPicker clickable"
             ng-click="self.toggleDetail()"
             ng-class="{'closedDetailPicker': !self.showDetail}">
@@ -56,7 +41,7 @@ function genComponentConf() {
         </div>
         <!-- DETAIL TOGGLES -->
         <div class="cis__detail__items" ng-if="self.showDetail">
-          <div class="cis__detail__items__item" ng-repeat="detail in self.availableDetails">
+          <div class="cis__detail__items__item" ng-repeat="detail in self.detailList">
               <!-- HEADER -->
               <div class="cis__detail__items__item__header"
                   ng-click="self.toggleOpenDetail(detail.identifier)"
@@ -90,89 +75,39 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.won = won;
 
-      // TODO: read this from config, see #1969 and subissues
-      this.availableDetails = {
-        description: {
-          identifier: "description",
-          label: "Description",
-          icon: "#ico36_description_circle",
-          component: "won-description-picker",
-        },
-        location: {
-          identifier: "location",
-          label: "Location",
-          icon: "#ico36_location_circle",
-          component: "won-location-picker",
-        },
-        person: {
-          identifier: "person",
-          label: "Person",
-          icon: "#ico36_person_single_circle",
-          component: "won-person-picker",
-        },
-        route: {
-          identifier: "travelAction",
-          label: "Route (From - To)",
-          icon: "#ico36_location_circle", // TODO: find/create better icon
-          component: "won-route-picker",
-        },
-        tags: {
-          identifier: "tags",
-          label: "Tags",
-          icon: "#ico36_tags_circle",
-          component: "won-tags-picker",
-        },
-        ttl: {
-          identifier: "ttl",
-          label: "Turtle (TTL)",
-          icon: "#ico36_rdf_logo_circle",
-          component: "won-ttl-picker",
-        },
-      };
-      console.log(this.availableDetails);
-
       //TODO: debug; deleteme
       window.cis4dbg = this;
 
       this.characterLimit = postTitleCharacterLimit;
+      this.details = new Set();
 
+      this.showDetail = false;
       this.openDetail = undefined;
 
-      this.reset();
-
-      //this.scrollContainer().addEventListener("scroll", e => this.onScroll(e));
-      const selectFromState = () => ({});
-
-      // Using actionCreators like this means that every action defined there is available in the template.
-      connect2Redux(selectFromState, actionCreators, [], this);
+      delay(0).then(() => this.loadInitialDraft());
     }
 
-    reset() {
-      this.draftObject = clone(emptyDraft);
-      this.details = new Set(); // remove all detail-cards
+    hasDetails() {
+      return (
+        this.detailList &&
+        this.detailList !== {} &&
+        Object.keys(this.detailList).length > 0
+      );
+    }
 
-      this.showDetail = false; // and close selector
+    loadInitialDraft() {
+      this.draftObject = clone(this.initialDraft);
+      for (const draftDetail in this.initialDraft) {
+        this.details.add(draftDetail);
+        this.draftObject[draftDetail] = this.initialDraft[draftDetail];
+      }
     }
 
     updateDraft() {
-      // TODO: this should use a detail list instead
-      if (!this.details.has("description")) {
-        this.draftObject.description = undefined;
-      }
-      if (!this.details.has("location")) {
-        this.draftObject.location = undefined;
-      }
-      if (!this.details.has("person")) {
-        this.draftObject.person = undefined;
-      }
-      if (!this.details.has("travelAction")) {
-        this.draftObject.travelAction = undefined;
-      }
-      if (!this.details.has("tags")) {
-        this.draftObject.tags = undefined;
-      }
-      if (!this.details.has("ttl")) {
-        this.draftObject.ttl = undefined;
+      for (const detail in this.detailList) {
+        if (!this.details.has(detail)) {
+          this.draftObject[detail] = undefined;
+        }
       }
 
       this.onUpdate({ draft: this.draftObject });
@@ -253,12 +188,9 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      isOrSeeks: "=",
-      /*
-             * Usage:
-             *  on-update="::myCallback(draft)"
-             */
-      onUpdate: "&",
+      detailList: "=",
+      initialDraft: "=",
+      onUpdate: "&", // Usage: on-update="::myCallback(draft)"
       onScroll: "&",
     },
     template: template,
