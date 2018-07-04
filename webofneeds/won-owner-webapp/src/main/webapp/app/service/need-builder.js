@@ -6,7 +6,7 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
-import { getIn } from "../utils.js";
+import { details } from "detailDefinitions";
 
 (function() {
   // <need-builder-js> scope
@@ -140,107 +140,28 @@ import { getIn } from "../utils.js";
     const buildContentNode = (id, isOrSeeksData, isSeeks) => ({
       "@id": id,
       "dc:title": isOrSeeksData.title,
-      "dc:description": isOrSeeksData.description,
-      "won:hasTag": isOrSeeksData.tags,
+      // TODO: check if these details existbefore trying to parse them
+      ...details["description"].parseToRDF({
+        value: isOrSeeksData["description"],
+      }),
+      ...details["location"].parseToRDF({
+        value: isOrSeeksData["location"],
+        // TODO: use detail-identifier instead of seeks/is
+        identifier: isSeeks ? "seeks" : "is",
+      }),
+      ...details["person"].parseToRDF({
+        value: isOrSeeksData["person"],
+      }),
+      ...details["route"].parseToRDF({
+        value: isOrSeeksData["travelAction"],
+      }),
+      ...details["tags"].parseToRDF({
+        value: isOrSeeksData["tags"],
+      }),
       "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
         ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
         : undefined,
-      "won:hasPerson": isOrSeeksData.person,
 
-      "foaf:title": getIn(isOrSeeksData, ["person", "title"])
-        ? getIn(isOrSeeksData, ["person", "title"])
-        : undefined,
-      "foaf:name": getIn(isOrSeeksData, ["person", "name"])
-        ? getIn(isOrSeeksData, ["person", "name"])
-        : undefined,
-      "s:worksFor": getIn(isOrSeeksData, ["person", "company"])
-        ? {
-            "@type": "s:Organization",
-            "s:name": getIn(isOrSeeksData, ["person", "company"]),
-          }
-        : undefined,
-      "s:jobTitle": getIn(isOrSeeksData, ["person", "position"])
-        ? getIn(isOrSeeksData, ["person", "position"])
-        : undefined,
-      "s:knowsAbout": getIn(isOrSeeksData, ["person", "skills"])
-        ? getIn(isOrSeeksData, ["person", "skills"]).toJS()
-        : undefined,
-      // "dc:description": getIn(isOrSeeksData, ["person", "bio"])
-      //   ? getIn(isOrSeeksData, ["person", "bio"])
-      //   : undefined,
-      "won:hasLocation": !isOrSeeksData.location
-        ? undefined
-        : {
-            "@type": "s:Place",
-            "s:geo": {
-              "@id": isSeeks ? "_:isLocation" : "_:seeksLocation",
-              "@type": "s:GeoCoordinates",
-              "s:latitude": isOrSeeksData.location.lat.toFixed(6),
-              "s:longitude": isOrSeeksData.location.lng.toFixed(6),
-            },
-            "s:name": isOrSeeksData.location.name,
-            "won:hasBoundingBox":
-              !isOrSeeksData.location.nwCorner ||
-              !isOrSeeksData.location.seCorner
-                ? undefined
-                : {
-                    "won:hasNorthWestCorner": {
-                      "@id": isSeeks ? "_:isBoundsNW" : "_:seeksBoundsNW",
-                      "@type": "s:GeoCoordinates",
-                      "s:latitude": isOrSeeksData.location.nwCorner.lat.toFixed(
-                        6
-                      ),
-                      "s:longitude": isOrSeeksData.location.nwCorner.lng.toFixed(
-                        6
-                      ),
-                    },
-                    "won:hasSouthEastCorner": {
-                      "@id": isSeeks ? "_:isBoundsSE" : "_:seeksBoundsSE",
-                      "@type": "s:GeoCoordinates",
-                      "s:latitude": isOrSeeksData.location.seCorner.lat.toFixed(
-                        6
-                      ),
-                      "s:longitude": isOrSeeksData.location.seCorner.lng.toFixed(
-                        6
-                      ),
-                    },
-                  },
-          },
-      "won:travelAction": !isOrSeeksData.travelAction
-        ? undefined
-        : {
-            "@type": "s:TravelAction",
-            "s:fromLocation": !isOrSeeksData.travelAction.fromLocation
-              ? undefined
-              : {
-                  "@type": "s:Place",
-                  "s:geo": {
-                    "@type": "s:GeoCoordinates",
-                    "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
-                      6
-                    ),
-                    "s:longitude": isOrSeeksData.travelAction.fromLocation.lng.toFixed(
-                      6
-                    ),
-                  },
-                  "s:name": isOrSeeksData.travelAction.fromLocation.name,
-                },
-            "s:toLocation": !isOrSeeksData.travelAction.toLocation
-              ? undefined
-              : {
-                  "@type": "s:Place",
-                  "s:geo": {
-                    "@type": "s:GeoCoordinates",
-                    "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
-                      6
-                    ),
-                    "s:longitude": isOrSeeksData.travelAction.toLocation.lng.toFixed(
-                      6
-                    ),
-                  },
-                  "s:name": isOrSeeksData.travelAction.toLocation.name,
-                },
-          },
       //TODO: Different id for is and seeks
       "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
         ? undefined
