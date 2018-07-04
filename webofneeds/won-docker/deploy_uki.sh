@@ -22,7 +22,7 @@ echo remove tmp passwd file
 
 # copy the openssl.conf file to the server where the certificates are generated
 # the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf
-# for entries of alternative server names: meicogsci.matchat.org, satvm06.researchstudio.at
+# for entries of alternative server names: cbi.matchat.org, satvm06.researchstudio.at
 scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-uki.conf won@satvm06:$base_folder/openssl.conf
 echo copied $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-uki.conf to won@satvm06:$base_folder/openssl.conf
 
@@ -31,10 +31,10 @@ scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-uki-http.conf won@satvm01
 echo copied $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-uki-http.conf to won@satvm06:$base_folder/nginx-uki-http.conf
 
 # copy letsencrypt certificate files from satvm01 (live/matchat) to satvm06
-ssh won@satvm06 mkdir -p $base_folder/letsencrypt/certs/live/meicogsci.matchat.org
-echo made directory $base_folder/letsencrypt/certs/live/meicogsci.matchat.org
-scp -3 -v won@satvm01:$live_base_folder/letsencrypt/certs/live/meicogsci.matchat.org/* won@satvm06:$base_folder/letsencrypt/certs/live/meicogsci.matchat.org/
-echo copied won@satvm01:$live_base_folder/letsencrypt/certs/live/meicogsci.matchat.org/* to won@satvm06:$base_folder/letsencrypt/certs/live/meicogsci.matchat.org/
+ssh won@satvm06 mkdir -p $base_folder/letsencrypt/certs/live/cbi.matchat.org
+echo made directory $base_folder/letsencrypt/certs/live/cbi.matchat.org
+scp -3 -v won@satvm01:$live_base_folder/letsencrypt/certs/live/cbi.matchat.org/* won@satvm06:$base_folder/letsencrypt/certs/live/cbi.matchat.org/
+echo copied won@satvm01:$live_base_folder/letsencrypt/certs/live/cbi.matchat.org/* to won@satvm06:$base_folder/letsencrypt/certs/live/cbi.matchat.org/
 
 # create the solr data directories (if not available yet) with full rights for every user.
 # This is done so that the directory on the host can be written by the solr user from inside the container
