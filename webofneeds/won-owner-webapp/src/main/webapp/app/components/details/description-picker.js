@@ -47,8 +47,6 @@ function genComponentConf() {
     showInitialDescription() {
       this.addedDescription = this.initialValue;
 
-      console.log(this.initialValue);
-
       if (this.initialValue && this.initialValue.trim().length > 0) {
         this.textfield().value = this.initialValue.trim();
         this.showResetButton = true;
