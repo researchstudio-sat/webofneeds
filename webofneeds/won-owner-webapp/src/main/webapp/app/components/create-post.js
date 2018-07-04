@@ -66,8 +66,8 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
         <div class="cp__header">
-            <a class="cp__header__back clickable show-in-responsive"
-                ng-click="self.router__stateGoCurrent({showCreateView: undefined})">
+            <a class="cp__header__back clickable"
+                ng-click="self.router__stateGoCurrent({useCase: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="cp__header__back__icon">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
