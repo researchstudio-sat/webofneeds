@@ -13,7 +13,11 @@ export function parseConnection(jsonldConnection) {
       uri: undefined,
       state: undefined,
       messages: Immutable.Map(),
-      agreementData: undefined,
+      agreementData: {
+        pendingProposalUris: Immutable.Set(),
+        agreementUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+      },
       remoteNeedUri: undefined,
       remoteConnectionUri: undefined,
       creationDate: undefined,

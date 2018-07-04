@@ -106,6 +106,7 @@ const actionHierarchy = {
     setLoadingMessages: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
+    clearAgreementData: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,
@@ -189,7 +190,13 @@ const actionHierarchy = {
       failure: messages.failedReopenNeed,
     },
     markAsRead: INJ_DEFAULT,
-    markAsRelevant: messages.markAsRelevant,
+    messageStatus: {
+      markAsRetracted: messages.markAsRetracted,
+      markAsRejected: messages.markAsRejected,
+      markAsAccepted: messages.markAsAccepted,
+      markAsCancelled: messages.markAsCancelled,
+      markAsCancellationPending: messages.markAsCancellationPending,
+    },
     connectionMessageReceived: messages.connectionMessageReceived,
     needMessageReceived: messages.needMessageReceived,
     connectMessageReceived: messages.connectMessageReceived,

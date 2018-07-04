@@ -1,0 +1,34 @@
+@import "won-config";
+@import "square-image";
+
+won-connection-message-status {
+  display: block;
+
+  .msgstatus__time {
+    display: inline-block;
+    color: $won-line-gray;
+    --local-primary: #{$won-secondary-color};
+
+    &--pending {
+      display: inline-block;
+      color: $won-line-gray;
+    }
+    &--failure {
+      display: inline-block;
+      //TODO: FAILURE MESSAGE STYLING
+    }
+  }
+  .msgstatus__icons {
+    display: inline-block;
+    &__icon {
+      display: inline-block;
+      @include fixed-square(0.5rem);
+
+      --local-primary: #{$won-line-gray};
+
+      &.received {
+        --local-primary: #{$won-secondary-color};
+      }
+    }
+  }
+}

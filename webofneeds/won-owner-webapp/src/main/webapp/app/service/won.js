@@ -232,13 +232,6 @@ won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix + ":EnvelopeGraph";
 won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
 won.WONMSG.hasContentCompacted = won.WONMSG.prefix + ":hasContent";
 
-won.WONMSG.unsetRelevantMessage =
-  won.WONMSG.baseUri + "hasUnsetRelevantMessage";
-won.WONMSG.unsetRelevantMessageCompacted =
-  won.WONMSG.prefix + ":hasUnsetRelevantMessage";
-won.WONMSG.isRelevant = won.WONMSG.baseUri + "isRelevant";
-won.WONMSG.isRelevantCompacted = won.WONMSG.prefix + ":isRelevant";
-
 won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
 won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
 won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
@@ -257,6 +250,7 @@ won.WONMSG.closeNeedSentMessageCompacted =
   won.WONMSG.prefix + ":DeactivateSentMessage";
 won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
 won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
+won.WONMSG.hintFeedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
 won.WONMSG.hintFeedbackMessageCompacted =
   won.WONMSG.prefix + ":HintFeedbackMessage";
 won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
@@ -1326,6 +1320,12 @@ WonMessage.prototype = {
       "http://purl.org/webofneeds/agreement#proposesToCancel"
     );
   },
+  getRejectsMessages: function() {
+    return this.getProperty("http://purl.org/webofneeds/agreement#rejects");
+  },
+  getRetractMessages: function() {
+    return this.getProperty("http://purl.org/webofneeds/modification#retracts");
+  },
 
   isProposeMessage: function() {
     return !!this.getProperty("http://purl.org/webofneeds/agreement#proposes");
@@ -1351,19 +1351,6 @@ WonMessage.prototype = {
   isRetractMessage: function() {
     return !!this.getProperty(
       "http://purl.org/webofneeds/modification#retracts"
-    );
-  },
-
-  isRelevant: function() {
-    return (
-      !!this.getMessageType() ===
-      "http://purl.org/webofneeds/message#isRelevant"
-    );
-  },
-
-  isUnsetRelevantMessage: function() {
-    return this.getProperty(
-      "http://purl.org/webofneeds/message#hasUnsetRelevantMessage"
     );
   },
 

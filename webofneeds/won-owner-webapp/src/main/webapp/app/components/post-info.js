@@ -13,7 +13,11 @@ import { attach } from "../utils.js";
 import won from "../won-es6.js";
 import { relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenPostUri, selectLastUpdateTime } from "../selectors.js";
+import {
+  selectOpenPostUri,
+  selectLastUpdateTime,
+  selectOpenConnectionUri,
+} from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -22,6 +26,7 @@ function genComponentConf() {
   let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
             <a class="post-info__header__back clickable show-in-responsive"
+               ng-class="{'show-in-responsive': !self.fromConnection}"
                ng-click="self.router__stateGoCurrent({postUri : null})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="post-info__header__back__icon clickable">
@@ -112,6 +117,7 @@ function genComponentConf() {
 
       const selectFromState = state => {
         const postUri = selectOpenPostUri(state);
+        const openConnectionUri = selectOpenConnectionUri(state);
         const post = state.getIn(["needs", postUri]);
         const is = post ? post.get("is") : undefined;
 
@@ -165,6 +171,7 @@ function genComponentConf() {
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: state.get("showRdf"),
+          fromConnection: !!openConnectionUri,
         };
       };
       connect2Redux(

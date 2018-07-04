@@ -5,21 +5,17 @@
 import won from "../won-es6.js";
 import Immutable from "immutable";
 
-import urljoin from "url-join";
-
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
   selectConnection,
 } from "../selectors.js";
 
-import { getIn, get, cloneAsMutable, deepFreeze } from "../utils.js";
+import { getIn, get, cloneAsMutable } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
 import { actionTypes, actionCreators } from "./actions.js";
-
-import { ownerBaseUrl } from "config";
 
 import {
   buildCreateMessage,
@@ -28,17 +24,7 @@ import {
   buildChatMessage,
   buildRateMessage,
   buildConnectMessage,
-  callAgreementsFetch,
-  callAgreementEventFetch,
 } from "../won-message-utils.js";
-
-const keySet = deepFreeze(
-  new Set([
-    "agreementUris",
-    "pendingProposalUris",
-    "cancellationPendingAgreementUris",
-  ])
-);
 
 export function connectionsChatMessage(
   chatMessage,
@@ -364,176 +350,6 @@ export function connectionsRate(connectionUri, rating) {
   };
 }
 
-export function loadAgreementData(ownNeedUri, connectionUri, agreementData) {
-  return (dispatch, getState) => {
-    const url = urljoin(
-      ownerBaseUrl,
-      "/rest/agreement/getAgreementProtocolUris",
-      "?connectionUri=" + connectionUri
-    );
-    let hasChanged = false;
-    callAgreementsFetch(url)
-      .then(response => {
-        const agreementHeadData = transformDataToSet(response);
-
-        for (let key of keySet) {
-          if (agreementHeadData.hasOwnProperty(key)) {
-            for (let event of agreementHeadData[key]) {
-              const chatMessages = getState()
-                .getIn([
-                  "needs",
-                  ownNeedUri,
-                  "connections",
-                  connectionUri,
-                  "messages",
-                ])
-                .toArray();
-              addAgreementDataToSate(
-                dispatch,
-                chatMessages,
-                ownNeedUri,
-                connectionUri,
-                event,
-                agreementData,
-                key
-              );
-              hasChanged = true;
-            }
-          }
-        }
-
-        //Remove all retracted/rejected messages
-        if (
-          agreementHeadData["rejectedMessageUris"] ||
-          agreementHeadData["retractedMessageUris"]
-        ) {
-          let removalSet = new Set([
-            ...agreementHeadData["rejectedMessageUris"],
-            ...agreementHeadData["retractedMessageUris"],
-          ]);
-
-          for (let uri of removalSet) {
-            //for(key of keySet) {
-            const key = "pendingProposalUris";
-            const data = agreementData;
-            for (let obj of data[key]) {
-              if (obj.stateUri === uri || obj.headUri === uri) {
-                console.log("Message " + uri + " was removed");
-                //Update State!
-                data[key].delete(obj);
-                hasChanged = true;
-              }
-            }
-            if (hasChanged) {
-              dispatch({
-                type: actionCreators.connections__updateAgreementData,
-                payload: {
-                  connectionUri: connectionUri,
-                  agreementData: data,
-                },
-              });
-            }
-          }
-        }
-      })
-      .then(() => {
-        if (!hasChanged) {
-          dispatch({
-            type: actionCreators.connections__setLoadingMessages,
-            payload: {
-              connectionUri: connectionUri,
-              isLoadingMessages: false,
-            },
-          });
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        dispatch({
-          type: actionCreators.connections__setLoadingMessages,
-          payload: {
-            connectionUri: connectionUri,
-            isLoadingMessages: false,
-          },
-        });
-      });
-  };
-}
-
-export function addAgreementDataToSate(
-  dispatch,
-  chatMessages,
-  ownNeedUri,
-  connectionUri,
-  eventUri,
-  agreementData,
-  key,
-  obj
-) {
-  return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
-    won.wonMessageFromJsonLd(response).then(msg => {
-      let agreementObject = obj;
-
-      if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
-        /*if we find out that the receiverneed of the crawled event is actually our
-                 need we will call the method again but this time with the correct eventUri
-                 */
-        if (!agreementObject) {
-          agreementObject = {
-            stateUri: undefined,
-            headUri: undefined,
-          };
-        }
-        agreementObject.headUri = msg.getMessageUri();
-        addAgreementDataToSate(
-          dispatch,
-          chatMessages,
-          ownNeedUri,
-          connectionUri,
-          msg.getRemoteMessageUri(),
-          agreementData,
-          key,
-          agreementObject
-        );
-      } else {
-        if (!agreementObject) {
-          agreementObject = {
-            stateUri: undefined,
-            headUri: undefined,
-          };
-          agreementObject.headUri = msg.getMessageUri();
-        }
-
-        agreementObject.stateUri = msg.getMessageUri();
-        agreementData[key].add(agreementObject);
-
-        //Dont load in state again!
-        let found = false;
-        for (const chatMessage of chatMessages) {
-          console.log("ChatMessage: ", chatMessage);
-          console.log("ChatMessageSize: ", chatMessages.size);
-          if (agreementObject.stateUri === chatMessage.get("uri")) {
-            found = true;
-          }
-        }
-        if (!found) {
-          dispatch({
-            type: actionCreators.messages__connectionMessageReceived,
-            msg: msg,
-          });
-        }
-        dispatch({
-          type: actionCreators.connections__updateAgreementData,
-          payload: {
-            connectionUri: connectionUri,
-            agreementData: agreementData,
-          },
-        });
-      }
-    });
-  });
-}
-
 /**
  * @param connectionUri
  * @param numberOfEvents
@@ -691,37 +507,6 @@ export function showMoreMessages(connectionUriParam, numberOfEvents) {
         });
       });
   };
-}
-
-function transformDataToSet(response) {
-  const tmpAgreementData = {
-    agreementUris: new Set(response.agreementUris),
-    pendingProposalUris: new Set(response.pendingProposalUris),
-    pendingProposals: new Set(response.pendingProposals),
-    acceptedCancellationProposalUris: new Set(
-      response.acceptedCancellationProposalUris
-    ),
-    cancellationPendingAgreementUris: new Set(
-      response.cancellationPendingAgreementUris
-    ),
-    pendingCancellationProposalUris: new Set(
-      response.pendingCancellationProposalUris
-    ),
-    cancelledAgreementUris: new Set(response.cancelledAgreementUris),
-    rejectedMessageUris: new Set(response.rejectedMessageUris),
-    retractedMessageUris: new Set(response.retractedMessageUris),
-  };
-  return filterAgreementSet(tmpAgreementData);
-}
-
-function filterAgreementSet(tmpAgreementData) {
-  for (let prop of tmpAgreementData.cancellationPendingAgreementUris) {
-    if (tmpAgreementData.agreementUris.has(prop)) {
-      tmpAgreementData.agreementUris.delete(prop);
-    }
-  }
-
-  return tmpAgreementData;
 }
 
 function numOfEvts2pageSize(numberOfEvents) {

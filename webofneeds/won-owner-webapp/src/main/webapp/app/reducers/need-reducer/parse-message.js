@@ -8,21 +8,11 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     wonMessage.contentGraphTrig
   );
 
-  let clauses = undefined;
-
-  if (
-    wonMessage.isProposeMessage() ||
-    wonMessage.isAcceptMessage() ||
-    wonMessage.isProposeToCancel()
-  ) {
-    if (wonMessage.isProposeMessage()) {
-      clauses = wonMessage.getProposedMessages();
-    } else if (wonMessage.isAcceptMessage()) {
-      clauses = wonMessage.getAcceptedMessages();
-    } else {
-      clauses = wonMessage.getProposedToCancelMessages();
-    }
-  }
+  const proposedMessages = wonMessage.getProposedMessages();
+  const proposedToCancelMessages = wonMessage.getProposedToCancelMessages();
+  const acceptedMessages = wonMessage.getAcceptedMessages();
+  const rejectedMessages = wonMessage.getRejectsMessages();
+  const retractedMessages = wonMessage.getRetractMessages();
 
   let parsedMessage = {
     belongsToUri: undefined,
@@ -31,30 +21,59 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       remoteUri: !wonMessage.isFromOwner()
         ? wonMessage.getRemoteMessageUri()
         : undefined,
-      text: wonMessage.getTextMessage(),
-      contentGraphs: wonMessage.getContentGraphs(),
+      content: {
+        text: wonMessage.getTextMessage(),
+        matchScore: wonMessage.getMatchScore(),
+      },
+      references: {
+        proposes:
+          !proposedMessages || Array.isArray(proposedMessages)
+            ? proposedMessages
+            : [proposedMessages],
+        proposesToCancel:
+          !proposedToCancelMessages || Array.isArray(proposedToCancelMessages)
+            ? proposedToCancelMessages
+            : [proposedToCancelMessages],
+        accepts:
+          !acceptedMessages || Array.isArray(acceptedMessages)
+            ? acceptedMessages
+            : [acceptedMessages],
+        rejects:
+          !rejectedMessages || Array.isArray(rejectedMessages)
+            ? rejectedMessages
+            : [rejectedMessages],
+        retracts:
+          !retractedMessages || Array.isArray(retractedMessages)
+            ? retractedMessages
+            : [retractedMessages],
+      },
+      hasReferences: false, //will be determined by the hasReferences function
+      hasContent: false, //will be determined by the hasContent function
+      isParsable: false, //will be determined by the clause (hasReferences || hasContent) function
       date: msStringToDate(wonMessage.getTimestamp()),
       outgoingMessage: wonMessage.isFromOwner(),
-      unread:
-        !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
-      connectMessage: wonMessage.isConnectMessage(),
-      //TODO: add all different types
-      clauses: clauses,
-      isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
-      isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
-      failedToSend: false,
-      isProposeMessage: wonMessage.isProposeMessage(),
-      isAcceptMessage: wonMessage.isAcceptMessage(),
-      isProposeToCancel: wonMessage.isProposeToCancel(),
-      isRejectMessage: wonMessage.isRejectMessage(),
-      isRetractMessage: wonMessage.isRetractMessage(),
-      isRelevant: true,
+      messageType: wonMessage.getMessageType(),
+      messageStatus: {
+        isRetracted: false,
+        isRejected: false,
+        isAccepted: false,
+        isCancellationPending: false,
+        isCancelled: false,
+      },
       contentGraphTrig: {
         prefixes: trigPrefixes,
         body: trigBody,
       },
+      contentGraphs: wonMessage.getContentGraphs(),
       contentGraphTrigRaw: wonMessage.contentGraphTrig,
       contentGraphTrigError: wonMessage.contentGraphTrigError,
+      //Receive Status Flags
+      unread:
+        !wonMessage.isFromOwner() && !isUriRead(wonMessage.getMessageUri()),
+      //Send Status Flags
+      isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      failedToSend: false,
     },
   };
 
@@ -63,6 +82,13 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   } else {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
+
+  parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);
+  parsedMessage.data.hasReferences = hasReferences(
+    parsedMessage.data.references
+  );
+  parsedMessage.data.isParsable =
+    parsedMessage.data.hasContent || parsedMessage.data.hasReferences;
 
   if (
     !parsedMessage.data.uri ||
@@ -77,4 +103,21 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   } else {
     return Immutable.fromJS(parsedMessage);
   }
+}
+function hasContent(content) {
+  for (let prop in content) {
+    if (content[prop] !== undefined && content[prop] != null) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasReferences(refContent) {
+  for (let prop in refContent) {
+    if (refContent[prop] !== undefined && refContent[prop] != null) {
+      return true;
+    }
+  }
+  return false;
 }

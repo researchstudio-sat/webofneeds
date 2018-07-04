@@ -106,11 +106,32 @@ $ngRedux.getState();
                lastUpdateDate: date, //date of lastUpdate of this connection (last date of the message that was added)
                messages: { //Immutable.Map() of all the TextMessages sent over this connection
                    [messageUri]: {
-                       connectMessage: true|false, //whether or not this was the connectMessage(a.k.a firstMessage)
+                       messageType: //no default but is always set to the specific message type of the received/sent wonMessage
                        date: date, //creation Date of this message
                        unread: true|false, //whether or not this message is new (or already seen if you will)
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
-                       text: string, //message text
+                       content: {
+                           text: wonMessage.getTextMessage(),
+                           matchScore: wonMessage.getMatchScore(),
+                       },
+                       references: {
+                           //These references are parsed in a way that it will always be a list no matter if there is only a single element or an array
+                           proposes: wonMessage.getProposedMessages(),
+                           proposesToCancel: wonMessage.getProposedToCancelMessages(),
+                           accepts: wonMessage.getAcceptedMessages(),
+                           rejects: wonMessage.getRejectsMessages(),
+                           retracts: wonMessage.getRetractMessages(),
+                       }
+                       hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
+                       hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
+                       isParsable: true|false //true if hasReferences or hasContent is true
+                       messageStatus: {
+                           isRetracted: true|false //if the message was retracted
+                           isRejected: true|false //if the message was rejected
+                           isAccepted: true|false //if the message was accepted
+                           isCancellationPending: true|false //if the message is pending to be cancelled
+                           isCancelled: true|false //if the message was cancelled
+                       }
                        uri: string //unique identifier of this message
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
@@ -119,9 +140,9 @@ $ngRedux.getState();
                    ...
                },
                agreementData: { //contains agreementData that is necessary to display for the user
-                   agreementUris: Set(), //agreementUris with the current state uris of the connection
-                   cancellationPendingAgreementUris: Set(), ///proposeToCancelUris with the current state uris of the connection
-                   pendingProposalUris: Set(), //pendingProposalUris with the current state uris of the connection
+                   agreementUris: Immutable.Set(), //agreementUris with the current state uris of the connection
+                   cancellationPendingAgreementUris: Immutable.Set(), ///proposeToCancelUris with the current state uris of the connection
+                   pendingProposalUris: Immutable.Set(), //pendingProposalUris with the current state uris of the connection
                },
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)

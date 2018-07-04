@@ -1,8 +1,8 @@
 import won from "../won-es6.js";
+import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./connection-message.js";
-import connectionAgreementModule from "./connection-agreement.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
@@ -11,7 +11,7 @@ import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
 import { connect2Redux } from "../won-utils.js";
-import { attach, delay, deepFreeze, clone } from "../utils.js";
+import { attach, delay } from "../utils.js";
 import {
   callAgreementsFetch,
   callAgreementEventFetch,
@@ -26,23 +26,9 @@ import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
-const declarations = deepFreeze({
-  proposal: "proposal",
-  agreement: "agreement",
-  proposeToCancel: "proposeToCancel",
-});
-
-const keySet = deepFreeze(
-  new Set([
-    "agreementUris",
-    "pendingProposalUris",
-    "cancellationPendingAgreementUris",
-  ])
-);
-
 function genComponentConf() {
   let template = `
-        <div class="pm__header">
+        <div class="pm__header" ng-if="!self.showAgreementData">
             <a class="pm__header__back clickable show-in-responsive"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
@@ -57,7 +43,21 @@ function genComponentConf() {
             </won-connection-header>
             <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
-        <div class="pm__content">
+        <div class="pm__header" ng-if="self.showAgreementData">
+            <a class="pm__header__back clickable"
+                ng-click="self.setShowAgreementData(false)">
+                <svg style="--local-primary:var(--won-primary-color);"
+                     class="pm__header__back__icon clickable">
+                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                </svg>
+            </a>
+            <div class="pm__header__title clickable"
+                ng-click="self.setShowAgreementData(false)">
+              Showing Agreement Data
+            </div>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+        </div>
+        <div class="pm__content" ng-class="{'won-agreement-content': self.showAgreementData}">
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
@@ -65,90 +65,56 @@ function genComponentConf() {
                     class="hspinner"/>
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.connection.get('isLoadingMessages') && !self.allLoaded"
+                ng-if="!self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
             <won-connection-message
-                ng-repeat="msg in self.chatMessages"
+                ng-if="!self.showAgreementData"
+                ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')"
-                hide-option="msg.hide"
-                ng-class="{
-                    'won-unread' : msg.get('unread'),
-                    'won-not-relevant': !msg.get('isRelevant') || msg.hide,
-                    'won-cm--left' : !msg.get('outgoingMessage'),
-                    'won-cm--right' : msg.get('outgoingMessage')
-                }"
                 on-update="self.setShowAgreementData(false)"
                 on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
                 on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
             </won-connection-message>
-            <div class="pm__content__agreement" ng-if="self.showAgreementData">
-                <svg style="--local-primary:var(--won-primary-color);"
-                    class="pm__content__agreement__icon clickable"
-                    ng-click="self.setShowAgreementData(false) && (self.showLoadingInfo = false)"">
-                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
-                </svg>
-                
-                <!-- Loading Text -->
-                <div class="pm__content__agreement__title" ng-if="self.showLoadingInfo  && !self.agreementDataIsValid()"> 
-	            		<span class="ng-hide" ng-show="self.connection.get('isLoadingMessages')">Loading the Agreement Data. Please be patient, because patience is a talent :)</span>
-	            		<span class="ng-hide" ng-show="!self.connection.get('isLoadingMessages')">No Agreement Data found</span>
-            	</div>
-	            <!-- /LoadingText -->
-                
-                <!-- Agreements-->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size"> 
-            		Agreements
-            		<span ng-show="self.connection.get('isLoadingMessages')"> (loading...)</span>
-            		<span ng-if="!self.connection.get('isLoadingMessages')"> (up-to-date)</span>
-            	</div>
-	            <won-connection-agreement
-	            	ng-repeat="agreement in self.getArrayFromSet(self.agreementStateData.agreementUris) track by $index"
-	                state-Uri="agreement.stateUri"
-	                agreement-number="$index"
-	                agreement-declaration="self.declarations.agreement"
-	                connection-uri="self.connectionUri"
-	                on-update="self.setShowAgreementData(false)"
-	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-	            </won-connection-agreement>
-	            <!-- /Agreements -->
-	            <!-- ProposeToCancel -->
-	            <won-connection-agreement
-	            	ng-repeat="proposeToCancel in self.getArrayFromSet(self.agreementStateData.cancellationPendingAgreementUris) track by $index"
-	                state-uri="proposeToCancel.stateUri"
-	                head-uri="proposeToCancel.headUri"
-	                cancel-uri="self.getCancelUri(proposeToCancel.headUri)"
-	                own-cancel="self.checkOwnCancel(proposeToCancel.headUri)"
-	                agreement-number="self.agreementStateData.agreementUris.size + $index"
-	                agreement-declaration="self.declarations.proposeToCancel"
-	                connection-uri="self.connectionUri"
-	                on-update="[self.setShowAgreementData(false), self.filterMessages(draft)]"
-	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-	            </won-connection-agreement>
-	            <!-- /ProposeToCancel -->           	
-            	<!-- PROPOSALS -->
-            	<div class="pm__content__agreement__title" ng-show="self.agreementStateData.pendingProposalUris.size">
-            		<br ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
-            		<hr ng-show="self.agreementStateData.agreementUris.size || self.agreementStateData.cancellationPendingAgreementUris.size" />
-            		Proposals
-    				<span ng-show="self.connection.get('isLoadingMessages')"> (loading...)</span>
-            		<span ng-if="!self.connection.get('isLoadingMessages')"> (up-to-date)</span>
-            	</div>
-	            <won-connection-agreement
-	            	ng-repeat="proposal in self.getArrayFromSet(self.agreementStateData.pendingProposalUris) track by $index"
-	                state-Uri="proposal.stateUri"
-	                agreement-number="$index"
-	                agreement-declaration="self.declarations.proposal"
-	                connection-uri="self.connectionUri"
-	                on-update="self.setShowAgreementData(false);"
-	                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
-	            </won-connection-agreement>
-	            <!-- /PROPOSALS -->
-	            
+
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.connection.get('isLoadingMessages')">
+              Agreements
             </div>
-            
+            <won-connection-message
+              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
+              ng-repeat="agreement in self.agreementUrisArray"
+              connection-uri="self.connectionUri"
+              message-uri="agreement.get('stateUri')"
+              on-update="self.setShowAgreementData(false)"
+              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris && !self.connection.get('isLoadingMessages')">
+              Agreements with Pending Cancellation
+            </div>
+            <won-connection-message
+              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
+              ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
+              connection-uri="self.connectionUri"
+              message-uri="proposeToCancel.get('stateUri')"
+              on-update="self.setShowAgreementData(false)"
+              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris && !self.connection.get('isLoadingMessages')">
+              Open Proposals
+            </div>
+            <won-connection-message
+              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
+              ng-repeat="proposal in self.pendingProposalUrisArray"
+              connection-uri="self.connectionUri"
+              message-uri="proposal.get('stateUri')"
+              on-update="self.setShowAgreementData(false)"
+              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
+              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+            </won-connection-message>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
                target="_blank"
@@ -196,17 +162,8 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
 
-      this.reload = true;
-
-      this.showLoadingInfo = false;
-
-      this.declarations = clone(declarations);
-
-      this.agreementHeadData = this.cloneDefaultData();
-      //this.agreementStateData = this.cloneDefaultStateData();
-      this.agreementLoadingData = this.cloneDefaultStateData();
-
-      //this.showAgreementData = false;
+      this.agreementHead = this.cloneDefaultData();
+      this.agreementLoading = this.cloneDefaultStateData();
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -232,13 +189,18 @@ function genComponentConf() {
         const chatMessages = connection && connection.get("messages");
         const allLoaded =
           chatMessages &&
-          chatMessages.filter(msg => msg.get("connectMessage")).size > 0;
+          chatMessages.filter(
+            msg => msg.get("messageType") === won.WONMSG.connectMessage
+          ).size > 0;
 
-        let agreementStateData = connection && connection.get("agreementData");
-
-        if (agreementStateData && !agreementStateData.agreementUris) {
-          agreementStateData = this.cloneDefaultStateData();
-        }
+        const agreementData = connection && connection.get("agreementData");
+        const agreementUris =
+          agreementData && agreementData.get("agreementUris");
+        const cancellationPendingAgreementUris =
+          agreementData &&
+          agreementData.get("cancellationPendingAgreementUris");
+        const pendingProposalUris =
+          agreementData && agreementData.get("pendingProposalUris");
 
         //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
@@ -248,30 +210,55 @@ function genComponentConf() {
           // TODO: Optimization
           for (const msg of msgSet) {
             if (
-              msg.get("isProposeMessage") ||
-              msg.get("isProposeToCancel") ||
-              msg.get("isAcceptMessage")
+              !msg.getIn(["messageStatus", "isAccepted"]) &&
+              this.isOldAcceptedMsg(msg)
             ) {
-              if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                msg.hide = true;
-                this.messages__markAsRelevant({
-                  messageUri: msg.get("uri"),
-                  connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
-                  relevant: false,
-                });
-              }
-            } else if (this.agreementHeadData.retractedMessageUris.size) {
-              //TODO: filter out retracted messages faster
-              if (msg.get("isRelevant") && this.isOldAgreementMsg(msg)) {
-                msg.hide = true;
-                this.messages__markAsRelevant({
-                  messageUri: msg.get("uri"),
-                  connectionUri: connectionUri,
-                  needUri: ownNeed.get("uri"),
-                  relevant: false,
-                });
-              }
+              this.messages__messageStatus__markAsAccepted({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                accepted: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isRejected"]) &&
+              this.isOldRejectedMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsRejected({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                rejected: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isRetracted"]) &&
+              this.isOldRetractedMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsRetracted({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                retracted: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isCancelled"]) &&
+              this.isOldCancelledMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsCancelled({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                cancelled: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isCancellationPending"]) &&
+              this.isOldCancellationPendingMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsCancellationPending({
+                messageUri: msg.get("uri"),
+                connectionUri: connectionUri,
+                needUri: ownNeed.get("uri"),
+                cancellationPending: true,
+              });
             }
           }
 
@@ -280,18 +267,15 @@ function genComponentConf() {
             return a.get("date").getTime() - b.get("date").getTime();
           });
         }
-        if (this.reload && connection) {
-          this.getAgreementData(connection, ownNeed);
-          this.reload = false;
-        }
 
         return {
           ownNeed,
           theirNeed,
           connectionUri,
           connection,
-          agreementStateData,
-          chatMessages: sortedMessages,
+
+          sortedMessages: sortedMessages,
+          chatMessages,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -305,6 +289,20 @@ function genComponentConf() {
           shouldShowRdf: state.get("showRdf"),
           // if the connect-message is here, everything else should be as well
           allLoaded,
+          //agreementUrisToDisplay
+          agreementData,
+          hasAgreementUris: agreementUris && agreementUris.size > 0,
+          hasCancellationPendingAgreementUris:
+            cancellationPendingAgreementUris &&
+            cancellationPendingAgreementUris.size > 0,
+          hasPendingProposalUris:
+            pendingProposalUris && pendingProposalUris.size > 0,
+          agreementUrisArray: agreementUris && agreementUris.toArray(),
+          cancellationPendingAgreementUrisArray:
+            cancellationPendingAgreementUris &&
+            cancellationPendingAgreementUris.toArray(),
+          pendingProposalUrisArray:
+            pendingProposalUris && pendingProposalUris.toArray(),
         };
       };
 
@@ -317,7 +315,7 @@ function genComponentConf() {
       );
 
       this.$scope.$watch(
-        () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
+        () => this.sortedMessages && this.sortedMessages.length, // trigger if there's messages added (or removed)
         () =>
           delay(0).then(() =>
             // scroll to bottom directly after rendering, if snapped
@@ -354,6 +352,15 @@ function genComponentConf() {
           );
         }
       });
+    }
+
+    getAgreementData() {
+      this.connections__setLoadingMessages({
+        connectionUri: this.connectionUri,
+        isLoadingMessages: true,
+      });
+
+      this.getAgreementDataUris();
     }
 
     loadPreviousMessages() {
@@ -423,7 +430,6 @@ function genComponentConf() {
 
     showAgreementDataField() {
       this.getAgreementData();
-      this.showLoadingInfo = true;
       this.setShowAgreementData(true);
     }
 
@@ -434,91 +440,79 @@ function genComponentConf() {
       });
     }
 
-    agreementDataIsValid() {
-      const aD = this.agreementStateData;
-      if (
-        aD &&
-        (aD.agreementUris.size ||
-          aD.pendingProposalUris.size ||
-          aD.cancellationPendingAgreementUris.size)
-      ) {
-        return true;
-      }
-      return false;
-    }
-
-    getAgreementData(connection) {
-      if (connection) {
-        this.connection = connection;
-      } else {
-        this.connections__setLoadingMessages({
-          connectionUri: this.connectionUri,
-          isLoadingMessages: true,
-        });
-      }
-
-      this.agreementLoadingData = this.cloneDefaultStateData();
-      if (!this.agreementStateData) {
-        this.agreementStateData = this.cloneDefaultStateData();
-      }
-
-      this.getAgreementDataUris();
+    encodeParam(param) {
+      return encodeURIComponent(param);
     }
 
     getAgreementDataUris() {
       const url = urljoin(
         ownerBaseUrl,
         "/rest/agreement/getAgreementProtocolUris",
-        `?connectionUri=${this.connection.get("uri")}`
+        `?connectionUri=${this.encodeParam(this.connection.get("uri"))}`
       );
       let hasChanged = false;
       callAgreementsFetch(url)
         .then(response => {
-          this.agreementHeadData = this.transformDataToSet(response);
+          this.agreementHead = this.transformDataToSet(response);
 
-          for (const key of keySet) {
-            if (this.agreementHeadData.hasOwnProperty(key)) {
-              for (const data of this.agreementHeadData[key]) {
-                this.addAgreementDataToSate(data, key);
-                hasChanged = true;
-              }
-            }
-          }
+          const agreementUris = this.agreementHead.get("agreementUris");
+          const pendingProposalUris = this.agreementHead.get(
+            "pendingProposalUris"
+          );
+          const cancellationPendingAgreementUris = this.agreementHead.get(
+            "cancellationPendingAgreementUris"
+          );
+
+          agreementUris.map(data => {
+            this.addAgreementDataToState(data, "agreementUris");
+            hasChanged = true;
+          });
+          pendingProposalUris.map(data => {
+            this.addAgreementDataToState(data, "pendingProposalUris");
+            hasChanged = true;
+          });
+          cancellationPendingAgreementUris.map(data => {
+            this.addAgreementDataToState(
+              data,
+              "cancellationPendingAgreementUris"
+            );
+            hasChanged = true;
+          });
+
           //no data found for keyset: no relevant agreementData to show in GUI - clean state data
           if (!hasChanged) {
-            this.connections__updateAgreementData({
+            this.connections__clearAgreementData({
               connectionUri: this.connectionUri,
-              agreementData: this.cloneDefaultStateData(),
             });
           }
           //Remove all retracted/rejected messages
           else if (
-            this.agreementStateData &&
-            (this.agreementHeadData["rejectedMessageUris"] ||
-              this.agreementHeadData["retractedMessageUris"])
+            this.agreementData &&
+            (this.agreementHead.get("rejectedMessageUris") ||
+              this.agreementHead.get("retractedMessageUris"))
           ) {
-            let removalSet = new Set([
-              ...this.agreementHeadData["rejectedMessageUris"],
-              ...this.agreementHeadData["retractedMessageUris"],
-            ]);
+            const pendingProposalUris = this.agreementData.get(
+              "pendingProposalUris"
+            );
+            const pendingProposalUrisWithout =
+              pendingProposalUris &&
+              pendingProposalUris
+                .subtract(this.agreementHead.get("rejectedMessageUris"))
+                .subtract(this.agreementHead.get("retractedMessageUris"));
 
-            const data = this.agreementStateData;
+            this.agreementData = this.agreementData.set(
+              "pendingProposalUris",
+              pendingProposalUrisWithout
+            );
 
-            for (const uri of removalSet) {
-              const key = "pendingProposalUris";
-              for (const obj of data[key]) {
-                if (obj.stateUri === uri || obj.headUri === uri) {
-                  console.log("Message " + uri + " was removed");
-                  data[key].delete(obj);
-                  hasChanged = true;
-                }
-              }
-            }
-            if (hasChanged) {
-              this.agreementStateData = this.cloneDefaultStateData();
-              this.connections__updateAgreementData({
+            if (
+              pendingProposalUris &&
+              pendingProposalUrisWithout &&
+              pendingProposalUris.size != pendingProposalUrisWithout.size
+            ) {
+              hasChanged = true;
+              this.connections__clearAgreementData({
                 connectionUri: this.connectionUri,
-                agreementData: data,
               });
             }
           }
@@ -541,38 +535,41 @@ function genComponentConf() {
     }
 
     transformDataToSet(response) {
-      const tmpAgreementData = {
-        agreementUris: new Set(response.agreementUris),
-        pendingProposalUris: new Set(response.pendingProposalUris),
-        pendingProposals: new Set(response.pendingProposals),
-        acceptedCancellationProposalUris: new Set(
+      const tmpAgreementData = Immutable.fromJS({
+        agreementUris: Immutable.Set(response.agreementUris),
+        pendingProposalUris: Immutable.Set(response.pendingProposalUris),
+        pendingProposals: Immutable.Set(response.pendingProposals),
+        acceptedCancellationProposalUris: Immutable.Set(
           response.acceptedCancellationProposalUris
         ),
-        cancellationPendingAgreementUris: new Set(
+        cancellationPendingAgreementUris: Immutable.Set(
           response.cancellationPendingAgreementUris
         ),
-        pendingCancellationProposalUris: new Set(
+        pendingCancellationProposalUris: Immutable.Set(
           response.pendingCancellationProposalUris
         ),
-        cancelledAgreementUris: new Set(response.cancelledAgreementUris),
-        rejectedMessageUris: new Set(response.rejectedMessageUris),
-        retractedMessageUris: new Set(response.retractedMessageUris),
-      };
+        cancelledAgreementUris: Immutable.Set(response.cancelledAgreementUris),
+        rejectedMessageUris: Immutable.Set(response.rejectedMessageUris),
+        retractedMessageUris: Immutable.Set(response.retractedMessageUris),
+      });
 
       return this.filterAgreementSet(tmpAgreementData);
     }
 
     filterAgreementSet(tmpAgreementData) {
-      for (const prop of tmpAgreementData.cancellationPendingAgreementUris) {
-        if (tmpAgreementData.agreementUris.has(prop)) {
-          tmpAgreementData.agreementUris.delete(prop);
-        }
-      }
+      const cancellationPendingAgreementUris =
+        tmpAgreementData &&
+        tmpAgreementData.get("cancellationPendingAgreementUris");
+      const agreementUrisWithout =
+        tmpAgreementData &&
+        tmpAgreementData
+          .get("agreementUris")
+          .subtract(cancellationPendingAgreementUris);
 
-      return tmpAgreementData;
+      return tmpAgreementData.set("agreementUris", agreementUrisWithout);
     }
 
-    addAgreementDataToSate(eventUri, key, obj) {
+    addAgreementDataToState(eventUri, key, obj) {
       const ownNeedUri = this.ownNeed.get("uri");
       return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
@@ -583,156 +580,180 @@ function genComponentConf() {
                          need we will call the method again but this time with the correct eventUri
                          */
             if (!agreementObject) {
-              agreementObject = this.cloneDefaultAgreementObject();
+              agreementObject = Immutable.fromJS({
+                stateUri: undefined,
+                headUri: undefined,
+              });
             }
-            agreementObject.headUri = msg.getMessageUri();
-            this.addAgreementDataToSate(
+            agreementObject = agreementObject.set(
+              "headUri",
+              msg.getMessageUri()
+            );
+            this.addAgreementDataToState(
               msg.getRemoteMessageUri(),
               key,
               agreementObject
             );
           } else {
             if (!agreementObject) {
-              agreementObject = this.cloneDefaultAgreementObject();
-              agreementObject.headUri = msg.getMessageUri();
+              agreementObject = Immutable.fromJS({
+                stateUri: undefined,
+                headUri: undefined,
+              });
+              agreementObject = agreementObject.set(
+                "headUri",
+                msg.getMessageUri()
+              );
             }
+            agreementObject = agreementObject.set(
+              "stateUri",
+              msg.getMessageUri()
+            );
 
-            agreementObject.stateUri = msg.getMessageUri();
-            this.agreementLoadingData[key].add(agreementObject);
+            //this.agreementLoadingJS[key].add(agreementObject);
+            //TODO: does the line below do the same?
+            this.agreementLoading = this.agreementLoading.set(
+              key,
+              this.agreementLoading.get(key).add(agreementObject)
+            );
 
-            //Dont load in state again!
-            let found = false;
-            for (const chatMessage of this.chatMessages) {
-              if (agreementObject.stateUri === chatMessage.get("uri")) {
-                found = true;
-              }
-            }
-            if (!found) {
+            //If message isnt in the state we add it
+            if (this.chatMessages.get(agreementObject.get("stateUri"))) {
               this.messages__connectionMessageReceived(msg);
             }
 
             //Update agreementData in State
             this.connections__updateAgreementData({
               connectionUri: this.connectionUri,
-              agreementData: this.agreementLoadingData,
+              agreementData: this.agreementLoading,
             });
           }
         });
       });
     }
 
-    filterAgreementStateData(agreementObject, del) {
-      for (const key of keySet) {
-        this.checkObject(key, agreementObject, del);
-      }
-    }
-
     checkObject(key, agreementObject, del) {
-      const data = this.agreementStateData;
-      for (const object of data[key]) {
-        if (object.stateUri === agreementObject.stateUri) {
-          if (del.value) {
-            data[key].delete(object);
-            this.connections__updateAgreementData({
-              connectionUri: this.connectionUri,
-              agreementData: data,
-            });
-          }
-          return true;
-        }
+      const foundKeys = this.agreementData.get(key);
+
+      const foundObjects =
+        foundKeys &&
+        foundKeys.filter(
+          object => object.get("stateUri") === agreementObject.get("stateUri")
+        );
+
+      if (foundKeys && del) {
+        this.agreementData = this.agreementData.set(
+          key,
+          foundKeys.filter(
+            object => object.get("stateUri") !== agreementObject.get("stateUri")
+          )
+        );
       }
-      return false;
+
+      return foundObjects && foundObjects.size > 0;
     }
 
     filterMessages(stateUri) {
-      const object = {
+      const object = Immutable.fromJS({
         stateUri: stateUri,
         headUri: undefined,
-      };
+      });
 
-      const del = {
-        value: true,
-      };
-      this.filterAgreementStateData(object, del);
+      this.checkObject("agreementUris", object, true);
+      this.checkObject("pendingProposalUris", object, true);
+      this.checkObject("cancellationPendingAgreementUris", object, true);
     }
 
-    getCancelUri(agreementUri) {
-      const pendingProposals = this.agreementHeadData.pendingProposals;
-      for (const prop of pendingProposals) {
-        if (prop.proposesToCancel.includes(agreementUri)) {
-          return prop.uri;
-        }
-      }
-      return undefined;
-    }
-
-    checkOwnCancel(headUri) {
-      const pendingProposals = this.agreementHeadData.pendingProposals;
-      for (const prop of pendingProposals) {
-        if (prop.proposesToCancel.includes(headUri)) {
-          if (prop.proposingNeedUri === this.ownNeed.get("uri")) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    isOldAgreementMsg(msg) {
-      const aD = this.agreementHeadData;
+    isOldCancelledMsg(msg) {
       if (
-        aD.agreementUris.has(msg.get("uri")) ||
-        aD.agreementUris.has(msg.get("remoteUri")) ||
-        aD.cancellationPendingAgreementUris.has(msg.get("uri")) ||
-        aD.cancellationPendingAgreementUris.has(msg.get("remoteUri")) ||
-        aD.cancelledAgreementUris.has(msg.get("uri")) ||
-        aD.cancelledAgreementUris.has(msg.get("remoteUri")) ||
-        aD.acceptedCancellationProposalUris.has(msg.get("uri")) ||
-        aD.acceptedCancellationProposalUris.has(msg.get("remoteUri")) ||
-        aD.retractedMessageUris.has(msg.get("uri")) ||
-        aD.retractedMessageUris.has(msg.get("remoteUri")) ||
-        aD.rejectedMessageUris.has(msg.get("uri")) ||
-        aD.rejectedMessageUris.has(msg.get("remoteUri"))
+        this.agreementHead &&
+        (this.agreementHead.getIn([
+          "acceptedCancellationProposalUris",
+          msg.get("uri"),
+        ]) ||
+          this.agreementHead.getIn([
+            "acceptedCancellationProposalUris",
+            msg.get("remoteUri"),
+          ]))
       ) {
         return true;
       }
       return false;
     }
 
-    getArrayFromSet(set) {
-      if (!set) {
-        set = new Set();
+    isOldCancellationPendingMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["cancelledAgreementUris", msg.get("uri")]) ||
+          this.agreementHead.getIn([
+            "cancelledAgreementUris",
+            msg.get("remoteUri"),
+          ]))
+      ) {
+        return true;
       }
-      return Array.from(set);
+      return false;
+    }
+
+    isOldAcceptedMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["agreementUris", msg.get("uri")]) ||
+          this.agreementHead.getIn(["agreementUris", msg.get("remoteUri")]))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    isOldRetractedMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["retractedMessageUris", msg.get("uri")]) ||
+          this.agreementHead.getIn([
+            "retractedMessageUris",
+            msg.get("remoteUri"),
+          ]))
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    isOldRejectedMsg(msg) {
+      if (
+        this.agreementHead &&
+        (this.agreementHead.getIn(["rejectedMessageUris", msg.get("uri")]) ||
+          this.agreementHead.getIn([
+            "rejectedMessageUris",
+            msg.get("remoteUri"),
+          ]))
+      ) {
+        return true;
+      }
+      return false;
     }
 
     cloneDefaultData() {
-      return {
-        agreementUris: new Set(),
-        pendingProposalUris: new Set(),
-        pendingProposals: new Set(),
-        acceptedCancellationProposalUris: new Set(),
-        cancellationPendingAgreementUris: new Set(),
-        pendingCancellationProposalUris: new Set(),
-        cancelledAgreementUris: new Set(),
-        rejectedMessageUris: new Set(),
-        retractedMessageUris: new Set(),
-      };
+      return Immutable.fromJS({
+        agreementUris: Immutable.Set(),
+        pendingProposalUris: Immutable.Set(),
+        pendingProposals: Immutable.Set(),
+        acceptedCancellationProposalUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+        pendingCancellationProposalUris: Immutable.Set(),
+        cancelledAgreementUris: Immutable.Set(),
+        rejectedMessageUris: Immutable.Set(),
+        retractedMessageUris: Immutable.Set(),
+      });
     }
 
     cloneDefaultStateData() {
-      return {
-        pendingProposalUris: new Set(),
-        agreementUris: new Set(),
-        cancellationPendingAgreementUris: new Set(),
-      };
-    }
-
-    cloneDefaultAgreementObject() {
-      return {
-        stateUri: undefined,
-        headUri: undefined,
-      };
+      return Immutable.fromJS({
+        pendingProposalUris: Immutable.Set(),
+        agreementUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+      });
     }
 
     openRequest(message) {
@@ -761,7 +782,6 @@ export default angular
     autoresizingTextareaModule,
     chatTextFieldSimpleModule,
     connectionMessageModule,
-    connectionAgreementModule,
     connectionHeaderModule,
     labelledHrModule,
     connectionContextDropdownModule,

@@ -18,7 +18,11 @@ import {
   addMessage,
   addExistingMessages,
   markMessageAsRead,
-  markMessageAsRelevant,
+  markMessageAsRejected,
+  markMessageAsRetracted,
+  markMessageAsAccepted,
+  markMessageAsCancelled,
+  markMessageAsCancellationPending,
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
@@ -31,6 +35,7 @@ import {
   changeConnectionStateByFun,
   storeConnectionsData,
   updateAgreementStateData,
+  clearAgreementStateData,
   setShowAgreementData,
 } from "./reduce-connections.js";
 
@@ -256,12 +261,23 @@ export default function(allNeedsInState = initialState, action = {}) {
           messages: {
             [eventUri]: {
               uri: eventUri,
-              text: optimisticEvent.getTextMessage(),
+              content: {
+                text: optimisticEvent.getTextMessage(),
+              },
+              isParsable: !!optimisticEvent.getTextMessage(),
+              hasContent: !!optimisticEvent.getTextMessage(),
+              hasReferences: false,
               date: msStringToDate(optimisticEvent.getSentTimestamp()),
               outgoingMessage: true,
               unread: true,
-              connectMessage: true,
-              isRelevant: true,
+              messageType: won.WONMSG.connectMessage,
+              messageStatus: {
+                isRetracted: false,
+                isRejected: false,
+                isAccepted: false,
+                isCancelled: false,
+                isCancellationPending: false,
+              },
             },
           },
         });
@@ -423,13 +439,45 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri
       );
-    case actionTypes.messages.markAsRelevant:
-      return markMessageAsRelevant(
+    case actionTypes.messages.messageStatus.markAsRejected:
+      return markMessageAsRejected(
         allNeedsInState,
         action.payload.messageUri,
         action.payload.connectionUri,
         action.payload.needUri,
-        action.payload.relevant
+        action.payload.rejected
+      );
+    case actionTypes.messages.messageStatus.markAsRetracted:
+      return markMessageAsRetracted(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.retracted
+      );
+    case actionTypes.messages.messageStatus.markAsAccepted:
+      return markMessageAsAccepted(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.accepted
+      );
+    case actionTypes.messages.messageStatus.markAsCancelled:
+      return markMessageAsCancelled(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.cancelled
+      );
+    case actionTypes.messages.messageStatus.markAsCancellationPending:
+      return markMessageAsCancellationPending(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.cancellationPending
       );
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
@@ -455,6 +503,12 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.agreementData
       );
+    case actionTypes.connections.clearAgreementData:
+      return clearAgreementStateData(
+        allNeedsInState,
+        action.payload.connectionUri
+      );
+
     case actionTypes.connections.showAgreementData:
       return setShowAgreementData(
         allNeedsInState,

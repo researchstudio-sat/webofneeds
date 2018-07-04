@@ -22,6 +22,14 @@ export const labels = deepFreeze({
       "Conversation open. You can exchange messages with your counterpart.",
     [won.WON.Closed]: "Conversation closed. You can reopen it.",
   },
+  messageType: {
+    [won.WONMSG.connectMessage]: "Connect Message",
+    [won.WONMSG.openMessage]: "Open Message",
+    [won.WONMSG.closeMessage]: "Close Message",
+    [won.WONMSG.connectionMessage]: "Connection Message",
+    [won.WONMSG.hintMessage]: "Hint Message",
+    [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
+  },
 });
 
 /**

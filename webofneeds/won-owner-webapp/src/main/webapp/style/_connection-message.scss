@@ -1,6 +1,9 @@
 @import "speech-bubble";
 @import "square-image";
 @import "trig";
+@import "connection-message-status";
+@import "message-content";
+@import "referenced-message-content";
 
 won-connection-message {
   &.won-unread {
@@ -29,11 +32,20 @@ won-connection-message {
         $thinBorderWidth,
         0.8rem
       );
+
+      &.references {
+        @include speech-bubble-left(
+          $won-light-gray,
+          $thinDarkBorder,
+          $speechBubbleTailSize/2,
+          $thinBorderWidth,
+          0.8rem
+        );
+      }
     }
   }
   &.won-cm--right {
     justify-content: flex-end;
-    color: red !important;
     & .won-cm__center__bubble {
       @include speech-bubble-right(
         $won-light-gray,
@@ -42,44 +54,103 @@ won-connection-message {
         $thinBorderWidth,
         0.8rem
       );
+
+      &.references {
+        @include speech-bubble-right(
+          $won-light-gray,
+          $thinDarkBorder,
+          $speechBubbleTailSize/2,
+          $thinBorderWidth,
+          0.8rem
+        );
+      }
     }
   }
-  &.won-not-relevant {
+  &.won-is-accepted {
+    //TODO: STYLING
+  }
+  &.won-is-cancelled {
+    //TODO: STYLING
+  }
+  &.won-is-cancellationPending {
+    //TODO: STYLING
+  }
+  &.won-is-rejected {
+    //TODO: STYLING
+  }
+  &.won-is-retracted {
     opacity: 0.35;
     .won-cm__center__bubble {
       text-decoration: line-through;
       text-decoration-color: black;
     }
   }
+
   .won-cm__center {
     grid-area: content;
     font-size: $smallFontSize;
     max-width: 100%;
+
     .won-cm__center__bubble {
+      display: grid;
+      grid-template-areas: "content carret" "trig trig" "actions actions";
+      grid-template-columns: 1fr min-content;
       padding: 0.5rem;
       border: $thinGrayBorder;
       word-break: break-word;
       min-height: 2.5rem;
       box-sizing: border-box; // background: $won-light-gray;
-      &.agreement {
-        padding: 0.5rem;
-        border: $thinDarkBorder;
-        background: $won-light-gray;
+      background-color: $won-light-gray; // like the error toast-notifications
+      color: black;
+
+      &__carret {
+        grid-area: carret;
+        svg {
+          @include fixed-square(1rem); // visually center icon on line
+        }
       }
-      &.info {
-        opacity: 0.9;
-        padding: 0.5rem;
-        border: $thinDarkBorder;
-        background: $won-light-gray;
+
+      &__content {
+        grid-area: content;
+        display: grid;
+        grid-auto-flow: row;
+        grid-gap: 0.5rem;
       }
-      &__text__message--prewrap {
-        white-space: pre-wrap;
-      }
+
       &__button-area {
+        grid-area: actions;
+        border-top: $thinGrayBorder;
         padding-top: 0.5rem;
+        margin-top: 0.5rem;
         display: grid;
         grid-auto-flow: column;
         grid-gap: 0.5rem;
+      }
+
+      won-trig {
+        grid-area: trig;
+        border-top: $thinGrayBorder;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      //Message Type Styling
+      &.references {
+        padding: 0.5rem;
+        border: $thinDarkBorder;
+        background: $won-light-gray;
+      }
+
+      //Message Sent Status styling
+      &.pending {
+        opacity: 0.33;
+      }
+      &.partiallyLoaded {
+        opacity: 0.66;
+      }
+      &.failure {
+        color: #ff0000;
+        //TODO: FAILURE MESSAGE STYLING
       }
     }
     &.won-cm__center--nondisplayable {
@@ -90,56 +161,6 @@ won-connection-message {
         background-color: white; // like the error toast-notifications
         color: #8f8f8f;
       }
-    }
-    .won-cm__center__bubble {
-      background-color: $won-light-gray; // like the error toast-notifications
-      color: black;
-
-      &.pending {
-        opacity: 0.33;
-      }
-      &.partiallyLoaded {
-        opacity: 0.66;
-      }
-
-      &.failure {
-        color: #ff0000;
-        //TODO: FAILURE MESSAGE STYLING
-      }
-    }
-    &__status {
-      &__time {
-        display: inline-block;
-        color: $won-line-gray;
-        --local-primary: #{$won-secondary-color};
-
-        &--pending {
-          display: inline-block;
-          color: $won-line-gray;
-        }
-        &--failure {
-          display: inline-block;
-          //TODO: FAILURE MESSAGE STYLING
-        }
-      }
-      &__icons {
-        display: inline-block;
-        &__icon {
-          display: inline-block;
-          @include fixed-square(0.5rem);
-
-          --local-primary: #{$won-line-gray};
-
-          &.received {
-            --local-primary: #{$won-secondary-color};
-          }
-        }
-      }
-    }
-    &__carret {
-      @include fixed-square(1rem); // visually center icon on line
-      position: relative;
-      top: 0.1em;
     }
   }
 }
