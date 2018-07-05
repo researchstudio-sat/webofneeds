@@ -19,13 +19,13 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
             <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
+                ng-show="self.isOrSeeksPart.details.get('title')">
                 <span ng-show="!self.isOrSeeksPart.hasSearchString">Title</span>
                 <span ng-show="self.isOrSeeksPart.hasSearchString">Searching for</span>
             </h2>
             <p class="post-info__details"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
-                {{ self.isOrSeeksPart.isOrSeeks.get('title')}}
+                ng-show="self.isOrSeeksPart.details.get('title')">
+                {{ self.isOrSeeksPart.details.get('title')}}
             </p>
             <h2 class="post-info__heading"
                 ng-if="self.person">
@@ -37,27 +37,27 @@ function genComponentConf() {
             </won-person-details>
 
            	<h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('description')">
+                ng-show="self.content.details.get('description')">
                 Description
             </h2>
-            <p class="post-info__details--prewrap" ng-show="self.isOrSeeksPart.isOrSeeks.get('description')">{{ self.isOrSeeksPart.isOrSeeks.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+            <p class="post-info__details--prewrap" ng-show="self.content.details.get('description')">{{ self.content.details.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
 
             <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('tags')">
+                ng-show="self.content.details.get('tags')">
                 Tags
             </h2>
             <div class="post-info__details post-info__tags"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('tags')">
-                    <span class="post-info__tags__tag" ng-repeat="tag in self.isOrSeeksPart.isOrSeeks.get('tags').toJS()">#{{tag}}</span>
+                ng-show="self.content.details.get('tags')">
+                    <span class="post-info__tags__tag" ng-repeat="tag in self.content.details.get('tags').toJS()">#{{tag}}</span>
             </div>
 
             <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.location">
+                ng-show="self.content.details.get('location')">
                 Location
             </h2>
             <p class="post-info__details clickable"
-               ng-show="self.isOrSeeksPart.address" ng-click="self.toggleMap()">
-                {{ self.isOrSeeksPart.address }}
+               ng-show="self.content.details.get('address')" ng-click="self.toggleMap()">
+                {{ self.content.details.get('address') }}
 				        <svg class="post-info__carret">
                   <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
                 </svg>
@@ -69,24 +69,24 @@ function genComponentConf() {
                 </svg>
             </p>                
             <won-need-map 
-              locations="[self.isOrSeeksPart.location]"
-              ng-if="self.isOrSeeksPart.location && self.showMap">
+              locations="[self.content.details.get('location')]"
+              ng-if="self.content.details.get('location') && self.showMap">
             </won-need-map>
 
             <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.travelAction">
+                ng-show="self.content.details.get('travelAction')">
                 Route
             </h2>
             <p class="post-info__details clickable"
-               ng-show="self.isOrSeeksPart.travelAction"
+               ng-show="self.content.details.get('travelAction')"
                ng-click="self.toggleRouteMap()">
 
-              <span ng-if="self.isOrSeeksPart.fromAddress">
-                <strong>From: </strong>{{ self.isOrSeeksPart.fromAddress }}
+              <span ng-if="self.content.details.getIn(['travelAction', 'fromAddress'])">
+                <strong>From: </strong>{{ self.content.details.getIn(['travelAction', 'fromAddress']) }}
               </span>
               </br>
-              <span ng-if="self.isOrSeeksPart.toAddress">
-              <strong>To: </strong>{{ self.isOrSeeksPart.toAddress }}
+              <span ng-if="self.content.details.getIn(['travelAction', 'toAddress'])">
+              <strong>To: </strong>{{ self.content.details.getIn(['travelAction', 'toAddress']) }}
               </span>
 
               <svg class="post-info__carret">
@@ -101,7 +101,7 @@ function genComponentConf() {
             </p>
             <won-need-map
               locations="self.travelLocations"
-              ng-if="self.isOrSeeksPart.travelAction && self.showRouteMap">
+              ng-if="self.content.details.get('travelAction') && self.showRouteMap">
             </won-need-map>
     	`;
 
@@ -117,16 +117,19 @@ function genComponentConf() {
 
       const self = this;
 
-      this.$scope.$watch("self.isOrSeeksPart.isOrSeeks", newIs => {
+      this.$scope.$watch("self.content.details", newIs => {
         self.person = newIs && newIs.get("person");
       });
 
-      this.$scope.$watch("self.isOrSeeksPart.travelAction", newValue => {
-        self.travelLocations = newValue && [
-          newValue.get("fromLocation"),
-          newValue.get("toLocation"),
-        ];
-      });
+      this.$scope.$watch(
+        "self.content.details.get('travelAction')",
+        newValue => {
+          self.travelLocations = newValue && [
+            newValue.get("fromLocation"),
+            newValue.get("toLocation"),
+          ];
+        }
+      );
     }
 
     toggleMap() {
@@ -145,7 +148,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      isOrSeeksPart: "=",
+      content: "=",
     },
     template: template,
   };

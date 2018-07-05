@@ -65,9 +65,9 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
-            <won-post-is-or-seeks-info is-or-seeks-part="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info content="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
-            <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info content="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
             <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
               <h2 class="post-info__heading">
                   RDF
@@ -130,38 +130,12 @@ function genComponentConf() {
           WON: won.WON,
           isPart: is
             ? {
-                postUri: postUri,
-                isOrSeeks: is,
-                isString: "is",
-                person: is && is.get("person"),
-                location: is && is.get("location"),
-                address:
-                  is.get("location") && is.get("location").get("address"),
-                travelAction: is && is.get("travelAction"),
-                fromAddress:
-                  is.get("travelAction") &&
-                  is.get("travelAction").get("fromAddress"),
-                toAddress:
-                  is.get("travelAction") &&
-                  is.get("travelAction").get("toAddress"),
+                details: is,
               }
             : undefined,
           seeksPart: seeks
             ? {
-                postUri: postUri,
-                isOrSeeks: seeks,
-                seeksString: "seeks",
-                location: seeks && seeks.get("location"),
-                person: seeks && seeks.get("person"),
-                address:
-                  seeks.get("location") && seeks.get("location").get("address"),
-                travelAction: seeks && seeks.get("travelAction"),
-                fromAddress:
-                  seeks.get("travelAction") &&
-                  seeks.get("travelAction").get("fromAddress"),
-                toAddress:
-                  seeks.get("travelAction") &&
-                  seeks.get("travelAction").get("toAddress"),
+                details: seeks,
                 hasSearchString: searchString, // WORKAROUND - because only seeksPart is send to child component
               }
             : undefined,
