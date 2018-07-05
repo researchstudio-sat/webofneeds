@@ -55,9 +55,6 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <won-gallery ng-show="self.post.get('hasImages')">
-            </won-gallery>
-
             <!-- GENERAL Part -->
             <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
                 Created
@@ -65,6 +62,10 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.friendlyTimestamp">
                 {{ self.friendlyTimestamp }}
             </p>
+
+            <won-gallery ng-show="self.post.get('hasImages')">
+            </won-gallery>
+
             <won-post-is-or-seeks-info content="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
             <won-post-is-or-seeks-info content="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
