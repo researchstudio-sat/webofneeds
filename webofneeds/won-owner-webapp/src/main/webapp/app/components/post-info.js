@@ -69,9 +69,9 @@ function genComponentConf() {
             <won-gallery ng-show="self.post.get('hasImages')">
             </won-gallery>
 
-            <won-post-is-or-seeks-info content="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
-            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
-            <won-post-is-or-seeks-info content="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch"></won-post-is-or-seeks-info>
+            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
+            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch"></won-post-is-or-seeks-info>
             <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
               <h2 class="post-info__heading">
                   RDF
@@ -128,21 +128,10 @@ function genComponentConf() {
         //TODO it will be possible to have more than one seeks
         const seeks = post ? post.get("seeks") : undefined;
 
-        const searchString = post ? post.get("searchString") : undefined;
-
         return {
           WON: won.WON,
-          isPart: is
-            ? {
-                details: is,
-              }
-            : undefined,
-          seeksPart: seeks
-            ? {
-                details: seeks,
-                hasSearchString: searchString, // WORKAROUND - because only seeksPart is send to child component
-              }
-            : undefined,
+          hasIsBranch: !!is,
+          hasSeeksBranch: !!seeks,
           post,
           friendlyTimestamp:
             post &&
