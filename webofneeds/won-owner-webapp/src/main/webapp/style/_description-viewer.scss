@@ -1,0 +1,28 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-description-viewer {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 0.5rem;
+
+  .dv__header {
+    display: flex;
+    align-items: center;
+    color: $won-primary-text-color;
+
+    &__icon {
+      @include fixed-square($iconSize);
+      --local-primary: #{$won-primary-text-color};
+      margin-right: 0.5rem;
+    }
+
+    &__label {
+      font-weight: bold;
+    }
+  }
+
+  .dv__content {
+    white-space: pre-wrap;
+  }
+}

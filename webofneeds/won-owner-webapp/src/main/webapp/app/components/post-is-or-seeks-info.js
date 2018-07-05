@@ -5,7 +5,9 @@ import angular from "angular";
 
 import "ng-redux";
 import needMapModule from "./need-map.js";
-import personDetailsModule from "./person-details.js";
+import personViewerModule from "./details/viewer/person-viewer.js";
+import descriptionViewerModule from "./details/viewer/description-viewer.js";
+import tagsViewerModule from "./details/viewer/tags-viewer.js";
 
 import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
@@ -22,6 +24,12 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
+            <h2 class="post-info__heading">
+              DETAILS JS
+            </h2>
+            <p class="post-info__detail">
+              {{ self.details.toJS() }}
+            </p>
             <h2 class="post-info__heading"
                 ng-show="self.details.get('title')">
                 <span ng-show="!self.searchString">Title</span>
@@ -31,29 +39,14 @@ function genComponentConf() {
                 ng-show="self.details.get('title')">
                 {{ self.details.get('title')}}
             </p>
-            <h2 class="post-info__heading"
-                ng-if="self.details.get('person')">
-                Person Details
-            </h2>
-            <won-person-details 
-              ng-if="self.details.get('person')"
-              person="self.details.get('person')">
-            </won-person-details>
+            <won-person-viewer ng-if="self.details.get('person')" content="self.details.get('person')" detail="self.getDetail('person')">
+            </won-person-viewer>
 
-           	<h2 class="post-info__heading"
-                ng-show="self.details.get('description')">
-                Description
-            </h2>
-            <p class="post-info__details--prewrap" ng-show="self.details.get('description')">{{ self.details.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+           	<won-description-viewer ng-if="self.details.get('description')" content="self.details.get('description')" detail="self.getDetail('description')">
+            </won-description-viewer>
 
-            <h2 class="post-info__heading"
-                ng-show="self.details.get('tags')">
-                Tags
-            </h2>
-            <div class="post-info__details post-info__tags"
-                ng-show="self.details.get('tags')">
-                    <span class="post-info__tags__tag" ng-repeat="tag in self.details.get('tags').toJS()">#{{tag}}</span>
-            </div>
+            <won-tags-viewer ng-if="self.details.get('tags')" content="self.details.get('tags')" detail="self.getDetail('tags')">
+            </won-tags-viewer>
 
             <h2 class="post-info__heading" ng-if="self.details.getIn(['location','address'])">
                 Location
@@ -152,6 +145,19 @@ function genComponentConf() {
     toggleRouteMap() {
       this.showRouteMap = !this.showRouteMap;
     }
+
+    getDetail(key) {
+      const detail = this.allDetails && this.allDetails[key];
+      if (!detail) {
+        console.error(
+          "Could not find detail with key: ",
+          key,
+          " in:  ",
+          this.allDetails
+        );
+      }
+      return detail;
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -171,6 +177,8 @@ export default //.controller('CreateNeedController', [...serviceDependencies, Cr
 angular
   .module("won.owner.components.postIsOrSeeksInfo", [
     needMapModule,
-    personDetailsModule,
+    personViewerModule,
+    descriptionViewerModule,
+    tagsViewerModule,
   ])
   .directive("wonPostIsOrSeeksInfo", genComponentConf).name;

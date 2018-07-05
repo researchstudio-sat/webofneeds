@@ -3,7 +3,9 @@
 @import "animate";
 @import "responsiveness-utils";
 @import "trig";
-@import "animate";
+@import "description-viewer";
+@import "tags-viewer";
+@import "person-viewer";
 
 won-send-request,
 won-post-info {
@@ -84,14 +86,6 @@ won-post-info {
       background-color: white;
     }
 
-    won-post-is-or-seeks-info {
-      .post-info__details {
-        &--prewrap {
-          white-space: pre-wrap;
-        }
-      }
-    }
-
     won-trig {
       background-color: $won-light-gray;
       border: $thinGrayBorder;
@@ -109,19 +103,6 @@ won-post-info {
         @media (max-width: $responsivenessBreakPoint) {
           height: 15rem;
         }
-      }
-    }
-
-    .post-info__tags {
-      display: flex;
-      flex-wrap: wrap;
-
-      &__tag {
-        border-radius: 0.5rem;
-        background: $won-primary-color;
-        color: white;
-        margin: 0.25rem 0.25rem 0.25rem 0;
-        padding: 0.25rem 0.5rem;
       }
     }
 

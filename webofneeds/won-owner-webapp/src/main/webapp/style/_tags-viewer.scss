@@ -1,0 +1,37 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-tags-viewer {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 0.5rem;
+
+  .tv__header {
+    display: flex;
+    align-items: center;
+    color: $won-primary-text-color;
+
+    &__icon {
+      @include fixed-square($iconSize);
+      --local-primary: #{$won-primary-text-color};
+      margin-right: 0.5rem;
+    }
+
+    &__label {
+      font-weight: bold;
+    }
+  }
+
+  .tv__content {
+    display: flex;
+    flex-wrap: wrap;
+
+    &__tag {
+      border-radius: 0.5rem;
+      background: $won-primary-color;
+      color: $won-secondary-text-color;
+      margin: 0.25rem 0.25rem 0.25rem 0;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+}
