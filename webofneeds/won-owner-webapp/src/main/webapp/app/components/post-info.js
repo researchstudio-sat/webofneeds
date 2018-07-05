@@ -55,13 +55,16 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <!-- GENERAL Part -->
-            <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
-                Created
-            </h2>
-            <p class="post-info__details" ng-show="self.friendlyTimestamp">
-                {{ self.friendlyTimestamp }}
-            </p>
+            <div class="post-info__content__general">
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.friendlyTimestamp">
+                  Created
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
+                  {{ self.friendlyTimestamp }}
+                </div>
+              </div>
+            </div>
 
             <won-gallery ng-show="self.post.get('hasImages')">
             </won-gallery>

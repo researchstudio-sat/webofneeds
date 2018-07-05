@@ -54,19 +54,22 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <!-- GENERAL Part -->
-            <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
-                Created
-            </h2>
-            <p class="post-info__details" ng-show="self.friendlyTimestamp">
-                {{ self.friendlyTimestamp }}
-            </p>
-            <h2 class="post-info__heading" ng-show="self.displayedPost.get('type')">
-                Type
-            </h2>
-            <p class="post-info__details" ng-show="self.displayedPost.get('type')">
-                {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
-            </p>
+            <div class="post-info__content__general">
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.friendlyTimestamp">
+                  Created
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
+                  {{ self.friendlyTimestamp }}
+                </div>
+                <div class="post-info__content__general__item__label" ng-show="self.displayedPost.get('type')">
+                  Type
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.displayedPost.get('type')">
+                  {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
+                </div>
+              </div>
+            </div>
 
             <won-gallery ng-show="self.displayedPost.get('hasImages')">
             </won-gallery>
