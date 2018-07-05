@@ -6,6 +6,7 @@
 @import "description-viewer";
 @import "tags-viewer";
 @import "person-viewer";
+@import "location-viewer";
 
 won-send-request,
 won-post-info {
@@ -90,20 +91,6 @@ won-post-info {
       background-color: $won-light-gray;
       border: $thinGrayBorder;
       padding: 0.5rem;
-    }
-
-    won-need-map {
-      display: block;
-      @include slideWithOpacityAnimation(0.5s, linear, 20rem);
-
-      .need-map__mapmount {
-        width: 100%;
-        height: 31rem;
-
-        @media (max-width: $responsivenessBreakPoint) {
-          height: 15rem;
-        }
-      }
     }
 
     .post-info__carret {

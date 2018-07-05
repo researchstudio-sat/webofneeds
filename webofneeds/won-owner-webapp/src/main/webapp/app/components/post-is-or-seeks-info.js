@@ -7,6 +7,7 @@ import "ng-redux";
 import needMapModule from "./need-map.js";
 import personViewerModule from "./details/viewer/person-viewer.js";
 import descriptionViewerModule from "./details/viewer/description-viewer.js";
+import locationViewerModule from "./details/viewer/location-viewer.js";
 import tagsViewerModule from "./details/viewer/tags-viewer.js";
 
 import { attach } from "../utils.js";
@@ -48,26 +49,8 @@ function genComponentConf() {
             <won-tags-viewer ng-if="self.details.get('tags')" content="self.details.get('tags')" detail="self.getDetail('tags')">
             </won-tags-viewer>
 
-            <h2 class="post-info__heading" ng-if="self.details.getIn(['location','address'])">
-                Location
-            </h2>
-            <p class="post-info__details clickable"
-               ng-if="self.details.getIn(['location','address'])" ng-click="self.toggleMap()">
-                {{ self.details.getIn(['location','address']) }}
-				        <svg class="post-info__carret">
-                  <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
-                </svg>
-				        <svg class="post-info__carret" ng-show="!self.showMap">
-	                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-	              </svg>
-                <svg class="post-info__carret" ng-show="self.showMap">
-                   <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                </svg>
-            </p>                
-            <won-need-map 
-              locations="[self.details.get('location')]"
-              ng-if="self.details.get('location') && self.showMap">
-            </won-need-map>
+            <won-location-viewer ng-if="self.details.get('location')" content="self.details.get('location')" detail="self.getDetail('location')">
+            </won-location-viewer>
 
             <h2 class="post-info__heading"
                 ng-show="self.details.get('travelAction')">
@@ -108,7 +91,6 @@ function genComponentConf() {
       //TODO debug; deleteme
       window.isis4dbg = this;
 
-      this.showMap = false;
       this.showRouteMap = false;
       this.allDetails = getAllDetails();
       const self = this;
@@ -136,10 +118,6 @@ function genComponentConf() {
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
-    }
-
-    toggleMap() {
-      this.showMap = !this.showMap;
     }
 
     toggleRouteMap() {
@@ -179,6 +157,7 @@ angular
     needMapModule,
     personViewerModule,
     descriptionViewerModule,
+    locationViewerModule,
     tagsViewerModule,
   ])
   .directive("wonPostIsOrSeeksInfo", genComponentConf).name;
