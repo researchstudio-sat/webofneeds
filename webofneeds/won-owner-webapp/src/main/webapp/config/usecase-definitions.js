@@ -143,7 +143,7 @@ const professionalUseCases = {
   },
   phdSeeks: {
     identifier: "phdSeeks",
-    label: "Apply for PhD position",
+    label: "Find a PhD position",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     isDetails: {
@@ -166,7 +166,7 @@ const professionalUseCases = {
   },
   postDocSeeks: {
     identifier: "postDocSeeks",
-    label: "Apply for a PostDoc position",
+    label: "Find a PostDoc position",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     isDetails: {
@@ -189,7 +189,7 @@ const professionalUseCases = {
   },
   consortiumSeeks: {
     identifier: "consortiumSeeks",
-    label: "Apply a project consortium to join",
+    label: "Find a project consortium to join",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     seeksDetails: {
