@@ -18,12 +18,6 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-            <h2 class="post-info__heading">
-              PRESENT DETAILS IN THE POST
-            </h2>
-            <p class="post-info__details">
-              {{ self.content.details && self.content.details.toJS() }}
-            </p>
             <h2 class="post-info__heading"
                 ng-show="self.content.details.get('title')">
                 <span ng-show="!self.content.hasSearchString">Title</span>
