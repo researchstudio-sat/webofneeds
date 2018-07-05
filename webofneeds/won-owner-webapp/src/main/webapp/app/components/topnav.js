@@ -61,10 +61,11 @@ function genTopnavConf() {
                    Suppress tracking.
                 </a>
 	  		</div>
+	  		    <br>
             <button
                 ng-click="self.acceptDisclaimer()"
                 class="si__button">
-                    Accept
+                    Ok, I'll keep it in mind
             </button>
         </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
