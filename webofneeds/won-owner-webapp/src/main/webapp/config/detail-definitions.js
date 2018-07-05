@@ -232,10 +232,10 @@ export const details = {
         return Immutable.fromJS(person);
       }
 
-      console.error(
+      /*console.error(
         "Cant parse person, data does not contain enough information: ",
         jsonLDImm.toJS()
-      );
+      );*/
       return undefined;
     },
   },
@@ -371,25 +371,8 @@ export const details = {
       }
       return { "won:hasTag": value };
     },
-    parseFromRDF: function({ jsonLD }) {
-      //TODO: Implement this method
-      console.log("trying to parse RDF to content from: ", jsonLD);
-      return undefined;
-    },
-  },
-  ttl: {
-    identifier: "ttl",
-    label: "Turtle (TTL)",
-    icon: "#ico36_rdf_logo_circle",
-    component: "won-ttl-picker",
-    parseToRDF: function({ value }) {
-      if (!value) {
-        return undefined;
-      }
-      // TODO: return value
-    },
     parseFromRDF: function(jsonLDImm) {
-      const tags = jsonLDImm && jsonLDImm.get("won:hasTags");
+      const tags = jsonLDImm && jsonLDImm.get("won:hasTag");
 
       if (!tags) {
         return undefined;
@@ -407,6 +390,23 @@ export const details = {
         );
         return undefined;
       }
+    },
+  },
+  ttl: {
+    identifier: "ttl",
+    label: "Turtle (TTL)",
+    icon: "#ico36_rdf_logo_circle",
+    component: "won-ttl-picker",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return undefined;
+      }
+      // TODO: return value
+    },
+    parseFromRDF: function(jsonLDImm) {
+      // TODO: return value
+      console.error("IMPLEMENT ME", jsonLDImm);
+      return undefined;
     },
   },
 };
