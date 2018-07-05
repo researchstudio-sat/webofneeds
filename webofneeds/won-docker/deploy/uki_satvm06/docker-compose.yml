@@ -71,7 +71,7 @@ services:
       - "uri.host=cbi.matchat.org"
       - "http.port=8082"
       - "node.default.http.port=443"
-      - "uri.prefix=https://cbi.matchat.org/owner"
+      - "uri.prefix=https://cbi.matchat.org"
       - "uri.prefix.node.default=https://node.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5432/won_owner"
