@@ -19,13 +19,13 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
             <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.details.get('title')">
-                <span ng-show="!self.isOrSeeksPart.hasSearchString">Title</span>
-                <span ng-show="self.isOrSeeksPart.hasSearchString">Searching for</span>
+                ng-show="self.content.details.get('title')">
+                <span ng-show="!self.content.hasSearchString">Title</span>
+                <span ng-show="self.content.hasSearchString">Searching for</span>
             </h2>
             <p class="post-info__details"
-                ng-show="self.isOrSeeksPart.details.get('title')">
-                {{ self.isOrSeeksPart.details.get('title')}}
+                ng-show="self.content.details.get('title')">
+                {{ self.content.details.get('title')}}
             </p>
             <h2 class="post-info__heading"
                 ng-if="self.person">
