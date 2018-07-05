@@ -26,7 +26,7 @@ export const emptyDraft = {
 const allDetailsUseCase = {
   allDetails: {
     identifier: "allDetails",
-    label: "All Details",
+    label: "New custom post",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     isDetails: details,
@@ -37,7 +37,7 @@ const allDetailsUseCase = {
 const pureSearchUseCase = {
   pureSearch: {
     identifier: "pureSearch",
-    label: "Search Posts",
+    label: "Search posts",
     icon: "#ico36_search",
     draft: { ...emptyDraft },
     isDetails: undefined,
@@ -50,9 +50,31 @@ const pureSearchUseCase = {
 // there won't be an is or seeks part unless defined in the draft
 // details predefined in the draft can only be changed IF included in the correct detail list
 const socialUseCases = {
+  breakfast: {
+    identifier: "breakfast",
+    label: "Get breakfast together",
+    icon: "#ico36_plus",
+    draft: {
+      ...emptyDraft,
+      is: { tags: ["essen", "food"] },
+      seeks: { title: "breakfast" },
+      searchString: "breakfast",
+    },
+    isDetails: {
+      description: { ...details.description },
+      foodAllergies: {
+        ...details.description,
+        identifier: "foodallergies",
+        label: "Food Allergies",
+      },
+      location: { ...details.location },
+      tags: { ...details.tags },
+    },
+    seeksDetails: undefined,
+  },
   lunch: {
     identifier: "lunch",
-    label: "Get Lunch Together",
+    label: "Get lunch together",
     icon: "#ico36_plus",
     draft: {
       ...emptyDraft,
@@ -74,7 +96,7 @@ const socialUseCases = {
   },
   afterparty: {
     identifier: "afterparty",
-    label: "Afterparty",
+    label: "Enjoy the evening together",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     seeksDetails: {
@@ -84,7 +106,7 @@ const socialUseCases = {
   },
   sightseeing: {
     identifier: "sightseeing",
-    label: "Sight Seeing",
+    label: "Go sightseeing together",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     seeksDetails: {
@@ -98,7 +120,17 @@ const socialUseCases = {
 };
 
 const professionalUseCases = {
-  // getToKnow: {},
+  getToKnow: {
+    identifier: "getToKnow",
+    label: "Find people",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+      person: { ...details.person },
+    },
+  },
   phdIs: {
     identifier: "phdIs",
     label: "Offer a PhD position",
@@ -111,7 +143,53 @@ const professionalUseCases = {
   },
   phdSeeks: {
     identifier: "phdSeeks",
-    label: "Search for a PhD position",
+    label: "Find a PhD position",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      person: { ...details.person },
+    },
+    seeksDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  postDocIs: {
+    identifier: "postDocIs",
+    label: "Offer a PostDoc position",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  postDocSeeks: {
+    identifier: "postDocSeeks",
+    label: "Find a PostDoc position",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      person: { ...details.person },
+    },
+    seeksDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  consortiumIs: {
+    identifier: "consortiumIs",
+    label: "Announce slot in project consortium",
+    icon: "#ico36_plus",
+    draft: { ...emptyDraft },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  consortiumSeeks: {
+    identifier: "consortiumSeeks",
+    label: "Find a project consortium to join",
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     seeksDetails: {
@@ -119,8 +197,45 @@ const professionalUseCases = {
       location: { ...details.location },
     },
   },
-  // postdoc: {},
-  // consortium: {},
+};
+
+const infoUseCases = {
+  question: {
+    identifier: "question",
+    label: "Ask a question",
+    icon: "#ico36_plus",
+    draft: {
+      ...emptyDraft,
+      is: { tags: ["question"] },
+      seeks: { tags: "answer" },
+    },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+      tags: { ...details.tags },
+    },
+    seeksDetails: undefined,
+  },
+  answer: {
+    //answer should have 'no hint for counterpart'
+    identifier: "answer",
+    label: "Answer questions",
+    icon: "#ico36_plus",
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "Answer questions",
+        tags: ["answer"],
+      },
+      seeks: { tags: "question" },
+    },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+      tags: { ...details.tags },
+    },
+    seeksDetails: undefined,
+  },
 };
 
 /*const otherUseCases = {
@@ -133,6 +248,7 @@ const professionalUseCases = {
 export const useCases = {
   ...socialUseCases,
   ...professionalUseCases,
+  ...infoUseCases,
   ...allDetailsUseCase,
   ...pureSearchUseCase,
 };
@@ -140,20 +256,26 @@ export const useCases = {
 export const useCaseGroups = {
   social: {
     identifier: "socialgroup",
-    label: "Do something social",
+    label: "Fun activities",
     icon: undefined,
     useCases: { ...socialUseCases },
   },
   professional: {
     identifier: "professionalgroup",
-    label: "Do something professional",
-    icon: "#ico36_plus",
+    label: "Professional networking",
+    icon: undefined,
     useCases: { ...professionalUseCases },
+  },
+  info: {
+    identifier: "infogroup",
+    label: "Questions and Answers",
+    icon: undefined,
+    useCases: { ...infoUseCases },
   },
   other: {
     identifier: "othergroup",
-    label: "And now for something completely different",
-    icon: "#ico36_plus",
+    label: "Something else",
+    icon: undefined,
     useCases: { ...allDetailsUseCase, ...pureSearchUseCase },
   },
 };

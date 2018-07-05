@@ -29,7 +29,7 @@ function genComponentConf() {
                     <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
             </svg>
             <div class="cpi__item__text">
-                Post
+                Add interest or suggestion
             </div>
         </div>
     `;
