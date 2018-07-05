@@ -9,6 +9,7 @@ import personViewerModule from "./details/viewer/person-viewer.js";
 import descriptionViewerModule from "./details/viewer/description-viewer.js";
 import locationViewerModule from "./details/viewer/location-viewer.js";
 import tagsViewerModule from "./details/viewer/tags-viewer.js";
+import routeViewerModule from "./details/viewer/route-viewer.js";
 
 import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
@@ -25,12 +26,6 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-            <h2 class="post-info__heading">
-              DETAILS JS
-            </h2>
-            <p class="post-info__detail">
-              {{ self.details.toJS() }}
-            </p>
             <h2 class="post-info__heading"
                 ng-show="self.details.get('title')">
                 <span ng-show="!self.searchString">Title</span>
@@ -40,6 +35,7 @@ function genComponentConf() {
                 ng-show="self.details.get('title')">
                 {{ self.details.get('title')}}
             </p>
+
             <won-person-viewer ng-if="self.details.get('person')" content="self.details.get('person')" detail="self.getDetail('person')">
             </won-person-viewer>
 
@@ -52,36 +48,8 @@ function genComponentConf() {
             <won-location-viewer ng-if="self.details.get('location')" content="self.details.get('location')" detail="self.getDetail('location')">
             </won-location-viewer>
 
-            <h2 class="post-info__heading"
-                ng-show="self.details.get('travelAction')">
-                Route
-            </h2>
-            <p class="post-info__details clickable"
-               ng-show="self.details.get('travelAction')"
-               ng-click="self.toggleRouteMap()">
-
-              <span ng-if="self.details.getIn(['travelAction', 'fromAddress'])">
-                <strong>From: </strong>{{ self.details.getIn(['travelAction', 'fromAddress']) }}
-              </span>
-              </br>
-              <span ng-if="self.details.getIn(['travelAction', 'toAddress'])">
-              <strong>To: </strong>{{ self.details.getIn(['travelAction', 'toAddress']) }}
-              </span>
-
-              <svg class="post-info__carret">
-                <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
-              </svg>
-              <svg class="post-info__carret" ng-show="!self.showRouteMap">
-                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-              </svg>
-              <svg class="post-info__carret" ng-show="self.showRouteMap">
-                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-              </svg>
-            </p>
-            <won-need-map
-              locations="self.travelLocations"
-              ng-if="self.details.get('travelAction') && self.showRouteMap">
-            </won-need-map>
+            <won-route-viewer ng-if="self.details.get('travelAction')" content="self.details.get('travelAction')" detail="self.getDetail('route')"> <!-- TODO: rename detail to travelAction -->
+            </won-route-viewer>
     	`;
 
   class Controller {
@@ -91,16 +59,7 @@ function genComponentConf() {
       //TODO debug; deleteme
       window.isis4dbg = this;
 
-      this.showRouteMap = false;
       this.allDetails = getAllDetails();
-      const self = this;
-
-      this.$scope.$watch("self.details.get('travelAction')", newValue => {
-        self.travelLocations = newValue && [
-          newValue.get("fromLocation"),
-          newValue.get("toLocation"),
-        ];
-      });
 
       const selectFromState = state => {
         const postUri = selectOpenPostUri(state);
@@ -118,10 +77,6 @@ function genComponentConf() {
       };
 
       connect2Redux(selectFromState, actionCreators, [], this);
-    }
-
-    toggleRouteMap() {
-      this.showRouteMap = !this.showRouteMap;
     }
 
     getDetail(key) {
@@ -158,6 +113,7 @@ angular
     personViewerModule,
     descriptionViewerModule,
     locationViewerModule,
+    routeViewerModule,
     tagsViewerModule,
   ])
   .directive("wonPostIsOrSeeksInfo", genComponentConf).name;

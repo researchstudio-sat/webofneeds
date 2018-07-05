@@ -1,0 +1,78 @@
+import angular from "angular";
+import { attach } from "../../../utils.js";
+import needMapModule from "../../need-map.js";
+
+const serviceDependencies = ["$scope", "$element"];
+function genComponentConf() {
+  let template = `
+        <div class="rv__header">
+          <svg class="rv__header__icon" ng-if="self.detail.icon">
+              <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
+          </svg>
+          <span ng-if="self.detail.label">{{self.detail.label}}</span>
+        </div>
+        <div class="rv__content">
+          <div class="rv__content__text clickable"
+               ng-if="self.content.get('fromAddress') || self.content.get('toAddress')" ng-click="self.toggleMap()">
+                <div>
+                  <span ng-if="self.content.get('fromAddress')">
+                    <strong>From: </strong>{{ self.content.get('fromAddress') }}
+                  </span>
+                  </br>
+                  <span ng-if="self.content.get('toAddress')">
+                    <strong>To: </strong>{{ self.content.get('toAddress') }}
+                  </span>
+                </div>
+				        <svg class="rv__content__text__carret">
+                  <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
+                </svg>
+				        <svg class="rv__content__text__carret" ng-show="!self.showMap">
+	                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+	              </svg>
+                <svg class="rv__content__text__carret" ng-show="self.showMap">
+                   <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                </svg>
+          </div>
+          <won-need-map
+            locations="self.locations"
+            ng-if="self.content && self.showMap">
+          </won-need-map>
+        </div>
+    `;
+
+  class Controller {
+    constructor() {
+      attach(this, serviceDependencies, arguments);
+      window.lv4dbg = this;
+      this.showMap = false;
+
+      this.$scope.$watch("self.content", newValue => {
+        self.locations = newValue && [
+          newValue.get("fromLocation"),
+          newValue.get("toLocation"),
+        ];
+      });
+    }
+
+    toggleMap() {
+      this.showMap = !this.showMap;
+    }
+  }
+  Controller.$inject = serviceDependencies;
+
+  return {
+    restrict: "E",
+    controller: Controller,
+    controllerAs: "self",
+    bindToController: true, //scope-bindings -> ctrl
+    scope: {
+      content: "=",
+      detail: "=",
+    },
+    template: template,
+  };
+}
+
+export default angular
+  .module("won.owner.components.routeViewer", [needMapModule])
+  .directive("wonRouteViewer", genComponentConf).name;
