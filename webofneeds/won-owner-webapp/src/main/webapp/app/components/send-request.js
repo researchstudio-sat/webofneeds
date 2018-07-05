@@ -54,9 +54,6 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <won-gallery ng-show="self.displayedPost.get('hasImages')">
-            </won-gallery>
-
             <!-- GENERAL Part -->
             <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
                 Created
@@ -70,14 +67,18 @@ function genComponentConf() {
             <p class="post-info__details" ng-show="self.displayedPost.get('type')">
                 {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
             </p>
+
+            <won-gallery ng-show="self.displayedPost.get('hasImages')">
+            </won-gallery>
+
             <!-- IS Part -->
             <div ng-show="self.isPart">
-                <won-post-is-or-seeks-info is-or-seeks-part="self.isPart"></won-post-is-or-seeks-info>
+                <won-post-is-or-seeks-info content="self.isPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <!-- SEEKS Part -->
             <div ng-show="self.seeksPart">
-                <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart"></won-post-is-or-seeks-info>
+                <won-post-is-or-seeks-info content="self.seeksPart"></won-post-is-or-seeks-info>
             </div>
             </br>
             <a class="rdflink clickable"
@@ -145,28 +146,23 @@ function genComponentConf() {
         //TODO it will be possible to have more than one seeks
         const seeks = displayedPost ? displayedPost.get("seeks") : undefined;
 
+        const searchString = displayedPost
+          ? displayedPost.get("searchString")
+          : undefined;
+
         return {
           connection,
           connectionUri,
           ownNeed,
           isPart: is
             ? {
-                postUri: postUriToConnectTo,
-                isOrSeeks: is,
-                isString: "is",
-                location: is && is.get("location"),
-                address:
-                  is.get("location") && is.get("location").get("address"),
+                details: is,
               }
             : undefined,
           seeksPart: seeks
             ? {
-                postUri: postUriToConnectTo,
-                isOrSeeks: seeks,
-                seeksString: "seeks",
-                location: seeks && seeks.get("location"),
-                address:
-                  seeks.get("location") && seeks.get("location").get("address"),
+                details: seeks,
+                hasSearchString: searchString, // WORKAROUND - because only seeksPart is send to child component
               }
             : undefined,
           displayedPost,
