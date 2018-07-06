@@ -2,25 +2,7 @@
 @import "sizing-utils";
 
 won-route-viewer {
-  display: grid;
-  grid-auto-flow: row;
-  grid-gap: 0.5rem;
-
-  .rv__header {
-    display: flex;
-    align-items: center;
-    color: $won-primary-text-color;
-
-    &__icon {
-      @include fixed-square($iconSize);
-      --local-primary: #{$won-primary-text-color};
-      margin-right: 0.5rem;
-    }
-
-    &__label {
-      font-weight: bold;
-    }
-  }
+  @include won-detail-viewer("rv");
 
   .rv__content {
     &__text {

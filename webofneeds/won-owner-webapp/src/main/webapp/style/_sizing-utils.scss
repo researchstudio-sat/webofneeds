@@ -76,21 +76,29 @@
 @mixin won-detail-viewer($prefix) {
   display: grid;
   grid-auto-flow: row;
-  grid-gap: 0.5rem;
+  grid-gap: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
 
   .#{$prefix}__header {
+    display: flex;
+    align-items: center;
+    color: $won-primary-text-color;
+
     &__icon {
-      @include fixed-square($iconSize);
+      @include fixed-square($contentInfoHeaderIconSize);
       --local-primary: #{$won-primary-text-color};
-      margin-right: 0.5rem;
+      margin-right: 0.25rem;
     }
 
     &__label {
+      font-size: $normalFontSize;
       font-weight: bold;
     }
   }
 
   .#{$prefix}__content {
+    padding-left: calc(0.25rem + #{$contentInfoHeaderIconSize});
   }
 }
 
