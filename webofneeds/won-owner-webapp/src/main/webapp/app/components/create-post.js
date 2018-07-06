@@ -22,7 +22,7 @@ import { useCases } from "useCaseDefinitions";
 import descriptionPickerModule from "./details/description-picker.js";
 import locationPickerModule from "./details/location-picker.js";
 import personPickerModule from "./details/person-picker.js";
-import routePickerModule from "./details/route-picker.js";
+import travelActionPickerModule from "./details/travel-action-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 
@@ -427,7 +427,7 @@ angular
     descriptionPickerModule,
     locationPickerModule,
     personPickerModule,
-    routePickerModule,
+    travelActionPickerModule,
     tagsPickerModule,
     ttlPickerModule,
     createIsseeksModule,

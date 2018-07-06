@@ -43,7 +43,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.routev4dbg = this;
       this.showMap = false;
 
       this.$scope.$watch("self.content", (newContent, prevContent) =>
@@ -85,5 +84,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.routeViewer", [needMapModule])
-  .directive("wonRouteViewer", genComponentConf).name;
+  .module("won.owner.components.travelActionViewer", [needMapModule])
+  .directive("wonTravelActionViewer", genComponentConf).name;

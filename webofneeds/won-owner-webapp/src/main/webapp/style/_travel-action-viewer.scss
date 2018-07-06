@@ -1,7 +1,7 @@
 @import "won-config";
 @import "sizing-utils";
 
-won-route-viewer {
+won-travel-action-viewer {
   @include won-detail-viewer("rv");
 
   .rv__content {

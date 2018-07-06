@@ -4,12 +4,12 @@
 import angular from "angular";
 
 import "ng-redux";
-import needMapModule from "./need-map.js";
+// TODO: these should be replaced by importing defintions from config
 import personViewerModule from "./details/viewer/person-viewer.js";
 import descriptionViewerModule from "./details/viewer/description-viewer.js";
 import locationViewerModule from "./details/viewer/location-viewer.js";
 import tagsViewerModule from "./details/viewer/tags-viewer.js";
-import routeViewerModule from "./details/viewer/route-viewer.js";
+import travelActionViewerModule from "./details/viewer/travel-action-viewer.js";
 import titleViewerModule from "./details/viewer/title-viewer.js";
 
 import { attach } from "../utils.js";
@@ -33,20 +33,14 @@ function genComponentConf() {
         <won-title-viewer ng-if="!self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Title' }">
         </won-title-viewer>
 
-        <won-person-viewer ng-if="self.details.get('person')" content="self.details.get('person')" detail="self.getDetail('person')">
-        </won-person-viewer>
-
-        <won-description-viewer ng-if="self.details.get('description')" content="self.details.get('description')" detail="self.getDetail('description')">
-        </won-description-viewer>
-
-        <won-tags-viewer ng-if="self.details.get('tags')" content="self.details.get('tags')" detail="self.getDetail('tags')">
-        </won-tags-viewer>
-
-        <won-location-viewer ng-if="self.details.get('location')" content="self.details.get('location')" detail="self.getDetail('location')">
-        </won-location-viewer>
-
-        <won-route-viewer ng-if="self.details.get('travelAction')" content="self.details.get('travelAction')" detail="self.getDetail('route')"> <!-- TODO: rename detail to travelAction -->
-        </won-route-viewer>
+        <!-- COMPONENT -->
+        <div class="pis__component"
+          ng-repeat="detail in self.allDetails"
+          ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
+          detail-viewer-element="{{detail.viewerComponent}}"
+          detail="detail"
+          content="self.getDetailContent(detail.identifier)">
+        </div>
     	`;
 
   class Controller {
@@ -88,6 +82,10 @@ function genComponentConf() {
       }
       return detail;
     }
+
+    getDetailContent(key) {
+      return key && this.details && this.details.get(key);
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -106,12 +104,33 @@ function genComponentConf() {
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
   .module("won.owner.components.postIsOrSeeksInfo", [
-    needMapModule,
     personViewerModule,
     descriptionViewerModule,
     locationViewerModule,
-    routeViewerModule,
+    travelActionViewerModule,
     tagsViewerModule,
     titleViewerModule,
+  ])
+  .directive("detailViewerElement", [
+    "$compile",
+    function($compile) {
+      return {
+        restrict: "A",
+        scope: {
+          content: "=",
+          detail: "=",
+        },
+        link: function(scope, element, attrs) {
+          const customTag = attrs.detailViewerElement;
+          if (!customTag) return;
+
+          const customElem = angular.element(
+            `<${customTag} detail="detail" content="content"></${customTag}>`
+          );
+
+          element.append($compile(customElem)(scope));
+        },
+      };
+    },
   ])
   .directive("wonPostIsOrSeeksInfo", genComponentConf).name;

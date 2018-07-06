@@ -11,6 +11,7 @@ export const details = {
     label: "Description",
     icon: "#ico36_description_circle",
     component: "won-description-picker",
+    viewerComponent: "won-description-viewer",
     parseToRDF: function({ value }) {
       if (!value) {
         return { "dc:description": undefined };
@@ -26,6 +27,7 @@ export const details = {
     label: "Location",
     icon: "#ico36_location_circle",
     component: "won-location-picker",
+    viewerComponent: "won-location-viewer",
     parseToRDF: function({ value, identifier }) {
       if (!value) {
         // TODO: this should happen in need-builder
@@ -173,6 +175,7 @@ export const details = {
     label: "Person",
     icon: "#ico36_person_single_circle",
     component: "won-person-picker",
+    viewerComponent: "won-person-viewer",
     parseToRDF: function({ value }) {
       if (!value) {
         return { "foaf:person": undefined };
@@ -239,12 +242,12 @@ export const details = {
       return undefined;
     },
   },
-  // TODO: rename to travelAction
-  route: {
+  travelAction: {
     identifier: "travelAction",
     label: "Route (From - To)",
     icon: "#ico36_location_circle",
-    component: "won-route-picker",
+    component: "won-travel-action-picker",
+    viewerComponent: "won-travel-action-viewer",
     parseToRDF: function({ value }) {
       if (!value) {
         return { "won:travelAction": undefined };
@@ -365,6 +368,7 @@ export const details = {
     label: "Tags",
     icon: "#ico36_tags_circle",
     component: "won-tags-picker",
+    viewerComponent: "won-tags-viewer",
     parseToRDF: function({ value }) {
       if (!value) {
         return { "won:hasTag": undefined };
@@ -397,6 +401,7 @@ export const details = {
     label: "Turtle (TTL)",
     icon: "#ico36_rdf_logo_circle",
     component: "won-ttl-picker",
+    viewerComponent: undefined,
     parseToRDF: function({ value }) {
       if (!value) {
         return undefined;
