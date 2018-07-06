@@ -13,10 +13,30 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="conn__content conn__content--empty hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.isPost && !self.isSearch && !self.useCase">
-        <span class="conn__content__description__text">
-            No element selected
-        </span>
+    <div class="conn__content hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.isPost && !self.isSearch && !self.useCase">
+        <div class="conn__content__welcome">
+            <div class="conn__content__welcome__text" ng-include="self.welcomeTemplate"></div>
+            <div class="conn__content__welcome__createx">
+                <button class="won-button--filled red conn__content__welcome__createx__button"
+                        ng-click="self.createWhatsAround()"
+                        ng-disabled="self.pendingPublishing"
+                        ng-if="!self.pendingPublishing">
+                    <svg class="won-button-icon" style="--local-primary:white;">
+                        <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
+                    </svg>
+                    <span ng-if="!self.pendingPublishing">What's in your Area?</span>
+                    <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
+                </button>
+                <button class="won-button--filled red conn__content__welcome__createx__button"
+                        ng-click="self.createWhatsNew()"
+                        ng-disabled="self.pendingPublishing">
+                    <span ng-if="!self.pendingPublishing">What's new?</span>
+                    <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
+                </button>
+            </div>
+            <won-labelled-hr label="::'Or'" class="conn__content__welcome__labelledhr"></won-labelled-hr>
+            <won-usecase-picker-content></won-usecase-picker-content>
+        </div>
     </div>
     <div class="conn__content" ng-if="self.useCase || self.isPost || self.isSearch || self.selectedPost || (self.connection && self.connectionType !== self.WON.Closed)">
         <won-usecase-picker ng-if="!self.useCase && self.isPost && !self.selectedPost && !self.connection"></won-usecase-picker>

@@ -19,30 +19,30 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-      <div class="ucp__content__usecasegroup"
+      <div class="ucpc__usecasegroup"
         ng-repeat="useCaseGroup in self.useCaseGroups"
         ng-if="self.displayableUseCaseGroup(useCaseGroup)">
-          <div class="ucp__content__usecasegroup__header"
+          <div class="ucpc__usecasegroup__header"
             ng-if="self.showUseCaseGroupHeaders">
-            <svg class="ucp__content__usecasegroup__header__icon"
+            <svg class="ucpc__usecasegroup__header__icon"
               ng-if="!!useCaseGroup.icon">
               <use xlink:href="{{ useCaseGroup.icon }}" href="{{ useCaseGroup.icon }}"></use>
             </svg>
-            <div class="ucp__content__usecasegroup__header__label"
+            <div class="ucpc__usecasegroup__header__label"
               ng-if="!!useCaseGroup.label">
                 {{ useCaseGroup.label }}
             </div>
           </div>
-          <div class="ucp__content__usecasegroup__usecases">
-            <div class="ucp__content__usecasegroup__usecases__usecase clickable"
+          <div class="ucpc__usecasegroup__usecases">
+            <div class="ucpc__usecasegroup__usecases__usecase clickable"
               ng-repeat="useCase in useCaseGroup.useCases"
               ng-if="self.displayableUseCase(useCase)"
               ng-click="self.startFrom(useCase)">
-              <svg class="ucp__content__usecasegroup__usecases__usecase__icon"
+              <svg class="ucpc__usecasegroup__usecases__usecase__icon"
                 ng-if="!!useCase.icon">
                 <use xlink:href="{{ useCase.icon }}" href="{{ useCase.icon }}"></use>
               </svg>
-              <div class="ucp__content__usecasegroup__usecases__usecase__label"
+              <div class="ucpc__usecasegroup__usecases__usecase__label"
                 ng-if="!!useCase.label">
                   {{ useCase.label }}
               </div>
@@ -55,7 +55,7 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
-      window.ucp4dbg = this;
+      window.ucpc4dbg = this;
       this.useCaseGroups = useCaseGroups;
       this.showUseCaseGroupHeaders = this.showUseCaseGroups();
 
