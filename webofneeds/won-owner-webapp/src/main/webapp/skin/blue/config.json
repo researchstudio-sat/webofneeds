@@ -3,5 +3,6 @@
   "adminEmail": "office.sat@researchstudio.at",
   "imprintTemplate": "imprint.html",
   "privacyPolicyTemplate": "privacyPolicy.html",
+  "welcomeTemplate": "welcomeTemplate.html",
   "defaultContext": []
 }
