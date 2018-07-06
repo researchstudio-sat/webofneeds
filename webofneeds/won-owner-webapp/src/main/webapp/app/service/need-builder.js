@@ -7,6 +7,7 @@
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
 import { useCases } from "useCaseDefinitions";
+import { getAllDetails } from "../utils";
 
 (function() {
   // <need-builder-js> scope
@@ -168,24 +169,26 @@ import { useCases } from "useCaseDefinitions";
             },
         //TODO images, time, currency(?)
       };
+      let detailList = undefined;
       if (args.useCase && useCases[args.useCase]) {
-        // get list of potential details from use case
         const useCase = useCases[args.useCase];
-        const detailList = isSeeks ? "seeksDetails" : "isDetails";
-        // iterate over details
-        for (let detailName in useCase[detailList]) {
-          // parse detail to RDF
-          const detail = useCase[detailList][detailName];
-          let detailRDF = {
-            ...detail.parseToRDF({
-              value: isOrSeeksData[detail.identifier],
-              identifier: detail.identifier,
-            }),
-          };
-          // add to content node
-          for (let key in detailRDF) {
-            contentNode[key] = detailRDF[key];
-          }
+        const ucDetails = isSeeks ? "seeksDetails" : "isDetails";
+        detailList = useCase[ucDetails];
+      } else {
+        detailList = getAllDetails();
+      }
+
+      for (const detailName in detailList) {
+        const detail = detailList[detailName];
+        const detailRDF = {
+          ...detail.parseToRDF({
+            value: isOrSeeksData[detail.identifier],
+            identifier: detail.identifier,
+          }),
+        };
+        // add to content node
+        for (const key in detailRDF) {
+          contentNode[key] = detailRDF[key];
         }
       }
       return contentNode;
