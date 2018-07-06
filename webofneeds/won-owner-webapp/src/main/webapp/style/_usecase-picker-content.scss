@@ -2,65 +2,8 @@
 @import "animate";
 @import "sizing-utils";
 @import "responsiveness-utils";
-@import "usecase-picker-content";
 
-won-usecase-picker {
-  display: grid;
-  grid-template-areas: "header" "main";
-  grid-template-rows: min-content minmax($minimalGridRows, 1fr);
-  grid-row-gap: $gridRowGap;
-  width: 100%;
-  max-width: $maxContentWidth;
-  height: 100%;
-  box-sizing: border-box;
-  padding: $gridRowGap;
-
-  /*
-  &.create-post-mobile {
-    grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
-  }*/
-
-  .ucp__header {
-    grid-area: header;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "header_back header_title";
-    font-size: $normalFontSize;
-    text-align: left;
-    min-width: 0;
-    align-items: center;
-
-    // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
-    padding-left: 0.5rem;
-    @media (max-width: $responsivenessBreakPoint) {
-      padding-left: 0;
-    }
-
-    &__title {
-      grid-area: header_title;
-      color: $won-subtitle-gray;
-      font-size: $mediumFontSize;
-      font-weight: 400;
-    }
-
-    &__back {
-      grid-area: header_back;
-      &__icon {
-        /*@media (max-width: $responsivenessBreakPoint) {
-          @include fixed-square(2.5rem);
-        }*/
-        @include fixed-square($backIconSize);
-      }
-    }
-  }
-
-  won-usecase-picker-content {
-    grid-area: main;
-  }
-}
-
-.ucp__content {
-  grid-area: main;
+won-usecase-picker-content {
   display: grid;
   grid-auto-rows: min-content;
   grid-gap: 1rem;
