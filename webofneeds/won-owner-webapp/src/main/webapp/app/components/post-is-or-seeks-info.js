@@ -10,6 +10,7 @@ import descriptionViewerModule from "./details/viewer/description-viewer.js";
 import locationViewerModule from "./details/viewer/location-viewer.js";
 import tagsViewerModule from "./details/viewer/tags-viewer.js";
 import routeViewerModule from "./details/viewer/route-viewer.js";
+import titleViewerModule from "./details/viewer/title-viewer.js";
 
 import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
@@ -26,30 +27,23 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-            <h2 class="post-info__heading"
-                ng-show="self.details.get('title')">
-                <span ng-show="!self.searchString">Title</span>
-                <span ng-show="self.searchString">Searching for</span>
-            </h2>
-            <p class="post-info__details"
-                ng-show="self.details.get('title')">
-                {{ self.details.get('title')}}
-            </p>
+        <won-title-viewer ng-if="self.details.get('title')" content="self.details.get('title')" detail="self.getTitleDetail()">
+        </won-title-viewer>
 
-            <won-person-viewer ng-if="self.details.get('person')" content="self.details.get('person')" detail="self.getDetail('person')">
-            </won-person-viewer>
+        <won-person-viewer ng-if="self.details.get('person')" content="self.details.get('person')" detail="self.getDetail('person')">
+        </won-person-viewer>
 
-           	<won-description-viewer ng-if="self.details.get('description')" content="self.details.get('description')" detail="self.getDetail('description')">
-            </won-description-viewer>
+        <won-description-viewer ng-if="self.details.get('description')" content="self.details.get('description')" detail="self.getDetail('description')">
+        </won-description-viewer>
 
-            <won-tags-viewer ng-if="self.details.get('tags')" content="self.details.get('tags')" detail="self.getDetail('tags')">
-            </won-tags-viewer>
+        <won-tags-viewer ng-if="self.details.get('tags')" content="self.details.get('tags')" detail="self.getDetail('tags')">
+        </won-tags-viewer>
 
-            <won-location-viewer ng-if="self.details.get('location')" content="self.details.get('location')" detail="self.getDetail('location')">
-            </won-location-viewer>
+        <won-location-viewer ng-if="self.details.get('location')" content="self.details.get('location')" detail="self.getDetail('location')">
+        </won-location-viewer>
 
-            <won-route-viewer ng-if="self.details.get('travelAction')" content="self.details.get('travelAction')" detail="self.getDetail('route')"> <!-- TODO: rename detail to travelAction -->
-            </won-route-viewer>
+        <won-route-viewer ng-if="self.details.get('travelAction')" content="self.details.get('travelAction')" detail="self.getDetail('route')"> <!-- TODO: rename detail to travelAction -->
+        </won-route-viewer>
     	`;
 
   class Controller {
@@ -91,6 +85,19 @@ function genComponentConf() {
       }
       return detail;
     }
+
+    /**
+     * This method is a workaround for the title detail
+     * @param key
+     * @returns {allDetailsUseCase.allDetails|*|Controller.allDetails}
+     */
+    getTitleDetail() {
+      if (this.searchString) {
+        return { label: "Searching for" };
+      } else {
+        return { label: "Title" };
+      }
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -115,5 +122,6 @@ angular
     locationViewerModule,
     routeViewerModule,
     tagsViewerModule,
+    titleViewerModule,
   ])
   .directive("wonPostIsOrSeeksInfo", genComponentConf).name;
