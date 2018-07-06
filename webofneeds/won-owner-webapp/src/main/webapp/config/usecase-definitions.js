@@ -225,7 +225,7 @@ const professionalUseCases = {
   consortiumIs: {
     identifier: "consortiumIs",
     label: "Announce slot in project consortium",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_consortium",
     draft: { ...emptyDraft },
     isDetails: {
       description: { ...details.description },
@@ -235,7 +235,7 @@ const professionalUseCases = {
   consortiumSeeks: {
     identifier: "consortiumSeeks",
     label: "Find a project consortium to join",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_consortium",
     draft: { ...emptyDraft },
     seeksDetails: {
       description: { ...details.description },
