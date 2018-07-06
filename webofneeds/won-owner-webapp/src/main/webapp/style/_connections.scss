@@ -50,18 +50,34 @@
       border-right: none;
     }
 
-    &--empty {
+    &__welcome {
+      padding: 0.5rem;
+      width: 100%;
+      overflow: auto;
+      box-sizing: border-box;
+
       background: $won-lighter-gray;
 
-      // display message centered
-      flex-direction: column;
+      &__text {
+        padding-bottom: 1rem;
+      }
 
-      .conn__content__description__text {
-        display: flex;
-        align-self: center;
-        font-weight: 300;
-        color: var(--won-dark-gray);
-        font-size: $bigFontSize;
+      &__createx {
+        display: grid;
+        grid-gap: 0.5rem;
+        grid-auto-flow: column;
+        grid-template-columns: 1fr 1fr;
+
+        &.won-pending-publishing {
+          grid-template-columns: 1fr;
+        }
+
+        &__button {
+          white-space: normal;
+        }
+      }
+
+      &__labelledhr {
       }
     }
   }

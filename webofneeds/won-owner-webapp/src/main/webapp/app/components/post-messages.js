@@ -29,7 +29,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <div class="pm__header" ng-if="!self.showAgreementData">
-            <a class="pm__header__back clickable show-in-responsive"
+            <a class="pm__header__back clickable"
                ng-click="self.router__stateGoCurrent({connectionUri : undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                      class="pm__header__back__icon clickable">
