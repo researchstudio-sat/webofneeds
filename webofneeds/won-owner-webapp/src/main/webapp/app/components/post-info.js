@@ -25,7 +25,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <div class="post-info__header" ng-if="self.includeHeader">
-            <a class="post-info__header__back clickable show-in-responsive"
+            <a class="post-info__header__back clickable"
                ng-class="{'show-in-responsive': !self.fromConnection}"
                ng-click="self.router__stateGoCurrent({postUri : null})">
                 <svg style="--local-primary:var(--won-primary-color);"
