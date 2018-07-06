@@ -1,6 +1,6 @@
 import Immutable from "immutable";
 import won from "../../won-es6.js";
-import { is } from "../../utils.js";
+import { getAllDetails } from "../../won-utils.js";
 
 export function parseNeed(jsonldNeed, ownNeed) {
   const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -49,11 +49,11 @@ export function parseNeed(jsonldNeed, ownNeed) {
     }
 
     /*
-         * The following code-snippet is solely to determine if the parsed need
-         * is a special "whats around"-need, in order to do this we have to make
-         * sure that the won:hasFlag is checked in two forms, both as a string
-         * and an immutable object
-         */
+     * The following code-snippet is solely to determine if the parsed need
+     * is a special "whats around"-need, in order to do this we have to make
+     * sure that the won:hasFlag is checked in two forms, both as a string
+     * and an immutable object
+     */
     const wonHasFlags = jsonldNeedImm.get("won:hasFlag");
     const isWhatsAround =
       wonHasFlags &&
@@ -98,26 +98,17 @@ export function parseNeed(jsonldNeed, ownNeed) {
     let isPart = undefined;
     let seeksPart = undefined;
     let type = undefined;
-
-    const genIsSeeksPart = (isOrSeeks, type) => ({
-      title: isOrSeeks.get("dc:title"),
-      type: type,
-      description: isOrSeeks.get("dc:description"),
-      tags: parseTags(isOrSeeks.get("won:hasTag")),
-      person: parsePerson(isOrSeeks),
-      location: parseLocation(isOrSeeks.get("won:hasLocation")),
-      travelAction: parseTravelAction(isOrSeeks.get("won:travelAction")),
-    });
+    const detailsToParse = getAllDetails();
 
     if (isPresent) {
       type = seeksPresent
         ? won.WON.BasicNeedTypeCombinedCompacted
         : won.WON.BasicNeedTypeSupplyCompacted;
-      isPart = genIsSeeksPart(is, type);
+      isPart = generateContent(is, type, detailsToParse);
     }
     if (seeksPresent) {
       type = isPresent ? type : won.WON.BasicNeedTypeDemandCompacted;
-      seeksPart = genIsSeeksPart(seeks, type);
+      seeksPart = generateContent(seeks, type, detailsToParse);
     }
     if (searchString) {
       parsedNeed.searchString = searchString;
@@ -154,251 +145,33 @@ export function parseNeed(jsonldNeed, ownNeed) {
   return Immutable.fromJS(parsedNeed);
 }
 
-function parsePerson(isOrSeeks) {
-  if (!isOrSeeks) return undefined;
-
-  const isOrSeeksImm = Immutable.fromJS(isOrSeeks);
-
-  let person = {
-    name: undefined,
-    title: undefined,
-    company: undefined,
-    position: undefined,
-    skills: undefined,
-    // bio: undefined,
+/**
+ * Tries to extract all the detailsToParse from the given contentJsonLd
+ * uses the parseFromRdf function defined in the detail to extract the content
+ * uses the detail identifier as the key of the contentDetail that is to be added
+ * @param contentJsonLd
+ * @param type
+ * @param detailsToParse
+ * @returns {{title: *, type: *}}
+ */
+function generateContent(contentJsonLd, type, detailsToParse) {
+  let content = {
+    title: contentJsonLd.get("dc:title"),
+    type: type,
   };
 
-  person.name = isOrSeeksImm.get("foaf:name");
-  person.title = isOrSeeksImm.get("foaf:title");
-  person.company = isOrSeeksImm.get("s:worksFor");
-  person.position = isOrSeeksImm.get("s:jobTitle");
-  person.skills = isOrSeeksImm.get("s:knowsAbout")
-    ? Immutable.List.isList(isOrSeeksImm.get("s:knowsAbout"))
-      ? isOrSeeksImm.get("s:knowsAbout")
-      : Immutable.List.of(isOrSeeksImm.get("s:knowsAbout"))
-    : undefined;
-  //person.bio = isOrSeeksImm.get("dc:description");
+  if (detailsToParse) {
+    for (const detailKey in detailsToParse) {
+      const detailToParse = detailsToParse[detailKey];
+      const detailIdentifier = detailToParse && detailToParse.identifier;
+      const detailValue =
+        detailToParse && detailToParse.parseFromRDF(contentJsonLd);
 
-  // if there's anything, use it
-  if (
-    person.name ||
-    person.title ||
-    person.company ||
-    person.position ||
-    person.skills
-  ) {
-    return Immutable.fromJS(person);
+      if (detailIdentifier && detailValue) {
+        content[detailIdentifier] = detailValue;
+      }
+    }
   }
 
-  // console.error(
-  //   "Cant parse person, data does not contain enough information: ",
-  //   isOrSeeksImm.toJS()
-  // );
-  return undefined;
-}
-
-function parseTags(tags) {
-  if (!tags) {
-    return undefined;
-  } else if (is("String", tags)) {
-    return Immutable.fromJS([tags]);
-  } else if (is("Array", tags)) {
-    return Immutable.fromJS(tags);
-  } else if (Immutable.List.isList(tags)) {
-    return tags; // id; it is already in the format we want
-  } else {
-    console.error(
-      "Found unexpected format of tags (should be Array, " +
-        "Immutable.List, or a single tag as string): " +
-        JSON.stringify(tags)
-    );
-    return undefined;
-  }
-}
-
-function parseLocation(jsonldLocation) {
-  if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
-
-  const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
-
-  let location = {
-    address: undefined,
-    lat: undefined,
-    lng: undefined,
-    nwCorner: {
-      lat: undefined,
-      lng: undefined,
-    },
-    seCorner: {
-      lat: undefined,
-      lng: undefined,
-    },
-  };
-
-  location.address =
-    jsonldLocationImm.get("s:name") ||
-    jsonldLocationImm.get("http://schema.org/name");
-
-  location.lat = Number.parseFloat(
-    jsonldLocationImm.getIn(["s:geo", "s:latitude"]) ||
-      jsonldLocationImm.getIn([
-        "http://schema.org/geo",
-        "http://schema.org/latitude",
-      ])
-  );
-  location.lng = Number.parseFloat(
-    jsonldLocationImm.getIn(["s:geo", "s:longitude"]) ||
-      jsonldLocationImm.getIn([
-        "http://schema.org/geo",
-        "http://schema.org/longitude",
-      ])
-  );
-
-  location.nwCorner.lat = Number.parseFloat(
-    jsonldLocationImm.getIn([
-      "won:hasBoundingBox",
-      "won:hasNorthWestCorner",
-      "s:latitude",
-    ]) ||
-      jsonldLocationImm.getIn([
-        "won:hasBoundingBox",
-        "won:hasNorthWestCorner",
-        "http://schema.org/latitude",
-      ])
-  );
-  location.nwCorner.lng = Number.parseFloat(
-    jsonldLocationImm.getIn([
-      "won:hasBoundingBox",
-      "won:hasNorthWestCorner",
-      "s:longitude",
-    ]) ||
-      jsonldLocationImm.getIn([
-        "won:hasBoundingBox",
-        "won:hasNorthWestCorner",
-        "http://schema.org/longitude",
-      ])
-  );
-  location.seCorner.lat = Number.parseFloat(
-    jsonldLocationImm.getIn([
-      "won:hasBoundingBox",
-      "won:hasSouthEastCorner",
-      "s:latitude",
-    ]) ||
-      jsonldLocationImm.getIn([
-        "won:hasBoundingBox",
-        "won:hasSouthEastCorner",
-        "http://schema.org/latitude",
-      ])
-  );
-  location.seCorner.lng = Number.parseFloat(
-    jsonldLocationImm.getIn([
-      "won:hasBoundingBox",
-      "won:hasSouthEastCorner",
-      "s:longitude",
-    ]) ||
-      jsonldLocationImm.getIn([
-        "won:hasBoundingBox",
-        "won:hasSouthEastCorner",
-        "http://schema.org/longitude",
-      ])
-  );
-
-  if (
-    location.address &&
-    location.lat &&
-    location.lng &&
-    location.nwCorner.lat &&
-    location.nwCorner.lng &&
-    location.seCorner.lat &&
-    location.seCorner.lng
-  ) {
-    return Immutable.fromJS(location);
-  }
-
-  console.error(
-    "Cant parse location, data is an invalid location-object: ",
-    jsonldLocationImm.toJS()
-  );
-  return undefined;
-}
-
-function parseTravelAction(jsonTravelAction) {
-  if (!jsonTravelAction) return undefined;
-
-  const travelActionImm = Immutable.fromJS(jsonTravelAction);
-
-  let travelAction = {
-    fromAddress: undefined,
-    fromLocation: {
-      lat: undefined,
-      lng: undefined,
-    },
-    toAddress: undefined,
-    toLocation: {
-      lat: undefined,
-      lng: undefined,
-    },
-  };
-
-  travelAction.fromAddress =
-    travelActionImm.getIn(["s:fromLocation", "s:name"]) ||
-    travelActionImm.getIn([
-      "http://schema.org/fromLocation",
-      "http://schema.org/name",
-    ]);
-
-  travelAction.fromLocation.lat =
-    travelActionImm.getIn(["s:fromLocation", "s:geo", "s:latitude"]) ||
-    travelActionImm.getIn([
-      "http://schema.org/fromLocation",
-      "http://schema.org/geo",
-      "http://schema.org/latitude",
-    ]);
-
-  travelAction.fromLocation.lng =
-    travelActionImm.getIn(["s:fromLocation", "s:geo", "s:longitude"]) ||
-    travelActionImm.getIn([
-      "http://schema.org/fromLocation",
-      "http://schema.org/geo",
-      "http://schema.org/longitude",
-    ]);
-
-  travelAction.toAddress =
-    travelActionImm.getIn(["s:toLocation", "s:name"]) ||
-    travelActionImm.getIn([
-      "http://schema.org/toLocation",
-      "http://schema.org/name",
-    ]);
-
-  travelAction.toLocation.lat =
-    travelActionImm.getIn(["s:toLocation", "s:geo", "s:latitude"]) ||
-    travelActionImm.getIn([
-      "http://schema.org/toLocation",
-      "http://schema.org/geo",
-      "http://schema.org/latitude",
-    ]);
-
-  travelAction.toLocation.lng =
-    travelActionImm.getIn(["s:toLocation", "s:geo", "s:longitude"]) ||
-    travelActionImm.getIn([
-      "http://schema.org/toLocation",
-      "http://schema.org/geo",
-      "http://schema.org/longitude",
-    ]);
-
-  if (
-    (travelAction.fromAddress &&
-      travelAction.fromLocation.lat &&
-      travelAction.fromLocation.lng) ||
-    (travelAction.toAddress &&
-      travelAction.toLocation.lat &&
-      travelAction.toLocation.lng)
-  ) {
-    return Immutable.fromJS(travelAction);
-  }
-
-  console.error(
-    "Cant parse travelAction, data is an invalid travelAction-object: ",
-    travelActionImm.toJS()
-  );
+  return content;
 }

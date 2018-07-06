@@ -1,13 +1,9 @@
-// TODO: import detail-picker components here
+// TODO: import detail-picker components here, not in create-post
 // TODO: each detail picker should know it's own rdf template
-// --> current goal: detail-pickers don't learn to speak RDF
-// --> instead, each picker has a RDF template telling us how it would look
-// --> and TODO: exposes a toRDF() method that converts whatever JSON the picker returns to RDF
-// --> reasoning: we want JSON objects in the state, because RDF is harder to handle
-// --> we want the need-reducer to work with arbitrary details, without required edits for each new detail
-// --> so need-reducer can't be the part that knows how to convert a detail
-// TODO: define RDF template *inside* the detail-pickers and link it here, so the linter doesn't complain
-// --> alternatively, if we don't need a template, refer something else.
+// --> both for parsing to and from rdf
+// --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
+import { getIn, is } from "../app/utils.js";
+import Immutable from "immutable";
 
 export const details = {
   description: {
@@ -15,35 +11,407 @@ export const details = {
     label: "Description",
     icon: "#ico36_description_circle",
     component: "won-description-picker",
+    viewerComponent: "won-description-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "dc:description": undefined };
+      }
+      return { "dc:description": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return jsonLDImm && jsonLDImm.get("dc:description");
+    },
   },
   location: {
     identifier: "location",
     label: "Location",
     icon: "#ico36_location_circle",
     component: "won-location-picker",
+    viewerComponent: "won-location-viewer",
+    parseToRDF: function({ value, identifier }) {
+      if (!value) {
+        // TODO: this should happen in need-builder
+        return { "won:hasLocation": undefined };
+      }
+      return {
+        "won:hasLocation": {
+          "@type": "s:Place",
+          "s:geo": {
+            "@id": "_:" + identifier + "-location",
+            "@type": "s:GeoCoordinates",
+            "s:latitude": value.lat.toFixed(6),
+            "s:longitude": value.lng.toFixed(6),
+          },
+          "s:name": value.name,
+          "won:hasBoundingBox":
+            !value.nwCorner || !value.seCorner
+              ? undefined
+              : {
+                  "won:hasNorthWestCorner": {
+                    "@id": "_:" + identifier + "BoundsNW",
+                    "@type": "s:GeoCoordinates",
+                    "s:latitude": value.nwCorner.lat.toFixed(6),
+                    "s:longitude": value.nwCorner.lng.toFixed(6),
+                  },
+                  "won:hasSouthEastCorner": {
+                    "@id": "_:" + identifier + "BoundsSE",
+                    "@type": "s:GeoCoordinates",
+                    "s:latitude": value.seCorner.lat.toFixed(6),
+                    "s:longitude": value.seCorner.lng.toFixed(6),
+                  },
+                },
+        },
+      };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const jsonldLocation = jsonLDImm && jsonLDImm.get("won:hasLocation");
+      if (!jsonldLocation) return undefined; // NO LOCATION PRESENT
+
+      const jsonldLocationImm = Immutable.fromJS(jsonldLocation);
+
+      let location = {
+        address: undefined,
+        lat: undefined,
+        lng: undefined,
+        nwCorner: {
+          lat: undefined,
+          lng: undefined,
+        },
+        seCorner: {
+          lat: undefined,
+          lng: undefined,
+        },
+      };
+
+      location.address =
+        jsonldLocationImm.get("s:name") ||
+        jsonldLocationImm.get("http://schema.org/name");
+
+      location.lat = Number.parseFloat(
+        jsonldLocationImm.getIn(["s:geo", "s:latitude"]) ||
+          jsonldLocationImm.getIn([
+            "http://schema.org/geo",
+            "http://schema.org/latitude",
+          ])
+      );
+      location.lng = Number.parseFloat(
+        jsonldLocationImm.getIn(["s:geo", "s:longitude"]) ||
+          jsonldLocationImm.getIn([
+            "http://schema.org/geo",
+            "http://schema.org/longitude",
+          ])
+      );
+
+      location.nwCorner.lat = Number.parseFloat(
+        jsonldLocationImm.getIn([
+          "won:hasBoundingBox",
+          "won:hasNorthWestCorner",
+          "s:latitude",
+        ]) ||
+          jsonldLocationImm.getIn([
+            "won:hasBoundingBox",
+            "won:hasNorthWestCorner",
+            "http://schema.org/latitude",
+          ])
+      );
+      location.nwCorner.lng = Number.parseFloat(
+        jsonldLocationImm.getIn([
+          "won:hasBoundingBox",
+          "won:hasNorthWestCorner",
+          "s:longitude",
+        ]) ||
+          jsonldLocationImm.getIn([
+            "won:hasBoundingBox",
+            "won:hasNorthWestCorner",
+            "http://schema.org/longitude",
+          ])
+      );
+      location.seCorner.lat = Number.parseFloat(
+        jsonldLocationImm.getIn([
+          "won:hasBoundingBox",
+          "won:hasSouthEastCorner",
+          "s:latitude",
+        ]) ||
+          jsonldLocationImm.getIn([
+            "won:hasBoundingBox",
+            "won:hasSouthEastCorner",
+            "http://schema.org/latitude",
+          ])
+      );
+      location.seCorner.lng = Number.parseFloat(
+        jsonldLocationImm.getIn([
+          "won:hasBoundingBox",
+          "won:hasSouthEastCorner",
+          "s:longitude",
+        ]) ||
+          jsonldLocationImm.getIn([
+            "won:hasBoundingBox",
+            "won:hasSouthEastCorner",
+            "http://schema.org/longitude",
+          ])
+      );
+
+      if (
+        location.address &&
+        location.lat &&
+        location.lng &&
+        location.nwCorner.lat &&
+        location.nwCorner.lng &&
+        location.seCorner.lat &&
+        location.seCorner.lng
+      ) {
+        return Immutable.fromJS(location);
+      }
+
+      console.error(
+        "Cant parse location, data is an invalid location-object: ",
+        jsonldLocationImm.toJS()
+      );
+      return undefined;
+    },
   },
   person: {
     identifier: "person",
     label: "Person",
     icon: "#ico36_person_single_circle",
     component: "won-person-picker",
+    viewerComponent: "won-person-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "foaf:person": undefined };
+      }
+      return {
+        "foaf:title": getIn(value, ["title"])
+          ? getIn(value, ["title"])
+          : undefined,
+        "foaf:name": getIn(value, ["name"])
+          ? getIn(value, ["name"])
+          : undefined,
+        "s:worksFor": getIn(value, ["company"])
+          ? {
+              "@type": "s:Organization",
+              "s:name": getIn(value, ["company"]),
+            }
+          : undefined,
+        "s:jobTitle": getIn(value, ["position"])
+          ? getIn(value, ["position"])
+          : undefined,
+        "s:knowsAbout": getIn(value, ["skills"])
+          ? getIn(value, ["skills"]).toJS()
+          : undefined,
+      };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      if (!jsonLDImm) return undefined;
+
+      let person = {
+        name: undefined,
+        title: undefined,
+        company: undefined,
+        position: undefined,
+        skills: undefined,
+        // bio: undefined,
+      };
+
+      person.name = jsonLDImm.get("foaf:name");
+      person.title = jsonLDImm.get("foaf:title");
+      person.company = jsonLDImm.get("s:worksFor");
+      person.position = jsonLDImm.get("s:jobTitle");
+      person.skills = jsonLDImm.get("s:knowsAbout")
+        ? Immutable.List.isList(jsonLDImm.get("s:knowsAbout"))
+          ? jsonLDImm.get("s:knowsAbout")
+          : Immutable.List.of(jsonLDImm.get("s:knowsAbout"))
+        : undefined;
+      //person.bio = isOrSeeksImm.get("dc:description");
+
+      // if there's anything, use it
+      if (
+        person.name ||
+        person.title ||
+        person.company ||
+        person.position ||
+        person.skills
+      ) {
+        return Immutable.fromJS(person);
+      }
+
+      /*console.error(
+        "Cant parse person, data does not contain enough information: ",
+        jsonLDImm.toJS()
+      );*/
+      return undefined;
+    },
   },
-  route: {
+  travelAction: {
     identifier: "travelAction",
     label: "Route (From - To)",
     icon: "#ico36_location_circle",
-    component: "won-route-picker",
+    component: "won-travel-action-picker",
+    viewerComponent: "won-travel-action-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "won:travelAction": undefined };
+      }
+      return {
+        "won:travelAction": {
+          "@type": "s:TravelAction",
+          "s:fromLocation": !value.fromLocation
+            ? undefined
+            : {
+                "@type": "s:Place",
+                "s:geo": {
+                  "@type": "s:GeoCoordinates",
+                  "s:latitude": value.fromLocation.lat.toFixed(6),
+                  "s:longitude": value.fromLocation.lng.toFixed(6),
+                },
+                "s:name": value.fromLocation.name,
+              },
+          "s:toLocation": !value.toLocation
+            ? undefined
+            : {
+                "@type": "s:Place",
+                "s:geo": {
+                  "@type": "s:GeoCoordinates",
+                  "s:latitude": value.toLocation.lat.toFixed(6),
+                  "s:longitude": value.toLocation.lng.toFixed(6),
+                },
+                "s:name": value.toLocation.name,
+              },
+        },
+      };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const jsonTravelAction = jsonLDImm && jsonLDImm.get("won:travelAction");
+      if (!jsonTravelAction) return undefined;
+
+      const travelActionImm = Immutable.fromJS(jsonTravelAction);
+
+      let travelAction = {
+        fromAddress: undefined,
+        fromLocation: {
+          lat: undefined,
+          lng: undefined,
+        },
+        toAddress: undefined,
+        toLocation: {
+          lat: undefined,
+          lng: undefined,
+        },
+      };
+
+      travelAction.fromAddress =
+        travelActionImm.getIn(["s:fromLocation", "s:name"]) ||
+        travelActionImm.getIn([
+          "http://schema.org/fromLocation",
+          "http://schema.org/name",
+        ]);
+
+      travelAction.fromLocation.lat =
+        travelActionImm.getIn(["s:fromLocation", "s:geo", "s:latitude"]) ||
+        travelActionImm.getIn([
+          "http://schema.org/fromLocation",
+          "http://schema.org/geo",
+          "http://schema.org/latitude",
+        ]);
+
+      travelAction.fromLocation.lng =
+        travelActionImm.getIn(["s:fromLocation", "s:geo", "s:longitude"]) ||
+        travelActionImm.getIn([
+          "http://schema.org/fromLocation",
+          "http://schema.org/geo",
+          "http://schema.org/longitude",
+        ]);
+
+      travelAction.toAddress =
+        travelActionImm.getIn(["s:toLocation", "s:name"]) ||
+        travelActionImm.getIn([
+          "http://schema.org/toLocation",
+          "http://schema.org/name",
+        ]);
+
+      travelAction.toLocation.lat =
+        travelActionImm.getIn(["s:toLocation", "s:geo", "s:latitude"]) ||
+        travelActionImm.getIn([
+          "http://schema.org/toLocation",
+          "http://schema.org/geo",
+          "http://schema.org/latitude",
+        ]);
+
+      travelAction.toLocation.lng =
+        travelActionImm.getIn(["s:toLocation", "s:geo", "s:longitude"]) ||
+        travelActionImm.getIn([
+          "http://schema.org/toLocation",
+          "http://schema.org/geo",
+          "http://schema.org/longitude",
+        ]);
+
+      if (
+        (travelAction.fromAddress &&
+          travelAction.fromLocation.lat &&
+          travelAction.fromLocation.lng) ||
+        (travelAction.toAddress &&
+          travelAction.toLocation.lat &&
+          travelAction.toLocation.lng)
+      ) {
+        return Immutable.fromJS(travelAction);
+      }
+
+      console.error(
+        "Cant parse travelAction, data is an invalid travelAction-object: ",
+        travelActionImm.toJS()
+      );
+      return undefined;
+    },
   },
   tags: {
     identifier: "tags",
     label: "Tags",
     icon: "#ico36_tags_circle",
     component: "won-tags-picker",
+    viewerComponent: "won-tags-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "won:hasTag": undefined };
+      }
+      return { "won:hasTag": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      const tags = jsonLDImm && jsonLDImm.get("won:hasTag");
+
+      if (!tags) {
+        return undefined;
+      } else if (is("String", tags)) {
+        return Immutable.fromJS([tags]);
+      } else if (is("Array", tags)) {
+        return Immutable.fromJS(tags);
+      } else if (Immutable.List.isList(tags)) {
+        return tags; // id; it is already in the format we want
+      } else {
+        console.error(
+          "Found unexpected format of tags (should be Array, " +
+            "Immutable.List, or a single tag as string): " +
+            JSON.stringify(tags)
+        );
+        return undefined;
+      }
+    },
   },
   ttl: {
     identifier: "ttl",
     label: "Turtle (TTL)",
     icon: "#ico36_rdf_logo_circle",
     component: "won-ttl-picker",
+    viewerComponent: undefined,
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return undefined;
+      }
+      // TODO: return value
+    },
+    parseFromRDF: function(jsonLDImm) {
+      // TODO: return value
+      console.error("IMPLEMENT ME", jsonLDImm);
+      return undefined;
+    },
   },
 };

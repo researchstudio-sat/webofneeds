@@ -596,8 +596,8 @@ function scrubSearchResults(searchResults) {
 // }
 
 export default angular
-  .module("won.owner.components.routePicker", [])
-  .directive("wonRoutePicker", genComponentConf).name;
+  .module("won.owner.components.travelActionPicker", [])
+  .directive("wonTravelActionPicker", genComponentConf).name;
 
 window.searchNominatim4dbg = searchNominatim;
 window.reverseSearchNominatim4dbg = reverseSearchNominatim;

@@ -13,6 +13,7 @@ import {
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
+import { useCases } from "useCaseDefinitions";
 
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
@@ -293,4 +294,26 @@ export function getRandomWonId() {
     getRandomString(1, "abcdefghijklmnopqrstuvwxyz") +
     getRandomString(11, "abcdefghijklmnopqrstuvwxyz0123456789")
   );
+}
+/**
+ * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
+ */
+export function getAllDetails() {
+  let details = {};
+
+  if (hasSubElements(useCases)) {
+    for (const useCaseKey in useCases) {
+      const useCase = useCases[useCaseKey];
+      if (useCase) {
+        const isDetails = useCase.isDetails ? useCase.isDetails : {};
+        const seeksDetails = useCase.seeksDetails ? useCase.seeksDetails : {};
+        details = { ...details, ...isDetails, ...seeksDetails };
+      }
+    }
+  }
+  return details;
+}
+
+function hasSubElements(obj) {
+  return obj && obj !== {} && Object.keys(obj).length > 0;
 }

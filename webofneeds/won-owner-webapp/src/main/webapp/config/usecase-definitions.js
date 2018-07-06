@@ -1,27 +1,30 @@
 import { details } from "detailDefinitions";
 
-// don't put detail placeholders in the draft, this only makes it harder to handle.
-// if we want to set a initial value (can be changed/deleted unless hidden), the draft
-// needs to be adjusted anyway, see "lunch"
 export const emptyDraft = {
-  is: {
-    // title: undefined,
-    // description: undefined,
-    // tags: undefined,
-    // person: undefined,
-    // location: undefined,
-    // travelAction: undefined,
-  },
-  seeks: {
-    // title: undefined,
-    // description: undefined,
-    // tags: undefined,
-    // person: undefined,
-    // location: undefined,
-    // travelAction: undefined,
-  },
+  is: {},
+  seeks: {},
   matchingContext: undefined,
 };
+
+/**
+ * USE CASE REQUIREMENTS
+ * detail identifiers in is and seeks have to be unique
+ * if two details use the same predicate on the same level,
+ * the latter detail will overwrite the former.
+ * Example:
+ * useCase: {
+ *    identifier: "useCase",
+ *    isDetails: {
+ *        detailA: {...details.description, identifier: "detailA"},
+ *        detailB: {...details.description, identifier: "detailB"},
+ *    }
+ * }
+ *
+ * In this case, the value of detailB will overwrite the value of detailA, because
+ * both use the predicate "dc:description".
+ * To avoid this, redefine the parseToRDF() and parseFromRDF() methods for either
+ * detail to use a different predicate.
+ */
 
 const allDetailsUseCase = {
   allDetails: {
@@ -66,6 +69,15 @@ const socialUseCases = {
         ...details.description,
         identifier: "foodallergies",
         label: "Food Allergies",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:foodAllergies": undefined }; // FIXME: won:foodAllergies does not exist
+          }
+          return { "won:foodAllergies": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          return jsonLDImm && jsonLDImm.get("won:foodAllergies");
+        },
       },
       location: { ...details.location },
       tags: { ...details.tags },

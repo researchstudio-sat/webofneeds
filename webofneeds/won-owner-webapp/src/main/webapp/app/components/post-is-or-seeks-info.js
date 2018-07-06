@@ -4,10 +4,19 @@
 import angular from "angular";
 
 import "ng-redux";
-import needMapModule from "./need-map.js";
-import personDetailsModule from "./person-details.js";
+// TODO: these should be replaced by importing defintions from config
+import personViewerModule from "./details/viewer/person-viewer.js";
+import descriptionViewerModule from "./details/viewer/description-viewer.js";
+import locationViewerModule from "./details/viewer/location-viewer.js";
+import tagsViewerModule from "./details/viewer/tags-viewer.js";
+import travelActionViewerModule from "./details/viewer/travel-action-viewer.js";
+import titleViewerModule from "./details/viewer/title-viewer.js";
 
 import { attach } from "../utils.js";
+import { getAllDetails } from "../won-utils.js";
+import { connect2Redux } from "../won-utils.js";
+import { actionCreators } from "../actions/actions.js";
+import { selectOpenPostUri } from "../selectors.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
@@ -18,91 +27,20 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-            <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
-                <span ng-show="!self.isOrSeeksPart.hasSearchString">Title</span>
-                <span ng-show="self.isOrSeeksPart.hasSearchString">Searching for</span>
-            </h2>
-            <p class="post-info__details"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('title')">
-                {{ self.isOrSeeksPart.isOrSeeks.get('title')}}
-            </p>
-            <h2 class="post-info__heading"
-                ng-if="self.person">
-                Person Details
-            </h2>
-            <won-person-details 
-              ng-if="self.person"
-              person="self.person">
-            </won-person-details>
+        <won-title-viewer ng-if="self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Searching for' }">
+        </won-title-viewer>
 
-           	<h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('description')">
-                Description
-            </h2>
-            <p class="post-info__details--prewrap" ng-show="self.isOrSeeksPart.isOrSeeks.get('description')">{{ self.isOrSeeksPart.isOrSeeks.get('description')}}</p> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <won-title-viewer ng-if="!self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Title' }">
+        </won-title-viewer>
 
-            <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('tags')">
-                Tags
-            </h2>
-            <div class="post-info__details post-info__tags"
-                ng-show="self.isOrSeeksPart.isOrSeeks.get('tags')">
-                    <span class="post-info__tags__tag" ng-repeat="tag in self.isOrSeeksPart.isOrSeeks.get('tags').toJS()">#{{tag}}</span>
-            </div>
-
-            <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.location">
-                Location
-            </h2>
-            <p class="post-info__details clickable"
-               ng-show="self.isOrSeeksPart.address" ng-click="self.toggleMap()">
-                {{ self.isOrSeeksPart.address }}
-				        <svg class="post-info__carret">
-                  <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
-                </svg>
-				        <svg class="post-info__carret" ng-show="!self.showMap">
-	                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-	              </svg>
-                <svg class="post-info__carret" ng-show="self.showMap">
-                   <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                </svg>
-            </p>                
-            <won-need-map 
-              locations="[self.isOrSeeksPart.location]"
-              ng-if="self.isOrSeeksPart.location && self.showMap">
-            </won-need-map>
-
-            <h2 class="post-info__heading"
-                ng-show="self.isOrSeeksPart.travelAction">
-                Route
-            </h2>
-            <p class="post-info__details clickable"
-               ng-show="self.isOrSeeksPart.travelAction"
-               ng-click="self.toggleRouteMap()">
-
-              <span ng-if="self.isOrSeeksPart.fromAddress">
-                <strong>From: </strong>{{ self.isOrSeeksPart.fromAddress }}
-              </span>
-              </br>
-              <span ng-if="self.isOrSeeksPart.toAddress">
-              <strong>To: </strong>{{ self.isOrSeeksPart.toAddress }}
-              </span>
-
-              <svg class="post-info__carret">
-                <use xlink:href="#ico-filter_map" href="#ico-filter_map"></use>
-              </svg>
-              <svg class="post-info__carret" ng-show="!self.showRouteMap">
-                <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-              </svg>
-              <svg class="post-info__carret" ng-show="self.showRouteMap">
-                  <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-              </svg>
-            </p>
-            <won-need-map
-              locations="self.travelLocations"
-              ng-if="self.isOrSeeksPart.travelAction && self.showRouteMap">
-            </won-need-map>
+        <!-- COMPONENT -->
+        <div class="pis__component"
+          ng-repeat="detail in self.allDetails"
+          ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
+          detail-viewer-element="{{detail.viewerComponent}}"
+          detail="detail"
+          content="self.getDetailContent(detail.identifier)">
+        </div>
     	`;
 
   class Controller {
@@ -112,29 +50,41 @@ function genComponentConf() {
       //TODO debug; deleteme
       window.isis4dbg = this;
 
-      this.showMap = false;
-      this.showRouteMap = false;
+      this.allDetails = getAllDetails();
 
-      const self = this;
+      const selectFromState = state => {
+        const postUri = selectOpenPostUri(state);
+        const post = postUri && state.getIn(["needs", postUri]);
+        const details = this.branch && post && post.get(this.branch);
+        const searchString =
+          post && this.branch === "seeks"
+            ? post.get("searchString")
+            : undefined; //workaround to display searchString only in seeks
 
-      this.$scope.$watch("self.isOrSeeksPart.isOrSeeks", newIs => {
-        self.person = newIs && newIs.get("person");
-      });
+        return {
+          searchString,
+          details,
+        };
+      };
 
-      this.$scope.$watch("self.isOrSeeksPart.travelAction", newValue => {
-        self.travelLocations = newValue && [
-          newValue.get("fromLocation"),
-          newValue.get("toLocation"),
-        ];
-      });
+      connect2Redux(selectFromState, actionCreators, ["self.branch"], this);
     }
 
-    toggleMap() {
-      this.showMap = !this.showMap;
+    getDetail(key) {
+      const detail = this.allDetails && this.allDetails[key];
+      if (!detail) {
+        console.error(
+          "Could not find detail with key: ",
+          key,
+          " in:  ",
+          this.allDetails
+        );
+      }
+      return detail;
     }
 
-    toggleRouteMap() {
-      this.showRouteMap = !this.showRouteMap;
+    getDetailContent(key) {
+      return key && this.details && this.details.get(key);
     }
   }
   Controller.$inject = serviceDependencies;
@@ -145,7 +95,7 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     scope: {
-      isOrSeeksPart: "=",
+      branch: "=",
     },
     template: template,
   };
@@ -154,7 +104,33 @@ function genComponentConf() {
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
   .module("won.owner.components.postIsOrSeeksInfo", [
-    needMapModule,
-    personDetailsModule,
+    personViewerModule,
+    descriptionViewerModule,
+    locationViewerModule,
+    travelActionViewerModule,
+    tagsViewerModule,
+    titleViewerModule,
+  ])
+  .directive("detailViewerElement", [
+    "$compile",
+    function($compile) {
+      return {
+        restrict: "A",
+        scope: {
+          content: "=",
+          detail: "=",
+        },
+        link: function(scope, element, attrs) {
+          const customTag = attrs.detailViewerElement;
+          if (!customTag) return;
+
+          const customElem = angular.element(
+            `<${customTag} detail="detail" content="content"></${customTag}>`
+          );
+
+          element.append($compile(customElem)(scope));
+        },
+      };
+    },
   ])
   .directive("wonPostIsOrSeeksInfo", genComponentConf).name;

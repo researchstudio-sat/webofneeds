@@ -54,32 +54,35 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
+            <div class="post-info__content__general">
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.friendlyTimestamp">
+                  Created
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
+                  {{ self.friendlyTimestamp }}
+                </div>
+              </div>
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.displayedPost.get('type')">
+                  Type
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.displayedPost.get('type')">
+                  {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
+                </div>
+              </div>
+              <won-post-share-link
+                ng-if="self.displayedPost.get('state') !== self.WON.InactiveCompacted"
+                post-uri="self.displayedPost && self.displayedPost.get('uri')">
+              </won-post-share-link>
+            </div>
+
             <won-gallery ng-show="self.displayedPost.get('hasImages')">
             </won-gallery>
 
-            <!-- GENERAL Part -->
-            <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
-                Created
-            </h2>
-            <p class="post-info__details" ng-show="self.friendlyTimestamp">
-                {{ self.friendlyTimestamp }}
-            </p>
-            <h2 class="post-info__heading" ng-show="self.displayedPost.get('type')">
-                Type
-            </h2>
-            <p class="post-info__details" ng-show="self.displayedPost.get('type')">
-                {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
-            </p>
-            <!-- IS Part -->
-            <div ng-show="self.isPart">
-                <won-post-is-or-seeks-info is-or-seeks-part="self.isPart"></won-post-is-or-seeks-info>
-            </div>
-            </br>
-            <!-- SEEKS Part -->
-            <div ng-show="self.seeksPart">
-                <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart"></won-post-is-or-seeks-info>
-            </div>
-            </br>
+            <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch"></won-post-is-or-seeks-info>
+            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
+            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch"></won-post-is-or-seeks-info>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf && self.connection"
                target="_blank"
@@ -100,12 +103,6 @@ function genComponentConf() {
             </a>
         </div>
         <div class="post-info__footer" ng-if="!self.isLoading()">
-            <won-post-share-link
-                ng-if="self.displayedPost.get('state') !== self.WON.InactiveCompacted"
-                post-uri="self.displayedPost && self.displayedPost.get('uri')">
-            </won-post-share-link>
-            <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
-
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
@@ -149,26 +146,8 @@ function genComponentConf() {
           connection,
           connectionUri,
           ownNeed,
-          isPart: is
-            ? {
-                postUri: postUriToConnectTo,
-                isOrSeeks: is,
-                isString: "is",
-                location: is && is.get("location"),
-                address:
-                  is.get("location") && is.get("location").get("address"),
-              }
-            : undefined,
-          seeksPart: seeks
-            ? {
-                postUri: postUriToConnectTo,
-                isOrSeeks: seeks,
-                seeksString: "seeks",
-                location: seeks && seeks.get("location"),
-                address:
-                  seeks.get("location") && seeks.get("location").get("address"),
-              }
-            : undefined,
+          hasIsBranch: !!is,
+          hasSeeksBranch: !!seeks,
           displayedPost,
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           postUriToConnectTo,

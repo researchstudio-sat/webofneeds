@@ -6,7 +6,8 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
-import { getIn } from "../utils.js";
+import { useCases } from "useCaseDefinitions";
+import { getAllDetails } from "../utils";
 
 (function() {
   // <need-builder-js> scope
@@ -137,133 +138,61 @@ import { getIn } from "../utils.js";
         hasFlag = result;
         */
 
-    const buildContentNode = (id, isOrSeeksData, isSeeks) => ({
-      "@id": id,
-      "dc:title": isOrSeeksData.title,
-      "dc:description": isOrSeeksData.description,
-      "won:hasTag": isOrSeeksData.tags,
-      "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
-        ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
-        : undefined,
-      "won:hasPerson": isOrSeeksData.person,
+    const buildContentNode = (id, isOrSeeksData, isSeeks) => {
+      let contentNode = {
+        "@id": id,
+        "dc:title": isOrSeeksData.title,
+        "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
+          ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
+          : undefined,
 
-      "foaf:title": getIn(isOrSeeksData, ["person", "title"])
-        ? getIn(isOrSeeksData, ["person", "title"])
-        : undefined,
-      "foaf:name": getIn(isOrSeeksData, ["person", "name"])
-        ? getIn(isOrSeeksData, ["person", "name"])
-        : undefined,
-      "s:worksFor": getIn(isOrSeeksData, ["person", "company"])
-        ? {
-            "@type": "s:Organization",
-            "s:name": getIn(isOrSeeksData, ["person", "company"]),
-          }
-        : undefined,
-      "s:jobTitle": getIn(isOrSeeksData, ["person", "position"])
-        ? getIn(isOrSeeksData, ["person", "position"])
-        : undefined,
-      "s:knowsAbout": getIn(isOrSeeksData, ["person", "skills"])
-        ? getIn(isOrSeeksData, ["person", "skills"]).toJS()
-        : undefined,
-      // "dc:description": getIn(isOrSeeksData, ["person", "bio"])
-      //   ? getIn(isOrSeeksData, ["person", "bio"])
-      //   : undefined,
-      "won:hasLocation": !isOrSeeksData.location
-        ? undefined
-        : {
-            "@type": "s:Place",
-            "s:geo": {
-              "@id": isSeeks ? "_:isLocation" : "_:seeksLocation",
-              "@type": "s:GeoCoordinates",
-              "s:latitude": isOrSeeksData.location.lat.toFixed(6),
-              "s:longitude": isOrSeeksData.location.lng.toFixed(6),
+        //TODO: Different id for is and seeks
+        "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
+          ? undefined
+          : {
+              "@id": "_:timeSpecification",
+              "@type": "won:TimeSpecification",
+              "won:hasRecurInfiniteTimes": isOrSeeksData.recurInfinite,
+              "won:hasRecursIn": isOrSeeksData.recursIn,
+              "won:hasStartTime": isOrSeeksData.startTime,
+              "won:hasEndTime": isOrSeeksData.endTime,
             },
-            "s:name": isOrSeeksData.location.name,
-            "won:hasBoundingBox":
-              !isOrSeeksData.location.nwCorner ||
-              !isOrSeeksData.location.seCorner
-                ? undefined
-                : {
-                    "won:hasNorthWestCorner": {
-                      "@id": isSeeks ? "_:isBoundsNW" : "_:seeksBoundsNW",
-                      "@type": "s:GeoCoordinates",
-                      "s:latitude": isOrSeeksData.location.nwCorner.lat.toFixed(
-                        6
-                      ),
-                      "s:longitude": isOrSeeksData.location.nwCorner.lng.toFixed(
-                        6
-                      ),
-                    },
-                    "won:hasSouthEastCorner": {
-                      "@id": isSeeks ? "_:isBoundsSE" : "_:seeksBoundsSE",
-                      "@type": "s:GeoCoordinates",
-                      "s:latitude": isOrSeeksData.location.seCorner.lat.toFixed(
-                        6
-                      ),
-                      "s:longitude": isOrSeeksData.location.seCorner.lng.toFixed(
-                        6
-                      ),
-                    },
-                  },
-          },
-      "won:travelAction": !isOrSeeksData.travelAction
-        ? undefined
-        : {
-            "@type": "s:TravelAction",
-            "s:fromLocation": !isOrSeeksData.travelAction.fromLocation
-              ? undefined
-              : {
-                  "@type": "s:Place",
-                  "s:geo": {
-                    "@type": "s:GeoCoordinates",
-                    "s:latitude": isOrSeeksData.travelAction.fromLocation.lat.toFixed(
-                      6
-                    ),
-                    "s:longitude": isOrSeeksData.travelAction.fromLocation.lng.toFixed(
-                      6
-                    ),
-                  },
-                  "s:name": isOrSeeksData.travelAction.fromLocation.name,
-                },
-            "s:toLocation": !isOrSeeksData.travelAction.toLocation
-              ? undefined
-              : {
-                  "@type": "s:Place",
-                  "s:geo": {
-                    "@type": "s:GeoCoordinates",
-                    "s:latitude": isOrSeeksData.travelAction.toLocation.lat.toFixed(
-                      6
-                    ),
-                    "s:longitude": isOrSeeksData.travelAction.toLocation.lng.toFixed(
-                      6
-                    ),
-                  },
-                  "s:name": isOrSeeksData.travelAction.toLocation.name,
-                },
-          },
-      //TODO: Different id for is and seeks
-      "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
-        ? undefined
-        : {
-            "@id": "_:timeSpecification",
-            "@type": "won:TimeSpecification",
-            "won:hasRecurInfiniteTimes": isOrSeeksData.recurInfinite,
-            "won:hasRecursIn": isOrSeeksData.recursIn,
-            "won:hasStartTime": isOrSeeksData.startTime,
-            "won:hasEndTime": isOrSeeksData.endTime,
-          },
 
-      "won:hasPriceSpecificationhas": !hasPriceSpecification(isOrSeeksData)
-        ? undefined
-        : {
-            "@id": "_:priceSpecification",
-            "@type": "won:PriceSpecification",
-            "won:hasCurrency": isOrSeeksData.currency,
-            "won:hasLowerPriceLimit": isOrSeeksData.lowerPriceLimit,
-            "won:hasUpperPriceLimit": isOrSeeksData.upperPriceLimit,
-          },
-      //TODO images, time, currency(?)
-    });
+        "won:hasPriceSpecificationhas": !hasPriceSpecification(isOrSeeksData)
+          ? undefined
+          : {
+              "@id": "_:priceSpecification",
+              "@type": "won:PriceSpecification",
+              "won:hasCurrency": isOrSeeksData.currency,
+              "won:hasLowerPriceLimit": isOrSeeksData.lowerPriceLimit,
+              "won:hasUpperPriceLimit": isOrSeeksData.upperPriceLimit,
+            },
+        //TODO images, time, currency(?)
+      };
+      let detailList = undefined;
+      if (args.useCase && useCases[args.useCase]) {
+        const useCase = useCases[args.useCase];
+        const ucDetails = isSeeks ? "seeksDetails" : "isDetails";
+        detailList = useCase[ucDetails];
+      } else {
+        detailList = getAllDetails();
+      }
+
+      for (const detailName in detailList) {
+        const detail = detailList[detailName];
+        const detailRDF = {
+          ...detail.parseToRDF({
+            value: isOrSeeksData[detail.identifier],
+            identifier: detail.identifier,
+          }),
+        };
+        // add to content node
+        for (const key in detailRDF) {
+          contentNode[key] = detailRDF[key];
+        }
+      }
+      return contentNode;
+    };
 
     // TODO: if both is and seeks are present, the seeks content gets ignored here
     const isWhatsAround = args.is
@@ -316,9 +245,9 @@ import { getIn } from "../utils.js";
         "won:hasSearchString": searchString ? searchString : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
-      args.is ? buildContentNode(isContentUri, args.is, true) : {},
+      args.is ? buildContentNode(isContentUri, args.is, false) : {},
       args.seeks && !isWhatsAround
-        ? buildContentNode(seeksContentUri, args.seeks, false)
+        ? buildContentNode(seeksContentUri, args.seeks, true)
         : {},
       ...(args.is && args.is.arbitraryJsonLd ? args.is.arbitraryJsonLd : []),
       ...(args.seeks && args.seeks.arbitraryJsonLd

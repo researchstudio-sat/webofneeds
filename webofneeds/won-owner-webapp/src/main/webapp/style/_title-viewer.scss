@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-title-viewer {
+  @include won-detail-viewer("titlev");
+}

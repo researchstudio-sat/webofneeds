@@ -1,0 +1,10 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-description-viewer {
+  @include won-detail-viewer("dv");
+
+  .dv__content {
+    white-space: pre-wrap;
+  }
+}

@@ -11,7 +11,7 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import trigModule from "./trig.js";
 import { attach } from "../utils.js";
 import won from "../won-es6.js";
-import { relativeTime } from "../won-label-utils.js";
+import { labels, relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import {
   selectOpenPostUri,
@@ -55,19 +55,35 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <won-gallery ng-show="self.post.get('hasImages')">
+            <div class="post-info__content__general">
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.friendlyTimestamp">
+                  Created
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
+                  {{ self.friendlyTimestamp }}
+                </div>
+              </div>
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.post.get('type')">
+                  Type
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.post.get('type')">
+                  {{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : '' }}
+                </div>
+              </div>
+              <won-post-share-link
+                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
+                post-uri="self.post.get('uri')">
+              </won-post-share-link>
+            </div>
+
+            <won-gallery ng-if="self.post.get('hasImages')">
             </won-gallery>
 
-            <!-- GENERAL Part -->
-            <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
-                Created
-            </h2>
-            <p class="post-info__details" ng-show="self.friendlyTimestamp">
-                {{ self.friendlyTimestamp }}
-            </p>
-            <won-post-is-or-seeks-info is-or-seeks-part="self.isPart" ng-if="self.isPart"></won-post-is-or-seeks-info>
-            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.isPart && self.seeksPart"></won-labelled-hr>
-            <won-post-is-or-seeks-info is-or-seeks-part="self.seeksPart" ng-if="self.seeksPart"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch"></won-post-is-or-seeks-info>
+            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
+            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch"></won-post-is-or-seeks-info>
             <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
               <h2 class="post-info__heading">
                   RDF
@@ -87,10 +103,6 @@ function genComponentConf() {
             </div>
         </div>
         <div class="post-info__footer" ng-if="!self.isLoading()">
-            <won-post-share-link
-                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
-                post-uri="self.post.get('uri')">
-            </won-post-share-link>
             <button class="won-button--filled red post-info__footer__button"
                 ng-if="self.post.get('ownNeed') && self.post.get('isWhatsNew')"
                 ng-click="self.createWhatsAround()"
@@ -110,6 +122,7 @@ function genComponentConf() {
 
       this.is = "is";
       this.seeks = "seeks";
+      this.labels = labels;
 
       this.pendingPublishing = false;
 
@@ -124,47 +137,10 @@ function genComponentConf() {
         //TODO it will be possible to have more than one seeks
         const seeks = post ? post.get("seeks") : undefined;
 
-        const searchString = post ? post.get("searchString") : undefined;
-
         return {
           WON: won.WON,
-          isPart: is
-            ? {
-                postUri: postUri,
-                isOrSeeks: is,
-                isString: "is",
-                person: is && is.get("person"),
-                location: is && is.get("location"),
-                address:
-                  is.get("location") && is.get("location").get("address"),
-                travelAction: is && is.get("travelAction"),
-                fromAddress:
-                  is.get("travelAction") &&
-                  is.get("travelAction").get("fromAddress"),
-                toAddress:
-                  is.get("travelAction") &&
-                  is.get("travelAction").get("toAddress"),
-              }
-            : undefined,
-          seeksPart: seeks
-            ? {
-                postUri: postUri,
-                isOrSeeks: seeks,
-                seeksString: "seeks",
-                location: seeks && seeks.get("location"),
-                person: seeks && seeks.get("person"),
-                address:
-                  seeks.get("location") && seeks.get("location").get("address"),
-                travelAction: seeks && seeks.get("travelAction"),
-                fromAddress:
-                  seeks.get("travelAction") &&
-                  seeks.get("travelAction").get("fromAddress"),
-                toAddress:
-                  seeks.get("travelAction") &&
-                  seeks.get("travelAction").get("toAddress"),
-                hasSearchString: searchString, // WORKAROUND - because only seeksPart is send to child component
-              }
-            : undefined,
+          hasIsBranch: !!is,
+          hasSeeksBranch: !!seeks,
           post,
           friendlyTimestamp:
             post &&

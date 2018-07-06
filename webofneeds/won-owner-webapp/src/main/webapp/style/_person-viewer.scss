@@ -1,0 +1,28 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-person-viewer {
+  @include won-detail-viewer("pv");
+
+  .pv__content {
+    display: grid;
+    grid-auto-flow: row;
+
+    &__detail {
+      display: grid;
+      grid-template-areas: "grid-item-label grid-item-value";
+      grid-template-columns: min-content 1fr;
+      grid-gap: 0.5rem;
+
+      &__label {
+        grid-area: grid-item-label;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: bold;
+      }
+      &__value {
+        grid-area: grid-item-value;
+      }
+    }
+  }
+}
