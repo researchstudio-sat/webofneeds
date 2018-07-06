@@ -27,7 +27,10 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-        <won-title-viewer ng-if="self.details.get('title')" content="self.details.get('title')" detail="self.getTitleDetail()">
+        <won-title-viewer ng-if="self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Searching for' }">
+        </won-title-viewer>
+
+        <won-title-viewer ng-if="!self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Title' }">
         </won-title-viewer>
 
         <won-person-viewer ng-if="self.details.get('person')" content="self.details.get('person')" detail="self.getDetail('person')">
@@ -84,19 +87,6 @@ function genComponentConf() {
         );
       }
       return detail;
-    }
-
-    /**
-     * This method is a workaround for the title detail
-     * @param key
-     * @returns {allDetailsUseCase.allDetails|*|Controller.allDetails}
-     */
-    getTitleDetail() {
-      if (this.searchString) {
-        return { label: "Searching for" };
-      } else {
-        return { label: "Title" };
-      }
     }
   }
   Controller.$inject = serviceDependencies;

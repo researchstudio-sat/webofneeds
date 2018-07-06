@@ -37,6 +37,24 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.lv4dbg = this;
       this.showMap = false;
+
+      this.$scope.$watch("self.content", (newContent, prevContent) =>
+        this.updatedContent(newContent, prevContent)
+      );
+      this.$scope.$watch("self.details", (newDetails, prevDetails) =>
+        this.updatedDetails(newDetails, prevDetails)
+      );
+    }
+
+    updatedDetails(newDetails, prevDetails) {
+      if (newDetails && newDetails != prevDetails) {
+        this.details = newDetails;
+      }
+    }
+    updatedContent(newContent, prevContent) {
+      if (newContent && newContent != prevContent) {
+        this.content = newContent;
+      }
     }
 
     toggleMap() {

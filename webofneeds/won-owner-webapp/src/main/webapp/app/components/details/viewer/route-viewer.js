@@ -34,8 +34,8 @@ function genComponentConf() {
                 </svg>
           </div>
           <won-need-map
-            locations="self.locations"
-            ng-if="self.content && self.showMap">
+            locations="[self.content.get('fromLocation'), self.content.get('toLocation')]"
+            ng-if="self.showMap && self.content && (self.content.get('fromLocation') || self.content.get('toLocation'))">
           </won-need-map>
         </div>
     `;
@@ -43,15 +43,26 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.lv4dbg = this;
+      window.routev4dbg = this;
       this.showMap = false;
 
-      this.$scope.$watch("self.content", newValue => {
-        self.locations = newValue && [
-          newValue.get("fromLocation"),
-          newValue.get("toLocation"),
-        ];
-      });
+      this.$scope.$watch("self.content", (newContent, prevContent) =>
+        this.updatedContent(newContent, prevContent)
+      );
+      this.$scope.$watch("self.details", (newDetails, prevDetails) =>
+        this.updatedDetails(newDetails, prevDetails)
+      );
+    }
+
+    updatedDetails(newDetails, prevDetails) {
+      if (newDetails && newDetails != prevDetails) {
+        this.details = newDetails;
+      }
+    }
+    updatedContent(newContent, prevContent) {
+      if (newContent && newContent != prevContent) {
+        this.content = newContent;
+      }
     }
 
     toggleMap() {

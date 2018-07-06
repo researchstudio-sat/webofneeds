@@ -19,6 +19,24 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
       window.tv4dbg = this;
+
+      this.$scope.$watch("self.content", (newContent, prevContent) =>
+        this.updatedContent(newContent, prevContent)
+      );
+      this.$scope.$watch("self.details", (newDetails, prevDetails) =>
+        this.updatedDetails(newDetails, prevDetails)
+      );
+    }
+
+    updatedDetails(newDetails, prevDetails) {
+      if (newDetails && newDetails != prevDetails) {
+        this.details = newDetails;
+      }
+    }
+    updatedContent(newContent, prevContent) {
+      if (newContent && newContent != prevContent) {
+        this.content = newContent;
+      }
     }
   }
   Controller.$inject = serviceDependencies;
