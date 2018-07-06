@@ -6,7 +6,7 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
-import { details } from "detailDefinitions";
+import { useCases } from "useCaseDefinitions";
 
 (function() {
   // <need-builder-js> scope
@@ -137,54 +137,59 @@ import { details } from "detailDefinitions";
         hasFlag = result;
         */
 
-    const buildContentNode = (id, isOrSeeksData, isSeeks) => ({
-      "@id": id,
-      "dc:title": isOrSeeksData.title,
-      // TODO: check if these details existbefore trying to parse them
-      ...details["description"].parseToRDF({
-        value: isOrSeeksData["description"],
-      }),
-      ...details["location"].parseToRDF({
-        value: isOrSeeksData["location"],
-        // TODO: use detail-identifier instead of seeks/is
-        identifier: isSeeks ? "seeks" : "is",
-      }),
-      ...details["person"].parseToRDF({
-        value: isOrSeeksData["person"],
-      }),
-      ...details["route"].parseToRDF({
-        value: isOrSeeksData["travelAction"],
-      }),
-      ...details["tags"].parseToRDF({
-        value: isOrSeeksData["tags"],
-      }),
-      "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
-        ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
-        : undefined,
+    const buildContentNode = (id, isOrSeeksData, isSeeks) => {
+      let contentNode = {
+        "@id": id,
+        "dc:title": isOrSeeksData.title,
+        "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
+          ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
+          : undefined,
 
-      //TODO: Different id for is and seeks
-      "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
-        ? undefined
-        : {
-            "@id": "_:timeSpecification",
-            "@type": "won:TimeSpecification",
-            "won:hasRecurInfiniteTimes": isOrSeeksData.recurInfinite,
-            "won:hasRecursIn": isOrSeeksData.recursIn,
-            "won:hasStartTime": isOrSeeksData.startTime,
-            "won:hasEndTime": isOrSeeksData.endTime,
-          },
+        //TODO: Different id for is and seeks
+        "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
+          ? undefined
+          : {
+              "@id": "_:timeSpecification",
+              "@type": "won:TimeSpecification",
+              "won:hasRecurInfiniteTimes": isOrSeeksData.recurInfinite,
+              "won:hasRecursIn": isOrSeeksData.recursIn,
+              "won:hasStartTime": isOrSeeksData.startTime,
+              "won:hasEndTime": isOrSeeksData.endTime,
+            },
 
-      "won:hasPriceSpecificationhas": !hasPriceSpecification(isOrSeeksData)
-        ? undefined
-        : {
-            "@id": "_:priceSpecification",
-            "@type": "won:PriceSpecification",
-            "won:hasCurrency": isOrSeeksData.currency,
-            "won:hasLowerPriceLimit": isOrSeeksData.lowerPriceLimit,
-            "won:hasUpperPriceLimit": isOrSeeksData.upperPriceLimit,
-          },
-      //TODO images, time, currency(?)
-    });
+        "won:hasPriceSpecificationhas": !hasPriceSpecification(isOrSeeksData)
+          ? undefined
+          : {
+              "@id": "_:priceSpecification",
+              "@type": "won:PriceSpecification",
+              "won:hasCurrency": isOrSeeksData.currency,
+              "won:hasLowerPriceLimit": isOrSeeksData.lowerPriceLimit,
+              "won:hasUpperPriceLimit": isOrSeeksData.upperPriceLimit,
+            },
+        //TODO images, time, currency(?)
+      };
+      if (args.useCase && useCases[args.useCase]) {
+        // get list of potential details from use case
+        const useCase = useCases[args.useCase];
+        const detailList = isSeeks ? "seeksDetails" : "isDetails";
+        // iterate over details
+        for (let detailName in useCase[detailList]) {
+          // parse detail to RDF
+          const detail = useCase[detailList][detailName];
+          let detailRDF = {
+            ...detail.parseToRDF({
+              value: isOrSeeksData[detail.identifier],
+              identifier: detail.identifier,
+            }),
+          };
+          // add to content node
+          for (let key in detailRDF) {
+            contentNode[key] = detailRDF[key];
+          }
+        }
+      }
+      return contentNode;
+    };
 
     // TODO: if both is and seeks are present, the seeks content gets ignored here
     const isWhatsAround = args.is
@@ -237,9 +242,9 @@ import { details } from "detailDefinitions";
         "won:hasSearchString": searchString ? searchString : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
-      args.is ? buildContentNode(isContentUri, args.is, true) : {},
+      args.is ? buildContentNode(isContentUri, args.is, false) : {},
       args.seeks && !isWhatsAround
-        ? buildContentNode(seeksContentUri, args.seeks, false)
+        ? buildContentNode(seeksContentUri, args.seeks, true)
         : {},
       ...(args.is && args.is.arbitraryJsonLd ? args.is.arbitraryJsonLd : []),
       ...(args.seeks && args.seeks.arbitraryJsonLd

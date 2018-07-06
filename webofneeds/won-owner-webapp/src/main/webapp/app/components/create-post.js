@@ -339,6 +339,10 @@ function genComponentConf() {
           //delete this.draftObject.is;
         }
 
+        if (this.useCase && this.useCase.identifier) {
+          this.draftObject.useCase = this.useCase.identifier;
+        }
+
         const draft = this.getPublishObject(this.draftObject);
 
         this.needs__create(
