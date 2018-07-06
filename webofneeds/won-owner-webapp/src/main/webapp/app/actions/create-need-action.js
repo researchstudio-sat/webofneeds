@@ -65,34 +65,35 @@ export function createWhatsNew() {
     const state = getState();
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
-    const openWhatsXNeeds = getIn(state, ["needs"]).filter(
-      need =>
-        need.get("state") === "won:Active" &&
-        (need.get("isWhatsAround") || need.get("isWhatsNew"))
-    );
 
-    if (openWhatsXNeeds.size == 0) {
-      const whatsNew = {
-        title: "What's New?",
-        type: "http://purl.org/webofneeds/model#DoTogether",
-        description:
-          "Automatically created post to see what's happening recently",
-        tags: undefined,
-        thumbnail: undefined,
-        whatsNew: true,
-      };
+    const whatsNew = {
+      title: "What's New?",
+      type: "http://purl.org/webofneeds/model#DoTogether",
+      description:
+        "Automatically created post to see what's happening recently",
+      tags: undefined,
+      thumbnail: undefined,
+      whatsNew: true,
+    };
 
-      //TODO: Point to same DataSet instead of double it
-      const whatsNewObject = {
-        is: whatsNew,
-        seeks: whatsNew,
-        matchingContext: defaultContext,
-      };
+    //TODO: Point to same DataSet instead of double it
+    const whatsNewObject = {
+      is: whatsNew,
+      seeks: whatsNew,
+      matchingContext: defaultContext,
+    };
 
-      dispatch(actionCreators.needs__create(whatsNewObject, nodeUri));
-    } else {
-      console.log("WhatsXNeed already exists, we will not create a new one");
-    }
+    getIn(state, ["needs"])
+      .filter(
+        need =>
+          need.get("state") === "won:Active" &&
+          (need.get("isWhatsAround") || need.get("isWhatsNew"))
+      )
+      .map(need => {
+        dispatch(actionCreators.needs__close(need.get("uri")));
+      });
+
+    dispatch(actionCreators.needs__create(whatsNewObject, nodeUri));
   };
 }
 
@@ -102,9 +103,6 @@ export function createWhatsAround() {
     const state = getState();
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
-    const openWhatsAroundNeeds = getIn(state, ["needs"]).filter(
-      need => need.get("state") === "won:Active" && need.get("isWhatsAround")
-    );
 
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -113,43 +111,35 @@ export function createWhatsAround() {
           const lng = currentLocation.coords.longitude;
           const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
 
-          if (openWhatsAroundNeeds.size == 0) {
-            reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
-              const location = nominatim2draftLocation(searchResult);
-              let whatsAround = {
-                title: "What's Around?",
-                type: "http://purl.org/webofneeds/model#DoTogether",
-                description:
-                  "Automatically created post to see what's happening in your area",
-                tags: undefined,
-                location: location,
-                thumbnail: undefined,
-                whatsAround: true,
-              };
+          reverseSearchNominatim(lat, lng, zoom).then(searchResult => {
+            const location = nominatim2draftLocation(searchResult);
+            let whatsAround = {
+              title: "What's Around?",
+              type: "http://purl.org/webofneeds/model#DoTogether",
+              description:
+                "Automatically created post to see what's happening in your area",
+              tags: undefined,
+              location: location,
+              thumbnail: undefined,
+              whatsAround: true,
+            };
 
-              getIn(state, ["needs"])
-                .filter(
-                  need =>
-                    need.get("state") === "won:Active" && need.get("isWhatsNew")
-                )
-                .map(need => {
-                  dispatch(actionCreators.needs__close(need.get("uri")));
-                });
-              const whatsAroundObject = {
-                is: whatsAround,
-                seeks: whatsAround,
-                matchingContext: defaultContext,
-              };
+            getIn(state, ["needs"])
+              .filter(
+                need =>
+                  need.get("state") === "won:Active" && need.get("isWhatsNew")
+              )
+              .map(need => {
+                dispatch(actionCreators.needs__close(need.get("uri")));
+              });
+            const whatsAroundObject = {
+              is: whatsAround,
+              seeks: whatsAround,
+              matchingContext: defaultContext,
+            };
 
-              dispatch(
-                actionCreators.needs__create(whatsAroundObject, nodeUri)
-              );
-            });
-          } else {
-            console.log(
-              "WhatsAroundNeed already exists, we will not create a new one"
-            );
-          }
+            dispatch(actionCreators.needs__create(whatsAroundObject, nodeUri));
+          });
         },
         error => {
           //error handler
