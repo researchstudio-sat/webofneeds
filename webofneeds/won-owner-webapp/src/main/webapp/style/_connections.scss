@@ -59,12 +59,14 @@
       background: $won-lighter-gray;
 
       &__text {
+        padding-bottom: 1rem;
       }
 
       &__createx {
         display: grid;
         grid-gap: 0.5rem;
         grid-auto-flow: column;
+        grid-template-columns: 1fr 1fr;
 
         &__button {
         }
