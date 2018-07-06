@@ -1,0 +1,16 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+@import "responsiveness-utils";
+@import "description-viewer";
+@import "tags-viewer";
+@import "person-viewer";
+@import "location-viewer";
+@import "route-viewer";
+@import "title-viewer";
+
+won-post-is-or-seeks-info {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 0.5rem;
+}
