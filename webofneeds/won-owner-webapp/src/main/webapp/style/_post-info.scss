@@ -108,6 +108,9 @@ won-post-info {
       display: grid;
       grid-auto-flow: row;
       font-size: $smallFontSize;
+      margin: 0.25rem 0 0 0;
+      background: var(--won-lighter-gray);
+      padding: 0.5rem;
 
       &__item {
         display: grid;

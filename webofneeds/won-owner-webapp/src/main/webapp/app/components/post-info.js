@@ -11,7 +11,7 @@ import postContextDropdownModule from "./post-context-dropdown.js";
 import trigModule from "./trig.js";
 import { attach } from "../utils.js";
 import won from "../won-es6.js";
-import { relativeTime } from "../won-label-utils.js";
+import { labels, relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import {
   selectOpenPostUri,
@@ -64,6 +64,14 @@ function genComponentConf() {
                   {{ self.friendlyTimestamp }}
                 </div>
               </div>
+              <div class="post-info__content__general__item">
+                <div class="post-info__content__general__item__label" ng-show="self.post.get('type')">
+                  Type
+                </div>
+                <div class="post-info__content__general__item__value" ng-show="self.post.get('type')">
+                  {{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : '' }}
+                </div>
+              </div>
             </div>
 
             <won-gallery ng-if="self.post.get('hasImages')">
@@ -114,6 +122,7 @@ function genComponentConf() {
 
       this.is = "is";
       this.seeks = "seeks";
+      this.labels = labels;
 
       this.pendingPublishing = false;
 

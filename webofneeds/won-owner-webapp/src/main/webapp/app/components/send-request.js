@@ -62,6 +62,8 @@ function genComponentConf() {
                 <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
                   {{ self.friendlyTimestamp }}
                 </div>
+              </div>
+              <div class="post-info__content__general__item">
                 <div class="post-info__content__general__item__label" ng-show="self.displayedPost.get('type')">
                   Type
                 </div>
