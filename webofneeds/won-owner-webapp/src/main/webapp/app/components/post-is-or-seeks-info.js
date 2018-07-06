@@ -73,7 +73,7 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, [], this);
+      connect2Redux(selectFromState, actionCreators, ["self.branch"], this);
     }
 
     getDetail(key) {
