@@ -59,7 +59,10 @@ const socialUseCases = {
     icon: "#ico36_uc_breakfast",
     draft: {
       ...emptyDraft,
-      is: { tags: ["breakfast"] },
+      is: {
+        tags: ["breakfast"],
+        title: "I'm up for breakfast! Any plans?",
+      },
       seeks: { title: "breakfast" },
       searchString: "breakfast",
     },
@@ -87,10 +90,13 @@ const socialUseCases = {
   lunch: {
     identifier: "lunch",
     label: "Get lunch",
-    icon: "#ico36_uc_meal",
+    icon: "#ico36_uc_meal_half",
     draft: {
       ...emptyDraft,
-      is: { tags: ["lunch"] },
+      is: {
+        tags: ["lunch"],
+        title: "I'm up for lunch! Any plans?",
+      },
       seeks: { title: "lunch" },
       searchString: "lunch",
     },
@@ -118,10 +124,13 @@ const socialUseCases = {
   afterparty: {
     identifier: "afterparty",
     label: "Go out",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_drinks",
     draft: {
       ...emptyDraft,
-      is: { tags: ["afterparty"] },
+      is: {
+        tags: ["afterparty"],
+        title: "I'm up for partying! Any plans?",
+      },
       seeks: { title: "afterparty" },
       searchString: "afterparty",
     },
@@ -151,8 +160,16 @@ const professionalUseCases = {
   getToKnow: {
     identifier: "getToKnow",
     label: "Find people",
-    icon: "#ico36_plus",
-    draft: { ...emptyDraft },
+    icon: "#ico36_person",
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["meetup"],
+        title: "I'm up for meeting new people!",
+      },
+      seeks: { title: "meetup" },
+      searchString: "meetup",
+    },
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
