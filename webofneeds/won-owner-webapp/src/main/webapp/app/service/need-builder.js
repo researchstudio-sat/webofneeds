@@ -1,3 +1,4 @@
+
 /**
  * builds the 0th node, the content-node, in the create message graph
  *
@@ -200,7 +201,7 @@ import { getAllDetails } from "../won-utils";
       ? true
       : isWhatsNew
         ? true
-        : args.searchString
+        : args.searchString && args.useCase === 'pureSearch' //hack: no hint for counterpart only if it's a pure search
           ? true
           : false;
     let isContentUri, seeksContentUri;
