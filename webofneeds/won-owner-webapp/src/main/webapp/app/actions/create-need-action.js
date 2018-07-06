@@ -80,13 +80,13 @@ export function createWhatsNew() {
         tags: undefined,
         thumbnail: undefined,
         whatsNew: true,
-        matchingContext: defaultContext,
       };
 
       //TODO: Point to same DataSet instead of double it
       const whatsNewObject = {
         is: whatsNew,
         seeks: whatsNew,
+        matchingContext: defaultContext,
       };
 
       dispatch(actionCreators.needs__create(whatsNewObject, nodeUri));
@@ -125,7 +125,6 @@ export function createWhatsAround() {
                 location: location,
                 thumbnail: undefined,
                 whatsAround: true,
-                matchingContext: defaultContext,
               };
 
               getIn(state, ["needs"])
@@ -139,6 +138,7 @@ export function createWhatsAround() {
               const whatsAroundObject = {
                 is: whatsAround,
                 seeks: whatsAround,
+                matchingContext: defaultContext,
               };
 
               dispatch(
