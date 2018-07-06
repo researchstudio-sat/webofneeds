@@ -4,7 +4,7 @@
 <main class="connectionscontent">
 
     <!-- LEFT SIDE -->
-    <div class="conn__list" ng-class="{'hide-in-responsive': self.connection || self.selectedPost || self.isPost || self.isSearch || !!self.useCase}">
+    <div class="conn__list" ng-class="{'hide-in-responsive': !self.hasOwnNeeds || self.connection || self.selectedPost || self.isPost || self.isSearch || !!self.useCase}">
         <won-connections-overview
             on-selected-connection="self.selectedConnection(connectionUri)"
             on-selected-need="self.selectedNeed(needUri)"
@@ -13,25 +13,29 @@
     </div>
 
     <!-- RIGHT SIDE -->
-    <div class="conn__content hide-in-responsive" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.isPost && !self.isSearch && !self.useCase">
+    <div class="conn__content" ng-if="!self.selectedPost && (!self.connection || self.connectionType === self.WON.Closed) && !self.isPost && !self.isSearch && !self.useCase"
+            ng-class="{'hide-in-responsive' : self.hasOwnNeeds}">
         <div class="conn__content__welcome">
             <div class="conn__content__welcome__text" ng-include="self.welcomeTemplate"></div>
-            <div class="conn__content__welcome__createx">
+            <div class="conn__content__welcome__createx won-pending-publishing" ng-if="self.pendingPublishing">
+                <button class="won-button--filled red conn__content__welcome__createx__button"
+                        ng-disabled="self.pendingPublishing">
+                    <span>Finding out what's going on&hellip;</span>
+                </button>
+            </div>
+            <div class="conn__content__welcome__createx" ng-if="!self.pendingPublishing">
                 <button class="won-button--filled red conn__content__welcome__createx__button"
                         ng-click="self.createWhatsAround()"
-                        ng-disabled="self.pendingPublishing"
-                        ng-if="!self.pendingPublishing">
+                        ng-disabled="self.pendingPublishing">
                     <svg class="won-button-icon" style="--local-primary:white;">
                         <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
                     </svg>
-                    <span ng-if="!self.pendingPublishing">What's in your Area?</span>
-                    <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
+                    <span>What's in your Area?</span>
                 </button>
                 <button class="won-button--filled red conn__content__welcome__createx__button"
                         ng-click="self.createWhatsNew()"
                         ng-disabled="self.pendingPublishing">
-                    <span ng-if="!self.pendingPublishing">What's new?</span>
-                    <span ng-if="self.pendingPublishing">Finding out what's going on&hellip;</span>
+                    <span>What's new?</span>
                 </button>
             </div>
             <won-labelled-hr label="::'Or'" class="conn__content__welcome__labelledhr"></won-labelled-hr>
