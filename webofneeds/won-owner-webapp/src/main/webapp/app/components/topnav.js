@@ -61,7 +61,6 @@ function genTopnavConf() {
                    Suppress tracking.
                 </a>
 	  		</div>
-	  		    <br>
             <button
                 ng-click="self.acceptDisclaimer()"
                 class="si__button">
