@@ -56,7 +56,7 @@ const socialUseCases = {
   breakfast: {
     identifier: "breakfast",
     label: "Get breakfast together",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_breakfast",
     draft: {
       ...emptyDraft,
       is: { tags: ["essen", "food"] },
