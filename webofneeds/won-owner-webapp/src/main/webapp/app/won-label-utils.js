@@ -23,10 +23,10 @@ export const labels = deepFreeze({
     [won.WON.Closed]: "Conversation closed. You can reopen it.",
   },
   messageType: {
-    [won.WONMSG.connectMessage]: "Connect Message",
-    [won.WONMSG.openMessage]: "Open Message",
+    [won.WONMSG.connectMessage]: "Contact Request",
+    [won.WONMSG.openMessage]: "Accepted Contact Request",
     [won.WONMSG.closeMessage]: "Close Message",
-    [won.WONMSG.connectionMessage]: "Connection Message",
+    [won.WONMSG.connectionMessage]: "Chat Message",
     [won.WONMSG.hintMessage]: "Hint Message",
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },

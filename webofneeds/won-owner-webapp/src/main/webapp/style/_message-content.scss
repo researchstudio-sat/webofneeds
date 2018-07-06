@@ -17,8 +17,10 @@ won-message-content {
   }
 
   .msgcontent__header {
+    margin-bottom: 0.5rem;
+
     &__type {
-      font-weight: bold;
+      color: $won-subtitle-gray;
     }
   }
 }

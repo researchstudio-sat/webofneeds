@@ -12,8 +12,8 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
       <div class="msgcontent__header" ng-if="self.message && !self.isConnectionMessage()">
-        <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()"> {{ self.labels.messageType[self.message.get('messageType')] }}</div>
-        <div class="msgcontent__header__type" ng-if="self.isOtherMessage()"> {{ self.message.get('messageType') }}</div>
+        <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()"> &lt;{{ self.labels.messageType[self.message.get('messageType')] }}&gt;</div>
+        <div class="msgcontent__header__type" ng-if="self.isOtherMessage()"> &lt;{{ self.message.get('messageType') }}&gt;</div>
       </div>
       <div class="msgcontent__body" ng-if="self.message">
         <div class="msgcontent__body__text--prewrap" ng-if="self.message.getIn(['content', 'text'])">{{ self.message.getIn(['content', 'text']) }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
