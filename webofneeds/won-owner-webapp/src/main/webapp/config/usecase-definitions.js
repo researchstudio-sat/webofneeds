@@ -30,7 +30,7 @@ const allDetailsUseCase = {
     icon: "#ico36_plus",
     draft: { ...emptyDraft },
     isDetails: details,
-    seeksDetails: details,
+    seeksDetails: details, //FIXME: need unique detail identifiers
   },
 };
 
@@ -66,6 +66,15 @@ const socialUseCases = {
         ...details.description,
         identifier: "foodallergies",
         label: "Food Allergies",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:foodAllergies": undefined };
+          }
+          return { "won:foodAllergies": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          return jsonLDImm && jsonLDImm.get("won:foodAllergies");
+        },
       },
       location: { ...details.location },
       tags: { ...details.tags },
