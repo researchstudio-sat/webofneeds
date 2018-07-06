@@ -20,7 +20,7 @@ function genComponentConf() {
             type="text"
             maxlength="{{self.characterLimit}}"
             class="cis__mandatory__title won-txt"
-            placeholder="What? - Short title shown in lists"
+            placeholder="{{self.titlePlaceholder? self.titlePlaceholder : 'What? (Short title shown in lists)'}}"
             ng-blur="::self.updateTitle()"
             ng-keyup="::self.updateTitle()"/>
     </div>
@@ -192,6 +192,7 @@ function genComponentConf() {
       initialDraft: "=",
       onUpdate: "&", // Usage: on-update="::myCallback(draft)"
       onScroll: "&",
+      titlePlaceholder: "=",
     },
     template: template,
   };
