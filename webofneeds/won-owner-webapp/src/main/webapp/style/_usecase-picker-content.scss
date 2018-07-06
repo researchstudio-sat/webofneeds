@@ -35,8 +35,7 @@ won-usecase-picker-content {
     &__usecases {
       display: grid;
       grid-gap: 0.5rem;
-      grid-template-columns: repeat(auto-fill, 10rem);
-      grid-auto-rows: min-content;
+      grid-template-columns: 1fr 1fr 1fr;
       grid-auto-flow: row dense;
 
       &__usecase {
@@ -45,7 +44,6 @@ won-usecase-picker-content {
         flex-direction: column;
         padding: 0.5rem;
         border-radius: 0.19rem;
-        //width: 10rem;
         background: $won-secondary-color-light;
 
         &:hover {
