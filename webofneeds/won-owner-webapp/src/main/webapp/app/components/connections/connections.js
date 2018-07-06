@@ -105,6 +105,7 @@ class ConnectionsController {
         hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
         open,
         mainViewScroll: state.get("mainViewScroll"),
+        showWelcomePage: !(ownNeeds && ownNeeds.size > 0),
       };
     };
 
