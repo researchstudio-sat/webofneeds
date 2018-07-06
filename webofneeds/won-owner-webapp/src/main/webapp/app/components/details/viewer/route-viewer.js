@@ -9,7 +9,7 @@ function genComponentConf() {
           <svg class="rv__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="rv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="rv__content">
           <div class="rv__content__text clickable"

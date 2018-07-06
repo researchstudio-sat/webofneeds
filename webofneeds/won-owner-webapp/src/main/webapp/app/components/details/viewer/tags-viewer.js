@@ -8,7 +8,7 @@ function genComponentConf() {
           <svg class="tv__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="tv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="tv__content">
           <div class="tv__content__tag" ng-repeat="tag in self.content.toJS()">{{tag}}</div>

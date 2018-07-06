@@ -8,7 +8,7 @@ function genComponentConf() {
           <svg class="pv__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="pv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="pv__content">
           <div class="pv__content__detail" ng-if="self.content.get('title')">

@@ -8,7 +8,7 @@ function genComponentConf() {
           <svg class="dv__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="dv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="dv__content">{{ self.content }}</div>  <!-- no spaces or newlines within the code-tag, because it is preformatted -->
     `;
