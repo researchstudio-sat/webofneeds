@@ -111,6 +111,7 @@ won-post-info {
       margin: 0.25rem 0 0 0;
       background: var(--won-lighter-gray);
       padding: 0.5rem;
+      grid-gap: 0.25rem;
 
       &__item {
         display: grid;

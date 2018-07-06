@@ -72,6 +72,10 @@ function genComponentConf() {
                   {{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : '' }}
                 </div>
               </div>
+              <won-post-share-link
+                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
+                post-uri="self.post.get('uri')">
+              </won-post-share-link>
             </div>
 
             <won-gallery ng-if="self.post.get('hasImages')">
@@ -99,10 +103,6 @@ function genComponentConf() {
             </div>
         </div>
         <div class="post-info__footer" ng-if="!self.isLoading()">
-            <won-post-share-link
-                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
-                post-uri="self.post.get('uri')">
-            </won-post-share-link>
             <button class="won-button--filled red post-info__footer__button"
                 ng-if="self.post.get('ownNeed') && self.post.get('isWhatsNew')"
                 ng-click="self.createWhatsAround()"

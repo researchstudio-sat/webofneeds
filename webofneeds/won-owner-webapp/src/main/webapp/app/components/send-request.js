@@ -71,6 +71,10 @@ function genComponentConf() {
                   {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
                 </div>
               </div>
+              <won-post-share-link
+                ng-if="self.displayedPost.get('state') !== self.WON.InactiveCompacted"
+                post-uri="self.displayedPost && self.displayedPost.get('uri')">
+              </won-post-share-link>
             </div>
 
             <won-gallery ng-show="self.displayedPost.get('hasImages')">
@@ -99,12 +103,6 @@ function genComponentConf() {
             </a>
         </div>
         <div class="post-info__footer" ng-if="!self.isLoading()">
-            <won-post-share-link
-                ng-if="self.displayedPost.get('state') !== self.WON.InactiveCompacted"
-                post-uri="self.displayedPost && self.displayedPost.get('uri')">
-            </won-post-share-link>
-            <won-labelled-hr label="::'Or'" class="post-info__footer__labelledhr"></won-labelled-hr>
-
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple

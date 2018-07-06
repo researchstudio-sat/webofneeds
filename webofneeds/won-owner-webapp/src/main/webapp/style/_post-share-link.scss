@@ -2,36 +2,8 @@
 @import "animate";
 
 won-post-share-link {
-  .psl__separator {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    align-items: center;
-
-    color: $won-line-gray;
-
-    &--open {
-      transition: border-bottom-width linear 0.1s;
-      border-bottom: $thinGrayBorder;
-      color: $won-primary-color;
-
-      &:hover {
-        color: $won-line-gray;
-      }
-    }
-
-    &:hover {
-      color: $won-primary-color;
-    }
-
-    &__arrow {
-      @include carretSized;
-      padding: 0.625em;
-    }
-  }
-
   .psl__content {
-    @include slideWithOpacityAnimation(0.5s, linear, 5rem);
+    border-top: $thinGrayBorder;
 
     .psl__info,
     .psl__text {
@@ -39,11 +11,11 @@ won-post-share-link {
     }
 
     .psl__text {
-      padding: 0.5rem 0;
+      padding: 0.25rem 0;
     }
 
     .psl__info {
-      padding-top: 0.5rem;
+      padding-top: 0.25rem;
     }
   }
 
@@ -55,16 +27,19 @@ won-post-share-link {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       border-right: none;
+      padding: 0.25rem;
+      font-size: $smallFontSize;
     }
 
     .psl__copy-button {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-      width: 2rem;
+      width: 1.5rem;
+      padding: 0.25rem 1.5rem;
     }
 
     .psl__button-icon {
-      @include fixed-square(1.5rem);
+      @include fixed-square(1.25rem);
     }
   }
 }
