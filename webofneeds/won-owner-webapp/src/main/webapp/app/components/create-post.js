@@ -216,7 +216,6 @@ function genComponentConf() {
 
       // TODO: think about how to deal with contexts predefined in usecases
       delay(0).then(() => {
-        this.updateMatchingContext(this.defaultMatchingContext);
         this.loadInitialDraft();
       });
 
@@ -299,13 +298,11 @@ function genComponentConf() {
         // deep clone of draft
         this.draftObject = JSON.parse(JSON.stringify(this.useCase.draft));
       }
-    }
 
-    updateMatchingContext(matchingContext) {
-      // also accepts []!
-      if (matchingContext && this.draftObject.matchingContext) {
+      // combine preset matching context with default matching context
+      if (this.defaultMatchingContext && this.draftObject.matchingContext) {
         const combinedContext = [
-          ...matchingContext,
+          ...this.defaultMatchingContext,
           ...this.draftObject.matchingContext,
         ].reduce(function(a, b) {
           if (a.indexOf(b) < 0) a.push(b);
@@ -313,7 +310,25 @@ function genComponentConf() {
         }, []);
 
         this.draftObject.matchingContext = combinedContext;
-      } else if (matchingContext) {
+      } else if (this.defaultMatchingContext) {
+        this.draftObject.matchingContext = this.defaultMatchingContext;
+      }
+    }
+
+    updateMatchingContext(matchingContext) {
+      // also accepts []!
+      // if (matchingContext && this.draftObject.matchingContext) {
+      //   const combinedContext = [
+      //     ...matchingContext,
+      //     ...this.draftObject.matchingContext,
+      //   ].reduce(function(a, b) {
+      //     if (a.indexOf(b) < 0) a.push(b);
+      //     return a;
+      //   }, []);
+
+      //   this.draftObject.matchingContext = combinedContext;
+      // } else
+      if (matchingContext) {
         this.draftObject.matchingContext = matchingContext;
       }
     }
