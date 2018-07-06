@@ -66,7 +66,7 @@ function genComponentConf() {
               </div>
             </div>
 
-            <won-gallery ng-show="self.post.get('hasImages')">
+            <won-gallery ng-if="self.post.get('hasImages')">
             </won-gallery>
 
             <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch"></won-post-is-or-seeks-info>
