@@ -6,7 +6,7 @@
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
 import won from "./won.js";
-import { useCases } from "useCaseDefinitions";
+// import { useCases } from "useCaseDefinitions";
 import { getAllDetails } from "../utils";
 
 (function() {
@@ -138,7 +138,7 @@ import { getAllDetails } from "../utils";
         hasFlag = result;
         */
 
-    const buildContentNode = (id, isOrSeeksData, isSeeks) => {
+    const buildContentNode = (id, isOrSeeksData) => {
       let contentNode = {
         "@id": id,
         "dc:title": isOrSeeksData.title,
@@ -169,14 +169,8 @@ import { getAllDetails } from "../utils";
             },
         //TODO images, time, currency(?)
       };
-      let detailList = undefined;
-      if (args.useCase && useCases[args.useCase]) {
-        const useCase = useCases[args.useCase];
-        const ucDetails = isSeeks ? "seeksDetails" : "isDetails";
-        detailList = useCase[ucDetails];
-      } else {
-        detailList = getAllDetails();
-      }
+
+      const detailList = getAllDetails();
 
       for (const detailName in detailList) {
         const detail = detailList[detailName];
@@ -245,9 +239,9 @@ import { getAllDetails } from "../utils";
         "won:hasSearchString": searchString ? searchString : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
-      args.is ? buildContentNode(isContentUri, args.is, false) : {},
+      args.is ? buildContentNode(isContentUri, args.is) : {},
       args.seeks && !isWhatsAround
-        ? buildContentNode(seeksContentUri, args.seeks, true)
+        ? buildContentNode(seeksContentUri, args.seeks)
         : {},
       ...(args.is && args.is.arbitraryJsonLd ? args.is.arbitraryJsonLd : []),
       ...(args.seeks && args.seeks.arbitraryJsonLd
