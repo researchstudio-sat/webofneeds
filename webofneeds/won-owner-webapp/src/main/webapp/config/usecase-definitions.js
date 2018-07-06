@@ -90,7 +90,7 @@ const socialUseCases = {
   lunch: {
     identifier: "lunch",
     label: "Get lunch",
-    icon: "#ico36_uc_meal_half",
+    icon: "#ico36_uc_meal-half",
     draft: {
       ...emptyDraft,
       is: {
