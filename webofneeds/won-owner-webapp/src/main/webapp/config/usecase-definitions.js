@@ -55,11 +55,11 @@ const pureSearchUseCase = {
 const socialUseCases = {
   breakfast: {
     identifier: "breakfast",
-    label: "Get breakfast together",
+    label: "Get breakfast",
     icon: "#ico36_uc_breakfast",
     draft: {
       ...emptyDraft,
-      is: { tags: ["essen", "food"] },
+      is: { tags: ["breakfast"] },
       seeks: { title: "breakfast" },
       searchString: "breakfast",
     },
@@ -86,11 +86,11 @@ const socialUseCases = {
   },
   lunch: {
     identifier: "lunch",
-    label: "Get lunch together",
-    icon: "#ico36_plus",
+    label: "Get lunch",
+    icon: "#ico36_uc_meal",
     draft: {
       ...emptyDraft,
-      is: { tags: ["essen", "food"] },
+      is: { tags: ["lunch"] },
       seeks: { title: "lunch" },
       searchString: "lunch",
     },
@@ -108,27 +108,34 @@ const socialUseCases = {
   },
   afterparty: {
     identifier: "afterparty",
-    label: "Enjoy the evening together",
+    label: "Go out",
     icon: "#ico36_plus",
-    draft: { ...emptyDraft },
-    seeksDetails: {
+    draft: {
+      ...emptyDraft,
+      is: { tags: ["afterparty"] },
+      seeks: { title: "afterparty" },
+      searchString: "afterparty",
+    },
+    isDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
   },
   sightseeing: {
     identifier: "sightseeing",
-    label: "Go sightseeing together",
+    label: "Go sightseeing",
     icon: "#ico36_plus",
-    draft: { ...emptyDraft },
-    seeksDetails: {
+    draft: {
+      ...emptyDraft,
+      is: { tags: ["sightseeing"] },
+      seeks: { title: "sightseeing" },
+      searchString: "sightseeing",
+    },
+    isDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
   },
-  // carsharing: {},
-  // meetSomeone: {},
-  // activity: {},
 };
 
 const professionalUseCases = {
