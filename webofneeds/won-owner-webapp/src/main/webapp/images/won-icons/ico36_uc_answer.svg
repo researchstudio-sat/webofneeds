@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -15,6 +14,8 @@
    width="36"
    sodipodi:docname="ico36_uc_answer.svg"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <defs
+     id="defs12" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -31,10 +32,10 @@
      inkscape:object-nodes="true"
      inkscape:snap-others="true"
      inkscape:snap-global="false"
-     inkscape:zoom="16"
-     inkscape:cx="-10.546874"
-     inkscape:cy="22.10579"
-     inkscape:window-x="-8"
+     inkscape:zoom="22.627417"
+     inkscape:cx="14.782653"
+     inkscape:cy="13.505016"
+     inkscape:window-x="2552"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4362"
@@ -48,31 +49,9 @@
      inkscape:snap-intersection-paths="true"
      inkscape:object-paths="true"
      inkscape:snap-object-midpoints="true"
-     inkscape:snap-center="true" />
-  <defs
-     id="defs4364">
-    <linearGradient
-       id="linearGradient6111"
-       osb:paint="solid">
-      <stop
-         style="stop-color:var(--local-primary);stop-opacity:1;"
-         offset="0"
-         id="stop6109" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient6103"
-       osb:paint="gradient">
-      <stop
-         style="stop-color:var(--local-primary);stop-opacity:1;"
-         offset="0"
-         id="stop6099" />
-      <stop
-         style="stop-color:var(--local-primary);stop-opacity:0;"
-         offset="1"
-         id="stop6101" />
-    </linearGradient>
-  </defs>
+     inkscape:snap-center="true"
+     inkscape:measure-start="17.5893,31.5988"
+     inkscape:measure-end="17.5893,7.6014" />
   <metadata
      id="metadata4367">
     <rdf:RDF>
@@ -85,15 +64,9 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.48807907px;line-height:1.25;font-family:'Bauhaus 93';-inkscape-font-specification:'Bauhaus 93, ';letter-spacing:0px;word-spacing:0px;fill:var(--local-primary);fill-opacity:1;stroke:none;stroke-width:1.11220193"
-     x="8.3877077"
-     y="32.532482"
-     id="text6345"><tspan
-       sodipodi:role="line"
-       id="tspan6343"
-       x="8.3877077"
-       y="32.532482"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bauhaus 93';-inkscape-font-specification:'Bauhaus 93, ';stroke-width:1.11220193">!</tspan></text>
+  <path
+     style="color:var(--local-primary);font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:var(--local-primary);letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:var(--local-primary);solid-opacity:1;vector-effect:none;fill:var(--local-primary);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.79999995;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+     d="M 17.866503,0.76451194 C 8.4102513,0.76451184 0.72587766,8.448887 0.72587743,17.905137 c 0,9.45625 7.68437357,17.142579 17.14062557,17.142578 1.182031,0 2.336944,-0.121205 3.453125,-0.349609 1.11618,-0.228403 2.194987,-0.564205 3.220703,-0.998047 -0.226589,0.09584 0.03134,0.0052 0.333984,0.01563 0.302649,0.01047 0.725291,0.04625 1.210938,0.103516 0.971293,0.114534 2.202599,0.308469 3.40625,0.515625 2.4073,0.414311 4.701171,0.880859 4.701171,0.880859 0.944559,0.190043 1.48702,-1.036452 0.710938,-1.607422 0,0 -1.420789,-1.040493 -2.734375,-2.15625 -0.656793,-0.557878 -1.287799,-1.140565 -1.666016,-1.572265 -0.106321,-0.121357 -0.129599,-0.168623 -0.1875,-0.251954 0.63375,-0.672882 1.244348,-1.369971 1.763672,-2.138671 0.616022,-0.911831 1.14819,-1.886393 1.582031,-2.91211 0.433842,-1.025715 0.769644,-2.102569 0.998047,-3.21875 0.228405,-1.116181 0.34961,-2.271093 0.34961,-3.453125 0,-9.4562495 -7.686328,-17.14062426 -17.142578,-17.14062506 z M 14.759081,6.2234964 H 21.23955 L 21.120409,20.553575 H 15.11455 Z m 3.214843,15.5136726 c 1.105346,0 2.052265,0.40036 2.841797,1.201171 0.800812,0.800812 1.201172,1.75403 1.201172,2.859375 0,1.105346 -0.394061,2.047919 -1.183593,2.826172 -0.789533,0.766975 -1.742751,1.150391 -2.859376,1.150391 -1.16174,0 -2.121257,-0.372771 -2.876953,-1.117188 -0.744416,-0.755695 -1.117187,-1.713259 -1.117187,-2.875 0,-1.127903 0.389715,-2.081121 1.167969,-2.859375 0.778253,-0.789532 1.720826,-1.185546 2.826171,-1.185546 z"
+     id="path828"
+     inkscape:connector-curvature="0" />
 </svg>
