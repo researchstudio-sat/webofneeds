@@ -9,8 +9,7 @@ const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `
         <!--div class="cpi__item clickable"
-            ng-click="self.selectCreate(self.SEARCH)"
-            ng-class="{'selected': self.isSearch}">
+            ng-click="">
             <svg class="cpi__item__icon"
                 title="Create a new search"
                 style="--local-primary:var(--won-primary-color);">
@@ -21,8 +20,7 @@ function genComponentConf() {
             </div>
         </div-->
         <div class="cpi__item clickable"
-            ng-click="self.selectCreate(self.POST)"
-            ng-class="{'selected': self.isPost}">
+            ng-click="self.selectUseCase()">
             <svg class="cpi__item__icon"
                 title="Create a new post"
                 style="--local-primary:var(--won-primary-color);">
@@ -42,28 +40,24 @@ function genComponentConf() {
       this.POST = "post";
 
       const selectFromState = state => {
-        const showCreateView = getIn(state, [
+        const showUseCases = getIn(state, [
           "router",
           "currentParams",
-          "showCreateView",
+          "showUseCases",
         ]);
-        const isSearch = showCreateView === this.SEARCH;
-        const isPost = showCreateView && !isSearch;
 
         return {
-          isSearch,
-          isPost,
-          showCreateView,
+          showUseCases,
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    selectCreate(type) {
+    selectUseCase() {
       this.router__stateGoCurrent({
         connectionUri: undefined,
         postUri: undefined,
-        showCreateView: type,
+        showUseCases: true,
         useCase: undefined,
       });
     }
