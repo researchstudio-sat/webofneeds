@@ -76,7 +76,7 @@ function genComponentConf() {
 
         return {
           listUseCases,
-          evenUseCaseListSize: listUseCases && listUseCases.size % 2 != 0,
+          evenUseCaseListSize: listUseCases && listUseCases.size % 2 == 0,
           showUseCases: !!showUseCases,
           useCase: useCaseString && this.getUseCase(useCaseString),
         };
