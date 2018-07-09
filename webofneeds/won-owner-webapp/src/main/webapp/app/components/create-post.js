@@ -158,10 +158,6 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
-
-      this.SEARCH = "search";
-      this.POST = "post";
-
       this.focusedElement = null;
       //TODO debug; deleteme
       window.cnc4dbg = this;
@@ -181,18 +177,11 @@ function genComponentConf() {
       this.isNew = true;
 
       const selectFromState = state => {
-        const showCreateView = getIn(state, [
-          "router",
-          "currentParams",
-          "showCreateView",
-        ]);
         const useCaseString = getIn(state, [
           "router",
           "currentParams",
           "useCase",
         ]);
-        const isSearch = showCreateView === this.SEARCH;
-        const isPost = showCreateView && !isSearch;
 
         // needed to be able to reset matching context to default
         // TODO: is there an easier way to do this?
@@ -207,11 +196,8 @@ function genComponentConf() {
 
         return {
           connectionHasBeenLost: !selectIsConnected(state),
-          showCreateView,
           useCaseString,
           useCase: this.getUseCase(useCaseString),
-          isSearch,
-          isPost,
           defaultMatchingContext: defaultMatchingContext,
         };
       };

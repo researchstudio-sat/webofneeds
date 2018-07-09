@@ -8,7 +8,6 @@ import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecasePickerContentModule from "../usecase-picker-content.js";
-import labelledHrModule from "../labelled-hr.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
@@ -30,8 +29,6 @@ class ConnectionsController {
     this.SEARCH = "search";
     this.POST = "post";
 
-    this.pendingPublishing = false;
-
     const scrollArea = this.$element[0].querySelector(".connectionscontent");
 
     this.scrollBuffer = callBuffer(scrollPosition => {
@@ -48,16 +45,13 @@ class ConnectionsController {
       );
       const selectedPost =
         selectedPostUri && state.getIn(["needs", selectedPostUri]);
-      const showCreateView = getIn(state, [
+      const showUseCases = getIn(state, [
         "router",
         "currentParams",
-        "showCreateView",
+        "showUseCases",
       ]);
 
       const useCase = getIn(state, ["router", "currentParams", "useCase"]);
-
-      const isSearch = showCreateView === this.SEARCH;
-      const isPost = showCreateView && !isSearch;
 
       const connectionUri = decodeURIComponent(
         getIn(state, ["router", "currentParams", "connectionUri"])
@@ -99,8 +93,7 @@ class ConnectionsController {
         connection,
         connectionType,
         useCase,
-        isSearch,
-        isPost,
+        showUseCases,
         hasConnections: connections && connections.size > 0,
         hasOwnNeeds: ownNeeds && ownNeeds.size > 0,
         open,
@@ -120,25 +113,11 @@ class ConnectionsController {
     });
   }
 
-  createWhatsAround() {
-    if (!this.pendingPublishing) {
-      this.pendingPublishing = true;
-      this.needs__whatsAround();
-    }
-  }
-
-  createWhatsNew() {
-    if (!this.pendingPublishing) {
-      this.pendingPublishing = true;
-      this.needs__whatsNew();
-    }
-  }
-
   selectedNeed(needUri) {
     this.router__stateGoCurrent({
       connectionUri: undefined,
       postUri: needUri,
-      showCreateView: undefined,
+      showUseCases: undefined,
     }); //TODO: Maybe leave the connectionUri in the parameters to go back when closing a selected need
   }
 
@@ -147,7 +126,7 @@ class ConnectionsController {
     this.router__stateGoCurrent({
       connectionUri,
       postUri: undefined,
-      showCreateView: undefined,
+      showUseCases: undefined,
     });
   }
 
@@ -198,7 +177,6 @@ export default angular
     usecasePickerContentModule,
     createPostModule,
     connectionsOverviewModule,
-    labelledHrModule,
   ])
   .controller("ConnectionsController", [
     ...serviceDependencies,

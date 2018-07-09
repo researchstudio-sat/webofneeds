@@ -35,7 +35,7 @@ import {
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
-        <won-create-post-item ng-class="{'selected' : self.showCreateView}"></won-create-post-item>
+        <won-create-post-item ng-class="{'selected' : self.showUseCases || !!self.useCase}"></won-create-post-item>
         <div ng-repeat="need in self.beingCreatedNeeds" class="co__item">
             <!-- ng-if="self.beingCreatedNeeds.size > 0" -->
             <div class="co__item__need" ng-class="{'selected' : need.get('uri') === self.needUriInRoute}">
@@ -217,7 +217,8 @@ function genComponentConf() {
         );
 
         const routerParams = selectRouterParams(state);
-        const showCreateView = get(routerParams, "showCreateView");
+        const showUseCases = get(routerParams, "showUseCases");
+        const useCase = get(routerParams, "useCase");
         const connUriInRoute = selectOpenConnectionUri(state);
         const needUriInRoute = selectOpenPostUri(state);
         const needImpliedInRoute =
@@ -233,7 +234,8 @@ function genComponentConf() {
         return {
           allNeeds,
           showClosedNeeds: state.get("showClosedNeeds"),
-          showCreateView,
+          showUseCases,
+          useCase,
           needUriInRoute,
           needUriImpliedInRoute,
           beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),

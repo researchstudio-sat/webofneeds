@@ -3,26 +3,45 @@ import ngAnimate from "angular-animate";
 import squareImageModule from "../components/square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { attach, getIn } from "../utils.js";
+import { useCases } from "useCaseDefinitions";
 import { connect2Redux } from "../won-utils.js";
 
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `
-        <!--div class="cpi__item clickable"
-            ng-click="self.selectCreate(self.SEARCH)"
-            ng-class="{'selected': self.isSearch}">
+        <div class="cpi__item selected"
+            ng-if="self.useCase">
             <svg class="cpi__item__icon"
-                title="Create a new search"
+                title="{{self.useCase['label']}}"
+                ng-if="self.useCase['icon']"
                 style="--local-primary:var(--won-primary-color);">
-                    <use xlink:href="#ico36_search" href="#ico36_search"></use>
+                    <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
             <div class="cpi__item__text">
-                Search
+                {{ self.useCase['label'] }}
             </div>
-        </div-->
+        </div>
         <div class="cpi__item clickable"
-            ng-click="self.selectCreate(self.POST)"
-            ng-class="{'selected': self.isPost}">
+            ng-if="!self.useCase"
+            ng-repeat="listUseCase in self.listUseCases"
+            ng-click="self.startFrom(listUseCase)">
+            <svg class="cpi__item__icon"
+                title="{{listUseCase['label']}}"
+                ng-if="listUseCase['icon']"
+                style="--local-primary:var(--won-primary-color);">
+                    <use xlink:href="{{listUseCase['icon']}}" href="{{listUseCase['icon']}}"></use>
+            </svg>
+            <div class="cpi__item__text">
+                {{ listUseCase['label'] }}
+            </div>
+        </div>
+        <div class="cpi__item clickable"
+            ng-click="self.selectUseCase()"
+            ng-if="!self.useCase"
+            ng-class="{
+              'selected': self.showUseCases,
+              'cpi__item--withcolspan': self.evenUseCaseListSize,
+            }">
             <svg class="cpi__item__icon"
                 title="Create a new post"
                 style="--local-primary:var(--won-primary-color);">
@@ -38,32 +57,76 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
-      this.SEARCH = "search";
-      this.POST = "post";
+      this.useCases = useCases;
 
       const selectFromState = state => {
-        const showCreateView = getIn(state, [
+        const showUseCases = getIn(state, [
           "router",
           "currentParams",
-          "showCreateView",
+          "showUseCases",
         ]);
-        const isSearch = showCreateView === this.SEARCH;
-        const isPost = showCreateView && !isSearch;
+
+        const useCaseString = getIn(state, [
+          "router",
+          "currentParams",
+          "useCase",
+        ]);
+
+        const listUseCases = this.getListUseCases();
 
         return {
-          isSearch,
-          isPost,
-          showCreateView,
+          listUseCases,
+          evenUseCaseListSize: listUseCases && listUseCases.size % 2 == 0,
+          showUseCases: !!showUseCases,
+          useCase: useCaseString && this.getUseCase(useCaseString),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
     }
 
-    selectCreate(type) {
+    getUseCase(useCaseString) {
+      if (useCaseString) {
+        for (const useCaseName in useCases) {
+          if (useCaseString === useCases[useCaseName]["identifier"]) {
+            return useCases[useCaseName];
+          }
+        }
+      }
+      return undefined;
+    }
+
+    getListUseCases() {
+      let listUseCases = {};
+
+      for (const useCaseKey in this.useCases) {
+        if (this.useCases[useCaseKey]["showInList"]) {
+          listUseCases[useCaseKey] = this.useCases[useCaseKey];
+        }
+      }
+      return listUseCases;
+    }
+
+    startFrom(selectedUseCase) {
+      const selectedUseCaseIdentifier =
+        selectedUseCase && selectedUseCase.identifier;
+
+      if (selectedUseCaseIdentifier) {
+        this.router__stateGoCurrent({
+          useCase: encodeURIComponent(selectedUseCaseIdentifier),
+        });
+      } else {
+        console.log(
+          "No usecase identifier found for given usecase, ",
+          selectedUseCase
+        );
+      }
+    }
+
+    selectUseCase() {
       this.router__stateGoCurrent({
         connectionUri: undefined,
         postUri: undefined,
-        showCreateView: type,
+        showUseCases: true,
         useCase: undefined,
       });
     }

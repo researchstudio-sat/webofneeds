@@ -3,7 +3,7 @@
  */
 import angular from "angular";
 import ngAnimate from "angular-animate";
-
+import labelledHrModule from "./labelled-hr.js";
 import "ng-redux";
 import { attach } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -19,6 +19,28 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
+      <div class="ucpc_createx won-pending-publishing" ng-if="self.pendingPublishing">
+          <button class="won-button--filled red ucpc_createx__button"
+                  ng-disabled="self.pendingPublishing">
+              <span>Finding out what's going on&hellip;</span>
+          </button>
+      </div>
+      <div class="ucpc__createx" ng-if="!self.pendingPublishing">
+          <button class="won-button--filled red ucpc__createx__button"
+                  ng-click="self.createWhatsAround()"
+                  ng-disabled="self.pendingPublishing">
+              <svg class="won-button-icon" style="--local-primary:white;">
+                  <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
+              </svg>
+              <span>What's in your Area?</span>
+          </button>
+          <button class="won-button--filled red ucpc_createx__button"
+                  ng-click="self.createWhatsNew()"
+                  ng-disabled="self.pendingPublishing">
+              <span>What's new?</span>
+          </button>
+      </div>
+      <won-labelled-hr label="::'Or'" class="ucpc__labelledhr"></won-labelled-hr>
       <div class="ucpc__usecasegroup"
         ng-repeat="useCaseGroup in self.useCaseGroups"
         ng-if="self.displayableUseCaseGroup(useCaseGroup)">
@@ -55,6 +77,8 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
+      this.pendingPublishing = false;
+
       window.ucpc4dbg = this;
       this.useCaseGroups = useCaseGroups;
       this.showUseCaseGroupHeaders = this.showUseCaseGroups();
@@ -67,6 +91,20 @@ function genComponentConf() {
 
       // Using actionCreators like this means that every action defined there is available in the template.
       connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    createWhatsAround() {
+      if (!this.pendingPublishing) {
+        this.pendingPublishing = true;
+        this.needs__whatsAround();
+      }
+    }
+
+    createWhatsNew() {
+      if (!this.pendingPublishing) {
+        this.pendingPublishing = true;
+        this.needs__whatsNew();
+      }
     }
 
     startFrom(selectedUseCase) {
@@ -151,5 +189,8 @@ function genComponentConf() {
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
 angular
-  .module("won.owner.components.usecasePickerContent", [ngAnimate])
+  .module("won.owner.components.usecasePickerContent", [
+    ngAnimate,
+    labelledHrModule,
+  ])
   .directive("wonUsecasePickerContent", genComponentConf).name;
