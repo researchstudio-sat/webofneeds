@@ -30,7 +30,7 @@ const allDetailsUseCase = {
   allDetails: {
     identifier: "allDetails",
     label: "New custom post",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_custom",
     draft: { ...emptyDraft },
     isDetails: details,
     seeksDetails: details,
@@ -142,7 +142,7 @@ const socialUseCases = {
   sightseeing: {
     identifier: "sightseeing",
     label: "Go sightseeing",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_sightseeing",
     draft: {
       ...emptyDraft,
       is: { tags: ["sightseeing"] },
@@ -160,7 +160,7 @@ const professionalUseCases = {
   getToKnow: {
     identifier: "getToKnow",
     label: "Find people",
-    icon: "#ico36_person",
+    icon: "#ico36_uc_find_people",
     draft: {
       ...emptyDraft,
       is: {
@@ -179,7 +179,7 @@ const professionalUseCases = {
   phdIs: {
     identifier: "phdIs",
     label: "Offer a PhD position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_phd",
     draft: { ...emptyDraft },
     isDetails: {
       description: { ...details.description },
@@ -189,7 +189,7 @@ const professionalUseCases = {
   phdSeeks: {
     identifier: "phdSeeks",
     label: "Find a PhD position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_phd",
     draft: { ...emptyDraft },
     isDetails: {
       person: { ...details.person },
@@ -202,7 +202,7 @@ const professionalUseCases = {
   postDocIs: {
     identifier: "postDocIs",
     label: "Offer a PostDoc position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_postdoc",
     draft: { ...emptyDraft },
     isDetails: {
       description: { ...details.description },
@@ -212,7 +212,7 @@ const professionalUseCases = {
   postDocSeeks: {
     identifier: "postDocSeeks",
     label: "Find a PostDoc position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_postdoc",
     draft: { ...emptyDraft },
     isDetails: {
       person: { ...details.person },
@@ -248,7 +248,7 @@ const infoUseCases = {
   question: {
     identifier: "question",
     label: "Ask a question",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_question",
     draft: {
       ...emptyDraft,
       is: { tags: ["question"] },
@@ -265,7 +265,7 @@ const infoUseCases = {
     //answer should have 'no hint for counterpart'
     identifier: "answer",
     label: "Answer questions",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_answer",
     draft: {
       ...emptyDraft,
       is: {
