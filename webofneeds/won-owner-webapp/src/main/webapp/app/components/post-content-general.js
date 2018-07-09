@@ -8,9 +8,8 @@ import { attach } from "../utils.js";
 import won from "../won-es6.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import { selectOpenPostUri, selectLastUpdateTime } from "../selectors.js";
+import { selectLastUpdateTime } from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -58,8 +57,7 @@ function genComponentConf() {
       this.labels = labels;
 
       const selectFromState = state => {
-        const postUri = selectOpenPostUri(state);
-        const post = state.getIn(["needs", postUri]);
+        const post = this.postUri && state.getIn(["needs", this.postUri]);
         const hasFlags = post && post.get("hasFlags");
 
         return {
@@ -72,13 +70,7 @@ function genComponentConf() {
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
         };
       };
-      connect2Redux(selectFromState, actionCreators, [], this);
-
-      classOnComponentRoot("won-is-loading", () => this.isLoading(), this);
-    }
-
-    isLoading() {
-      return !this.post || this.post.get("isLoading");
+      connect2Redux(selectFromState, actionCreators, ["self.postUri"], this);
     }
   }
 
@@ -89,7 +81,9 @@ function genComponentConf() {
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
     template: template,
-    scope: {},
+    scope: {
+      postUri: "=",
+    },
   };
 }
 

@@ -51,7 +51,7 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <won-post-content-general></won-post-content-general>
+            <won-post-content-general post-uri="self.post.get('uri')"></won-post-content-general>
 
             <won-gallery ng-if="self.post.get('hasImages')">
             </won-gallery>
