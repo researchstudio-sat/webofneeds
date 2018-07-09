@@ -5,19 +5,15 @@
 import angular from "angular";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
 import postHeaderModule from "./post-header.js";
-import postShareLinkModule from "./post-share-link.js";
 import labelledHrModule from "./labelled-hr.js";
 import postContextDropdownModule from "./post-context-dropdown.js";
+import postContentGeneral from "./post-content-general.js";
 import trigModule from "./trig.js";
 import { attach } from "../utils.js";
 import won from "../won-es6.js";
-import { labels, relativeTime } from "../won-label-utils.js";
+import { labels } from "../won-label-utils.js";
 import { connect2Redux } from "../won-utils.js";
-import {
-  selectOpenPostUri,
-  selectLastUpdateTime,
-  selectOpenConnectionUri,
-} from "../selectors.js";
+import { selectOpenPostUri, selectOpenConnectionUri } from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
@@ -55,28 +51,7 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <div class="post-info__content__general">
-              <div class="post-info__content__general__item">
-                <div class="post-info__content__general__item__label" ng-show="self.friendlyTimestamp">
-                  Created
-                </div>
-                <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
-                  {{ self.friendlyTimestamp }}
-                </div>
-              </div>
-              <div class="post-info__content__general__item">
-                <div class="post-info__content__general__item__label" ng-show="self.post.get('type')">
-                  Type
-                </div>
-                <div class="post-info__content__general__item__value" ng-show="self.post.get('type')">
-                  {{self.labels.type[self.post.get('type')]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : '' }}
-                </div>
-              </div>
-              <won-post-share-link
-                ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
-                post-uri="self.post.get('uri')">
-              </won-post-share-link>
-            </div>
+            <won-post-content-general></won-post-content-general>
 
             <won-gallery ng-if="self.post.get('hasImages')">
             </won-gallery>
@@ -142,9 +117,6 @@ function genComponentConf() {
           hasIsBranch: !!is,
           hasSeeksBranch: !!seeks,
           post,
-          friendlyTimestamp:
-            post &&
-            relativeTime(selectLastUpdateTime(state), post.get("creationDate")),
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: state.get("showRdf"),
           fromConnection: !!openConnectionUri,
@@ -189,9 +161,9 @@ export default angular
   .module("won.owner.components.postInfo", [
     postIsOrSeeksInfoModule,
     postHeaderModule,
-    postShareLinkModule,
     labelledHrModule,
     postContextDropdownModule,
+    postContentGeneral,
     trigModule,
   ])
   .directive("wonPostInfo", genComponentConf).name;
