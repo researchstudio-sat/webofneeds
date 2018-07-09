@@ -42,6 +42,7 @@ const pureSearchUseCase = {
     identifier: "pureSearch",
     label: "Search posts",
     icon: "#ico36_search",
+    showInList: true /*This parameter defines if the useCase should be shown outside of the usecase picker as well*/,
     draft: { ...emptyDraft },
     isDetails: undefined,
     seeksDetails: {},

@@ -2,10 +2,8 @@
 @import "speech-bubble";
 
 won-create-post-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  //padding: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   background-color: white;
   border-right: $thinGrayBorder;
   border-bottom: $thinGrayBorder;

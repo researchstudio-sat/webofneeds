@@ -3,24 +3,42 @@ import ngAnimate from "angular-animate";
 import squareImageModule from "../components/square-image.js";
 import { actionCreators } from "../actions/actions.js";
 import { attach, getIn } from "../utils.js";
+import { useCases } from "useCaseDefinitions";
 import { connect2Redux } from "../won-utils.js";
 
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `
-        <!--div class="cpi__item clickable"
-            ng-click="">
+        <div class="cpi__item selected"
+            ng-if="self.useCase">
             <svg class="cpi__item__icon"
-                title="Create a new search"
+                title="{{self.useCase['label']}}"
+                ng-if="self.useCase['icon']"
                 style="--local-primary:var(--won-primary-color);">
-                    <use xlink:href="#ico36_search" href="#ico36_search"></use>
+                    <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
             </svg>
             <div class="cpi__item__text">
-                Search
+                {{ self.useCase['label'] }}
             </div>
-        </div-->
+        </div>
         <div class="cpi__item clickable"
-            ng-click="self.selectUseCase()">
+            ng-if="!self.useCase && listUseCase['showInList']"
+            ng-repeat="listUseCase in self.useCases"
+            ng-click="self.startFrom(listUseCase)">
+            <svg class="cpi__item__icon"
+                title="{{listUseCase['label']}}"
+                ng-if="listUseCase['icon']"
+                style="--local-primary:var(--won-primary-color);">
+                    <use xlink:href="{{listUseCase['icon']}}" href="{{listUseCase['icon']}}"></use>
+            </svg>
+            <div class="cpi__item__text">
+                {{ listUseCase['label'] }}
+            </div>
+        </div>
+        <div class="cpi__item clickable"
+            ng-click="self.selectUseCase()"
+            ng-if="!self.useCase"
+            ng-class="{'selected': self.showUseCases}">
             <svg class="cpi__item__icon"
                 title="Create a new post"
                 style="--local-primary:var(--won-primary-color);">
@@ -36,6 +54,8 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
+      this.useCases = useCases;
+
       const selectFromState = state => {
         const showUseCases = getIn(state, [
           "router",
@@ -43,11 +63,45 @@ function genComponentConf() {
           "showUseCases",
         ]);
 
+        const useCaseString = getIn(state, [
+          "router",
+          "currentParams",
+          "useCase",
+        ]);
+
         return {
-          showUseCases,
+          showUseCases: !!showUseCases,
+          useCase: useCaseString && this.getUseCase(useCaseString),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
+    }
+
+    getUseCase(useCaseString) {
+      if (useCaseString) {
+        for (const useCaseName in useCases) {
+          if (useCaseString === useCases[useCaseName]["identifier"]) {
+            return useCases[useCaseName];
+          }
+        }
+      }
+      return undefined;
+    }
+
+    startFrom(selectedUseCase) {
+      const selectedUseCaseIdentifier =
+        selectedUseCase && selectedUseCase.identifier;
+
+      if (selectedUseCaseIdentifier) {
+        this.router__stateGoCurrent({
+          useCase: encodeURIComponent(selectedUseCaseIdentifier),
+        });
+      } else {
+        console.log(
+          "No usecase identifier found for given usecase, ",
+          selectedUseCase
+        );
+      }
     }
 
     selectUseCase() {
