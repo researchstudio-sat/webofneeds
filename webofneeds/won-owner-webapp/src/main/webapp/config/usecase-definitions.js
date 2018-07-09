@@ -181,7 +181,14 @@ const professionalUseCases = {
     identifier: "phdIs",
     label: "Offer a PhD position",
     icon: "#ico36_uc_phd",
-    draft: { ...emptyDraft },
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["offer-phd"],
+        title: "I'm offering a PhD position!",
+      },
+      searchString: "search-phd",
+    },
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
@@ -191,8 +198,16 @@ const professionalUseCases = {
     identifier: "phdSeeks",
     label: "Find a PhD position",
     icon: "#ico36_uc_phd",
-    draft: { ...emptyDraft },
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["search-phd"],
+        title: "I'm looking for a PhD position!",
+      },
+      searchString: "offer-phd",
+    },
     isDetails: {
+      description: { ...details.description },
       person: { ...details.person },
     },
     seeksDetails: {
@@ -204,7 +219,14 @@ const professionalUseCases = {
     identifier: "postDocIs",
     label: "Offer a PostDoc position",
     icon: "#ico36_uc_postdoc",
-    draft: { ...emptyDraft },
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["offer-postdoc"],
+        title: "I'm offering a PostDoc position!",
+      },
+      searchString: "search-postdoc",
+    },
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
@@ -214,8 +236,16 @@ const professionalUseCases = {
     identifier: "postDocSeeks",
     label: "Find a PostDoc position",
     icon: "#ico36_uc_postdoc",
-    draft: { ...emptyDraft },
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["search-postdoc"],
+        title: "I'm looking for a PostDoc position!",
+      },
+      searchString: "offer-postdoc",
+    },
     isDetails: {
+      description: { ...details.description },
       person: { ...details.person },
     },
     seeksDetails: {
@@ -225,9 +255,16 @@ const professionalUseCases = {
   },
   consortiumIs: {
     identifier: "consortiumIs",
-    label: "Announce slot in project consortium",
+    label: "Offer slot in a project consortium",
     icon: "#ico36_uc_consortium",
-    draft: { ...emptyDraft },
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["consortium"],
+        title: "Offering a slot in a project consortium",
+      },
+      searchString: "search-consortium",
+    },
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
@@ -237,7 +274,14 @@ const professionalUseCases = {
     identifier: "consortiumSeeks",
     label: "Find a project consortium to join",
     icon: "#ico36_uc_consortium",
-    draft: { ...emptyDraft },
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["search-consortium"],
+        title: "Looking for a slot in a project consortium",
+      },
+      searchString: "consortium",
+    },
     seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
