@@ -102,7 +102,10 @@ function genComponentConf() {
               caption: "Yes, Archive!",
               callback: () => {
                 this.needs__close(this.post.get("uri"));
-                this.router__stateGoCurrent({ postUri: null });
+                this.router__stateGoCurrent({
+                  useCase: undefined,
+                  postUri: undefined,
+                });
                 this.closeModalDialog();
               },
             },
