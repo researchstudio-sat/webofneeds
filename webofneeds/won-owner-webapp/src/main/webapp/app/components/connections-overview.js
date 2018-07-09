@@ -320,7 +320,10 @@ function genComponentConf() {
       if (this.isOpen(ownNeedUri)) {
         this.open[ownNeedUri] = false;
         if (this.isOpenByConnection(ownNeedUri)) {
-          this.router__stateGoCurrent({ connectionUri: null });
+          this.router__stateGoCurrent({
+            useCase: undefined,
+            connectionUri: undefined,
+          });
         }
       } else {
         this.open[ownNeedUri] = true;

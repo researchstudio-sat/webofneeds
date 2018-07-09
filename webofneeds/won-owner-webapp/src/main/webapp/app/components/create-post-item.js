@@ -9,7 +9,7 @@ import { connect2Redux } from "../won-utils.js";
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `
-        <div class="cpi__item selected"
+        <div class="cpi__item selected cpi__item--withcolspan"
             ng-if="self.useCase">
             <svg class="cpi__item__icon"
                 title="{{self.useCase['label']}}"

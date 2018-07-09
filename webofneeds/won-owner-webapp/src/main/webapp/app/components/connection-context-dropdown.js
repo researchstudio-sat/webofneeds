@@ -113,11 +113,14 @@ function genComponentConf() {
 
     closeConnection() {
       this.connections__close(this.connectionUri);
-      this.router__stateGoCurrent({ connectionUri: null });
+      this.router__stateGoCurrent({
+        useCase: undefined,
+        connectionUri: undefined,
+      });
     }
 
     goToPost(postUri) {
-      this.router__stateGoCurrent({ postUri: postUri });
+      this.router__stateGoCurrent({ useCase: undefined, postUri: postUri });
     }
   }
   Controller.$inject = serviceDependencies;
