@@ -20,7 +20,7 @@ const serviceDependencies = [
 function genComponentConf() {
   const template = `
       <div class="ucpc_createx won-pending-publishing" ng-if="self.pendingPublishing">
-          <button class="won-button--filled red conn__content__welcome__createx__button"
+          <button class="won-button--filled red ucpc_createx__button"
                   ng-disabled="self.pendingPublishing">
               <span>Finding out what's going on&hellip;</span>
           </button>
@@ -34,7 +34,7 @@ function genComponentConf() {
               </svg>
               <span>What's in your Area?</span>
           </button>
-          <button class="won-button--filled red ucpc__button"
+          <button class="won-button--filled red ucpc_createx__button"
                   ng-click="self.createWhatsNew()"
                   ng-disabled="self.pendingPublishing">
               <span>What's new?</span>
