@@ -67,24 +67,6 @@
           padding-bottom: 1.5rem;
         }
       }
-
-      &__createx {
-        display: grid;
-        grid-gap: 0.5rem;
-        grid-auto-flow: column;
-        grid-template-columns: 1fr 1fr;
-
-        &.won-pending-publishing {
-          grid-template-columns: 1fr;
-        }
-
-        &__button {
-          white-space: normal;
-        }
-      }
-
-      &__labelledhr {
-      }
     }
   }
 }

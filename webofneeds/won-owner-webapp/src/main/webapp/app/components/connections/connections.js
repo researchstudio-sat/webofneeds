@@ -8,7 +8,6 @@ import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecasePickerContentModule from "../usecase-picker-content.js";
-import labelledHrModule from "../labelled-hr.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import {
@@ -29,8 +28,6 @@ class ConnectionsController {
 
     this.SEARCH = "search";
     this.POST = "post";
-
-    this.pendingPublishing = false;
 
     const scrollArea = this.$element[0].querySelector(".connectionscontent");
 
@@ -120,20 +117,6 @@ class ConnectionsController {
     });
   }
 
-  createWhatsAround() {
-    if (!this.pendingPublishing) {
-      this.pendingPublishing = true;
-      this.needs__whatsAround();
-    }
-  }
-
-  createWhatsNew() {
-    if (!this.pendingPublishing) {
-      this.pendingPublishing = true;
-      this.needs__whatsNew();
-    }
-  }
-
   selectedNeed(needUri) {
     this.router__stateGoCurrent({
       connectionUri: undefined,
@@ -198,7 +181,6 @@ export default angular
     usecasePickerContentModule,
     createPostModule,
     connectionsOverviewModule,
-    labelledHrModule,
   ])
   .controller("ConnectionsController", [
     ...serviceDependencies,

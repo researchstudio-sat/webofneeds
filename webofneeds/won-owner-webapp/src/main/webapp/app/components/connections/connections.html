@@ -17,28 +17,6 @@
             ng-class="{'hide-in-responsive' : self.hasOwnNeeds}">
         <div class="conn__content__welcome">
             <div class="conn__content__welcome__text" ng-include="self.welcomeTemplate"></div>
-            <div class="conn__content__welcome__createx won-pending-publishing" ng-if="self.pendingPublishing">
-                <button class="won-button--filled red conn__content__welcome__createx__button"
-                        ng-disabled="self.pendingPublishing">
-                    <span>Finding out what's going on&hellip;</span>
-                </button>
-            </div>
-            <div class="conn__content__welcome__createx" ng-if="!self.pendingPublishing">
-                <button class="won-button--filled red conn__content__welcome__createx__button"
-                        ng-click="self.createWhatsAround()"
-                        ng-disabled="self.pendingPublishing">
-                    <svg class="won-button-icon" style="--local-primary:white;">
-                        <use xlink:href="#ico36_location_current" href="#ico36_location_current"></use>
-                    </svg>
-                    <span>What's in your Area?</span>
-                </button>
-                <button class="won-button--filled red conn__content__welcome__createx__button"
-                        ng-click="self.createWhatsNew()"
-                        ng-disabled="self.pendingPublishing">
-                    <span>What's new?</span>
-                </button>
-            </div>
-            <won-labelled-hr label="::'Or'" class="conn__content__welcome__labelledhr"></won-labelled-hr>
             <won-usecase-picker-content></won-usecase-picker-content>
         </div>
     </div>
