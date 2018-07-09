@@ -14,6 +14,17 @@
    width="36"
    sodipodi:docname="ico36_uc_sightseeing.svg"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <metadata
+     id="metadata8">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -31,7 +42,7 @@
      inkscape:snap-others="false"
      inkscape:snap-global="false"
      inkscape:zoom="16"
-     inkscape:cx="36.275869"
+     inkscape:cx="26.119619"
      inkscape:cy="15.041759"
      inkscape:window-x="2587"
      inkscape:window-y="0"
@@ -52,10 +63,10 @@
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="cssccccccccccsssc" />
   <rect
-     style="fill:var(--local-primary);fill-opacity:1;stroke:none;stroke-width:1.39987135;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+     style="fill-opacity:1;stroke:none;stroke-width:1.20156908;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;fill:var(--local-primary)"
      id="rect4718"
      width="6.7134919"
-     height="10.683837"
+     height="7.8713369"
      x="14.643252"
-     y="10.131498" />
+     y="11.881498" />
 </svg>
