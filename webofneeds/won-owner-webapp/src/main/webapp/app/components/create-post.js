@@ -100,7 +100,7 @@ function genComponentConf() {
             </won-create-isseeks>
 
             <!-- TUNE MATCHING -->
-            <won-labelled-hr label="::'Matching Behaviour'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
+            <won-labelled-hr label="::'Matching Behaviour'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails || self.useCase.seeksDetails"> </won-labelled-hr>
             
             <!-- TODO: when should this be shown as an option? --> 
             <div class="cp__content__tuning"
