@@ -164,6 +164,7 @@ $ngRedux.getState();
        toLoad: true|false, //whether or not the need is flagged as toLoad (for future loading purposes)
        isWhatsAround: true|false, //whether or not the need is a whatsaround need
        isWhatsNew: true|false, //whether or not this need is a whatsnew need
+       hasFlags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
        state: "won:Active" | "won:Inactive", //state of the need
        title: string, //title of the need
        type: "won:Supply" | "won:Demand" | "won:Offer", //type of the need
