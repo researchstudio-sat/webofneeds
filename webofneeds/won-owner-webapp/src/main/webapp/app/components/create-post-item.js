@@ -36,9 +36,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
-      this.SEARCH = "search";
-      this.POST = "post";
-
       const selectFromState = state => {
         const showUseCases = getIn(state, [
           "router",
