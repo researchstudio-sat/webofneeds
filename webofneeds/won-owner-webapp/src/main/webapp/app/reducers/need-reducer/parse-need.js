@@ -19,6 +19,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
     isBeingCreated: false,
     isWhatsAround: false,
     isWhatsNew: false,
+    hasFlags: undefined,
     matchingContexts: undefined,
     searchString: undefined,
     jsonld: jsonldNeed,
@@ -55,6 +56,9 @@ export function parseNeed(jsonldNeed, ownNeed) {
      * and an immutable object
      */
     const wonHasFlags = jsonldNeedImm.get("won:hasFlag");
+
+    const hasFlags = extractFlags(jsonldNeedImm.get("won:hasFlag"));
+
     const isWhatsAround =
       wonHasFlags &&
       wonHasFlags.filter(function(flag) {
@@ -133,6 +137,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
         ? wonHasMatchingContexts
         : Immutable.List.of(wonHasMatchingContexts)
       : undefined;
+    parsedNeed.hasFlags = hasFlags;
     parsedNeed.nodeUri = nodeUri;
   } else {
     console.error(
@@ -174,4 +179,19 @@ function generateContent(contentJsonLd, type, detailsToParse) {
   }
 
   return content;
+}
+
+function extractFlags(wonHasFlags) {
+  let hasFlags = Immutable.List();
+
+  wonHasFlags &&
+    wonHasFlags.map(function(flag) {
+      if (flag instanceof Immutable.Map) {
+        hasFlags = hasFlags.push(flag.get("@id"));
+      } else {
+        hasFlags = hasFlags.push(flag);
+      }
+    });
+
+  return hasFlags;
 }

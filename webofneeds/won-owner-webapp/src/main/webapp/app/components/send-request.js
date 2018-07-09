@@ -3,20 +3,15 @@ import "ng-redux";
 import connectionHeaderModule from "./connection-header.js";
 import feedbackGridModule from "./feedback-grid.js";
 import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
-import postShareLinkModule from "./post-share-link.js";
+import postContentGeneral from "./post-content-general.js";
 import labelledHrModule from "./labelled-hr.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
-
-import {
-  selectOpenPostUri,
-  selectNeedByConnectionUri,
-  selectLastUpdateTime,
-} from "../selectors.js";
+import { selectOpenPostUri, selectNeedByConnectionUri } from "../selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { labels, relativeTime } from "../won-label-utils.js";
+import { labels } from "../won-label-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -54,28 +49,7 @@ function genComponentConf() {
             <div class="post-info__details"></div>
         </div>
         <div class="post-info__content" ng-if="!self.isLoading()">
-            <div class="post-info__content__general">
-              <div class="post-info__content__general__item">
-                <div class="post-info__content__general__item__label" ng-show="self.friendlyTimestamp">
-                  Created
-                </div>
-                <div class="post-info__content__general__item__value" ng-show="self.friendlyTimestamp">
-                  {{ self.friendlyTimestamp }}
-                </div>
-              </div>
-              <div class="post-info__content__general__item">
-                <div class="post-info__content__general__item__label" ng-show="self.displayedPost.get('type')">
-                  Type
-                </div>
-                <div class="post-info__content__general__item__value" ng-show="self.displayedPost.get('type')">
-                  {{self.labels.type[self.displayedPost.get('type')]}}{{self.displayedPost.get('matchingContexts')? ' in '+ self.displayedPost.get('matchingContexts').join(', ') : '' }}
-                </div>
-              </div>
-              <won-post-share-link
-                ng-if="self.displayedPost.get('state') !== self.WON.InactiveCompacted"
-                post-uri="self.displayedPost && self.displayedPost.get('uri')">
-              </won-post-share-link>
-            </div>
+            <won-post-content-general post-uri="self.displayedPost.get('uri')"></won-post-content-general>
 
             <won-gallery ng-show="self.displayedPost.get('hasImages')">
             </won-gallery>
@@ -149,16 +123,8 @@ function genComponentConf() {
           hasIsBranch: !!is,
           hasSeeksBranch: !!seeks,
           displayedPost,
-          lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           postUriToConnectTo,
-          friendlyTimestamp:
-            displayedPost &&
-            relativeTime(
-              selectLastUpdateTime(state),
-              displayedPost.get("creationDate")
-            ),
           shouldShowRdf: state.get("showRdf"),
-          createdTimestamp: displayedPost && displayedPost.get("creationDate"),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -222,7 +188,7 @@ export default angular
     feedbackGridModule,
     labelledHrModule,
     chatTextFieldSimpleModule,
-    postShareLinkModule,
     connectionContextDropdownModule,
+    postContentGeneral,
   ])
   .directive("wonSendRequest", genComponentConf).name;

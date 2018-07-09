@@ -30,6 +30,13 @@ export const labels = deepFreeze({
     [won.WONMSG.hintMessage]: "Hint Message",
     [won.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
+  flags: {
+    [won.WON.BasicNeedTypeWhatsAroundCompacted]: "What's Around",
+    [won.WON.BasicNeedTypeWhatsNewCompacted]: "What's New",
+    [won.WON.NoHintForCounterpartCompacted]: "No Hint For Others",
+    [won.WON.NoHintForMeCompacted]: "No Hint For Me",
+    [won.WON.UsedForTestingCompacted]: "Used For Testing",
+  },
 });
 
 /**

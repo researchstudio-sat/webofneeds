@@ -30,7 +30,7 @@ function genComponentConf() {
          {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('title') }}
         </div>
         <div class="ph__right__topline__notitle" ng-show="!self.need.get('title')">
-         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} &lt;no title&gt;
+         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
         </div>
         <div class="ph__right__topline__date">
           {{ self.friendlyTimestamp }}
