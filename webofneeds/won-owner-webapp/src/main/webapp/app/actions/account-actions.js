@@ -27,6 +27,8 @@ import { getIn } from "../utils.js";
 import { selectAllConnectionUris } from "../selectors.js";
 import { loadLatestMessagesOfConnection } from "./connections-actions.js";
 
+// import { Observable } from "rxjs";
+
 /**
  * @param privateId
  * @param options see `accountLogin`
@@ -393,10 +395,25 @@ export function reconnect() {
       await checkLoginStatus();
       dispatch({ type: actionTypes.reconnect.success });
 
+      const state = getState();
+
+      /*
+      * -- check for new connections (i.e. matches and incoming requests) --
+      */
+      // await pageLoadAction()(dispatch, getState);
+      // const email = getIn(state, ["user", "email"]);
+      // await fetchOwnedData(email, payload => {
+      //   console.log("deleteme -- fetched and would dispatch: ", payload);
+      //   dispatch({
+      //     type: actionTypes.initialPageLoad, // TODO make this it's own type
+      //     payload: wellFormedPayload(payload),
+      //   });
+      // });
+      //TODO hard reload
+
       /* 
        * -- loading latest messages for all connections (we might have missed some during the dc) --
        */
-      const state = getState();
       const connectionUris = selectAllConnectionUris(state);
       await Promise.all(
         connectionUris.map(async connectionUri => {

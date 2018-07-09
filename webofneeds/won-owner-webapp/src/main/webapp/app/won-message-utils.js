@@ -546,73 +546,51 @@ export function callAgreementEventFetch(needUri, eventUri) {
     .then(response => response.json());
 }
 
-window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
-export const fetchDataForOwnedNeeds = fetchAllAccessibleAndRelevantData;
-function fetchAllAccessibleAndRelevantData(
+window.fetchAll4dbg = fetchDataForOwnedNeeds;
+export async function fetchDataForOwnedNeeds(
   ownNeedUris,
   curriedDispatch = () => undefined
 ) {
   if (!is("Array", ownNeedUris) || ownNeedUris.length === 0) {
-    return Promise.resolve(emptyDataset);
+    return emptyDataset;
   }
 
   console.log("fetchOwnNeedAndDispatch for: ", ownNeedUris);
-  const allOwnNeedsPromise = urisToLookupMap(ownNeedUris, uri =>
+  const allOwnNeeds = await urisToLookupMap(ownNeedUris, uri =>
     fetchOwnNeedAndDispatch(uri, curriedDispatch)
   );
 
   // wait for the own needs to be dispatched then load connections
-  const allConnectionsPromise = allOwnNeedsPromise
-    .then(() =>
-      Promise.all(
-        ownNeedUris.map(uri =>
-          won.getConnectionUrisOfNeed(uri, uri, true).then(connectionUris => {
-            const activeConnectionUris = connectionUris.filter(
-              connUri => !isConnUriClosed(connUri)
-            );
-            curriedDispatch(
-              wellFormedPayload({
-                needUriForConnections: uri,
-                activeConnectionUrisLoading: activeConnectionUris,
-              })
-            );
-            console.log(
-              "fetchConnectionAndDispatch for: ",
-              activeConnectionUris
-            );
-            return urisToLookupMap(activeConnectionUris, uri =>
-              fetchConnectionAndDispatch(uri, curriedDispatch)
-            );
-          })
-        )
-      )
+  //[{ uri -> cnct }]
+  const connectionMaps = await Promise.all(
+    ownNeedUris.map(needUri =>
+      fetchConnectionsOfNeedAndDispatch(needUri, curriedDispatch)
     )
-    .then((connectionMaps) /*[{ uri -> cnct }]*/ =>
-      // flatten into one lookup map
-      connectionMaps.reduce((a, b) => Object.assign(a, b), {}));
+  );
 
-  const allTheirNeedsPromise = allConnectionsPromise
-    .then(connections => {
-      const theirNeedUris = Object.values(connections).map(
-        cnct => cnct.hasRemoteNeed
-      );
+  // flatten into one lookup map
+  const allConnections = connectionMaps.reduce(
+    (a, b) => Object.assign(a, b),
+    {}
+  );
 
-      return Immutable.Set(theirNeedUris).toArray();
-    })
-    .then(theirNeedUris => {
-      curriedDispatch(
-        wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris })
-      );
-      console.log("fetchTheirNeedAndDispatch for: ", theirNeedUris);
-      return urisToLookupMap(theirNeedUris, uri =>
-        fetchTheirNeedAndDispatch(uri, curriedDispatch)
-      );
-    });
+  const theirNeedUris = Object.values(allConnections).map(
+    cnct => cnct.hasRemoteNeed
+  );
+
+  const theirNeedUris_ = Immutable.Set(theirNeedUris).toArray();
+  curriedDispatch(
+    wellFormedPayload({ theirNeedUrisInLoading: theirNeedUris_ })
+  );
+  console.log("fetchTheirNeedAndDispatch for: ", theirNeedUris_);
+  const allTheirNeeds = await urisToLookupMap(theirNeedUris_, uri =>
+    fetchTheirNeedAndDispatch(uri, curriedDispatch)
+  );
 
   const allDataRawPromise = Promise.all([
-    allOwnNeedsPromise,
-    allConnectionsPromise,
-    allTheirNeedsPromise,
+    allOwnNeeds,
+    allConnections,
+    allTheirNeeds,
   ]);
 
   return allDataRawPromise.then(
@@ -662,6 +640,30 @@ function fetchAllAccessibleAndRelevantData(
         }
      }
      */
+}
+
+async function fetchConnectionsOfNeedAndDispatch(
+  needUri,
+  curriedDispatch = () => undefined
+) {
+  const connectionUrisOfNeed = await won.getConnectionUrisOfNeed(
+    needUri,
+    needUri,
+    true
+  );
+  const activeConnectionUris = connectionUrisOfNeed.filter(
+    connUri => !isConnUriClosed(connUri)
+  );
+  curriedDispatch(
+    wellFormedPayload({
+      needUriForConnections: needUri,
+      activeConnectionUrisLoading: activeConnectionUris,
+    })
+  );
+  console.log("fetchConnectionAndDispatch for: ", activeConnectionUris);
+  return urisToLookupMap(activeConnectionUris, uri =>
+    fetchConnectionAndDispatch(uri, curriedDispatch)
+  );
 }
 
 function fetchOwnNeedAndDispatch(needUri, curriedDispatch = () => undefined) {
