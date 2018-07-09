@@ -16,16 +16,20 @@ import extendedConnectionIndicatorsModule from "./extended-connection-indicators
 import connectionSelectionItemModule from "./connection-selection-item.js";
 import createPostItemModule from "./create-post-item.js";
 
-import { attach, delay, sortByDate, getIn } from "../utils.js";
+import { attach, delay, sortByDate, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
 import {
-  selectAllOwnNeeds,
   selectAllNeeds,
   selectRouterParams,
   selectNeedByConnectionUri,
-  selectAllConnectionsInStateConnected,
+  selectOpenNeeds,
+  selectClosedNeeds,
+  selectNeedsInCreationProcess,
+  selectConnectionsWithoutConnectMessage,
+  selectOpenConnectionUri,
+  selectOpenPostUri,
 } from "../selectors.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
@@ -202,61 +206,27 @@ function genComponentConf() {
       const self = this;
       const selectFromState = state => {
         const allNeeds = selectAllNeeds(state);
-        const allOwnNeeds = selectAllOwnNeeds(state); //FILTER ALL CLOSED WHATS AROUNDS
-
-        const openNeeds =
-          allOwnNeeds &&
-          allOwnNeeds.filter(
-            post => post.get("state") === won.WON.ActiveCompacted
-          );
-        const closedNeeds =
-          allOwnNeeds &&
-          allOwnNeeds.filter(
-            post =>
-              post.get("state") === won.WON.InactiveCompacted &&
-              !(post.get("isWhatsAround") || post.get("isWhatsNew"))
-          ); //Filter whatsAround and whatsNew needs automatically
+        const openNeeds = selectOpenNeeds(state);
+        const closedNeeds = selectClosedNeeds(state);
 
         // needs that have been created but are not confirmed by the server yet
-        const beingCreatedNeeds =
-          allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
+        const beingCreatedNeeds = selectNeedsInCreationProcess(state);
 
-        const connectionsInStateConnected =
-          openNeeds && selectAllConnectionsInStateConnected(state);
-
-        const connectionsWithoutConnectMessage =
-          connectionsInStateConnected &&
-          connectionsInStateConnected.filter(
-            conn =>
-              !conn.get("messages") ||
-              conn
-                .get("messages")
-                .filter(
-                  msg => msg.get("messageType") === won.WONMSG.connectMessage
-                ).size == 0
-          );
-
-        const connectionsToCrawl = connectionsWithoutConnectMessage
-          ? connectionsWithoutConnectMessage
-          : Immutable.Map();
+        const connectionsToCrawl = selectConnectionsWithoutConnectMessage(
+          state
+        );
 
         const routerParams = selectRouterParams(state);
-        const showCreateView = getIn(state, [
-          "router",
-          "currentParams",
-          "showCreateView",
-        ]);
-        const connUriInRoute =
-          routerParams && decodeURIComponent(routerParams["connectionUri"]);
-        const needUriInRoute =
-          routerParams && decodeURIComponent(routerParams["postUri"]);
+        const showCreateView = get(routerParams, "showCreateView");
+        const connUriInRoute = selectOpenConnectionUri(state);
+        const needUriInRoute = selectOpenPostUri(state);
         const needImpliedInRoute =
           connUriInRoute && selectNeedByConnectionUri(state, connUriInRoute);
         const needUriImpliedInRoute =
           needImpliedInRoute && needImpliedInRoute.get("uri");
 
-        let sortedOpenNeeds = sortByDate(openNeeds);
-        let sortedClosedNeeds = sortByDate(closedNeeds);
+        const sortedOpenNeeds = sortByDate(openNeeds);
+        const sortedClosedNeeds = sortByDate(closedNeeds);
 
         const unloadedNeeds = closedNeeds.filter(need => need.get("toLoad"));
 
@@ -269,7 +239,7 @@ function genComponentConf() {
           beingCreatedNeeds: beingCreatedNeeds && beingCreatedNeeds.toArray(),
           sortedOpenNeeds,
           sortedClosedNeeds,
-          connectionsToCrawl,
+          connectionsToCrawl: connectionsToCrawl || Immutable.Map(),
           unloadedNeedsSize: unloadedNeeds ? unloadedNeeds.size : 0,
           closedNeedsSize: closedNeeds ? closedNeeds.size : 0,
         };
@@ -287,20 +257,20 @@ function genComponentConf() {
         }
       });
 
-      this.$scope.$watchGroup(["self.connectionsToCrawl"], () =>
-        this.ensureUnreadMessagesAreLoaded()
+      this.$scope.$watch("self.connectionsToCrawl", cnctToCrawl =>
+        this.ensureUnreadMessagesAreLoaded(cnctToCrawl)
       );
     }
 
-    ensureUnreadMessagesAreLoaded() {
+    ensureUnreadMessagesAreLoaded(connectionsToCrawl) {
       delay(0).then(() => {
         const MESSAGECOUNT = 10;
 
-        if (this.connectionsToCrawl.size == 0) {
+        if (connectionsToCrawl.size == 0) {
           console.log("ensureUnreadMessagesAreLoaded - nothing to crawl");
         }
 
-        this.connectionsToCrawl.map(conn => {
+        connectionsToCrawl.map(conn => {
           if (conn.get("isLoadingMessages")) return;
           const messages = conn.get("messages");
           const messageCount = messages ? messages.size : 0;

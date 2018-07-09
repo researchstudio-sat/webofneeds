@@ -17,6 +17,30 @@ export const selectAllOwnNeeds = state =>
 export const selectAllTheirNeeds = state =>
   selectAllNeeds(state).filter(need => !need.get("ownNeed"));
 
+export function selectOpenNeeds(state) {
+  const allOwnNeeds = selectAllOwnNeeds(state);
+  return (
+    allOwnNeeds &&
+    allOwnNeeds.filter(post => post.get("state") === won.WON.ActiveCompacted)
+  );
+}
+export function selectClosedNeeds(state) {
+  const allOwnNeeds = selectAllOwnNeeds(state);
+  return (
+    allOwnNeeds &&
+    allOwnNeeds.filter(
+      post =>
+        post.get("state") === won.WON.InactiveCompacted &&
+        !(post.get("isWhatsAround") || post.get("isWhatsNew"))
+    )
+  ); //Filter whatsAround and whatsNew needs automatically
+}
+export function selectNeedsInCreationProcess(state) {
+  const allOwnNeeds = selectAllOwnNeeds(state);
+  // needs that have been created but are not confirmed by the server yet
+  return allOwnNeeds && allOwnNeeds.filter(post => post.get("isBeingCreated"));
+}
+
 export const selectIsConnected = state =>
   !state.getIn(["messages", "reconnecting"]) &&
   !state.getIn(["messages", "lostConnection"]);
@@ -49,13 +73,13 @@ export function selectConnection(state, connectionUri) {
  */
 export function selectAllConnections(state) {
   const needs = selectAllOwnNeeds(state); //we only check own needs as these are the only ones who have connections stored
-  let connections = Immutable.Map();
-
-  needs.map(function(need) {
-    connections = connections.merge(need.get("connections"));
-  });
-
+  const connections = needs && needs.flatMap(need => need.get("connections"));
   return connections;
+}
+
+export function selectAllConnectionUris(state) {
+  const connections = selectAllConnections(state);
+  return connections && connections.keySeq().toSet();
 }
 
 /**
@@ -63,32 +87,40 @@ export function selectAllConnections(state) {
  * @returns Immutable.Map with all connections
  */
 export function selectAllConnectionsInStateConnected(state) {
-  return selectAllConnections(state).filter(
-    conn => conn.get("state") === won.WON.Connected
+  const allConnections = selectAllConnections(state);
+  return (
+    allConnections &&
+    allConnections.filter(conn => conn.get("state") === won.WON.Connected)
   );
+}
+
+export function selectConnectionsWithoutConnectMessage(state) {
+  const connectionsInStateConnected = selectAllConnectionsInStateConnected(
+    state
+  );
+
+  const connectionsWithoutConnectMessage =
+    connectionsInStateConnected &&
+    connectionsInStateConnected.filter(
+      conn =>
+        !conn.get("messages") ||
+        conn
+          .get("messages")
+          .filter(msg => msg.get("messageType") === won.WONMSG.connectMessage)
+          .size == 0
+    );
+  return connectionsWithoutConnectMessage;
 }
 
 export function selectAllMessages(state) {
   const connections = selectAllConnections(state);
-  let messages = Immutable.Map();
-
-  connections.map(function(conn) {
-    messages = messages.merge(conn.get("messages"));
-  });
-
+  const messages = connections && connections.flatMap(c => c.get("messages"));
   return messages;
 }
 
 export function selectAllMessagesByNeedUri(state, needUri) {
   const connections = state.getIn(["needs", needUri, "connections"]);
-  let messages = Immutable.Map();
-
-  if (connections) {
-    connections.map(function(conn) {
-      messages = messages.merge(conn.get("messages"));
-    });
-  }
-
+  const messages = connections && connections.flatMap(c => c.get("messages"));
   return messages;
 }
 
