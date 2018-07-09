@@ -31,7 +31,7 @@
      inkscape:snap-others="false"
      inkscape:snap-global="false"
      inkscape:zoom="22.627417"
-     inkscape:cx="5.1974245"
+     inkscape:cx="-1.9841287"
      inkscape:cy="21.590537"
      inkscape:window-x="2552"
      inkscape:window-y="-8"
@@ -78,13 +78,13 @@
   <path
      inkscape:connector-curvature="0"
      id="path909"
-     d="m 3.7551101,7.2953614 c 0,0 2.6390358,0.3231622 5.2413776,-0.02459 2.6023413,-0.3477518 5.5118653,0 5.5118653,0"
-     style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke:var(--local-primary);stroke-miterlimit:4;stroke-dasharray:none"
+     d="m 3.7551101,7.2953614 c 0,0 2.6390363,1.6931812 5.2413776,-0.02459 2.6023413,-1.7177712 5.5118653,0 5.5118653,0"
+     style="fill:none;stroke:var(--local-primary);stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      sodipodi:nodetypes="czc" />
   <path
      inkscape:connector-curvature="0"
      id="path909-9"
-     d="m 19.281821,12.225337 c 0,0 3.984569,0.314414 5.7753,-1.181924 1.790731,-1.4963384 5.030322,-0.968907 5.030322,-0.968907"
+     d="m 19.281821,12.225337 c 0,0 1.509695,-3.2211195 5.7753,-1.181924 4.265605,2.039196 5.030322,-0.968907 5.030322,-0.968907"
      style="fill:none;stroke:var(--local-primary);stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      sodipodi:nodetypes="czc" />
 </svg>

@@ -176,6 +176,11 @@ const professionalUseCases = {
       location: { ...details.location },
       person: { ...details.person },
     },
+    seeksDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+      person: { ...details.person },
+    },
   },
   phdIs: {
     identifier: "phdIs",
@@ -260,12 +265,16 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["consortium"],
+        tags: ["offer-consortium"],
         title: "Offering a slot in a project consortium",
       },
       searchString: "search-consortium",
     },
     isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+    seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
@@ -280,7 +289,11 @@ const professionalUseCases = {
         tags: ["search-consortium"],
         title: "Looking for a slot in a project consortium",
       },
-      searchString: "consortium",
+      searchString: "offer-consortium",
+    },
+    isDetails: {
+      description: { ...details.description },
+      location: { ...details.location },
     },
     seeksDetails: {
       description: { ...details.description },
