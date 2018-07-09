@@ -78,19 +78,21 @@ function genComponentConf() {
         <div class="cp__content">
 
             <!-- ADD TITLE AND DETAILS -->
-            <won-labelled-hr label="::'Post'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
+            <won-labelled-hr label="::'Offering / Is'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
             <won-create-isseeks 
                 ng-if="self.useCase.isDetails" 
                 is-or-seeks="::'Description'"
+                title-placeholder="::'What do you offer or propose? (Short title shown in lists)'"
                 detail-list="self.useCase.isDetails"
                 initial-draft="self.useCase.draft.is"
                 on-update="::self.updateDraft(draft, 'is')" 
                 on-scroll="::self.scrollToBottom(element)">
             </won-create-isseeks>
-            <won-labelled-hr label="::'Search'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
+            <won-labelled-hr label="::'Want / Looking For'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
             <won-create-isseeks 
                 ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
+                title-placeholder="::'What do you want or are you looking for? (Short title shown in lists)'"
                 detail-list="self.useCase.seeksDetails"
                 initial-draft="self.useCase.draft.seeks"
                 on-update="::self.updateDraft(draft, 'seeks')" 
@@ -98,7 +100,7 @@ function genComponentConf() {
             </won-create-isseeks>
 
             <!-- TUNE MATCHING -->
-            <won-labelled-hr label="::'Match'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails && self.useCase.seeksDetails"> </won-labelled-hr>
+            <won-labelled-hr label="::'Matching Behaviour'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails || self.useCase.seeksDetails"> </won-labelled-hr>
             
             <!-- TODO: when should this be shown as an option? --> 
             <div class="cp__content__tuning"
