@@ -16,7 +16,6 @@ import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
-import { selectOpenPostUri } from "../selectors.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
@@ -53,8 +52,7 @@ function genComponentConf() {
       this.allDetails = getAllDetails();
 
       const selectFromState = state => {
-        const postUri = selectOpenPostUri(state);
-        const post = postUri && state.getIn(["needs", postUri]);
+        const post = this.postUri && state.getIn(["needs", this.postUri]);
         const details = this.branch && post && post.get(this.branch);
         const searchString =
           post && this.branch === "seeks"
@@ -67,7 +65,12 @@ function genComponentConf() {
         };
       };
 
-      connect2Redux(selectFromState, actionCreators, ["self.branch"], this);
+      connect2Redux(
+        selectFromState,
+        actionCreators,
+        ["self.branch", "self.postUri"],
+        this
+      );
     }
 
     getDetail(key) {
@@ -96,6 +99,7 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       branch: "=",
+      postUri: "=",
     },
     template: template,
   };

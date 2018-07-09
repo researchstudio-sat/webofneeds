@@ -54,9 +54,9 @@ function genComponentConf() {
             <won-gallery ng-show="self.displayedPost.get('hasImages')">
             </won-gallery>
 
-            <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch" post-uri="self.displayedPost.get('uri')"></won-post-is-or-seeks-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
-            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.displayedPost.get('uri')"></won-post-is-or-seeks-info>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf && self.connection"
                target="_blank"
