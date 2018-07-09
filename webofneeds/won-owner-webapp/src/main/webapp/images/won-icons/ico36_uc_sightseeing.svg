@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg4362"
+   viewBox="0 0 35.999999 35.999999"
+   height="36"
+   width="36"
+   sodipodi:docname="ico36_uc_sightseeing.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2173"
+     inkscape:window-height="1368"
+     id="namedview38"
+     showgrid="false"
+     inkscape:object-nodes="false"
+     inkscape:snap-others="false"
+     inkscape:snap-global="false"
+     inkscape:zoom="16"
+     inkscape:cx="36.275869"
+     inkscape:cy="15.041759"
+     inkscape:window-x="2587"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg4362" />
+  <defs
+     id="defs4364" />
+  <path
+     style="fill:var(--local-primary);fill-opacity:1;stroke:var(--local-primary);stroke-width:1.39987135;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+     d="M 10.895637,3.5556149 C 10.226585,3.5555894 9.5894565,3.6916643 9.0097237,3.9368582 8.429991,4.1820522 7.9074056,4.5361153 7.468959,4.974562 7.0305125,5.4130086 6.6764492,5.9355945 6.4312552,6.5153261 6.1526084,6.9230536 1.1347777,24.225492 1.2404805,25.654193 c -6.893e-4,3.749525 3.0384121,6.789635 6.7879362,6.790192 3.7504053,6.9e-4 6.7908823,-3.039786 6.7901923,-6.790192 L 15.739007,8.4012404 C 15.73911,5.7259129 13.570963,3.5567579 10.895637,3.5556149 Z M 7.8163641,19.59265 c 0.2773645,-0.0098 0.5560601,0.0017 0.8324192,0.03384 2.7972677,0.3252 4.9769957,2.416623 5.3780127,5.159193 0.0947,0.647616 0.03659,1.746593 -0.124074,2.36416 -0.769734,2.958764 -3.627597,4.904911 -6.6413038,4.520778 C 5.1493667,31.401413 3.282349,29.980625 2.4406076,28.002562 1.6813767,26.218396 1.8639069,24.062958 2.9143418,22.398962 3.9686372,20.72885 5.8748125,19.661232 7.8163641,19.59265 Z"
+     id="circle4680"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cssccccccccccsssc" />
+  <path
+     style="fill:var(--local-primary);fill-opacity:1;stroke:var(--local-primary);stroke-width:1.39987135;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+     d="m 25.104363,3.555615 c 0.669052,-2.55e-5 1.30618,0.1360494 1.885913,0.3812434 0.579733,0.2451939 1.102318,0.5992571 1.540765,1.0377037 0.438446,0.4384467 0.79251,0.9610324 1.037703,1.540764 0.278648,0.4077275 5.296478,17.7101659 5.190775,19.1388669 6.9e-4,3.749525 -3.038411,6.789635 -6.787935,6.790192 -3.750406,6.9e-4 -6.790882,-3.039786 -6.790192,-6.790192 L 20.260994,8.4012404 C 20.260891,5.7259129 22.429038,3.556758 25.104363,3.555615 Z m 3.079273,16.037035 c -0.277365,-0.0098 -0.55606,0.0017 -0.83242,0.03384 -2.797267,0.3252 -4.976994,2.416623 -5.378011,5.159193 -0.0947,0.647616 -0.03659,1.746593 0.124073,2.36416 0.769735,2.958764 3.627596,4.904911 6.641303,4.520778 2.112053,-0.269209 3.97907,-1.689997 4.820811,-3.66806 0.759232,-1.784166 0.576701,-3.939604 -0.473734,-5.6036 -1.054295,-1.670112 -2.960471,-2.73773 -4.902022,-2.806312 z"
+     id="circle4680-2"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cssccccccccccsssc" />
+  <rect
+     style="fill:var(--local-primary);fill-opacity:1;stroke:none;stroke-width:1.39987135;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+     id="rect4718"
+     width="6.7134919"
+     height="10.683837"
+     x="14.643252"
+     y="10.131498" />
+</svg>

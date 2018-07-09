@@ -30,7 +30,7 @@ const allDetailsUseCase = {
   allDetails: {
     identifier: "allDetails",
     label: "New custom post",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_custom",
     draft: { ...emptyDraft },
     isDetails: details,
     seeksDetails: details,
@@ -55,11 +55,14 @@ const pureSearchUseCase = {
 const socialUseCases = {
   breakfast: {
     identifier: "breakfast",
-    label: "Get breakfast together",
-    icon: "#ico36_plus",
+    label: "Get breakfast",
+    icon: "#ico36_uc_breakfast",
     draft: {
       ...emptyDraft,
-      is: { tags: ["essen", "food"] },
+      is: {
+        tags: ["breakfast"],
+        title: "I'm up for breakfast! Any plans?",
+      },
       seeks: { title: "breakfast" },
       searchString: "breakfast",
     },
@@ -86,11 +89,14 @@ const socialUseCases = {
   },
   lunch: {
     identifier: "lunch",
-    label: "Get lunch together",
-    icon: "#ico36_plus",
+    label: "Get lunch",
+    icon: "#ico36_uc_meal-half",
     draft: {
       ...emptyDraft,
-      is: { tags: ["essen", "food"] },
+      is: {
+        tags: ["lunch"],
+        title: "I'm up for lunch! Any plans?",
+      },
       seeks: { title: "lunch" },
       searchString: "lunch",
     },
@@ -100,6 +106,15 @@ const socialUseCases = {
         ...details.description,
         identifier: "foodallergies",
         label: "Food Allergies",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:foodAllergies": undefined }; // FIXME: won:foodAllergies does not exist
+          }
+          return { "won:foodAllergies": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          return jsonLDImm && jsonLDImm.get("won:foodAllergies");
+        },
       },
       location: { ...details.location },
       tags: { ...details.tags },
@@ -108,35 +123,53 @@ const socialUseCases = {
   },
   afterparty: {
     identifier: "afterparty",
-    label: "Enjoy the evening together",
-    icon: "#ico36_plus",
-    draft: { ...emptyDraft },
-    seeksDetails: {
+    label: "Go out",
+    icon: "#ico36_uc_drinks",
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["afterparty"],
+        title: "I'm up for partying! Any plans?",
+      },
+      seeks: { title: "afterparty" },
+      searchString: "afterparty",
+    },
+    isDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
   },
   sightseeing: {
     identifier: "sightseeing",
-    label: "Go sightseeing together",
-    icon: "#ico36_plus",
-    draft: { ...emptyDraft },
-    seeksDetails: {
+    label: "Go sightseeing",
+    icon: "#ico36_uc_sightseeing",
+    draft: {
+      ...emptyDraft,
+      is: { tags: ["sightseeing"] },
+      seeks: { title: "sightseeing" },
+      searchString: "sightseeing",
+    },
+    isDetails: {
       description: { ...details.description },
       location: { ...details.location },
     },
   },
-  // carsharing: {},
-  // meetSomeone: {},
-  // activity: {},
 };
 
 const professionalUseCases = {
   getToKnow: {
     identifier: "getToKnow",
     label: "Find people",
-    icon: "#ico36_plus",
-    draft: { ...emptyDraft },
+    icon: "#ico36_uc_find_people",
+    draft: {
+      ...emptyDraft,
+      is: {
+        tags: ["meetup"],
+        title: "I'm up for meeting new people!",
+      },
+      seeks: { title: "meetup" },
+      searchString: "meetup",
+    },
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
@@ -146,7 +179,7 @@ const professionalUseCases = {
   phdIs: {
     identifier: "phdIs",
     label: "Offer a PhD position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_phd",
     draft: { ...emptyDraft },
     isDetails: {
       description: { ...details.description },
@@ -156,7 +189,7 @@ const professionalUseCases = {
   phdSeeks: {
     identifier: "phdSeeks",
     label: "Find a PhD position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_phd",
     draft: { ...emptyDraft },
     isDetails: {
       person: { ...details.person },
@@ -169,7 +202,7 @@ const professionalUseCases = {
   postDocIs: {
     identifier: "postDocIs",
     label: "Offer a PostDoc position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_postdoc",
     draft: { ...emptyDraft },
     isDetails: {
       description: { ...details.description },
@@ -179,7 +212,7 @@ const professionalUseCases = {
   postDocSeeks: {
     identifier: "postDocSeeks",
     label: "Find a PostDoc position",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_postdoc",
     draft: { ...emptyDraft },
     isDetails: {
       person: { ...details.person },
@@ -192,7 +225,7 @@ const professionalUseCases = {
   consortiumIs: {
     identifier: "consortiumIs",
     label: "Announce slot in project consortium",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_consortium",
     draft: { ...emptyDraft },
     isDetails: {
       description: { ...details.description },
@@ -202,7 +235,7 @@ const professionalUseCases = {
   consortiumSeeks: {
     identifier: "consortiumSeeks",
     label: "Find a project consortium to join",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_consortium",
     draft: { ...emptyDraft },
     seeksDetails: {
       description: { ...details.description },
@@ -215,7 +248,7 @@ const infoUseCases = {
   question: {
     identifier: "question",
     label: "Ask a question",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_question",
     draft: {
       ...emptyDraft,
       is: { tags: ["question"] },
@@ -232,7 +265,7 @@ const infoUseCases = {
     //answer should have 'no hint for counterpart'
     identifier: "answer",
     label: "Answer questions",
-    icon: "#ico36_plus",
+    icon: "#ico36_uc_answer",
     draft: {
       ...emptyDraft,
       is: {
@@ -268,7 +301,7 @@ export const useCases = {
 export const useCaseGroups = {
   social: {
     identifier: "socialgroup",
-    label: "Fun activities",
+    label: "Fun activities to do together",
     icon: undefined,
     useCases: { ...socialUseCases },
   },
