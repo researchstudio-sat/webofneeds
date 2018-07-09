@@ -22,8 +22,8 @@ function genComponentConf() {
             </div>
         </div>
         <div class="cpi__item clickable"
-            ng-if="!self.useCase && listUseCase['showInList']"
-            ng-repeat="listUseCase in self.useCases"
+            ng-if="!self.useCase"
+            ng-repeat="listUseCase in self.listUseCases"
             ng-click="self.startFrom(listUseCase)">
             <svg class="cpi__item__icon"
                 title="{{listUseCase['label']}}"
@@ -38,7 +38,10 @@ function genComponentConf() {
         <div class="cpi__item clickable"
             ng-click="self.selectUseCase()"
             ng-if="!self.useCase"
-            ng-class="{'selected': self.showUseCases}">
+            ng-class="{
+              'selected': self.showUseCases,
+              'cpi__item--withcolspan': self.evenUseCaseListSize,
+            }">
             <svg class="cpi__item__icon"
                 title="Create a new post"
                 style="--local-primary:var(--won-primary-color);">
@@ -69,7 +72,11 @@ function genComponentConf() {
           "useCase",
         ]);
 
+        const listUseCases = this.getListUseCases();
+
         return {
+          listUseCases,
+          evenUseCaseListSize: listUseCases && listUseCases.size % 2 != 0,
           showUseCases: !!showUseCases,
           useCase: useCaseString && this.getUseCase(useCaseString),
         };
@@ -86,6 +93,17 @@ function genComponentConf() {
         }
       }
       return undefined;
+    }
+
+    getListUseCases() {
+      let listUseCases = {};
+
+      for (const useCaseKey in this.useCases) {
+        if (this.useCases[useCaseKey]["showInList"]) {
+          listUseCases[useCaseKey] = this.useCases[useCaseKey];
+        }
+      }
+      return listUseCases;
     }
 
     startFrom(selectedUseCase) {

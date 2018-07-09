@@ -25,6 +25,10 @@ won-create-post-item {
     // needed for text positioning
     align-items: center;
     border-left: $thinGrayBorder;
+    border-top: $thinGrayBorder;
+    &--withcolspan {
+      grid-column: 1 / 3;
+    }
     :hover,
     &.selected {
       // TODO: SET CORRECT BACKGROUND COLOR
