@@ -36,7 +36,7 @@ function genComponentConf() {
             </div>
         </div>
         <div class="cpi__item clickable"
-            ng-click="self.selectUseCase()"
+            ng-click="self.showAvailableUseCases()"
             ng-if="!self.useCase"
             ng-class="{
               'selected': self.showUseCases,
@@ -112,6 +112,9 @@ function genComponentConf() {
 
       if (selectedUseCaseIdentifier) {
         this.router__stateGoCurrent({
+          connectionUri: undefined,
+          postUri: undefined,
+          showUseCases: undefined,
           useCase: encodeURIComponent(selectedUseCaseIdentifier),
         });
       } else {
@@ -122,7 +125,7 @@ function genComponentConf() {
       }
     }
 
-    selectUseCase() {
+    showAvailableUseCases() {
       this.router__stateGoCurrent({
         connectionUri: undefined,
         postUri: undefined,
