@@ -56,9 +56,17 @@ function genComponentConf() {
             <won-gallery ng-if="self.post.get('hasImages')">
             </won-gallery>
 
+            <!-- SEARCH STRING -->
+            <won-title-viewer 
+              ng-if="self.isPureSearch && self.searchString" 
+              content="self.searchString" 
+              detail="::{ label: 'Searching for' }">
+            </won-title-viewer>
+
+            <!-- DETAIL INFORMATION -->
             <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
             <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
-            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
+            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch && !self.isPureSearch" post-uri="self.post.get('uri')"></won-post-is-or-seeks-info>
             <div class="post-info__content__rdf" ng-if="self.shouldShowRdf">
               <h2 class="post-info__heading">
                   RDF
@@ -112,6 +120,15 @@ function genComponentConf() {
         //TODO it will be possible to have more than one seeks
         const seeks = post ? post.get("seeks") : undefined;
 
+        const isPureSearch =
+          post &&
+          is === undefined &&
+          post.get("seeks").size === 2 &&
+          post.get("searchString");
+
+        const searchString =
+          post && seeks ? post.get("searchString") : undefined; //workaround to display searchString only in seeks
+
         return {
           WON: won.WON,
           hasIsBranch: !!is,
@@ -120,6 +137,8 @@ function genComponentConf() {
           createdTimestamp: post && post.get("creationDate"),
           shouldShowRdf: state.get("showRdf"),
           fromConnection: !!openConnectionUri,
+          isPureSearch: isPureSearch,
+          searchString: searchString,
         };
       };
       connect2Redux(

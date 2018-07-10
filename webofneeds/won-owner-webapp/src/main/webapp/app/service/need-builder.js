@@ -141,7 +141,6 @@ import { getAllDetails } from "../won-utils";
     const buildContentNode = (id, isOrSeeksData) => {
       let contentNode = {
         "@id": id,
-        "dc:title": isOrSeeksData.title,
         "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
           ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,
