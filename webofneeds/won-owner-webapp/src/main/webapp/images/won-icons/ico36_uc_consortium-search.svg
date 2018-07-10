@@ -13,7 +13,7 @@
    viewBox="0 0 35.999999 35.999999"
    height="36"
    width="36"
-   sodipodi:docname="ico36_uc_consortium-join.svg"
+   sodipodi:docname="ico36_uc_consortium-search.svg"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -32,7 +32,7 @@
      inkscape:snap-others="true"
      inkscape:snap-global="false"
      inkscape:zoom="16"
-     inkscape:cx="-8.1488411"
+     inkscape:cx="-18.305091"
      inkscape:cy="13.649341"
      inkscape:window-x="2552"
      inkscape:window-y="-8"
@@ -91,13 +91,13 @@
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="ssssscsccccc" />
   <path
-     style="fill:var(--local-primary);fill-opacity:1;stroke:var(--local-primary);stroke-width:1.06106341;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+     style="fill:none;fill-opacity:1;stroke:var(--local-primary);stroke-width:1.06106341;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
      d="m 8.895594,19.833332 c -1.8981757,0 -3.4369509,1.640406 -3.4369509,3.663949 0,2.023543 1.5387752,3.663949 3.4369509,3.663948 1.898175,-10e-7 3.436949,-1.640406 3.436949,-3.663948 0,-2.023542 -1.538774,-3.663948 -3.436949,-3.663949 z m 0.0262,7.568066 c -1.7478542,-0.02907 -3.5119343,0.324137 -4.9930074,1.253896 -1.4810732,0.929758 -2.6772595,2.815024 -2.6772595,4.761458 2.0704462,0 12.9684339,0 15.2881439,0 0,-1.511691 -1.209246,-3.710229 -2.66678,-4.641376 -1.457543,-0.931143 -3.203245,-1.344909 -4.9511022,-1.373978 z"
      id="path882-5"
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="ssssscsccccc" />
   <path
-     style="fill:none;fill-opacity:1;stroke:var(--local-primary);stroke-width:1.06106341;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+     style="fill:var(--local-primary);fill-opacity:1;stroke:var(--local-primary);stroke-width:1.06106341;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
      d="m 27.104396,19.833332 c -1.898176,0 -3.436951,1.640406 -3.436951,3.663949 0,2.023543 1.538775,3.663948 3.436951,3.663948 1.898174,-10e-7 3.436949,-1.640406 3.436949,-3.663948 0,-2.023542 -1.538775,-3.663948 -3.436949,-3.663949 z m 0.0262,7.568066 c -1.747855,-0.02907 -3.511935,0.324137 -4.993008,1.253896 -1.481073,0.929758 -2.677259,2.815024 -2.677259,4.761458 2.070446,0 12.968433,0 15.288144,0 0,-1.511691 -1.209246,-3.710229 -2.66678,-4.641376 -1.457543,-0.931144 -3.203245,-1.344909 -4.951102,-1.373978 z"
      id="path882-8"
      inkscape:connector-curvature="0"
