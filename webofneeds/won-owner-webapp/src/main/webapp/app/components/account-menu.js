@@ -28,8 +28,11 @@ function genLogoutConf() {
                     <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
                 </svg>
 
-                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);">
+                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="!self.isPrivateIdUser">
                     <use xlink:href="#ico36_person" href="#ico36_person"></use>
+                </svg>
+                <svg class="topnav__button__icon" style="--local-primary:var(--won-primary-color);" ng-if="self.isPrivateIdUser">
+                    <use xlink:href="#ico36_person_anon" href="#ico36_person_anon"></use>
                 </svg>
 
             </won-dd-header>
@@ -72,14 +75,14 @@ function genLogoutConf() {
       const logout = state => ({
         loggedIn: state.getIn(["user", "loggedIn"]),
         email: state.getIn(["user", "email"]),
-        isPrivateUser: isPrivateUser(state),
+        isPrivateIdUser: isPrivateUser(state),
       });
 
       connect2Redux(logout, actionCreators, [], this);
     }
 
     getEmail() {
-      if (this.isPrivateUser) {
+      if (this.isPrivateIdUser) {
         return "Anonymous";
       } else {
         return ellipsizeString(this.email, this.maxEmailLength);
