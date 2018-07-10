@@ -388,17 +388,21 @@ function genComponentConf() {
       }
 
       // draft has no valid seeks part -> not a pure search
-      if (!draft.seeks || !draft.seeks.title) {
+      if (!draft.seeks || !draft.seeks.searchString) {
         return undefined;
       }
 
       for (let detail of Object.keys(draft.seeks)) {
-        if (detail !== "title" && detail !== "type" && draft.seeks[detail]) {
+        if (
+          detail !== "searchString" &&
+          detail !== "type" &&
+          draft.seeks[detail]
+        ) {
           return undefined;
         }
       }
 
-      return draft.seeks.title;
+      return draft.seeks.searchString;
     }
 
     createWhatsNew() {

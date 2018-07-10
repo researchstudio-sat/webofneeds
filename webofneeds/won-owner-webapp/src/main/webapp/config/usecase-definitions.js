@@ -45,9 +45,24 @@ const pureSearchUseCase = {
     label: "Search posts",
     icon: "#ico36_search",
     showInList: true /*This parameter defines if the useCase should be shown outside of the usecase picker as well*/,
-    draft: { ...emptyDraft },
+    draft: { ...emptyDraft, title: "Search posts" },
     isDetails: undefined,
-    seeksDetails: { title: { ...details.title, label: "Search for" } },
+    seeksDetails: {
+      searchString: {
+        ...details.title,
+        identifier: "searchString",
+        label: "Search for",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:query": undefined }; // TODO: should this be won:hasSearchString?
+          }
+          return { "s:query": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          return jsonLDImm && jsonLDImm.get("s:query");
+        },
+      },
+    },
   },
 };
 
