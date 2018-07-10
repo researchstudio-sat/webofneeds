@@ -46,6 +46,7 @@ import won.protocol.vocabulary.WON;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -134,6 +135,22 @@ public class SparqlMatcherActor extends UntypedActor {
 		ExprList filter = new ExprList(new E_Equals(new ExprVar(tmpVar), new NodeValueNode(tag)));
 		VarExprList variableAssignment = new VarExprList(variable, new E_Bound(new ExprVar(tmpVar)));
 		return OpExtend.create(OpLeftJoin.create(op, new OpTriple(matchTriple), filter), variableAssignment);
+	}
+
+	public Op hasOverlappingContext(Op op, Var variable, List<Node> contexts) {
+		Var tmpVar = Var.alloc(hashFunction(variable));
+
+		if(contexts.isEmpty()) {
+			return OpExtend.create(op, new VarExprList(variable, new NodeValueBoolean(false)));
+		}
+
+		List<Expr> contextExpressions = contexts.stream().map(NodeValueNode::new).collect(Collectors.toList());
+
+		Triple matchTriple = new Triple(resultName.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#hasMatchingContext"), tmpVar);
+		ExprList filter = new ExprList(new E_OneOf(new ExprVar(tmpVar), new ExprList(contextExpressions));
+		VarExprList variableAssignment = new VarExprList(variable, new E_Bound(new ExprVar(tmpVar)));
+
+		return null;
 	}
 
 
