@@ -196,9 +196,6 @@ export const details = {
         "s:jobTitle": getIn(value, ["position"])
           ? getIn(value, ["position"])
           : undefined,
-        "s:knowsAbout": getIn(value, ["skills"])
-          ? getIn(value, ["skills"]).toJS()
-          : undefined,
       };
     },
     parseFromRDF: function(jsonLDImm) {
@@ -209,36 +206,19 @@ export const details = {
         title: undefined,
         company: undefined,
         position: undefined,
-        skills: undefined,
         // bio: undefined,
       };
 
       person.name = jsonLDImm.get("foaf:name");
       person.title = jsonLDImm.get("foaf:title");
-      person.company = jsonLDImm.get("s:worksFor");
+      person.company = jsonLDImm.getIn(["s:worksFor", "s:name"]);
       person.position = jsonLDImm.get("s:jobTitle");
-      person.skills = jsonLDImm.get("s:knowsAbout")
-        ? Immutable.List.isList(jsonLDImm.get("s:knowsAbout"))
-          ? jsonLDImm.get("s:knowsAbout")
-          : Immutable.List.of(jsonLDImm.get("s:knowsAbout"))
-        : undefined;
       //person.bio = isOrSeeksImm.get("dc:description");
 
       // if there's anything, use it
-      if (
-        person.name ||
-        person.title ||
-        person.company ||
-        person.position ||
-        person.skills
-      ) {
+      if (person.name || person.title || person.company || person.position) {
         return Immutable.fromJS(person);
       }
-
-      /*console.error(
-        "Cant parse person, data does not contain enough information: ",
-        jsonLDImm.toJS()
-      );*/
       return undefined;
     },
   },

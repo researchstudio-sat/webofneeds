@@ -41,8 +41,6 @@ function genComponentConf() {
         { fieldname: "Name", name: "name", value: undefined },
         { fieldname: "Company", name: "company", value: undefined },
         { fieldname: "Position", name: "position", value: undefined },
-        { fieldname: "Skills", name: "skills", value: undefined },
-        //{ fieldname: "Bio", name: "bio", value: undefined },
       ];
       this.visibleResetButtons = new Set();
 
@@ -98,16 +96,8 @@ function genComponentConf() {
     updateDetails(detail) {
       // split between skills and everything else because skills should be a list
       if (detail.value) {
-        if (detail.name !== "skills") {
-          this.addedPerson = this.addedPerson.set(detail.name, detail.value);
-        } else if (detail.value.length > 0) {
-          let skills = Immutable.fromJS(detail.value.trim().split(/\s*,\s*/));
-          skills = skills.filter(skill => skill.length > 0);
-          this.addedPerson = this.addedPerson.set(detail.name, skills);
-        }
-
+        this.addedPerson = this.addedPerson.set(detail.name, detail.value);
         this.update(this.addedPerson);
-
         if (detail.value.length > 0) {
           this.visibleResetButtons.add(detail.name);
         } else {

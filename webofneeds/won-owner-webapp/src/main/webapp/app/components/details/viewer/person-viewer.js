@@ -43,14 +43,6 @@ function genComponentConf() {
               {{self.content.get('company')}}
             </div>
           </div>
-          <div class="pv__content__detail" ng-if="self.content.get('skills')">
-            <div class="pv__content__detail__label">
-              Skills:
-            </div>
-            <div class="pv__content__detail__value">
-              {{self.content.get('skills')}}
-            </div>
-          </div>
         </div>
     `;
 

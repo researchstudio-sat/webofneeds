@@ -1,3 +1,5 @@
+import { is } from "../app/utils.js";
+import Immutable from "immutable";
 import { details } from "detailDefinitions";
 
 export const emptyDraft = {
@@ -49,6 +51,70 @@ const pureSearchUseCase = {
   },
 };
 
+const skillsDetail = {
+  ...details.tags,
+  identifier: "skills",
+  label: "Skills",
+  icon: "#ico36_skill_circle",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:knowsAbout": undefined };
+    }
+    return { "s:knowsAbout": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const skills = jsonLDImm && jsonLDImm.get("s:knowsAbout");
+    if (!skills) {
+      return undefined;
+    } else if (is("String", skills)) {
+      return Immutable.fromJS([skills]);
+    } else if (is("Array", skills)) {
+      return Immutable.fromJS(skills);
+    } else if (Immutable.List.isList(skills)) {
+      return skills; // id; it is already in the format we want
+    } else {
+      console.error(
+        "Found unexpected format of skills (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(skills)
+      );
+      return undefined;
+    }
+  },
+};
+
+const interestsDetail = {
+  ...details.tags,
+  identifier: "interests",
+  label: "Interests",
+  icon: "#ico36_heart_circle",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "foaf:topic_interest": undefined };
+    }
+    return { "foaf:topic_interest": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const interests = jsonLDImm && jsonLDImm.get("foaf:topic_interest");
+    if (!interests) {
+      return undefined;
+    } else if (is("String", interests)) {
+      return Immutable.fromJS([interests]);
+    } else if (is("Array", interests)) {
+      return Immutable.fromJS(interests);
+    } else if (Immutable.List.isList(interests)) {
+      return interests; // id; it is already in the format we want
+    } else {
+      console.error(
+        "Found unexpected format of interests (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(interests)
+      );
+      return undefined;
+    }
+  },
+};
+
 // TODO: roles?
 // note: if no details are to be added for is or seeks,
 // there won't be an is or seeks part unless defined in the draft
@@ -84,7 +150,7 @@ const socialUseCases = {
         },
       },
       location: { ...details.location },
-      tags: { ...details.tags },
+      interests: { ...interestsDetail },
     },
     seeksDetails: undefined,
   },
@@ -118,7 +184,7 @@ const socialUseCases = {
         },
       },
       location: { ...details.location },
-      tags: { ...details.tags },
+      interests: { ...interestsDetail },
     },
     seeksDetails: undefined,
   },
@@ -138,6 +204,7 @@ const socialUseCases = {
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
+      interests: { ...interestsDetail },
     },
   },
   sightseeing: {
@@ -153,6 +220,7 @@ const socialUseCases = {
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
+      interests: { ...interestsDetail },
     },
   },
 };
@@ -175,11 +243,14 @@ const professionalUseCases = {
       description: { ...details.description },
       location: { ...details.location },
       person: { ...details.person },
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
     },
     seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
-      person: { ...details.person },
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
     },
   },
   phdIs: {
@@ -198,6 +269,10 @@ const professionalUseCases = {
       description: { ...details.description },
       location: { ...details.location },
     },
+    seeksDetails: {
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
+    },
   },
   phdSeeks: {
     identifier: "phdSeeks",
@@ -214,6 +289,8 @@ const professionalUseCases = {
     isDetails: {
       description: { ...details.description },
       person: { ...details.person },
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
     },
     seeksDetails: {
       description: { ...details.description },
@@ -236,6 +313,10 @@ const professionalUseCases = {
       description: { ...details.description },
       location: { ...details.location },
     },
+    seeksDetails: {
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
+    },
   },
   postDocSeeks: {
     identifier: "postDocSeeks",
@@ -252,6 +333,8 @@ const professionalUseCases = {
     isDetails: {
       description: { ...details.description },
       person: { ...details.person },
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
     },
     seeksDetails: {
       description: { ...details.description },
@@ -261,7 +344,7 @@ const professionalUseCases = {
   consortiumIs: {
     identifier: "consortiumIs",
     label: "Offer slot in a project consortium",
-    icon: "#ico36_uc_consortium",
+    icon: "#ico36_uc_consortium-offer",
     draft: {
       ...emptyDraft,
       is: {
@@ -277,12 +360,14 @@ const professionalUseCases = {
     seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
     },
   },
   consortiumSeeks: {
     identifier: "consortiumSeeks",
     label: "Find a project consortium to join",
-    icon: "#ico36_uc_consortium",
+    icon: "#ico36_uc_consortium-search",
     draft: {
       ...emptyDraft,
       is: {
@@ -294,6 +379,8 @@ const professionalUseCases = {
     isDetails: {
       description: { ...details.description },
       location: { ...details.location },
+      skills: { ...skillsDetail },
+      interests: { ...interestsDetail },
     },
     seeksDetails: {
       description: { ...details.description },
