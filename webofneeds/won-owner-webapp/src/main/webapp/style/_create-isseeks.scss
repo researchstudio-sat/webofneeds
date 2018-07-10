@@ -6,6 +6,7 @@
 @import "personpicker";
 @import "travelactionpicker";
 @import "tagspicker";
+@import "titlepicker";
 @import "ttlpicker";
 @import "animate";
 @import "sizing-utils";
@@ -15,11 +16,6 @@ won-create-isseeks {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-
-  // title
-  .cis__mandatory {
-    display: grid;
-  }
 
   // details picker
   .cis__addDetail {
