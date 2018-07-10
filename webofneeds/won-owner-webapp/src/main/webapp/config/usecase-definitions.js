@@ -47,7 +47,7 @@ const pureSearchUseCase = {
     showInList: true /*This parameter defines if the useCase should be shown outside of the usecase picker as well*/,
     draft: { ...emptyDraft },
     isDetails: undefined,
-    seeksDetails: {},
+    seeksDetails: { title: { ...details.title, label: "Search for" } },
   },
 };
 

@@ -2,7 +2,6 @@ import angular from "angular";
 
 import "ng-redux";
 import won from "../won-es6.js";
-import { postTitleCharacterLimit } from "config";
 import { attach, clone, delay, dispatchEvent } from "../utils.js";
 
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
@@ -66,7 +65,6 @@ function genComponentConf() {
       //TODO: debug; deleteme
       window.cis4dbg = this;
 
-      this.characterLimit = postTitleCharacterLimit; //TODO: remove limit
       this.details = new Set();
 
       this.showDetail = false;
