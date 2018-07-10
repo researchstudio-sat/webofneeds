@@ -6,6 +6,22 @@ import { getIn, is } from "../app/utils.js";
 import Immutable from "immutable";
 
 export const details = {
+  title: {
+    identifier: "title",
+    label: "Title",
+    icon: "#ico36_title_circle",
+    component: "won-title-picker",
+    viewerComponent: "won-title-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "dc:title": undefined };
+      }
+      return { "dc:title": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return jsonLDImm && jsonLDImm.get("dc:title");
+    },
+  },
   description: {
     identifier: "description",
     label: "Description",
@@ -374,22 +390,6 @@ export const details = {
         );
         return undefined;
       }
-    },
-  },
-  title: {
-    identifier: "title",
-    label: "Title",
-    icon: "#ico36_description_circle", // FIXME: should be #ico36_title_circle
-    component: "won-title-picker",
-    viewerComponent: "won-title-viewer",
-    parseToRDF: function({ value }) {
-      if (!value) {
-        return { "dc:title": undefined };
-      }
-      return { "dc:title": value };
-    },
-    parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:title");
     },
   },
   ttl: {
