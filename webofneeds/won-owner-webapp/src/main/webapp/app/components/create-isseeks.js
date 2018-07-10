@@ -14,18 +14,6 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-    <!-- Mandatory Input Fields -->
-    <div class="cis__mandatory">
-        <input
-            type="text"
-            maxlength="{{self.characterLimit}}"
-            class="cis__mandatory__title won-txt"
-            placeholder="{{self.titlePlaceholder? self.titlePlaceholder : 'What? (Short title shown in lists)'}}"
-            ng-blur="::self.updateTitle()"
-            ng-keyup="::self.updateTitle()"/>
-    </div>
-    <!-- Mandatory Input Fields -->
-
     <!-- DETAILS Picker -->
     <div class="cis__addDetail" ng-if="self.hasDetails()">
         <div class="cis__addDetail__header a detailPicker clickable"
@@ -78,7 +66,7 @@ function genComponentConf() {
       //TODO: debug; deleteme
       window.cis4dbg = this;
 
-      this.characterLimit = postTitleCharacterLimit;
+      this.characterLimit = postTitleCharacterLimit; //TODO: remove limit
       this.details = new Set();
 
       this.showDetail = false;
@@ -116,12 +104,6 @@ function genComponentConf() {
 
     setDraft(updatedDraft) {
       Object.assign(this.draftObject, updatedDraft);
-      this.updateDraft();
-    }
-
-    updateTitle() {
-      const titleString = ((this.titleInput() || {}).value || "").trim();
-      this.draftObject.title = titleString;
       this.updateDraft();
     }
 
@@ -166,18 +148,6 @@ function genComponentConf() {
         this.onScroll({ element: ".cis__details" });
       }
     }
-
-    titleInputNg() {
-      return angular.element(this.titleInput());
-    }
-    titleInput() {
-      if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(
-          ".cis__mandatory__title"
-        );
-      }
-      return this._titleInput;
-    }
   }
 
   Controller.$inject = serviceDependencies;
@@ -192,7 +162,6 @@ function genComponentConf() {
       initialDraft: "=",
       onUpdate: "&", // Usage: on-update="::myCallback(draft)"
       onScroll: "&",
-      titlePlaceholder: "=",
     },
     template: template,
   };
