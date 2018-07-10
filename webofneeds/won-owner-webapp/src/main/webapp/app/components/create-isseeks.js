@@ -15,6 +15,7 @@ function genComponentConf() {
   const template = `
     <!-- DETAILS Picker -->
     <div class="cis__addDetail" ng-if="self.hasDetails()">
+        <!--
         <div class="cis__addDetail__header a detailPicker clickable"
             ng-click="self.toggleDetail()"
             ng-class="{'closedDetailPicker': !self.showDetail}">
@@ -26,8 +27,9 @@ function genComponentConf() {
                     <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
         </div>
+        -->
         <!-- DETAIL TOGGLES -->
-        <div class="cis__detail__items" ng-if="self.showDetail">
+        <div class="cis__detail__items"> <!-- ng-if="self.showDetail" -->
           <div class="cis__detail__items__item" ng-repeat="detail in self.detailList">
               <!-- HEADER -->
               <div class="cis__detail__items__item__header"
