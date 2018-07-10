@@ -268,23 +268,12 @@ function genComponentConf() {
       delay(0).then(() => {
         const MESSAGECOUNT = 10;
 
-        if (connectionsToCrawl.size == 0) {
-          console.log("ensureUnreadMessagesAreLoaded - nothing to crawl");
-        }
-
         connectionsToCrawl.map(conn => {
           if (conn.get("isLoadingMessages")) return;
           const messages = conn.get("messages");
           const messageCount = messages ? messages.size : 0;
 
           if (messageCount == 0) {
-            console.log(
-              "ensureUnreadMessagesAreLoaded - Getting Latest Messages for connection: ",
-              conn.get("uri"),
-              " already loaded: ",
-              messageCount,
-              " messages"
-            );
             this.connections__showLatestMessages(conn.get("uri"), MESSAGECOUNT);
           } else {
             const receivedMessages = messages.filter(
@@ -293,22 +282,7 @@ function genComponentConf() {
             const receivedMessagesReadPresent =
               receivedMessages.filter(msg => !msg.get("unread")).size > 0;
 
-            if (receivedMessagesReadPresent) {
-              console.log(
-                "ensureUnreadMessagesAreLoaded - At least one Received Message already read in connection: ",
-                conn.get("uri"),
-                ", stop crawling further, already loaded: ",
-                messageCount,
-                " messages"
-              );
-            } else {
-              console.log(
-                "ensureUnreadMessagesAreLoaded - Only unread received Messages in connection: ",
-                conn.get("uri"),
-                ", crawl further, already loaded: ",
-                messageCount,
-                " messages"
-              );
+            if (!receivedMessagesReadPresent) {
               this.connections__showMoreMessages(conn.get("uri"), MESSAGECOUNT);
             }
           }
