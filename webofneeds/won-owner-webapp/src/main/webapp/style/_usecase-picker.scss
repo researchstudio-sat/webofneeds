@@ -20,6 +20,11 @@ won-usecase-picker {
     grid-template-rows: min-content minmax($mobileGridRows, 1fr) min-content;
   }*/
 
+  & .clickable,
+  & button {
+    transform: translate3d(0, 0, 0);
+  }
+
   .ucp__header {
     grid-area: header;
     display: grid;
