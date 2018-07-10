@@ -59,10 +59,7 @@ export const configRouting = [
   "$urlRouterProvider",
   "$stateProvider",
   ($urlRouterProvider, $stateProvider) => {
-    //$urlRouterProvider.otherwise('/landingpage');
     $urlRouterProvider.otherwise(($injector, $location) => {
-      //let updatedRoute =  $location.replace()
-      //    .path('/landingpage') // change route to landingpage
       $location.path(`/${defaultRoute}`); // change route to connections overview as default
 
       const origParams = $location.search();
@@ -81,7 +78,6 @@ export const configRouting = [
     [
       { path: "/about?privateId", component: "about" },
       { path: "/signup?privateId", component: "signup" },
-      { path: "/landingpage?privateId", component: "landingpage" },
       {
         path:
           "/connections?privateId?postUri?connectionUri?showUseCases?useCase",
