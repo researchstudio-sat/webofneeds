@@ -116,7 +116,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
     }
     if (searchString) {
       parsedNeed.searchString = searchString;
-      type = seeksPresent ? type : won.WON.BasicNeedTypeDemandCompacted; // TODO: check type
     }
 
     parsedNeed.is = isPart;
