@@ -24,6 +24,7 @@ import locationPickerModule from "./details/location-picker.js";
 import personPickerModule from "./details/person-picker.js";
 import travelActionPickerModule from "./details/travel-action-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
+import titlePickerModule from "./details/title-picker.js;";
 import ttlPickerModule from "./details/ttl-picker.js";
 
 const postTypeTexts = [
@@ -82,7 +83,6 @@ function genComponentConf() {
             <won-create-isseeks 
                 ng-if="self.useCase.isDetails" 
                 is-or-seeks="::'Description'"
-                title-placeholder="::'What are you offering?'"
                 detail-list="self.useCase.isDetails"
                 initial-draft="self.useCase.draft.is"
                 on-update="::self.updateDraft(draft, 'is')" 
@@ -92,7 +92,6 @@ function genComponentConf() {
             <won-create-isseeks 
                 ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
-                title-placeholder="::'What are you looking for?'"
                 detail-list="self.useCase.seeksDetails"
                 initial-draft="self.useCase.draft.seeks"
                 on-update="::self.updateDraft(draft, 'seeks')" 
@@ -436,6 +435,7 @@ angular
     personPickerModule,
     travelActionPickerModule,
     tagsPickerModule,
+    titlePickerModule,
     ttlPickerModule,
     createIsseeksModule,
     matchingContextModule,
