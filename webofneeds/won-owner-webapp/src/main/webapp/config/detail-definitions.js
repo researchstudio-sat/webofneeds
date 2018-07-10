@@ -376,6 +376,22 @@ export const details = {
       }
     },
   },
+  title: {
+    identifier: "title",
+    label: "Title",
+    icon: "#ico36_description_circle", // FIXME: should be #ico36_title_circle
+    component: "won-title-picker",
+    viewerComponent: "won-title-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "dc:title": undefined };
+      }
+      return { "dc:title": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return jsonLDImm && jsonLDImm.get("dc:title");
+    },
+  },
   ttl: {
     identifier: "ttl",
     label: "Turtle (TTL)",
