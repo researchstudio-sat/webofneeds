@@ -9,7 +9,6 @@ import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
 import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
-import { postTitleCharacterLimit } from "config";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
@@ -24,7 +23,7 @@ import locationPickerModule from "./details/location-picker.js";
 import personPickerModule from "./details/person-picker.js";
 import travelActionPickerModule from "./details/travel-action-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
-import titlePickerModule from "./details/title-picker.js;";
+import titlePickerModule from "./details/title-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 
 const postTypeTexts = [
@@ -162,7 +161,6 @@ function genComponentConf() {
       window.cnc4dbg = this;
 
       this.postTypeTexts = postTypeTexts;
-      this.characterLimit = postTitleCharacterLimit;
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
@@ -371,7 +369,7 @@ function genComponentConf() {
       }
 
       const title = get(isOrSeeks, "title");
-      const hasValidTitle = title && title.length < this.characterLimit;
+      const hasValidTitle = title && title.length > 0;
 
       let hasDetail = false;
       const details = Object.keys(isOrSeeks);
