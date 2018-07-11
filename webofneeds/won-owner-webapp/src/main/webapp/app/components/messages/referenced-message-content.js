@@ -6,7 +6,6 @@ import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
-import combinedMessageContentModule from "./combined-message-content.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -184,7 +183,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.referencedMessageContent", [
-    combinedMessageContentModule,
-  ])
+  .module("won.owner.components.referencedMessageContent", [])
   .directive("wonReferencedMessageContent", genComponentConf).name;
