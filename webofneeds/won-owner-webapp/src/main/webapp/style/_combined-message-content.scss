@@ -9,7 +9,7 @@ won-combined-message-content {
   grid-auto-flow: row;
   grid-gap: 0.5rem;
 
-  won-trig {
+  > won-trig {
     border-top: $thinGrayBorder;
     padding-top: 0.5rem;
   }
