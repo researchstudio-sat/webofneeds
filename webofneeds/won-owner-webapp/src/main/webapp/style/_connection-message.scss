@@ -110,11 +110,8 @@ won-connection-message {
         }
       }
 
-      &__content {
+      won-combined-message-content {
         grid-area: content;
-        display: grid;
-        grid-auto-flow: row;
-        grid-gap: 0.5rem;
       }
 
       &__button-area {

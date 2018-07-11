@@ -2,7 +2,7 @@ import won from "../won-es6.js";
 import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
-import connectionMessageModule from "./connection-message.js";
+import connectionMessageModule from "./messages/connection-message.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";

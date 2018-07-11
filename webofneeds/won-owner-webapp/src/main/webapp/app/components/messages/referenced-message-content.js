@@ -1,12 +1,12 @@
 import angular from "angular";
 
 import Immutable from "immutable";
-import { connect2Redux } from "../won-utils.js";
-import { attach, getIn } from "../utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { selectNeedByConnectionUri } from "../selectors.js";
-import { labels } from "../won-label-utils.js";
-import messageContentModule from "./message-content.js";
+import { connect2Redux } from "../../won-utils.js";
+import { attach, getIn } from "../../utils.js";
+import { actionCreators } from "../../actions/actions.js";
+import { selectNeedByConnectionUri } from "../../selectors.js";
+import { labels } from "../../won-label-utils.js";
+import combinedMessageContentModule from "./combined-message-content.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -15,7 +15,7 @@ function genComponentConf() {
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeUris">
         <div class="refmsgcontent__fragment__header">Proposes</div>
         <div class="refmsgcontent__fragment__body">
-          <won-message-content
+          <won-combined-message-content
             ng-repeat="msgUri in self.proposeUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -23,13 +23,13 @@ function genComponentConf() {
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
             connection-uri="self.connection.get('uri')">
-          </won-message-content>
+          </won-combined-message-content>
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRetractUris">
         <div class="refmsgcontent__fragment__header">Retracts</div>
         <div class="refmsgcontent__fragment__body">
-          <won-message-content
+          <won-combined-message-content
             ng-repeat="msgUri in self.retractUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -37,13 +37,13 @@ function genComponentConf() {
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
             connection-uri="self.connection.get('uri')">
-          </won-message-content>
+          </won-combined-message-content>
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasAcceptUris">
         <div class="refmsgcontent__fragment__header">Accepts</div>
         <div class="refmsgcontent__fragment__body">
-          <won-message-content
+          <won-combined-message-content
             ng-repeat="msgUri in self.acceptUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -51,13 +51,13 @@ function genComponentConf() {
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
             connection-uri="self.connection.get('uri')">
-          </won-message-content>
+          </won-combined-message-content>
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeToCancelUris">
         <div class="refmsgcontent__fragment__header">Propose to cancel</div>
         <div class="refmsgcontent__fragment__body">
-          <won-message-content
+          <won-combined-message-content
             ng-repeat="msgUri in self.proposeToCancelUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -65,13 +65,13 @@ function genComponentConf() {
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
             connection-uri="self.connection.get('uri')">
-          </won-message-content>
+          </won-combined-message-content>
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRejectUris">
         <div class="refmsgcontent__fragment__header">Rejects</div>
         <div class="refmsgcontent__fragment__body">
-          <won-message-content
+          <won-combined-message-content
             ng-repeat="msgUri in self.rejectUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -79,7 +79,7 @@ function genComponentConf() {
             }"
             message-uri="self.getReferencedMessage(msgUri).get('uri')"
             connection-uri="self.connection.get('uri')">
-          </won-message-content>
+          </won-combined-message-content>
         </div>
       </div>
     `;
@@ -185,6 +185,6 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.referencedMessageContent", [
-    messageContentModule,
+    combinedMessageContentModule,
   ])
   .directive("wonReferencedMessageContent", genComponentConf).name;

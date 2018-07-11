@@ -1,23 +1,24 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 
-import won from "../won-es6.js";
+import won from "../../won-es6.js";
 import Immutable from "immutable";
-import squareImageModule from "./square-image.js";
-import labelledHrModule from "./labelled-hr.js";
+import squareImageModule from "../square-image.js";
+import labelledHrModule from "../labelled-hr.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
-import messageContentModule from "./message-content.js";
+import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
-import trigModule from "./trig.js";
-import { connect2Redux } from "../won-utils.js";
-import { attach, get, getIn } from "../utils.js";
+import combinedMessageContentModule from "./combined-message-content.js";
+import trigModule from "../trig.js";
+import { connect2Redux } from "../../won-utils.js";
+import { attach, get, getIn } from "../../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
-} from "../won-message-utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { selectNeedByConnectionUri } from "../selectors.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+} from "../../won-message-utils.js";
+import { actionCreators } from "../../actions/actions.js";
+import { selectNeedByConnectionUri } from "../../selectors.js";
+import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -47,18 +48,10 @@ function genComponentConf() {
                   'partiallyLoaded': self.isPartiallyLoaded(),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
-    			      <div class="won-cm__center__bubble__content">
-                  <won-message-content
-                      ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
-                      message-uri="self.message.get('uri')"
-                      connection-uri="self.connection.get('uri')">
-                  </won-message-content>
-                  <won-referenced-message-content
-                      ng-if="self.message.get('hasReferences')"
-                      message-uri="self.message.get('uri')"
-                      connection-uri="self.connection.get('uri')">
-                  </won-referenced-message-content>
-                </div>
+    			      <won-combined-message-content
+    			        message-uri="self.message.get('uri')"
+                  connection-uri="self.connection.get('uri')">
+    			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="self.allowProposals"
                     ng-click="self.showDetail = !self.showDetail">
@@ -475,6 +468,7 @@ export default angular
     connectionMessageStatusModule,
     messageContentModule,
     referencedMessageContentModule,
+    combinedMessageContentModule,
     inviewModule.name,
     trigModule,
   ])
