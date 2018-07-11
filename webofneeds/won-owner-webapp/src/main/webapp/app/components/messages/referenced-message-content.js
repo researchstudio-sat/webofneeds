@@ -89,12 +89,6 @@ function genComponentConf() {
 
       this.labels = labels;
 
-      this.noParsableContentPlaceholder =
-        "«This message couldn't be displayed as it didn't contain," +
-        "any parsable content! " +
-        'Click on the "Show raw RDF data"-button in ' +
-        'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
-
       const selectFromState = state => {
         const ownNeed =
           this.connectionUri &&
