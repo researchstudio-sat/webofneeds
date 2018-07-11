@@ -11,6 +11,7 @@ export const emptyDraft = {
 /**
  * USE CASE REQUIREMENTS
  * detail identifiers in is and seeks have to be unique
+ * detail identifiers must not be "search"
  * if two details use the same predicate on the same level,
  * the latter detail will overwrite the former.
  * Example:
@@ -36,33 +37,6 @@ const allDetailsUseCase = {
     draft: { ...emptyDraft },
     isDetails: details,
     seeksDetails: details,
-  },
-};
-
-const pureSearchUseCase = {
-  pureSearch: {
-    identifier: "pureSearch",
-    label: "Search posts",
-    icon: "#ico36_search",
-    showInList: true /*This parameter defines if the useCase should be shown outside of the usecase picker as well*/,
-    draft: { ...emptyDraft, title: "Search posts" },
-    isDetails: undefined,
-    seeksDetails: {
-      searchString: {
-        ...details.title,
-        identifier: "searchString",
-        label: "Search for",
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:query": undefined }; // TODO: should this be won:hasSearchString?
-          }
-          return { "s:query": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          return jsonLDImm && jsonLDImm.get("s:query");
-        },
-      },
-    },
   },
 };
 
@@ -455,7 +429,6 @@ export const useCases = {
   ...professionalUseCases,
   ...infoUseCases,
   ...allDetailsUseCase,
-  ...pureSearchUseCase,
 };
 
 export const useCaseGroups = {
@@ -481,6 +454,6 @@ export const useCaseGroups = {
     identifier: "othergroup",
     label: "Something else",
     icon: undefined,
-    useCases: { ...allDetailsUseCase, ...pureSearchUseCase },
+    useCases: { ...allDetailsUseCase },
   },
 };
