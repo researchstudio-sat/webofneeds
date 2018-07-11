@@ -58,12 +58,12 @@ import java.util.stream.StreamSupport;
 public class SparqlMatcherActor extends UntypedActor {
 	private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-	
+
 	private ActorRef pubSubMediator;
-	
+
 	@Autowired
 	private SparqlMatcherConfig config;
-	
+
 	@Override
     public void preStart() throws IOException {
 
@@ -101,30 +101,30 @@ public class SparqlMatcherActor extends UntypedActor {
 	private static String hashFunction(Object input) {
 		return Integer.toHexString(input.hashCode());
 	}
-	
+
 	private static final Var resultName = Var.alloc("result");
 	private static final Var hint1 = Var.alloc("hint1");
 	private static final Var hint2 = Var.alloc("hint2");
-	
+
 	private static BasicPattern createDetailsQuery(Model model) {
 		BasicPattern pattern = new BasicPattern();
-		
+
 		StreamSupport.stream(Spliterators.spliteratorUnknownSize(model.listStatements(), Spliterator.CONCURRENT), true)
 		.map((statement) -> {
 			Triple triple = statement.asTriple();
 			RDFNode object = statement.getObject();
-			
+
 			Node newSubject = NodeFactory.createVariable(hashFunction(triple.getSubject()));
-			
+
 			Node newObject = triple.getObject();
-			
+
 			if(object.isAnon()) {
 				newObject = NodeFactory.createVariable(hashFunction(newObject));
 			}
-			
+
 			return new Triple(newSubject, triple.getPredicate(), newObject);
 		}).filter(p -> p != null).forEach(pattern::add);
-		
+
 		return pattern;
 	}
 
@@ -137,20 +137,19 @@ public class SparqlMatcherActor extends UntypedActor {
 		return OpExtend.create(OpLeftJoin.create(op, new OpTriple(matchTriple), filter), variableAssignment);
 	}
 
-	public Op hasOverlappingContext(Op op, Var variable, List<Node> contexts) {
-		Var tmpVar = Var.alloc(hashFunction(variable));
+	public Op hasOverlappingContext(Op op, Set<String> contexts) {
+		Var tmpVar = Var.alloc("overlappingContext");
 
 		if(contexts.isEmpty()) {
-			return OpExtend.create(op, new VarExprList(variable, new NodeValueBoolean(false)));
+			return op;
 		}
 
-		List<Expr> contextExpressions = contexts.stream().map(NodeValueNode::new).collect(Collectors.toList());
+		List<Expr> contextExpressions = contexts.stream().map(NodeValueString::new).collect(Collectors.toList());
 
 		Triple matchTriple = new Triple(resultName.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#hasMatchingContext"), tmpVar);
-		ExprList filter = new ExprList(new E_OneOf(new ExprVar(tmpVar), new ExprList(contextExpressions));
-		VarExprList variableAssignment = new VarExprList(variable, new E_Bound(new ExprVar(tmpVar)));
+		ExprList filter = new ExprList(new E_OneOf(new ExprVar(tmpVar), new ExprList(contextExpressions)));
 
-		return null;
+		return OpFilter.filter(filter, OpJoin.create(op, new OpTriple(matchTriple)));
 	}
 
 
@@ -168,17 +167,17 @@ public class SparqlMatcherActor extends UntypedActor {
 		Op variableOp = OpExtend.create(remoteMeOp, expressions);
 		return OpFilter.filterBy(filter, variableOp);
 	}
-	
+
 	private static Op createNeedQuery(Model model, Statement parentStatement, Node newPredicate) {
 		StatementBoundary boundary = new StatementBoundaryBase() {
 			public boolean stopAt(Statement s) {
 				return parentStatement.getSubject().equals(s.getSubject());
 			}
 		};
-		
+
 		Model subModel = new ModelExtract(boundary).extract(parentStatement.getObject().asResource(), model);
 		BasicPattern pattern = createDetailsQuery(subModel);
-		
+
 		pattern.add(new Triple(resultName.asNode(), newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
 
 		return new OpBGP(pattern);
@@ -253,22 +252,22 @@ public class SparqlMatcherActor extends UntypedActor {
 		NeedModelWrapper need = new NeedModelWrapper(needEvent.deserializeNeedDataset());
 
 		Model model = need.getNeedModel();
-		
+
 		ArrayList<Op> queries = new ArrayList<>(2);
-		
+
 		Statement seeks = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
-		
+
 		if(seeks != null) {
 			Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
 
 			queries.add(seeksQuery);
 		}
-		
+
 		Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
-		
+
 		if(is != null) {
 			Op isQuery = createNeedQuery(model, is, NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
-			
+
 			queries.add(isQuery);
 		}
 
@@ -279,33 +278,37 @@ public class SparqlMatcherActor extends UntypedActor {
 			queries.add(createSearchQuery(searchString));
 		}
 
+		Set<String> contexts = model.listObjectsOfProperty(model.createResource(needURI),
+				model.createProperty("http://purl.org/webofneeds/model#hasMatchingContext")).toList().stream().map(rdfNode -> rdfNode.asLiteral().getString()).collect(Collectors.toSet());
+
 		queries.stream().reduce((left, right) -> new OpUnion(left, right))
 		.ifPresent((union) -> {
 			BasicPattern nodeUriBGP = new BasicPattern();
 			Var wonNodeVar = Var.alloc("wonNode");
-			nodeUriBGP.add(new Triple(resultName.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#hasWonNode"), wonNodeVar.asNode()));
+            nodeUriBGP.add(new Triple(resultName.asNode(), NodeFactory.createURI("http://purl.org/webofneeds/model#hasWonNode"), wonNodeVar.asNode()));
 
-			Op query = new OpSlice(
-					new OpDistinct(
-							new OpProject(
-									relevantTimeFilter(
-										createHintQuery(
-												OpJoin.create(
-														new OpBGP(nodeUriBGP),
-														union),
-												need.hasFlag(WON.NO_HINT_FOR_ME),
-												need.hasFlag(WON.NO_HINT_FOR_COUNTERPART)
-										)
-									),
-									Arrays.asList(new Var[]{resultName, wonNodeVar, hint1, hint2})
-							)
-					),
-					0,
+            Op query = new OpSlice(
+                    new OpDistinct(
+                            new OpProject(
+                                    relevantTimeFilter(
+                                            hasOverlappingContext(
+                                                    createHintQuery(
+                                                            OpJoin.create(
+                                                                    new OpBGP(nodeUriBGP),
+                                                                    union),
+                                                            need.hasFlag(WON.NO_HINT_FOR_ME),
+                                                            need.hasFlag(WON.NO_HINT_FOR_COUNTERPART)
+                                                    ), contexts
+                                            )),
+                                    Arrays.asList(new Var[]{resultName, wonNodeVar, hint1, hint2})
+                            )
+                    ),
+                    0,
 					config.getLimitResults());
 			QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(query));
-			
+
 			ResultSet result = execution.execSelect();
-			
+
 			BulkHintEvent bulkHintEvent = new BulkHintEvent();
 
 			while(result.hasNext()) {
@@ -320,9 +323,9 @@ public class SparqlMatcherActor extends UntypedActor {
 				if(hintFor2)
 					bulkHintEvent.addHintEvent(new HintEvent(foundNeedNodeURI, foundNeedURI, needEvent.getWonNodeUri(), needURI, config.getMatcherUri(), 1));
 			}
-			
+
 			pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
-			
+
 		});
 	}
 
