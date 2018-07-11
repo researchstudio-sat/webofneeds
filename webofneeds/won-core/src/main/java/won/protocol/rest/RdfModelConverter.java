@@ -71,11 +71,7 @@ public class RdfModelConverter extends AbstractHttpMessageConverter<Model> {
     @Override
     protected void writeInternal(Model model, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
       Lang rdfLanguage = mimeTypeToJenaLanguage(httpOutputMessage.getHeaders().getContentType(), Lang.N3);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      RDFDataMgr.write(out, model, rdfLanguage);
-      byte[] outBytes = out.toByteArray();
-      httpOutputMessage.getHeaders().add(HttpHeaders.CONTENT_LENGTH, Integer.toString(out.size()));
-      httpOutputMessage.getBody().write(outBytes);
+      RDFDataMgr.write(httpOutputMessage.getBody(), model, rdfLanguage);
       httpOutputMessage.getBody().flush();
     }
 
