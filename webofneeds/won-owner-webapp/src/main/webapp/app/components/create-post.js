@@ -331,14 +331,6 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        // TODO: This should be a usecase/done via a different component
-        // Check if this is a search
-        const searchString = this.checkForSearchString(this.draftObject);
-        if (searchString) {
-          this.draftObject.searchString = searchString;
-          //delete this.draftObject.is;
-        }
-
         if (this.useCase && this.useCase.identifier) {
           this.draftObject.useCase = this.useCase.identifier;
         }
@@ -379,30 +371,6 @@ function genComponentConf() {
         }
       }
       return !!(hasValidTitle || hasDetail);
-    }
-
-    checkForSearchString(draft) {
-      // draft has an is part -> not a pure search
-      if (this.isOrSeeksIsValid(draft.is)) {
-        return undefined;
-      }
-
-      // draft has no valid seeks part -> not a pure search
-      if (!draft.seeks || !draft.seeks.searchString) {
-        return undefined;
-      }
-
-      for (let detail of Object.keys(draft.seeks)) {
-        if (
-          detail !== "searchString" &&
-          detail !== "type" &&
-          draft.seeks[detail]
-        ) {
-          return undefined;
-        }
-      }
-
-      return draft.seeks.searchString;
     }
 
     createWhatsNew() {
