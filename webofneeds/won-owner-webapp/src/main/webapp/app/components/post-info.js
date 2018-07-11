@@ -123,11 +123,10 @@ function genComponentConf() {
         const isPureSearch =
           post &&
           is === undefined &&
-          post.get("seeks").size === 2 &&
+          seeks === undefined &&
           post.get("searchString");
 
-        const searchString =
-          post && seeks ? post.get("searchString") : undefined; //workaround to display searchString only in seeks
+        const searchString = post ? post.get("searchString") : undefined; //workaround to display searchString only in seeks
 
         return {
           WON: won.WON,
