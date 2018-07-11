@@ -45,17 +45,17 @@ function genTopnavConf() {
             <div class="si__text">
                 This is the demonstrator of an ongoing research project. Please keep in mind:
                 <ul>
-                	<li> Your posts are public. Do not post anything you are not comfortable with everyone seeing. </li>
-			<li> Your user account is not publicly linked to your posts, to give you some privacy.</li>
-                	<li> The connections of your posts (i.e. the other posts you see, and their status) are public.</li>
-                	<li> Your conversations are private, but stored in clear text on our servers. Do not write anything you are not comfortable with writing on a postcard.</li>
+                	<li> Your posts are public. </li>
+					<li> Your user account is not publicly linked to your posts.</li>
+                	<li> The connections of your posts are public.</li>
+                	<li> The messages you exchange with others are private, but stored in clear text on our servers. </li>
                 </ul>     
                 <a target="_blank"
                    href="{{ self.absHRef(self.$state, 'about', {'#': 'privacyPolicy'}) }}">
                    See Privacy Policy.
                 </a>
                 <br />
-                We track your session with a cookie, and log you in automatically with another one, if you want that. We use an analytics tool (on our own servers) to improve the application, which also identifies you with a cookie.
+                We use cookies to track your session using a self-hosted analytics tool.
                 <a target="_blank"
                    href="/piwik/index.php?module=CoreAdminHome&action=optOut&language=en">
                    Suppress tracking.
@@ -64,7 +64,7 @@ function genTopnavConf() {
             <button
                 ng-click="self.acceptDisclaimer()"
                 class="si__button">
-                    Ok, I'll keep it in mind
+                    Ok, I'll keep that in mind
             </button>
         </div>
         <won-modal-dialog ng-if="self.showModalDialog"></won-modal-dialog>
