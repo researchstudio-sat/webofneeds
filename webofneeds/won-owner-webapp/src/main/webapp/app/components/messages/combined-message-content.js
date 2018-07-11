@@ -52,7 +52,10 @@ function genComponentConf() {
     }
 
     isConnectionMessage() {
-      return this.message.get("messageType") === won.WONMSG.connectionMessage;
+      return (
+        this.message &&
+        this.message.get("messageType") === won.WONMSG.connectionMessage
+      );
     }
   }
   Controller.$inject = serviceDependencies;
