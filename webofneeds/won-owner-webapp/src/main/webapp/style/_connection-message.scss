@@ -1,9 +1,7 @@
 @import "speech-bubble";
 @import "square-image";
-@import "trig";
 @import "connection-message-status";
-@import "message-content";
-@import "referenced-message-content";
+@import "combined-message-content";
 
 won-connection-message {
   &.won-unread {
@@ -93,7 +91,7 @@ won-connection-message {
 
     .won-cm__center__bubble {
       display: grid;
-      grid-template-areas: "content carret" "trig trig" "actions actions";
+      grid-template-areas: "content carret" "actions actions";
       grid-template-columns: 1fr min-content;
       padding: 0.5rem;
       border: $thinGrayBorder;
@@ -122,13 +120,6 @@ won-connection-message {
         display: grid;
         grid-auto-flow: column;
         grid-gap: 0.5rem;
-      }
-
-      won-trig {
-        grid-area: trig;
-        border-top: $thinGrayBorder;
-        padding-top: 0.5rem;
-        margin-top: 0.5rem;
       }
 
       //Message Type Styling

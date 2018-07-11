@@ -9,9 +9,9 @@ import connectionMessageStatusModule from "./connection-message-status.js";
 import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
-import trigModule from "../trig.js";
+
 import { connect2Redux } from "../../won-utils.js";
-import { attach, get, getIn } from "../../utils.js";
+import { attach, getIn } from "../../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
@@ -40,8 +40,7 @@ function genComponentConf() {
                 ng-class="{'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable')}"
                 in-view="$inview && self.markAsRead()">
             <div 
-                class="won-cm__center__bubble" 
-                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
+                class="won-cm__center__bubble"
     			      ng-class="{
     			        'references' : 	self.message.get('hasReferences'),
                   'pending': self.isPending(),
@@ -62,10 +61,6 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <won-trig
-                    trig="self.contentGraphTrig"
-                    ng-show="self.shouldShowRdf && self.contentGraphTrig">
-                </won-trig>
                 <div class="won-cm__center__bubble__button-area"
                     ng-if="self.showDetail">
                     <button class="won-button--filled thin black"
@@ -158,8 +153,6 @@ function genComponentConf() {
           theirNeed,
           connection,
           message,
-          contentGraphs: get(message, "contentGraphs") || Immutable.List(),
-          contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf,
           rdfLinkURL,
           allowProposals:
@@ -470,6 +463,5 @@ export default angular
     referencedMessageContentModule,
     combinedMessageContentModule,
     inviewModule.name,
-    trigModule,
   ])
   .directive("wonConnectionMessage", genComponentConf).name;

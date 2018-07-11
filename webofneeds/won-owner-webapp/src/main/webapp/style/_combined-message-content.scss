@@ -1,8 +1,16 @@
 @import "won-config";
 @import "sizing-utils";
+@import "trig";
+@import "message-content";
+@import "referenced-message-content";
 
 won-combined-message-content {
   display: grid;
   grid-auto-flow: row;
   grid-gap: 0.5rem;
+
+  won-trig {
+    border-top: $thinGrayBorder;
+    padding-top: 0.5rem;
+  }
 }
