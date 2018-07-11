@@ -8,7 +8,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
   let parsedNeed = {
     uri: undefined,
     nodeUri: undefined,
-    title: undefined,
     type: undefined,
     state: undefined,
     connections: Immutable.Map(),
@@ -35,7 +34,8 @@ export function parseNeed(jsonldNeed, ownNeed) {
 
     const searchString = jsonldNeedImm.get("won:hasSearchString");
 
-    //TODO We need to decide which is the main title? Or combine?
+    //TODO: We need to decide which is the main title? Or combine?
+    //TODO: search for hasHumanReadable or something similar, see #2037
     const title = isPresent
       ? is.get("dc:title")
       : seeksPresent
@@ -160,7 +160,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
  */
 function generateContent(contentJsonLd, type, detailsToParse) {
   let content = {
-    title: contentJsonLd.get("dc:title"),
+    //title: contentJsonLd.get("dc:title"),
     type: type,
   };
 

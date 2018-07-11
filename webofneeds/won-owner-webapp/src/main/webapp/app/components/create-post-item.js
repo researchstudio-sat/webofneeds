@@ -9,8 +9,10 @@ import { connect2Redux } from "../won-utils.js";
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `
+        
+        <!-- SHOW USECASE THAT'S BEING CREATED RIGHT NOW - NOT SEARCH -->
         <div class="cpi__item selected cpi__item--withcolspan"
-            ng-if="self.useCase">
+            ng-if="self.useCase && self.useCase !== 'search'">
             <svg class="cpi__item__icon"
                 title="{{self.useCase['label']}}"
                 ng-if="self.useCase['icon']"
@@ -21,6 +23,37 @@ function genComponentConf() {
                 {{ self.useCase['label'] }}
             </div>
         </div>
+
+        <!-- SHOW USECASE THAT'S BEING CREATED RIGHT NOW - SEARCH -->
+        <div class="cpi__item selected cpi__item--withcolspan"
+            ng-if="self.useCase && self.useCase === 'search'">
+            <svg class="cpi__item__icon"
+                title="Search"
+                style="--local-primary:var(--won-primary-color);">
+                    <use xlink:href="#ico36_search" href="#ico36_search"></use>
+            </svg>
+            <div class="cpi__item__text">
+                Search
+            </div>
+        </div>
+
+        <!-- SHOW PURE SEARCH -->
+        <div 
+          class="cpi__item clickable"
+          ng-click="self.showPureSearch()"
+          ng-if="!self.useCase">
+            <svg 
+              class="cpi__item__icon"
+              title="Search"
+              style="--local-primary:var(--won-primary-color);">
+                <use xlink:href="#ico36_search" href="#ico36_search"></use>
+            </svg>
+            <div class="cpi__item__text">
+                Search
+            </div>
+        </div>
+
+        <!-- SHOW STICKY USE CASES -->
         <div class="cpi__item clickable"
             ng-if="!self.useCase"
             ng-repeat="listUseCase in self.listUseCases"
@@ -35,12 +68,14 @@ function genComponentConf() {
                 {{ listUseCase['label'] }}
             </div>
         </div>
+
+        <!-- SHOW USECASE OVERVIEW -->
         <div class="cpi__item clickable"
             ng-click="self.showAvailableUseCases()"
             ng-if="!self.useCase"
             ng-class="{
               'selected': self.showUseCases,
-              'cpi__item--withcolspan': self.evenUseCaseListSize,
+              'cpi__item--withcolspan': !self.evenUseCaseListSize,
             }">
             <svg class="cpi__item__icon"
                 title="Create a new post"
@@ -58,6 +93,7 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
 
       this.useCases = useCases;
+      window.cpitem4dbg = this;
 
       const selectFromState = state => {
         const showUseCases = getIn(state, [
@@ -76,7 +112,8 @@ function genComponentConf() {
 
         return {
           listUseCases,
-          evenUseCaseListSize: listUseCases && listUseCases.size % 2 == 0,
+          evenUseCaseListSize:
+            listUseCases && Object.keys(listUseCases).length % 2 == 0,
           showUseCases: !!showUseCases,
           useCase: useCaseString && this.getUseCase(useCaseString),
         };
@@ -90,6 +127,9 @@ function genComponentConf() {
           if (useCaseString === useCases[useCaseName]["identifier"]) {
             return useCases[useCaseName];
           }
+        }
+        if (useCaseString === "search") {
+          return useCaseString;
         }
       }
       return undefined;
@@ -131,6 +171,16 @@ function genComponentConf() {
         postUri: undefined,
         showUseCases: true,
         useCase: undefined,
+      });
+    }
+
+    showPureSearch() {
+      // TODO: this link is still broken
+      this.router__stateGoCurrent({
+        connectionUri: undefined,
+        postUri: undefined,
+        showUseCases: undefined,
+        useCase: "search",
       });
     }
   }

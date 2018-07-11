@@ -36,7 +36,6 @@ import { actionCreators } from "./actions/actions.js";
 import topnav from "./components/topnav.js";
 import connectionsComponent from "./components/connections/connections.js";
 import postComponent from "./components/post/post.js";
-import landingPageComponent from "./components/landingpage/landingpage.js";
 import aboutComponent from "./components/about/about.js";
 import signupComponent from "./components/signup/signup.js";
 
@@ -71,7 +70,6 @@ let app = angular.module("won.owner", [
   //views
   connectionsComponent,
   postComponent,
-  landingPageComponent,
   aboutComponent,
   signupComponent,
 
