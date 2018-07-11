@@ -8,6 +8,7 @@
 
   color: white;
 
+  background: black; //Fallback in case the browser does not support css variables
   background: $won-secondary-color;
 
   padding: 1rem;
@@ -19,7 +20,8 @@
   box-sizing: border-box;
 
   &.visible {
-    max-height: 100%;
+    max-height: 100%; //Fallback in case the browser does not support vh
+    max-height: 100vh;
   }
 
   @media (max-width: $responsivenessBreakPoint) {
