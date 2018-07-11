@@ -123,6 +123,7 @@ const socialUseCases = {
       searchString: "breakfast",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       foodAllergies: {
         ...details.description,
@@ -157,6 +158,7 @@ const socialUseCases = {
       searchString: "lunch",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       foodAllergies: {
         ...details.description,
@@ -191,6 +193,7 @@ const socialUseCases = {
       searchString: "afterparty",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
       interests: { ...interestsDetail },
@@ -207,6 +210,7 @@ const socialUseCases = {
       searchString: "sightseeing",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
       interests: { ...interestsDetail },
@@ -229,6 +233,7 @@ const professionalUseCases = {
       searchString: "meetup",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
       person: { ...details.person },
@@ -255,6 +260,7 @@ const professionalUseCases = {
       searchString: "search-phd",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
     },
@@ -276,6 +282,7 @@ const professionalUseCases = {
       searchString: "offer-phd",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       person: { ...details.person },
       skills: { ...skillsDetail },
@@ -299,6 +306,7 @@ const professionalUseCases = {
       searchString: "search-postdoc",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
     },
@@ -320,6 +328,7 @@ const professionalUseCases = {
       searchString: "offer-postdoc",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       person: { ...details.person },
       skills: { ...skillsDetail },
@@ -343,6 +352,7 @@ const professionalUseCases = {
       searchString: "search-consortium",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
     },
@@ -366,6 +376,7 @@ const professionalUseCases = {
       searchString: "offer-consortium",
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
       skills: { ...skillsDetail },
@@ -389,6 +400,7 @@ const infoUseCases = {
       seeks: { tags: "answer" },
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
       tags: { ...details.tags },
@@ -409,6 +421,7 @@ const infoUseCases = {
       seeks: { tags: "question" },
     },
     isDetails: {
+      title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
       tags: { ...details.tags },
