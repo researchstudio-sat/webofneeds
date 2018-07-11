@@ -6,6 +6,7 @@ import postMessagesModule from "../post-messages.js";
 import postInfoModule from "../post-info.js";
 import connectionsOverviewModule from "../connections-overview.js";
 import createPostModule from "../create-post.js";
+import createSearchModule from "../create-search.js";
 import usecasePickerModule from "../usecase-picker.js";
 import usecasePickerContentModule from "../usecase-picker-content.js";
 import { attach, getIn, callBuffer } from "../../utils.js";
@@ -178,6 +179,7 @@ export default angular
     usecasePickerModule,
     usecasePickerContentModule,
     createPostModule,
+    createSearchModule,
     connectionsOverviewModule,
   ])
   .controller("ConnectionsController", [

@@ -6,7 +6,8 @@
 @import "create-isseeks";
 @import "responsiveness-utils";
 
-won-create-post {
+won-create-post,
+won-create-search {
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;

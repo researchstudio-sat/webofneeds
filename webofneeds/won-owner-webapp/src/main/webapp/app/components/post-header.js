@@ -29,7 +29,10 @@ function genComponentConf() {
         <div class="ph__right__topline__title" ng-show="self.need.get('title')">
          {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('title') }}
         </div>
-        <div class="ph__right__topline__notitle" ng-show="!self.need.get('title')">
+        <div class="ph__right__topline__title" ng-show="!self.need.get('title') && self.need.get('searchString')">
+         Search: {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('searchString') }}
+        </div>
+        <div class="ph__right__topline__notitle" ng-show="!self.need.get('title') && !self.need.get('searchString')">
          {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
         </div>
         <div class="ph__right__topline__date">

@@ -92,7 +92,7 @@ import { getAllDetails } from "../won-utils";
    * contentId, e.g. 'http://localhost:8080/won/resource/event/1997814854983652400#content-need';
    */
   won.buildNeedRdf = function(args) {
-    if (!args.is && !args.seeks) {
+    if (!args.is && !args.seeks && !args.searchString) {
       throw new Error(
         "Expected an object with an is- and/or a seeks-subobject. Something like `{ is: {...}, seeks: {...} }`. Got " +
           JSON.stringify(args)
@@ -141,7 +141,6 @@ import { getAllDetails } from "../won-utils";
     const buildContentNode = (id, isOrSeeksData) => {
       let contentNode = {
         "@id": id,
-        "dc:title": isOrSeeksData.title,
         "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
           ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,
@@ -188,19 +187,30 @@ import { getAllDetails } from "../won-utils";
       return contentNode;
     };
 
+    const matchingContext = args.matchingContext;
+    const searchString = args.searchString;
+
     // TODO: if both is and seeks are present, the seeks content gets ignored here
     const isWhatsAround = args.is
       ? args.is.whatsAround
-      : args.seeks.whatsAround;
-    const isWhatsNew = args.is ? args.is.whatsNew : args.seeks.whatsNew;
-    const noHints = args.is ? args.is.noHints : args.seeks.noHints;
-    const matchingContext = args.matchingContext;
-    const searchString = args.searchString;
+      : args.seeks
+        ? args.seeks.whatsAround
+        : undefined;
+    const isWhatsNew = args.is
+      ? args.is.whatsNew
+      : args.seeks
+        ? args.seeks.whatsNew
+        : undefined;
+    const noHints = args.is
+      ? args.is.noHints
+      : args.seeks
+        ? args.seeks.noHints
+        : undefined;
     const noHintForCounterpart = isWhatsAround
       ? true
       : isWhatsNew
         ? true
-        : args.searchString && args.useCase === "pureSearch" //hack: no hint for counterpart only if it's a pure search
+        : args.useCase === "search" //hack: no hint for counterpart if it's a pure search
           ? true
           : false;
     let isContentUri, seeksContentUri;
@@ -220,7 +230,9 @@ import { getAllDetails } from "../won-utils";
       {
         "@id": args.is
           ? args.is.publishedContentUri
-          : args.seeks.publishedContentUri,
+          : args.seeks
+            ? args.seeks.publishedContentUri
+            : undefined,
         "@type": "won:Need",
         "won:is": isContentUri ? { "@id": isContentUri } : undefined,
         "won:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,

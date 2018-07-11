@@ -2,7 +2,6 @@ import angular from "angular";
 
 import "ng-redux";
 import won from "../won-es6.js";
-import { postTitleCharacterLimit } from "config";
 import { attach, clone, delay, dispatchEvent } from "../utils.js";
 
 //TODO: can't inject $scope with the angular2-router, preventing redux-cleanup
@@ -14,20 +13,9 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-    <!-- Mandatory Input Fields -->
-    <div class="cis__mandatory">
-        <input
-            type="text"
-            maxlength="{{self.characterLimit}}"
-            class="cis__mandatory__title won-txt"
-            placeholder="{{self.titlePlaceholder? self.titlePlaceholder : 'What? (Short title shown in lists)'}}"
-            ng-blur="::self.updateTitle()"
-            ng-keyup="::self.updateTitle()"/>
-    </div>
-    <!-- Mandatory Input Fields -->
-
     <!-- DETAILS Picker -->
     <div class="cis__addDetail" ng-if="self.hasDetails()">
+        <!--
         <div class="cis__addDetail__header a detailPicker clickable"
             ng-click="self.toggleDetail()"
             ng-class="{'closedDetailPicker': !self.showDetail}">
@@ -39,8 +27,9 @@ function genComponentConf() {
                     <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                 </svg>
         </div>
+        -->
         <!-- DETAIL TOGGLES -->
-        <div class="cis__detail__items" ng-if="self.showDetail">
+        <div class="cis__detail__items"> <!-- ng-if="self.showDetail" -->
           <div class="cis__detail__items__item" ng-repeat="detail in self.detailList">
               <!-- HEADER -->
               <div class="cis__detail__items__item__header"
@@ -78,7 +67,6 @@ function genComponentConf() {
       //TODO: debug; deleteme
       window.cis4dbg = this;
 
-      this.characterLimit = postTitleCharacterLimit;
       this.details = new Set();
 
       this.showDetail = false;
@@ -116,12 +104,6 @@ function genComponentConf() {
 
     setDraft(updatedDraft) {
       Object.assign(this.draftObject, updatedDraft);
-      this.updateDraft();
-    }
-
-    updateTitle() {
-      const titleString = ((this.titleInput() || {}).value || "").trim();
-      this.draftObject.title = titleString;
       this.updateDraft();
     }
 
@@ -166,18 +148,6 @@ function genComponentConf() {
         this.onScroll({ element: ".cis__details" });
       }
     }
-
-    titleInputNg() {
-      return angular.element(this.titleInput());
-    }
-    titleInput() {
-      if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(
-          ".cis__mandatory__title"
-        );
-      }
-      return this._titleInput;
-    }
   }
 
   Controller.$inject = serviceDependencies;
@@ -192,7 +162,6 @@ function genComponentConf() {
       initialDraft: "=",
       onUpdate: "&", // Usage: on-update="::myCallback(draft)"
       onScroll: "&",
-      titlePlaceholder: "=",
     },
     template: template,
   };

@@ -26,13 +26,7 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-        <won-title-viewer ng-if="self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Searching for' }">
-        </won-title-viewer>
-
-        <won-title-viewer ng-if="!self.searchString && self.details.get('title')" content="self.details.get('title')" detail="::{ label: 'Title' }">
-        </won-title-viewer>
-
-        <!-- COMPONENT -->
+      <!-- COMPONENT -->
         <div class="pis__component"
           ng-repeat="detail in self.allDetails"
           ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
@@ -54,13 +48,8 @@ function genComponentConf() {
       const selectFromState = state => {
         const post = this.postUri && state.getIn(["needs", this.postUri]);
         const details = this.branch && post && post.get(this.branch);
-        const searchString =
-          post && this.branch === "seeks"
-            ? post.get("searchString")
-            : undefined; //workaround to display searchString only in seeks
 
         return {
-          searchString,
           details,
         };
       };

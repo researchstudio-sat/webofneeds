@@ -9,7 +9,6 @@ import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
 import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
-import { postTitleCharacterLimit } from "config";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import won from "../won-es6.js";
@@ -24,6 +23,7 @@ import locationPickerModule from "./details/location-picker.js";
 import personPickerModule from "./details/person-picker.js";
 import travelActionPickerModule from "./details/travel-action-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
+import titlePickerModule from "./details/title-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 
 const postTypeTexts = [
@@ -82,7 +82,6 @@ function genComponentConf() {
             <won-create-isseeks 
                 ng-if="self.useCase.isDetails" 
                 is-or-seeks="::'Description'"
-                title-placeholder="::'What are you offering?'"
                 detail-list="self.useCase.isDetails"
                 initial-draft="self.useCase.draft.is"
                 on-update="::self.updateDraft(draft, 'is')" 
@@ -92,7 +91,6 @@ function genComponentConf() {
             <won-create-isseeks 
                 ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
-                title-placeholder="::'What are you looking for?'"
                 detail-list="self.useCase.seeksDetails"
                 initial-draft="self.useCase.draft.seeks"
                 on-update="::self.updateDraft(draft, 'seeks')" 
@@ -163,7 +161,6 @@ function genComponentConf() {
       window.cnc4dbg = this;
 
       this.postTypeTexts = postTypeTexts;
-      this.characterLimit = postTitleCharacterLimit;
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
@@ -334,14 +331,6 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        // TODO: This should be a usecase/done via a different component
-        // Check if this is a search
-        const searchString = this.checkForSearchString(this.draftObject);
-        if (searchString) {
-          this.draftObject.searchString = searchString;
-          //delete this.draftObject.is;
-        }
-
         if (this.useCase && this.useCase.identifier) {
           this.draftObject.useCase = this.useCase.identifier;
         }
@@ -372,7 +361,7 @@ function genComponentConf() {
       }
 
       const title = get(isOrSeeks, "title");
-      const hasValidTitle = title && title.length < this.characterLimit;
+      const hasValidTitle = title && title.length > 0;
 
       let hasDetail = false;
       const details = Object.keys(isOrSeeks);
@@ -382,26 +371,6 @@ function genComponentConf() {
         }
       }
       return !!(hasValidTitle || hasDetail);
-    }
-
-    checkForSearchString(draft) {
-      // draft has an is part -> not a pure search
-      if (this.isOrSeeksIsValid(draft.is)) {
-        return undefined;
-      }
-
-      // draft has no valid seeks part -> not a pure search
-      if (!draft.seeks || !draft.seeks.title) {
-        return undefined;
-      }
-
-      for (let detail of Object.keys(draft.seeks)) {
-        if (detail !== "title" && detail !== "type" && draft.seeks[detail]) {
-          return undefined;
-        }
-      }
-
-      return draft.seeks.title;
     }
 
     createWhatsNew() {
@@ -436,6 +405,7 @@ angular
     personPickerModule,
     travelActionPickerModule,
     tagsPickerModule,
+    titlePickerModule,
     ttlPickerModule,
     createIsseeksModule,
     matchingContextModule,
