@@ -72,7 +72,7 @@ won-connections-overview {
       padding-left: 0.5rem; // intrent connections so it's clear they belong *to* the post
       background: $won-line-gray;
       // TODO line-gray for a fill?
-      @include slideWithOpacityAnimation(0.5s, linear, 250rem);
+      @include slideWithOpacityAnimationFixedHorizontal(0.5s, linear, 250rem);
     }
   }
   .co__separator {
