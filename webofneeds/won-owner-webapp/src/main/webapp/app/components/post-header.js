@@ -35,25 +35,14 @@ function genComponentConf() {
         <div class="ph__right__topline__notitle" ng-show="!self.need.get('title') && !self.need.get('searchString')">
          {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
         </div>
-        <div class="ph__right__topline__date">
-          {{ self.friendlyTimestamp }}
-        </div>
       </div>
       <div class="ph__right__subtitle">
-        <!--
-        <span class="piu__header__title__subtitle__group" ng-show="{{self.need.get('group')}}">
-          
-        <svg style="--local-primary:var(--won-primary-color);"
-          class="piu__header__title__subtitle__group__icon">
-            <use xlink:href="#ico36_group" href="#ico36_group"></use>
-        </svg>
-          {{self.need.get('group')}}
-          <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
-        </span>
-        -->
         <span class="ph__right__subtitle__type">
           {{self.labels.type[self.need.get('type')]}}{{self.need.get('matchingContexts')? ' in '+ self.need.get('matchingContexts').join(', ') : '' }}
         </span>
+        <div class="ph__right__subtitle__date">
+          {{ self.friendlyTimestamp }}
+        </div>
       </div>
     </div>
     

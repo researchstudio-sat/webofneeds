@@ -39,29 +39,22 @@ function genComponentConf() {
           <div class="ch__right__topline__notitle" ng-show="!self.theirNeed.get('title')" title="no title">
             {{ self.theirNeed.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
           </div>
-          <div class="ch__right__topline__date">
-            {{ self.friendlyTimestamp }}
-          </div>
         </div>
         <div class="ch__right__subtitle">
-          <!--
-          <span class="piu__header__title__subtitle__group" ng-show="{{self.theirNeed.get('group')}}">
-
-          <svg style="--local-primary:var(--won-primary-color);"
-            class="piu__header__title__subtitle__group__icon">
-              <use xlink:href="#ico36_group" href="#ico36_group"></use>
-          </svg>
-            {{self.theirNeed.get('group')}}
-            <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
-          </span>
-          -->
           <span class="ch__right__subtitle__type">
-
             <won-connection-state 
               connection-uri="self.connection.get('uri')">
             </won-connection-state>
-            {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
+            <span class="ch__right__subtitle__type__state" ng-if="!self.unreadMessageCount">
+              {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
+            </span>
+            <span class="ch__right__subtitle__type__unreadcount" ng-if="self.unreadMessageCount">
+              {{ self.unreadMessageCount }} unread Messages
+            </span>
           </span>
+          <div class="ch__right__subtitle__date">
+            {{ self.friendlyTimestamp }}
+          </div>
         </div>
       </div>
       <div class="ch__icon" ng-if="self.isLoading()">
@@ -91,11 +84,18 @@ function genComponentConf() {
         const theirNeed =
           connection &&
           selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
+        const allMessages = connection && connection.get("messages");
+        const unreadMessages =
+          allMessages && allMessages.filter(msg => msg.get("unread"));
 
         return {
           connection,
           ownNeed,
           theirNeed,
+          unreadMessageCount:
+            unreadMessages && unreadMessages.size > 0
+              ? unreadMessages.size
+              : undefined,
           friendlyTimestamp:
             theirNeed &&
             relativeTime(

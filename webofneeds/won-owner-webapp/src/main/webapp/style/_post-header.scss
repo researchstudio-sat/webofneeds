@@ -24,12 +24,6 @@ won-post-header {
       width: 7rem;
       background-color: $won-skeleton-color;
     }
-
-    .ph__right__topline__date {
-      height: $smallFontSize;
-      width: 3rem;
-      background-color: $won-skeleton-color;
-    }
   }
 
   color: black;
@@ -59,14 +53,10 @@ won-post-header {
 
     &__topline {
       grid-area: topline;
-      display: grid;
-      grid-template-areas: "title date";
-      grid-template-columns: 1fr min-content;
       min-width: 0;
 
       &__notitle,
       &__title {
-        grid-area: title;
         min-width: 0;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -76,22 +66,13 @@ won-post-header {
       &__notitle {
         color: $won-subtitle-gray;
       }
-
-      &__date {
-        grid-area: date;
-        font-size: $smallFontSize;
-        color: $won-subtitle-gray;
-        white-space: nowrap;
-        padding-left: 0.5rem;
-        min-width: 0;
-      }
     }
 
     &__subtitle {
       grid-area: subtitle;
+      display: grid;
+      grid-template-columns: 1fr min-content;
       color: $won-subtitle-gray;
-      display: flex;
-      flex-direction: row;
       font-size: $smallFontSize;
       min-width: 0;
 
@@ -101,19 +82,12 @@ won-post-header {
         white-space: nowrap;
       }
 
-      &__group {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-
-        &__dash {
-          padding: 0 0.25rem;
-        }
-
-        &__icon {
-          padding-right: 0.25rem;
-          @include fixed-square(0.75rem);
-        }
+      &__date {
+        font-size: $smallFontSize;
+        color: $won-subtitle-gray;
+        white-space: nowrap;
+        padding-left: 0.5rem;
+        min-width: 0;
       }
     }
   }
