@@ -58,10 +58,12 @@ function genComponentConf() {
             <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__content" ng-class="{'won-agreement-content': self.showAgreementData}">
-            <div class="pm__content__unreadindicator won-button--outlined thin red"
-              ng-click="self.goToUnreadMessages()"
+            <div class="pm__content__unreadindicator"
               ng-if="self.unreadMessageCount && (!self._snapBottom || self.showAgreementData)">
-              {{self.unreadMessageCount}} unread Messages
+              <div class="pm__content__unreadindicator__content won-button--filled red"
+                ng-click="self.goToUnreadMessages()">
+                {{self.unreadMessageCount}} unread Messages
+              </div>
             </div>
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
