@@ -624,7 +624,7 @@ function genComponentConf() {
 
             //If message isnt in the state we add it
             if (this.chatMessages.get(agreementObject.get("stateUri"))) {
-              this.messages__connectionMessageReceived(msg);
+              this.messages__processConnectionMessage(msg);
             }
 
             //Update agreementData in State
