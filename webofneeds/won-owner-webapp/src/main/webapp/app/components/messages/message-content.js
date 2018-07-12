@@ -20,8 +20,9 @@ function genComponentConf() {
         <div class="msgcontent__body__matchScore" ng-if="self.message.getIn(['content', 'matchScore'])">MatchScore: {{self.message.getIn(['content', 'matchScore']) }}</div>
         <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
       </div>
-      <div class="msgcontent__body" ng-if="!self.message">
-        <div class="msgcontent__body__text">«Message not (yet) loaded»</div>
+      <div class="msgcontent__body clickable" ng-if="!self.message">
+        <div class="msgcontent__body__text hide-in-responsive">«Message not (yet) loaded. Click to Load»</div>
+        <div class="msgcontent__body__text show-in-responsive">«Message not (yet) loaded. Tap to Load»</div>
       </div>
     `;
 
