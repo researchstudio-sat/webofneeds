@@ -62,10 +62,15 @@
         width: 100%;
         padding-bottom: 1rem;
         h1 {
-          padding-bottom: 1.5rem;
+          padding-bottom: 1.5rem; 
+          text-align: center;
         }
         p {
           padding-bottom: 1.5rem;
+          text-align: center;
+        }
+        h3 {
+          text-align: center;
         }
       }
     }
