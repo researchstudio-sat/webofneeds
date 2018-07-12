@@ -23,7 +23,7 @@ function genComponentConf() {
       </won-referenced-message-content>
       <won-trig
           trig="self.contentGraphTrig"
-          ng-if="self.contentGraphTrig">
+          ng-if="self.shouldShowRdf && self.contentGraphTrig">
       </won-trig>
     `;
 
