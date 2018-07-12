@@ -80,6 +80,17 @@ won-post-messages {
       top: 0;
       position: sticky;
       z-index: 10;
+      margin-bottom: 0.5rem;
+
+      @include slideWithOpacityAnimationFixedHorizontal(
+        0.5s,
+        linear,
+        3rem,
+        0,
+        0,
+        0,
+        0.5rem
+      );
 
       &__content {
         height: 3rem;
@@ -91,16 +102,6 @@ won-post-messages {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-
-        @include slideWithOpacityAnimationFixedHorizontal(
-          0.5s,
-          linear,
-          3rem,
-          0.66rem,
-          0.66rem,
-          0,
-          0.5rem
-        );
       }
     }
   }
@@ -129,7 +130,6 @@ won-post-messages {
       padding-bottom: 0.5rem;
       margin-bottom: 0.5rem;
     }
-
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
       width: 100%;
