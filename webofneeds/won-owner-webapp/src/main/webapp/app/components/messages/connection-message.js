@@ -1,23 +1,24 @@
 import angular from "angular";
 import inviewModule from "angular-inview";
 
-import won from "../won-es6.js";
+import won from "../../won-es6.js";
 import Immutable from "immutable";
-import squareImageModule from "./square-image.js";
-import labelledHrModule from "./labelled-hr.js";
+import squareImageModule from "../square-image.js";
+import labelledHrModule from "../labelled-hr.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
-import messageContentModule from "./message-content.js";
+import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
-import trigModule from "./trig.js";
-import { connect2Redux } from "../won-utils.js";
-import { attach, get, getIn } from "../utils.js";
+import combinedMessageContentModule from "./combined-message-content.js";
+
+import { connect2Redux } from "../../won-utils.js";
+import { attach, getIn } from "../../utils.js";
 import {
   buildProposalMessage,
   buildModificationMessage,
-} from "../won-message-utils.js";
-import { actionCreators } from "../actions/actions.js";
-import { selectNeedByConnectionUri } from "../selectors.js";
-import { classOnComponentRoot } from "../cstm-ng-utils.js";
+} from "../../won-message-utils.js";
+import { actionCreators } from "../../actions/actions.js";
+import { selectNeedByConnectionUri } from "../../selectors.js";
+import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -39,26 +40,17 @@ function genComponentConf() {
                 ng-class="{'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable')}"
                 in-view="$inview && self.markAsRead()">
             <div 
-                class="won-cm__center__bubble" 
-                title="{{ self.shouldShowRdf ? self.rdfToString(self.message.get('contentGraphs')) : undefined }}"
+                class="won-cm__center__bubble"
     			      ng-class="{
     			        'references' : 	self.message.get('hasReferences'),
                   'pending': self.isPending(),
                   'partiallyLoaded': self.isPartiallyLoaded(),
                   'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
     			      }">
-    			      <div class="won-cm__center__bubble__content">
-                  <won-message-content
-                      ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
-                      message-uri="self.message.get('uri')"
-                      connection-uri="self.connection.get('uri')">
-                  </won-message-content>
-                  <won-referenced-message-content
-                      ng-if="self.message.get('hasReferences')"
-                      message-uri="self.message.get('uri')"
-                      connection-uri="self.connection.get('uri')">
-                  </won-referenced-message-content>
-                </div>
+    			      <won-combined-message-content
+    			        message-uri="self.message.get('uri')"
+                  connection-uri="self.connection.get('uri')">
+    			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="self.allowProposals"
                     ng-click="self.showDetail = !self.showDetail">
@@ -69,10 +61,6 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <won-trig
-                    trig="self.contentGraphTrig"
-                    ng-show="self.shouldShowRdf && self.contentGraphTrig">
-                </won-trig>
                 <div class="won-cm__center__bubble__button-area"
                     ng-if="self.showDetail">
                     <button class="won-button--filled thin black"
@@ -118,7 +106,7 @@ function genComponentConf() {
                 </div>
             </div>
             <won-connection-message-status message-uri="self.message.get('uri')" connection-uri="self.connection.get('uri')">
-            </won-connection-messages-status>
+            </won-connection-message-status>
             <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
                 <svg class="rdflink__small clickable">
                     <use xlink:href="#rdf_logo_2" href="#rdf_logo_2"></use>
@@ -165,8 +153,6 @@ function genComponentConf() {
           theirNeed,
           connection,
           message,
-          contentGraphs: get(message, "contentGraphs") || Immutable.List(),
-          contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf,
           rdfLinkURL,
           allowProposals:
@@ -348,8 +334,6 @@ function genComponentConf() {
         "Ok, I am hereby making a proposal"
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
-
-      this.onSendProposal({ proposalUri: uri });
     }
 
     proposeToCancel() {
@@ -360,8 +344,6 @@ function genComponentConf() {
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
-
-      this.onUpdate();
     }
 
     sendAccept() {
@@ -374,7 +356,6 @@ function genComponentConf() {
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsAccepted(true);
-      this.onRemoveData({ proposalUri: this.messageUri });
     }
 
     retractMessage() {
@@ -390,7 +371,6 @@ function genComponentConf() {
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRetracted(true);
-      this.onUpdate();
     }
 
     rejectMessage() {
@@ -406,7 +386,6 @@ function genComponentConf() {
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRejected(true);
-      this.onUpdate();
     }
 
     rdfToString(jsonld) {
@@ -460,9 +439,6 @@ function genComponentConf() {
       messageUri: "=",
       connectionUri: "=",
       // Usage: on-update="::myCallback(draft)"
-      onUpdate: "&",
-      onSendProposal: "&",
-      onRemoveData: "&",
     },
     template: template,
   };
@@ -475,7 +451,7 @@ export default angular
     connectionMessageStatusModule,
     messageContentModule,
     referencedMessageContentModule,
+    combinedMessageContentModule,
     inviewModule.name,
-    trigModule,
   ])
   .directive("wonConnectionMessage", genComponentConf).name;

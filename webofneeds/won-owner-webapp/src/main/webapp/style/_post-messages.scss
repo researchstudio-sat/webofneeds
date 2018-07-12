@@ -75,10 +75,54 @@ won-post-messages {
       box-sizing: border-box;
     }
 
+    &__unreadindicator {
+      height: 3rem;
+      top: 0;
+      position: sticky;
+      z-index: 10;
+      margin-bottom: 0.5rem;
+
+      @include slideWithOpacityAnimationFixedHorizontal(
+        0.5s,
+        linear,
+        3rem,
+        0,
+        0,
+        0,
+        0.5rem
+      );
+
+      &__content {
+        height: 3rem;
+        padding: 0.66em;
+        margin-bottom: 0.5rem;
+        box-sizing: border-box;
+        font-size: $normalFontSize;
+        line-height: $normalFontSize;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+  .pm__content {
+    grid-area: main;
+    padding: 0.5rem;
+    background: white;
+    border: $thinGrayBorder;
+    overflow: auto;
+    flex-grow: 1;
+    &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
+    &__loadspinner {
+      width: 100%;
+      height: 3rem;
+      padding: 0.66em 2em;
+      text-align: center;
+      box-sizing: border-box;
+    }
     &.won-agreement-content {
       background: $won-lighter-gray;
     }
-
     &__agreement__title {
       font-size: $mediumFontSize;
       font-weight: bold;
@@ -86,7 +130,6 @@ won-post-messages {
       padding-bottom: 0.5rem;
       margin-bottom: 0.5rem;
     }
-
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
       width: 100%;

@@ -25,10 +25,6 @@ function genComponentConf() {
         ng-click="self.setOpen()"
         class="clickable">
       </won-connection-header>
-
-      <div class="conn__unreadCount" ng-if="self.connection.get('state') === self.WON.Connected">
-        {{ self.unreadMessagesCount }}
-      </div>
     `;
 
   class Controller {

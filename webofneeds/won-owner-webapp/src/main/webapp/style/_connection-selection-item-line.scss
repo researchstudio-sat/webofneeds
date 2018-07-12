@@ -36,11 +36,6 @@ won-connection-selection-item {
   border-left: $thinGrayBorder;
   border-top: $thinGrayBorder;
 
-  .conn__unreadCount {
-    color: $won-primary-color;
-    margin-left: 0.5rem;
-  }
-
   &:hover,
   &.selected {
     background-color: white;

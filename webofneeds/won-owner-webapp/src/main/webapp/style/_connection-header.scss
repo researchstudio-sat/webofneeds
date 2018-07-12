@@ -23,12 +23,6 @@ won-connection-header {
       width: 7rem;
       background-color: $won-skeleton-color;
     }
-
-    .ch__right__topline__date {
-      height: $smallFontSize;
-      width: 3rem;
-      background-color: $won-skeleton-color;
-    }
   }
 
   color: black;
@@ -39,13 +33,6 @@ won-connection-header {
   grid-template-columns: min-content 1fr;
   grid-column-gap: 0.5rem;
   min-width: 0;
-
-  won-connection-state {
-    display: inline-block;
-    svg {
-      @include fixed-square($smallFontSize);
-    }
-  }
 
   .ch__icon {
     grid-area: icon;
@@ -60,13 +47,10 @@ won-connection-header {
     min-width: 0;
     &__topline {
       grid-area: topline;
-      display: grid;
-      grid-template-areas: "title date";
-      grid-template-columns: 1fr min-content;
       min-width: 0;
+
       &__notitle,
       &__title {
-        grid-area: title;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -76,38 +60,42 @@ won-connection-header {
       &__notitle {
         color: $won-subtitle-gray;
       }
+    }
+    &__subtitle {
+      grid-area: subtitle;
+      display: grid;
+      grid-template-columns: 1fr min-content;
+      color: $won-subtitle-gray;
+      font-size: $smallFontSize;
+      min-width: 0;
+
+      &__type {
+        display: flex;
+        align-items: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+        won-connection-state {
+          display: inline-block;
+          padding-right: 0.25rem;
+
+          svg {
+            @include fixed-square($smallFontSize);
+          }
+        }
+
+        &__unreadcount {
+          color: $won-primary-color;
+        }
+      }
+
       &__date {
-        grid-area: date;
         font-size: $smallFontSize;
         color: $won-subtitle-gray;
         white-space: nowrap;
         padding-left: 0.5rem;
         min-width: 0;
-      }
-    }
-    &__subtitle {
-      grid-area: subtitle;
-      color: $won-subtitle-gray;
-      display: flex;
-      flex-direction: row;
-      font-size: $smallFontSize;
-      min-width: 0;
-      &__type {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-      }
-      &__group {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        &__dash {
-          padding: 0 0.25rem;
-        }
-        &__icon {
-          padding-right: 0.25rem;
-          @include fixed-square(0.75rem);
-        }
       }
     }
   }
