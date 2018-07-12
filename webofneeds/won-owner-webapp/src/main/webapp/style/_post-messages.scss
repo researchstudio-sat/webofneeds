@@ -75,6 +75,28 @@ won-post-messages {
       box-sizing: border-box;
     }
 
+    &__unreadindicator {
+      height: 3rem;
+      padding: 0.66em;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
+      font-size: $normalFontSize;
+      line-height: $normalFontSize;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      @include slideWithOpacityAnimationFixedHorizontal(
+        0.5s,
+        linear,
+        3rem,
+        0.66rem,
+        0.66rem,
+        0,
+        0.5rem
+      );
+    }
+
     &.won-agreement-content {
       background: $won-lighter-gray;
     }

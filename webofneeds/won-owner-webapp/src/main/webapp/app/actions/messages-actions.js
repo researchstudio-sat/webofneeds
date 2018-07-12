@@ -210,7 +210,6 @@ export function connectionMessageReceived(event) {
 
     callAgreementsFetch(url).then(response => {
       console.log("response : ", response);
-      let change = false;
       for (const effect of response) {
         console.log("effect : ", effect);
         switch (effect.type) {
@@ -227,15 +226,11 @@ export function connectionMessageReceived(event) {
                   accepted: true,
                 },
               });
-              change = true;
             }
             break;
 
           case "PROPOSES":
             console.log("PROPOSES");
-            if (effect.proposes) {
-              change = true;
-            }
             break;
 
           case "REJECTS":
@@ -251,7 +246,6 @@ export function connectionMessageReceived(event) {
                   rejected: true,
                 },
               });
-              change = true;
             }
             break;
 
@@ -272,22 +266,11 @@ export function connectionMessageReceived(event) {
                 },
               });
             }
-            change = true;
             break;
 
           default:
             break;
         }
-      }
-
-      if (change) {
-        dispatch({
-          type: actionTypes.connections.showAgreementData,
-          payload: {
-            connectionUri: connectionUri,
-            showAgreementData: false,
-          },
-        });
       }
 
       dispatch({

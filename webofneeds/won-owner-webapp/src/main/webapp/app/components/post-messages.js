@@ -58,6 +58,11 @@ function genComponentConf() {
             <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__content" ng-class="{'won-agreement-content': self.showAgreementData}">
+            <div class="pm__content__unreadindicator won-button--outlined thin red"
+              ng-click="self.goToUnreadMessages()"
+              ng-if="self.unreadMessageCount && (!self._snapBottom || self.showAgreementData)">
+              {{self.unreadMessageCount}} unread Messages
+            </div>
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
@@ -73,12 +78,8 @@ function genComponentConf() {
                 ng-if="!self.showAgreementData"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
-                message-uri="msg.get('uri')"
-                on-update="self.setShowAgreementData(false)"
-                on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
-                on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+                message-uri="msg.get('uri')">
             </won-connection-message>
-
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.connection.get('isLoadingMessages')">
               Agreements
             </div>
@@ -86,10 +87,7 @@ function genComponentConf() {
               ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
               ng-repeat="agreement in self.agreementUrisArray"
               connection-uri="self.connectionUri"
-              message-uri="agreement.get('stateUri')"
-              on-update="self.setShowAgreementData(false)"
-              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
-              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+              message-uri="agreement.get('stateUri')">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris && !self.connection.get('isLoadingMessages')">
               Agreements with Pending Cancellation
@@ -98,10 +96,7 @@ function genComponentConf() {
               ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
               ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
               connection-uri="self.connectionUri"
-              message-uri="proposeToCancel.get('stateUri')"
-              on-update="self.setShowAgreementData(false)"
-              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
-              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+              message-uri="proposeToCancel.get('stateUri')">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris && !self.connection.get('isLoadingMessages')">
               Open Proposals
@@ -110,10 +105,7 @@ function genComponentConf() {
               ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
               ng-repeat="proposal in self.pendingProposalUrisArray"
               connection-uri="self.connectionUri"
-              message-uri="proposal.get('stateUri')"
-              on-update="self.setShowAgreementData(false)"
-              on-send-proposal="[self.addProposal(proposalUri), self.setShowAgreementData(false)]"
-              on-remove-data="[self.filterMessages(proposalUri), self.setShowAgreementData(false)]">
+              message-uri="proposal.get('stateUri')">
             </won-connection-message>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
@@ -268,6 +260,9 @@ function genComponentConf() {
           });
         }
 
+        const unreadMessages =
+          chatMessages && chatMessages.filter(msg => msg.get("unread"));
+
         return {
           ownNeed,
           theirNeed,
@@ -276,6 +271,7 @@ function genComponentConf() {
 
           sortedMessages: sortedMessages,
           chatMessages,
+          unreadMessageCount: unreadMessages && unreadMessages.size,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
@@ -373,6 +369,13 @@ function genComponentConf() {
           );
         }
       });
+    }
+
+    goToUnreadMessages() {
+      if (this.showAgreementData) {
+        this.setShowAgreementData(false);
+      }
+      this.snapToBottom();
     }
 
     snapToBottom() {
@@ -630,38 +633,6 @@ function genComponentConf() {
           }
         });
       });
-    }
-
-    checkObject(key, agreementObject, del) {
-      const foundKeys = this.agreementData.get(key);
-
-      const foundObjects =
-        foundKeys &&
-        foundKeys.filter(
-          object => object.get("stateUri") === agreementObject.get("stateUri")
-        );
-
-      if (foundKeys && del) {
-        this.agreementData = this.agreementData.set(
-          key,
-          foundKeys.filter(
-            object => object.get("stateUri") !== agreementObject.get("stateUri")
-          )
-        );
-      }
-
-      return foundObjects && foundObjects.size > 0;
-    }
-
-    filterMessages(stateUri) {
-      const object = Immutable.fromJS({
-        stateUri: stateUri,
-        headUri: undefined,
-      });
-
-      this.checkObject("agreementUris", object, true);
-      this.checkObject("pendingProposalUris", object, true);
-      this.checkObject("cancellationPendingAgreementUris", object, true);
     }
 
     isOldCancelledMsg(msg) {

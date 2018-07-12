@@ -334,8 +334,6 @@ function genComponentConf() {
         "Ok, I am hereby making a proposal"
       );
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
-
-      this.onSendProposal({ proposalUri: uri });
     }
 
     proposeToCancel() {
@@ -346,8 +344,6 @@ function genComponentConf() {
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
-
-      this.onUpdate();
     }
 
     sendAccept() {
@@ -360,7 +356,6 @@ function genComponentConf() {
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsAccepted(true);
-      this.onRemoveData({ proposalUri: this.messageUri });
     }
 
     retractMessage() {
@@ -376,7 +371,6 @@ function genComponentConf() {
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRetracted(true);
-      this.onUpdate();
     }
 
     rejectMessage() {
@@ -392,7 +386,6 @@ function genComponentConf() {
       this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
 
       this.markAsRejected(true);
-      this.onUpdate();
     }
 
     rdfToString(jsonld) {
@@ -446,9 +439,6 @@ function genComponentConf() {
       messageUri: "=",
       connectionUri: "=",
       // Usage: on-update="::myCallback(draft)"
-      onUpdate: "&",
-      onSendProposal: "&",
-      onRemoveData: "&",
     },
     template: template,
   };
