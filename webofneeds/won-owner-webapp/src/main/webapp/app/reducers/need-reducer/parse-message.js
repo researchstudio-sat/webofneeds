@@ -52,6 +52,11 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       isParsable: false, //will be determined by the clause (hasReferences || hasContent) function
       date: msStringToDate(wonMessage.getTimestamp()),
       outgoingMessage: wonMessage.isFromOwner(),
+      systemMessage:
+        !wonMessage.isFromOwner() &&
+        !wonMessage.getSenderNeed() &&
+        wonMessage.getSenderNode(),
+      senderUri: wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
       messageType: wonMessage.getMessageType(),
       messageStatus: {
         isRetracted: false,
@@ -93,7 +98,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   if (
     !parsedMessage.data.uri ||
     !parsedMessage.belongsToUri ||
-    !parsedMessage.data.date
+    !parsedMessage.data.date ||
+    !parsedMessage.data.senderUri
   ) {
     console.error(
       "Cant parse chat-message, data is an invalid message-object: ",

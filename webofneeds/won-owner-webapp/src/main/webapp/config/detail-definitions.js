@@ -402,12 +402,16 @@ export const details = {
       if (!value) {
         return undefined;
       }
+      return undefined;
       // TODO: return value
     },
     parseFromRDF: function(jsonLDImm) {
-      // TODO: return value
-      console.error("IMPLEMENT ME", jsonLDImm);
+      //console.error("IMPLEMENT ME", jsonLDImm);
+      if (!jsonLDImm) {
+        return undefined;
+      }
       return undefined;
+      // TODO: return value
     },
   },
 };

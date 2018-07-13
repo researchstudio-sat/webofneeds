@@ -22,8 +22,7 @@
         <won-usecase-picker ng-if="!self.useCase && self.showUseCases && !self.selectedPost && !self.connection"></won-usecase-picker>
         <won-create-post ng-if="(!!self.useCase) && self.useCase !== 'search' && !self.selectedPost && !self.connection"></won-create-post>
         <won-create-search ng-if="(!!self.useCase) && self.useCase === 'search' && !self.selectedPost && !self.connection"></won-create-search>
-        <won-send-request include-header="true" ng-if="!self.selectedPost && !self.showUseCases && self.connectionType === self.WON.Suggested"></won-send-request>
-        <won-post-messages ng-if="!self.selectedPost && !self.showUseCases && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent)"></won-post-messages>
+        <won-post-messages ng-if="!self.selectedPost && !self.showUseCases && (self.connectionType === self.WON.Connected || self.connectionType === self.WON.RequestReceived || self.connectionType === self.WON.RequestSent || self.connectionType === self.WON.Suggested)"></won-post-messages>
         <won-post-info include-header="true" ng-if="self.selectedPost && !self.showUseCases"></won-post-info>
     </div>
 </main>

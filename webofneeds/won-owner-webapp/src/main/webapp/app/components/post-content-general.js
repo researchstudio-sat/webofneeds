@@ -33,7 +33,7 @@ function genComponentConf() {
             </div>
           </div>
         </div>
-        <div class="pcg__columns__right" ng-if="self.hasFlags">
+        <div class="pcg__columns__right" ng-if="self.hasFlags && self.hasFlags.size > 0">
           <div class="pcg__columns__right__item">
             <div class="pcg__columns__right__item__label">
               Flags
@@ -45,7 +45,7 @@ function genComponentConf() {
         </div>
       </div>
       <won-post-share-link
-        ng-if="!(self.post.get('state') === self.WON.InactiveCompacted || self.post.get('isWhatsAround') || self.post.get('isWhatsNew'))"
+        ng-if="!self.preventSharing"
         post-uri="self.post.get('uri')">
       </won-post-share-link>
     `;
@@ -53,7 +53,7 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-
+      window.pcg4dbg = this;
       this.labels = labels;
 
       const selectFromState = state => {
@@ -65,6 +65,12 @@ function genComponentConf() {
           post,
           type: post && post.get("type"),
           hasFlags,
+          preventSharing:
+            (post && post.get("state") === won.WON.InactiveCompacted) ||
+            (hasFlags &&
+              hasFlags.filter(
+                flag => flag === won.WON.NoHintForCounterpartCompacted
+              ).size > 0),
           friendlyTimestamp:
             post &&
             relativeTime(selectLastUpdateTime(state), post.get("creationDate")),

@@ -2,28 +2,10 @@
 @import "sizing-utils";
 @import "animate";
 @import "responsiveness-utils";
-@import "trig";
-@import "post-is-or-seeks-info";
-@import "post-content-general";
+@import "post-content";
 
 won-send-request,
 won-post-info {
-  &.won-is-loading {
-    @include animateOpacityHeartBeat();
-
-    .post-info__details {
-      height: $normalFontSize;
-      width: 100%;
-      background-color: $won-skeleton-color;
-      margin-top: 0.25rem;
-    }
-    .post-info__heading {
-      height: $normalFontSize;
-      width: 5rem;
-      background-color: $won-skeleton-color;
-    }
-  }
-
   display: grid;
   grid-template-areas: "header" "main" "footer";
   grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
@@ -39,7 +21,7 @@ won-post-info {
     grid-template-areas: "main" "footer";
     grid-template-rows: minmax($minimalGridRows, 1fr) min-content;
 
-    .post-info__content {
+    won-post-content {
       border-top: none;
     }
   }
@@ -72,38 +54,9 @@ won-post-info {
     }
   }
 
-  .post-info__content {
+  won-post-content {
     grid-area: main;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
     border-top: $thinGrayBorder;
-    overflow: auto;
-    word-wrap: break-word;
-
-    won-labelled-hr span {
-      background-color: white;
-    }
-
-    won-trig {
-      background-color: $won-light-gray;
-      border: $thinGrayBorder;
-      padding: 0.5rem;
-    }
-
-    .post-info__carret {
-      @include fixed-square(1rem);
-
-      // visually center icon on line
-      position: relative;
-      top: 0.1em;
-    }
-
-    .post-info__heading {
-      margin-top: 1rem;
-      font-size: $normalFontSize;
-      font-weight: 700;
-    }
   }
 
   .post-info__footer {

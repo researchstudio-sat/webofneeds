@@ -3,9 +3,11 @@ import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./messages/connection-message.js";
+import postContentMessageModule from "./messages/post-content-message.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
+import feedbackGridModule from "./feedback-grid.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -41,7 +43,7 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
             <a class="pm__header__back clickable"
@@ -55,7 +57,7 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
             </div>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__content" ng-class="{'won-agreement-content': self.showAgreementData}">
             <div class="pm__content__unreadindicator"
@@ -65,6 +67,11 @@ function genComponentConf() {
                 {{self.unreadMessageCount}} unread Messages
               </div>
             </div>
+            <won-post-content-message
+              class="won-cm--left"
+              ng-if="self.theirNeedUri"
+              post-uri="self.theirNeedUri">
+            </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
@@ -72,7 +79,7 @@ function genComponentConf() {
                     class="hspinner"/>
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
+                ng-if="!self.isSuggested && !self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -149,6 +156,18 @@ function genComponentConf() {
                 Decline
             </button>
         </div>
+        <div class="pm__footer" ng-if="self.isSuggested">
+            <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
+
+            <chat-textfield-simple
+                placeholder="::'Message (optional)'"
+                on-submit="::self.sendRequest(value)"
+                allow-empty-submit="::true"
+                submit-button-label="::'Ask to Chat'"
+                ng-if="!self.connection || self.connection.get('isRated')"
+            >
+            </chat-textfield-simple>
+        </div>
     `;
 
   class Controller {
@@ -178,8 +197,8 @@ function genComponentConf() {
         const connection =
           ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
-        const theirNeed =
-          connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
+        const theirNeedUri = connection && connection.get("remoteNeedUri");
+        const theirNeed = theirNeedUri && state.getIn(["needs", theirNeedUri]);
         const chatMessages = connection && connection.get("messages");
         const allLoaded =
           chatMessages &&
@@ -268,6 +287,7 @@ function genComponentConf() {
         return {
           ownNeed,
           theirNeed,
+          theirNeedUri,
           connectionUri,
           connection,
 
@@ -283,6 +303,8 @@ function genComponentConf() {
             connection && connection.get("state") === won.WON.RequestReceived,
           isConnected:
             connection && connection.get("state") === won.WON.Connected,
+          isSuggested:
+            connection && connection.get("state") === won.WON.Suggested,
           debugmode: won.debugmode,
           shouldShowRdf: state.get("showRdf"),
           // if the connect-message is here, everything else should be as well
@@ -733,6 +755,35 @@ function genComponentConf() {
       this.connections__open(this.connectionUri, message);
     }
 
+    sendRequest(message) {
+      const isOwnNeedWhatsX =
+        this.ownNeed &&
+        (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"));
+
+      if (!this.connection || isOwnNeedWhatsX) {
+        this.router__stateGoResetParams("connections");
+
+        if (isOwnNeedWhatsX) {
+          //Close the connection if there was a present connection for a whatsaround need
+          this.connections__close(this.connectionUri);
+        }
+
+        if (this.theirNeedUri) {
+          this.connections__connectAdHoc(this.theirNeedUri, message);
+        }
+
+        //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
+      } else {
+        this.needs__connect(
+          this.ownNeed.get("uri"),
+          this.connectionUri,
+          this.theirNeedUri,
+          message
+        );
+        this.router__stateGoCurrent({ connectionUri: this.connectionUri });
+      }
+    }
+
     closeConnection() {
       this.connections__close(this.connection.get("uri"));
       this.router__stateGoCurrent({ connectionUri: null });
@@ -758,5 +809,7 @@ export default angular
     connectionHeaderModule,
     labelledHrModule,
     connectionContextDropdownModule,
+    feedbackGridModule,
+    postContentMessageModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;

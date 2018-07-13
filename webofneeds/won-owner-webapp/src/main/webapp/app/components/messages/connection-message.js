@@ -4,7 +4,6 @@ import inviewModule from "angular-inview";
 import won from "../../won-es6.js";
 import Immutable from "immutable";
 import squareImageModule from "../square-image.js";
-import labelledHrModule from "../labelled-hr.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
 import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
@@ -30,14 +29,24 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <won-square-image
+            class="clickable"
             title="self.theirNeed.get('title')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
             ng-if="!self.message.get('outgoingMessage')">
         </won-square-image>
+        <won-square-image
+            title="System"
+            src=""
+            uri="self.message.get('senderUri')"
+            ng-if="self.message.get('systemMessage')">
+        </won-square-image>
         <div class="won-cm__center"
-                ng-class="{'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable')}"
+                ng-class="{
+                  'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable'),
+                  'won-cm__center--system': self.message.get('systemMessage')
+                }"
                 in-view="$inview && self.markAsRead()">
             <div 
                 class="won-cm__center__bubble"
@@ -180,11 +189,6 @@ function genComponentConf() {
         () => this.isOutgoingMessage(),
         this
       );
-      classOnComponentRoot(
-        "won-cm--system",
-        () => this.isSystemMessage(),
-        this
-      );
       classOnComponentRoot("won-is-rejected", () => this.isRejected(), this);
       classOnComponentRoot("won-is-retracted", () => this.isRetracted(), this);
       classOnComponentRoot("won-is-accepted", () => this.isAccepted(), this);
@@ -199,11 +203,6 @@ function genComponentConf() {
 
     isReceivedMessage() {
       return this.message && !this.message.get("outgoingMessage");
-    }
-
-    isSystemMessage() {
-      //TODO: IMPLEMENT THIS METHOD
-      return false;
     }
 
     isOutgoingMessage() {
@@ -388,10 +387,6 @@ function genComponentConf() {
       this.markAsRejected(true);
     }
 
-    rdfToString(jsonld) {
-      return JSON.stringify(jsonld);
-    }
-
     /**
      * determines if the sent message is not received by any of the servers yet but not failed either
      */
@@ -423,10 +418,6 @@ function genComponentConf() {
     encodeParam(param) {
       return encodeURIComponent(param);
     }
-
-    isConnectionMessage() {
-      return this.message.get("messageType") === won.WONMSG.connectionMessage;
-    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -438,7 +429,6 @@ function genComponentConf() {
     scope: {
       messageUri: "=",
       connectionUri: "=",
-      // Usage: on-update="::myCallback(draft)"
     },
     template: template,
   };
@@ -447,7 +437,6 @@ function genComponentConf() {
 export default angular
   .module("won.owner.components.connectionMessage", [
     squareImageModule,
-    labelledHrModule,
     connectionMessageStatusModule,
     messageContentModule,
     referencedMessageContentModule,
