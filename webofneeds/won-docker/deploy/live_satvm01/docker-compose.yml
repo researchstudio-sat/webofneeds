@@ -300,4 +300,6 @@ services:
     - "2564:2564"
     depends_on:
     - matcher_service
+    volumes:
+    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/
 
