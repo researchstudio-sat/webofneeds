@@ -110,6 +110,8 @@ $ngRedux.getState();
                        date: date, //creation Date of this message
                        unread: true|false, //whether or not this message is new (or already seen if you will)
                        outgoingMessage: true|false, //flag to indicate if this was an outgoing or incoming message
+                       systemMessage: true|false, //flag to indicate if this message came from the system (e.g. hint messages) !wonMessage.isFromOwner() && !wonMessage.getSenderNeed() && wonMessage.getSenderNode(),
+                       senderUri: uri //to indicate which need or node sent the message itself, wonMessage.getSenderNeed() || wonMessage.getSenderNode(),
                        content: {
                            text: wonMessage.getTextMessage(),
                            matchScore: wonMessage.getMatchScore(),

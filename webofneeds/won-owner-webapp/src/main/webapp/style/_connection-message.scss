@@ -15,7 +15,6 @@ won-connection-message {
   grid-template-columns: min-content minmax(min-content, max-content);
 
   won-square-image {
-    cursor: pointer; /* the image links to their post info */
     grid-area: icon;
   }
 
@@ -141,6 +140,7 @@ won-connection-message {
         //TODO: FAILURE MESSAGE STYLING
       }
     }
+    &.won-cm__center--system,
     &.won-cm__center--nondisplayable {
       // hsla(57, 100%, 95%, 1);
       // lighten bg and text color? (might just suggest pending)

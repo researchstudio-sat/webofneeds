@@ -30,14 +30,24 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `
         <won-square-image
+            class="clickable"
             title="self.theirNeed.get('title')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
             ng-if="!self.message.get('outgoingMessage')">
         </won-square-image>
+        <won-square-image
+            title="System"
+            src=""
+            uri="self.message.get('senderUri')"
+            ng-if="self.message.get('systemMessage')">
+        </won-square-image>
         <div class="won-cm__center"
-                ng-class="{'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable')}"
+                ng-class="{
+                  'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable'),
+                  'won-cm__center--system': self.message.get('systemMessage')
+                }"
                 in-view="$inview && self.markAsRead()">
             <div 
                 class="won-cm__center__bubble"
