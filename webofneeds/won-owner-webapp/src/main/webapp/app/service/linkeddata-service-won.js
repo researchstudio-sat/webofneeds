@@ -1469,19 +1469,7 @@ import won from "./won.js";
     const event = await won.getNode(eventUri, fetchParams);
 
     event.rawJsonLd = await won.getRawEvent(eventUri, fetchParams);
-    const wonMessage = await won.wonMessageFromJsonLd(event.rawJsonLd);
 
-    console.log(
-      "graphs in event \n",
-      event.rawJsonLd,
-      "\n",
-      wonMessage,
-      "\n",
-      Array.from(privateData.documentToGraph[eventUri]),
-      "\n\n\n"
-    );
-
-    // event.rawJsonLd = eventJsonLd;
     await addContentGraphTrig(event, fetchParams);
 
     // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
@@ -1502,20 +1490,16 @@ import won from "./won.js";
         return event;
       }
       /*
-            * there's some messages (e.g. incoming connect) where there's
-            * vital information in the correspondingRemoteMessage. So
-            * we fetch it here.
-            */
+       * there's some messages (e.g. incoming connect) where there's
+       * vital information in the correspondingRemoteMessage. So
+       * we fetch it here.
+       */
       fetchParams.doNotFetch = true;
       const correspondingEventUri = event.hasCorrespondingRemoteMessage;
       const correspondingEvent = await won.getNode(
         correspondingEventUri,
         fetchParams
       );
-      // const correspondingEventJsonLd = await won.getGraph(
-      //     correspondingEventUri, correspondingEventUri, fetchParams
-      // );
-      // correspondingEvent.rawJsonLd = correspondingEventJsonLd;
       await addContentGraphTrig(correspondingEvent, fetchParams);
       if (correspondingEvent.type) {
         //if we have at least a type attribute, we add the remote event to the
