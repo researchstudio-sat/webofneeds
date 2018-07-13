@@ -1,0 +1,24 @@
+@import "won-config";
+
+won-dropdown-picker {
+  .dropdownp__input {
+    position: relative;
+    display: grid;
+
+    .dropdownp__input__inner {
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
+  }
+}

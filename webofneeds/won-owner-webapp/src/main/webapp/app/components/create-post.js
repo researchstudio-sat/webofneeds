@@ -25,6 +25,7 @@ import travelActionPickerModule from "./details/travel-action-picker.js";
 import tagsPickerModule from "./details/tags-picker.js";
 import titlePickerModule from "./details/title-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
+import dropdownPickerModule from "./details/dropdown-picker.js";
 
 const postTypeTexts = [
   {
@@ -407,6 +408,7 @@ angular
     tagsPickerModule,
     titlePickerModule,
     ttlPickerModule,
+    dropdownPickerModule,
     createIsseeksModule,
     matchingContextModule,
     ngAnimate,
