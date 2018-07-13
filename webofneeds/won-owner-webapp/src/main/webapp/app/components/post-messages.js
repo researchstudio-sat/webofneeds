@@ -6,6 +6,7 @@ import connectionMessageModule from "./messages/connection-message.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
+import feedbackGridModule from "./feedback-grid.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -149,6 +150,18 @@ function genComponentConf() {
                 Decline
             </button>
         </div>
+        <div class="pm__footer" ng-if="self.isSuggested">
+            <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
+
+            <chat-textfield-simple
+                placeholder="::'Message (optional)'"
+                on-submit="::self.sendRequest(value)"
+                allow-empty-submit="::true"
+                submit-button-label="::'Ask to Chat'"
+                ng-if="!self.connection || self.connection.get('isRated')"
+            >
+            </chat-textfield-simple>
+        </div>
     `;
 
   class Controller {
@@ -178,8 +191,8 @@ function genComponentConf() {
         const connection =
           ownNeed && ownNeed.getIn(["connections", connectionUri]);
 
-        const theirNeed =
-          connection && state.getIn(["needs", connection.get("remoteNeedUri")]);
+        const theirNeedUri = connection && connection.get("remoteNeedUri");
+        const theirNeed = theirNeedUri && state.getIn(["needs", theirNeedUri]);
         const chatMessages = connection && connection.get("messages");
         const allLoaded =
           chatMessages &&
@@ -268,6 +281,7 @@ function genComponentConf() {
         return {
           ownNeed,
           theirNeed,
+          theirNeedUri,
           connectionUri,
           connection,
 
@@ -283,6 +297,8 @@ function genComponentConf() {
             connection && connection.get("state") === won.WON.RequestReceived,
           isConnected:
             connection && connection.get("state") === won.WON.Connected,
+          isSuggested:
+            connection && connection.get("state") === won.WON.Suggested,
           debugmode: won.debugmode,
           shouldShowRdf: state.get("showRdf"),
           // if the connect-message is here, everything else should be as well
@@ -733,6 +749,35 @@ function genComponentConf() {
       this.connections__open(this.connectionUri, message);
     }
 
+    sendRequest(message) {
+      const isOwnNeedWhatsX =
+        this.ownNeed &&
+        (this.ownNeed.get("isWhatsAround") || this.ownNeed.get("isWhatsNew"));
+
+      if (!this.connection || isOwnNeedWhatsX) {
+        this.router__stateGoResetParams("connections");
+
+        if (isOwnNeedWhatsX) {
+          //Close the connection if there was a present connection for a whatsaround need
+          this.connections__close(this.connectionUri);
+        }
+
+        if (this.theirNeedUri) {
+          this.connections__connectAdHoc(this.theirNeedUri, message);
+        }
+
+        //this.router__stateGoCurrent({connectionUri: null, sendAdHocRequest: null});
+      } else {
+        this.needs__connect(
+          this.ownNeed.get("uri"),
+          this.connectionUri,
+          this.theirNeedUri,
+          message
+        );
+        this.router__stateGoCurrent({ connectionUri: this.connectionUri });
+      }
+    }
+
     closeConnection() {
       this.connections__close(this.connection.get("uri"));
       this.router__stateGoCurrent({ connectionUri: null });
@@ -758,5 +803,6 @@ export default angular
     connectionHeaderModule,
     labelledHrModule,
     connectionContextDropdownModule,
+    feedbackGridModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;
