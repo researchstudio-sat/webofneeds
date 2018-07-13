@@ -372,3 +372,5 @@ services:
       - "62923:62923"
     depends_on:
       - matcher_service
+    volumes:
+    - $base_folder/won-client-certs/matcher_sparql:/usr/src/matcher-sparql/client-certs/

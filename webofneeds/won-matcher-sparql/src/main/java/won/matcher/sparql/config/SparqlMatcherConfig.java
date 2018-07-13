@@ -16,7 +16,7 @@ public class SparqlMatcherConfig
 	 @Value("${matcher.sparql.uri.sparql.endpoint}")
 	 private String sparqlEndpoint;
 	 
-	 @Value("${matcher.sparql.uri.public}")
+	 @Value("${matcher.uri}")
 	 private String matcherUri;
 
 	 @Value("${matcher.sparql.limitResults}")

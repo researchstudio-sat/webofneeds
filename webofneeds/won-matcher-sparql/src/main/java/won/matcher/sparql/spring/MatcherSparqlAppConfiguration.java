@@ -7,10 +7,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import won.matcher.service.common.config.ClusterConfig;
 import won.matcher.service.common.spring.SpringExtension;
@@ -25,6 +22,10 @@ import won.matcher.sparql.config.SparqlMatcherConfig;
 @ComponentScan({"won.matcher.sparql.spring", "won.matcher.service.common.config", "won.matcher.service.common.service.http",
                 "won.matcher.sparql.actor", "won.matcher.sparql.config", "won.matcher.sparql.index", "won.matcher.sparql" +
                   ".query", "won.matcher.sparql.hints"})
+@ImportResource({"classpath:/spring/component/matcher-service/ehcache/spring-node-ehcache.xml",
+        "classpath:/matcher-sparql-security.xml",
+        "classpath:/spring/component/cryptographyServices.xml",
+        "classpath:/spring/component/wonNodeInformationService.xml"})
 public class MatcherSparqlAppConfiguration
 {
   @Autowired
