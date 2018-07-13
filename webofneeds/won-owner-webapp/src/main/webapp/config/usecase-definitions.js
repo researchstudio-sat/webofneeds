@@ -430,10 +430,232 @@ const infoUseCases = {
   },
 };
 
+const realEstateUseCases = {
+  searchRent: {
+    identifier: "searchRent",
+    label: "Find a place to rent",
+    icon: "#ico36_uc_custom", // TODO: replace this icon
+    draft: {
+      ...emptyDraft,
+      seeks: { title: "Looking for a place to rent" },
+      searchString: "for-rent",
+    },
+    isDetails: undefined,
+    seeksDetails: {
+      location: { ...details.location },
+      floorSize: {
+        ...details.title,
+        identifier: "floorSize",
+        label: "Floor size in square meters",
+        icon: "#ico36_plus_circle", // TODO: better icon
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:floorSize": undefined };
+          }
+          return { "s:floorSize": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
+          if (!floorSize) {
+            return undefined;
+          } else {
+            return floorSize + "m2";
+          }
+        },
+      },
+      numberOfRooms: {
+        ...details.title,
+        identifier: "numberOfRooms",
+        label: "Number of Rooms",
+        icon: "#ico36_plus_circle", // TODO: better icon
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:numberOfRooms": undefined };
+          }
+          return { "s:numberOfRooms": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
+          if (!numberOfRooms) {
+            return undefined;
+          } else {
+            return numberOfRooms;
+          }
+        },
+      },
+      features: {
+        ...details.tags,
+        identifier: "features",
+        label: "Features",
+        icon: "#ico36_plus_circle", //TODO: better icon
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:amenityFeature": undefined };
+          } else {
+            return {
+              "s:amenityFeature": {
+                "@type": "s:LocationFeatureSpecification",
+                "s:name": value,
+              },
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
+          const features = amenityFeature && amenityFeature.get("s:name");
+
+          if (!features) {
+            return undefined;
+          } else if (is("String", features)) {
+            return Immutable.fromJS([features]);
+          } else if (is("Array", features)) {
+            return Immutable.fromJS(features);
+          } else if (Immutable.List.isList(features)) {
+            return features;
+          } else {
+            console.error(
+              "Found unexpected format of features (should be Array, " +
+                "Immutable.List, or a single tag as string): " +
+                JSON.stringify(features)
+            );
+            return undefined;
+          }
+        },
+      },
+      rent: {
+        ...details.title,
+        identifier: "rent",
+        label: "Rent per month",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:rent": undefined }; // FIXME: won:rent does not exist
+          }
+          return { "won:rent": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          return jsonLDImm && jsonLDImm.get("won:rent");
+        },
+      },
+    },
+  },
+  offerRent: {
+    identifier: "offerRent",
+    label: "Rent a place out",
+    icon: "#ico36_uc_custom", // TODO: replace this icon
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "For Rent",
+        tags: "for-rent",
+      },
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+      floorSize: {
+        ...details.title,
+        identifier: "floorSize",
+        label: "Floor size in square meters",
+        icon: "#ico36_plus_circle", // TODO: better icon
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:floorSize": undefined };
+          }
+          return { "s:floorSize": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
+          if (!floorSize) {
+            return undefined;
+          } else {
+            return floorSize + "m2";
+          }
+        },
+      },
+      numberOfRooms: {
+        ...details.title,
+        identifier: "numberOfRooms",
+        label: "Number of Rooms",
+        icon: "#ico36_plus_circle", // TODO: better icon
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:numberOfRooms": undefined };
+          }
+          return { "s:numberOfRooms": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
+          if (!numberOfRooms) {
+            return undefined;
+          } else {
+            return numberOfRooms;
+          }
+        },
+      },
+      features: {
+        ...details.tags,
+        identifier: "features",
+        label: "Features",
+        icon: "#ico36_plus_circle", //TODO: better icon
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:amenityFeature": undefined };
+          } else {
+            return {
+              "s:amenityFeature": {
+                "@type": "s:LocationFeatureSpecification",
+                "s:name": value,
+              },
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
+          const features = amenityFeature && amenityFeature.get("s:name");
+
+          if (!features) {
+            return undefined;
+          } else if (is("String", features)) {
+            return Immutable.fromJS([features]);
+          } else if (is("Array", features)) {
+            return Immutable.fromJS(features);
+          } else if (Immutable.List.isList(features)) {
+            return features;
+          } else {
+            console.error(
+              "Found unexpected format of features (should be Array, " +
+                "Immutable.List, or a single tag as string): " +
+                JSON.stringify(features)
+            );
+            return undefined;
+          }
+        },
+      },
+      rent: {
+        ...details.title,
+        identifier: "rent",
+        label: "Rent per month",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:rent": undefined }; // FIXME: won:rent does not exist
+          }
+          return { "won:rent": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          return jsonLDImm && jsonLDImm.get("won:rent");
+        },
+      },
+    },
+    seeksDetails: undefined,
+  },
+  // searchBuy: {},
+  // offerBuy: {},
+};
+
 /*const otherUseCases = {
   // taxi: {},
   // transport: {},
-  // realEstate: {},
   // job: {},
 };*/
 
@@ -441,6 +663,7 @@ export const useCases = {
   ...socialUseCases,
   ...professionalUseCases,
   ...infoUseCases,
+  ...realEstateUseCases,
   ...allDetailsUseCase,
 };
 
@@ -462,6 +685,12 @@ export const useCaseGroups = {
     label: "Questions and Answers",
     icon: undefined,
     useCases: { ...infoUseCases },
+  },
+  realEstate: {
+    identifier: "realestategroup",
+    label: "Real Estate",
+    icon: undefined,
+    useCases: { ...realEstateUseCases },
   },
   other: {
     identifier: "othergroup",
