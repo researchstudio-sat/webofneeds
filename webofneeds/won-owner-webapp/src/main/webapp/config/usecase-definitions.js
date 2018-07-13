@@ -430,10 +430,50 @@ const infoUseCases = {
   },
 };
 
+const realEstateUseCases = {
+  searchRent: {
+    identifier: "searchRent",
+    label: "Find a place to rent",
+    icon: "#ico36_uc_custom", // TODO: replace this icon
+    draft: {
+      ...emptyDraft,
+      searchString: "offerRent",
+    },
+    isDetails: undefined,
+    seeksDetails: {
+      location: { ...details.location },
+      area: { ...details.description },
+      numberOfRooms: { ...details.description },
+      features: { ...details.tags },
+      rent: { ...details.description },
+    },
+  },
+  offerRent: {
+    identifier: "offerRent",
+    label: "Rent a place out",
+    icon: "#ico36_uc_custom", // TODO: replace this icon
+    draft: {
+      ...emptyDraft,
+      seeks: { title: "offerRent" },
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+      area: { ...details.description },
+      numberOfRooms: { ...details.description },
+      features: { ...details.tags },
+      rent: { ...details.description },
+    },
+    seeksDetails: undefined,
+  },
+  // searchBuy: {},
+  // offerBuy: {},
+};
+
 /*const otherUseCases = {
   // taxi: {},
   // transport: {},
-  // realEstate: {},
   // job: {},
 };*/
 
@@ -441,6 +481,7 @@ export const useCases = {
   ...socialUseCases,
   ...professionalUseCases,
   ...infoUseCases,
+  ...realEstateUseCases,
   ...allDetailsUseCase,
 };
 
@@ -462,6 +503,12 @@ export const useCaseGroups = {
     label: "Questions and Answers",
     icon: undefined,
     useCases: { ...infoUseCases },
+  },
+  realEstate: {
+    identifier: "realestategroup",
+    label: "Real Estate",
+    icon: undefined,
+    useCases: { ...realEstateUseCases },
   },
   other: {
     identifier: "othergroup",
