@@ -61,7 +61,7 @@ export function runMessagingAgent(redux) {
     function(message) {
       if (message.isFromExternal() && message.isConnectionMessage()) {
         redux.dispatch(
-          actionCreators.messages__connectionMessageReceived(message)
+          actionCreators.messages__processConnectionMessage(message)
         );
         return true;
       }

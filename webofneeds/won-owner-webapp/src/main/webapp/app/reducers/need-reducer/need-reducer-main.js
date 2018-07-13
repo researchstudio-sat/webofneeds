@@ -516,7 +516,7 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.showAgreementData
       );
     // NEW MESSAGE STATE UPDATES
-    case actionTypes.messages.connectionMessageReceived:
+    case actionTypes.messages.processConnectionMessage:
       // ADD RECEIVED CHAT MESSAGES
       // payload; { events }
       return addMessage(allNeedsInState, action.payload);

@@ -1,11 +1,13 @@
 import angular from "angular";
 
 import Immutable from "immutable";
+import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
+import { callAgreementEventFetch } from "../../won-message-utils.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -15,6 +17,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header">Proposes</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.proposeUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -29,6 +32,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header">Retracts</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.retractUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -43,6 +47,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header">Accepts</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.acceptUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -57,6 +62,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header">Propose to cancel</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.proposeToCancelUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -71,6 +77,7 @@ function genComponentConf() {
         <div class="refmsgcontent__fragment__header">Rejects</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
+            ng-click="self.loadMessage(msgUri)"
             ng-repeat="msgUri in self.rejectUrisArray"
             ng-class="{
               'won-cm--left' : self.getReferencedMessage(msgUri) && !self.getReferencedMessage(msgUri).get('outgoingMessage'),
@@ -119,6 +126,7 @@ function genComponentConf() {
         const hasRejectUris = rejectUris && rejectUris.size > 0;
 
         return {
+          ownNeedUri: ownNeed && ownNeed.get("uri"),
           chatMessages: chatMessages,
           connection,
           hasProposeUris,
@@ -159,6 +167,35 @@ function genComponentConf() {
           return undefined;
         }
       }
+    }
+
+    loadMessage(messageUri) {
+      if (!this.getReferencedMessage(messageUri)) {
+        console.log("Trying to retrieve msg: ", messageUri);
+        this.addMessageToState(messageUri);
+      }
+    }
+
+    addMessageToState(eventUri) {
+      const ownNeedUri = this.ownNeedUri;
+      return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
+        won.wonMessageFromJsonLd(response).then(msg => {
+          if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
+            /*if we find out that the receiverneed of the crawled event is actually our
+             need we will call the method again but this time with the correct eventUri
+             */
+            console.log(
+              "Message is not from you, so we need to retrieve the remoteMessageUri",
+              msg
+            );
+            this.addMessageToState(msg.getRemoteMessageUri());
+          } else {
+            //If message isnt in the state we add it
+            console.log("retrieved message: ", msg);
+            this.messages__processConnectionMessage(msg);
+          }
+        });
+      });
     }
   }
   Controller.$inject = serviceDependencies;

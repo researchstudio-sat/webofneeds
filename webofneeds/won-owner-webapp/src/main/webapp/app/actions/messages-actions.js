@@ -189,10 +189,22 @@ export function openMessageReceived(event) {
   };
 }
 
-export function connectionMessageReceived(event) {
+export function processConnectionMessage(event) {
   return (dispatch, getState) => {
-    const connectionUri = event.getReceiver();
-    const needUri = event.getReceiverNeed();
+    const _needUri = event.getSenderNeed();
+    const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
+
+    let connectionUri;
+    let needUri;
+
+    if (isSentEvent) {
+      connectionUri = event.getSender();
+      needUri = event.getSenderNeed();
+    } else {
+      connectionUri = event.getReceiver();
+      needUri = event.getReceiverNeed();
+    }
+
     const messages = getState().getIn([
       "needs",
       needUri,
@@ -274,7 +286,7 @@ export function connectionMessageReceived(event) {
       }
 
       dispatch({
-        type: actionTypes.messages.connectionMessageReceived,
+        type: actionTypes.messages.processConnectionMessage,
         payload: event,
       });
     });
