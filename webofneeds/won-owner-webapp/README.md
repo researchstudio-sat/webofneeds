@@ -167,72 +167,14 @@ $ngRedux.getState();
        isWhatsAround: true|false, //whether or not the need is a whatsaround need
        isWhatsNew: true|false, //whether or not this need is a whatsnew need
        hasFlags: Immutable.List //all the flags that are present within the won:hasFlags predicate of a need
+       searchString: string, //optional parameter, used for full text matching
        state: "won:Active" | "won:Inactive", //state of the need
-       title: string, //title of the need
        type: "won:Supply" | "won:Demand" | "won:Offer", //type of the need
        unread: true|false, //whether or not this need has new information that has not been read yet
        uri: string, //unique identifier of this need
 
-       is : { 
-           title: string, //title of the need
-           description: string, //description of the need as a string (non mandatory, empty if not present)
-           tags: Array of strings, //array of strings (non mandatory, empty if not present)
-           location: { //non mandatory but if present it contains all elements below
-               address: string, //address as human readable string
-               lat: float, //latitude of address
-               lng: float, //longitude of address
-               nwCorner: { //north west corner of the boundingbox
-                   lat: float,
-                   lng: float,
-               },
-               seCorner: { //south east corner of the boundingbox
-                   lat: float,
-                   lng: float,
-               }
-           },
-           travelAction: { //non mandatory, may contain half or all of the elements below
-               fromAddress: string,
-               fromLocation: {
-                   lat: float, 
-                   lng: float,
-               },
-               toAddress: string,
-               toLocation: {
-                   lat: float, 
-                   lng: float, 
-               }
-           }
-       },
-       seeks: {
-           title: string, //title of the need
-           description: string, //description of the need as a string (non mandatory, empty if not present)
-           tags: Array of strings, //array of strings (non mandatory, empty if not present)
-           location: { //non mandatory but if present it contains all elements below
-               address: string, //address as human readable string
-               lat: float, //latitude of address
-               lng: float, //longitude of address
-               nwCorner: { //north west corner of the boundingbox
-                   lat: float,
-                   lng: float,
-               },
-               seCorner: { //south east corner of the boundingbox
-                   lat: float,
-                   lng: float,
-               }
-           },
-           travelAction: { //non mandatory, may contain half or all of the elements below
-               fromAddress: string,
-               fromLocation: {
-                   lat: float, 
-                   lng: float,
-               },
-               toAddress: string,
-               toLocation: {
-                   lat: float, 
-                   lng: float, 
-               }
-           }
-       }
+       is : {...},
+       seeks: {...}
    },
    ...
  },
@@ -272,6 +214,49 @@ Example: If you want to retrieve all present connections for a given need you wi
 All The DataParsing happens within the `need-reducer.js` and should only be implemented here, in their respective Methods `parseNeed(jsonLdNeed, ownNeed)`, `parseConnection(jsonLdConnection, unread)` and `parseMessage(jsonLdMessage, outgoingMessage, unread)`.
 It is very important to not parse needs/connections/messages in any other place or in any other way to make sure that the structure of the corresponding items is always the same, and so that the Views don't have to implement fail-safes when accessing elements, e.g. a Location is only present if the whole location data can be parsed/stored within the state, otherwise the location will stay empty.
 This is also true for every message connection and need, as soon as the data is in the state you can be certain that all the mandatory values are set correctly.
+
+### Data Structure
+
+The `is` and `seeks` parts in the state displayed above store all details of a given need. All available detail types are defined in `detail-definitions.js` and added to needs via use cases defined in `usecase-definitions.js`. All details in `detail-definitions.js` have a default `parseToRDF({value, identifier})` and `parseFromRDF(jsonLDImm)` functions that are used for all data parsing.
+
+To adjust details for individual use cases, the data parsing functions should be overwritten in `usecase-definitions.js`. For parsing, **all details defined in any use case** will be considered. To avoid unexpected behaviour, `detail.identifier` must be unique across all use cases and must not be "search", as this literal is used to recognise full-text searches. Additonally, if two or more use cases use the same `parseToRDF({value, identifier})` function or use the same RDF predicates, information may not be correctly recognised. E.g., if one use case parses a "description" to be saved as `dc:description`, and another use case parses a "biography" to also be saved as `dc:description`, "description" and "biography" can't be told apart while parsing. As a result, which `parseFromRDF(sonLDImm)` is used for parsing the information depends on the order of use case definitions.
+
+Details are represented in the state as part of `is` and `seeks`, for example:
+
+```javascript
+/*
+is : { 
+           title: string, //title of the need
+           description: string, //description of the need as a string (non mandatory, empty if not present)
+           tags: Array of strings, //array of strings (non mandatory, empty if not present)
+           location: { //non mandatory but if present it contains all elements below
+               address: string, //address as human readable string
+               lat: float, //latitude of address
+               lng: float, //longitude of address
+               nwCorner: { //north west corner of the boundingbox
+                   lat: float,
+                   lng: float,
+               },
+               seCorner: { //south east corner of the boundingbox
+                   lat: float,
+                   lng: float,
+               }
+           },
+           travelAction: { //non mandatory, may contain half or all of the elements below
+               fromAddress: string,
+               fromLocation: {
+                   lat: float, 
+                   lng: float,
+               },
+               toAddress: string,
+               toLocation: {
+                   lat: float, 
+                   lng: float, 
+               }
+           }
+       }
+*/
+```
 
 ## Server-Interaction
 
