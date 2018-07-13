@@ -437,6 +437,7 @@ const realEstateUseCases = {
     icon: "#ico36_uc_custom", // TODO: replace this icon
     draft: {
       ...emptyDraft,
+      seeks: { title: "Looking for a place to rent" },
       searchString: "for-rent",
     },
     isDetails: undefined,
@@ -489,13 +490,19 @@ const realEstateUseCases = {
         icon: "#ico36_plus_circle", //TODO: better icon
         parseToRDF: function({ value }) {
           if (!value) {
-            return { "won:realEstateFeature": undefined }; // FIXME: wo:realEstateFeature does not exist
+            return { "s:amenityFeature": undefined };
           } else {
-            return { "won:realEstateFeature": value };
+            return {
+              "s:amenityFeature": {
+                "@type": "s:LocationFeatureSpecification",
+                "s:name": value,
+              },
+            };
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const features = jsonLDImm && jsonLDImm.get("won:realEstateFeature");
+          const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
+          const features = amenityFeature && amenityFeature.get("s:name");
 
           if (!features) {
             return undefined;
@@ -504,7 +511,7 @@ const realEstateUseCases = {
           } else if (is("Array", features)) {
             return Immutable.fromJS(features);
           } else if (Immutable.List.isList(features)) {
-            return features; // id; it is already in the format we want
+            return features;
           } else {
             console.error(
               "Found unexpected format of features (should be Array, " +
@@ -593,13 +600,19 @@ const realEstateUseCases = {
         icon: "#ico36_plus_circle", //TODO: better icon
         parseToRDF: function({ value }) {
           if (!value) {
-            return { "won:realEstateFeature": undefined }; // FIXME: wo:realEstateFeature does not exist
+            return { "s:amenityFeature": undefined };
           } else {
-            return { "won:realEstateFeature": value };
+            return {
+              "s:amenityFeature": {
+                "@type": "s:LocationFeatureSpecification",
+                "s:name": value,
+              },
+            };
           }
         },
         parseFromRDF: function(jsonLDImm) {
-          const features = jsonLDImm && jsonLDImm.get("won:realEstateFeature");
+          const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
+          const features = amenityFeature && amenityFeature.get("s:name");
 
           if (!features) {
             return undefined;
@@ -608,7 +621,7 @@ const realEstateUseCases = {
           } else if (is("Array", features)) {
             return Immutable.fromJS(features);
           } else if (Immutable.List.isList(features)) {
-            return features; // id; it is already in the format we want
+            return features;
           } else {
             console.error(
               "Found unexpected format of features (should be Array, " +
