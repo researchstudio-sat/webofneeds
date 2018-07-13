@@ -67,6 +67,11 @@ function genComponentConf() {
                 {{self.unreadMessageCount}} unread Messages
               </div>
             </div>
+            <won-post-content-message
+              class="won-cm--left"
+              ng-if="self.theirNeedUri"
+              post-uri="self.theirNeedUri">
+            </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
                 <img src="images/spinner/on_white.gif"
@@ -78,11 +83,6 @@ function genComponentConf() {
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
-            <won-post-content-message
-              class="won-cm--left"
-              ng-if="self.theirNeedUri"
-              post-uri="self.theirNeedUri">
-            </won-post-content-message>
             <won-connection-message
                 ng-if="!self.showAgreementData"
                 ng-repeat="msg in self.sortedMessages"
