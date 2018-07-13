@@ -2,10 +2,23 @@
 @import "square-image";
 @import "connection-message-status";
 @import "combined-message-content";
+@import "animate";
 
+won-post-content-message,
 won-connection-message {
   &.won-unread {
     background-color: $won-unread;
+  }
+
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+
+    .pcm__icon__skeleton {
+      grid-area: icon;
+      @include fixed-square($postIconSize);
+      background-color: $won-skeleton-color;
+      margin: 0 0.5rem 0 0;
+    }
   }
 
   padding: 0.5rem 0;
@@ -106,7 +119,7 @@ won-connection-message {
           @include fixed-square(1rem); // visually center icon on line
         }
       }
-
+      > won-post-content,
       > won-combined-message-content {
         grid-area: content;
       }

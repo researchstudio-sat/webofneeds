@@ -1,0 +1,48 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+@import "responsiveness-utils";
+@import "trig";
+@import "post-is-or-seeks-info";
+@import "post-content-general";
+
+won-post-content {
+  .post-skeleton,
+  .post-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    overflow: auto;
+    word-wrap: break-word;
+
+    won-labelled-hr span {
+      background-color: white;
+    }
+
+    won-trig {
+      background-color: $won-light-gray;
+      border: $thinGrayBorder;
+      padding: 0.5rem;
+    }
+  }
+
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+
+    .post-skeleton__details {
+      height: $normalFontSize;
+      width: 100%;
+      background-color: $won-skeleton-color;
+      margin-top: 0.25rem;
+    }
+    .post-skeleton__heading {
+      height: $normalFontSize;
+      width: 5rem;
+      background-color: $won-skeleton-color;
+      margin-top: 1rem;
+      font-size: $normalFontSize;
+      font-weight: 700;
+    }
+  }
+}

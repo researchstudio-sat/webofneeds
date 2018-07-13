@@ -1,17 +1,12 @@
 import angular from "angular";
 import "ng-redux";
-import connectionHeaderModule from "./connection-header.js";
 import feedbackGridModule from "./feedback-grid.js";
-import postIsOrSeeksInfoModule from "./post-is-or-seeks-info.js";
-import postContentGeneral from "./post-content-general.js";
-import labelledHrModule from "./labelled-hr.js";
+import postContentModule from "./post-content.js";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
-import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 import { selectOpenPostUri, selectNeedByConnectionUri } from "../selectors.js";
 import { connect2Redux } from "../won-utils.js";
-import { labels } from "../won-label-utils.js";
 import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 
@@ -19,48 +14,7 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
-        <div class="post-info__content" ng-if="self.isLoading()">
-            <h2 class="post-info__heading"></h2>
-            <p class="post-info__details"></p>
-            <h2 class="post-info__heading"></h2>
-            <p class="post-info__details"></p>
-            <h2 class="post-info__heading"></h2>
-            <p class="post-info__details"></p>
-            <p class="post-info__details"></p>
-            <p class="post-info__details"></p>
-            <p class="post-info__details"></p>
-            <p class="post-info__details"></p>
-            <h2 class="post-info__heading"></h2>
-            <div class="post-info__details"></div>
-        </div>
-        <div class="post-info__content" ng-if="!self.isLoading()">
-            <won-post-content-general post-uri="self.displayedPost.get('uri')"></won-post-content-general>
-
-            <won-gallery ng-show="self.displayedPost.get('hasImages')">
-            </won-gallery>
-
-            <won-post-is-or-seeks-info branch="::'is'" ng-if="self.hasIsBranch" post-uri="self.displayedPost.get('uri')"></won-post-is-or-seeks-info>
-            <won-labelled-hr label="::'Search'" class="cp__labelledhr" ng-show="self.hasIsBranch && self.hasSeeksBranch"></won-labelled-hr>
-            <won-post-is-or-seeks-info branch="::'seeks'" ng-if="self.hasSeeksBranch" post-uri="self.displayedPost.get('uri')"></won-post-is-or-seeks-info>
-            <a class="rdflink clickable"
-               ng-if="self.shouldShowRdf && self.connection"
-               target="_blank"
-               href="{{ self.connectionUri }}">
-                    <svg class="rdflink__small">
-                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
-                    </svg>
-                    <span class="rdflink__label">Connection</span>
-            </a>
-            <a class="rdflink clickable"
-               ng-if="self.shouldShowRdf"
-               target="_blank"
-               href="{{ self.postUriToConnectTo }}">
-                    <svg class="rdflink__small">
-                        <use xlink:href="#rdf_logo_1" href="#rdf_logo_1"></use>
-                    </svg>
-                    <span class="rdflink__label">Post</span>
-            </a>
-        </div>
+        <won-post-content post-uri="self.postUriToConnectTo"></won-post-content>
         <div class="post-info__footer" ng-if="!self.isLoading()">
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
@@ -78,10 +32,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.message = "";
-      this.labels = labels;
-      this.WON = won.WON;
-      window.openMatch4dbg = this;
 
       const selectFromState = state => {
         const connectionUri = decodeURIComponent(
@@ -97,19 +47,12 @@ function genComponentConf() {
 
         const displayedPost = state.getIn(["needs", postUriToConnectTo]);
 
-        const is = displayedPost ? displayedPost.get("is") : undefined;
-        //TODO it will be possible to have more than one seeks
-        const seeks = displayedPost ? displayedPost.get("seeks") : undefined;
-
         return {
           connection,
           connectionUri,
           ownNeed,
-          hasIsBranch: !!is,
-          hasSeeksBranch: !!seeks,
           displayedPost,
           postUriToConnectTo,
-          shouldShowRdf: state.get("showRdf"),
         };
       };
       connect2Redux(selectFromState, actionCreators, [], this);
@@ -166,12 +109,9 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.sendRequest", [
-    postIsOrSeeksInfoModule,
-    connectionHeaderModule,
     feedbackGridModule,
-    labelledHrModule,
     chatTextFieldSimpleModule,
     connectionContextDropdownModule,
-    postContentGeneral,
+    postContentModule,
   ])
   .directive("wonSendRequest", genComponentConf).name;

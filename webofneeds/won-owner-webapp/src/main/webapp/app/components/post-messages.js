@@ -3,6 +3,7 @@ import Immutable from "immutable";
 import angular from "angular";
 import chatTextFieldSimpleModule from "./chat-textfield-simple.js";
 import connectionMessageModule from "./messages/connection-message.js";
+import postContentMessageModule from "./messages/post-content-message.js";
 import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
@@ -56,7 +57,7 @@ function genComponentConf() {
                 ng-click="self.setShowAgreementData(false)">
               Showing Agreement Data
             </div>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__content" ng-class="{'won-agreement-content': self.showAgreementData}">
             <div class="pm__content__unreadindicator"
@@ -73,10 +74,15 @@ function genComponentConf() {
                     class="hspinner"/>
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
+                ng-if="!self.isSuggested && !self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
+            <won-post-content-message
+              class="won-cm--left"
+              ng-if="self.theirNeedUri"
+              post-uri="self.theirNeedUri">
+            </won-post-content-message>
             <won-connection-message
                 ng-if="!self.showAgreementData"
                 ng-repeat="msg in self.sortedMessages"
@@ -804,5 +810,6 @@ export default angular
     labelledHrModule,
     connectionContextDropdownModule,
     feedbackGridModule,
+    postContentMessageModule,
   ])
   .directive("wonPostMessages", genComponentConf).name;
