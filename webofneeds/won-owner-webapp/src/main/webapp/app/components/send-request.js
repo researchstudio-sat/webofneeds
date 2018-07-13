@@ -19,21 +19,6 @@ const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
-        <div class="post-info__header" ng-if="self.includeHeader">
-            <a class="post-info__header__back clickable"
-               ng-click="self.router__stateGoCurrent({connectionUri : undefined, sendAdHocRequest: undefined})">
-                <svg style="--local-primary:var(--won-primary-color);"
-                     class="post-info__header__back__icon clickable">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
-                </svg>
-            </a>
-            <won-connection-header
-                connection-uri="self.connection.get('uri')"
-                timestamp="self.connection.get('lastUpdateDate')"
-                hide-image="::false">
-            </won-connection-header>
-            <won-connection-context-dropdown ng-if="self.connection && self.connection.get('isRated')"></won-connection-context-dropdown>
-        </div>
         <div class="post-info__content" ng-if="self.isLoading()">
             <h2 class="post-info__heading"></h2>
             <p class="post-info__details"></p>
@@ -174,9 +159,7 @@ function genComponentConf() {
     controller: Controller,
     controllerAs: "self",
     bindToController: true, //scope-bindings -> ctrl
-    scope: {
-      includeHeader: "=", //only read once
-    },
+    scope: {},
     template: template,
   };
 }

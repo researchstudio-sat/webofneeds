@@ -42,7 +42,7 @@ function genComponentConf() {
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
-            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
+            <won-connection-context-dropdown ng-if="self.isConnected || self.isSentRequest || self.isReceivedRequest || (self.isSuggested && self.connection.get('isRated'))" show-agreement-data-field="::self.showAgreementDataField()"></won-connection-context-dropdown>
         </div>
         <div class="pm__header" ng-if="self.showAgreementData">
             <a class="pm__header__back clickable"
