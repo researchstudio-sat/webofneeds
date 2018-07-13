@@ -212,7 +212,7 @@ public class SparqlMatcherActor extends UntypedActor {
 
         filteredNeeds.forEach((hintTarget, hints) -> {
             hints.stream().limit(config.getLimitResults()).forEach(hint -> {
-                bulkHintEvent.addHintEvent(new HintEvent(hintTarget.getNeedUri(), hintTarget.getWonNodeUri(), hint.getNeedUri(), hint.getWonNodeUri(), config.getMatcherUri(), 1));
+                bulkHintEvent.addHintEvent(new HintEvent(hintTarget.getWonNodeUri(), hintTarget.getNeedUri(), hint.getWonNodeUri(), hint.getNeedUri(), config.getMatcherUri(), 1));
             });
         });
 
