@@ -22,22 +22,6 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:title");
     },
   },
-  dropdown: {
-    identifier: "dropdown",
-    label: "Dropdown",
-    icon: "#ico36_title_circle", //TODO: use correct icon
-    component: "won-dropdown-picker",
-    viewerComponent: "won-title-viewer",
-    parseToRDF: function({ value }) {
-      if (!value) {
-        return { "dc:dropdown": undefined }; //TODO: IMPL CORRECT DEFAULT
-      }
-      return { "dc:dropdown": value };
-    },
-    parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:dropdown");
-    },
-  },
   description: {
     identifier: "description",
     label: "Description",
@@ -439,12 +423,37 @@ export const details = {
  */
 export const abstractDetails = {
   number: {
-    identifier: undefined,
-    label: undefined,
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
     icon: undefined,
     component: "won-number-picker",
     viewerComponent: "won-number-viewer",
-    parseToRDF: undefined,
-    parseFromRDF: undefined,
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
+  dropdown: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    icon: undefined,
+    component: "won-dropdown-picker",
+    viewerComponent: "won-title-viewer",
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
   },
 };
