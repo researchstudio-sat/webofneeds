@@ -1,6 +1,6 @@
 import { is } from "../app/utils.js";
 import Immutable from "immutable";
-import { details } from "detailDefinitions";
+import { details, abstractDetails } from "detailDefinitions";
 
 export const emptyDraft = {
   is: {},
@@ -444,7 +444,7 @@ const realEstateUseCases = {
     seeksDetails: {
       location: { ...details.location },
       floorSize: {
-        ...details.title,
+        ...abstractDetails.number,
         identifier: "floorSize",
         label: "Floor size in square meters",
         icon: "#ico36_plus_circle", // TODO: better icon
@@ -464,7 +464,7 @@ const realEstateUseCases = {
         },
       },
       numberOfRooms: {
-        ...details.title,
+        ...abstractDetails.number,
         identifier: "numberOfRooms",
         label: "Number of Rooms",
         icon: "#ico36_plus_circle", // TODO: better icon
@@ -523,7 +523,7 @@ const realEstateUseCases = {
         },
       },
       rent: {
-        ...details.title,
+        ...abstractDetails.number,
         identifier: "rent",
         label: "Rent per month",
         parseToRDF: function({ value }) {
@@ -554,7 +554,7 @@ const realEstateUseCases = {
       description: { ...details.description },
       location: { ...details.location },
       floorSize: {
-        ...details.title,
+        ...abstractDetails.number,
         identifier: "floorSize",
         label: "Floor size in square meters",
         icon: "#ico36_plus_circle", // TODO: better icon
@@ -574,7 +574,7 @@ const realEstateUseCases = {
         },
       },
       numberOfRooms: {
-        ...details.title,
+        ...abstractDetails.number,
         identifier: "numberOfRooms",
         label: "Number of Rooms",
         icon: "#ico36_plus_circle", // TODO: better icon
@@ -633,7 +633,7 @@ const realEstateUseCases = {
         },
       },
       rent: {
-        ...details.title,
+        ...abstractDetails.number,
         identifier: "rent",
         label: "Rent per month",
         parseToRDF: function({ value }) {

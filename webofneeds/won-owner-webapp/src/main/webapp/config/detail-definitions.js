@@ -22,22 +22,6 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:title");
     },
   },
-  number: {
-    identifier: "number",
-    label: "Number",
-    icon: "#ico36_title_circle",
-    component: "won-number-picker",
-    viewerComponent: "won-number-viewer",
-    parseToRDF: function({ value }) {
-      if (!value) {
-        return { "dc:number": undefined };
-      }
-      return { "dc:number": value }; //TODO: IMPL CORRECT VALUE THINGY
-    },
-    parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("dc:number"); //TODO: IMPL CORRECT VALUE THINGY
-    },
-  },
   description: {
     identifier: "description",
     label: "Description",
@@ -429,5 +413,22 @@ export const details = {
       return undefined;
       // TODO: return value
     },
+  },
+};
+
+/**
+ * Defines a set of details that will only be visible within a specific 'implementation'
+ * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
+ * you want to use it.
+ */
+export const abstractDetails = {
+  number: {
+    identifier: undefined,
+    label: undefined,
+    icon: undefined,
+    component: "won-number-picker",
+    viewerComponent: "won-number-viewer",
+    parseToRDF: undefined,
+    parseFromRDF: undefined,
   },
 };
