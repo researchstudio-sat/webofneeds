@@ -326,6 +326,7 @@ function genComponentConf() {
     scope: {
       onUpdate: "&",
       initialValue: "=",
+      detail: "=",
     },
     template: template,
   };

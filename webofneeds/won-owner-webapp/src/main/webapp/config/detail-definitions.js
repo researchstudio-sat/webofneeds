@@ -5,6 +5,61 @@
 import { getIn, is } from "../app/utils.js";
 import Immutable from "immutable";
 
+/**
+ * Defines a set of details that will only be visible within a specific 'implementation'
+ * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
+ * you want to use it.
+ */
+export const abstractDetails = {
+  number: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    icon: undefined,
+    component: "won-number-picker",
+    viewerComponent: "won-number-viewer",
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
+  dropdown: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    icon: undefined,
+    component: "won-dropdown-picker",
+    viewerComponent: "won-title-viewer",
+    options: function() {
+      throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
+      /**
+       * e.g. relationship status....
+        [
+         {value: "single", label: "single"},
+         {value: "married", label: "married"},
+         {value: "complicated", label: "it's complicated"},
+         {value: "divorced", label: "divorced"},
+         {value: "free", label: "free for all"},
+        ]
+       */
+    },
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
+};
+
 export const details = {
   title: {
     identifier: "title",
@@ -412,48 +467,6 @@ export const details = {
       }
       return undefined;
       // TODO: return value
-    },
-  },
-};
-
-/**
- * Defines a set of details that will only be visible within a specific 'implementation'
- * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
- * you want to use it.
- */
-export const abstractDetails = {
-  number: {
-    identifier: function() {
-      throw "abstract Detail does not override necessary identifier";
-    },
-    label: function() {
-      throw "abstract Detail does not override necessary label";
-    },
-    icon: undefined,
-    component: "won-number-picker",
-    viewerComponent: "won-number-viewer",
-    parseToRDF: function() {
-      throw "abstract Detail does not override necessary function";
-    },
-    parseFromRDF: function() {
-      throw "abstract Detail does not override necessary function";
-    },
-  },
-  dropdown: {
-    identifier: function() {
-      throw "abstract Detail does not override necessary identifier";
-    },
-    label: function() {
-      throw "abstract Detail does not override necessary label";
-    },
-    icon: undefined,
-    component: "won-dropdown-picker",
-    viewerComponent: "won-title-viewer",
-    parseToRDF: function() {
-      throw "abstract Detail does not override necessary function";
-    },
-    parseFromRDF: function() {
-      throw "abstract Detail does not override necessary function";
     },
   },
 };

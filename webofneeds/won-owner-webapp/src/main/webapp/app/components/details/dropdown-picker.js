@@ -10,11 +10,7 @@ function genComponentConf() {
             type="text"
             class="dropdownp__input__inner"
             ng-selected="::self.updateDropdown()">
-            <option value="1">option 1</option>
-            <option value="2">option 2</option>
-            <option value="3">option 3</option>
-            <option value="4">option 4</option>
-            <option value="5">option 5</option>
+            <option ng-repeat="option in self.detail.options" value="{{option.value}}" ng-selected="option.value === self.initialValue">{{option.label}}</option>
          </select>
       </div>
     `;
@@ -66,6 +62,8 @@ function genComponentConf() {
     bindToController: true, //scope-bindings -> ctrl
     scope: {
       onUpdate: "&",
+      initialValue: "=",
+      detail: "=",
     },
     template: template,
   };
