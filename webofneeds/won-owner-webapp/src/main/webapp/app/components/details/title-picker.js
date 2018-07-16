@@ -15,7 +15,7 @@ function genComponentConf() {
           <input
               type="text"
               class="titlep__input__inner won-txt"
-              placeholder="What? (Short title shown in lists)"
+              placeholder="{{self.detail.placeholder}}"
               ng-blur="::self.updateTitle()"
               ng-keyup="::self.updateTitle()"/>
       </div>

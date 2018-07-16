@@ -10,7 +10,7 @@ function genComponentConf() {
         <input 
           class="tp__input__inner"
           type="text"
-          placeholder="e.g. #couch #free"
+          placeholder="{{self.detail.placeholder}}"
           ng-keyup="::self.updateTags()"
           ng-class="{'tp__input__inner--withreset' : self.showResetButton}"
         />

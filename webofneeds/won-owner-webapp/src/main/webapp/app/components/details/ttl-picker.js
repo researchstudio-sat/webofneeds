@@ -24,7 +24,7 @@ function genComponentConf() {
           class="ttlp__input__inner won-txt won-txt--code"
           ng-keyup="::self.updateTTLBuffered()"
           ng-blur="::self.updateTTL()"
-          placeholder="Enter TTL..."></textarea>
+          placeholder="{{self.detail.placeholder}}"></textarea>
       </div>
       
       <!-- HELP TEXT -->

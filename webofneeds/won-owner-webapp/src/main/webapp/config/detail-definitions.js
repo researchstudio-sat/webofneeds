@@ -37,7 +37,7 @@ export const abstractDetails = {
     },
     icon: undefined,
     component: "won-dropdown-picker",
-    viewerComponent: "won-title-viewer",
+    viewerComponent: "won-dropdown-viewer",
     options: function() {
       throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
       /**

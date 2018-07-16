@@ -53,7 +53,7 @@ function genComponentConf() {
                 type="text"
                 id="rp__from-searchbox__inner"
                 class="rp__searchbox__inner"
-                placeholder="Start Location"
+                placeholder="{{self.detail.placeholder.departure}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.fromShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
@@ -96,7 +96,7 @@ function genComponentConf() {
                 type="text"
                 id="rp__to-searchbox__inner"
                 class="rp__searchbox__inner"
-                placeholder="Destination"
+                placeholder="{{self.detail.placeholder.destination}}"
                 ng-class="{'rp__searchbox__inner--withreset' : self.toShowResetButton}"/>
             <svg class="rp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"

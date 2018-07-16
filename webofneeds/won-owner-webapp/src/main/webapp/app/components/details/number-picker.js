@@ -15,7 +15,7 @@ function genComponentConf() {
           <input
               type="number"
               class="numberp__input__inner won-txt"
-              placeholder="What? (Short title shown in lists)"
+              placeholder="{{self.detail.placeholder}}"
               ng-blur="::self.updateNumber()"
               ng-keyup="::self.updateNumber()"/>
       </div>

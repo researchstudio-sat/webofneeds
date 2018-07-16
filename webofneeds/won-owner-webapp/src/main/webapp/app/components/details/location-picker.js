@@ -27,7 +27,7 @@ function genComponentConf() {
                 type="text"
                 id="lp__searchbox__inner"
                 class="lp__searchbox__inner"
-                placeholder="Search for location"
+                placeholder="{{self.detail.placeholder}}"
                 ng-class="{'lp__searchbox__inner--withreset' : self.showResetButton}"/>
             <svg class="lp__searchbox__icon clickable" 
                  style="--local-primary:var(--won-primary-color);"
