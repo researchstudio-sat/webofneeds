@@ -1,0 +1,38 @@
+@import "won-config";
+@import "textfield";
+
+won-number-picker {
+  .numberp__input {
+    position: relative;
+    display: grid;
+
+    .numberp__input__icon {
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
+
+    .numberp__input__inner {
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
+
+    .numberp__input__inner::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+}
