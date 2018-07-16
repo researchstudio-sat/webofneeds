@@ -10,7 +10,8 @@ function genComponentConf() {
             type="text"
             class="dropdownp__input__inner"
             ng-selected="::self.updateDropdown()">
-            <option ng-repeat="option in self.detail.options" value="{{option.value}}" ng-selected="option.value === self.initialValue">{{option.label}}</option>
+            <option value="">{{ self.detail.placeholder }}</option>
+            <option ng-repeat="option in self.detail.options" value="{{option.value}}">{{option.label}}</option>
          </select>
       </div>
     `;
