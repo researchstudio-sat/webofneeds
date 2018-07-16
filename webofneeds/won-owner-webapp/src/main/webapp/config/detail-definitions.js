@@ -65,6 +65,7 @@ export const details = {
     identifier: "title",
     label: "Title",
     icon: "#ico36_title_circle",
+    placeholder: "What? (Short title shown in lists)",
     component: "won-title-picker",
     viewerComponent: "won-title-viewer",
     parseToRDF: function({ value }) {
@@ -81,6 +82,7 @@ export const details = {
     identifier: "description",
     label: "Description",
     icon: "#ico36_description_circle",
+    placeholder: "Enter Description...",
     component: "won-description-picker",
     viewerComponent: "won-description-viewer",
     parseToRDF: function({ value }) {
@@ -97,6 +99,7 @@ export const details = {
     identifier: "location",
     label: "Location",
     icon: "#ico36_location_circle",
+    placeholder: "Search for location",
     component: "won-location-picker",
     viewerComponent: "won-location-viewer",
     parseToRDF: function({ value, identifier }) {
@@ -245,6 +248,7 @@ export const details = {
     identifier: "person",
     label: "Person",
     icon: "#ico36_person_single_circle",
+    placeholder: undefined,
     component: "won-person-picker",
     viewerComponent: "won-person-viewer",
     parseToRDF: function({ value }) {
@@ -297,6 +301,10 @@ export const details = {
     identifier: "travelAction",
     label: "Route (From - To)",
     icon: "#ico36_location_circle",
+    placeholder: {
+      departure: "Start location",
+      destination: "Destination",
+    },
     component: "won-travel-action-picker",
     viewerComponent: "won-travel-action-viewer",
     parseToRDF: function({ value }) {
@@ -418,6 +426,7 @@ export const details = {
     identifier: "tags",
     label: "Tags",
     icon: "#ico36_tags_circle",
+    placeholder: "e.g. #couch #free",
     component: "won-tags-picker",
     viewerComponent: "won-tags-viewer",
     parseToRDF: function({ value }) {
@@ -451,6 +460,7 @@ export const details = {
     identifier: "ttl",
     label: "Turtle (TTL)",
     icon: "#ico36_rdf_logo_circle",
+    placeholder: "Enter TTL...",
     component: "won-ttl-picker",
     viewerComponent: undefined,
     parseToRDF: function({ value }) {
