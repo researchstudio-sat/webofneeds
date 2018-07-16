@@ -9,7 +9,8 @@ function genComponentConf() {
          <select
             type="text"
             class="dropdownp__input__inner"
-            ng-selected="::self.updateDropdown()">
+            ng-model="self.selectedValue"
+            ng-change="::self.updateDropdown()">
             <option value="">{{ self.detail.placeholder }}</option>
             <option ng-repeat="option in self.detail.options" value="{{option.value}}">{{option.label}}</option>
          </select>
@@ -21,9 +22,10 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
+      this.selectedValue = this.initialValue;
       window.dropdownp4dbg = this;
 
-      delay(0).then(() => this.showInitialValues());
+      delay(0).then(() => this.showInitialValue());
     }
 
     /**
@@ -33,13 +35,18 @@ function genComponentConf() {
       this.onUpdate({ value: selectedValue });
     }
 
-    showInitialValues() {
+    showInitialValue() {
       //TODO: IMPLEMENT THE INITIAL VALUES
       this.$scope.$apply();
     }
 
     updateDropdown() {
-      this.update(this.select().value);
+      this.selectedValue = this.select().value;
+      if (this.selectedValue && this.selectedValue.length !== "") {
+        this.update(this.selectedValue);
+      } else {
+        this.update(undefined);
+      }
     }
 
     selectNg() {
