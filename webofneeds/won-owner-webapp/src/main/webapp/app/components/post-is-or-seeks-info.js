@@ -12,6 +12,7 @@ import tagsViewerModule from "./details/viewer/tags-viewer.js";
 import travelActionViewerModule from "./details/viewer/travel-action-viewer.js";
 import titleViewerModule from "./details/viewer/title-viewer.js";
 import numberViewerModule from "./details/viewer/number-viewer.js";
+import dropdownViewerModule from "./details/viewer/dropdown-viewer.js";
 
 import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
@@ -105,6 +106,7 @@ angular
     tagsViewerModule,
     titleViewerModule,
     numberViewerModule,
+    dropdownViewerModule,
   ])
   .directive("detailViewerElement", [
     "$compile",
