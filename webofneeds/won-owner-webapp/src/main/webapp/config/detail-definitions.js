@@ -22,6 +22,22 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:title");
     },
   },
+  dropdown: {
+    identifier: "dropdown",
+    label: "Dropdown",
+    icon: "#ico36_title_circle", //TODO: use correct icon
+    component: "won-dropdown-picker",
+    viewerComponent: "won-title-viewer",
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "dc:dropdown": undefined }; //TODO: IMPL CORRECT DEFAULT
+      }
+      return { "dc:dropdown": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return jsonLDImm && jsonLDImm.get("dc:dropdown");
+    },
+  },
   description: {
     identifier: "description",
     label: "Description",
