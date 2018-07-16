@@ -6,22 +6,22 @@ import Immutable from "immutable";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div ng-repeat="detail in self.personDetails" class="pp__detail">
+      <div ng-repeat="dtl in self.personDetails" class="pp__detail">
           <div class="pp__detail__label">
-              {{detail.fieldname}}
+              {{dtl.fieldname}}
           </div>
           <input
             type="text"
-            id="{{detail.name}}"
+            id="{{dtl.name}}"
             class="pp__detail__input"
-            ng-model="detail.value"
-            ng-keyup="::self.updateDetails(detail)"
-            ng-class="{'pp__detail__input--withreset' : self.showResetButton(detail.name)}"
+            ng-model="dtl.value"
+            ng-keyup="::self.updateDetails(dtl)"
+            ng-class="{'pp__detail__input--withreset' : self.showResetButton(dtl.name)}"
           />
           <svg class="pp__detail__icon clickable" 
             style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showResetButton(detail.name)"
-            ng-click="self.resetPersonDetail(detail.name)">
+            ng-if="self.showResetButton(dtl.name)"
+            ng-click="self.resetPersonDetail(dtl.name)">
               <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
       </div>
@@ -57,10 +57,7 @@ function genComponentConf() {
         //check validity
         const personArray = Array.from(person.values());
         isEmpty = personArray.every(
-          detail =>
-            detail === undefined ||
-            detail === "" ||
-            (detail && detail.size === 0)
+          dtl => dtl === undefined || dtl === "" || (dtl && dtl.size === 0)
         );
       }
       if (person && !isEmpty) {
@@ -72,20 +69,20 @@ function genComponentConf() {
 
     showInitialPerson() {
       if (this.initialValue && this.initialValue.size > 0) {
-        for (let [detail, value] of this.initialValue.entries()) {
-          this.addedPerson = this.addedPerson.set(detail, value);
+        for (let [dtl, value] of this.initialValue.entries()) {
+          this.addedPerson = this.addedPerson.set(dtl, value);
 
           let personIndex = this.personDetails.findIndex(
-            personDetail => personDetail.name === detail
+            personDetail => personDetail.name === dtl
           );
-          if (personIndex !== -1 && detail !== "skills") {
+          if (personIndex !== -1 && dtl !== "skills") {
             this.personDetails[personIndex].value = value;
-          } else if (personIndex !== -1 && detail === "skills") {
+          } else if (personIndex !== -1 && dtl === "skills") {
             let valueText = value.size > 0 ? value.toJS() : [];
             this.personDetails[personIndex].value = valueText.toString();
           }
           if (value && value.length > 0) {
-            this.visibleResetButtons.add(detail);
+            this.visibleResetButtons.add(dtl);
           }
         }
       }
@@ -93,32 +90,32 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    updateDetails(detail) {
+    updateDetails(dtl) {
       // split between skills and everything else because skills should be a list
-      if (detail.value) {
-        this.addedPerson = this.addedPerson.set(detail.name, detail.value);
+      if (dtl.value) {
+        this.addedPerson = this.addedPerson.set(dtl.name, dtl.value);
         this.update(this.addedPerson);
-        if (detail.value.length > 0) {
-          this.visibleResetButtons.add(detail.name);
+        if (dtl.value.length > 0) {
+          this.visibleResetButtons.add(dtl.name);
         } else {
-          this.visibleResetButtons.delete(detail.name);
+          this.visibleResetButtons.delete(dtl.name);
         }
       } else {
-        this.addedPerson = this.addedPerson.set(detail.name, undefined);
+        this.addedPerson = this.addedPerson.set(dtl.name, undefined);
         this.update(this.addedPerson);
-        this.visibleResetButtons.delete(detail.name);
+        this.visibleResetButtons.delete(dtl.name);
       }
     }
 
-    showResetButton(detail) {
-      return this.visibleResetButtons.has(detail);
+    showResetButton(dtl) {
+      return this.visibleResetButtons.has(dtl);
     }
 
-    resetPersonDetail(detail) {
-      this.addedPerson = this.addedPerson.set(detail, undefined);
-      this.visibleResetButtons.delete(detail);
+    resetPersonDetail(dtl) {
+      this.addedPerson = this.addedPerson.set(dtl, undefined);
+      this.visibleResetButtons.delete(dtl);
       let personIndex = this.personDetails.findIndex(
-        personDetail => personDetail.name === detail
+        personDetail => personDetail.name === dtl
       );
       if (personIndex !== -1) {
         this.personDetails[personIndex].value = "";
