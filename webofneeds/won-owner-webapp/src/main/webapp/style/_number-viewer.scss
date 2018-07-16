@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-number-viewer {
+  @include won-detail-viewer("numberv");
+}

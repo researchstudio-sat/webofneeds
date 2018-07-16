@@ -27,7 +27,7 @@ export const details = {
     label: "Number",
     icon: "#ico36_title_circle",
     component: "won-number-picker",
-    viewerComponent: "won-title-viewer",
+    viewerComponent: "won-number-viewer",
     parseToRDF: function({ value }) {
       if (!value) {
         return { "dc:number": undefined };
