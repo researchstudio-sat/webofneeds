@@ -16,9 +16,6 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
   switch (action.type) {
-    case actionTypes.logout:
-      return initialState;
-
     case actionTypes.needs.connect:
     case actionTypes.needs.create:
       return messages.setIn(
@@ -65,6 +62,54 @@ export function messagesReducer(messages = initialState, action = {}) {
       return initialLoadFinished
         ? messages.set("lostConnection", false).set("reconnecting", false)
         : messages;
+    }
+
+    case actionTypes.login: {
+      const loginFinished = getIn(action, ["payload", "loginFinished"]);
+      const httpSessionUpgraded =
+        !loginFinished && getIn(action, ["payload", "httpSessionUpgraded"]);
+      if (loginFinished) {
+        return messages.set("lostConnection", false).set("reconnecting", false);
+      } else if (httpSessionUpgraded) {
+        /*
+         * now that the session has been upgraded, we need to set the flag
+         * that triggers a websocket reset.
+         * TODO this is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+        return messages.set("reconnecting", true);
+      } else {
+        console.error(
+          "Got unexpected payload for `actionTypes.logout` ",
+          action
+        );
+        return messages;
+      }
+    }
+
+    case actionTypes.logout: {
+      const logoutFinished = getIn(action, ["payload", "logoutFinished"]);
+      const httpSessionDowngraded =
+        !logoutFinished && getIn(action, ["payload", "httpSessionDowngraded"]);
+      if (logoutFinished) {
+        return initialState
+          .set("lostConnection", false)
+          .set("reconnecting", false);
+      } else if (httpSessionDowngraded) {
+        /*
+         * now that the session has been downgraded, we need to set the flag
+         * that triggers a websocket reset.
+         * TODO this is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+        return messages.set("reconnecting", true);
+      } else {
+        console.error(
+          "Got unexpected payload for `actionTypes.logout` ",
+          action
+        );
+        return messages;
+      }
     }
 
     case actionTypes.reconnect.start:

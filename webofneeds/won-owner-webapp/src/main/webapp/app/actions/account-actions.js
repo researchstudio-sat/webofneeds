@@ -192,7 +192,7 @@ export function accountLogin(credentials, options) {
         }
       })
       .then(() => login(credentials))
-      .then(() => curriedDispatch({}))
+      .then(() => curriedDispatch({ httpSessionUpgraded: true }))
       .then(() => {
         if (!options_.doRedirects) {
           return;
@@ -212,13 +212,6 @@ export function accountLogin(credentials, options) {
         }
       })
       .then(() => curriedDispatch({ loginFinished: true }))
-      .then(() =>
-        /**
-         * TODO this action is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        dispatch(actionCreators.reconnect__start())
-      )
       .catch(error => {
         console.error("accountLogin ErrorObject", error);
         return Promise.resolve()
@@ -287,52 +280,52 @@ export function accountLogout(options) {
     }
     _logoutInProcess = true;
 
-    return (
-      Promise.resolve()
-        .then(() =>
-          dispatch({
-            type: actionTypes.logoutStarted,
-            payload: {},
-          })
-        )
-        .then(() => logout())
-        .catch(error => {
-          //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-          console.log("Error while trying to log out: ", error);
+    return Promise.resolve()
+      .then(() =>
+        dispatch({
+          type: actionTypes.logoutStarted,
+          payload: {},
         })
-        .then(() => {
-          // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-          if (
-            options_.doRedirects &&
-            getIn(state, ["router", "currentParams", "privateId"])
-          ) {
-            return stateGoCurrent({ privateId: null })(dispatch, getState);
-          }
+      )
+      .then(() => logout())
+      .catch(error => {
+        //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+        console.log("Error while trying to log out: ", error);
+      })
+      .then(() => {
+        // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
+        if (
+          options_.doRedirects &&
+          getIn(state, ["router", "currentParams", "privateId"])
+        ) {
+          return stateGoCurrent({ privateId: null })(dispatch, getState);
+        }
+      })
+      .then(() =>
+        dispatch({
+          type: actionTypes.logout,
+          payload: Immutable.fromJS({
+            loggedIn: false,
+            httpSessionDowngraded: true,
+          }),
         })
-        /* finally */
-        .then(() =>
-          dispatch({
-            type: actionTypes.logout,
-            payload: Immutable.fromJS({ loggedIn: false }),
-          })
-        )
-        .then(() => {
-          won.clearStore();
-          /**
-           * TODO this action is part of the session-upgrade hack documented in:
-           * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-           */
-          dispatch(actionCreators.reconnect__start());
+      )
+      .then(() => {
+        won.clearStore();
+      })
+      .then(
+        () =>
+          options_.doRedirects && checkAccessToCurrentRoute(dispatch, getState)
+      )
+      .then(() => {
+        _logoutInProcess = false;
+      })
+      .then(() =>
+        dispatch({
+          type: actionTypes.logout,
+          payload: Immutable.fromJS({ loggedIn: false, logoutFinished: true }),
         })
-        .then(
-          () =>
-            options_.doRedirects &&
-            checkAccessToCurrentRoute(dispatch, getState)
-        )
-        .then(() => {
-          _logoutInProcess = false;
-        })
-    );
+      );
   };
 }
 
