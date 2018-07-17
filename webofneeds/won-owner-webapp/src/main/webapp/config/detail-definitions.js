@@ -152,6 +152,25 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:time");
     },
   },
+  month: {
+    identifier: "month",
+    label: "Month",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Month...",
+    component: "won-month-picker",
+    viewerComponent: "won-month-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:month": undefined };
+      }
+      return { "dc:month": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:month");
+    },
+  },
   location: {
     identifier: "location",
     label: "Location",
