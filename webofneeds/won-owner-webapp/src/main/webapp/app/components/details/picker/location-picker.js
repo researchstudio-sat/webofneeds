@@ -13,10 +13,10 @@ import {
   leafletBounds,
   delay,
   getIn,
-} from "../../utils.js";
-import { doneTypingBufferNg, DomCache } from "../../cstm-ng-utils.js";
+} from "../../../utils.js";
+import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
-import { initLeaflet } from "../../won-utils.js";
+import { initLeaflet } from "../../../won-utils.js";
 
 const serviceDependencies = ["$scope", "$element", "$sce"];
 function genComponentConf() {

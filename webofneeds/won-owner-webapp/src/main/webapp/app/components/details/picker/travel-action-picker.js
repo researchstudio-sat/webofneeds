@@ -8,10 +8,10 @@ import {
   nominatim2draftLocation,
   delay,
   getIn,
-} from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
+} from "../../../utils.js";
+import { DomCache } from "../../../cstm-ng-utils.js";
 
-import { initLeaflet } from "../../won-utils.js";
+import { initLeaflet } from "../../../won-utils.js";
 
 const serviceDependencies = ["$scope", "$element", "$sce"];
 function genComponentConf() {

@@ -7,7 +7,7 @@ import ngAnimate from "angular-animate";
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
 import imageDropzoneModule from "./image-dropzone.js";
-import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
+import matchingContextModule from "./details/picker/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";

@@ -6,13 +6,13 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
-import matchingContextModule from "./details/matching-context-picker.js"; // TODO: should be renamed
+import matchingContextModule from "./details/picker/matching-context-picker.js"; // TODO: should be renamed
 import { getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 
-import titlePickerModule from "./details/title-picker.js";
+import titlePickerModule from "./details/picker/title-picker.js";
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
