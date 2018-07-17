@@ -17,7 +17,7 @@ function genComponentConf() {
               class="monthp__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
               ng-model="self.value"
-              ng-change="::self.updateDatetime()"/>
+              ng-change="::self.updateMonth()"/>
       </div>
     `;
 
