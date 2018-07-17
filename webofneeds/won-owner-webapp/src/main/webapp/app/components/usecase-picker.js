@@ -27,7 +27,7 @@ function genComponentConf() {
                     <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
-            <span class="ucp__header__title">What would you like to post?</span>
+            <span class="ucp__header__title">What do you have or want?</span>
         </div>
         <won-usecase-picker-content>
         </won-usecase-picker-content>
