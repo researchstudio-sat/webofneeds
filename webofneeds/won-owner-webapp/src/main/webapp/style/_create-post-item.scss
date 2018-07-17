@@ -1,5 +1,6 @@
 @import "won-config";
 @import "speech-bubble";
+@import "sizing-utils";
 
 won-create-post-item {
   display: grid;
@@ -34,9 +35,8 @@ won-create-post-item {
       // TODO: SET CORRECT BACKGROUND COLOR
     }
     &__icon {
-      // TODO: use mixins/default sizes here
-      width: 3.5rem;
-      height: 3.5rem;
+      @include fixed-square($postIconSize);
+      padding: 0.5rem;
     }
     &__text {
       font-weight: 400;

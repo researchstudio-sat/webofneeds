@@ -32,6 +32,11 @@ function genComponentConf() {
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
+            <svg class="cp__header__icon"
+                title="Search"
+                style="--local-primary:var(--won-primary-color);">
+                    <use xlink:href="#ico36_search" href="#ico36_search"></use>
+            </svg>
             <span class="cp__header__title">Search</span>
         </div>
 

@@ -26,8 +26,9 @@ won-create-search {
   .cp__header {
     grid-area: header;
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "header_back header_title";
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "header_back header_icon header_title";
+    grid-gap: 0.5rem;
     font-size: $normalFontSize;
     text-align: left;
     min-width: 0;
@@ -46,12 +47,14 @@ won-create-search {
       font-weight: 400;
     }
 
+    &__icon {
+      grid-area: header_icon;
+      @include fixed-square($postIconSize);
+    }
+
     &__back {
       grid-area: header_back;
       &__icon {
-        /*@media (max-width: $responsivenessBreakPoint) {
-          @include fixed-square(2.5rem);
-        }*/
         @include fixed-square($backIconSize);
       }
     }

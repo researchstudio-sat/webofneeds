@@ -75,6 +75,12 @@ function genComponentConf() {
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
                 </svg>
             </a>
+            <svg class="cp__header__icon"
+                title="{{self.useCase['label']}}"
+                ng-if="self.useCase['icon']"
+                style="--local-primary:var(--won-primary-color);">
+                    <use xlink:href="{{self.useCase['icon']}}" href="{{self.useCase['icon']}}"></use>
+            </svg>
             <span class="cp__header__title">{{self.useCase.label}}</span>
         </div>
         <div class="cp__content">
