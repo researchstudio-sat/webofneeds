@@ -18,19 +18,19 @@ import { selectIsConnected } from "../selectors.js";
 // import { details } from "detailDefinitions";
 import { useCases } from "useCaseDefinitions";
 // TODO: these should be replaced by importing defintions from config
-import descriptionPickerModule from "./details/description-picker.js";
-import locationPickerModule from "./details/location-picker.js";
-import personPickerModule from "./details/person-picker.js";
-import travelActionPickerModule from "./details/travel-action-picker.js";
-import tagsPickerModule from "./details/tags-picker.js";
-import titlePickerModule from "./details/title-picker.js";
-import ttlPickerModule from "./details/ttl-picker.js";
-import numberPickerModule from "./details/number-picker.js";
-import datePickerModule from "./details/date-picker.js";
-import datetimePickerModule from "./details/datetime-picker.js";
-import timePickerModule from "./details/time-picker.js";
-import monthPickerModule from "./details/month-picker.js";
-import dropdownPickerModule from "./details/dropdown-picker.js";
+import descriptionPickerModule from "./details/picker/description-picker.js";
+import locationPickerModule from "./details/picker/location-picker.js";
+import personPickerModule from "./details/picker/person-picker.js";
+import travelActionPickerModule from "./details/picker/travel-action-picker.js";
+import tagsPickerModule from "./details/picker/tags-picker.js";
+import titlePickerModule from "./details/picker/title-picker.js";
+import ttlPickerModule from "./details/picker/ttl-picker.js";
+import numberPickerModule from "./details/picker/number-picker.js";
+import datePickerModule from "./details/picker/date-picker.js";
+import datetimePickerModule from "./details/picker/datetime-picker.js";
+import timePickerModule from "./details/picker/time-picker.js";
+import monthPickerModule from "./details/picker/month-picker.js";
+import dropdownPickerModule from "./details/picker/dropdown-picker.js";
 
 const postTypeTexts = [
   {

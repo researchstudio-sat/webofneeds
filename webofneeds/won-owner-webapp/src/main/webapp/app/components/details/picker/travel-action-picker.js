@@ -1,6 +1,6 @@
 import angular from "angular";
 import Immutable from "immutable"; // also exports itself as (window).L
-import L from "../../leaflet-bundleable.js";
+import L from "../../../leaflet-bundleable.js";
 import {
   attach,
   searchNominatim,

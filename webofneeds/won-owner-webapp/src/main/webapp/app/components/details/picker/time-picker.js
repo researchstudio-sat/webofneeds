@@ -1,23 +1,23 @@
 import angular from "angular";
-import { attach, delay } from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
+import { attach, delay } from "../../../utils.js";
+import { DomCache } from "../../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="titlep__input">
-         <svg class="titlep__input__icon clickable" 
+      <div class="timep__input">
+         <svg class="timep__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetTitle()">
+            ng-click="self.resetTime()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
           <input
-              type="text"
-              class="titlep__input__inner won-txt"
+              type="time"
+              class="timep__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
-              ng-blur="::self.updateTitle()"
-              ng-keyup="::self.updateTitle()"/>
+              ng-model="self.value"
+              ng-change="::self.updateTime()"/>
       </div>
     `;
 
@@ -26,27 +26,27 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
-      window.titlep4dbg = this;
+      window.timep4dbg = this;
 
-      this.addedTitle = this.initialValue;
+      this.addedTime = this.initialValue;
       this.showResetButton = false;
 
-      delay(0).then(() => this.showInitialTitle());
+      delay(0).then(() => this.showInitialTime());
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(title) {
-      if (title && title.trim().length > 0) {
-        this.onUpdate({ value: title });
+    update(date) {
+      if (date) {
+        this.onUpdate({ value: date });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
-    showInitialTitle() {
-      this.addedTitle = this.initialValue;
+    showInitialTime() {
+      this.addedTime = this.initialValue;
 
       if (this.initialValue && this.initialValue.trim().length > 0) {
         this.textfield().value = this.initialValue.trim();
@@ -56,43 +56,43 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    updateTitle() {
+    updateTime() {
       const text = this.textfield().value;
 
       if (text && text.trim().length > 0) {
-        this.addedTitle = text.trim();
-        this.update(this.addedTitle);
+        this.addedTime = text.trim();
+        this.update(this.addedTime);
         this.showResetButton = true;
       } else {
-        this.resetTitle();
+        this.resetTime();
       }
     }
 
-    resetTitle() {
-      this.addedTitle = undefined;
+    resetTime() {
+      this.addedTime = undefined;
       this.textfield().value = "";
       this.update(undefined);
       this.showResetButton = false;
     }
 
     // textfieldNg() {
-    //   return this.domCache.ng(".titlep__input__inner");
+    //   return this.domCache.ng(".timep__input__inner");
     // }
 
     // textfield() {
-    //   return this.domCache.dom(".titlep__input__inner");
-    // } // TODO: why is this done differently for title than for any other picker?
+    //   return this.domCache.dom(".timep__input__inner");
+    // } // TODO: why is this done differently for number than for any other picker?
 
     textfieldNg() {
       return angular.element(this.textfield());
     }
     textfield() {
-      if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(
-          ".titlep__input__inner"
+      if (!this._timeInput) {
+        this._timeInput = this.$element[0].querySelector(
+          ".timep__input__inner"
         );
       }
-      return this._titleInput;
+      return this._timeInput;
     }
   }
   Controller.$inject = serviceDependencies;
@@ -112,5 +112,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.titlePicker", [])
-  .directive("wonTitlePicker", genComponentConf).name;
+  .module("won.owner.components.timePicker", [])
+  .directive("wonTimePicker", genComponentConf).name;
