@@ -27,6 +27,7 @@ import titlePickerModule from "./details/title-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 import numberPickerModule from "./details/number-picker.js";
 import datePickerModule from "./details/date-picker.js";
+import datetimePickerModule from "./details/datetime-picker.js";
 import timePickerModule from "./details/time-picker.js";
 import dropdownPickerModule from "./details/dropdown-picker.js";
 
@@ -419,6 +420,7 @@ angular
     numberPickerModule,
     datePickerModule,
     timePickerModule,
+    datetimePickerModule,
     ttlPickerModule,
     dropdownPickerModule,
     createIsseeksModule,
