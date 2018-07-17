@@ -28,6 +28,10 @@ won-number-picker {
       );
       padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
         0.438rem;
+
+      &:invalid {
+        /*TODO: Define styling for invalid input field*/
+      }
     }
 
     .numberp__input__inner::-ms-clear {

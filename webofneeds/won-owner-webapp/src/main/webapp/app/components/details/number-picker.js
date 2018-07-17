@@ -1,6 +1,5 @@
 import angular from "angular";
 import { attach, delay } from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -16,15 +15,14 @@ function genComponentConf() {
               type="number"
               class="numberp__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
-              ng-blur="::self.updateNumber()"
-              ng-keyup="::self.updateNumber()"/>
+              ng-blur="::self.updateNumber(true)"
+              ng-keyup="::self.updateNumber(false)"/>
       </div>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.domCache = new DomCache(this.$element);
 
       window.numberp4dbg = this;
 
@@ -37,9 +35,9 @@ function genComponentConf() {
     /**
      * Checks validity and uses callback method
      */
-    update(title) {
-      if (title && title.trim().length > 0) {
-        this.onUpdate({ value: title });
+    update(number) {
+      if (number) {
+        this.onUpdate({ value: number });
       } else {
         this.onUpdate({ value: undefined });
       }
@@ -56,36 +54,27 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    updateNumber() {
-      const text = this.textfield().value;
+    updateNumber(resetInput) {
+      const number = this.textfield().value;
 
-      if (text && text.trim().length > 0) {
-        this.addedNumber = text.trim();
+      if (number) {
+        this.addedNumber = number;
         this.update(this.addedNumber);
         this.showResetButton = true;
       } else {
-        this.resetNumber();
+        this.resetNumber(resetInput);
       }
     }
 
-    resetNumber() {
+    resetNumber(resetInput) {
       this.addedNumber = undefined;
-      this.textfield().value = "";
+      if (resetInput) {
+        this.textfield().value = "";
+        this.showResetButton = false;
+      }
       this.update(undefined);
-      this.showResetButton = false;
     }
 
-    // textfieldNg() {
-    //   return this.domCache.ng(".numberp__input__inner");
-    // }
-
-    // textfield() {
-    //   return this.domCache.dom(".numberp__input__inner");
-    // } // TODO: why is this done differently for number than for any other picker?
-
-    textfieldNg() {
-      return angular.element(this.textfield());
-    }
     textfield() {
       if (!this._numberInput) {
         this._numberInput = this.$element[0].querySelector(
