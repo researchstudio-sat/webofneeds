@@ -5,19 +5,19 @@ import { DomCache } from "../../cstm-ng-utils.js";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="datep__input">
-         <svg class="datep__input__icon clickable"
+      <div class="timep__input">
+         <svg class="timep__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetDate()">
+            ng-click="self.resetTime()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
           <input
-              type="date"
-              class="datep__input__inner won-txt"
+              type="time"
+              class="timep__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
               ng-model="self.value"
-              ng-change="::self.updateDate()"/>
+              ng-change="::self.updateTime()"/>
       </div>
     `;
 
@@ -26,12 +26,12 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
-      window.datep4dbg = this;
+      window.timep4dbg = this;
 
-      this.addedDate = this.initialValue;
+      this.addedTime = this.initialValue;
       this.showResetButton = false;
 
-      delay(0).then(() => this.showInitialDate());
+      delay(0).then(() => this.showInitialTime());
     }
 
     /**
@@ -45,8 +45,8 @@ function genComponentConf() {
       }
     }
 
-    showInitialDate() {
-      this.addedDate = this.initialValue;
+    showInitialTime() {
+      this.addedTime = this.initialValue;
 
       if (this.initialValue && this.initialValue.trim().length > 0) {
         this.textfield().value = this.initialValue.trim();
@@ -56,43 +56,43 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    updateDate() {
+    updateTime() {
       const text = this.textfield().value;
 
       if (text && text.trim().length > 0) {
-        this.addedDate = text.trim();
-        this.update(this.addedDate);
+        this.addedTime = text.trim();
+        this.update(this.addedTime);
         this.showResetButton = true;
       } else {
-        this.resetDate();
+        this.resetTime();
       }
     }
 
-    resetDate() {
-      this.addedDate = undefined;
+    resetTime() {
+      this.addedTime = undefined;
       this.textfield().value = "";
       this.update(undefined);
       this.showResetButton = false;
     }
 
     // textfieldNg() {
-    //   return this.domCache.ng(".datep__input__inner");
+    //   return this.domCache.ng(".timep__input__inner");
     // }
 
     // textfield() {
-    //   return this.domCache.dom(".datep__input__inner");
+    //   return this.domCache.dom(".timep__input__inner");
     // } // TODO: why is this done differently for number than for any other picker?
 
     textfieldNg() {
       return angular.element(this.textfield());
     }
     textfield() {
-      if (!this._dateInput) {
-        this._dateInput = this.$element[0].querySelector(
-          ".datep__input__inner"
+      if (!this._timeInput) {
+        this._timeInput = this.$element[0].querySelector(
+          ".timep__input__inner"
         );
       }
-      return this._dateInput;
+      return this._timeInput;
     }
   }
   Controller.$inject = serviceDependencies;
@@ -112,5 +112,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.datePicker", [])
-  .directive("wonDatePicker", genComponentConf).name;
+  .module("won.owner.components.timePicker", [])
+  .directive("wonTimePicker", genComponentConf).name;

@@ -27,6 +27,7 @@ import titlePickerModule from "./details/title-picker.js";
 import ttlPickerModule from "./details/ttl-picker.js";
 import numberPickerModule from "./details/number-picker.js";
 import datePickerModule from "./details/date-picker.js";
+import timePickerModule from "./details/time-picker.js";
 import dropdownPickerModule from "./details/dropdown-picker.js";
 
 const postTypeTexts = [
@@ -417,6 +418,7 @@ angular
     titlePickerModule,
     numberPickerModule,
     datePickerModule,
+    timePickerModule,
     ttlPickerModule,
     dropdownPickerModule,
     createIsseeksModule,

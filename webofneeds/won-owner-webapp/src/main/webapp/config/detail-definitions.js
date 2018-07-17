@@ -114,6 +114,25 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:date");
     },
   },
+  time: {
+    identifier: "time",
+    label: "Time",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Time...",
+    component: "won-time-picker",
+    viewerComponent: "won-time-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:time": undefined };
+      }
+      return { "dc:time": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:time");
+    },
+  },
   location: {
     identifier: "location",
     label: "Location",
