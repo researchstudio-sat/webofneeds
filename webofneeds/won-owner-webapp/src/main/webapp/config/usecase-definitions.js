@@ -431,6 +431,8 @@ const infoUseCases = {
 };
 
 const realEstateUseCases = {
+  // TODO: rent is not found when parsing details - why?
+  // TODO: use commit --amend if possible!
   searchRent: {
     identifier: "searchRent",
     label: "Find a place to rent",
@@ -452,14 +454,31 @@ const realEstateUseCases = {
           if (!value) {
             return { "s:floorSize": undefined };
           }
-          return { "s:floorSize": value };
+          return {
+            "s:floorSize": {
+              "@type": "s:QuantitativeValue",
+              "s:value": value,
+              "s:unitCode": "MTK",
+            },
+          };
         },
         parseFromRDF: function(jsonLDImm) {
           const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
-          if (!floorSize) {
+          const fs = floorSize && floorSize.get("s:value");
+          const unit = floorSize && floorSize.get("s:unitCode");
+          if (!fs) {
             return undefined;
           } else {
-            return floorSize + "m2";
+            if (unit === "MTK") {
+              return fs + "m²";
+            } else if (unit === "FTK") {
+              return fs + "sq ft";
+            } else if (unit === "YDK") {
+              return fs + "sq yd";
+            } else if (!unit) {
+              return fs + " (no unit specified)";
+            }
+            return fs + " " + unit;
           }
         },
       },
@@ -525,16 +544,36 @@ const realEstateUseCases = {
       rent: {
         ...abstractDetails.number,
         identifier: "rent",
-        label: "Rent per month",
+        label: "Rent in EUR/month",
         icon: "#ico36_plus_circle", //TODO: better icon
         parseToRDF: function({ value }) {
           if (!value) {
-            return { "won:rent": undefined }; // FIXME: won:rent does not exist
+            return { "s:priceSpecification": undefined };
           }
-          return { "won:rent": value };
+          return {
+            "s:priceSpecification": {
+              "@type": "s:CompoundPriceSpecification",
+              "s:price": value,
+              "s:priceCurrency": "EUR",
+              "s:description": "total rent per month",
+              // "s:priceComponent": {
+              //   "@type": "s:UnitPriceSpecification",
+              //   "s:price": 0,
+              //   "s:priceCurrency": "EUR",
+              //   "s:description": "",
+              // }
+            },
+          };
         },
         parseFromRDF: function(jsonLDImm) {
-          return jsonLDImm && jsonLDImm.get("won:rent");
+          const rentPrice = jsonLDImm && jsonLDImm.get("s:priceSpecification");
+          const rent = rentPrice && rentPrice.get("s:price");
+
+          if (!rent) {
+            return undefined;
+          } else {
+            return rent + " EUR/month";
+          }
         },
       },
     },
@@ -547,7 +586,6 @@ const realEstateUseCases = {
       ...emptyDraft,
       is: {
         title: "For Rent",
-        tags: "for-rent",
       },
     },
     isDetails: {
@@ -563,14 +601,31 @@ const realEstateUseCases = {
           if (!value) {
             return { "s:floorSize": undefined };
           }
-          return { "s:floorSize": value };
+          return {
+            "s:floorSize": {
+              "@type": "s:QuantitativeValue",
+              "s:value": value,
+              "s:unitCode": "MTK",
+            },
+          };
         },
         parseFromRDF: function(jsonLDImm) {
           const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
-          if (!floorSize) {
+          const fs = floorSize && floorSize.get("s:value");
+          const unit = floorSize && floorSize.get("s:unitCode");
+          if (!fs) {
             return undefined;
           } else {
-            return floorSize + "m2";
+            if (unit === "MTK") {
+              return fs + "m²";
+            } else if (unit === "FTK") {
+              return fs + "sq ft";
+            } else if (unit === "YDK") {
+              return fs + "sq yd";
+            } else if (!unit) {
+              return fs + " (no unit specified)";
+            }
+            return fs + " " + unit;
           }
         },
       },
@@ -636,16 +691,36 @@ const realEstateUseCases = {
       rent: {
         ...abstractDetails.number,
         identifier: "rent",
-        label: "Rent per month",
+        label: "Rent in EUR/month",
         icon: "#ico36_plus_circle", //TODO: better icon
         parseToRDF: function({ value }) {
           if (!value) {
-            return { "won:rent": undefined }; // FIXME: won:rent does not exist
+            return { "s:priceSpecification": undefined };
           }
-          return { "won:rent": value };
+          return {
+            "s:priceSpecification": {
+              "@type": "s:CompoundPriceSpecification",
+              "s:price": value,
+              "s:priceCurrency": "EUR",
+              "s:description": "total rent per month",
+              // "s:priceComponent": {
+              //   "@type": "s:UnitPriceSpecification",
+              //   "s:price": 0,
+              //   "s:priceCurrency": "EUR",
+              //   "s:description": "",
+              // }
+            },
+          };
         },
         parseFromRDF: function(jsonLDImm) {
-          return jsonLDImm && jsonLDImm.get("won:rent");
+          const rentPrice = jsonLDImm && jsonLDImm.get("s:priceSpecification");
+          const rent = rentPrice && rentPrice.get("s:price");
+
+          if (!rent) {
+            return undefined;
+          } else {
+            return rent + " EUR/month";
+          }
         },
       },
     },
