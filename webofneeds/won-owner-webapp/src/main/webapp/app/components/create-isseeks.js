@@ -51,7 +51,8 @@ function genComponentConf() {
                 detail-element="{{detail.component}}"
                 on-update="::self.updateDetail(identifier, value)"
                 initial-value="::self.draftObject[detail.identifier]"
-                identifier="detail.identifier">
+                identifier="detail.identifier"
+                detail="detail">
               </div>
           </div>
         </div>
@@ -180,13 +181,14 @@ angular
           onUpdate: "&",
           initialValue: "=",
           identifier: "=",
+          detail: "=",
         },
         link: function(scope, element, attrs) {
           const customTag = attrs.detailElement;
           if (!customTag) return;
 
           const customElem = angular.element(
-            `<${customTag} initial-value="initialValue" on-update="internalUpdate(value)"></${customTag}>`
+            `<${customTag} initial-value="initialValue" on-update="internalUpdate(value)" detail="detail"></${customTag}>`
           );
           //customElem.attr("on-update", scope.onUpdate);
 

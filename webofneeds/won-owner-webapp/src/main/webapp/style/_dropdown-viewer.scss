@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-dropdown-viewer {
+  @include won-detail-viewer("dropdownv");
+}

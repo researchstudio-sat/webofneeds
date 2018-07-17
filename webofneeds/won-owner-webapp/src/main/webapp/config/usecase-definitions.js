@@ -526,6 +526,7 @@ const realEstateUseCases = {
         ...abstractDetails.number,
         identifier: "rent",
         label: "Rent per month",
+        icon: "#ico36_plus_circle", //TODO: better icon
         parseToRDF: function({ value }) {
           if (!value) {
             return { "won:rent": undefined }; // FIXME: won:rent does not exist
@@ -636,6 +637,7 @@ const realEstateUseCases = {
         ...abstractDetails.number,
         identifier: "rent",
         label: "Rent per month",
+        icon: "#ico36_plus_circle", //TODO: better icon
         parseToRDF: function({ value }) {
           if (!value) {
             return { "won:rent": undefined }; // FIXME: won:rent does not exist

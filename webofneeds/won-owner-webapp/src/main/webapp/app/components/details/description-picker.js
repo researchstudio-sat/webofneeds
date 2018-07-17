@@ -16,7 +16,7 @@ function genComponentConf() {
           won-textarea-autogrow
           class="dp__input__inner won-txt"
           ng-keyup="::self.updateDescription()"
-          placeholder="Enter Description..."></textarea>
+          placeholder="{{self.detail.placeholder}}"></textarea>
       </div> 
     `;
 
@@ -92,6 +92,7 @@ function genComponentConf() {
     scope: {
       onUpdate: "&",
       initialValue: "=",
+      detail: "=",
     },
     template: template,
   };

@@ -5,11 +5,67 @@
 import { getIn, is } from "../app/utils.js";
 import Immutable from "immutable";
 
+/**
+ * Defines a set of details that will only be visible within a specific 'implementation'
+ * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
+ * you want to use it.
+ */
+export const abstractDetails = {
+  number: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    icon: undefined,
+    component: "won-number-picker",
+    viewerComponent: "won-number-viewer",
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
+  dropdown: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    icon: undefined,
+    component: "won-dropdown-picker",
+    viewerComponent: "won-dropdown-viewer",
+    options: function() {
+      throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
+      /**
+       * e.g. relationship status....
+        [
+         {value: "single", label: "single"},
+         {value: "married", label: "married"},
+         {value: "complicated", label: "it's complicated"},
+         {value: "divorced", label: "divorced"},
+         {value: "free", label: "free for all"},
+        ]
+       */
+    },
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
+};
+
 export const details = {
   title: {
     identifier: "title",
     label: "Title",
     icon: "#ico36_title_circle",
+    placeholder: "What? (Short title shown in lists)",
     component: "won-title-picker",
     viewerComponent: "won-title-viewer",
     parseToRDF: function({ value }) {
@@ -26,6 +82,7 @@ export const details = {
     identifier: "description",
     label: "Description",
     icon: "#ico36_description_circle",
+    placeholder: "Enter Description...",
     component: "won-description-picker",
     viewerComponent: "won-description-viewer",
     parseToRDF: function({ value }) {
@@ -42,6 +99,7 @@ export const details = {
     identifier: "location",
     label: "Location",
     icon: "#ico36_location_circle",
+    placeholder: "Search for location",
     component: "won-location-picker",
     viewerComponent: "won-location-viewer",
     parseToRDF: function({ value, identifier }) {
@@ -190,6 +248,7 @@ export const details = {
     identifier: "person",
     label: "Person",
     icon: "#ico36_person_single_circle",
+    placeholder: undefined,
     component: "won-person-picker",
     viewerComponent: "won-person-viewer",
     parseToRDF: function({ value }) {
@@ -242,6 +301,10 @@ export const details = {
     identifier: "travelAction",
     label: "Route (From - To)",
     icon: "#ico36_location_circle",
+    placeholder: {
+      departure: "Start location",
+      destination: "Destination",
+    },
     component: "won-travel-action-picker",
     viewerComponent: "won-travel-action-viewer",
     parseToRDF: function({ value }) {
@@ -363,6 +426,7 @@ export const details = {
     identifier: "tags",
     label: "Tags",
     icon: "#ico36_tags_circle",
+    placeholder: "e.g. #couch #free",
     component: "won-tags-picker",
     viewerComponent: "won-tags-viewer",
     parseToRDF: function({ value }) {
@@ -396,6 +460,7 @@ export const details = {
     identifier: "ttl",
     label: "Turtle (TTL)",
     icon: "#ico36_rdf_logo_circle",
+    placeholder: "Enter TTL...",
     component: "won-ttl-picker",
     viewerComponent: undefined,
     parseToRDF: function({ value }) {
@@ -414,21 +479,78 @@ export const details = {
       // TODO: return value
     },
   },
-};
-
-/**
- * Defines a set of details that will only be visible within a specific 'implementation'
- * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
- * you want to use it.
- */
-export const abstractDetails = {
-  number: {
-    identifier: undefined,
-    label: undefined,
-    icon: undefined,
-    component: "won-number-picker",
-    viewerComponent: "won-number-viewer",
-    parseToRDF: undefined,
-    parseFromRDF: undefined,
+  gender: {
+    ...abstractDetails.dropdown,
+    identifier: "gender",
+    label: "Gender",
+    icon: "#ico36_tags_circle",
+    placeholder: "Select Gender",
+    options: [
+      { value: "Agender", label: "Agender" },
+      { value: "Androgyne", label: "Androgyne" },
+      { value: "Androgynous", label: "Androgynous" },
+      { value: "Bigender", label: "Bigender" },
+      { value: "Cis", label: "Cis" },
+      { value: "Cisgender", label: "Cisgender" },
+      { value: "Cis Female", label: "Cis Female" },
+      { value: "Cis Male", label: "Cis Male" },
+      { value: "Cis Man", label: "Cis Man" },
+      { value: "Cis Woman", label: "Cis Woman" },
+      { value: "Cisgender Female", label: "Cisgender Female" },
+      { value: "Cisgender Male", label: "Cisgender Male" },
+      { value: "Cisgender Man", label: "Cisgender Man" },
+      { value: "Cisgender Woman", label: "Cisgender Woman" },
+      { value: "Female to Male", label: "Female to Male" },
+      { value: "FTM", label: "FTM" },
+      { value: "Gender Fluid", label: "Gender Fluid" },
+      { value: "Gender Nonconforming", label: "Gender Nonconforming" },
+      { value: "Gender Questioning", label: "Gender Questioning" },
+      { value: "Gender Variant", label: "Gender Variant" },
+      { value: "Genderqueer", label: "Genderqueer" },
+      { value: "Intersex", label: "Intersex" },
+      { value: "Male to Female", label: "Male to Female" },
+      { value: "MTF", label: "MTF" },
+      { value: "Neither", label: "Neither" },
+      { value: "Neutrois", label: "Neutrois" },
+      { value: "Non-binary", label: "Non-binary" },
+      { value: "Other", label: "Other" },
+      { value: "Pangender", label: "Pangender" },
+      { value: "Trans", label: "Trans" },
+      { value: "Trans*", label: "Trans*" },
+      { value: "Trans Female", label: "Trans Female" },
+      { value: "Trans* Female", label: "Trans* Female" },
+      { value: "Trans Male", label: "Trans Male" },
+      { value: "Trans* Male", label: "Trans* Male" },
+      { value: "Trans Man", label: "Trans Man" },
+      { value: "Trans* Man", label: "Trans* Man" },
+      { value: "Trans Person", label: "Trans Person" },
+      { value: "Trans* Person", label: "Trans* Person" },
+      { value: "Trans Woman", label: "Trans Woman" },
+      { value: "Trans* Woman", label: "Trans* Woman" },
+      { value: "Transfeminine", label: "Transfeminine" },
+      { value: "Transgender", label: "Transgender" },
+      { value: "Transgender Female", label: "Transgender Female" },
+      { value: "Transgender Male", label: "Transgender Male" },
+      { value: "Transgender Man", label: "Transgender Man" },
+      { value: "Transgender Person", label: "Transgender Person" },
+      { value: "Transgender Woman", label: "Transgender Woman" },
+      { value: "Transmasculine", label: "Transmasculine" },
+      { value: "Transsexual", label: "Transsexual" },
+      { value: "Transsexual Female", label: "Transsexual Female" },
+      { value: "Transsexual Male", label: "Transsexual Male" },
+      { value: "Transsexual Man", label: "Transsexual Man" },
+      { value: "Transsexual Person", label: "Transsexual Person" },
+      { value: "Transsexual Woman", label: "Transsexual Woman" },
+      { value: "Two-Spirit", label: "Two-Spirit" },
+    ],
+    parseToRDF: function({ value }) {
+      if (!value) {
+        return { "s:gender": undefined };
+      }
+      return { "s:gender": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      return jsonLDImm && jsonLDImm.get("s:gender");
+    },
   },
 };
