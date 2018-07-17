@@ -415,3 +415,20 @@ export const details = {
     },
   },
 };
+
+/**
+ * Defines a set of details that will only be visible within a specific 'implementation'
+ * you will need to alter the identifier, label, icon, parseToRDF, and parseFromRDF if
+ * you want to use it.
+ */
+export const abstractDetails = {
+  number: {
+    identifier: undefined,
+    label: undefined,
+    icon: undefined,
+    component: "won-number-picker",
+    viewerComponent: "won-number-viewer",
+    parseToRDF: undefined,
+    parseFromRDF: undefined,
+  },
+};
