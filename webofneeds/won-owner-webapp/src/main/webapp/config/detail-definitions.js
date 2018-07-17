@@ -95,6 +95,25 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:description");
     },
   },
+  date: {
+    identifier: "date",
+    label: "Date",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Date...",
+    component: "won-date-picker",
+    viewerComponent: "won-date-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:date": undefined };
+      }
+      return { "dc:date": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:date");
+    },
+  },
   location: {
     identifier: "location",
     label: "Location",
