@@ -4,115 +4,127 @@
 const READ_URIS = "wonReadUris";
 const CLOSED_CONN_URIS = "wonClosedConnectionUris";
 const DISCLAIMER_ACCEPTED = "disclaimerAccepted";
+const PRIVATE_ID = "privateId";
+
+let readUrisCache;
+let closedConnUrisCache;
+let disclaimerAcceptedCache;
 
 export function markUriAsRead(uri) {
-  //TODO: BETTER IMPL
   if (!isUriRead(uri)) {
-    let readUrisString = localStorage.getItem(READ_URIS);
-    if (!readUrisString) {
-      readUrisString = JSON.stringify([uri]);
-    } else {
-      try {
-        let readUriList = JSON.parse(readUrisString);
-        readUriList.push(uri);
-        readUrisString = JSON.stringify(readUriList);
-      } catch (e) {
-        clearReadUris();
-        readUrisString = JSON.stringify([uri]);
-      }
-    }
-
-    localStorage.setItem(READ_URIS, readUrisString);
+    readUrisCache = getReadUris();
+    readUrisCache.push(uri);
+    localStorage.setItem(READ_URIS, JSON.stringify(readUrisCache));
   }
 }
 
+export function getReadUris() {
+  if (!readUrisCache) {
+    let readUrisString = localStorage.getItem(READ_URIS);
+
+    if (readUrisString) {
+      try {
+        readUrisCache = JSON.parse(readUrisString);
+      } catch (e) {
+        clearReadUris();
+        readUrisCache = [];
+      }
+    } else {
+      readUrisCache = [];
+    }
+  }
+
+  return readUrisCache;
+}
+
 export function isUriRead(uri) {
-  //TODO: BETTER IMPL
-  let readUrisString = localStorage.getItem(READ_URIS);
+  if (!readUrisCache) {
+    let readUrisString = localStorage.getItem(READ_URIS);
 
-  if (readUrisString) {
-    let readUriList = JSON.parse(readUrisString);
+    if (readUrisString) {
+      readUrisCache = JSON.parse(readUrisString);
+    }
+  }
 
-    for (const readUri of readUriList) {
+  if (readUrisCache) {
+    for (const readUri of readUrisCache) {
       if (readUri === uri) {
         return true;
       }
     }
   }
+
   return false;
 }
 
 export function clearReadUris() {
+  readUrisCache = undefined;
   localStorage.removeItem(READ_URIS);
 }
 
 export function clearPrivateId() {
-  localStorage.removeItem("privateId");
+  localStorage.removeItem(PRIVATE_ID);
 }
 
 export function savePrivateId(privateId) {
-  localStorage.setItem("privateId", privateId);
+  localStorage.setItem(PRIVATE_ID, privateId);
 }
 
 export function markConnUriAsClosed(uri) {
-  //TODO: BETTER IMPL
   if (!isConnUriClosed(uri)) {
-    let closedConnUrisString = localStorage.getItem(CLOSED_CONN_URIS);
-    if (!closedConnUrisString) {
-      closedConnUrisString = JSON.stringify([uri]);
-    } else {
-      try {
-        let closedConnUriList = JSON.parse(closedConnUrisString);
-        closedConnUriList.push(uri);
-        closedConnUrisString = JSON.stringify(closedConnUriList);
-      } catch (e) {
-        clearClosedConnUris();
-        closedConnUrisString = JSON.stringify([uri]);
-      }
-    }
-
-    localStorage.setItem(CLOSED_CONN_URIS, closedConnUrisString);
+    closedConnUrisCache = getClosedConnUris();
+    closedConnUrisCache.push(uri);
+    localStorage.setItem(CLOSED_CONN_URIS, JSON.stringify(closedConnUrisCache));
   }
 }
 
 export function getClosedConnUris() {
-  let closedConnUrisString = localStorage.getItem(CLOSED_CONN_URIS);
+  if (!closedConnUrisCache) {
+    let closedConnUrisString = localStorage.getItem(CLOSED_CONN_URIS);
 
-  if (!closedConnUrisString) {
-    return [];
-  } else {
-    return JSON.parse(closedConnUrisString);
+    if (closedConnUrisString) {
+      try {
+        closedConnUrisCache = JSON.parse(closedConnUrisString);
+      } catch (e) {
+        clearClosedConnUris();
+        closedConnUrisCache = [];
+      }
+    } else {
+      closedConnUrisCache = [];
+    }
   }
+
+  return closedConnUrisCache;
 }
 
 export function isConnUriClosed(uri) {
-  //TODO: BETTER IMPL
-  let closedConnUrisString = localStorage.getItem(CLOSED_CONN_URIS);
-
-  if (closedConnUrisString) {
-    let closedConnUriList = JSON.parse(closedConnUrisString);
-
-    for (const closedUri of closedConnUriList) {
-      if (closedUri === uri) {
-        return true;
-      }
+  for (const closedUri of getClosedConnUris()) {
+    if (closedUri === uri) {
+      return true;
     }
   }
+
   return false;
 }
 
 export function clearClosedConnUris() {
+  closedConnUrisCache = undefined;
   localStorage.removeItem(CLOSED_CONN_URIS);
 }
 
 export function isDisclaimerAccepted() {
-  return !!localStorage.getItem(DISCLAIMER_ACCEPTED);
+  if (!disclaimerAcceptedCache) {
+    disclaimerAcceptedCache = !!localStorage.getItem(DISCLAIMER_ACCEPTED);
+  }
+  return disclaimerAcceptedCache;
 }
 
 export function setDisclaimerAccepted() {
-  localStorage.setItem(DISCLAIMER_ACCEPTED, true);
+  disclaimerAcceptedCache = true;
+  localStorage.setItem(DISCLAIMER_ACCEPTED, disclaimerAcceptedCache);
 }
 
 export function clearDisclaimerAccepted() {
+  disclaimerAcceptedCache = undefined;
   localStorage.removeItem(DISCLAIMER_ACCEPTED);
 }
