@@ -11,7 +11,6 @@ import matchingContextModule from "./details/picker/matching-context-picker.js";
 import createIsseeksModule from "./create-isseeks.js";
 import { get, getIn, attach, delay } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
-import won from "../won-es6.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 
@@ -32,37 +31,6 @@ import timePickerModule from "./details/picker/time-picker.js";
 import monthPickerModule from "./details/picker/month-picker.js";
 import dropdownPickerModule from "./details/picker/dropdown-picker.js";
 
-const postTypeTexts = [
-  {
-    type: won.WON.BasicNeedTypeDemand,
-    text: "I'm looking for",
-    helpText:
-      "Select this if you are looking for things or services other people offer",
-  },
-  {
-    type: won.WON.BasicNeedTypeSupply,
-    text: "I'm offering",
-    helpText:
-      "Use this if you are offering an item or a service. You will find people who said" +
-      " that they're looking for something.",
-  },
-  {
-    type: won.WON.BasicNeedTypeDotogether,
-    text: "I want to find someone to",
-    helpText:
-      "Select this if you are looking to find other people who share your interest. You will be matched" +
-      " with other people who chose this option as well.",
-  },
-  {
-    type: won.WON.BasicNeedTypeCombined,
-    text: "I'm offering and looking for",
-    helpText:
-      "Select this if you are looking for things or services other people offer + Use this if you are offering an item or a service. You will find people who said" +
-      " that they're looking for something.",
-  },
-];
-
-//TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",
   "$scope",
@@ -169,10 +137,7 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
       this.focusedElement = null;
-      //TODO debug; deleteme
       window.cnc4dbg = this;
-
-      this.postTypeTexts = postTypeTexts;
 
       this.windowHeight = window.screen.height;
       this.scrollContainer().addEventListener("scroll", e => this.onResize(e));
@@ -243,8 +208,6 @@ function genComponentConf() {
         this.scrollContainer().scrollTop = scrollTop - heightHeader;
 
         this.focusedElement = element;
-        //TODO: debug: delete me
-        //console.log("ScrollTop: ", this.scrollContainer().scrollTop);
       }
     }
 
@@ -383,13 +346,6 @@ function genComponentConf() {
         }
       }
       return !!(hasValidTitle || hasDetail);
-    }
-
-    createWhatsNew() {
-      if (!this.pendingPublishing) {
-        this.pendingPublishing = true;
-        this.needs__whatsNew();
-      }
     }
   }
 

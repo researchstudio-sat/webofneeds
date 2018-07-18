@@ -13,23 +13,9 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-    <!-- DETAILS Picker -->
     <div class="cis__addDetail" ng-if="self.hasDetails()">
-        <!--
-        <div class="cis__addDetail__header a detailPicker clickable"
-            ng-click="self.toggleDetail()"
-            ng-class="{'closedDetailPicker': !self.showDetail}">
-                <span>Add more detail</span>
-                <svg class="cis__addDetail__header__carret" ng-show="!self.showDetail">
-                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                </svg>
-                <svg class="cis__addDetail__header__carret" ng-show="self.showDetail">
-                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                </svg>
-        </div>
-        -->
         <!-- DETAIL TOGGLES -->
-        <div class="cis__detail__items"> <!-- ng-if="self.showDetail" -->
+        <div class="cis__detail__items">
           <div class="cis__detail__items__item" ng-repeat="detail in self.detailList">
               <!-- HEADER -->
               <div class="cis__detail__items__item__header"
@@ -46,7 +32,7 @@ function genComponentConf() {
 
               <!-- COMPONENT -->
               <div class="cis__detail__items__item__component"
-                ng-click="self.onScroll({element: '.cis__details'})"
+                ng-click="self.onScroll({element: '.cis__detail__items__item__component'})"
                 ng-if="self.openDetail === detail.identifier"
                 detail-element="{{detail.component}}"
                 on-update="::self.updateDetail(identifier, value)"
@@ -57,7 +43,6 @@ function genComponentConf() {
           </div>
         </div>
     </div>
-    <!-- /DETAIL Picker/ -->
   `;
 
   class Controller {
@@ -70,7 +55,6 @@ function genComponentConf() {
 
       this.details = new Set();
 
-      this.showDetail = false;
       this.openDetail = undefined;
 
       delay(0).then(() => this.loadInitialDraft());
@@ -122,21 +106,8 @@ function genComponentConf() {
       this.updateDraft();
     }
 
-    updateScroll() {
-      // FIXME: broken due to HTML changes
-      // console.log("Scoll activity");
-      // this.onScroll();
-    }
-
     pickImage(image) {
       this.draftObject.thumbnail = image;
-    }
-
-    toggleDetail() {
-      if (!this.showDetail) {
-        this.onScroll({ element: ".cis__addDetail__header.a" });
-      }
-      this.showDetail = !this.showDetail;
     }
 
     toggleOpenDetail(detail) {
@@ -145,8 +116,7 @@ function genComponentConf() {
         this.openDetail = undefined;
       } else {
         this.openDetail = detail;
-        //this.onScroll({ element: ".cis__addDetail__header.a" });
-        this.onScroll({ element: ".cis__details" });
+        this.onScroll({ element: ".cis__detail__items__item__component" });
       }
     }
   }
