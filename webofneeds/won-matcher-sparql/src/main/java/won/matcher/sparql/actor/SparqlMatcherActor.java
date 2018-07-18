@@ -140,6 +140,10 @@ public class SparqlMatcherActor extends UntypedActor {
         Model subModel = new ModelExtract(boundary).extract(parentStatement.getObject().asResource(), model);
         BasicPattern pattern = createDetailsQuery(subModel);
 
+        if(pattern.isEmpty()) {
+            return null;
+        }
+
         pattern.add(new Triple(resultName.asNode(), newPredicate, NodeFactory.createVariable(hashFunction(parentStatement.getObject()))));
 
         return new OpBGP(pattern);
@@ -230,16 +234,16 @@ public class SparqlMatcherActor extends UntypedActor {
 
         if (seeks != null) {
             Op seeksQuery = createNeedQuery(model, seeks, NodeFactory.createURI("http://purl.org/webofneeds/model#is"));
-
-            queries.add(seeksQuery);
+            if(seeksQuery != null)
+                queries.add(seeksQuery);
         }
 
         Statement is = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#is"));
 
         if (is != null) {
             Op isQuery = createNeedQuery(model, is, NodeFactory.createURI("http://purl.org/webofneeds/model#seeks"));
-
-            queries.add(isQuery);
+            if(isQuery != null)
+                queries.add(isQuery);
         }
 
         Statement search = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#hasSearchString"));
