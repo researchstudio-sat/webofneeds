@@ -14,6 +14,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   const rejectedMessages = wonMessage.getRejectsMessages();
   const retractedMessages = wonMessage.getRetractMessages();
 
+  const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
+
   let parsedMessage = {
     belongsToUri: undefined,
     data: {
@@ -23,7 +25,10 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
         : undefined,
       content: {
         text: wonMessage.getTextMessage(),
-        matchScore: wonMessage.getMatchScore(),
+        matchScore:
+          !isNaN(matchScoreFloat) && isFinite(matchScoreFloat)
+            ? matchScoreFloat
+            : undefined,
       },
       references: {
         proposes:
