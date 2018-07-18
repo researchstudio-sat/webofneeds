@@ -45,6 +45,7 @@ const skillsDetail = {
   identifier: "skills",
   label: "Skills",
   icon: "#ico36_skill_circle",
+  placeholder: "e.g. RDF, project-management",
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:knowsAbout": undefined };
@@ -77,6 +78,7 @@ const interestsDetail = {
   identifier: "interests",
   label: "Interests",
   icon: "#ico36_heart_circle",
+  placeholder: "e.g. food, cats",
   parseToRDF: function({ value }) {
     if (!value) {
       return { "foaf:topic_interest": undefined };
@@ -265,8 +267,8 @@ const professionalUseCases = {
       location: { ...details.location },
     },
     seeksDetails: {
-      skills: { ...skillsDetail },
-      interests: { ...interestsDetail },
+      skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
+      interests: { ...interestsDetail, placeholder: "" },
     },
   },
   phdSeeks: {
@@ -285,8 +287,8 @@ const professionalUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       person: { ...details.person },
-      skills: { ...skillsDetail },
-      interests: { ...interestsDetail },
+      skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
+      interests: { ...interestsDetail, placeholder: "" },
     },
     seeksDetails: {
       description: { ...details.description },
@@ -311,8 +313,8 @@ const professionalUseCases = {
       location: { ...details.location },
     },
     seeksDetails: {
-      skills: { ...skillsDetail },
-      interests: { ...interestsDetail },
+      skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
+      interests: { ...interestsDetail, placeholder: "" },
     },
   },
   postDocSeeks: {
@@ -331,8 +333,8 @@ const professionalUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       person: { ...details.person },
-      skills: { ...skillsDetail },
-      interests: { ...interestsDetail },
+      skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
+      interests: { ...interestsDetail, placeholder: "" },
     },
     seeksDetails: {
       description: { ...details.description },
@@ -359,8 +361,8 @@ const professionalUseCases = {
     seeksDetails: {
       description: { ...details.description },
       location: { ...details.location },
-      skills: { ...skillsDetail },
-      interests: { ...interestsDetail },
+      skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
+      interests: { ...interestsDetail, placeholder: "" },
     },
   },
   consortiumSeeks: {
@@ -379,8 +381,8 @@ const professionalUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
-      skills: { ...skillsDetail },
-      interests: { ...interestsDetail },
+      skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
+      interests: { ...interestsDetail, placeholder: "" },
     },
     seeksDetails: {
       description: { ...details.description },
@@ -403,7 +405,10 @@ const infoUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
-      tags: { ...details.tags },
+      tags: {
+        ...details.tags,
+        placeholder: "e.g. question, general, area-of-interest",
+      },
     },
     seeksDetails: undefined,
   },
@@ -424,7 +429,10 @@ const infoUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
-      tags: { ...details.tags },
+      tags: {
+        ...details.tags,
+        placeholder: "e.g. answer, general, area-of-interest",
+      },
     },
     seeksDetails: undefined,
   },
@@ -494,6 +502,7 @@ const realEstateFeaturesDetail = {
   identifier: "features",
   label: "Features",
   icon: "#ico36_plus_circle", //TODO: better icon
+  placeholder: "e.g. balcony, bathtub",
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:amenityFeature": undefined };
