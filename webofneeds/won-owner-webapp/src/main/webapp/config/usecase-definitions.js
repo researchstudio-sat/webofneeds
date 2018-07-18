@@ -450,7 +450,7 @@ const realEstateFloorSizeDetail = {
     return {
       "s:floorSize": {
         "@type": "s:QuantitativeValue",
-        "s:value": value,
+        "s:value": [{ "@value": value, "@type": "xsd:float" }],
         "s:unitCode": "MTK",
       },
     };
@@ -485,7 +485,7 @@ const realEstateNumberOfRoomsDetail = {
     if (!value) {
       return { "s:numberOfRooms": undefined };
     }
-    return { "s:numberOfRooms": value };
+    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
   },
   parseFromRDF: function(jsonLDImm) {
     const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
@@ -550,7 +550,7 @@ const realEstateRentDetail = {
     return {
       "s:priceSpecification": {
         "@type": "s:CompoundPriceSpecification",
-        "s:price": value,
+        "s:price": [{ "@value": value, "@type": "xsd:float" }],
         "s:priceCurrency": "EUR",
         "s:description": "total rent per month",
         // "s:priceComponent": {
