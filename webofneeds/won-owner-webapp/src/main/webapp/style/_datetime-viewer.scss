@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-datetime-viewer {
+  @include won-detail-viewer("datetimev");
+}

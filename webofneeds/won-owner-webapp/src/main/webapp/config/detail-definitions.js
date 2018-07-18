@@ -95,6 +95,82 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:description");
     },
   },
+  date: {
+    identifier: "date",
+    label: "Date",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Date...",
+    component: "won-date-picker",
+    viewerComponent: "won-date-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:date": undefined };
+      }
+      return { "dc:date": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:date");
+    },
+  },
+  datetime: {
+    identifier: "datetime",
+    label: "Date & Time",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Date and Time...",
+    component: "won-datetime-picker",
+    viewerComponent: "won-datetime-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:datetime": undefined };
+      }
+      return { "dc:datetime": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:datetime");
+    },
+  },
+  time: {
+    identifier: "time",
+    label: "Time",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Time...",
+    component: "won-time-picker",
+    viewerComponent: "won-time-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:time": undefined };
+      }
+      return { "dc:time": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:time");
+    },
+  },
+  month: {
+    identifier: "month",
+    label: "Month",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Month...",
+    component: "won-month-picker",
+    viewerComponent: "won-month-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:month": undefined };
+      }
+      return { "dc:month": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:month");
+    },
+  },
   location: {
     identifier: "location",
     label: "Location",

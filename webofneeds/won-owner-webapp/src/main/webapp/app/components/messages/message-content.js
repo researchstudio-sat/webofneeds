@@ -12,12 +12,12 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
       <div class="msgcontent__header" ng-if="self.message && !self.isConnectionMessage()">
-        <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()">{{ self.labels.messageType[self.message.get('messageType')] }}</div>
-        <div class="msgcontent__header__type" ng-if="self.isOtherMessage()">{{ self.message.get('messageType') }}</div>
+        <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()">{{ self.labels.messageType[self.messageType] }}</div>
+        <div class="msgcontent__header__type" ng-if="self.isOtherMessage()">{{ self.messageType }}</div>
       </div>
       <div class="msgcontent__body" ng-if="self.message">
-        <div class="msgcontent__body__text--prewrap" ng-if="self.message.getIn(['content', 'text'])">{{ self.message.getIn(['content', 'text']) }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-        <div class="msgcontent__body__matchScore" ng-if="self.message.getIn(['content', 'matchScore'])">MatchScore: {{self.message.getIn(['content', 'matchScore']) }}</div>
+        <div class="msgcontent__body__text--prewrap" ng-if="self.hasText">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <div class="msgcontent__body__matchScore" ng-if="self.hasMatchScore">MatchScore: {{self.matchScorePercentage }}%</div>
         <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
       </div>
       <div class="msgcontent__body clickable" ng-if="!self.message">
@@ -49,9 +49,18 @@ function genComponentConf() {
           this.messageUri &&
           getIn(connection, ["messages", this.messageUri]);
 
+        const matchScore = message && getIn(message, ["content", "matchScore"]);
+
+        const text = text && getIn(message, ["content", "text"]);
+
         return {
           connection,
           message,
+          messageType: message && message.get("messageType"),
+          matchScorePercentage: matchScore && matchScore * 100,
+          hasMatchScore: !!matchScore,
+          hasText: !!text,
+          text,
         };
       };
 
@@ -64,23 +73,23 @@ function genComponentConf() {
     }
 
     isConnectionMessage() {
-      return this.message.get("messageType") === won.WONMSG.connectionMessage;
+      return this.messageType === won.WONMSG.connectionMessage;
     }
 
     isConnectMessage() {
-      return this.message.get("messageType") === won.WONMSG.connectMessage;
+      return this.messageType === won.WONMSG.connectMessage;
     }
 
     isOpenMessage() {
-      return this.message.get("messageType") === won.WONMSG.openMessage;
+      return this.messageType === won.WONMSG.openMessage;
     }
 
     isHintMessage() {
-      return this.message.get("messageType") === won.WONMSG.hintMessage;
+      return this.messageType === won.WONMSG.hintMessage;
     }
 
     isHintFeedbackMessage() {
-      return this.message.get("messageType") === won.WONMSG.hintFeedbackMessage;
+      return this.messageType === won.WONMSG.hintFeedbackMessage;
     }
 
     isOtherMessage() {

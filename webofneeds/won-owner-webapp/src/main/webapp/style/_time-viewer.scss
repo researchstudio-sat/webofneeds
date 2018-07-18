@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-time-viewer {
+  @include won-detail-viewer("timev");
+}
