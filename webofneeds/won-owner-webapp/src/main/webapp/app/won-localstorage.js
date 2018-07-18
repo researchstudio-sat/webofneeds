@@ -26,7 +26,7 @@ export function getReadUris() {
       try {
         readUrisCache = JSON.parse(readUrisString);
       } catch (e) {
-        clearReadUris();
+        localStorage.removeItem(READ_URIS);
         readUrisCache = [];
       }
     } else {
@@ -38,19 +38,9 @@ export function getReadUris() {
 }
 
 export function isUriRead(uri) {
-  if (!readUrisCache) {
-    let readUrisString = localStorage.getItem(READ_URIS);
-
-    if (readUrisString) {
-      readUrisCache = JSON.parse(readUrisString);
-    }
-  }
-
-  if (readUrisCache) {
-    for (const readUri of readUrisCache) {
-      if (readUri === uri) {
-        return true;
-      }
+  for (const readUri of getReadUris()) {
+    if (readUri === uri) {
+      return true;
     }
   }
 
@@ -86,7 +76,7 @@ export function getClosedConnUris() {
       try {
         closedConnUrisCache = JSON.parse(closedConnUrisString);
       } catch (e) {
-        clearClosedConnUris();
+        localStorage.removeItem(CLOSED_CONN_URIS);
         closedConnUrisCache = [];
       }
     } else {
