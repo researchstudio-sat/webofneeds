@@ -82,15 +82,6 @@ won-create-isseeks {
             --local-primary: #{$won-primary-color};
           }
         }
-
-        &__component {
-          .cis__details {
-            border-top: $thinBorderWidth solid $won-line-gray;
-
-            color: black;
-            --local-primary: black; // for the svg-icons
-          }
-        }
       }
     }
   }
