@@ -430,9 +430,142 @@ const infoUseCases = {
   },
 };
 
+const realEstateFloorSizeDetail = {
+  ...abstractDetails.number,
+  identifier: "floorSize",
+  label: "Floor size in square meters",
+  icon: "#ico36_plus_circle", // TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:floorSize": undefined };
+    }
+    return {
+      "s:floorSize": {
+        "@type": "s:QuantitativeValue",
+        "s:value": value,
+        "s:unitCode": "MTK",
+      },
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
+    const fs = floorSize && floorSize.get("s:value");
+    const unit = floorSize && floorSize.get("s:unitCode");
+    if (!fs) {
+      return undefined;
+    } else {
+      if (unit === "MTK") {
+        return fs + "m²";
+      } else if (unit === "FTK") {
+        return fs + "sq ft";
+      } else if (unit === "YDK") {
+        return fs + "sq yd";
+      } else if (!unit) {
+        return fs + " (no unit specified)";
+      }
+      return fs + " " + unit;
+    }
+  },
+};
+
+const realEstateNumberOfRoomsDetail = {
+  ...abstractDetails.number,
+  identifier: "numberOfRooms",
+  label: "Number of Rooms",
+  icon: "#ico36_plus_circle", // TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:numberOfRooms": undefined };
+    }
+    return { "s:numberOfRooms": value };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
+    if (!numberOfRooms) {
+      return undefined;
+    } else {
+      return numberOfRooms;
+    }
+  },
+};
+
+const realEstateFeaturesDetail = {
+  ...details.tags,
+  identifier: "features",
+  label: "Features",
+  icon: "#ico36_plus_circle", //TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:amenityFeature": undefined };
+    } else {
+      return {
+        "s:amenityFeature": {
+          "@type": "s:LocationFeatureSpecification",
+          "s:name": value,
+        },
+      };
+    }
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
+    const features = amenityFeature && amenityFeature.get("s:name");
+
+    if (!features) {
+      return undefined;
+    } else if (is("String", features)) {
+      return Immutable.fromJS([features]);
+    } else if (is("Array", features)) {
+      return Immutable.fromJS(features);
+    } else if (Immutable.List.isList(features)) {
+      return features;
+    } else {
+      console.error(
+        "Found unexpected format of features (should be Array, " +
+          "Immutable.List, or a single tag as string): " +
+          JSON.stringify(features)
+      );
+      return undefined;
+    }
+  },
+};
+
+const realEstateRentDetail = {
+  ...abstractDetails.number,
+  identifier: "rent",
+  label: "Rent in EUR/month",
+  icon: "#ico36_plus_circle", //TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:priceSpecification": undefined };
+    }
+    return {
+      "s:priceSpecification": {
+        "@type": "s:CompoundPriceSpecification",
+        "s:price": value,
+        "s:priceCurrency": "EUR",
+        "s:description": "total rent per month",
+        // "s:priceComponent": {
+        //   "@type": "s:UnitPriceSpecification",
+        //   "s:price": 0,
+        //   "s:priceCurrency": "EUR",
+        //   "s:description": "",
+        // }
+      },
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const rentPrice = jsonLDImm && jsonLDImm.get("s:priceSpecification");
+    const rent = rentPrice && rentPrice.get("s:price");
+
+    if (!rent) {
+      return undefined;
+    } else {
+      return rent + " EUR/month";
+    }
+  },
+};
+
 const realEstateUseCases = {
-  // TODO: rent is not found when parsing details - why?
-  // TODO: use commit --amend if possible!
   searchRent: {
     identifier: "searchRent",
     label: "Find a place to rent",
@@ -445,137 +578,10 @@ const realEstateUseCases = {
     isDetails: undefined,
     seeksDetails: {
       location: { ...details.location },
-      floorSize: {
-        ...abstractDetails.number,
-        identifier: "floorSize",
-        label: "Floor size in square meters",
-        icon: "#ico36_plus_circle", // TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:floorSize": undefined };
-          }
-          return {
-            "s:floorSize": {
-              "@type": "s:QuantitativeValue",
-              "s:value": value,
-              "s:unitCode": "MTK",
-            },
-          };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
-          const fs = floorSize && floorSize.get("s:value");
-          const unit = floorSize && floorSize.get("s:unitCode");
-          if (!fs) {
-            return undefined;
-          } else {
-            if (unit === "MTK") {
-              return fs + "m²";
-            } else if (unit === "FTK") {
-              return fs + "sq ft";
-            } else if (unit === "YDK") {
-              return fs + "sq yd";
-            } else if (!unit) {
-              return fs + " (no unit specified)";
-            }
-            return fs + " " + unit;
-          }
-        },
-      },
-      numberOfRooms: {
-        ...abstractDetails.number,
-        identifier: "numberOfRooms",
-        label: "Number of Rooms",
-        icon: "#ico36_plus_circle", // TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:numberOfRooms": undefined };
-          }
-          return { "s:numberOfRooms": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
-          if (!numberOfRooms) {
-            return undefined;
-          } else {
-            return numberOfRooms;
-          }
-        },
-      },
-      features: {
-        ...details.tags,
-        identifier: "features",
-        label: "Features",
-        icon: "#ico36_plus_circle", //TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:amenityFeature": undefined };
-          } else {
-            return {
-              "s:amenityFeature": {
-                "@type": "s:LocationFeatureSpecification",
-                "s:name": value,
-              },
-            };
-          }
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
-          const features = amenityFeature && amenityFeature.get("s:name");
-
-          if (!features) {
-            return undefined;
-          } else if (is("String", features)) {
-            return Immutable.fromJS([features]);
-          } else if (is("Array", features)) {
-            return Immutable.fromJS(features);
-          } else if (Immutable.List.isList(features)) {
-            return features;
-          } else {
-            console.error(
-              "Found unexpected format of features (should be Array, " +
-                "Immutable.List, or a single tag as string): " +
-                JSON.stringify(features)
-            );
-            return undefined;
-          }
-        },
-      },
-      rent: {
-        ...abstractDetails.number,
-        identifier: "rent",
-        label: "Rent in EUR/month",
-        icon: "#ico36_plus_circle", //TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:priceSpecification": undefined };
-          }
-          return {
-            "s:priceSpecification": {
-              "@type": "s:CompoundPriceSpecification",
-              "s:price": value,
-              "s:priceCurrency": "EUR",
-              "s:description": "total rent per month",
-              // "s:priceComponent": {
-              //   "@type": "s:UnitPriceSpecification",
-              //   "s:price": 0,
-              //   "s:priceCurrency": "EUR",
-              //   "s:description": "",
-              // }
-            },
-          };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const rentPrice = jsonLDImm && jsonLDImm.get("s:priceSpecification");
-          const rent = rentPrice && rentPrice.get("s:price");
-
-          if (!rent) {
-            return undefined;
-          } else {
-            return rent + " EUR/month";
-          }
-        },
-      },
+      floorSize: { ...realEstateFloorSizeDetail },
+      numberOfRooms: { ...realEstateNumberOfRoomsDetail },
+      features: { ...realEstateFeaturesDetail },
+      rent: { ...realEstateRentDetail },
     },
   },
   offerRent: {
@@ -592,137 +598,10 @@ const realEstateUseCases = {
       title: { ...details.title },
       description: { ...details.description },
       location: { ...details.location },
-      floorSize: {
-        ...abstractDetails.number,
-        identifier: "floorSize",
-        label: "Floor size in square meters",
-        icon: "#ico36_plus_circle", // TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:floorSize": undefined };
-          }
-          return {
-            "s:floorSize": {
-              "@type": "s:QuantitativeValue",
-              "s:value": value,
-              "s:unitCode": "MTK",
-            },
-          };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const floorSize = jsonLDImm && jsonLDImm.get("s:floorSize");
-          const fs = floorSize && floorSize.get("s:value");
-          const unit = floorSize && floorSize.get("s:unitCode");
-          if (!fs) {
-            return undefined;
-          } else {
-            if (unit === "MTK") {
-              return fs + "m²";
-            } else if (unit === "FTK") {
-              return fs + "sq ft";
-            } else if (unit === "YDK") {
-              return fs + "sq yd";
-            } else if (!unit) {
-              return fs + " (no unit specified)";
-            }
-            return fs + " " + unit;
-          }
-        },
-      },
-      numberOfRooms: {
-        ...abstractDetails.number,
-        identifier: "numberOfRooms",
-        label: "Number of Rooms",
-        icon: "#ico36_plus_circle", // TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:numberOfRooms": undefined };
-          }
-          return { "s:numberOfRooms": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
-          if (!numberOfRooms) {
-            return undefined;
-          } else {
-            return numberOfRooms;
-          }
-        },
-      },
-      features: {
-        ...details.tags,
-        identifier: "features",
-        label: "Features",
-        icon: "#ico36_plus_circle", //TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:amenityFeature": undefined };
-          } else {
-            return {
-              "s:amenityFeature": {
-                "@type": "s:LocationFeatureSpecification",
-                "s:name": value,
-              },
-            };
-          }
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const amenityFeature = jsonLDImm && jsonLDImm.get("s:amenityFeature");
-          const features = amenityFeature && amenityFeature.get("s:name");
-
-          if (!features) {
-            return undefined;
-          } else if (is("String", features)) {
-            return Immutable.fromJS([features]);
-          } else if (is("Array", features)) {
-            return Immutable.fromJS(features);
-          } else if (Immutable.List.isList(features)) {
-            return features;
-          } else {
-            console.error(
-              "Found unexpected format of features (should be Array, " +
-                "Immutable.List, or a single tag as string): " +
-                JSON.stringify(features)
-            );
-            return undefined;
-          }
-        },
-      },
-      rent: {
-        ...abstractDetails.number,
-        identifier: "rent",
-        label: "Rent in EUR/month",
-        icon: "#ico36_plus_circle", //TODO: better icon
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "s:priceSpecification": undefined };
-          }
-          return {
-            "s:priceSpecification": {
-              "@type": "s:CompoundPriceSpecification",
-              "s:price": value,
-              "s:priceCurrency": "EUR",
-              "s:description": "total rent per month",
-              // "s:priceComponent": {
-              //   "@type": "s:UnitPriceSpecification",
-              //   "s:price": 0,
-              //   "s:priceCurrency": "EUR",
-              //   "s:description": "",
-              // }
-            },
-          };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const rentPrice = jsonLDImm && jsonLDImm.get("s:priceSpecification");
-          const rent = rentPrice && rentPrice.get("s:price");
-
-          if (!rent) {
-            return undefined;
-          } else {
-            return rent + " EUR/month";
-          }
-        },
-      },
+      floorSize: { ...realEstateFloorSizeDetail },
+      numberOfRooms: { ...realEstateNumberOfRoomsDetail },
+      features: { ...realEstateFeaturesDetail },
+      rent: { ...realEstateRentDetail },
     },
     seeksDetails: undefined,
   },
