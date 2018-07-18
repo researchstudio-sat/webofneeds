@@ -24,10 +24,10 @@ function genComponentConf() {
                 ng-click="self.router__stateGoCurrent({showUseCases: undefined, useCase: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
                     class="ucp__header__back__icon">
-                    <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
-            <span class="ucp__header__title">What would you like to post?</span>
+            <span class="ucp__header__title">What do you have or want?</span>
         </div>
         <won-usecase-picker-content>
         </won-usecase-picker-content>
