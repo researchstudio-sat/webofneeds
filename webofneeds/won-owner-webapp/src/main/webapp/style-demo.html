@@ -1,0 +1,111 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width">
+  <!-- see http://getbootstrap.com/css/#overview-mobile -->
+  <title>Style Demo - Web Of Needs</title>
+  <link rel="stylesheet" href="./generated/won.min.css" />
+  <link rel="stylesheet" href="./skin/current/config.css" />
+  <!-- link rel="icon" type="image/png" href="images/won-icons/won-icon64.png" / -->
+  <link rel="icon" type="image/png" href="skin/current/images/logo.png">
+</head>
+
+<body>
+
+
+  <section ui-view="" class="ng-scope">
+    <header class="ng-scope">
+      <won-topnav class="ng-isolate-scope">
+        <nav class="topnav hide-in-responsive" ng-class="{'hide-in-responsive': !self.isPostView &amp;&amp; self.connectionOrPostDetailOpen}">
+          <div class="topnav__inner">
+            <div class="topnav__inner__left">
+              <a href="#!/connections?privateId=b92ks59q-m5n7f9aq" class="topnav__button">
+                <img src="skin/current/images/logo.svg" class="topnav__button__icon">
+                <span class="topnav__page-title topnav__button__caption hide-in-responsive ng-binding">
+                  Style Demo
+                </span>
+              </a>
+            </div>
+            <div class="topnav__inner__center"></div>
+            <div class="topnav__inner__right"> </div>
+          </div>
+        </nav>
+      </won-topnav>
+    </header>
+    <main class="connectionscontent ng-scope" style="background-color: white">
+
+      <section>
+        <h2>Filled Button</h2>
+        <p>Use like:</p>
+        <p>
+          <code><pre>
+            &lt;a class="won-button--filled red" href="#"&gt;
+              Demo Button
+            &lt;/a&gt;
+          </pre></code>
+        </p>
+
+        <a class="won-button--filled red" href="#">
+          Demo Button
+        </a>
+      </section>
+    </main>
+  </section>
+
+
+
+  <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
+  <img src="./generated/symbol/svg/sprite.symbol.svg" style="display:none">
+  <script>
+    // from https://github.com/gagan-bansal/parse-svg/blob/master/index.js
+    function parseSVG(xmlString) {
+      const div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+      div.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg">' + xmlString + "</svg>";
+      const frag = document.createDocumentFragment();
+      while (div.firstChild.firstChild) frag.appendChild(div.firstChild.firstChild);
+      return frag;
+    }
+    /**
+     * Fetch and inline an icon-spritemap so it can be colored using css-constiables.
+     */
+    function inlineSVGSpritesheet(path, id) {
+      return fetch(path)
+        .then(res => res.text())
+        .then(xmlString => parseSVG(xmlString))
+        .then(svgDocumentFragment => {
+          if (!svgDocumentFragment)
+            throw new Error("Couldn't parse icon-spritesheet.");
+          document.body.appendChild(svgDocumentFragment);
+          const svgNode = document.body.lastChild; // the node resulting from the fragment we just appended
+          if (svgNode && svgNode.style) {
+            svgNode.style.display = "none";
+          }
+          if (id) {
+            svgNode.id = id;
+          }
+        });
+    }
+    inlineSVGSpritesheet("./generated/symbol/svg/sprite.symbol.svg", "icon-sprite");
+  </script>
+
+</body>
+
+</html>
