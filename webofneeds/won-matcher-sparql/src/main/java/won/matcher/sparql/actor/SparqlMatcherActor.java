@@ -13,11 +13,9 @@ import com.github.jsonldjava.core.JsonLdError;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
+import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.op.*;
@@ -219,12 +217,25 @@ public class SparqlMatcherActor extends UntypedActor {
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
     }
 
-    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
+    private Optional<Op> clientSuppliedQuery(String queryString) {
+        Query query =  QueryFactory.create(queryString);
+        if(query.getQueryType() != Query.QueryTypeSelect) {
+            return Optional.empty();
+        }
+
+        if(!query.getProjectVars().contains(resultName)) {
+            return Optional.empty();
+        }
+        Op op = Algebra.compile(query);
+        return Optional.of(new OpDistinct(op));
+    }
+
+    private Optional<Op> defaultQuery(NeedModelWrapper need) {
         Model model = need.getNeedModel();
 
         String needURI = need.getNeedUri();
 
-        ArrayList<Op> queries = new ArrayList<>(2);
+        ArrayList<Op> queries = new ArrayList<>(3);
 
         Statement seeks = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#seeks"));
 
@@ -249,39 +260,56 @@ public class SparqlMatcherActor extends UntypedActor {
             queries.add(createSearchQuery(searchString));
         }
 
-        Set<NeedModelWrapper> needs = queries.stream().reduce((left, right) -> new OpUnion(left, right))
-                .map((union) -> {
+        return queries.stream()
+                .reduce((left, right) -> new OpUnion(left, right))
+                .map((union) -> new OpDistinct(
+                                new OpProject(
+                                        union,
+                                        Arrays.asList(new Var[]{resultName})
+                                )
+                        )
+                );
+    }
 
-                    Op query = new OpDistinct(
-                            new OpProject(
-                                    union,
-                                    Arrays.asList(new Var[]{resultName})
-                            )
-                    );
+    private Set<NeedModelWrapper> queryNeed(NeedModelWrapper need) {
+        Model model = need.getNeedModel();
+        String needURI = need.getNeedUri();
 
-                    QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(query));
+        Optional<Op> query;
 
-                    ResultSet result = execution.execSelect();
+        Statement userQuery = model.getProperty(model.createResource(needURI), model.createProperty("http://purl.org/webofneeds/model#hasQuery"));
 
-                    Stream<QuerySolution> stream = StreamSupport.stream(
-                            Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
-                            false);
+        if(userQuery != null) {
+            query = clientSuppliedQuery(userQuery.getString());
+        } else {
+            query = defaultQuery(need);
+        }
 
-                    Set<NeedModelWrapper> matchedNeeds = stream
-                            .map(querySolution -> {
-                                String foundNeedURI = querySolution.get(resultName.getName()).toString();
-                                try {
-                                    return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
-                                } catch (URISyntaxException e) {
-                                    e.printStackTrace();
-                                    return null;
-                                }
-                            })
-                            .filter(foundNeed -> foundNeed != null)
-                            .collect(Collectors.toSet());
+        Set<NeedModelWrapper> needs = query.map(q -> {
 
-                    return matchedNeeds;
-                })
+            QueryExecution execution = QueryExecutionFactory.sparqlService(config.getSparqlEndpoint(), OpAsQuery.asQuery(q));
+
+            ResultSet result = execution.execSelect();
+
+            Stream<QuerySolution> stream = StreamSupport.stream(
+                    Spliterators.spliteratorUnknownSize(result, Spliterator.CONCURRENT),
+                    false);
+
+            Set<NeedModelWrapper> matchedNeeds = stream
+                    .map(querySolution -> {
+                        String foundNeedURI = querySolution.get(resultName.getName()).toString();
+                        try {
+                            return new NeedModelWrapper(linkedDataSource.getDataForResource(new URI(foundNeedURI)));
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    })
+                    .filter(foundNeed -> foundNeed != null)
+                    .collect(Collectors.toSet());
+
+            return matchedNeeds;
+        })
                 .orElse(new HashSet<>());
 
         return needs;
@@ -301,7 +329,7 @@ public class SparqlMatcherActor extends UntypedActor {
     }
 
     private static boolean postFilter(NeedModelWrapper need, NeedModelWrapper foundNeed) {
-        if(need.getNeedUri().equals(foundNeed.getNeedUri())) {
+        if (need.getNeedUri().equals(foundNeed.getNeedUri())) {
             return false;
         }
         if (need.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForMe"))) {
@@ -312,10 +340,10 @@ public class SparqlMatcherActor extends UntypedActor {
         }
 
         Set<String> needContexts = getMatchingContexts(need);
-        if(!needContexts.isEmpty()) {
+        if (!needContexts.isEmpty()) {
             Set<String> foundNeedContexts = getMatchingContexts(foundNeed);
             foundNeedContexts.retainAll(needContexts);
-            if(foundNeedContexts.isEmpty()) {
+            if (foundNeedContexts.isEmpty()) {
                 return false;
             }
         }
