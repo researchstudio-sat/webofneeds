@@ -10,6 +10,8 @@ import { actionCreators } from "../actions/actions.js";
 import { labels, relativeTime } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
+import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
+import { getHumanReadableStringFromNeed } from "../reducers/need-reducer/parse-need.js";
 import {
   selectLastUpdateTime,
   selectNeedByConnectionUri,
@@ -33,11 +35,11 @@ function genComponentConf() {
       </div>
       <div class="ch__right" ng-if="!self.isLoading()">
         <div class="ch__right__topline">
-          <div class="ch__right__topline__title" ng-show="self.theirNeed.get('title')" title="{{ self.theirNeed.get('title') }}">
-            {{ self.theirNeed.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.theirNeed.get('title') }}
+          <div class="ch__right__topline__title" ng-if="self.theirNeedHumanReadableString" title="{{ self.theirNeedHumanReadableString }}">
+            {{ self.theirNeedHumanReadableString }}
           </div>
-          <div class="ch__right__topline__notitle" ng-show="!self.theirNeed.get('title')" title="no title">
-            {{ self.theirNeed.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
+          <div class="ch__right__topline__notitle" ng-if="!self.latestMessageString && !self.theirNeedHumanReadableString" title="no title">
+            no title
           </div>
         </div>
         <div class="ch__right__subtitle">
@@ -74,7 +76,6 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.ph4dbg = this;
       this.labels = labels;
       this.WON = won.WON;
       const selectFromState = state => {
@@ -88,10 +89,24 @@ function genComponentConf() {
         const unreadMessages =
           allMessages && allMessages.filter(msg => msg.get("unread"));
 
+        const sortedMessages = allMessages && allMessages.toArray();
+        if (sortedMessages) {
+          sortedMessages.sort(function(a, b) {
+            return b.get("date").getTime() - a.get("date").getTime();
+          });
+        }
+        const latestMessageHumanReadableString =
+          sortedMessages &&
+          getHumanReadableStringFromMessage(sortedMessages[0]);
+        const theirNeedHumanReadableString =
+          theirNeed && getHumanReadableStringFromNeed(theirNeed);
+
         return {
           connection,
           ownNeed,
           theirNeed,
+          latestMessageHumanReadableString,
+          theirNeedHumanReadableString,
           unreadMessageCount:
             unreadMessages && unreadMessages.size > 0
               ? unreadMessages.size
