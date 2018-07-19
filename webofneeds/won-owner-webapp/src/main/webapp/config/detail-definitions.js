@@ -502,7 +502,7 @@ export const details = {
     identifier: "tags",
     label: "Tags",
     icon: "#ico36_tags_circle",
-    placeholder: "e.g. #couch #free",
+    placeholder: "e.g. couch, free",
     component: "won-tags-picker",
     viewerComponent: "won-tags-viewer",
     parseToRDF: function({ value }) {
