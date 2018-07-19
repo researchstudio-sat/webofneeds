@@ -12,6 +12,7 @@ import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
+import { getHumanReadableStringFromNeed } from "../reducers/need-reducer/parse-need.js";
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
@@ -26,14 +27,11 @@ function genComponentConf() {
     </won-square-image>
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.isLoading()">
       <div class="ph__right__topline">
-        <div class="ph__right__topline__title" ng-show="self.need.get('title')">
-         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('title') }}
+        <div class="ph__right__topline__title" ng-if="self.needHumanReadableString">
+         {{ self.needHumanReadableString }}
         </div>
-        <div class="ph__right__topline__title" ng-show="!self.need.get('title') && self.need.get('searchString')">
-         Search: {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('searchString') }}
-        </div>
-        <div class="ph__right__topline__notitle" ng-show="!self.need.get('title') && !self.need.get('searchString')">
-         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
+        <div class="ph__right__topline__notitle" ng-if="!self.needHumanReadableString">
+         no title
         </div>
       </div>
       <div class="ph__right__subtitle">
@@ -48,7 +46,7 @@ function genComponentConf() {
     
     <div class="ph__right" ng-if="self.need.get('isBeingCreated')">
       <div class="ph__right__topline">
-        <div class="ph__right__topline__title">
+        <div class="ph__right__topline__notitle>
           Creating...
         </div>
       </div>
@@ -77,9 +75,12 @@ function genComponentConf() {
       this.WON = won.WON;
       const selectFromState = state => {
         const need = state.getIn(["needs", this.needUri]);
+        const needHumanReadableString =
+          need && getHumanReadableStringFromNeed(need);
 
         return {
           need,
+          needHumanReadableString,
           friendlyTimestamp:
             need &&
             relativeTime(

@@ -194,3 +194,14 @@ function extractFlags(wonHasFlags) {
 
   return hasFlags;
 }
+
+export function getHumanReadableStringFromNeed(need) {
+  const searchString = need && need.get("searchString");
+  const title = need && need.get("title");
+  if (title) {
+    return title;
+  } else if (searchString) {
+    return "Search: " + searchString;
+  }
+  return undefined;
+}
