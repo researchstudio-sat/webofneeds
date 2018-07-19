@@ -51,7 +51,7 @@ function genComponentConf() {
 
         const matchScore = message && getIn(message, ["content", "matchScore"]);
 
-        const text = text && getIn(message, ["content", "text"]);
+        const text = message && getIn(message, ["content", "text"]);
 
         return {
           connection,
