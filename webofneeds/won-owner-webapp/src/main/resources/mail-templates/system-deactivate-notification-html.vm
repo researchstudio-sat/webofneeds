@@ -1,6 +1,6 @@
 <div>
     <p> Hi there,</p>
-    <p>Your posting <a href="$linkLocalNeed">$localNeedTitle</a> was deactivated by the WoN node that hosts it.
+    <p>Your post <a href="$linkLocalNeed">$localNeedTitle</a> was deactivated by the WoN node that hosts it.
 
     </p>
     #if ($textMsg)

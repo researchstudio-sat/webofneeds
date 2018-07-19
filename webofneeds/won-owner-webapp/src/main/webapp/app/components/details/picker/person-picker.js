@@ -1,6 +1,6 @@
 import angular from "angular";
-import { attach, delay } from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
+import { attach, delay } from "../../../utils.js";
+import { DomCache } from "../../../cstm-ng-utils.js";
 import Immutable from "immutable";
 
 const serviceDependencies = ["$scope", "$element"];

@@ -1,0 +1,40 @@
+@import "won-config";
+@import "textfield";
+
+won-date-picker {
+  .datep__input {
+    position: relative;
+    display: grid;
+
+    .datep__input__icon {
+      @include fixed-square($bigiconSize);
+      position: absolute;
+      right: 0.5rem;
+      top: $formInputHeight / 2 - $bigiconSize / 2;
+      z-index: 1;
+    }
+
+    .datep__input__inner {
+      width: 100%;
+      box-sizing: border-box;
+      border: $thinGrayBorder;
+      min-height: $formInputHeight;
+      min-height: $formInputHeight;
+      word-wrap: break-word;
+
+      $verticalPadding: calcVerticalPaddingToHeight(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+        0.438rem;
+    }
+
+    .datep__input__inner::-ms-clear {
+      width: 0;
+      height: 0;
+    }
+  }
+}

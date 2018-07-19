@@ -1,23 +1,23 @@
 import angular from "angular";
-import { attach, delay } from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
+import { attach, delay } from "../../../utils.js";
+import { DomCache } from "../../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="titlep__input">
-         <svg class="titlep__input__icon clickable" 
+      <div class="monthp__input">
+         <svg class="monthp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetTitle()">
+            ng-click="self.resetDatetime()">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
           <input
-              type="text"
-              class="titlep__input__inner won-txt"
+              type="month"
+              class="monthp__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
-              ng-blur="::self.updateTitle()"
-              ng-keyup="::self.updateTitle()"/>
+              ng-model="self.value"
+              ng-change="::self.updateMonth()"/>
       </div>
     `;
 
@@ -26,27 +26,27 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
-      window.titlep4dbg = this;
+      window.monthp4dbg = this;
 
-      this.addedTitle = this.initialValue;
+      this.addedMonth = this.initialValue;
       this.showResetButton = false;
 
-      delay(0).then(() => this.showInitialTitle());
+      delay(0).then(() => this.showInitialMonth());
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(title) {
-      if (title && title.trim().length > 0) {
-        this.onUpdate({ value: title });
+    update(month) {
+      if (month) {
+        this.onUpdate({ value: month });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
-    showInitialTitle() {
-      this.addedTitle = this.initialValue;
+    showInitialMonth() {
+      this.addedMonth = this.initialValue;
 
       if (this.initialValue && this.initialValue.trim().length > 0) {
         this.textfield().value = this.initialValue.trim();
@@ -56,43 +56,43 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    updateTitle() {
+    updateMonth() {
       const text = this.textfield().value;
 
       if (text && text.trim().length > 0) {
-        this.addedTitle = text.trim();
-        this.update(this.addedTitle);
+        this.addedMonth = text.trim();
+        this.update(this.addedMonth);
         this.showResetButton = true;
       } else {
-        this.resetTitle();
+        this.resetMonth();
       }
     }
 
-    resetTitle() {
-      this.addedTitle = undefined;
+    resetMonth() {
+      this.addedMonth = undefined;
       this.textfield().value = "";
       this.update(undefined);
       this.showResetButton = false;
     }
 
     // textfieldNg() {
-    //   return this.domCache.ng(".titlep__input__inner");
+    //   return this.domCache.ng(".monthp__input__inner");
     // }
 
     // textfield() {
-    //   return this.domCache.dom(".titlep__input__inner");
-    // } // TODO: why is this done differently for title than for any other picker?
+    //   return this.domCache.dom(".monthp__input__inner");
+    // } // TODO: why is this done differently for number than for any other picker?
 
     textfieldNg() {
       return angular.element(this.textfield());
     }
     textfield() {
-      if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(
-          ".titlep__input__inner"
+      if (!this._monthInput) {
+        this._monthInput = this.$element[0].querySelector(
+          ".monthp__input__inner"
         );
       }
-      return this._titleInput;
+      return this._monthInput;
     }
   }
   Controller.$inject = serviceDependencies;
@@ -112,5 +112,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.titlePicker", [])
-  .directive("wonTitlePicker", genComponentConf).name;
+  .module("won.owner.components.monthPicker", [])
+  .directive("wonMonthPicker", genComponentConf).name;

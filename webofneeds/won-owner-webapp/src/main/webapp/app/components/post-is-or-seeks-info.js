@@ -12,6 +12,10 @@ import tagsViewerModule from "./details/viewer/tags-viewer.js";
 import travelActionViewerModule from "./details/viewer/travel-action-viewer.js";
 import titleViewerModule from "./details/viewer/title-viewer.js";
 import numberViewerModule from "./details/viewer/number-viewer.js";
+import dateViewerModule from "./details/viewer/date-viewer.js";
+import datetimeViewerModule from "./details/viewer/datetime-viewer.js";
+import monthViewerModule from "./details/viewer/month-viewer.js";
+import timeViewerModule from "./details/viewer/time-viewer.js";
 import dropdownViewerModule from "./details/viewer/dropdown-viewer.js";
 
 import { attach } from "../utils.js";
@@ -107,6 +111,10 @@ angular
     titleViewerModule,
     numberViewerModule,
     dropdownViewerModule,
+    dateViewerModule,
+    timeViewerModule,
+    datetimeViewerModule,
+    monthViewerModule,
   ])
   .directive("detailViewerElement", [
     "$compile",

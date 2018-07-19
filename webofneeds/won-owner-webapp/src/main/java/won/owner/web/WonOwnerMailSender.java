@@ -75,6 +75,10 @@ public class WonOwnerMailSender {
     this.wonMailSender = wonMailSender;
   }
 
+  private String useValueOrDefaultValue(String value, String defaultValue) {
+    return value != null ? value : defaultValue;
+  }
+  
   private VelocityContext createContext(String toEmail, String localNeed, String remoteNeed,
                                         String localConnection, String textMsg) {
 
@@ -88,6 +92,7 @@ public class WonOwnerMailSender {
       Dataset needDataset = linkedDataSource.getDataForResource(URI.create(remoteNeed));
       DefaultNeedModelWrapper remoteNeedWrapper = new DefaultNeedModelWrapper(needDataset);
       String remoteNeedTitle = remoteNeedWrapper.getSomeTitleFromIsOrAll("en", "de");
+      remoteNeedTitle = useValueOrDefaultValue(remoteNeedTitle, "(no title)");
       velocityContext.put("remoteNeedTitle", remoteNeedTitle);
       String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
       velocityContext.put("linkRemoteNeed", linkRemoteNeed);
@@ -97,6 +102,7 @@ public class WonOwnerMailSender {
       Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
       DefaultNeedModelWrapper localNeedWrapper = new DefaultNeedModelWrapper(localNeedDataset);
       String localNeedTitle = localNeedWrapper.getSomeTitleFromIsOrAll("en","de");
+      localNeedTitle = useValueOrDefaultValue(localNeedTitle, "(no title)");
       String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
       velocityContext.put("linkLocalNeed", linkLocalNeed);
       velocityContext.put("localNeedTitle", localNeedTitle);

@@ -33,10 +33,9 @@ function genTopnavConf() {
                     Reconnect
             </button>
 
-            <img src="images/spinner/on_red.gif"
-                alt="Reconnecting&hellip;"
-                ng-show="self.reconnecting"
-                class="hspinner"/>
+            <svg class="hspinner" ng-show="self.reconnecting">
+                <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+            </svg>
         </div>
         <div class="slide-in" ng-class="{'visible': !self.acceptedDisclaimer}">
             <svg class="si__icon" style="--local-primary:white;">
