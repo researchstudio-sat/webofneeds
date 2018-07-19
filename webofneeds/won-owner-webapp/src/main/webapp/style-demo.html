@@ -25,6 +25,38 @@
   <link rel="stylesheet" href="./skin/current/config.css" />
   <!-- link rel="icon" type="image/png" href="images/won-icons/won-icon64.png" / -->
   <link rel="icon" type="image/png" href="skin/current/images/logo.png">
+
+  <style>
+    main {
+      /* overwrite normal height:100% */
+      height: auto;
+
+      display: grid;
+      grid-row-gap: 2rem;
+      justify-items: center;
+      padding-top: 2rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 2rem;
+    }
+
+    body>section {
+      background-color: white;
+    }
+    main>section {
+      width: 25rem;
+    }
+
+    pre {
+      background-color: var(--won-light-gray);
+      border: 1px solid var(--won-line-gray);
+      padding: 0.5rem;
+    }
+
+    h2 {
+      /* margin-top: 3rem; */
+    }
+  </style>
 </head>
 
 <body>
@@ -49,25 +81,28 @@
         </nav>
       </won-topnav>
     </header>
-    <main class="connectionscontent ng-scope" style="background-color: white">
+    <main>
+
 
       <section>
         <h2>Filled Button</h2>
         <p>Use like:</p>
         <p>
           <code><pre>
-            &lt;a class="won-button--filled red" href="#"&gt;
-              Demo Button
-            &lt;/a&gt;
-          </pre></code>
+&lt;a class="won-button--filled red" href="#"&gt;
+  Demo Button
+&lt;/a&gt;</pre></code>
         </p>
 
         <a class="won-button--filled red" href="#">
           Demo Button
         </a>
       </section>
+
+
     </main>
   </section>
+
 
 
 
