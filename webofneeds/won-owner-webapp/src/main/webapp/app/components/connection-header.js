@@ -47,11 +47,18 @@ function genComponentConf() {
             <won-connection-state 
               connection-uri="self.connection.get('uri')">
             </won-connection-state>
-            <span class="ch__right__subtitle__type__state" ng-if="!self.unreadMessageCount">
+            <span class="ch__right__subtitle__type__state" ng-if="!self.unreadMessageCount && !self.latestMessageHumanReadableString">
               {{ self.connection && self.getTextForConnectionState(self.connection.get('state')) }}
             </span>
-            <span class="ch__right__subtitle__type__unreadcount" ng-if="self.unreadMessageCount">
+            <span class="ch__right__subtitle__type__unreadcount" ng-if="self.unreadMessageCount > 1">
               {{ self.unreadMessageCount }} unread Messages
+            </span>
+            <span class="ch__right__subtitle__type__unreadcount" ng-if="self.unreadMessageCount == 1 && !self.latestMessageHumanReadableString">
+              {{ self.unreadMessageCount }} unread Message
+            </span>
+            <span class="ch__right__subtitle__type__message" ng-if="!(self.unreadMessageCount > 1) && self.latestMessageHumanReadableString"
+              ng-class="{'won-unread': self.latestMessageUnread}">
+              {{ self.latestMessageHumanReadableString }}
             </span>
           </span>
           <div class="ch__right__subtitle__date">
@@ -95,9 +102,12 @@ function genComponentConf() {
             return b.get("date").getTime() - a.get("date").getTime();
           });
         }
+
+        const latestMessage = sortedMessages && sortedMessages[0];
         const latestMessageHumanReadableString =
-          sortedMessages &&
-          getHumanReadableStringFromMessage(sortedMessages[0]);
+          latestMessage && getHumanReadableStringFromMessage(latestMessage);
+        const latestMessageUnread =
+          latestMessage && latestMessage.get("unread");
         const theirNeedHumanReadableString =
           theirNeed && getHumanReadableStringFromNeed(theirNeed);
 
@@ -106,6 +116,7 @@ function genComponentConf() {
           ownNeed,
           theirNeed,
           latestMessageHumanReadableString,
+          latestMessageUnread,
           theirNeedHumanReadableString,
           unreadMessageCount:
             unreadMessages && unreadMessages.size > 0
