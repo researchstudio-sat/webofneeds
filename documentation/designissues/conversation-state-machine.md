@@ -9,7 +9,7 @@ to reflect the state of the communication channel and that should be its only us
 
 Moreover, the possible states and their transitions can be very different depending on the use case.
 
-## Solution
+## Solution 1: Finite State Machines
 
 Using the agreement protocol the conversation partners have the ability to agree on RDF data. 
 Let them agree on a set of triples that defines a finite state machine.
@@ -23,7 +23,7 @@ That definition can be interpreted on both sides of the conversation - with iden
 The result of such an interpretation is the state after the last event that happened.
 The interpretation only takes triples into account that have been agreed upon. 
 
-## Implementation
+### Implementation
 This protocol is a higher-level, end-to-end protocol. It has to be implemented by all clients. 
 Important questions:
 * Who proposes a state machine and how are they authored?
@@ -34,10 +34,10 @@ Important questions:
 	* later: visualize it? calculate formal proofs? Probably, if it is too complicated to analyze visually, it should be broken up in multiple smaller ones.
 	* later: only reference an external definition (the generally accepted state machine for transport, for example), and compare checksums
 	
-## Validity of Events 
+### Validity of Events 
 We said that state machines only take data into account that are agreed upon. That may be cumbersome, because the state will not change when you state that an event took place, only when your counterpart agrees it did. We could include data that has been proposed, but that's inaccurate: If I propose something, it is clear that it may not be agreed upon. Moreover, I could propose multiple, exclusive things (not implemented yet but planned). However, when I say: 'I just delivered your package' that is not a proposition. From my point of view it immediately receives truth status. Later, my counterpart may reject this assertion, or explicitly accept it. We might introduce a new message type into the agreement protocol, 'agr:asserts', that adds the asserted triples to the agreement triples immediately without the need to be accepted, but can later be rejected by the counterpart or retracted by the asserter, in which case the triples are removed again. We'll have to think about how that influences the rest of the protocol, especially, what happens to agreements made between an assertion and its rejection? (intuition: they become invalid and have to be renewed)
 
-## Format
+### Format
 Example
 ```
 _:state1 a wsm:State;
@@ -85,4 +85,18 @@ ex:msg2 wsm:hasEvent _:serviceEvent.
 
 ```
 
-	
+## Solution 2: Petri Nets
+
+Same as Solution 1, but using Petri Nets instead of FSMs. Main arguments for that: smaller networks in case of parallel tasks
+
+## Solution 3: BPMN
+
+Same as Solution 2, but using Petri Nets instead of FSMs. Main arguments for that: smaller networks in case of parallel tasks
+
+Arguments for:
+1. Tooling, Community, Documentation,...
+2. If we want more complex things processes, choreographies etc., we can build them
+Argumetns against:
+1. A lot of dead weight
+2. No unambiguous semantics (I believe)
+
