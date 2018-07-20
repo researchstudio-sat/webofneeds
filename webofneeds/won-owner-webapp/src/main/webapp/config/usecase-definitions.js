@@ -27,6 +27,27 @@ export const emptyDraft = {
  * both use the predicate "dc:description".
  * To avoid this, redefine the parseToRDF() and parseFromRDF() methods for either
  * detail to use a different predicate.
+ *
+ * SUPPLYING A QUERY
+ * If it is necessary to fine-tune the matching behaviour of a usecase, a custom SPARQL query can be added to the definition.
+ * Exmaple:
+ * useCase: {
+ *    ...,
+ *    queryGenerator: (draft, resultName) {
+ *        new SparqlParser.parse(`
+ *            PREFIX won: <http://purl.org/webofneeds/model#>
+ *
+ *            SELECT ${resultName} WHERE {
+ *                ${resultName} a won:Need .
+ *            }
+ *        `)
+ *    }
+ * }
+ *
+ * A `queryGenerator` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
+ *
+ * The query needs to be a SELECT query and select only the resultName variable.
+ * This will be automatically enforced by the need builder.
  */
 
 const allDetailsUseCase = {
