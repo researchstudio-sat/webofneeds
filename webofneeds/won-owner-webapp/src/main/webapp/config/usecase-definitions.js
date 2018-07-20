@@ -646,25 +646,27 @@ const transportUseCases = {
     icon: "#ico36_uc_custom", // TODO: better icon
     draft: {
       ...emptyDraft,
-      seeks: { title: "Looking to get something transported" },
+      is: { title: "Looking to get something transported" },
     },
     isDetails: {
+      title: { ...details.title },
       content: {
         ...details.description,
         identifier: "content",
         label: "Content",
         placeholder: "Provide information about what should be transported",
         parseToRDF: function({ value }) {
-          // TODO: impl
           if (!value) {
-            return undefined;
+            return { "s:name": undefined };
+          } else {
+            return { "@type": "s:Product", "s:name": value };
           }
-          return undefined;
         },
         parseFromRDF: function(jsonLDImm) {
-          // TODO: impl
-          if (jsonLDImm || !jsonLDImm) {
-            return undefined;
+          const content = jsonLDImm && jsonLDImm.get("s:name");
+          if (content) {
+            console.log("JSONLDImm of @type: ", jsonLDImm.get("@type"));
+            return content;
           }
         },
       },
@@ -673,27 +675,88 @@ const transportUseCases = {
         identifier: "weight",
         label: "Weight",
         icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            // TODO: unit codes
+            return { "s:weight": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:weight": [{ "@value": value, "@type": "xsd:float" }],
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const weight = jsonLDImm && jsonLDImm.get("s:weight");
+          if (weight) {
+            return weight;
+          }
+        },
       },
-      length: { ...abstractDetails.number },
-      width: { ...abstractDetails.number },
+      length: {
+        ...abstractDetails.number,
+        identifier: "length",
+        label: "Length",
+        icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            // TODO: unit codes
+            return { "s:length": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:length": [{ "@value": value, "@type": "xsd:float" }],
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const length = jsonLDImm && jsonLDImm.get("s:length");
+          if (length) {
+            return length;
+          }
+        },
+      },
+      width: {
+        ...abstractDetails.number,
+        identifier: "width",
+        label: "Width",
+        icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            // TODO: unit codes
+            return { "s:width": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:width": [{ "@value": value, "@type": "xsd:float" }],
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const width = jsonLDImm && jsonLDImm.get("s:width");
+          if (width) {
+            return width;
+          }
+        },
+      },
       tags: { ...details.tags },
     },
     seeksDetails: {
-      title: { ...details.title },
-      fromTo: { ...details.travelAction },
+      travelAction: { ...details.travelAction },
     },
   },
   transportOffer: {
     identifier: "transportOffer",
-    label: "Transport something",
+    label: "Offer Transportation",
     icon: "#ico36_uc_custom", // TODO: better icon
     draft: {
       ...emptyDraft,
       is: { title: "Transportation Offer" },
+      searchString: "transport", // TODO: replace this with a query
     },
     isDetails: {
       title: { ...details.title },
-      area: { ...details.location },
+      location: { ...details.location },
     },
     seeksDetails: {
       tags: { ...details.tags },
