@@ -803,8 +803,8 @@ export const useCaseGroups = {
     useCases: { ...realEstateUseCases },
   },
   transport: {
-    identifier: "realestategroup",
-    label: "Real Estate",
+    identifier: "transportgroup",
+    label: "Transport",
     icon: undefined,
     useCases: { ...transportUseCases },
   },
