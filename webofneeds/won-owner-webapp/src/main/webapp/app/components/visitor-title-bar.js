@@ -15,12 +15,12 @@ function genComponentConf() {
             <div class="vtb__inner">
                 <div class="vtb__inner__left">
                     <won-square-image
-                        title="self.post.get('title')"
+                        title="self.post.get('humanReadable')"
                         src="self.post.get('titleImgSrc')"
                         uri="self.post.get('uri')">
                     </won-square-image>
                     <hgroup>
-                        <h1 class="vtb__title">{{ self.post.get('title') }}</h1>
+                        <h1 class="vtb__title">{{ self.post.get('humanReadable') }}</h1>
                         <div class="vtb__titles__type">{{self.labels.type[self.post.get("type")]}}{{self.post.get('matchingContexts')? ' in '+ self.post.get('matchingContexts').join(', ') : '' }}</div>
                     </hgroup>
                 </div>

@@ -26,14 +26,11 @@ function genComponentConf() {
     </won-square-image>
     <div class="ph__right" ng-if="!self.need.get('isBeingCreated') && !self.isLoading()">
       <div class="ph__right__topline">
-        <div class="ph__right__topline__title" ng-show="self.need.get('title')">
-         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('title') }}
+        <div class="ph__right__topline__title" ng-if="self.need.get('humanReadable')">
+         {{ self.need.get('humanReadable') }}
         </div>
-        <div class="ph__right__topline__title" ng-show="!self.need.get('title') && self.need.get('searchString')">
-         Search: {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}}{{ self.need.get('searchString') }}
-        </div>
-        <div class="ph__right__topline__notitle" ng-show="!self.need.get('title') && !self.need.get('searchString')">
-         {{ self.need.get('state') === self.WON.InactiveCompacted ? "[Inactive] " : ""}} no title
+        <div class="ph__right__topline__notitle" ng-if="!self.need.get('humanReadable')">
+         no title
         </div>
       </div>
       <div class="ph__right__subtitle">
@@ -48,7 +45,7 @@ function genComponentConf() {
     
     <div class="ph__right" ng-if="self.need.get('isBeingCreated')">
       <div class="ph__right__topline">
-        <div class="ph__right__topline__title">
+        <div class="ph__right__topline__notitle">
           Creating...
         </div>
       </div>

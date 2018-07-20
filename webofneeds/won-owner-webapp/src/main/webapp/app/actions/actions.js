@@ -399,7 +399,7 @@ export function needsClosedBySystem(event) {
       type: actionTypes.needs.closedBySystem,
       payload: {
         needUri: event.getReceiverNeed(),
-        needTitle: need.get("title"),
+        humanReadable: need.get("humanReadable"),
         message: event.getTextMessage(),
       },
     });

@@ -132,3 +132,8 @@ function hasReferences(refContent) {
   }
   return false;
 }
+
+export function getHumanReadableStringFromMessage(message) {
+  const text = message && message.getIn(["content", "text"]);
+  return text;
+}
