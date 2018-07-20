@@ -30,6 +30,7 @@ import datetimePickerModule from "./details/picker/datetime-picker.js";
 import timePickerModule from "./details/picker/time-picker.js";
 import monthPickerModule from "./details/picker/month-picker.js";
 import dropdownPickerModule from "./details/picker/dropdown-picker.js";
+import selectPickerModule from "./details/picker/select-picker.js";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -383,6 +384,7 @@ angular
     dropdownPickerModule,
     createIsseeksModule,
     matchingContextModule,
+    selectPickerModule,
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;

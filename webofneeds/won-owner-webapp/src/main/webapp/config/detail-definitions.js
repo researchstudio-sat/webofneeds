@@ -28,6 +28,37 @@ export const abstractDetails = {
       throw "abstract Detail does not override necessary function";
     },
   },
+  select: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    icon: undefined,
+    component: "won-select-picker",
+    viewerComponent: "won-select-viewer",
+    multiSelect: false,
+    options: function() {
+      throw 'abstract Detail does not override necessary options array(structure: [{value: val, label: "labeltext"}...]';
+      /**
+       * e.g. number of rooms ....
+       [
+        {value: "1", label: "one"},
+        {value: "2", label: "two"},
+        {value: "3", label: "three"},
+        {value: "4", label: "four"},
+        {value: "5+", label: "more"},
+       ]
+       */
+    },
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
   dropdown: {
     identifier: function() {
       throw "abstract Detail does not override necessary identifier";
