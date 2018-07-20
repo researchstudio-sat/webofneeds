@@ -8,6 +8,9 @@
 import won from "./won.js";
 // import { useCases } from "useCaseDefinitions";
 import { getAllDetails } from "../won-utils";
+import { useCases } from "../../config/usecase-definitions.js";
+
+import { Generator } from "sparqljs";
 
 (function() {
   // <need-builder-js> scope
@@ -226,6 +229,23 @@ import { getAllDetails } from "../won-utils";
         ? won.WON.contentNodeBlankUri.seeks
         : undefined;
     }
+
+    const useCase = useCases[args.useCase];
+
+    const queryMask = {
+      type: "query",
+      queryType: "SELECT",
+      variables: ["?result"],
+    };
+
+    const query = useCase &&
+      useCase.generateQuery && {
+        ...useCase.generateQuery(args, "?result"),
+        ...queryMask,
+      };
+
+    const sparqlGenerator = new Generator();
+
     const graph = [
       {
         "@id": args.is
@@ -285,6 +305,7 @@ import { getAllDetails } from "../won-utils";
           "@id": won.WON.hasFlag,
           "@type": "@id",
         },
+        "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,
       },
     };
   };
