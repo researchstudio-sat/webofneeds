@@ -269,6 +269,7 @@ import { Generator } from "sparqljs";
         ]), ///.toArray().filter(f => f),
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
+        "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
       args.is ? buildContentNode(isContentUri, args.is) : {},
@@ -305,7 +306,6 @@ import { Generator } from "sparqljs";
           "@id": won.WON.hasFlag,
           "@type": "@id",
         },
-        "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,
       },
     };
   };
