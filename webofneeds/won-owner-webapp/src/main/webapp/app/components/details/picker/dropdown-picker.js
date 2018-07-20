@@ -1,6 +1,6 @@
 import angular from "angular";
-import { attach, delay } from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
+import { attach, delay } from "../../../utils.js";
+import { DomCache } from "../../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -22,7 +22,6 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       this.domCache = new DomCache(this.$element);
 
-      this.selectedValue = this.initialValue;
       window.dropdownp4dbg = this;
 
       delay(0).then(() => this.showInitialValue());
@@ -37,6 +36,7 @@ function genComponentConf() {
 
     showInitialValue() {
       //TODO: IMPLEMENT THE INITIAL VALUES
+      this.selectedValue = this.initialValue;
       this.$scope.$apply();
     }
 

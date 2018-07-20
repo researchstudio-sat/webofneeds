@@ -95,6 +95,82 @@ export const details = {
       return jsonLDImm && jsonLDImm.get("dc:description");
     },
   },
+  date: {
+    identifier: "date",
+    label: "Date",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Date...",
+    component: "won-date-picker",
+    viewerComponent: "won-date-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:date": undefined };
+      }
+      return { "dc:date": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:date");
+    },
+  },
+  datetime: {
+    identifier: "datetime",
+    label: "Date & Time",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Date and Time...",
+    component: "won-datetime-picker",
+    viewerComponent: "won-datetime-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:datetime": undefined };
+      }
+      return { "dc:datetime": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:datetime");
+    },
+  },
+  time: {
+    identifier: "time",
+    label: "Time",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Time...",
+    component: "won-time-picker",
+    viewerComponent: "won-time-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:time": undefined };
+      }
+      return { "dc:time": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:time");
+    },
+  },
+  month: {
+    identifier: "month",
+    label: "Month",
+    icon: "#ico36_time_circle",
+    placeholder: "Enter Month...",
+    component: "won-month-picker",
+    viewerComponent: "won-month-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: Correct parseToRDF
+      if (!value) {
+        return { "dc:month": undefined };
+      }
+      return { "dc:month": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: Correct parseFromRDF
+      return jsonLDImm && jsonLDImm.get("dc:month");
+    },
+  },
   location: {
     identifier: "location",
     label: "Location",
@@ -426,7 +502,7 @@ export const details = {
     identifier: "tags",
     label: "Tags",
     icon: "#ico36_tags_circle",
-    placeholder: "e.g. #couch #free",
+    placeholder: "e.g. couch, free",
     component: "won-tags-picker",
     viewerComponent: "won-tags-viewer",
     parseToRDF: function({ value }) {
@@ -477,80 +553,6 @@ export const details = {
       }
       return undefined;
       // TODO: return value
-    },
-  },
-  gender: {
-    ...abstractDetails.dropdown,
-    identifier: "gender",
-    label: "Gender",
-    icon: "#ico36_tags_circle",
-    placeholder: "Select Gender",
-    options: [
-      { value: "Agender", label: "Agender" },
-      { value: "Androgyne", label: "Androgyne" },
-      { value: "Androgynous", label: "Androgynous" },
-      { value: "Bigender", label: "Bigender" },
-      { value: "Cis", label: "Cis" },
-      { value: "Cisgender", label: "Cisgender" },
-      { value: "Cis Female", label: "Cis Female" },
-      { value: "Cis Male", label: "Cis Male" },
-      { value: "Cis Man", label: "Cis Man" },
-      { value: "Cis Woman", label: "Cis Woman" },
-      { value: "Cisgender Female", label: "Cisgender Female" },
-      { value: "Cisgender Male", label: "Cisgender Male" },
-      { value: "Cisgender Man", label: "Cisgender Man" },
-      { value: "Cisgender Woman", label: "Cisgender Woman" },
-      { value: "Female to Male", label: "Female to Male" },
-      { value: "FTM", label: "FTM" },
-      { value: "Gender Fluid", label: "Gender Fluid" },
-      { value: "Gender Nonconforming", label: "Gender Nonconforming" },
-      { value: "Gender Questioning", label: "Gender Questioning" },
-      { value: "Gender Variant", label: "Gender Variant" },
-      { value: "Genderqueer", label: "Genderqueer" },
-      { value: "Intersex", label: "Intersex" },
-      { value: "Male to Female", label: "Male to Female" },
-      { value: "MTF", label: "MTF" },
-      { value: "Neither", label: "Neither" },
-      { value: "Neutrois", label: "Neutrois" },
-      { value: "Non-binary", label: "Non-binary" },
-      { value: "Other", label: "Other" },
-      { value: "Pangender", label: "Pangender" },
-      { value: "Trans", label: "Trans" },
-      { value: "Trans*", label: "Trans*" },
-      { value: "Trans Female", label: "Trans Female" },
-      { value: "Trans* Female", label: "Trans* Female" },
-      { value: "Trans Male", label: "Trans Male" },
-      { value: "Trans* Male", label: "Trans* Male" },
-      { value: "Trans Man", label: "Trans Man" },
-      { value: "Trans* Man", label: "Trans* Man" },
-      { value: "Trans Person", label: "Trans Person" },
-      { value: "Trans* Person", label: "Trans* Person" },
-      { value: "Trans Woman", label: "Trans Woman" },
-      { value: "Trans* Woman", label: "Trans* Woman" },
-      { value: "Transfeminine", label: "Transfeminine" },
-      { value: "Transgender", label: "Transgender" },
-      { value: "Transgender Female", label: "Transgender Female" },
-      { value: "Transgender Male", label: "Transgender Male" },
-      { value: "Transgender Man", label: "Transgender Man" },
-      { value: "Transgender Person", label: "Transgender Person" },
-      { value: "Transgender Woman", label: "Transgender Woman" },
-      { value: "Transmasculine", label: "Transmasculine" },
-      { value: "Transsexual", label: "Transsexual" },
-      { value: "Transsexual Female", label: "Transsexual Female" },
-      { value: "Transsexual Male", label: "Transsexual Male" },
-      { value: "Transsexual Man", label: "Transsexual Man" },
-      { value: "Transsexual Person", label: "Transsexual Person" },
-      { value: "Transsexual Woman", label: "Transsexual Woman" },
-      { value: "Two-Spirit", label: "Two-Spirit" },
-    ],
-    parseToRDF: function({ value }) {
-      if (!value) {
-        return { "s:gender": undefined };
-      }
-      return { "s:gender": value };
-    },
-    parseFromRDF: function(jsonLDImm) {
-      return jsonLDImm && jsonLDImm.get("s:gender");
     },
   },
 };

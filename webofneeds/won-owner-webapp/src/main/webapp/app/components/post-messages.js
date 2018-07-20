@@ -74,9 +74,9 @@ function genComponentConf() {
             </won-post-content-message>
             <div class="pm__content__loadspinner"
                 ng-if="self.connection.get('isLoadingMessages')">
-                <img src="images/spinner/on_white.gif"
-                    alt="Loading&hellip;"
-                    class="hspinner"/>
+                <svg class="hspinner">
+                  <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
+              </svg>
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
                 ng-if="!self.isSuggested && !self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"

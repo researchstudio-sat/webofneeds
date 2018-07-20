@@ -1,6 +1,6 @@
 import angular from "angular";
-import { attach, delay, extractHashtags } from "../../utils.js";
-import { DomCache } from "../../cstm-ng-utils.js";
+import { attach, delay, extractHashtags } from "../../../utils.js";
+import { DomCache } from "../../../cstm-ng-utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {

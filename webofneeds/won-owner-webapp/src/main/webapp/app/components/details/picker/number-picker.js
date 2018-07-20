@@ -1,5 +1,5 @@
 import angular from "angular";
-import { attach, delay } from "../../utils.js";
+import { attach, delay } from "../../../utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -8,7 +8,7 @@ function genComponentConf() {
          <svg class="numberp__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
-            ng-click="self.resetNumber()">
+            ng-click="self.resetNumber(true)">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
           <input

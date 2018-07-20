@@ -57,6 +57,7 @@ won-post-info {
   won-post-content {
     grid-area: main;
     border-top: $thinGrayBorder;
+    display: grid;
   }
 
   .post-info__footer {
