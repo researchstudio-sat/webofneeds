@@ -34,15 +34,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
 
     const searchString = jsonldNeedImm.get("won:hasSearchString");
 
-    //TODO: We need to decide which is the main title? Or combine?
-    //TODO: search for hasHumanReadable or something similar, see #2037
-    const title = isPresent
-      ? is.get("dc:title")
-      : seeksPresent
-        ? seeks.get("dc:title")
-        : undefined;
-    parsedNeed.title = title;
-
     if (uri) {
       parsedNeed.uri = uri;
     } else {
@@ -138,6 +129,7 @@ export function parseNeed(jsonldNeed, ownNeed) {
       : undefined;
     parsedNeed.hasFlags = hasFlags;
     parsedNeed.nodeUri = nodeUri;
+    parsedNeed.humanReadable = getHumanReadableStringFromNeed(parsedNeed);
   } else {
     console.error(
       "Cant parse need, data is an invalid need-object: ",
@@ -160,7 +152,6 @@ export function parseNeed(jsonldNeed, ownNeed) {
  */
 function generateContent(contentJsonLd, type, detailsToParse) {
   let content = {
-    //title: contentJsonLd.get("dc:title"),
     type: type,
   };
 
@@ -195,11 +186,20 @@ function extractFlags(wonHasFlags) {
   return hasFlags;
 }
 
-export function getHumanReadableStringFromNeed(need) {
-  const searchString = need && need.get("searchString");
-  const title = need && need.get("title");
-  if (title) {
-    return title;
+function getHumanReadableStringFromNeed(need) {
+  const searchString = need && need.searchString;
+  const isPresent = !!need.is;
+  const seeksPresent = !!need.seeks;
+  const isTitle = isPresent && need.is.title;
+  const seeksTitle = seeksPresent && need.seeks.title;
+
+  if (isTitle && seeksTitle) {
+    return isTitle + " - " + seeksTitle;
+  }
+  if (seeksTitle) {
+    return seeksTitle;
+  } else if (isTitle) {
+    return isTitle;
   } else if (searchString) {
     return "Search: " + searchString;
   }
