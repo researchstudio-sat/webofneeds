@@ -209,7 +209,7 @@ export function addNeedInCreation(needs, needInCreation, needUri) {
     }
 
     need = need.set("type", type);
-    need = need.set("title", title);
+    need = need.set("humanReadable", title);
 
     let isWhatsAround = false;
     let isWhatsNew = false;
