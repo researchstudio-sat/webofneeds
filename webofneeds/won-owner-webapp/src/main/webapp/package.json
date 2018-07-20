@@ -26,6 +26,7 @@
     "reselect": "^2.0.2",
     "sha.js": "^2.4.11",
     "sockjs-client": "^1.1.4",
+    "sparqljs": "^2.0.3",
     "undo.js": "^0.2.0",
     "url-join": "^4.0.0",
     "whatwg-fetch": "^0.10.1"
