@@ -496,7 +496,7 @@ export function needMessageReceived(event) {
       type: actionTypes.messages.needMessageReceived,
       payload: {
         needUri: event.getReceiverNeed(),
-        needTitle: need.get("title"),
+        humanReadable: need.get("humanReadable"),
         message: event.getTextMessage(),
       },
     });
