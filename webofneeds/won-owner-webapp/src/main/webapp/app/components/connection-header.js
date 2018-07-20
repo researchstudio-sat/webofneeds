@@ -11,7 +11,6 @@ import { labels, relativeTime } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
-import { getHumanReadableStringFromNeed } from "../reducers/need-reducer/parse-need.js";
 import {
   selectLastUpdateTime,
   selectNeedByConnectionUri,
@@ -28,17 +27,17 @@ function genComponentConf() {
             class="ch__icon__theirneed"
             ng-class="{'bigger' : self.biggerImage, 'inactive' : self.theirNeed.get('state') === self.WON.InactiveCompacted}"
             src="self.theirNeed.get('TODO')"
-            title="self.theirNeed.get('title')"
+            title="self.theirNeed.get('humanReadable')"
             uri="self.theirNeed.get('uri')"
             ng-show="!self.hideImage">
           </won-square-image>
       </div>
       <div class="ch__right" ng-if="!self.isLoading()">
         <div class="ch__right__topline">
-          <div class="ch__right__topline__title" ng-if="self.theirNeedHumanReadableString" title="{{ self.theirNeedHumanReadableString }}">
-            {{ self.theirNeedHumanReadableString }}
+          <div class="ch__right__topline__title" ng-if="self.theirNeed.get('humanReadable')" title="{{ self.theirNeed.get('humanReadable') }}">
+            {{ self.theirNeed.get('humanReadable') }}
           </div>
-          <div class="ch__right__topline__notitle" ng-if="!self.latestMessageString && !self.theirNeedHumanReadableString" title="no title">
+          <div class="ch__right__topline__notitle" ng-if="!self.theirNeed.get('humanReadable')" title="no title">
             no title
           </div>
         </div>
@@ -108,8 +107,6 @@ function genComponentConf() {
           latestMessage && getHumanReadableStringFromMessage(latestMessage);
         const latestMessageUnread =
           latestMessage && latestMessage.get("unread");
-        const theirNeedHumanReadableString =
-          theirNeed && getHumanReadableStringFromNeed(theirNeed);
 
         return {
           connection,
@@ -117,7 +114,6 @@ function genComponentConf() {
           theirNeed,
           latestMessageHumanReadableString,
           latestMessageUnread,
-          theirNeedHumanReadableString,
           unreadMessageCount:
             unreadMessages && unreadMessages.size > 0
               ? unreadMessages.size
