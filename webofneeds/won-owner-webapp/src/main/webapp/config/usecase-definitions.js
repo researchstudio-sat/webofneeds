@@ -639,17 +639,78 @@ const realEstateUseCases = {
   // offerBuy: {},
 };
 
-/*const otherUseCases = {
+const transportUseCases = {
+  transportDemand: {
+    identifier: "transportDemand",
+    label: "Let something be transported",
+    icon: "#ico36_uc_custom", // TODO: better icon
+    draft: {
+      ...emptyDraft,
+      seeks: { title: "Looking to get something transported" },
+    },
+    isDetails: {
+      content: {
+        ...details.description,
+        identifier: "content",
+        label: "Content",
+        placeholder: "Provide information about what should be transported",
+        parseToRDF: function({ value }) {
+          // TODO: impl
+          if (!value) {
+            return undefined;
+          }
+          return undefined;
+        },
+        parseFromRDF: function(jsonLDImm) {
+          // TODO: impl
+          if (jsonLDImm || !jsonLDImm) {
+            return undefined;
+          }
+        },
+      },
+      weight: {
+        ...abstractDetails.number,
+        identifier: "weight",
+        label: "Weight",
+        icon: "#ico36_plus_circle",
+      },
+      length: { ...abstractDetails.number },
+      width: { ...abstractDetails.number },
+      tags: { ...details.tags },
+    },
+    seeksDetails: {
+      title: { ...details.title },
+      fromTo: { ...details.travelAction },
+    },
+  },
+  transportOffer: {
+    identifier: "transportOffer",
+    label: "Transport something",
+    icon: "#ico36_uc_custom", // TODO: better icon
+    draft: {
+      ...emptyDraft,
+      is: { title: "Transportation Offer" },
+    },
+    isDetails: {
+      title: { ...details.title },
+      area: { ...details.location },
+    },
+    seeksDetails: {
+      tags: { ...details.tags },
+      description: { ...details.description },
+    },
+  },
   // taxi: {},
   // transport: {},
   // job: {},
-};*/
+};
 
 export const useCases = {
   ...socialUseCases,
   ...professionalUseCases,
   ...infoUseCases,
   ...realEstateUseCases,
+  ...transportUseCases,
   ...allDetailsUseCase,
 };
 
@@ -677,6 +738,12 @@ export const useCaseGroups = {
     label: "Real Estate",
     icon: undefined,
     useCases: { ...realEstateUseCases },
+  },
+  transport: {
+    identifier: "realestategroup",
+    label: "Real Estate",
+    icon: undefined,
+    useCases: { ...transportUseCases },
   },
   other: {
     identifier: "othergroup",
