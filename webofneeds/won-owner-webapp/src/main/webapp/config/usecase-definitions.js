@@ -599,7 +599,7 @@ const realEstateUseCases = {
   searchRent: {
     identifier: "searchRent",
     label: "Find a place to rent",
-    icon: "#ico36_uc_custom", // TODO: replace this icon
+    icon: "#ico36_uc_realestate",
     draft: {
       ...emptyDraft,
       seeks: { title: "Looking for a place to rent" },
@@ -617,7 +617,7 @@ const realEstateUseCases = {
   offerRent: {
     identifier: "offerRent",
     label: "Rent a place out",
-    icon: "#ico36_uc_custom", // TODO: replace this icon
+    icon: "#ico36_uc_realestate",
     draft: {
       ...emptyDraft,
       is: {
@@ -642,8 +642,8 @@ const realEstateUseCases = {
 const transportUseCases = {
   transportDemand: {
     identifier: "transportDemand",
-    label: "Let something be transported",
-    icon: "#ico36_uc_custom", // TODO: better icon
+    label: "Send something",
+    icon: "#ico36_uc_transport_demand",
     draft: {
       ...emptyDraft,
       is: { title: "Looking to get something transported" },
@@ -748,7 +748,7 @@ const transportUseCases = {
   transportOffer: {
     identifier: "transportOffer",
     label: "Offer Transportation",
-    icon: "#ico36_uc_custom", // TODO: better icon
+    icon: "#ico36_uc_transport_offer",
     draft: {
       ...emptyDraft,
       is: { title: "Transportation Offer" },
