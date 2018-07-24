@@ -790,12 +790,27 @@ const transportUseCases = {
     label: "Find a taxi",
     icon: "#ico36_uc_custom", // TODO: taxi icon
     draft: { ...emptyDraft, is: { title: "Looking for a taxi" } },
+    // TODO: some sort of identifier that this person is looking for a taxi? i.e. something that can be matched --> title?
     isDetails: {
       // TODO: amount of people? other details?
+      description: { ...details.description },
     },
     seeksDetails: {
       location: { ...details.location },
       travelAction: { ...details.travelAction },
+    },
+  },
+  taxiOffer: {
+    identifier: "taxiOffer",
+    label: "Offer a taxi",
+    icon: "#ico36_uc_custom", // TODO: taxi icon
+    draft: {
+      ...emptyDraft,
+      is: { title: "Taxi" },
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
     },
   },
   transportDemand: {
