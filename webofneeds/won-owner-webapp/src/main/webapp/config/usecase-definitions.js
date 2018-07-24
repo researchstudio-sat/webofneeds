@@ -62,11 +62,11 @@ const floorSizeRangeDetail = {
       return { "won:minFloorSize": undefined, "won:maxFloorSize": undefined };
     }
     return {
-      "won:minFloorSize": getIn(value, ["minValue"])
-        ? getIn(value, ["minValue"])
+      "won:minFloorSize": getIn(value, ["min"])
+        ? getIn(value, ["min"])
         : undefined,
-      "won:maxFloorSize": getIn(value, ["maxValue"])
-        ? getIn(value, ["maxValue"])
+      "won:maxFloorSize": getIn(value, ["max"])
+        ? getIn(value, ["max"])
         : undefined,
     };
   },
@@ -106,11 +106,11 @@ const allDetailsUseCase = {
       ...emptyDraft,
       is: {
         checkbox: ["1", "2", "4", "5+"],
-        minMaxFloorSize: { minValue: 10, maxValue: 15 },
+        minMaxFloorSize: { min: 10, max: 15 },
       },
       seeks: {
         radio: "4",
-        minMaxFloorSize: { minValue: 10, maxValue: 15 },
+        minMaxFloorSize: { min: 10, max: 15 },
       },
     },
     isDetails: {

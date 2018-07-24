@@ -46,8 +46,8 @@ function genComponentConf() {
 
       window.rangep4dbg = this;
 
-      this.addedMinNumber = this.initialValue && this.initialValue.minValue;
-      this.addedMaxNumber = this.initialValue && this.initialValue.maxValue;
+      this.addedMinNumber = this.initialValue && this.initialValue.min;
+      this.addedMaxNumber = this.initialValue && this.initialValue.max;
       this.showMinResetButton = false;
       this.showMaxResetButton = false;
 
@@ -60,37 +60,37 @@ function genComponentConf() {
     updateMin(number) {
       if (number) {
         this.onUpdate({
-          value: { minValue: number, maxValue: this.addedMaxNumber },
+          value: { min: number, max: this.addedMaxNumber },
         });
       } else {
         this.onUpdate({
-          value: { minValue: undefined, maxValue: this.addedMaxNumber },
+          value: { min: undefined, maxe: this.addedMaxNumber },
         });
       }
     }
     updateMax(number) {
       if (number) {
         this.onUpdate({
-          value: { minValue: this.addedMinNumber, maxValue: number },
+          value: { min: this.addedMinNumber, max: number },
         });
       } else {
         this.onUpdate({
-          value: { minValue: this.addedMinNumber, maxValue: undefined },
+          value: { min: this.addedMinNumber, max: undefined },
         });
       }
     }
 
     showInitialRange() {
-      this.addedMinNumber = this.initialValue && this.initialValue.minValue;
-      this.addedMaxNumber = this.initialValue && this.initialValue.maxValue;
+      this.addedMinNumber = this.initialValue && this.initialValue.min;
+      this.addedMaxNumber = this.initialValue && this.initialValue.max;
 
       if (this.initialValue) {
-        if (this.initialValue.minValue) {
-          this.minTextfield().value = this.initialValue.minValue;
+        if (this.initialValue.min) {
+          this.minTextfield().value = this.initialValue.min;
           this.showMinResetButton = true;
         }
-        if (this.initialValue.maxValue) {
-          this.maxTextfield().value = this.initialValue.maxValue;
+        if (this.initialValue.max) {
+          this.maxTextfield().value = this.initialValue.max;
           this.showMaxResetButton = true;
         }
       }

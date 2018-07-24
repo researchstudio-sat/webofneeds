@@ -13,34 +13,18 @@ function genComponentConf() {
         <div class="rangev__content">
           <div class="rangev__content__detail" ng-if="self.content.get('title')">
             <div class="rangev__content__detail__label">
-              Title
+              {{self.detail.minLabel}}
             </div>
             <div class="rangev__content__detail__value">
-              {{self.content.get('title')}}
+              {{self.content.get('min')}}
             </div>
           </div>
           <div class="rangev__content__detail" ng-if="self.content.get('name')">
             <div class="rangev__content__detail__label">
-              Name
+              {{self.detail.maxLabel}}
             </div>
             <div class="rangev__content__detail__value">
-              {{self.content.get('name')}}
-            </div>
-          </div>
-          <div class="rangev__content__detail" ng-if="self.content.get('position')">
-            <div class="rangev__content__detail__label">
-              Position
-            </div>
-            <div class="rangev__content__detail__value">
-              {{self.content.get('position')}}
-            </div>
-          </div>
-          <div class="rangev__content__detail" ng-if="self.content.get('company')">
-            <div class="rangev__content__detail__label">
-              Company
-            </div>
-            <div class="rangev__content__detail__value">
-              {{self.content.get('company')}}
+              {{self.content.get('max')}}
             </div>
           </div>
         </div>
@@ -50,7 +34,6 @@ function genComponentConf() {
     constructor() {
       attach(this, serviceDependencies, arguments);
 
-      //TODO: debug; deleteme
       window.rangev4dbg = this;
 
       this.$scope.$watch("self.content", (newContent, prevContent) =>
