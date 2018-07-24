@@ -1,6 +1,7 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -16,8 +17,7 @@ function genComponentConf() {
               type="text"
               class="titlep__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
-              ng-blur="::self.updateTitle()"
-              ng-keyup="::self.updateTitle()"/>
+              won-input="::self.updateTitle()" />
       </div>
     `;
 
@@ -112,5 +112,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.titlePicker", [])
+  .module("won.owner.components.titlePicker", [wonInput])
   .directive("wonTitlePicker", genComponentConf).name;

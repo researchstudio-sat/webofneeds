@@ -1,5 +1,6 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -21,7 +22,7 @@ function genComponentConf() {
               class="rangep__input__min"
               placeholder="{{self.detail.minPlaceholder}}"
               ng-blur="::self.updateMinNumber(true)"
-              ng-keyup="::self.updateMinNumber(false)"
+              won-input="::self.updateMinNumber(false)"
               ng-class="{'rangep__input__min--withreset' : self.showMinResetButton}"/>
       </div>
       <div class="rangep__input">
@@ -41,7 +42,7 @@ function genComponentConf() {
               class="rangep__input__max"
               placeholder="{{self.detail.maxPlaceholder}}"
               ng-blur="::self.updateMaxNumber(true)"
-              ng-keyup="::self.updateMaxNumber(false)"
+              won-input="::self.updateMaxNumber(false)"
               ng-class="{'rangep__input__max--withreset' : self.showMaxResetButton}"/>
       </div>
     `;
@@ -193,5 +194,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.rangePicker", [])
+  .module("won.owner.components.rangePicker", [wonInput])
   .directive("wonRangePicker", genComponentConf).name;

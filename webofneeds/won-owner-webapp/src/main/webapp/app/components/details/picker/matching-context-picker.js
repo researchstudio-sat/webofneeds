@@ -1,6 +1,7 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -24,7 +25,7 @@ function genComponentConf() {
           class="mcp__input__inner"
           type="text"
           placeholder="e.g. 'sports fitness'"
-          ng-keyup="::self.updateMatchingContext()"
+          won-input="::self.updateMatchingContext()"
           ng-class="{'mcp__input__inner--withreset' : self.showResetButton}"
         />
         <svg class="mcp__input__icon clickable" 
@@ -182,5 +183,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.matchingContextPicker", [])
+  .module("won.owner.components.matchingContextPicker", [wonInput])
   .directive("wonMatchingContextPicker", genComponentConf).name;
