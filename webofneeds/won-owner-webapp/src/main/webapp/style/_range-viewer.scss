@@ -1,0 +1,19 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-range-viewer {
+  @include won-detail-viewer("rangev");
+
+  .rangev__content {
+    &--twocolumns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 0.5rem;
+    }
+
+    &__detail__label {
+      padding-bottom: 0.25rem;
+      font-weight: bold;
+    }
+  }
+}

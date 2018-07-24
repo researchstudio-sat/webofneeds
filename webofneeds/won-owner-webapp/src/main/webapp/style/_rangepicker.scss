@@ -1,0 +1,62 @@
+@import "won-config";
+@import "textfield";
+
+won-range-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.5rem;
+
+  .rangep__input {
+    &__reset {
+      position: relative;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        right: 0;
+        top: 0.5rem;
+      }
+    }
+
+    &__label {
+      display: block;
+      @include default-font;
+    }
+
+    &__min,
+    &__max {
+      border: $thinGrayBorder;
+
+      @include textfieldPadding(
+        $normalFontSize,
+        22/16,
+        $thinBorderWidth,
+        $formInputHeight
+      );
+
+      &.rangep__input__min--withreset,
+      &.rangep__input__max--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
+
+      box-sizing: border-box;
+      min-height: $formInputHeight;
+      min-width: 0; // so a size is specified and break-word works
+      width: 100%;
+
+      word-wrap: break-word;
+
+      &::-ms-clear {
+        width: 0;
+        height: 0;
+      }
+    }
+  }
+}

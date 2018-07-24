@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-select-viewer {
+  @include won-detail-viewer("selectv");
+}
