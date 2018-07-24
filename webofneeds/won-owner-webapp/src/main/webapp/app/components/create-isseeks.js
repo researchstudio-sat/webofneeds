@@ -19,7 +19,7 @@ function genComponentConf() {
           <div class="cis__detail__items__item" ng-repeat="detail in self.detailList">
               <!-- HEADER -->
               <div class="cis__detail__items__item__header"
-                  ng-click="self.toggleOpenDetail(detail.identifier)"
+                  ng-click="self.toggleOpenDetail($event, detail.identifier)"
                   ng-class="{'picked' : self.openDetail === detail.identifier}">
                   <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
                       <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
@@ -32,7 +32,6 @@ function genComponentConf() {
 
               <!-- COMPONENT -->
               <div class="cis__detail__items__item__component"
-                ng-click="self.onScroll({element: '.cis__detail__items__item__component'})"
                 ng-if="self.openDetail === detail.identifier"
                 detail-element="{{detail.component}}"
                 on-update="::self.updateDetail(identifier, value)"
@@ -110,13 +109,16 @@ function genComponentConf() {
       this.draftObject.thumbnail = image;
     }
 
-    toggleOpenDetail(detail) {
+    toggleOpenDetail($event, detail) {
       // open clicked detail
       if (this.openDetail === detail) {
         this.openDetail = undefined;
       } else {
         this.openDetail = detail;
-        this.onScroll({ element: ".cis__detail__items__item__component" });
+        const target = $event.currentTarget.parentElement;
+        setTimeout(() => {
+          this.onScroll({ element: target });
+        }, 0);
       }
     }
   }
