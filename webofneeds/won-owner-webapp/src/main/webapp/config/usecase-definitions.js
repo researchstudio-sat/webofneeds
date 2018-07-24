@@ -673,69 +673,114 @@ const transportUseCases = {
       weight: {
         ...abstractDetails.number,
         identifier: "weight",
-        label: "Weight",
+        label: "Weight in kg",
         icon: "#ico36_plus_circle",
         parseToRDF: function({ value }) {
           if (!value) {
-            // TODO: unit codes
             return { "s:weight": undefined };
           } else {
             return {
               "@type": "s:Product",
-              "s:weight": [{ "@value": value, "@type": "xsd:float" }],
+              "s:weight": {
+                "@type": "s:QuantitativeValue",
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:unitCode": "KGM",
+              },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
           const weight = jsonLDImm && jsonLDImm.get("s:weight");
-          if (weight) {
-            return weight;
+          const w = weight && weight.get("s:value");
+          const unit = weight && weight.get("s:unitCode");
+
+          if (!w) {
+            return undefined;
+          } else {
+            if (unit === "KGM") {
+              return w + "kg";
+            } else if (unit === "GRM") {
+              return w + "g";
+            } else if (!unit) {
+              return w + " (no unit specified)";
+            }
+            return w + " " + unit;
           }
         },
       },
       length: {
         ...abstractDetails.number,
         identifier: "length",
-        label: "Length",
+        label: "Length in cm",
         icon: "#ico36_plus_circle",
         parseToRDF: function({ value }) {
           if (!value) {
-            // TODO: unit codes
             return { "s:length": undefined };
           } else {
             return {
               "@type": "s:Product",
-              "s:length": [{ "@value": value, "@type": "xsd:float" }],
+              "s:length": {
+                "@type": "s:QuantitativeValue",
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:unitCode": "CMT",
+              },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
           const length = jsonLDImm && jsonLDImm.get("s:length");
-          if (length) {
-            return length;
+          const l = length && length.get("s:value");
+          const unit = length && length.get("s:unitCode");
+
+          if (!l) {
+            return undefined;
+          } else {
+            if (unit === "CMT") {
+              return l + "cm";
+            } else if (unit === "MTR") {
+              return l + "m";
+            } else if (!unit) {
+              return l + " (no unit specified)";
+            }
+            return l + " " + unit;
           }
         },
       },
       width: {
         ...abstractDetails.number,
         identifier: "width",
-        label: "Width",
+        label: "Width in cm",
         icon: "#ico36_plus_circle",
         parseToRDF: function({ value }) {
           if (!value) {
-            // TODO: unit codes
             return { "s:width": undefined };
           } else {
             return {
               "@type": "s:Product",
-              "s:width": [{ "@value": value, "@type": "xsd:float" }],
+              "s:width": {
+                "@type": "s:QuantitativeValue",
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:unitCode": "CMT",
+              },
             };
           }
         },
         parseFromRDF: function(jsonLDImm) {
           const width = jsonLDImm && jsonLDImm.get("s:width");
-          if (width) {
-            return width;
+          const w = width && width.get("s:value");
+          const unit = width && width.get("s:unitCode");
+
+          if (!w) {
+            return undefined;
+          } else {
+            if (unit === "CMT") {
+              return w + "cm";
+            } else if (unit === "MTR") {
+              return w + "m";
+            } else if (!unit) {
+              return w + " (no unit specified)";
+            }
+            return w + " " + unit;
           }
         },
       },
