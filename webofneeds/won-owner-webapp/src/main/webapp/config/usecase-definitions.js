@@ -27,6 +27,27 @@ export const emptyDraft = {
  * both use the predicate "dc:description".
  * To avoid this, redefine the parseToRDF() and parseFromRDF() methods for either
  * detail to use a different predicate.
+ *
+ * SUPPLYING A QUERY
+ * If it is necessary to fine-tune the matching behaviour of a usecase, a custom SPARQL query can be added to the definition.
+ * Exmaple:
+ * useCase: {
+ *    ...,
+ *    queryGenerator: (draft, resultName) {
+ *        new SparqlParser.parse(`
+ *            PREFIX won: <http://purl.org/webofneeds/model#>
+ *
+ *            SELECT ${resultName} WHERE {
+ *                ${resultName} a won:Need .
+ *            }
+ *        `)
+ *    }
+ * }
+ *
+ * A `queryGenerator` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
+ *
+ * The query needs to be a SELECT query and select only the resultName variable.
+ * This will be automatically enforced by the need builder.
  */
 
 const allDetailsUseCase = {
@@ -578,7 +599,7 @@ const realEstateUseCases = {
   searchRent: {
     identifier: "searchRent",
     label: "Find a place to rent",
-    icon: "#ico36_uc_custom", // TODO: replace this icon
+    icon: "#ico36_uc_realestate",
     draft: {
       ...emptyDraft,
       seeks: { title: "Looking for a place to rent" },
@@ -596,7 +617,7 @@ const realEstateUseCases = {
   offerRent: {
     identifier: "offerRent",
     label: "Rent a place out",
-    icon: "#ico36_uc_custom", // TODO: replace this icon
+    icon: "#ico36_uc_realestate",
     draft: {
       ...emptyDraft,
       is: {
@@ -618,17 +639,141 @@ const realEstateUseCases = {
   // offerBuy: {},
 };
 
-/*const otherUseCases = {
+const transportUseCases = {
+  transportDemand: {
+    identifier: "transportDemand",
+    label: "Send something",
+    icon: "#ico36_uc_transport_demand",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Looking to get something transported" },
+    },
+    isDetails: {
+      title: { ...details.title },
+      content: {
+        ...details.description,
+        identifier: "content",
+        label: "Content",
+        placeholder: "Provide information about what should be transported",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:name": undefined };
+          } else {
+            return { "@type": "s:Product", "s:name": value };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const content = jsonLDImm && jsonLDImm.get("s:name");
+          if (content) {
+            console.log("JSONLDImm of @type: ", jsonLDImm.get("@type"));
+            return content;
+          }
+        },
+      },
+      weight: {
+        ...abstractDetails.number,
+        identifier: "weight",
+        label: "Weight",
+        icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            // TODO: unit codes
+            return { "s:weight": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:weight": [{ "@value": value, "@type": "xsd:float" }],
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const weight = jsonLDImm && jsonLDImm.get("s:weight");
+          if (weight) {
+            return weight;
+          }
+        },
+      },
+      length: {
+        ...abstractDetails.number,
+        identifier: "length",
+        label: "Length",
+        icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            // TODO: unit codes
+            return { "s:length": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:length": [{ "@value": value, "@type": "xsd:float" }],
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const length = jsonLDImm && jsonLDImm.get("s:length");
+          if (length) {
+            return length;
+          }
+        },
+      },
+      width: {
+        ...abstractDetails.number,
+        identifier: "width",
+        label: "Width",
+        icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            // TODO: unit codes
+            return { "s:width": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:width": [{ "@value": value, "@type": "xsd:float" }],
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const width = jsonLDImm && jsonLDImm.get("s:width");
+          if (width) {
+            return width;
+          }
+        },
+      },
+      tags: { ...details.tags },
+    },
+    seeksDetails: {
+      travelAction: { ...details.travelAction },
+    },
+  },
+  transportOffer: {
+    identifier: "transportOffer",
+    label: "Offer Transportation",
+    icon: "#ico36_uc_transport_offer",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Transportation Offer" },
+      searchString: "transport", // TODO: replace this with a query
+    },
+    isDetails: {
+      title: { ...details.title },
+      location: { ...details.location },
+    },
+    seeksDetails: {
+      tags: { ...details.tags },
+      description: { ...details.description },
+    },
+  },
   // taxi: {},
   // transport: {},
   // job: {},
-};*/
+};
 
 export const useCases = {
   ...socialUseCases,
   ...professionalUseCases,
   ...infoUseCases,
   ...realEstateUseCases,
+  ...transportUseCases,
   ...allDetailsUseCase,
 };
 
@@ -656,6 +801,12 @@ export const useCaseGroups = {
     label: "Real Estate",
     icon: undefined,
     useCases: { ...realEstateUseCases },
+  },
+  transport: {
+    identifier: "transportgroup",
+    label: "Transport",
+    icon: undefined,
+    useCases: { ...transportUseCases },
   },
   other: {
     identifier: "othergroup",

@@ -101,21 +101,21 @@ export default function(allToasts = initialState, action = {}) {
       );
 
     case actionTypes.messages.needMessageReceived: {
-      const title = action.payload.needTitle;
+      const humanReadable = action.payload.humanReadable;
       const message = action.payload.message;
       return pushNewToast(
         allToasts,
-        "Notification for your posting '" + title + "': " + message,
+        "Notification for your posting '" + humanReadable + "': " + message,
         won.WON.infoToast
       );
     }
 
     case actionTypes.needs.closedBySystem: {
-      const title = action.payload.needTitle;
+      const humanReadable = action.payload.humanReadable;
       const message = action.payload.message;
       return pushNewToast(
         allToasts,
-        "Closed your posting '" + title + "'. Cause: " + message,
+        "Closed your posting '" + humanReadable + "'. Cause: " + message,
         won.WON.infoToast
       );
     }

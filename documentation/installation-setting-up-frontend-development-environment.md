@@ -22,7 +22,7 @@ You'll need to run `npm install -g windows-build-tools` (otherwise building `nod
 Open a windows power shell with admin permissions and run these commmand (possibly adapting the path for your settings):
 
 ```
-$env:PATH = "C:\DATA\DEV\workspace\webofneeds\webofneeds\won-owner-webapp\src\main\webapp\node;" + $env:PATH`
+$env:PATH = "C:\DATA\DEV\workspace\webofneeds\webofneeds\won-owner-webapp\src\main\webapp\node;" + $env:PATH
 npm install -g windows-build-tools
 ```
 

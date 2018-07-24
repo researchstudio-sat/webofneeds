@@ -8,6 +8,9 @@
 import won from "./won.js";
 // import { useCases } from "useCaseDefinitions";
 import { getAllDetails } from "../won-utils";
+import { useCases } from "../../config/usecase-definitions.js";
+
+import { Generator } from "sparqljs";
 
 (function() {
   // <need-builder-js> scope
@@ -226,6 +229,23 @@ import { getAllDetails } from "../won-utils";
         ? won.WON.contentNodeBlankUri.seeks
         : undefined;
     }
+
+    const useCase = useCases[args.useCase];
+
+    const queryMask = {
+      type: "query",
+      queryType: "SELECT",
+      variables: ["?result"],
+    };
+
+    const query = useCase &&
+      useCase.generateQuery && {
+        ...useCase.generateQuery(args, "?result"),
+        ...queryMask,
+      };
+
+    const sparqlGenerator = new Generator();
+
     const graph = [
       {
         "@id": args.is
@@ -249,6 +269,7 @@ import { getAllDetails } from "../won-utils";
         ]), ///.toArray().filter(f => f),
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
+        "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
       args.is ? buildContentNode(isContentUri, args.is) : {},

@@ -79,10 +79,6 @@ export function messagesReducer(messages = initialState, action = {}) {
          */
         return messages.set("reconnecting", true);
       } else {
-        console.error(
-          "Got unexpected payload for `actionTypes.logout` ",
-          action
-        );
         return messages;
       }
     }

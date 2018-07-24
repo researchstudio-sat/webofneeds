@@ -30,7 +30,7 @@ function genComponentConf() {
   let template = `
         <won-square-image
             class="clickable"
-            title="self.theirNeed.get('title')"
+            title="self.theirNeed.get('humanReadable')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
