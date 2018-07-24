@@ -24,6 +24,8 @@ export const abstractDetails = {
     maxLabel: function() {
       throw "abstract Detail does not override necessary maxLabel";
     },
+    minPlaceholder: undefined,
+    maxPlaceholder: undefined,
     icon: undefined,
     component: "won-range-picker",
     viewerComponent: "won-range-viewer",

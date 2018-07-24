@@ -1,4 +1,4 @@
-import { is } from "../app/utils.js";
+import { getIn, is } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 
@@ -50,6 +50,45 @@ export const emptyDraft = {
  * This will be automatically enforced by the need builder.
  */
 
+const floorSizeRangeDetail = {
+  ...abstractDetails.range,
+  identifier: "minMaxFloorSize",
+  label: "Min/Max Floor size in square meters",
+  icon: "#ico36_plus_circle", //TODO: better icon,
+  minLabel: "Min FloorSize",
+  maxLabel: "Max FloorSize",
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "won:minFloorSize": undefined, "won:maxFloorSize": undefined };
+    }
+    return {
+      "won:minFloorSize": getIn(value, ["minValue"])
+        ? getIn(value, ["minValue"])
+        : undefined,
+      "won:maxFloorSize": getIn(value, ["maxValue"])
+        ? getIn(value, ["maxValue"])
+        : undefined,
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    if (!jsonLDImm) return undefined;
+
+    let range = {
+      min: undefined,
+      max: undefined,
+    };
+
+    range.min = jsonLDImm.get("won:minFloorSize");
+    range.max = jsonLDImm.get("won:maxFloorSize");
+
+    // if there's anything, use it
+    if (range.min || range.max) {
+      return Immutable.fromJS(range);
+    }
+    return undefined;
+  },
+};
+
 const allDetailsUseCase = {
   allDetails: {
     identifier: "allDetails",
@@ -67,12 +106,15 @@ const allDetailsUseCase = {
       ...emptyDraft,
       is: {
         checkbox: ["1", "2", "4", "5+"],
+        minMaxFloorSize: { minValue: 10, maxValue: 15 },
       },
       seeks: {
         radio: "4",
+        minMaxFloorSize: { minValue: 10, maxValue: 15 },
       },
     },
     isDetails: {
+      floorSizeRangeDetail,
       checkbox: {
         component: "won-select-picker",
         viewerComponent: "won-select-viewer",
@@ -116,6 +158,7 @@ const allDetailsUseCase = {
       },
     },
     seeksDetails: {
+      floorSizeRangeDetail,
       radio: {
         component: "won-select-picker",
         viewerComponent: "won-select-viewer",
