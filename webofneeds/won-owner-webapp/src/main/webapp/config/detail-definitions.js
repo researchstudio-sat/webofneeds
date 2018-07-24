@@ -11,6 +11,29 @@ import Immutable from "immutable";
  * you want to use it.
  */
 export const abstractDetails = {
+  range: {
+    identifier: function() {
+      throw "abstract Detail does not override necessary identifier";
+    },
+    label: function() {
+      throw "abstract Detail does not override necessary label";
+    },
+    minLabel: function() {
+      throw "abstract Detail does not override necessary minLabel";
+    },
+    maxLabel: function() {
+      throw "abstract Detail does not override necessary maxLabel";
+    },
+    icon: undefined,
+    component: "won-range-picker",
+    viewerComponent: "won-range-viewer",
+    parseToRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+  },
   number: {
     identifier: function() {
       throw "abstract Detail does not override necessary identifier";
