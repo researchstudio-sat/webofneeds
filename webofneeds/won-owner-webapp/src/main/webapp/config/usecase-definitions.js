@@ -59,6 +59,106 @@ const allDetailsUseCase = {
     isDetails: details,
     seeksDetails: details,
   },
+  testPickerUseCase: {
+    identifier: "pickerTestUseCase",
+    label: "Picker Test",
+    icon: "#ico36_uc_custom",
+    draft: {
+      ...emptyDraft,
+      is: {
+        checkbox: ["1", "2", "4", "5+"],
+      },
+      seeks: {
+        radio: "4",
+      },
+    },
+    isDetails: {
+      checkbox: {
+        component: "won-select-picker",
+        viewerComponent: "won-select-viewer",
+        identifier: "checkbox",
+        label: "Checkbox",
+        icon: "#ico36_tags_circle",
+        multiSelect: true,
+        options: [
+          { value: "1", label: "one" },
+          { value: "2", label: "two" },
+          { value: "3", label: "three" },
+          { value: "4", label: "four" },
+          { value: "5+", label: "more" },
+        ],
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:hasCheckbox": undefined };
+          }
+          return { "won:hasCheckbox": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const checkbox = jsonLDImm && jsonLDImm.get("won:hasCheckbox");
+
+          if (!checkbox) {
+            return undefined;
+          } else if (is("String", checkbox)) {
+            return Immutable.fromJS([checkbox]);
+          } else if (is("Array", checkbox)) {
+            return Immutable.fromJS(checkbox);
+          } else if (Immutable.List.isList(checkbox)) {
+            return checkbox; // id; it is already in the format we want
+          } else {
+            console.error(
+              "Found unexpected format of checkbox (should be Array, " +
+                "Immutable.List, or a single checkbox as string): " +
+                JSON.stringify(checkbox)
+            );
+            return undefined;
+          }
+        },
+      },
+    },
+    seeksDetails: {
+      radio: {
+        component: "won-select-picker",
+        viewerComponent: "won-select-viewer",
+        identifier: "radio",
+        label: "Radio",
+        icon: "#ico36_tags_circle",
+        multiSelect: false,
+        options: [
+          { value: "1", label: "one" },
+          { value: "2", label: "two" },
+          { value: "3", label: "three" },
+          { value: "4", label: "four" },
+          { value: "5+", label: "more" },
+        ],
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "won:hasRadio": undefined };
+          }
+          return { "won:hasRadio": value };
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const radio = jsonLDImm && jsonLDImm.get("won:hasRadio");
+
+          if (!radio) {
+            return undefined;
+          } else if (is("String", radio)) {
+            return Immutable.fromJS([radio]);
+          } else if (is("Array", radio)) {
+            return Immutable.fromJS(radio);
+          } else if (Immutable.List.isList(radio)) {
+            return radio; // id; it is already in the format we want
+          } else {
+            console.error(
+              "Found unexpected format of checkbox (should be Array, " +
+                "Immutable.List, or a single radio as string): " +
+                JSON.stringify(radio)
+            );
+            return undefined;
+          }
+        },
+      },
+    },
+  },
 };
 
 const skillsDetail = {
