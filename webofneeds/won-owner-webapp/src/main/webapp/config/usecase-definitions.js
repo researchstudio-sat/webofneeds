@@ -785,6 +785,19 @@ const realEstateUseCases = {
 };
 
 const transportUseCases = {
+  taxiDemand: {
+    identifier: "taxiDemand",
+    label: "Find a taxi",
+    icon: "#ico36_uc_custom", // TODO: taxi icon
+    draft: { ...emptyDraft, is: { title: "Looking for a taxi" } },
+    isDetails: {
+      // TODO: amount of people? other details?
+    },
+    seeksDetails: {
+      location: { ...details.location },
+      travelAction: { ...details.travelAction },
+    },
+  },
   transportDemand: {
     identifier: "transportDemand",
     label: "Send something",
