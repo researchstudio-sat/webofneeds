@@ -789,10 +789,14 @@ const transportUseCases = {
     identifier: "taxiDemand",
     label: "Find a taxi",
     icon: "#ico36_uc_custom", // TODO: taxi icon
-    draft: { ...emptyDraft, is: { title: "Looking for a taxi" } },
-    // TODO: some sort of identifier that this person is looking for a taxi? i.e. something that can be matched --> title?
+    draft: {
+      ...emptyDraft,
+      is: { title: "Looking for a taxi", tags: "search-taxi" },
+      searchString: "offer-taxi",
+    },
+    // TODO: amount of people? other details?
     isDetails: {
-      // TODO: amount of people? other details?
+      title: { ...details.title },
       description: { ...details.description },
     },
     seeksDetails: {
@@ -806,7 +810,8 @@ const transportUseCases = {
     icon: "#ico36_uc_custom", // TODO: taxi icon
     draft: {
       ...emptyDraft,
-      is: { title: "Taxi" },
+      is: { title: "Taxi", tags: "offer-taxi" },
+      searchString: "search-taxi",
     },
     isDetails: {
       title: { ...details.title },
