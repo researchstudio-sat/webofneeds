@@ -1,6 +1,7 @@
 import angular from "angular";
 import { attach, delay, extractHashtags } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -11,7 +12,7 @@ function genComponentConf() {
           class="tp__input__inner"
           type="text"
           placeholder="{{self.detail.placeholder}}"
-          ng-keyup="::self.updateTags()"
+          won-input="::self.updateTags()"
           ng-class="{'tp__input__inner--withreset' : self.showResetButton}"
         />
         <svg class="tp__input__icon clickable" 
@@ -114,5 +115,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.tagsPicker", [])
+  .module("won.owner.components.tagsPicker", [wonInput])
   .directive("wonTagsPicker", genComponentConf).name;

@@ -1,5 +1,6 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -16,7 +17,7 @@ function genComponentConf() {
               class="numberp__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
               ng-blur="::self.updateNumber(true)"
-              ng-keyup="::self.updateNumber(false)"/>
+              won-input="::self.updateNumber(false)"/>
       </div>
     `;
 
@@ -101,5 +102,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.numberPicker", [])
+  .module("won.owner.components.numberPicker", [wonInput])
   .directive("wonNumberPicker", genComponentConf).name;

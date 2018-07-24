@@ -7,6 +7,7 @@ import {
   //getIn
 } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -22,7 +23,7 @@ function genComponentConf() {
         <textarea
           won-textarea-autogrow
           class="ttlp__input__inner won-txt won-txt--code"
-          ng-keyup="::self.updateTTLBuffered()"
+          won-input="::self.updateTTLBuffered()"
           ng-blur="::self.updateTTL()"
           placeholder="{{self.detail.placeholder}}"></textarea>
       </div>
@@ -158,5 +159,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.ttlPicker", [])
+  .module("won.owner.components.ttlPicker", [wonInput])
   .directive("wonTtlPicker", genComponentConf).name;

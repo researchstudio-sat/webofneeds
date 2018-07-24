@@ -1,6 +1,7 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -15,7 +16,7 @@ function genComponentConf() {
         <textarea
           won-textarea-autogrow
           class="dp__input__inner won-txt"
-          ng-keyup="::self.updateDescription()"
+          won-input="::self.updateDescription()"
           placeholder="{{self.detail.placeholder}}"></textarea>
       </div> 
     `;
@@ -99,5 +100,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.descriptionPicker", [])
+  .module("won.owner.components.descriptionPicker", [wonInput])
   .directive("wonDescriptionPicker", genComponentConf).name;

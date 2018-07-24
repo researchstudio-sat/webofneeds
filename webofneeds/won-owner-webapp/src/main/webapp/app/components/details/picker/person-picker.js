@@ -2,6 +2,7 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import Immutable from "immutable";
+import wonInput from "../../../directives/input.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
@@ -15,7 +16,7 @@ function genComponentConf() {
             id="{{dtl.name}}"
             class="pp__detail__input"
             ng-model="dtl.value"
-            ng-keyup="::self.updateDetails(dtl)"
+            won-input="::self.updateDetails(dtl)"
             ng-class="{'pp__detail__input--withreset' : self.showResetButton(dtl.name)}"
           />
           <svg class="pp__detail__icon clickable" 
@@ -140,5 +141,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.personPicker", [])
+  .module("won.owner.components.personPicker", [wonInput])
   .directive("wonPersonPicker", genComponentConf).name;
