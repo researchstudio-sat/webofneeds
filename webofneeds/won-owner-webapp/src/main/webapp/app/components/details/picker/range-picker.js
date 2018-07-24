@@ -64,25 +64,29 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     updateMin(number) {
-      if (number) {
+      if (number && this.addedMaxNumber) {
         this.onUpdate({
           value: { min: number, max: this.addedMaxNumber },
         });
-      } else {
+      } else if (number) {
         this.onUpdate({
-          value: { min: undefined, max: this.addedMaxNumber },
+          value: { min: number, max: undefined },
         });
+      } else {
+        this.onUpdate({ value: undefined });
       }
     }
     updateMax(number) {
-      if (number) {
+      if (number && this.addedMinNumber) {
         this.onUpdate({
           value: { min: this.addedMinNumber, max: number },
         });
-      } else {
+      } else if (number) {
         this.onUpdate({
-          value: { min: this.addedMinNumber, max: undefined },
+          value: { min: undefined, max: number },
         });
+      } else {
+        this.onUpdate({ value: undefined });
       }
     }
 
