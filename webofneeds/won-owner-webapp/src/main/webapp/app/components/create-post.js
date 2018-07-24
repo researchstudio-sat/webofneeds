@@ -65,7 +65,7 @@ function genComponentConf() {
                 detail-list="self.useCase.isDetails"
                 initial-draft="self.useCase.draft.is"
                 on-update="::self.updateDraft(draft, 'is')" 
-                on-scroll="::self.scrollToBottom(element)">
+                on-scroll="::self.scrollIntoView(element)">
             </won-create-isseeks>
             <won-labelled-hr label="::'Looking For'" class="cp__content__labelledhr" ng-if="self.useCase.seeksDetails"> </won-labelled-hr>
             <won-create-isseeks 
@@ -74,7 +74,7 @@ function genComponentConf() {
                 detail-list="self.useCase.seeksDetails"
                 initial-draft="self.useCase.draft.seeks"
                 on-update="::self.updateDraft(draft, 'seeks')" 
-                on-scroll="::self.scrollToBottom(element)">
+                on-scroll="::self.scrollIntoView(element)">
             </won-create-isseeks>
 
             <!-- TUNE MATCHING -->
@@ -191,23 +191,18 @@ function genComponentConf() {
       if (this.focusedElement) {
         if (this.windowHeight < window.screen.height) {
           this.windowHeight < window.screen.height;
-          this.scrollToBottom(this.focusedElement);
+          this.scrollIntoView(document.querySelector(this.focusedElement));
         } else {
           this.windowHeight = window.screen.height;
         }
       }
     }
 
-    scrollToBottom(element) {
+    scrollIntoView(element) {
       this._programmaticallyScrolling = true;
 
       if (element) {
-        let heightHeader =
-          this.$element[0].querySelector(".cp__header").offsetHeight + 10;
-        let scrollTop = this.$element[0].querySelector(element).offsetTop;
-        this.scrollContainer().scrollTop = scrollTop - heightHeader;
-
-        this.focusedElement = element;
+        element.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
     }
 
