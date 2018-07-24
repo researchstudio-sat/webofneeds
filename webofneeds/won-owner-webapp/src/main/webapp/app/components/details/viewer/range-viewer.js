@@ -11,7 +11,7 @@ function genComponentConf() {
           <span class="rangev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="rangev__content">
-          <div class="rangev__content__detail" ng-if="self.content.get('title')">
+          <div class="rangev__content__detail" ng-if="self.content.get('min')">
             <div class="rangev__content__detail__label">
               {{self.detail.minLabel}}
             </div>
@@ -19,7 +19,7 @@ function genComponentConf() {
               {{self.content.get('min')}}
             </div>
           </div>
-          <div class="rangev__content__detail" ng-if="self.content.get('name')">
+          <div class="rangev__content__detail" ng-if="self.content.get('max')">
             <div class="rangev__content__detail__label">
               {{self.detail.maxLabel}}
             </div>
