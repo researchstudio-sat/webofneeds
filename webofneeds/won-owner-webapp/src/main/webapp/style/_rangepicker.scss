@@ -2,15 +2,29 @@
 @import "textfield";
 
 won-range-picker {
-  .rangep__detail {
-    position: relative;
-    padding: 0.3rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.5rem;
 
-    .rangep__detail__label {
+  .rangep__input {
+    &__reset {
+      position: relative;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        right: 0;
+        top: 0.5rem;
+      }
+    }
+
+    &__label {
+      display: block;
       @include default-font;
     }
 
-    .rangep__detail__input {
+    &__min,
+    &__max {
       border: $thinGrayBorder;
 
       @include textfieldPadding(
@@ -20,14 +34,8 @@ won-range-picker {
         $formInputHeight
       );
 
-      box-sizing: border-box;
-      min-height: $formInputHeight;
-      min-width: 0; // so a size is specified and break-word works
-      width: 100%;
-
-      word-wrap: break-word;
-
-      &--withreset {
+      &.rangep__input__min--withreset,
+      &.rangep__input__max--withreset {
         $verticalPadding: calcVerticalPaddingToHeight(
           $normalFontSize,
           22/16,
@@ -37,28 +45,18 @@ won-range-picker {
         padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
           0.438rem;
       }
-    }
 
-    .rangep__detail__input::-ms-clear {
-      width: 0;
-      height: 0;
-    }
+      box-sizing: border-box;
+      min-height: $formInputHeight;
+      min-width: 0; // so a size is specified and break-word works
+      width: 100%;
 
-    .rangep__detail__icon {
-      @include fixed-square($bigiconSize);
+      word-wrap: break-word;
 
-      $verticalPosition: calcVerticalPaddingToHeight(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2 + $normalFontSize +
-        $verticalPosition / 2;
-      z-index: 1;
+      &::-ms-clear {
+        width: 0;
+        height: 0;
+      }
     }
   }
 }

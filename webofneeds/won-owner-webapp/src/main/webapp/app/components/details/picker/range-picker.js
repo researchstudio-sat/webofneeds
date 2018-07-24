@@ -5,38 +5,44 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="rangep__input">
-         <svg class="rangep__input__icon clickable"
-            style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showMinResetButton"
-            ng-click="self.resetMinNumber(true)">
-            <use xlink:href="#ico36_close" href="#ico36_close"></use>
-          </svg>
           <label class="rangep__input__label">
             {{self.detail.minLabel}}
           </label>
+          <div class="rangep__input__reset clickable">
+            <svg class="rangep__input__reset__icon"
+              style="--local-primary:var(--won-primary-color);"
+              ng-if="self.showMinResetButton"
+              ng-click="self.resetMinNumber(true)">
+              <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
+          </div>
           <input
               type="number"
-              class="rangep__input__min won-txt"
+              class="rangep__input__min"
               placeholder="{{self.detail.minPlaceholder}}"
               ng-blur="::self.updateMinNumber(true)"
-              ng-keyup="::self.updateMinNumber(false)"/>
+              ng-keyup="::self.updateMinNumber(false)"
+              ng-class="{'rangep__input__min--withreset' : self.showMinResetButton}"/>
       </div>
       <div class="rangep__input">
-         <svg class="rangep__input__icon clickable"
-            style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showMaxResetButton"
-            ng-click="self.resetMaxNumber(true)">
-            <use xlink:href="#ico36_close" href="#ico36_close"></use>
-          </svg>
           <label class="rangep__input__label">
             {{self.detail.maxLabel}}
           </label>
+          <div class="rangep__input__reset clickable">
+            <svg class="rangep__input__reset__icon"
+              style="--local-primary:var(--won-primary-color);"
+              ng-if="self.showMaxResetButton"
+              ng-click="self.resetMaxNumber(true)">
+              <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            </svg>
+          </div>
           <input
               type="number"
-              class="rangep__input__max won-txt"
+              class="rangep__input__max"
               placeholder="{{self.detail.maxPlaceholder}}"
               ng-blur="::self.updateMaxNumber(true)"
-              ng-keyup="::self.updateMaxNumber(false)"/>
+              ng-keyup="::self.updateMaxNumber(false)"
+              ng-class="{'rangep__input__max--withreset' : self.showMaxResetButton}"/>
       </div>
     `;
 
