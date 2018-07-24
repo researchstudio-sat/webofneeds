@@ -1,100 +1,75 @@
 import angular from "angular";
-import { attach, delay, extractHashtags } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
+import { attach } from "../../../utils.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <!-- TAGS INPUT -->
-      <div class="tp__input">
-        <input 
-          class="tp__input__inner"
-          type="text"
-          placeholder="{{self.detail.placeholder}}"
-          ng-keyup="::self.updateTags()"
-          ng-class="{'tp__input__inner--withreset' : self.showResetButton}"
-        />
-        <svg class="tp__input__icon clickable" 
-          style="--local-primary:var(--won-primary-color);"
-          ng-if="self.showResetButton"
-          ng-click="self.resetTags()">
-          <use xlink:href="#ico36_close" href="#ico36_close"></use>
-        </svg>
-      </div>
-
-      <!-- LIST OF ADDED TAGS -->
-      <!-- TODO: make tags individually deletable -->
-      <!-- TODO: add # to tag text -->
-      <div class="tp__taglist">
-        <span class="tp__taglist__tag" ng-repeat="tag in self.addedTags">{{tag}}</span>
+      <div class="selectp__input">
+        <label ng-repeat="option in self.detail.options"
+          ng-click="self.updateSelects()"
+          class="selectp__input__inner">
+          <input
+            class="selectp__input__inner__select"
+            type="{{ self.getSelectType() }}"
+            name="{{ self.getInputName() }}"
+            value="{{option.value}}"
+            ng-checked="self.isChecked(option)"/>
+          {{ option.label }}
+        </label>
       </div>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.domCache = new DomCache(this.$element);
+      window.selectp4dbg = this;
+    }
 
-      window.tp4dbg = this;
-
-      this.addedTags = this.initialValue;
-      this.showResetButton = false;
-
-      delay(0).then(() => this.showInitialTags());
+    getSelectType() {
+      return this.detail && this.detail.multiSelect ? "checkbox" : "radio";
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(tags) {
+    update(selectedValues) {
       // check if there are tags
-      if (tags && tags.length > 0) {
-        this.onUpdate({ value: tags });
+      if (selectedValues && selectedValues.length > 0) {
+        this.onUpdate({ value: selectedValues });
       } else {
         this.onUpdate({ value: undefined });
       }
     }
 
-    showInitialTags() {
-      this.addedTags = this.initialValue;
-      let _tagsForTextfield = "";
-      if (this.initialValue && this.initialValue.length > 0) {
-        this.initialValue.forEach(function(tag) {
-          _tagsForTextfield += tag + " ";
-        });
-        this.showResetButton = true;
+    isChecked(option) {
+      if (this.initialValue) {
+        for (const key in this.initialValue) {
+          if (this.initialValue[key] === option.value) {
+            return true;
+          }
+        }
       }
-      this.textfield().value = _tagsForTextfield.trim();
-
-      this.$scope.$apply();
+      return false;
     }
 
-    updateTags() {
-      // TODO: do something with text that does not start with #
-      const text = this.textfield().value;
-
-      if (text && text.trim().length > 0) {
-        this.addedTags = extractHashtags(text);
-        this.update(this.addedTags);
-        this.showResetButton = true;
-      } else {
-        this.resetTags();
-      }
+    updateSelects() {
+      let selectedValues = [];
+      this.selectedFields().forEach(selected =>
+        selectedValues.push(selected.value)
+      );
+      this.update(selectedValues);
     }
 
-    resetTags() {
-      this.addedTags = undefined;
-      this.textfield().value = "";
-      this.update(undefined);
-      this.showResetButton = false;
+    selectedFields() {
+      return this.$element[0].querySelectorAll(
+        "input[name='" + this.getInputName() + "']:checked"
+      );
     }
 
-    textfieldNg() {
-      return this.domCache.ng(".tp__input__inner");
-    }
-
-    textfield() {
-      return this.domCache.dom(".tp__input__inner");
+    getInputName() {
+      /*TODO: Implement a sort of hashcode to prepend to the returned name to add the
+      possibility of using the same identifier in is and seeks for these pickers*/
+      return this.detail.identifier;
     }
   }
   Controller.$inject = serviceDependencies;
