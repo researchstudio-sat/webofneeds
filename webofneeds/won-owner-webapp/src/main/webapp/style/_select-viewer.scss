@@ -1,19 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
 
-won-tags-viewer {
-  @include won-detail-viewer("tv");
-
-  .tv__content {
-    display: flex;
-    flex-wrap: wrap;
-
-    &__tag {
-      border-radius: 0.5rem;
-      background: $won-primary-color;
-      color: $won-secondary-text-color;
-      margin: 0.25rem 0.25rem 0.25rem 0;
-      padding: 0.25rem 0.5rem;
-    }
-  }
+won-select-viewer {
+  @include won-detail-viewer("selectv");
 }
