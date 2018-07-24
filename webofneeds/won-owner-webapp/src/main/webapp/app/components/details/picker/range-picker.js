@@ -70,7 +70,7 @@ function genComponentConf() {
         });
       } else {
         this.onUpdate({
-          value: { min: undefined, maxe: this.addedMaxNumber },
+          value: { min: undefined, max: this.addedMaxNumber },
         });
       }
     }
