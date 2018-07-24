@@ -1,126 +1,161 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
-import { DomCache } from "../../../cstm-ng-utils.js";
-import Immutable from "immutable";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div ng-repeat="dtl in self.personDetails" class="rangep__detail">
-          <div class="rangep__detail__label">
-              {{dtl.fieldname}}
-          </div>
-          <input
-            type="text"
-            id="{{dtl.name}}"
-            class="rangep__detail__input"
-            ng-model="dtl.value"
-            ng-keyup="::self.updateDetails(dtl)"
-            ng-class="{'rangep__detail__input--withreset' : self.showResetButton(dtl.name)}"
-          />
-          <svg class="rangep__detail__icon clickable"
+      <div class="rangep__input">
+         <svg class="rangep__input__icon clickable"
             style="--local-primary:var(--won-primary-color);"
-            ng-if="self.showResetButton(dtl.name)"
-            ng-click="self.resetPersonDetail(dtl.name)">
-              <use xlink:href="#ico36_close" href="#ico36_close"></use>
+            ng-if="self.showMinResetButton"
+            ng-click="self.resetMinNumber(true)">
+            <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
+          <label class="rangep__input__label">
+            {{self.detail.minLabel}}
+          </label>
+          <input
+              type="number"
+              class="rangep__input__min won-txt"
+              placeholder="{{self.detail.minPlaceholder}}"
+              ng-blur="::self.updateMinNumber(true)"
+              ng-keyup="::self.updateMinNumber(false)"/>
+      </div>
+      <div class="rangep__input">
+         <svg class="rangep__input__icon clickable"
+            style="--local-primary:var(--won-primary-color);"
+            ng-if="self.showMaxResetButton"
+            ng-click="self.resetMaxNumber(true)">
+            <use xlink:href="#ico36_close" href="#ico36_close"></use>
+          </svg>
+          <label class="rangep__input__label">
+            {{self.detail.maxLabel}}
+          </label>
+          <input
+              type="number"
+              class="rangep__input__max won-txt"
+              placeholder="{{self.detail.maxPlaceholder}}"
+              ng-blur="::self.updateMaxNumber(true)"
+              ng-keyup="::self.updateMaxNumber(false)"/>
       </div>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.domCache = new DomCache(this.$element);
 
       window.rangep4dbg = this;
 
-      this.addedPerson = Immutable.Map();
+      this.addedMinNumber = this.initialValue && this.initialValue.minValue;
+      this.addedMaxNumber = this.initialValue && this.initialValue.maxValue;
+      this.showMinResetButton = false;
+      this.showMaxResetButton = false;
 
-      this.personDetails = [
-        { fieldname: "Title", name: "title", value: undefined },
-        { fieldname: "Name", name: "name", value: undefined },
-        { fieldname: "Company", name: "company", value: undefined },
-        { fieldname: "Position", name: "position", value: undefined },
-      ];
-      this.visibleResetButtons = new Set();
-
-      delay(0).then(() => this.showInitialPerson());
+      delay(0).then(() => this.showInitialRange());
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(person) {
-      let isEmpty = true;
-      // check if person is empty
-      if (person) {
-        //check validity
-        const personArray = Array.from(person.values());
-        isEmpty = personArray.every(
-          dtl => dtl === undefined || dtl === "" || (dtl && dtl.size === 0)
-        );
-      }
-      if (person && !isEmpty) {
-        this.onUpdate({ value: person });
+    updateMin(number) {
+      if (number) {
+        this.onUpdate({
+          value: { minValue: number, maxValue: this.addedMaxNumber },
+        });
       } else {
-        this.onUpdate({ value: undefined });
+        this.onUpdate({
+          value: { minValue: undefined, maxValue: this.addedMaxNumber },
+        });
+      }
+    }
+    updateMax(number) {
+      if (number) {
+        this.onUpdate({
+          value: { minValue: this.addedMinNumber, maxValue: number },
+        });
+      } else {
+        this.onUpdate({
+          value: { minValue: this.addedMinNumber, maxValue: undefined },
+        });
       }
     }
 
-    showInitialPerson() {
-      if (this.initialValue && this.initialValue.size > 0) {
-        for (let [dtl, value] of this.initialValue.entries()) {
-          this.addedPerson = this.addedPerson.set(dtl, value);
+    showInitialRange() {
+      this.addedMinNumber = this.initialValue && this.initialValue.minValue;
+      this.addedMaxNumber = this.initialValue && this.initialValue.maxValue;
 
-          let personIndex = this.personDetails.findIndex(
-            personDetail => personDetail.name === dtl
-          );
-          if (personIndex !== -1 && dtl !== "skills") {
-            this.personDetails[personIndex].value = value;
-          } else if (personIndex !== -1 && dtl === "skills") {
-            let valueText = value.size > 0 ? value.toJS() : [];
-            this.personDetails[personIndex].value = valueText.toString();
-          }
-          if (value && value.length > 0) {
-            this.visibleResetButtons.add(dtl);
-          }
+      if (this.initialValue) {
+        if (this.initialValue.minValue) {
+          this.minTextfield().value = this.initialValue.minValue;
+          this.showMinResetButton = true;
+        }
+        if (this.initialValue.maxValue) {
+          this.maxTextfield().value = this.initialValue.maxValue;
+          this.showMaxResetButton = true;
         }
       }
 
       this.$scope.$apply();
     }
 
-    updateDetails(dtl) {
-      // split between skills and everything else because skills should be a list
-      if (dtl.value) {
-        this.addedPerson = this.addedPerson.set(dtl.name, dtl.value);
-        this.update(this.addedPerson);
-        if (dtl.value.length > 0) {
-          this.visibleResetButtons.add(dtl.name);
-        } else {
-          this.visibleResetButtons.delete(dtl.name);
-        }
+    updateMinNumber(resetInput) {
+      const number = this.minTextfield().value;
+
+      if (number) {
+        this.addedMinNumber = number;
+        this.updateMin(this.addedMinNumber);
+        this.showMinResetButton = true;
       } else {
-        this.addedPerson = this.addedPerson.set(dtl.name, undefined);
-        this.update(this.addedPerson);
-        this.visibleResetButtons.delete(dtl.name);
+        this.resetMinNumber(resetInput);
       }
     }
 
-    showResetButton(dtl) {
-      return this.visibleResetButtons.has(dtl);
+    updateMaxNumber(resetInput) {
+      const number = this.maxTextfield().value;
+
+      if (number) {
+        this.addedMaxNumber = number;
+        this.updateMax(this.addedMaxNumber);
+        this.showMaxResetButton = true;
+      } else {
+        this.resetMaxNumber(resetInput);
+      }
     }
 
-    resetPersonDetail(dtl) {
-      this.addedPerson = this.addedPerson.set(dtl, undefined);
-      this.visibleResetButtons.delete(dtl);
-      let personIndex = this.personDetails.findIndex(
-        personDetail => personDetail.name === dtl
-      );
-      if (personIndex !== -1) {
-        this.personDetails[personIndex].value = "";
+    resetMinNumber(resetInput) {
+      this.addedMinNumber = undefined;
+      if (resetInput) {
+        this.minTextfield().value = "";
+        this.showMinResetButton = false;
       }
-      this.update(this.addedPerson);
+      this.updateMin(undefined);
+    }
+
+    resetMaxNumber(resetInput) {
+      this.addedMaxNumber = undefined;
+      if (resetInput) {
+        this.maxTextfield().value = "";
+        this.showMaxResetButton = false;
+      }
+      this.updateMax(undefined);
+    }
+
+    minTextfield() {
+      if (!this._minNumberInput) {
+        this._minNumberInput = this.$element[0].querySelector(
+          ".rangep__input__min"
+        );
+      }
+      return this._minNumberInput;
+    }
+
+    maxTextfield() {
+      if (!this._maxNumberInput) {
+        this._maxNumberInput = this.$element[0].querySelector(
+          ".rangep__input__max"
+        );
+      }
+      return this._maxNumberInput;
     }
   }
   Controller.$inject = serviceDependencies;

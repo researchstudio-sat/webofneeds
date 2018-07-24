@@ -46,8 +46,8 @@ function genComponentConf() {
     showInitialNumber() {
       this.addedNumber = this.initialValue;
 
-      if (this.initialValue && this.initialValue.trim().length > 0) {
-        this.textfield().value = this.initialValue.trim();
+      if (this.initialValue) {
+        this.textfield().value = this.initialValue;
         this.showResetButton = true;
       }
 
