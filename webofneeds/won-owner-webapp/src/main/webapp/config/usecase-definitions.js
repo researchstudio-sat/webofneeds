@@ -785,6 +785,40 @@ const realEstateUseCases = {
 };
 
 const transportUseCases = {
+  taxiDemand: {
+    identifier: "taxiDemand",
+    label: "Find a taxi",
+    icon: "#ico36_uc_route_demand",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Looking for a taxi", tags: "search-taxi" },
+      searchString: "offer-taxi",
+    },
+    // TODO: amount of people? other details?
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+    },
+    seeksDetails: {
+      location: { ...details.location },
+      travelAction: { ...details.travelAction },
+    },
+  },
+  taxiOffer: {
+    identifier: "taxiOffer",
+    label: "Offer a taxi",
+    icon: "#ico36_uc_taxi_offer",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Taxi", tags: "offer-taxi" },
+      searchString: "search-taxi",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      // location: {...details.location}, // TODO: add area of service
+    },
+  },
   transportDemand: {
     identifier: "transportDemand",
     label: "Send something",
@@ -953,9 +987,6 @@ const transportUseCases = {
       description: { ...details.description },
     },
   },
-  // taxi: {},
-  // transport: {},
-  // job: {},
 };
 
 export const useCases = {
