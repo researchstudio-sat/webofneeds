@@ -1,28 +1,80 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-<g>
-	<path fill="#FFFFFF" d="M18,35c9.374,0,17-7.626,17-17S27.374,1,18,1S1,8.626,1,18S8.626,35,18,35L18,35z"/>
-	<g>
-		<g>
-			<defs>
-				<path id="SVGID_1_" d="M18,36c9.941,0,18-8.059,18-18c0-9.941-8.059-18-18-18C8.059,0,0,8.059,0,18C0,27.941,8.059,36,18,36
-					L18,36z"/>
-			</defs>
-			<clipPath id="SVGID_2_">
-				<use xlink:href="#SVGID_1_"  overflow="visible"/>
-			</clipPath>
-			<path clip-path="url(#SVGID_2_)" fill="var(--local-primary)" d="M26,16.894V9.822h-7.07L8.322,20.43l7.071,7.07L26,16.894L26,16.894z M24,14
-				c0,1.105-0.895,2-2,2s-2-0.895-2-2c0-1.104,0.895-2,2-2S24,12.896,24,14L24,14z"/>
-		</g>
-	</g>
-	<g>
-		<g>
-			<path fill="none" stroke="var(--local-primary)" stroke-width="2" d="M18,35c9.374,0,17-7.626,17-17S27.374,1,18,1S1,8.626,1,18
-				S8.626,35,18,35L18,35z"/>
-		</g>
-	</g>
-</g>
-</svg>
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="36px"
+   height="36px"
+   viewBox="0 0 36 36"
+   enable-background="new 0 0 36 36"
+   xml:space="preserve"
+   sodipodi:docname="ico36_tags_circle.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"><metadata
+     id="metadata29"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs27" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1192"
+     inkscape:window-height="741"
+     id="namedview25"
+     showgrid="false"
+     inkscape:pagecheckerboard="true"
+     inkscape:zoom="6.5555556"
+     inkscape:cx="18"
+     inkscape:cy="18"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1" /><path
+     style="fill:none;stroke:var(--local-primary);stroke-opacity:1"
+     inkscape:connector-curvature="0"
+     id="path2"
+     d="M 18,35 C 27.374,35 35,27.374 35,18 35,8.626 27.374,1 18,1 8.626,1 1,8.626 1,18 1,27.374 8.626,35 18,35 Z" /><g
+     id="g14"><g
+       id="g12"><defs
+         id="defs5"><path
+           inkscape:connector-curvature="0"
+           d="M 18,36 C 27.941,36 36,27.941 36,18 36,8.059 27.941,0 18,0 8.059,0 0,8.059 0,18 0,27.941 8.059,36 18,36 Z"
+           id="SVGID_1_" /></defs><clipPath
+         id="SVGID_2_"><use
+           height="100%"
+           width="100%"
+           y="0"
+           x="0"
+           style="overflow:visible"
+           id="use7"
+           overflow="visible"
+           xlink:href="#SVGID_1_" /></clipPath><path
+         inkscape:connector-curvature="0"
+         id="path10"
+         d="M 26,16.894 V 9.822 H 18.93 L 8.322,20.43 15.393,27.5 Z M 24,14 c 0,1.105 -0.895,2 -2,2 -1.105,0 -2,-0.895 -2,-2 0,-1.104 0.895,-2 2,-2 1.105,0 2,0.896 2,2 z"
+         fill="var(--local-primary)"
+         clip-path="url(#SVGID_2_)" /></g></g><g
+     id="g20"
+     style="stroke:var(--local-primary);stroke-opacity:1;fill:none"><g
+       id="g18"
+       style="stroke:var(--local-primary);stroke-opacity:1;fill:none"><path
+         style="fill:none;stroke-width:2;stroke:var(--local-primary);stroke-opacity:1"
+         inkscape:connector-curvature="0"
+         id="path16"
+         d="M 18,35 C 27.374,35 35,27.374 35,18 35,8.626 27.374,1 18,1 8.626,1 1,8.626 1,18 1,27.374 8.626,35 18,35 Z"
+         stroke="var(--local-primary)" /></g></g></svg>
