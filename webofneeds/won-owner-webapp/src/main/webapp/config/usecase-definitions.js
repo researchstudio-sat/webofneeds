@@ -279,7 +279,6 @@ const socialUseCases = {
         tags: ["lunch"],
         title: "I'm up for lunch! Any plans?",
       },
-      seeks: { title: "lunch" },
       searchString: "lunch",
     },
     isDetails: {
@@ -314,7 +313,6 @@ const socialUseCases = {
         tags: ["afterparty"],
         title: "I'm up for partying! Any plans?",
       },
-      seeks: { title: "afterparty" },
       searchString: "afterparty",
     },
     isDetails: {
@@ -331,7 +329,6 @@ const socialUseCases = {
     draft: {
       ...emptyDraft,
       is: { tags: ["sightseeing"] },
-      seeks: { title: "sightseeing" },
       searchString: "sightseeing",
     },
     isDetails: {
@@ -354,7 +351,6 @@ const professionalUseCases = {
         tags: ["meetup"],
         title: "I'm up for meeting new people!",
       },
-      seeks: { title: "meetup" },
       searchString: "meetup",
     },
     isDetails: {
@@ -743,8 +739,12 @@ const realEstateUseCases = {
     icon: "#ico36_uc_realestate",
     draft: {
       ...emptyDraft,
-      seeks: { title: "Looking for a place to rent" },
-      searchString: "for-rent",
+      seeks: {
+        tags: ["for-rent"],
+      },
+      is: {
+        tags: ["to-rent"],
+      },
     },
     isDetails: undefined,
     seeksDetails: {
@@ -763,6 +763,10 @@ const realEstateUseCases = {
       ...emptyDraft,
       is: {
         title: "For Rent",
+        tags: ["for-rent"],
+      },
+      seeks: {
+        tags: ["to-rent"],
       },
     },
     isDetails: {
