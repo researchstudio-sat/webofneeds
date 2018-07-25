@@ -27,7 +27,7 @@ function genComponentConf() {
               <svg class="cis__circleicon">
                   <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
               </svg>
-              <span>{{detail.label}}</span>
+              <span class="cis__detail__items__item__header__label">{{detail.label}}</span>
           </div>
 
           <!-- COMPONENT -->

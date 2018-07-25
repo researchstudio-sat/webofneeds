@@ -56,9 +56,13 @@ won-create-isseeks {
       }
 
       &__header {
-        display: flex;
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        grid-gap: 0.5rem;
         align-items: center;
+        text-align: left;
         font-size: $normalFontSize;
+        white-space: nowrap;
         cursor: pointer;
 
         color: black;
