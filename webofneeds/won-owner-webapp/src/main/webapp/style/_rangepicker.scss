@@ -13,7 +13,7 @@ won-range-picker {
       &__icon {
         @include fixed-square($bigiconSize);
         position: absolute;
-        right: 0;
+        left: 0;
         top: 0.5rem;
       }
     }
@@ -25,6 +25,7 @@ won-range-picker {
 
     &__min,
     &__max {
+      text-align: right;
       border: $thinGrayBorder;
 
       @include textfieldPadding(
@@ -42,8 +43,8 @@ won-range-picker {
           $thinBorderWidth,
           $formInputHeight
         );
-        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-          0.438rem;
+        padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
+          $bigiconSize;
       }
 
       box-sizing: border-box;
