@@ -184,7 +184,20 @@ import { Generator } from "sparqljs";
         };
         // add to content node
         for (const key in detailRDF) {
-          contentNode[key] = detailRDF[key];
+          //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
+          if (!contentNode[key]) {
+            contentNode[key] = detailRDF[key];
+          } else if (!detailRDF[key]) {
+            //TODO: impl merge function)
+            console.log(
+              "contentNode already contains key[",
+              key,
+              "] omitting adding new content - oldContent: ",
+              contentNode[key],
+              " newContent: ",
+              detailRDF[key]
+            );
+          }
         }
       }
       return contentNode;
