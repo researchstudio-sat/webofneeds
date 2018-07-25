@@ -16,7 +16,6 @@ won-create-search {
   max-width: $maxContentWidth;
   height: 100%;
   box-sizing: border-box;
-  padding: $gridRowGap;
 
   /*
   &.create-post-mobile {
@@ -24,6 +23,10 @@ won-create-search {
   }*/
 
   .cp__header {
+    margin: $gridRowGap;
+    margin-bottom: 0;
+    padding-bottom: 0.5rem;
+
     grid-area: header;
     display: grid;
     grid-template-columns: auto auto 1fr;
@@ -33,6 +36,7 @@ won-create-search {
     text-align: left;
     min-width: 0;
     align-items: center;
+    border-bottom: $thinGrayBorder;
 
     // so it doesn't interset with the speech-bubble tail coming in from the left on the desktop version
     padding-left: 0.5rem;
@@ -65,33 +69,29 @@ won-create-search {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    border-top: $thinGrayBorder;
-    padding-top: 1rem;
     overflow: auto;
 
-    won-labelled-hr span {
+    .cp__content__branchheader {
+      font-weight: 400;
+      font-size: $normalFontSize + 0.25rem;
+      padding: 1rem 0.5rem 0.5rem 0.5rem;
+      color: $won-primary-color;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      .cp__content__branchheader__carret {
+        @include fixed-square(1rem);
+      }
+    }
+
+    won-labelled-hr .wlh__label__text {
       background-color: white;
     }
 
     .cp__content__tuning {
-      padding: 0 0 0 0;
       @include appearAnimation(0.5s, linear);
-
-      .cp__content__tuning__title {
-        display: flex;
-        font-weight: 400;
-        font-size: $normalFontSize + 0.25rem;
-        padding: 0.5rem 0;
-        color: $won-primary-color;
-
-        .cp__content__tuning__title__carret {
-          @include fixed-square(1rem);
-
-          // visually center icon on line
-          position: relative;
-          top: 0.1em;
-        }
-      }
 
       .cp__content__tuning_matching-context {
         @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
@@ -106,9 +106,10 @@ won-create-search {
   }
 
   .cp__footer {
+    margin: $gridRowGap;
     grid-area: footer;
 
-    won-labelled-hr span {
+    won-labelled-hr .wlh__label__text {
       background-color: white;
     }
 
@@ -116,5 +117,21 @@ won-create-search {
       width: 100%;
       margin-top: 1rem;
     }
+  }
+}
+
+won-create-search {
+  padding: 0 $gridRowGap;
+
+  .cp__content {
+    .cp__content__branchheader {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .cp__header {
+    margin-left: 0;
+    margin-right: 0;
   }
 }

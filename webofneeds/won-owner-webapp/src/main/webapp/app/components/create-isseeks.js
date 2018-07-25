@@ -13,34 +13,33 @@ const serviceDependencies = [
 
 function genComponentConf() {
   const template = `
-    <div class="cis__addDetail" ng-if="self.hasDetails()">
-        <!-- DETAIL TOGGLES -->
-        <div class="cis__detail__items">
-          <div class="cis__detail__items__item" ng-repeat="detail in self.detailList">
-              <!-- HEADER -->
-              <div class="cis__detail__items__item__header"
-                  ng-click="self.toggleOpenDetail($event, detail.identifier)"
-                  ng-class="{'picked' : self.openDetail === detail.identifier}">
-                  <svg class="cis__circleicon" ng-show="!self.details.has(detail.identifier)">
-                      <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
-                  </svg>
-                  <svg class="cis__circleicon" ng-show="self.details.has(detail.identifier)">
-                      <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
-                  </svg>
-                  <span>{{detail.label}}</span>
-              </div>
-
-              <!-- COMPONENT -->
-              <div class="cis__detail__items__item__component"
-                ng-if="self.openDetail === detail.identifier"
-                detail-element="{{detail.component}}"
-                on-update="::self.updateDetail(identifier, value)"
-                initial-value="::self.draftObject[detail.identifier]"
-                identifier="detail.identifier"
-                detail="detail">
-              </div>
+    <!-- DETAIL TOGGLES -->
+    <div class="cis__detail__items">
+      <div class="cis__detail__items__item" ng-repeat="detail in self.detailList"
+          ng-class="{
+            'cis__detail__items__item--won-expanded': self.openDetail === detail.identifier,
+            'cis__detail__items__item--won-hasvalue': self.details.has(detail.identifier),
+          }">
+          <!-- HEADER -->
+          <div class="cis__detail__items__item__header"
+              ng-click="self.toggleOpenDetail($event, detail.identifier)"
+              ng-class="{'picked' : self.openDetail === detail.identifier}">
+              <svg class="cis__circleicon">
+                  <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
+              </svg>
+              <span>{{detail.label}}</span>
           </div>
-        </div>
+
+          <!-- COMPONENT -->
+          <div class="cis__detail__items__item__component"
+            ng-if="self.openDetail === detail.identifier"
+            detail-element="{{detail.component}}"
+            on-update="::self.updateDetail(identifier, value)"
+            initial-value="::self.draftObject[detail.identifier]"
+            identifier="detail.identifier"
+            detail="detail">
+          </div>
+      </div>
     </div>
   `;
 
@@ -57,14 +56,6 @@ function genComponentConf() {
       this.openDetail = undefined;
 
       delay(0).then(() => this.loadInitialDraft());
-    }
-
-    hasDetails() {
-      return (
-        this.detailList &&
-        this.detailList !== {} &&
-        Object.keys(this.detailList).length > 0
-      );
     }
 
     loadInitialDraft() {

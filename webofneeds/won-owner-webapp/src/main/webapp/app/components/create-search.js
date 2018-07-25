@@ -28,8 +28,12 @@ function genComponentConf() {
             <a class="cp__header__back clickable"
                 ng-click="self.router__stateGoCurrent({useCase: undefined})">
                 <svg style="--local-primary:var(--won-primary-color);"
-                    class="cp__header__back__icon">
+                    class="cp__header__back__icon show-in-responsive">
                     <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+                </svg>
+                <svg style="--local-primary:var(--won-primary-color);"
+                    class="cp__header__back__icon hide-in-responsive">
+                    <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
             </a>
             <svg class="cp__header__icon"
@@ -51,21 +55,18 @@ function genComponentConf() {
             
 
             <!-- TUNE MATCHING -->
-            <won-labelled-hr label="::'Matching behaviour'" class="cp__content__labelledhr"> </won-labelled-hr>
-            
-            <!-- TODO: when should this be shown as an option? --> 
+            <!-- TODO: when should this be shown as an option? -->
+            <div class="cp__content__branchheader b detailPicker clickable"
+                ng-click="self.toggleTuningOptions()">
+                <span>Tune Matching Behaviour</span>
+                <svg class="cp__content__branchheader__carret" ng-show="!self.showTuningOptions">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                </svg>
+                <svg class="cp__content__branchheader__carret" ng-show="self.showTuningOptions">
+                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                </svg>
+            </div>
             <div class="cp__content__tuning">
-                <div class="cp__content__tuning__title b detailPicker clickable"
-                    ng-click="self.toggleTuningOptions()"
-                    ng-class="{'closedDetailPicker': !self.showTuningOptions}">
-                    <span>Tune Matching Behaviour</span>
-                    <svg class="cp__content__tuning__title__carret" ng-show="!self.showTuningOptions">
-                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                    </svg>
-                    <svg class="cp__content__tuning__title__carret" ng-show="self.showTuningOptions">
-                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                    </svg>
-                </div>
                 <div class="cp__content__tuning_matching-context">
                     <won-matching-context-picker
                       ng-if="self.showTuningOptions"
