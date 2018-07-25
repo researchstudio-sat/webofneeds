@@ -788,7 +788,7 @@ const transportUseCases = {
   taxiDemand: {
     identifier: "taxiDemand",
     label: "Find a taxi",
-    icon: "#ico36_uc_route_demand", // TODO: taxi icon
+    icon: "#ico36_uc_route_demand",
     draft: {
       ...emptyDraft,
       is: { title: "Looking for a taxi", tags: "search-taxi" },
@@ -807,7 +807,7 @@ const transportUseCases = {
   taxiOffer: {
     identifier: "taxiOffer",
     label: "Offer a taxi",
-    icon: "#ico36_uc_taxi_offer", // TODO: taxi icon
+    icon: "#ico36_uc_taxi_offer",
     draft: {
       ...emptyDraft,
       is: { title: "Taxi", tags: "offer-taxi" },
@@ -816,6 +816,7 @@ const transportUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
+      // location: {...details.location}, // TODO: add area of service
     },
   },
   transportDemand: {
@@ -986,9 +987,6 @@ const transportUseCases = {
       description: { ...details.description },
     },
   },
-  // taxi: {},
-  // transport: {},
-  // job: {},
 };
 
 export const useCases = {
