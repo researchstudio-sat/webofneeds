@@ -25,64 +25,60 @@ won-create-isseeks {
   flex-direction: column;
   flex-shrink: 0;
 
-  // details picker
-  .cis__addDetail {
-    //border-top: $thinBorderWidth solid $won-line-gray;
-    padding: 0 0 0 0;
-    @include appearAnimation(0.5s, linear);
+  .cis__detail__items {
+    display: grid;
+    grid-auto-flow: row;
 
-    .cis__addDetail__header {
-      display: flex;
-      font-size: $mediumFontSize;
-      font-weight: 400;
-
-      &.detailPicker {
-        font-size: $normalFontSize + 0.25rem;
-        padding: 0.5rem 0;
-        color: $won-primary-color;
-        --local-primary: #{$won-primary-color}; // for the svg-icons
-      }
-
-      .cis__addDetail__header__carret {
-        @include fixed-square(1rem);
-
-        // visually center icon on line
-        position: relative;
-        top: 0.1em;
-      }
-    }
-
-    .cis__detail__items {
+    &__item {
+      $item-indicator-width: 0.2rem;
+      $item-padding: 0.5rem;
+      padding: $item-padding;
       display: grid;
       grid-auto-flow: row;
-      grid-gap: 0.5rem;
+      grid-gap: $item-padding;
+      border-bottom: $thinGrayBorder;
+      padding-left: calc(#{$item-padding} + #{$item-indicator-width});
+      background-color: white;
 
-      &__item {
+      &--won-expanded,
+      &:hover {
+        background: $won-light-gray;
+      }
+
+      &--won-hasvalue,
+      &--won-hasvalue:hover {
+        border-left: $item-indicator-width solid $won-primary-color;
+        padding-left: $item-padding;
+      }
+
+      &:first-child {
+        border-top: $thinGrayBorder;
+      }
+
+      &__header {
         display: grid;
-        grid-auto-flow: row;
+        grid-template-columns: min-content 1fr;
         grid-gap: 0.5rem;
+        align-items: center;
+        text-align: left;
+        font-size: $normalFontSize;
+        white-space: nowrap;
+        cursor: pointer;
 
-        &__header {
-          display: flex;
-          align-items: center;
-          font-size: $normalFontSize;
-          cursor: pointer;
+        color: black;
+        --local-primary: black; // for the svg-icons
 
-          color: black;
-          --local-primary: black; // for the svg-icons
+        .cis__circleicon {
+          @include fixed-height(2rem);
+          @include fixed-width(2rem);
+        }
 
-          .cis__circleicon {
-            @include fixed-height(2rem);
-            @include fixed-width(2rem);
-          }
-
-          &.picked,
-          &.picked .cis__circleicon {
-            //color: $won-line-gray;
-            //--local-primary: #{$won-line-gray}; // for the svg-icons
-            color: $won-primary-color;
-            --local-primary: #{$won-primary-color};
-          }
+        &.picked,
+        &.picked .cis__circleicon {
+          //color: $won-line-gray;
+          //--local-primary: #{$won-line-gray}; // for the svg-icons
+          color: $won-primary-color;
+          --local-primary: #{$won-primary-color};
         }
       }
     }

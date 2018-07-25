@@ -64,7 +64,10 @@ function genComponentConf() {
         <div class="cp__content">
 
             <!-- ADD TITLE AND DETAILS -->
-            <won-labelled-hr label="::'Your offer or self description'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails"> </won-labelled-hr>
+            <div class="cp__content__branchheader"
+              ng-if="self.useCase.isDetails">
+              Your offer or self description
+            </div>
             <won-create-isseeks 
                 ng-if="self.useCase.isDetails" 
                 is-or-seeks="::'Description'"
@@ -73,7 +76,10 @@ function genComponentConf() {
                 on-update="::self.updateDraft(draft, 'is')" 
                 on-scroll="::self.scrollIntoView(element)">
             </won-create-isseeks>
-            <won-labelled-hr label="::'Looking For'" class="cp__content__labelledhr" ng-if="self.useCase.seeksDetails"> </won-labelled-hr>
+            <div class="cp__content__branchheader"
+              ng-if="self.useCase.seeksDetails">
+              Looking For
+            </div>
             <won-create-isseeks 
                 ng-if="self.useCase.seeksDetails" 
                 is-or-seeks="::'Search'" 
@@ -84,22 +90,19 @@ function genComponentConf() {
             </won-create-isseeks>
 
             <!-- TUNE MATCHING -->
-            <won-labelled-hr label="::'Matching behaviour'" class="cp__content__labelledhr" ng-if="self.useCase.isDetails || self.useCase.seeksDetails"> </won-labelled-hr>
-            
-            <!-- TODO: when should this be shown as an option? --> 
+            <div class="cp__content__branchheader b detailPicker clickable"
+                ng-if="self.useCase.isDetails || self.useCase.seeksDetails"
+                ng-click="self.toggleTuningOptions()">
+                <span>Tune Matching Behaviour</span>
+                <svg class="cp__content__branchheader__carret" ng-show="!self.showTuningOptions">
+                    <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
+                </svg>
+                <svg class="cp__content__branchheader__carret" ng-show="self.showTuningOptions">
+                    <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
+                </svg>
+            </div>
             <div class="cp__content__tuning"
             ng-if="self.useCase.isDetails || self.useCase.seeksDetails">
-                <div class="cp__content__tuning__title b detailPicker clickable"
-                    ng-click="self.toggleTuningOptions()"
-                    ng-class="{'closedDetailPicker': !self.showTuningOptions}">
-                    <span>Tune Matching Behaviour</span>
-                    <svg class="cp__content__tuning__title__carret" ng-show="!self.showTuningOptions">
-                        <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
-                    </svg>
-                    <svg class="cp__content__tuning__title__carret" ng-show="self.showTuningOptions">
-                        <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
-                    </svg>
-                </div>
                 <div class="cp__content__tuning_matching-context">
                     <won-matching-context-picker
                       ng-if="self.showTuningOptions"
