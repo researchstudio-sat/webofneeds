@@ -1,4 +1,4 @@
-import { getIn, is } from "../app/utils.js";
+import { is } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 
@@ -50,45 +50,6 @@ export const emptyDraft = {
  * This will be automatically enforced by the need builder.
  */
 
-const floorSizeRangeDetail = {
-  ...abstractDetails.range,
-  identifier: "minMaxFloorSize",
-  label: "Min/Max Floor size in square meters",
-  icon: "#ico36_plus_circle", //TODO: better icon,
-  minLabel: "Min FloorSize",
-  maxLabel: "Max FloorSize",
-  parseToRDF: function({ value }) {
-    if (!value) {
-      return { "won:minFloorSize": undefined, "won:maxFloorSize": undefined };
-    }
-    return {
-      "won:minFloorSize": getIn(value, ["min"])
-        ? getIn(value, ["min"])
-        : undefined,
-      "won:maxFloorSize": getIn(value, ["max"])
-        ? getIn(value, ["max"])
-        : undefined,
-    };
-  },
-  parseFromRDF: function(jsonLDImm) {
-    if (!jsonLDImm) return undefined;
-
-    let range = {
-      min: undefined,
-      max: undefined,
-    };
-
-    range.min = jsonLDImm.get("won:minFloorSize");
-    range.max = jsonLDImm.get("won:maxFloorSize");
-
-    // if there's anything, use it
-    if (range.min || range.max) {
-      return Immutable.fromJS(range);
-    }
-    return undefined;
-  },
-};
-
 const allDetailsUseCase = {
   allDetails: {
     identifier: "allDetails",
@@ -114,7 +75,6 @@ const allDetailsUseCase = {
       },
     },
     isDetails: {
-      floorSizeRangeDetail,
       checkbox: {
         component: "won-select-picker",
         viewerComponent: "won-select-viewer",
@@ -158,7 +118,6 @@ const allDetailsUseCase = {
       },
     },
     seeksDetails: {
-      floorSizeRangeDetail,
       radio: {
         component: "won-select-picker",
         viewerComponent: "won-select-viewer",
@@ -320,7 +279,6 @@ const socialUseCases = {
         tags: ["lunch"],
         title: "I'm up for lunch! Any plans?",
       },
-      seeks: { title: "lunch" },
       searchString: "lunch",
     },
     isDetails: {
@@ -355,7 +313,6 @@ const socialUseCases = {
         tags: ["afterparty"],
         title: "I'm up for partying! Any plans?",
       },
-      seeks: { title: "afterparty" },
       searchString: "afterparty",
     },
     isDetails: {
@@ -372,7 +329,6 @@ const socialUseCases = {
     draft: {
       ...emptyDraft,
       is: { tags: ["sightseeing"] },
-      seeks: { title: "sightseeing" },
       searchString: "sightseeing",
     },
     isDetails: {
@@ -395,7 +351,6 @@ const professionalUseCases = {
         tags: ["meetup"],
         title: "I'm up for meeting new people!",
       },
-      seeks: { title: "meetup" },
       searchString: "meetup",
     },
     isDetails: {
@@ -738,6 +693,45 @@ const realEstateRentDetail = {
   },
 };
 
+const realEstateRentRangeDetail = {
+  ...abstractDetails.range,
+  identifier: "rentRange",
+  label: "Rent in EUR/month",
+  minLabel: "From",
+  maxLabel: "To",
+  icon: "#ico36_plus_circle", //TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:priceSpecification": undefined };
+    }
+    return {
+      "s:priceSpecification": {
+        "@type": "s:CompoundPriceSpecification",
+        "s:minPrice": [{ "@value": value.min, "@type": "xsd:float" }],
+        "s:maxPrice": [{ "@value": value.max, "@type": "xsd:float" }],
+        "s:priceCurrency": "EUR",
+        "s:description": "total rent per month in between min/max",
+      },
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const rentPrice = jsonLDImm && jsonLDImm.get("s:priceSpecification");
+    const minRent = rentPrice && rentPrice.get("s:minPrice");
+    const maxRent = rentPrice && rentPrice.get("s:maxPrice");
+
+    // if there's anything, use it
+    if (minRent || maxRent) {
+      const rentRange = {
+        min: minRent + " EUR/month",
+        max: maxRent + " EUR/month",
+      };
+
+      return Immutable.fromJS(rentRange);
+    }
+    return undefined;
+  },
+};
+
 const realEstateUseCases = {
   searchRent: {
     identifier: "searchRent",
@@ -745,8 +739,12 @@ const realEstateUseCases = {
     icon: "#ico36_uc_realestate",
     draft: {
       ...emptyDraft,
-      seeks: { title: "Looking for a place to rent" },
-      searchString: "for-rent",
+      seeks: {
+        tags: ["for-rent"],
+      },
+      is: {
+        tags: ["to-rent"],
+      },
     },
     isDetails: undefined,
     seeksDetails: {
@@ -754,7 +752,7 @@ const realEstateUseCases = {
       floorSize: { ...realEstateFloorSizeDetail },
       numberOfRooms: { ...realEstateNumberOfRoomsDetail },
       features: { ...realEstateFeaturesDetail },
-      rent: { ...realEstateRentDetail },
+      rentRange: { ...realEstateRentRangeDetail },
     },
   },
   offerRent: {
@@ -765,6 +763,10 @@ const realEstateUseCases = {
       ...emptyDraft,
       is: {
         title: "For Rent",
+        tags: ["for-rent"],
+      },
+      seeks: {
+        tags: ["to-rent"],
       },
     },
     isDetails: {
