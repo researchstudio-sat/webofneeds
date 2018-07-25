@@ -6,18 +6,21 @@ const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
       <div class="numberp__input">
-         <svg class="numberp__input__icon clickable"
+        <div class="numberp__input__reset clickable">
+          <svg class="numberp__input__reset__icon"
             style="--local-primary:var(--won-primary-color);"
             ng-if="self.showResetButton"
             ng-click="self.resetNumber(true)">
             <use xlink:href="#ico36_close" href="#ico36_close"></use>
           </svg>
-          <input
-              type="number"
-              class="numberp__input__inner won-txt"
-              placeholder="{{self.detail.placeholder}}"
-              ng-blur="::self.updateNumber(true)"
-              won-input="::self.updateNumber(false)"/>
+        </div>
+        <input
+            type="number"
+            class="numberp__input__inner won-txt"
+            placeholder="{{self.detail.placeholder}}"
+            ng-blur="::self.updateNumber(true)"
+            won-input="::self.updateNumber(false)"
+            ng-class="{'numberp__input__inner--withreset' : self.showResetButton}"/>
       </div>
     `;
 

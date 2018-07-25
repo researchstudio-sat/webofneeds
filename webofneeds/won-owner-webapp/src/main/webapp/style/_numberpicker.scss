@@ -6,31 +6,42 @@ won-number-picker {
     position: relative;
     display: grid;
 
-    .numberp__input__icon {
-      @include fixed-square($bigiconSize);
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2;
-      z-index: 1;
+    &__reset {
+      position: relative;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+      }
     }
 
     .numberp__input__inner {
+      text-align: right;
       border: $thinGrayBorder;
-      min-height: $formInputHeight;
-      min-height: $formInputHeight;
-      word-wrap: break-word;
 
-      $verticalPadding: calcVerticalPaddingToHeight(
+      @include textfieldPadding(
         $normalFontSize,
         22/16,
         $thinBorderWidth,
         $formInputHeight
       );
-      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-        0.438rem;
+      word-wrap: break-word;
 
       &:invalid {
         /*TODO: Define styling for invalid input field*/
+      }
+
+      &.numberp__input__inner--withreset {
+        $verticalPadding: calcVerticalPaddingToHeight(
+          $normalFontSize,
+          22/16,
+          $thinBorderWidth,
+          $formInputHeight
+        );
+        padding: $verticalPadding 0.438rem $verticalPadding 0.438rem +
+          $bigiconSize;
       }
     }
 
