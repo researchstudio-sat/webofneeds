@@ -86,22 +86,25 @@ won-create-search {
       }
     }
 
-    won-labelled-hr .wlh__label__text {
-      background-color: white;
-    }
-
     .cp__content__tuning {
       @include appearAnimation(0.5s, linear);
 
       .cp__content__tuning_matching-context {
-        @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.3rem 0);
-        padding: 0.3rem 0 0 0;
+        @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.5rem);
+        padding: 0.5rem;
       }
     }
 
-    .cp__content__publish {
-      width: 100%;
-      margin-top: 1rem;
+    &__responsivebuttons {
+      padding: 0 0.5rem;
+
+      won-labelled-hr .wlh__label__text {
+        background-color: white;
+      }
+
+      .cp__content__publish {
+        width: 100%;
+      }
     }
   }
 
@@ -128,8 +131,31 @@ won-create-search {
       padding-left: 0;
       padding-right: 0;
     }
+
+    .cp__content__tuning {
+      @include appearAnimation(0.5s, linear);
+
+      .cp__content__tuning_matching-context {
+        @include slideWithOpacityAnimation(0.5s, linear, 20rem, 0.5rem 0);
+        padding: 0.5rem 0;
+      }
+    }
+
+    &__responsivebuttons {
+      padding-left: 0;
+      padding-right: 0;
+
+      won-labelled-hr .wlh__label__text {
+        background-color: white;
+      }
+
+      .cp__content__publish {
+        width: 100%;
+      }
+    }
   }
 
+  .cp__footer,
   .cp__header {
     margin-left: 0;
     margin-right: 0;

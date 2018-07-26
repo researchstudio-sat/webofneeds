@@ -6,12 +6,11 @@
 won-matching-context-picker {
   .mcp__checkboxes {
     display: flex;
-    padding: 0 0.3rem 0.3rem 0.3rem;
+    padding: 0 0 0.3rem 0;
   }
 
   .mcp__input {
     position: relative;
-    padding-left: 0.3rem;
 
     .mcp__input__icon {
       @include fixed-square($bigiconSize);
@@ -59,13 +58,12 @@ won-matching-context-picker {
   .mcp__helptext {
     @include fine-print;
     @include appearAnimation(0.5s, linear);
-    padding-left: 0.3rem;
   }
 
   .mcp__contextlist {
     display: flex;
     flex-wrap: wrap;
-    padding: 0.3rem;
+    padding: 0.3rem 0;
 
     .mcp__contextlist__context {
       border-radius: 0.5rem;
@@ -78,6 +76,5 @@ won-matching-context-picker {
 
   .mcp__restore-button {
     margin: 0.66rem 0; // space around button
-    //padding: 0.5em 1.5em; // override button size
   }
 }
