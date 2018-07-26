@@ -119,9 +119,9 @@ const allDetailsUseCase = {
           if (value && this.options) {
             let humanReadable = "";
 
-            for (const entry in value) {
+            for (const key in value) {
               const foundOption = this.options.find(
-                elem => elem.value === entry
+                elem => elem.value === value[key]
               );
               const foundOptionLabel = foundOption && foundOption.label;
               if (foundOptionLabel) {
@@ -186,9 +186,9 @@ const allDetailsUseCase = {
           if (value && this.options) {
             let humanReadable = "";
 
-            for (const entry in value) {
+            for (const key in value) {
               const foundOption = this.options.find(
-                elem => elem.value === entry
+                elem => elem.value === value[key]
               );
               const foundOptionLabel = foundOption && foundOption.label;
               if (foundOptionLabel) {

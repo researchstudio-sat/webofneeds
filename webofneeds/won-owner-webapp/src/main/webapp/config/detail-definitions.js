@@ -753,8 +753,8 @@ export const details = {
       if (value) {
         let humanReadable = "";
 
-        for (const entry in value) {
-          humanReadable += entry + ", ";
+        for (const key in value) {
+          humanReadable += value[key] + ", ";
         }
         humanReadable = humanReadable.trim();
 
