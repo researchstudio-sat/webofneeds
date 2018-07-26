@@ -35,7 +35,7 @@ function genComponentConf() {
               </span>
               <span class="cis__detail__items__item__header__content"
                 ng-if="self.details.has(detail.identifier) && self.openDetail !== detail.identifier">
-                {{self.draftObject[detail.identifier]}}
+                {{ self.generateHumanReadable(detail) }}
               </span>
           </div>
 
@@ -65,6 +65,13 @@ function genComponentConf() {
       this.openDetail = undefined;
 
       delay(0).then(() => this.loadInitialDraft());
+    }
+
+    generateHumanReadable(detail) {
+      return detail.generateHumanReadable({
+        value: this.draftObject[detail.identifier],
+        includeLabel: false,
+      });
     }
 
     loadInitialDraft() {

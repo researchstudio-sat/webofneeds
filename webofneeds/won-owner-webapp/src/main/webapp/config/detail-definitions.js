@@ -35,6 +35,9 @@ export const abstractDetails = {
     parseFromRDF: function() {
       throw "abstract Detail does not override necessary function";
     },
+    generateHumanReadable: function() {
+      throw "abstract Detail does not override necessary function";
+    },
   },
   number: {
     identifier: function() {
@@ -50,6 +53,9 @@ export const abstractDetails = {
       throw "abstract Detail does not override necessary function";
     },
     parseFromRDF: function() {
+      throw "abstract Detail does not override necessary function";
+    },
+    generateHumanReadable: function() {
       throw "abstract Detail does not override necessary function";
     },
   },
@@ -83,6 +89,9 @@ export const abstractDetails = {
     parseFromRDF: function() {
       throw "abstract Detail does not override necessary function";
     },
+    generateHumanReadable: function() {
+      throw "abstract Detail does not override necessary function";
+    },
   },
   dropdown: {
     identifier: function() {
@@ -113,6 +122,9 @@ export const abstractDetails = {
     parseFromRDF: function() {
       throw "abstract Detail does not override necessary function";
     },
+    generateHumanReadable: function() {
+      throw "abstract Detail does not override necessary function";
+    },
   },
 };
 
@@ -133,6 +145,12 @@ export const details = {
     parseFromRDF: function(jsonLDImm) {
       return jsonLDImm && jsonLDImm.get("dc:title");
     },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
+    },
   },
   description: {
     identifier: "description",
@@ -149,6 +167,12 @@ export const details = {
     },
     parseFromRDF: function(jsonLDImm) {
       return jsonLDImm && jsonLDImm.get("dc:description");
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
     },
   },
   date: {
@@ -169,6 +193,12 @@ export const details = {
       //TODO: Correct parseFromRDF
       return jsonLDImm && jsonLDImm.get("dc:date");
     },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
+    },
   },
   datetime: {
     identifier: "datetime",
@@ -187,6 +217,12 @@ export const details = {
     parseFromRDF: function(jsonLDImm) {
       //TODO: Correct parseFromRDF
       return jsonLDImm && jsonLDImm.get("dc:datetime");
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
     },
   },
   time: {
@@ -207,6 +243,12 @@ export const details = {
       //TODO: Correct parseFromRDF
       return jsonLDImm && jsonLDImm.get("dc:time");
     },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
+    },
   },
   month: {
     identifier: "month",
@@ -225,6 +267,12 @@ export const details = {
     parseFromRDF: function(jsonLDImm) {
       //TODO: Correct parseFromRDF
       return jsonLDImm && jsonLDImm.get("dc:month");
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        return includeLabel ? this.label + ": " + value : value;
+      }
+      return undefined;
     },
   },
   location: {
@@ -375,6 +423,26 @@ export const details = {
       );
       return undefined;
     },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        let humanReadable;
+        if (value.name) {
+          humanReadable = value.name;
+        } else {
+          const locationLat = value.lat && value.lat.toFixed(6);
+          const locationLng = value.lng && value.lng.toFixed(6);
+          if (locationLat && locationLng) {
+            humanReadable = "@(" + locationLat + " , " + locationLng + ")";
+          }
+        }
+        if (humanReadable) {
+          return includeLabel
+            ? this.label + ": " + humanReadable.trim()
+            : humanReadable.trim();
+        }
+      }
+      return undefined;
+    },
   },
   person: {
     identifier: "person",
@@ -425,6 +493,49 @@ export const details = {
       // if there's anything, use it
       if (person.name || person.title || person.company || person.position) {
         return Immutable.fromJS(person);
+      }
+      return undefined;
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      const title = getIn(value, ["title"]);
+      const name = getIn(value, ["name"]);
+      const company = getIn(value, ["company"]);
+      const position = getIn(value, ["position"]);
+
+      let humanReadable;
+      if (title) {
+        humanReadable = title + " ";
+      }
+      if (name) {
+        if (humanReadable) {
+          humanReadable += name + " ";
+        } else {
+          humanReadable = name + " ";
+        }
+      }
+      if (company) {
+        if (humanReadable) {
+          humanReadable += "works at " + company + " ";
+        } else {
+          humanReadable = company + " ";
+        }
+      }
+      if (position) {
+        if (humanReadable) {
+          if (company) {
+            humanReadable += "as a " + position;
+          } else {
+            humanReadable += "is a " + position;
+          }
+        } else {
+          humanReadable = position;
+        }
+      }
+
+      if (humanReadable) {
+        return includeLabel
+          ? this.label + ": " + humanReadable.trim()
+          : humanReadable.trim();
       }
       return undefined;
     },
@@ -553,6 +664,57 @@ export const details = {
       );
       return undefined;
     },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value && (value.fromLocation || value.toLocation)) {
+        const fromLocation = value.fromLocation;
+        const toLocation = value.toLocation;
+
+        const fromLocationName = fromLocation.name;
+        const toLocationName = toLocation.name;
+
+        let humanReadable;
+
+        if (fromLocationName) {
+          humanReadable = "from: " + fromLocationName + " ";
+        } else {
+          const fromLocationLat =
+            fromLocation.lat && fromLocation.lat.toFixed(6);
+          const fromLocationLng =
+            fromLocation.lng && fromLocation.lng.toFixed(6);
+          if (fromLocationLat && fromLocationLng) {
+            humanReadable =
+              "from: @(" + fromLocationLat + " , " + fromLocationLng + ") ";
+          }
+        }
+
+        if (toLocationName) {
+          if (humanReadable) {
+            humanReadable += "to: " + toLocationName + " ";
+          } else {
+            humanReadable = "to: " + toLocationName + " ";
+          }
+        } else {
+          const toLocationLat = toLocation.lat && toLocation.lat.toFixed(6);
+          const toLocationLng = toLocation.lng && toLocation.lng.toFixed(6);
+          if (toLocationLat && toLocationLng) {
+            if (humanReadable) {
+              humanReadable +=
+                "to: @(" + toLocationLat + " , " + toLocationLng + ") ";
+            } else {
+              humanReadable +=
+                "to: @(" + toLocationLat + " , " + toLocationLng + ") ";
+            }
+          }
+        }
+
+        if (humanReadable) {
+          return includeLabel
+            ? this.label + ": " + humanReadable.trim()
+            : humanReadable.trim();
+        }
+      }
+      return undefined;
+    },
   },
   tags: {
     identifier: "tags",
@@ -587,6 +749,24 @@ export const details = {
         return undefined;
       }
     },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        let humanReadable = "";
+
+        for (const entry in value) {
+          humanReadable += entry + ", ";
+        }
+        humanReadable = humanReadable.trim();
+
+        if (humanReadable.length > 0) {
+          humanReadable = humanReadable.substr(0, humanReadable.length - 1);
+          return includeLabel
+            ? this.label + ": " + humanReadable
+            : humanReadable;
+        }
+      }
+      return undefined;
+    },
   },
   ttl: {
     identifier: "ttl",
@@ -609,6 +789,13 @@ export const details = {
       }
       return undefined;
       // TODO: return value
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      //TODO: implement generateHumanReadable
+      if (!value || includeLabel) {
+        return undefined;
+      }
+      return undefined;
     },
   },
 };
