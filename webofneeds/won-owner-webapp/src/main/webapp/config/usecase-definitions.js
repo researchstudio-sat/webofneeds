@@ -34,7 +34,7 @@ export const emptyDraft = {
  * Exmaple:
  * useCase: {
  *    ...,
- *    queryGenerator: (draft, resultName) => {
+ *    generateQuery: (draft, resultName) => {
  *        new SparqlParser.parse(`
  *            PREFIX won: <http://purl.org/webofneeds/model#>
  *
@@ -45,7 +45,7 @@ export const emptyDraft = {
  *    }
  * }
  *
- * A `queryGenerator` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
+ * A `generateQuery` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
  *
  * The query needs to be a SELECT query and select only the resultName variable.
  * This will be automatically enforced by the need builder.
@@ -755,29 +755,29 @@ const realEstateUseCases = {
       features: { ...realEstateFeaturesDetail },
       rentRange: { ...realEstateRentRangeDetail },
     },
-    queryGenerator: (draft, resultName) => {
-      const queryTemplate =
+    generateQuery: (draft, resultName) => {
+      let queryTemplate =
         `
         prefix s:     <http://schema.org/>
         prefix won:   <http://purl.org/webofneeds/model#>
         prefix dc:    <http://purl.org/dc/elements/1.1/>
 
         Select ` +
-          resultName +
-          `
+        resultName +
+        `
 
-        where {
+        WHERE {
           ?main won:is ?is.
           ?is s:priceSpecification ?pricespec.
           ?pricespec s:price ?price.
           ?pricespec s:priceCurrency ?currency.
-          ` +
-          draft.seeks.rentRange && draft.seeks.rentRange.min
-          ? `FILTER (?price >= ` + draft.seeks.rentRange.min + `)`
-          : ` ` + draft.seeks.rentRange && draft.seeks.rentRange.max
-            ? `FILTER (?price <= ` + draft.seeks.rentRange.max + `)`
-            : ` ` +
-              `FILTER (?currency = 'EUR')
+          FILTER (?price >= ` +
+        draft.seeks.rentRange.min +
+        `)
+          FILTER (?price <= ` +
+        draft.seeks.rentRange.max +
+        `)
+          FILTER (?currency = 'EUR')
         }
         `;
 
