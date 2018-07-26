@@ -22,12 +22,21 @@ function genComponentConf() {
           }">
           <!-- HEADER -->
           <div class="cis__detail__items__item__header"
+              ng-class="{
+                'cis__detail__items__item__header--won-showvalue': self.details.has(detail.identifier) && self.openDetail !== detail.identifier,
+              }"
               ng-click="self.toggleOpenDetail($event, detail.identifier)"
               ng-class="{'picked' : self.openDetail === detail.identifier}">
               <svg class="cis__circleicon">
                   <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
               </svg>
-              <span class="cis__detail__items__item__header__label">{{detail.label}}</span>
+              <span class="cis__detail__items__item__header__label">
+                {{detail.label}}
+              </span>
+              <span class="cis__detail__items__item__header__content"
+                ng-if="self.details.has(detail.identifier) && self.openDetail !== detail.identifier">
+                {{self.draftObject[detail.identifier]}}
+              </span>
           </div>
 
           <!-- COMPONENT -->

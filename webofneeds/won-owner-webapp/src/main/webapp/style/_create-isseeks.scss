@@ -65,6 +65,22 @@ won-create-isseeks {
         white-space: nowrap;
         cursor: pointer;
 
+        &--won-showvalue {
+          grid-template-columns: min-content 1fr 2fr;
+        }
+
+        &__label {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        &__content {
+          color: $won-line-gray;
+          font-style: italic;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
         color: black;
         --local-primary: black; // for the svg-icons
 
