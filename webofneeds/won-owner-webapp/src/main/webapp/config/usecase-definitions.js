@@ -1,6 +1,7 @@
 import { is } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
+import { Parser as SparqlParser } from "sparqljs";
 
 export const emptyDraft = {
   is: {},
@@ -33,7 +34,7 @@ export const emptyDraft = {
  * Exmaple:
  * useCase: {
  *    ...,
- *    queryGenerator: (draft, resultName) {
+ *    queryGenerator: (draft, resultName) => {
  *        new SparqlParser.parse(`
  *            PREFIX won: <http://purl.org/webofneeds/model#>
  *
@@ -753,6 +754,34 @@ const realEstateUseCases = {
       numberOfRooms: { ...realEstateNumberOfRoomsDetail },
       features: { ...realEstateFeaturesDetail },
       rentRange: { ...realEstateRentRangeDetail },
+    },
+    queryGenerator: (draft, resultName) => {
+      const queryTemplate =
+        `
+        prefix s:     <http://schema.org/>
+        prefix won:   <http://purl.org/webofneeds/model#>
+        prefix dc:    <http://purl.org/dc/elements/1.1/>
+
+        Select ` +
+          resultName +
+          `
+
+        where {
+          ?main won:is ?is.
+          ?is s:priceSpecification ?pricespec.
+          ?pricespec s:price ?price.
+          ?pricespec s:priceCurrency ?currency.
+          ` +
+          draft.seeks.rentRange && draft.seeks.rentRange.min
+          ? `FILTER (?price >= ` + draft.seeks.rentRange.min + `)`
+          : ` ` + draft.seeks.rentRange && draft.seeks.rentRange.max
+            ? `FILTER (?price <= ` + draft.seeks.rentRange.max + `)`
+            : ` ` +
+              `FILTER (?currency = 'EUR')
+        }
+        `;
+
+      return new SparqlParser().parse(queryTemplate);
     },
   },
   offerRent: {
