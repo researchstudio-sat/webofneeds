@@ -767,7 +767,9 @@ const realEstateUseCases = {
         `
 
         WHERE {
-          ?main won:is ?is.
+          ` +
+        resultName +
+        ` won:is ?is.
           ?is s:priceSpecification ?pricespec.
           ?pricespec s:price ?price.
           ?pricespec s:priceCurrency ?currency.
