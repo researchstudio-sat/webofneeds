@@ -77,19 +77,19 @@ function genComponentConf() {
             </div>
 
             <!-- PUBLISH BUTTON - RESPONSIVE MODE -->
-            <won-labelled-hr label="::'done?'" class="cp__content__labelledhr show-in-responsive"></won-labelled-hr>
-
-            <button type="submit" class="won-button--filled red cp__content__publish show-in-responsive"
-                    ng-disabled="!self.isValid()"
-                    ng-click="::self.publish()">
-                <span ng-show="!self.pendingPublishing">
-                    Publish
-                </span>
-                <span ng-show="self.pendingPublishing">
-                    Publishing&nbsp;&hellip;
-                </span>
-            </button>
-
+            <div class="cp__content__responsivebuttons show-in-responsive">
+              <won-labelled-hr label="::'done?'" class="cp__content__labelledhr"></won-labelled-hr>
+              <button type="submit" class="won-button--filled red cp__content__publish"
+                      ng-disabled="!self.isValid()"
+                      ng-click="::self.publish()">
+                  <span ng-show="!self.pendingPublishing">
+                      Publish
+                  </span>
+                  <span ng-show="self.pendingPublishing">
+                      Publishing&nbsp;&hellip;
+                  </span>
+              </button>
+            </div>
         </div>
 
         <!-- FOOTER: PUBLISH BUTTON - NON-RESPONSIVE MODE -->

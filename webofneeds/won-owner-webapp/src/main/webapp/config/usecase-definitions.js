@@ -115,6 +115,30 @@ const allDetailsUseCase = {
             return undefined;
           }
         },
+        generateHumanReadable: function({ value, includeLabel }) {
+          if (value && this.options) {
+            let humanReadable = "";
+
+            for (const key in value) {
+              const foundOption = this.options.find(
+                elem => elem.value === value[key]
+              );
+              const foundOptionLabel = foundOption && foundOption.label;
+              if (foundOptionLabel) {
+                humanReadable += foundOptionLabel + ", ";
+              }
+            }
+            humanReadable = humanReadable.trim();
+
+            if (humanReadable.length > 0) {
+              humanReadable = humanReadable.substr(0, humanReadable.length - 1);
+              return includeLabel
+                ? this.label + ": " + humanReadable
+                : humanReadable;
+            }
+          }
+          return undefined;
+        },
       },
     },
     seeksDetails: {
@@ -157,6 +181,30 @@ const allDetailsUseCase = {
             );
             return undefined;
           }
+        },
+        generateHumanReadable: function({ value, includeLabel }) {
+          if (value && this.options) {
+            let humanReadable = "";
+
+            for (const key in value) {
+              const foundOption = this.options.find(
+                elem => elem.value === value[key]
+              );
+              const foundOptionLabel = foundOption && foundOption.label;
+              if (foundOptionLabel) {
+                humanReadable += foundOptionLabel + ", ";
+              }
+            }
+            humanReadable = humanReadable.trim();
+
+            if (humanReadable.length > 0) {
+              humanReadable = humanReadable.substr(0, humanReadable.length - 1);
+              return includeLabel
+                ? this.label + ": " + humanReadable
+                : humanReadable;
+            }
+          }
+          return undefined;
         },
       },
     },
@@ -593,6 +641,12 @@ const realEstateFloorSizeDetail = {
       return fs + " " + unit;
     }
   },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return (includeLabel ? this.label + ": " + value : value) + "m²";
+    }
+    return undefined;
+  },
 };
 
 const realEstateNumberOfRoomsDetail = {
@@ -613,6 +667,12 @@ const realEstateNumberOfRoomsDetail = {
     } else {
       return numberOfRooms;
     }
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return (includeLabel ? this.label + ": " + value : value) + " Rooms";
+    }
+    return undefined;
   },
 };
 
@@ -691,6 +751,12 @@ const realEstateRentDetail = {
       return rent + " EUR/month";
     }
   },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return (includeLabel ? this.label + ": " + value : value) + " EUR/month";
+    }
+    return undefined;
+  },
 };
 
 const realEstateRentRangeDetail = {
@@ -727,6 +793,23 @@ const realEstateRentRangeDetail = {
       };
 
       return Immutable.fromJS(rentRange);
+    }
+    return undefined;
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      let humanReadable;
+      if (value.min && value.max) {
+        humanReadable =
+          "between " + value.min + " and " + value.max + " EUR/month";
+      } else if (value.min) {
+        humanReadable = "at least " + value.min + "EUR/month";
+      } else if (value.max) {
+        humanReadable = "at most " + value.max + "EUR/month";
+      }
+      if (humanReadable) {
+        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
+      }
     }
     return undefined;
   },
@@ -886,6 +969,12 @@ const transportUseCases = {
             return w + " " + unit;
           }
         },
+        generateHumanReadable: function({ value, includeLabel }) {
+          if (value) {
+            return (includeLabel ? this.label + ": " + value : value) + "kg";
+          }
+          return undefined;
+        },
       },
       length: {
         ...abstractDetails.number,
@@ -924,6 +1013,12 @@ const transportUseCases = {
             return l + " " + unit;
           }
         },
+        generateHumanReadable: function({ value, includeLabel }) {
+          if (value) {
+            return (includeLabel ? this.label + ": " + value : value) + "cm";
+          }
+          return undefined;
+        },
       },
       width: {
         ...abstractDetails.number,
@@ -961,6 +1056,12 @@ const transportUseCases = {
             }
             return w + " " + unit;
           }
+        },
+        generateHumanReadable: function({ value, includeLabel }) {
+          if (value) {
+            return (includeLabel ? this.label + ": " + value : value) + "cm";
+          }
+          return undefined;
         },
       },
       tags: { ...details.tags },
@@ -1005,18 +1106,6 @@ export const useCaseGroups = {
     icon: undefined,
     useCases: { ...socialUseCases },
   },
-  professional: {
-    identifier: "professionalgroup",
-    label: "Professional networking",
-    icon: undefined,
-    useCases: { ...professionalUseCases },
-  },
-  info: {
-    identifier: "infogroup",
-    label: "Questions and Answers",
-    icon: undefined,
-    useCases: { ...infoUseCases },
-  },
   realEstate: {
     identifier: "realestategroup",
     label: "Real Estate",
@@ -1028,6 +1117,18 @@ export const useCaseGroups = {
     label: "Transport",
     icon: undefined,
     useCases: { ...transportUseCases },
+  },
+  professional: {
+    identifier: "professionalgroup",
+    label: "Professional networking",
+    icon: undefined,
+    useCases: { ...professionalUseCases },
+  },
+  info: {
+    identifier: "infogroup",
+    label: "Questions and Answers",
+    icon: undefined,
+    useCases: { ...infoUseCases },
   },
   other: {
     identifier: "othergroup",
