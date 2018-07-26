@@ -1,6 +1,7 @@
 import { is } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
+import { Parser as SparqlParser } from "sparqljs";
 
 export const emptyDraft = {
   is: {},
@@ -33,7 +34,7 @@ export const emptyDraft = {
  * Exmaple:
  * useCase: {
  *    ...,
- *    queryGenerator: (draft, resultName) {
+ *    generateQuery: (draft, resultName) => {
  *        new SparqlParser.parse(`
  *            PREFIX won: <http://purl.org/webofneeds/model#>
  *
@@ -44,7 +45,7 @@ export const emptyDraft = {
  *    }
  * }
  *
- * A `queryGenerator` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
+ * A `generateQuery` is a function that takes the current need draft and the name of the result variable and returns a sparqljs json representation of the query. This can be created either programmatically or by using the Parser class from the sparqljs library.
  *
  * The query needs to be a SELECT query and select only the resultName variable.
  * This will be automatically enforced by the need builder.
@@ -836,6 +837,36 @@ const realEstateUseCases = {
       numberOfRooms: { ...realEstateNumberOfRoomsDetail },
       features: { ...realEstateFeaturesDetail },
       rentRange: { ...realEstateRentRangeDetail },
+    },
+    generateQuery: (draft, resultName) => {
+      let queryTemplate =
+        `
+        prefix s:     <http://schema.org/>
+        prefix won:   <http://purl.org/webofneeds/model#>
+        prefix dc:    <http://purl.org/dc/elements/1.1/>
+
+        Select ` +
+        resultName +
+        `
+
+        WHERE {
+          ` +
+        resultName +
+        ` won:is ?is.
+          ?is s:priceSpecification ?pricespec.
+          ?pricespec s:price ?price.
+          ?pricespec s:priceCurrency ?currency.
+          FILTER (?price >= ` +
+        draft.seeks.rentRange.min +
+        `)
+          FILTER (?price <= ` +
+        draft.seeks.rentRange.max +
+        `)
+          FILTER (?currency = 'EUR')
+        }
+        `;
+
+      return new SparqlParser().parse(queryTemplate);
     },
   },
   offerRent: {
