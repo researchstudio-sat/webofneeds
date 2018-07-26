@@ -39,7 +39,7 @@
         StringWriter stringWriter = new StringWriter();
         model.write(stringWriter,"TURTLE");
         //String escapedTurtle = HtmlUtils.htmlEscape(stringWriter.toString());
-        String htmlTurtle = stringWriter.toString().replaceAll("<([^>\s]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
+        String htmlTurtle = stringWriter.toString().replaceAll("<([^>\\s]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
         out.print(htmlTurtle);
 %>
     </pre>

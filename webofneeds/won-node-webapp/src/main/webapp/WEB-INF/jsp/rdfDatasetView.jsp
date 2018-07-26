@@ -42,7 +42,7 @@
         StringWriter stringWriter = new StringWriter();
         RDFDataMgr.write(stringWriter, dataset, RDFFormat.TRIG.getLang());
         //String escapedTurtle = HtmlUtils.htmlEscape(stringWriter.toString());
-        String htmlTurtle = stringWriter.toString().replaceAll("<([^>\s]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
+        String htmlTurtle = stringWriter.toString().replaceAll("<([^>\\s]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
         //convert all prefixed URIs to links
         Map<String, String> prefixes = dataset.getDefaultModel().getNsPrefixMap();
         for(String key: prefixes.keySet()) {
