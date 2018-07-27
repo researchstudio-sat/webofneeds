@@ -24,19 +24,24 @@ function genComponentConf() {
           <div class="cis__detail__items__item__header"
               ng-class="{
                 'cis__detail__items__item__header--won-showvalue': self.details.has(detail.identifier) && self.openDetail !== detail.identifier,
+                'cis__detail__items__item__header--won-showmandatoryindicator': detail.mandatory && !(self.details.has(detail.identifier) || self.openDetail === detail.identifier),
               }"
-              ng-click="self.toggleOpenDetail($event, detail.identifier)"
-              ng-class="{'picked' : self.openDetail === detail.identifier}">
+              ng-click="self.toggleOpenDetail($event, detail.identifier)">
               <svg class="cis__circleicon">
                   <use xlink:href={{detail.icon}} href={{detail.icon}}></use>
               </svg>
-              <span class="cis__detail__items__item__header__label">
+              <div class="cis__detail__items__item__header__label">
                 {{detail.label}}
-              </span>
-              <span class="cis__detail__items__item__header__content"
+              </div>
+              <div class="cis__detail__items__item__header__content"
                 ng-if="self.details.has(detail.identifier) && self.openDetail !== detail.identifier">
                 {{ self.generateHumanReadable(detail) }}
-              </span>
+              </div>
+              <div class="cis__mandatory" ng-if="detail.mandatory && !(self.details.has(detail.identifier) || self.openDetail === detail.identifier)" title="This is a mandatory Detail">
+                <svg class="cis__mandatory__icon">
+                    <use xlink:href="#ico16_indicator_warning" href="#ico16_indicator_warning"></use>
+                </svg>
+              </div>
           </div>
 
           <!-- COMPONENT -->

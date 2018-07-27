@@ -236,22 +236,33 @@ function genComponentConf() {
     }
 
     toggleTuningOptions() {
-      // if (!this.showTuningOptions) {
-      //   this.onScroll({ element: ".cis__addDetail__header.b" });
-      // }
       this.showTuningOptions = !this.showTuningOptions;
     }
 
     isValid() {
       const draft = this.draftObject;
-      const hasContent = get(draft, "is") || get(draft, "seeks");
-      const hasValidIs = this.isOrSeeksIsValid(get(draft, "is"));
-      const hasValidSeeks = this.isOrSeeksIsValid(get(draft, "seeks"));
-      return (
-        !this.connectionHasBeenLost &&
-        hasContent &&
-        (hasValidIs || hasValidSeeks)
-      );
+      const isBranch = get(draft, "is");
+      const seeksBranch = get(draft, "seeks");
+
+      if (isBranch || seeksBranch) {
+        const mandatoryIsDetailsSet = this.mandatoryDetailsSet(
+          isBranch,
+          this.useCase.isDetails
+        );
+        const mandatorySeeksDetailsSet = this.mandatoryDetailsSet(
+          seeksBranch,
+          this.useCase.seeksDetails
+        );
+        if (mandatoryIsDetailsSet && mandatorySeeksDetailsSet) {
+          const hasIsContent = this.isBranchContentPresent(isBranch);
+          const hasSeeksContent = this.isBranchContentPresent(seeksBranch);
+
+          return (
+            !this.connectionHasBeenLost && (hasIsContent || hasSeeksContent)
+          );
+        }
+      }
+      return false;
     }
 
     loadInitialDraft() {
@@ -308,7 +319,6 @@ function genComponentConf() {
     }
 
     publish() {
-      // Post both needs
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
@@ -326,32 +336,43 @@ function genComponentConf() {
     }
 
     getPublishObject(draft) {
-      if (!this.isOrSeeksIsValid(draft.is)) {
+      if (!this.isBranchContentPresent(draft.is)) {
         delete draft.is;
       }
-      if (!this.isOrSeeksIsValid(draft.seeks)) {
+      if (!this.isBranchContentPresent(draft.seeks)) {
         delete draft.seeks;
       }
       return draft;
     }
 
-    // returns true if the part has a valid title or any other detail
-    isOrSeeksIsValid(isOrSeeks) {
-      if (!isOrSeeks) {
-        return false;
-      }
-
-      const title = get(isOrSeeks, "title");
-      const hasValidTitle = title && title.length > 0;
-
-      let hasDetail = false;
-      const details = Object.keys(isOrSeeks);
-      for (let d of details) {
-        if (isOrSeeks[d] && d !== "type") {
-          hasDetail = true;
+    // returns true if the branch has any content present
+    isBranchContentPresent(isOrSeeks) {
+      if (isOrSeeks) {
+        const details = Object.keys(isOrSeeks);
+        for (let d of details) {
+          if (isOrSeeks[d] && d !== "type") {
+            return true;
+          }
         }
       }
-      return !!(hasValidTitle || hasDetail);
+      return false;
+    }
+
+    // returns true if the part in isOrSeeks, has all the mandatory details of the useCaseBranchDetails
+    mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
+      if (!useCaseBranchDetails) {
+        return true;
+      }
+
+      for (const key in useCaseBranchDetails) {
+        if (useCaseBranchDetails[key].mandatory) {
+          const detailSaved = isOrSeeks && isOrSeeks[key];
+          if (!detailSaved) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
   }
 

@@ -886,11 +886,17 @@ const realEstateUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
-      location: { ...details.location },
+      location: {
+        ...details.location,
+        mandatory: true,
+      },
       floorSize: { ...realEstateFloorSizeDetail },
       numberOfRooms: { ...realEstateNumberOfRoomsDetail },
       features: { ...realEstateFeaturesDetail },
-      rent: { ...realEstateRentDetail },
+      rent: {
+        ...realEstateRentDetail,
+        mandatory: true,
+      },
     },
     seeksDetails: undefined,
   },
