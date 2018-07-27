@@ -129,7 +129,10 @@ export function parseNeed(jsonldNeed, ownNeed) {
       : undefined;
     parsedNeed.hasFlags = hasFlags;
     parsedNeed.nodeUri = nodeUri;
-    parsedNeed.humanReadable = getHumanReadableStringFromNeed(parsedNeed);
+    parsedNeed.humanReadable = getHumanReadableStringFromNeed(
+      parsedNeed,
+      detailsToParse
+    );
   } else {
     console.error(
       "Cant parse need, data is an invalid need-object: ",
@@ -186,22 +189,86 @@ function extractFlags(wonHasFlags) {
   return hasFlags;
 }
 
-function getHumanReadableStringFromNeed(need) {
-  const searchString = need && need.searchString;
-  const isPresent = !!need.is;
-  const seeksPresent = !!need.seeks;
-  const isTitle = isPresent && need.is.title;
-  const seeksTitle = seeksPresent && need.seeks.title;
+function getHumanReadableStringFromNeed(need, detailsToParse) {
+  if (need && detailsToParse) {
+    const isBranch = need.is;
+    const seeksBranch = need.seeks;
 
-  if (isTitle && seeksTitle) {
-    return isTitle + " - " + seeksTitle;
-  }
-  if (seeksTitle) {
-    return seeksTitle;
-  } else if (isTitle) {
-    return isTitle;
-  } else if (searchString) {
-    return "Search: " + searchString;
+    const isTitle = isBranch && isBranch.title;
+    const seeksTitle = seeksBranch && seeksBranch.title;
+
+    if (isTitle && seeksTitle) {
+      return isTitle + " - " + seeksTitle;
+    } else if (seeksTitle) {
+      return seeksTitle;
+    } else if (isTitle) {
+      return isTitle;
+    } else {
+      const searchString = need && need.searchString;
+
+      if (searchString) {
+        return "Search: " + searchString;
+      }
+    }
+
+    let humanReadableIsDetails = generateHumanReadableArray(
+      isBranch,
+      detailsToParse
+    );
+    let humanReadableSeeksDetails = generateHumanReadableArray(
+      seeksBranch,
+      detailsToParse
+    );
+
+    if (
+      humanReadableIsDetails.length > 0 &&
+      humanReadableSeeksDetails.length > 0
+    ) {
+      return (
+        "Is: " +
+        humanReadableIsDetails.join(" ") +
+        " Seeks: " +
+        humanReadableSeeksDetails.join(", ")
+      );
+    } else if (humanReadableIsDetails.length > 0) {
+      return humanReadableIsDetails.join(", ");
+    } else if (humanReadableSeeksDetails.length > 0) {
+      return humanReadableSeeksDetails.join(", ");
+    }
   }
   return undefined;
+}
+
+function generateHumanReadableArray(presentDetails, detailsToParse) {
+  let humanReadableArray = [];
+  if (presentDetails) {
+    for (const key in presentDetails) {
+      const detailToParse = detailsToParse[key];
+      if (detailToParse) {
+        console.log(
+          "Generating HumanReadable for: ",
+          key,
+          "detailToParse: ",
+          detailToParse,
+          " detailValue: ",
+          presentDetails[key]
+        );
+        const detailValue = presentDetails[key];
+        const detailValueJS =
+          detailValue && Immutable.Iterable.isIterable(detailValue)
+            ? detailValue.toJS()
+            : detailValue;
+
+        if (detailValueJS) {
+          humanReadableArray.push(
+            detailToParse.generateHumanReadable({
+              value: detailValueJS,
+              includeLabel: true,
+            })
+          );
+        }
+      }
+    }
+  }
+  return humanReadableArray;
 }

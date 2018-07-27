@@ -428,6 +428,8 @@ export const details = {
         let humanReadable;
         if (value.name) {
           humanReadable = value.name;
+        } else if (value.address) {
+          humanReadable = value.address;
         } else {
           const locationLat = value.lat && value.lat.toFixed(6);
           const locationLng = value.lng && value.lng.toFixed(6);
@@ -669,8 +671,20 @@ export const details = {
         const fromLocation = value.fromLocation;
         const toLocation = value.toLocation;
 
-        const fromLocationName = fromLocation.name;
-        const toLocationName = toLocation.name;
+        let fromLocationName;
+        let toLocationName;
+
+        if (fromLocation.name) {
+          fromLocationName = fromLocation.name;
+        } else if (value && value.fromAddress) {
+          fromLocationName = value.fromAddress;
+        }
+
+        if (toLocation.name) {
+          toLocationName = toLocation.name;
+        } else if (value && value.toAddress) {
+          toLocationName = value.toAddress;
+        }
 
         let humanReadable;
 
