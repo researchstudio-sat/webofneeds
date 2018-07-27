@@ -1,13 +1,16 @@
 # Conversation State Machines
 
 ## Requirements
-We use conversations to represent all sorts of relationships, many of them intrinsically stateful, such as a transport job. 
-For many applications, this state needs to be made explicit. Moreover, it has to be consistent on both sides of the conversation.
+We use conversations to represent all sorts of relationships, many of them intrinsically stateful processes, such as a transport job. We want to represent these processes on top of the agreement protocol. We need:
+* unambiguous representation of process state
+* determine possible next actions per participant
 
 We cannot use the conversation state in the WoN protocol to represent a higher-level state as it is used 
 to reflect the state of the communication channel and that should be its only use.
 
 Moreover, the possible states and their transitions can be very different depending on the use case.
+
+Note: As we are designing an end-to-end protocol that the clients have to agree on, we are flexible. We can design something simple at first and add other protocols later without having to worry about the WoN nodes.
 
 ## Solution 1: Finite State Machines
 
@@ -87,7 +90,17 @@ ex:msg2 wsm:hasEvent _:serviceEvent.
 
 ## Solution 2: Petri Nets
 
-Same as Solution 1, but using Petri Nets instead of FSMs. Main arguments for that: smaller networks in case of parallel tasks
+Same as Solution 1, but using Petri Nets instead of FSMs. 
+
+Arguments for: 
+* smaller networks in case of parallel tasks than with FSMs
+* simple and clear execution semantics
+
+Arguments against:
+* Not as easy to understand as BPMN
+* Tooling not as good as for BPMN
+* There are many flavors. We may have to choose.
+
 
 ## Solution 3: BPMN
 
@@ -96,7 +109,8 @@ Same as Solution 2, but using Petri Nets instead of FSMs. Main arguments for tha
 Arguments for:
 1. Tooling, Community, Documentation,...
 2. If we want more complex things processes, choreographies etc., we can build them
-Argumetns against:
+
+Arguments against:
 1. A lot of dead weight
 2. No unambiguous semantics (I believe)
 
