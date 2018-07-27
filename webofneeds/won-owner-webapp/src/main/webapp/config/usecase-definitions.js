@@ -863,29 +863,27 @@ const realEstateUseCases = {
           }
         }
 
-        if (filterStrings.length > 0) {
-          const prefixes = `
-            prefix s:     <http://schema.org/>
-            prefix won:   <http://purl.org/webofneeds/model#>
-            prefix dc:    <http://purl.org/dc/elements/1.1/>
-          `;
-          let queryTemplate =
-            prefixes +
-            " Select " +
-            resultName +
-            "WHERE { " +
-            resultName +
-            ` won:is ?is.
-              ?is s:priceSpecification ?pricespec.
-              ?pricespec s:price ?price.
-              ?pricespec s:priceCurrency ?currency. ` +
-            filterStrings.join(" ") +
-            " }";
+        const prefixes = `
+          prefix s:     <http://schema.org/>
+          prefix won:   <http://purl.org/webofneeds/model#>
+          prefix dc:    <http://purl.org/dc/elements/1.1/>
+        `;
+        let queryTemplate =
+          prefixes +
+          " Select " +
+          resultName +
+          "WHERE { " +
+          resultName +
+          ` won:is ?is.
+            ?is s:priceSpecification ?pricespec.
+            ?pricespec s:price ?price.
+            ?pricespec s:priceCurrency ?currency. ` +
+          (filterStrings && filterStrings.join(" ")) +
+          " }";
 
-          return new SparqlParser().parse(queryTemplate);
-        }
-        return undefined;
+        return new SparqlParser().parse(queryTemplate);
       }
+      return undefined;
     },
   },
   offerRent: {
