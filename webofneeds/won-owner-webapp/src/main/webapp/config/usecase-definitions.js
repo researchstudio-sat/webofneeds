@@ -1116,6 +1116,50 @@ const transportUseCases = {
           return undefined;
         },
       },
+      height: {
+        ...abstractDetails.number,
+        identifier: "height",
+        label: "Height in cm",
+        icon: "#ico36_plus_circle",
+        parseToRDF: function({ value }) {
+          if (!value) {
+            return { "s:height": undefined };
+          } else {
+            return {
+              "@type": "s:Product",
+              "s:height": {
+                "@type": "s:QuantitativeValue",
+                "s:value": [{ "@value": value, "@type": "xsd:float" }],
+                "s:unitCode": "CMT",
+              },
+            };
+          }
+        },
+        parseFromRDF: function(jsonLDImm) {
+          const height = jsonLDImm && jsonLDImm.get("s:height");
+          const h = height && height.get("s:value");
+          const unit = height && height.get("s:unitCode");
+
+          if (!h) {
+            return undefined;
+          } else {
+            if (unit === "CMT") {
+              return h + "cm";
+            } else if (unit === "MTR") {
+              return h + "m";
+            } else if (!unit) {
+              return h + " (no unit specified)";
+            }
+            return h + " " + unit;
+          }
+        },
+        generateHumanReadable: function({ value, includeLabel }) {
+          if (value) {
+            return (includeLabel ? this.label + ": " + value : value) + "cm";
+          }
+          return undefined;
+        },
+      },
       tags: { ...details.tags },
     },
     seeksDetails: {
