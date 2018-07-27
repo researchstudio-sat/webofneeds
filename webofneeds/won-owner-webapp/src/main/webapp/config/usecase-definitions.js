@@ -768,14 +768,18 @@ const realEstateRentRangeDetail = {
   maxLabel: "To",
   icon: "#ico36_plus_circle", //TODO: better icon
   parseToRDF: function({ value }) {
-    if (!value) {
+    if (!value || !(value.min || value.max)) {
       return { "s:priceSpecification": undefined };
     }
     return {
       "s:priceSpecification": {
         "@type": "s:CompoundPriceSpecification",
-        "s:minPrice": [{ "@value": value.min, "@type": "xsd:float" }],
-        "s:maxPrice": [{ "@value": value.max, "@type": "xsd:float" }],
+        "s:minPrice": value.min && [
+          { "@value": value.min, "@type": "xsd:float" },
+        ],
+        "s:maxPrice": value.max && [
+          { "@value": value.max, "@type": "xsd:float" },
+        ],
         "s:priceCurrency": "EUR",
         "s:description": "total rent per month in between min/max",
       },
@@ -789,8 +793,8 @@ const realEstateRentRangeDetail = {
     // if there's anything, use it
     if (minRent || maxRent) {
       const rentRange = {
-        min: minRent + " EUR/month",
-        max: maxRent + " EUR/month",
+        min: minRent && minRent + " EUR/month",
+        max: maxRent && maxRent + " EUR/month",
       };
 
       return Immutable.fromJS(rentRange);
@@ -839,32 +843,43 @@ const realEstateUseCases = {
       rentRange: { ...realEstateRentRangeDetail },
     },
     generateQuery: (draft, resultName) => {
-      let queryTemplate =
-        `
+      const seeksBranch = draft && draft.seeks;
+      const rentRange = seeksBranch && seeksBranch.rentRange;
+      let filterStrings = [];
+
+      if (rentRange) {
+        if (rentRange.min || rentRange.max) {
+          filterStrings.push("FILTER (?currency = 'EUR') ");
+        }
+        if (rentRange.min) {
+          filterStrings.push(
+            "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
+          );
+        }
+        if (rentRange.max) {
+          filterStrings.push(
+            "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
+          );
+        }
+      }
+
+      const prefixes = `
         prefix s:     <http://schema.org/>
         prefix won:   <http://purl.org/webofneeds/model#>
         prefix dc:    <http://purl.org/dc/elements/1.1/>
-
-        Select ` +
+      `;
+      let queryTemplate =
+        prefixes +
+        " Select " +
         resultName +
-        `
-
-        WHERE {
-          ` +
+        "WHERE { " +
         resultName +
         ` won:is ?is.
           ?is s:priceSpecification ?pricespec.
           ?pricespec s:price ?price.
-          ?pricespec s:priceCurrency ?currency.
-          FILTER (?price >= ` +
-        draft.seeks.rentRange.min +
-        `)
-          FILTER (?price <= ` +
-        draft.seeks.rentRange.max +
-        `)
-          FILTER (?currency = 'EUR')
-        }
-        `;
+          ?pricespec s:priceCurrency ?currency. ` +
+        (filterStrings && filterStrings.join(" ")) +
+        " }";
 
       return new SparqlParser().parse(queryTemplate);
     },
