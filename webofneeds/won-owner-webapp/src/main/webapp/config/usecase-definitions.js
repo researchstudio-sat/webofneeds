@@ -289,8 +289,8 @@ const socialUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["breakfast"],
         title: "I'm up for breakfast! Any plans?",
+        tags: ["breakfast"],
       },
       seeks: { title: "breakfast" },
       searchString: "breakfast",
@@ -324,8 +324,8 @@ const socialUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["lunch"],
         title: "I'm up for lunch! Any plans?",
+        tags: ["lunch"],
       },
       searchString: "lunch",
     },
@@ -358,8 +358,8 @@ const socialUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["afterparty"],
         title: "I'm up for partying! Any plans?",
+        tags: ["afterparty"],
       },
       searchString: "afterparty",
     },
@@ -396,8 +396,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["meetup"],
         title: "I'm up for meeting new people!",
+        tags: ["meetup"],
       },
       searchString: "meetup",
     },
@@ -423,8 +423,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["offer-phd"],
         title: "I'm offering a PhD position!",
+        tags: ["offer-phd"],
       },
       searchString: "search-phd",
     },
@@ -445,8 +445,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["search-phd"],
         title: "I'm looking for a PhD position!",
+        tags: ["search-phd"],
       },
       searchString: "offer-phd",
     },
@@ -469,8 +469,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["offer-postdoc"],
         title: "I'm offering a PostDoc position!",
+        tags: ["offer-postdoc"],
       },
       searchString: "search-postdoc",
     },
@@ -491,8 +491,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["search-postdoc"],
         title: "I'm looking for a PostDoc position!",
+        tags: ["search-postdoc"],
       },
       searchString: "offer-postdoc",
     },
@@ -515,8 +515,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["offer-consortium"],
         title: "Offering a slot in a project consortium",
+        tags: ["offer-consortium"],
       },
       searchString: "search-consortium",
     },
@@ -539,8 +539,8 @@ const professionalUseCases = {
     draft: {
       ...emptyDraft,
       is: {
-        tags: ["search-consortium"],
         title: "Looking for a slot in a project consortium",
+        tags: ["search-consortium"],
       },
       searchString: "offer-consortium",
     },
