@@ -843,47 +843,45 @@ const realEstateUseCases = {
       rentRange: { ...realEstateRentRangeDetail },
     },
     generateQuery: (draft, resultName) => {
-      if (draft.seeks) {
-        const rentRange = draft.seeks.rentRange;
-        let filterStrings = [];
+      const seeksBranch = draft && draft.seeks;
+      const rentRange = seeksBranch && seeksBranch.rentRange;
+      let filterStrings = [];
 
-        if (rentRange) {
-          if (rentRange.min || rentRange.max) {
-            filterStrings.push("FILTER (?currency = 'EUR') ");
-          }
-          if (rentRange.min) {
-            filterStrings.push(
-              "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
-            );
-          }
-          if (rentRange.max) {
-            filterStrings.push(
-              "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
-            );
-          }
+      if (rentRange) {
+        if (rentRange.min || rentRange.max) {
+          filterStrings.push("FILTER (?currency = 'EUR') ");
         }
-
-        const prefixes = `
-          prefix s:     <http://schema.org/>
-          prefix won:   <http://purl.org/webofneeds/model#>
-          prefix dc:    <http://purl.org/dc/elements/1.1/>
-        `;
-        let queryTemplate =
-          prefixes +
-          " Select " +
-          resultName +
-          "WHERE { " +
-          resultName +
-          ` won:is ?is.
-            ?is s:priceSpecification ?pricespec.
-            ?pricespec s:price ?price.
-            ?pricespec s:priceCurrency ?currency. ` +
-          (filterStrings && filterStrings.join(" ")) +
-          " }";
-
-        return new SparqlParser().parse(queryTemplate);
+        if (rentRange.min) {
+          filterStrings.push(
+            "FILTER (?price >= " + draft.seeks.rentRange.min + " )"
+          );
+        }
+        if (rentRange.max) {
+          filterStrings.push(
+            "FILTER (?price <= " + draft.seeks.rentRange.max + " )"
+          );
+        }
       }
-      return undefined;
+
+      const prefixes = `
+        prefix s:     <http://schema.org/>
+        prefix won:   <http://purl.org/webofneeds/model#>
+        prefix dc:    <http://purl.org/dc/elements/1.1/>
+      `;
+      let queryTemplate =
+        prefixes +
+        " Select " +
+        resultName +
+        "WHERE { " +
+        resultName +
+        ` won:is ?is.
+          ?is s:priceSpecification ?pricespec.
+          ?pricespec s:price ?price.
+          ?pricespec s:priceCurrency ?currency. ` +
+        (filterStrings && filterStrings.join(" ")) +
+        " }";
+
+      return new SparqlParser().parse(queryTemplate);
     },
   },
   offerRent: {
