@@ -755,15 +755,15 @@ const realEstateFloorSizeRangeDetail = {
     if (!Immutable.List.isList(properties))
       properties = Immutable.List.of(properties);
 
-    const numberOfRooms = properties.find(
+    const floorSize = properties.find(
       property =>
         property.get("https://www.w3.org/ns/shacl#path") == "s:floorSize"
     );
 
-    if (numberOfRooms) {
+    if (floorSize) {
       return Immutable.fromJS({
-        min: numberOfRooms.get("https://www.w3.org/ns/shacl#minInclusive"),
-        max: numberOfRooms.get("https://www.w3.org/ns/shacl#maxInclusive"),
+        min: floorSize.get("https://www.w3.org/ns/shacl#minInclusive"),
+        max: floorSize.get("https://www.w3.org/ns/shacl#maxInclusive"),
       });
     } else {
       return undefined;
@@ -939,8 +939,8 @@ const realEstateUseCases = {
     isDetails: undefined,
     seeksDetails: {
       location: { ...details.location },
-      floorSize: { ...realEstateFloorSizeRangeDetail },
-      numberOfRooms: { ...realEstateNumberOfRoomsRangeDetail },
+      floorSizeRange: { ...realEstateFloorSizeRangeDetail },
+      numberOfRoomsRange: { ...realEstateNumberOfRoomsRangeDetail },
       features: { ...realEstateFeaturesDetail },
       rentRange: { ...realEstateRentRangeDetail },
     },
