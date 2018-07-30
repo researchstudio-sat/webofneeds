@@ -17,7 +17,8 @@ function genComponentConf() {
               class="timep__input__inner won-txt"
               placeholder="{{self.detail.placeholder}}"
               ng-model="self.value"
-              ng-change="::self.updateTime()"/>
+              ng-change="::self.updateTime()"
+              ng-class="{'timep__input__inner--withreset' : self.showResetButton}"/>
       </div>
     `;
 
