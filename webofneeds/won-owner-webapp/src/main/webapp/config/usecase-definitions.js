@@ -651,27 +651,51 @@ const realEstateFloorSizeDetail = {
 };
 
 const realEstateNumberOfRoomsDetail = {
-  ...abstractDetails.number,
+  ...abstractDetails.range,
   identifier: "numberOfRooms",
   label: "Number of Rooms",
+  minLabel: "From",
+  maxLabel: "To",
   icon: "#ico36_plus_circle", // TODO: better icon
   parseToRDF: function({ value }) {
     if (!value) {
-      return { "s:numberOfRooms": undefined };
+      return {};
     }
-    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
+    return {
+      "https://www.w3.org/ns/shacl#property": {
+        "https://www.w3.org/ns/shacl#path": "s:numberOfRooms",
+        "https://www.w3.org/ns/shacl#minInclusive": value.min,
+        "https://www.w3.org/ns/shacl#maxInclusive": value.max,
+      },
+    };
   },
   parseFromRDF: function(jsonLDImm) {
-    const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
-    if (!numberOfRooms) {
-      return undefined;
+    let properties =
+      jsonLDImm && jsonLDImm.get("https://www.w3.org/ns/shacl#property");
+    if (!properties) return undefined;
+
+    if (!Immutable.List.isList(properties))
+      properties = Immutable.List.of(properties);
+
+    const numberOfRooms = properties.find(
+      property =>
+        property.get("https://www.w3.org/ns/shacl#path") == "s:numberOfRooms"
+    );
+
+    if (numberOfRooms) {
+      return Immutable.fromJS({
+        min: numberOfRooms.get("https://www.w3.org/ns/shacl#minInclusive"),
+        max: numberOfRooms.get("https://www.w3.org/ns/shacl#maxInclusive"),
+      });
     } else {
-      return numberOfRooms;
+      return undefined;
     }
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
-      return (includeLabel ? this.label + ": " + value : value) + " Rooms";
+      return `${includeLabel ? `${this.label}: ` : ""}${value.min} - ${
+        value.max
+      } Rooms`;
     }
     return undefined;
   },
