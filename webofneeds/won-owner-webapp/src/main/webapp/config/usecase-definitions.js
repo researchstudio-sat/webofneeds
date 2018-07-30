@@ -728,6 +728,57 @@ const realEstateNumberOfRoomsRangeDetail = {
   },
 };
 
+const realEstateFloorSizeRangeDetail = {
+  ...abstractDetails.range,
+  identifier: "floorSizeRange",
+  label: "Floor size in square meters",
+  minLabel: "From",
+  maxLabel: "To",
+  icon: "#ico36_plus_circle", // TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return {};
+    }
+    return {
+      "https://www.w3.org/ns/shacl#property": {
+        "https://www.w3.org/ns/shacl#path": "s:floorSize",
+        "https://www.w3.org/ns/shacl#minInclusive": value.min,
+        "https://www.w3.org/ns/shacl#maxInclusive": value.max,
+      },
+    };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    let properties =
+      jsonLDImm && jsonLDImm.get("https://www.w3.org/ns/shacl#property");
+    if (!properties) return undefined;
+
+    if (!Immutable.List.isList(properties))
+      properties = Immutable.List.of(properties);
+
+    const numberOfRooms = properties.find(
+      property =>
+        property.get("https://www.w3.org/ns/shacl#path") == "s:floorSize"
+    );
+
+    if (numberOfRooms) {
+      return Immutable.fromJS({
+        min: numberOfRooms.get("https://www.w3.org/ns/shacl#minInclusive"),
+        max: numberOfRooms.get("https://www.w3.org/ns/shacl#maxInclusive"),
+      });
+    } else {
+      return undefined;
+    }
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return `${includeLabel ? `${this.label}: ` : ""}${value.min} - ${
+        value.max
+      } m²`;
+    }
+    return undefined;
+  },
+};
+
 const realEstateFeaturesDetail = {
   ...details.tags,
   identifier: "features",
@@ -888,7 +939,7 @@ const realEstateUseCases = {
     isDetails: undefined,
     seeksDetails: {
       location: { ...details.location },
-      floorSize: { ...realEstateFloorSizeDetail },
+      floorSize: { ...realEstateFloorSizeRangeDetail },
       numberOfRooms: { ...realEstateNumberOfRoomsRangeDetail },
       features: { ...realEstateFeaturesDetail },
       rentRange: { ...realEstateRentRangeDetail },
