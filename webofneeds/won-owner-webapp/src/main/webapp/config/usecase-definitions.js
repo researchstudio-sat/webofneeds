@@ -651,8 +651,35 @@ const realEstateFloorSizeDetail = {
 };
 
 const realEstateNumberOfRoomsDetail = {
-  ...abstractDetails.range,
+  ...abstractDetails.number,
   identifier: "numberOfRooms",
+  label: "Number of Rooms",
+  icon: "#ico36_plus_circle", // TODO: better icon
+  parseToRDF: function({ value }) {
+    if (!value) {
+      return { "s:numberOfRooms": undefined };
+    }
+    return { "s:numberOfRooms": [{ "@value": value, "@type": "xsd:float" }] };
+  },
+  parseFromRDF: function(jsonLDImm) {
+    const numberOfRooms = jsonLDImm && jsonLDImm.get("s:numberOfRooms");
+    if (!numberOfRooms) {
+      return undefined;
+    } else {
+      return numberOfRooms;
+    }
+  },
+  generateHumanReadable: function({ value, includeLabel }) {
+    if (value) {
+      return (includeLabel ? this.label + ": " + value : value) + " Rooms";
+    }
+    return undefined;
+  },
+};
+
+const realEstateNumberOfRoomsRangeDetail = {
+  ...abstractDetails.range,
+  identifier: "numberOfRoomsRange",
   label: "Number of Rooms",
   minLabel: "From",
   maxLabel: "To",
@@ -862,7 +889,7 @@ const realEstateUseCases = {
     seeksDetails: {
       location: { ...details.location },
       floorSize: { ...realEstateFloorSizeDetail },
-      numberOfRooms: { ...realEstateNumberOfRoomsDetail },
+      numberOfRooms: { ...realEstateNumberOfRoomsRangeDetail },
       features: { ...realEstateFeaturesDetail },
       rentRange: { ...realEstateRentRangeDetail },
     },
