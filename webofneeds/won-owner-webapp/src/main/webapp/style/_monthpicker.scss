@@ -28,13 +28,21 @@ won-month-picker {
         $thinBorderWidth,
         $formInputHeight
       );
-      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-        0.438rem;
+      padding: $verticalPadding 0.438rem $verticalPadding 0.438rem;
+
+      &--withreset {
+        padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
+          0.438rem;
+      }
     }
 
     .monthp__input__inner::-ms-clear {
       width: 0;
       height: 0;
+    }
+
+    input[type="month"]::-webkit-clear-button {
+      -webkit-appearance: none;
     }
   }
 }
