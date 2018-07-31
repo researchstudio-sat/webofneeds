@@ -234,17 +234,17 @@ function genComponentConf() {
       const seeksBranch = get(draft, "seeks");
 
       if (isBranch || seeksBranch) {
-        const mandatoryIsDetailsSet = this.mandatoryDetailsSet(
+        const mandatoryIsDetailsSet = mandatoryDetailsSet(
           isBranch,
           this.useCase.isDetails
         );
-        const mandatorySeeksDetailsSet = this.mandatoryDetailsSet(
+        const mandatorySeeksDetailsSet = mandatoryDetailsSet(
           seeksBranch,
           this.useCase.seeksDetails
         );
         if (mandatoryIsDetailsSet && mandatorySeeksDetailsSet) {
-          const hasIsContent = this.isBranchContentPresent(isBranch);
-          const hasSeeksContent = this.isBranchContentPresent(seeksBranch);
+          const hasIsContent = isBranchContentPresent(isBranch);
+          const hasSeeksContent = isBranchContentPresent(seeksBranch);
 
           return (
             !this.connectionHasBeenLost && (hasIsContent || hasSeeksContent)
@@ -311,57 +311,16 @@ function genComponentConf() {
       if (!this.pendingPublishing) {
         this.pendingPublishing = true;
 
-        if (this.useCase && this.useCase.identifier) {
-          this.draftObject.useCase = this.useCase.identifier;
-        }
+        this.draftObject.useCase = get(this.useCase, "identifier");
+        // this.draftObject.type = get(this.useCase, "type");
 
-        const draft = this.getPublishObject(this.draftObject);
+        sanitizeDraft(this.draftObject);
 
         this.needs__create(
-          draft,
+          this.draftObject,
           this.$ngRedux.getState().getIn(["config", "defaultNodeUri"])
         );
       }
-    }
-
-    getPublishObject(draft) {
-      if (!this.isBranchContentPresent(draft.is)) {
-        delete draft.is;
-      }
-      if (!this.isBranchContentPresent(draft.seeks)) {
-        delete draft.seeks;
-      }
-      return draft;
-    }
-
-    // returns true if the branch has any content present
-    isBranchContentPresent(isOrSeeks) {
-      if (isOrSeeks) {
-        const details = Object.keys(isOrSeeks);
-        for (let d of details) {
-          if (isOrSeeks[d] && d !== "type") {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    // returns true if the part in isOrSeeks, has all the mandatory details of the useCaseBranchDetails
-    mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
-      if (!useCaseBranchDetails) {
-        return true;
-      }
-
-      for (const key in useCaseBranchDetails) {
-        if (useCaseBranchDetails[key].mandatory) {
-          const detailSaved = isOrSeeks && isOrSeeks[key];
-          if (!detailSaved) {
-            return false;
-          }
-        }
-      }
-      return true;
     }
   }
 
@@ -388,6 +347,42 @@ function selectUseCaseFrom(useCaseString, useCases) {
     }
   }
   return undefined;
+}
+function sanitizeDraft(draft) {
+  if (!isBranchContentPresent(draft.is)) {
+    delete draft.is;
+  }
+  if (!isBranchContentPresent(draft.seeks)) {
+    delete draft.seeks;
+  }
+}
+// returns true if the branch has any content present
+function isBranchContentPresent(isOrSeeks) {
+  if (isOrSeeks) {
+    const details = Object.keys(isOrSeeks);
+    for (let d of details) {
+      if (isOrSeeks[d] && d !== "type") {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+// returns true if the part in isOrSeeks, has all the mandatory details of the useCaseBranchDetails
+function mandatoryDetailsSet(isOrSeeks, useCaseBranchDetails) {
+  if (!useCaseBranchDetails) {
+    return true;
+  }
+
+  for (const key in useCaseBranchDetails) {
+    if (useCaseBranchDetails[key].mandatory) {
+      const detailSaved = isOrSeeks && isOrSeeks[key];
+      if (!detailSaved) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
