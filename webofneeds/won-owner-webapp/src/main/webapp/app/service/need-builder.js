@@ -29,7 +29,6 @@ import { Generator } from "sparqljs";
    *
    * **mandatory parameters:**
    *
-   * * args.type: the type of the need (e.g. 'won:Supply')
    * * args.title: a string with the title (e.g. 'Couch to give away')
    * * args.description: a longer string describing the need in detail
    *
