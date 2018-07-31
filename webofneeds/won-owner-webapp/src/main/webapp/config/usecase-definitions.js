@@ -708,11 +708,17 @@ const realEstateNumberOfRoomsRangeDetail = {
       property =>
         property.get("https://www.w3.org/ns/shacl#path") == "s:numberOfRooms"
     );
+    const minNumberOfRooms =
+      numberOfRooms &&
+      numberOfRooms.get("https://www.w3.org/ns/shacl#minInclusive");
+    const maxNumberOfRooms =
+      numberOfRooms &&
+      numberOfRooms.get("https://www.w3.org/ns/shacl#maxInclusive");
 
-    if (numberOfRooms) {
+    if (minNumberOfRooms || maxNumberOfRooms) {
       return Immutable.fromJS({
-        min: numberOfRooms.get("https://www.w3.org/ns/shacl#minInclusive"),
-        max: numberOfRooms.get("https://www.w3.org/ns/shacl#maxInclusive"),
+        min: minNumberOfRooms,
+        max: maxNumberOfRooms,
       });
     } else {
       return undefined;
@@ -760,10 +766,15 @@ const realEstateFloorSizeRangeDetail = {
         property.get("https://www.w3.org/ns/shacl#path") == "s:floorSize"
     );
 
-    if (floorSize) {
+    const minFloorSize =
+      floorSize && floorSize.get("https://www.w3.org/ns/shacl#minInclusive");
+    const maxFloorSize =
+      floorSize && floorSize.get("https://www.w3.org/ns/shacl#maxInclusive");
+
+    if (minFloorSize || maxFloorSize) {
       return Immutable.fromJS({
-        min: floorSize.get("https://www.w3.org/ns/shacl#minInclusive"),
-        max: floorSize.get("https://www.w3.org/ns/shacl#maxInclusive"),
+        min: minFloorSize && minFloorSize + "m²",
+        max: maxFloorSize && maxFloorSize + "m²",
       });
     } else {
       return undefined;
