@@ -182,7 +182,7 @@ function genComponentConf() {
         return {
           connectionHasBeenLost: !selectIsConnected(state),
           useCaseString,
-          useCase: this.getUseCase(useCaseString),
+          useCase: selectUseCaseFrom(useCaseString, useCases),
           defaultMatchingContext: defaultMatchingContext,
         };
       };
@@ -224,17 +224,6 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
-    getUseCase(useCaseString) {
-      if (useCaseString) {
-        for (const useCaseName in useCases) {
-          if (useCaseString === useCases[useCaseName]["identifier"]) {
-            return useCases[useCaseName];
-          }
-        }
-      }
-      return undefined;
-    }
-
     toggleTuningOptions() {
       this.showTuningOptions = !this.showTuningOptions;
     }
@@ -268,7 +257,7 @@ function genComponentConf() {
     loadInitialDraft() {
       // just to be sure this is loaded already
       if (!this.useCase) {
-        this.getUseCase(this.useCaseString);
+        selectUseCaseFrom(this.useCaseString, useCases);
       }
 
       if (this.useCase && this.useCase.draft) {
@@ -388,6 +377,17 @@ function genComponentConf() {
     },
     template: template,
   };
+}
+
+function selectUseCaseFrom(useCaseString, useCases) {
+  if (useCaseString) {
+    for (const useCaseName in useCases) {
+      if (useCaseString === useCases[useCaseName]["identifier"]) {
+        return useCases[useCaseName];
+      }
+    }
+  }
+  return undefined;
 }
 
 export default //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
