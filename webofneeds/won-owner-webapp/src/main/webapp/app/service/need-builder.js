@@ -15,12 +15,6 @@ import { Generator } from "sparqljs";
 (function() {
   // <need-builder-js> scope
 
-  function hasPriceSpecification() {
-    return false; //TODO price-specification not fully implemented yet
-  }
-  function hasTimeConstraint() {
-    return false; //TODO time-constraint-attachment not implemented yet
-  }
   function hasAttachmentUrls(args) {
     return (
       args.attachmentUris &&
@@ -147,29 +141,6 @@ import { Generator } from "sparqljs";
         "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
           ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,
-
-        //TODO: Different id for is and seeks
-        "won:hasTimeSpecification": !hasTimeConstraint(isOrSeeksData)
-          ? undefined
-          : {
-              "@id": "_:timeSpecification",
-              "@type": "won:TimeSpecification",
-              "won:hasRecurInfiniteTimes": isOrSeeksData.recurInfinite,
-              "won:hasRecursIn": isOrSeeksData.recursIn,
-              "won:hasStartTime": isOrSeeksData.startTime,
-              "won:hasEndTime": isOrSeeksData.endTime,
-            },
-
-        "won:hasPriceSpecificationhas": !hasPriceSpecification(isOrSeeksData)
-          ? undefined
-          : {
-              "@id": "_:priceSpecification",
-              "@type": "won:PriceSpecification",
-              "won:hasCurrency": isOrSeeksData.currency,
-              "won:hasLowerPriceLimit": isOrSeeksData.lowerPriceLimit,
-              "won:hasUpperPriceLimit": isOrSeeksData.upperPriceLimit,
-            },
-        //TODO images, time, currency(?)
       };
 
       const detailList = getAllDetails();
@@ -189,7 +160,7 @@ import { Generator } from "sparqljs";
             if (!Array.isArray(contentNode[key]))
               contentNode[key] = Array.of(contentNode[key]);
 
-            contentNode[key].concat(detailRDF[key]);
+            contentNode[key] = contentNode[key].concat(detailRDF[key]);
           } else {
             contentNode[key] = detailRDF[key];
           }
