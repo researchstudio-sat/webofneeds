@@ -16,7 +16,8 @@ function genComponentConf() {
     <a
         ng-if="self.isPrivateIdUser"
         href="{{ self.absHRef(self.$state, 'signup') }}"
-        class="won-button--outlined thin red show-in-responsive">
+        class="won-button--outlined thin red show-in-responsive"
+        ng-click="self.hideMainMenuDisplay()">
         Sign up
     </a>
     <!--
