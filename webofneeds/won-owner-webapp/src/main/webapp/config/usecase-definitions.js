@@ -691,8 +691,12 @@ const realEstateNumberOfRoomsRangeDetail = {
     return {
       "https://www.w3.org/ns/shacl#property": {
         "https://www.w3.org/ns/shacl#path": "s:numberOfRooms",
-        "https://www.w3.org/ns/shacl#minInclusive": value.min,
-        "https://www.w3.org/ns/shacl#maxInclusive": value.max,
+        "https://www.w3.org/ns/shacl#minInclusive": value.min && [
+          { "@value": value.min, "@type": "xsd:float" },
+        ],
+        "https://www.w3.org/ns/shacl#maxInclusive": value.max && [
+          { "@value": value.max, "@type": "xsd:float" },
+        ],
       },
     };
   },
@@ -748,8 +752,12 @@ const realEstateFloorSizeRangeDetail = {
     return {
       "https://www.w3.org/ns/shacl#property": {
         "https://www.w3.org/ns/shacl#path": "s:floorSize",
-        "https://www.w3.org/ns/shacl#minInclusive": value.min,
-        "https://www.w3.org/ns/shacl#maxInclusive": value.max,
+        "https://www.w3.org/ns/shacl#minInclusive": value.min && [
+          { "@value": value.min, "@type": "xsd:float" },
+        ],
+        "https://www.w3.org/ns/shacl#maxInclusive": value.max && [
+          { "@value": value.max, "@type": "xsd:float" },
+        ],
       },
     };
   },
@@ -958,6 +966,9 @@ const realEstateUseCases = {
     generateQuery: (draft, resultName) => {
       const seeksBranch = draft && draft.seeks;
       const rentRange = seeksBranch && seeksBranch.rentRange;
+      const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
+      const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
+
       let filterStrings = [];
 
       if (rentRange) {
@@ -976,6 +987,36 @@ const realEstateUseCases = {
         }
       }
 
+      if (floorSizeRange) {
+        if (floorSizeRange.min) {
+          filterStrings.push(
+            "FILTER (?floorSize >= " + draft.seeks.floorSizeRange.min + " )"
+          );
+        }
+        if (floorSizeRange.max) {
+          filterStrings.push(
+            "FILTER (?floorSize <= " + draft.seeks.floorSizeRange.max + " )"
+          );
+        }
+      }
+
+      if (numberOfRoomsRange) {
+        if (numberOfRoomsRange.min) {
+          filterStrings.push(
+            "FILTER (?numberOfRooms >= " +
+              draft.seeks.numberOfRoomsRange.min +
+              " )"
+          );
+        }
+        if (numberOfRoomsRange.max) {
+          filterStrings.push(
+            "FILTER (?numberOfRooms <= " +
+              draft.seeks.numberOfRoomsRange.max +
+              " )"
+          );
+        }
+      }
+
       const prefixes = `
         prefix s:     <http://schema.org/>
         prefix won:   <http://purl.org/webofneeds/model#>
@@ -990,7 +1031,9 @@ const realEstateUseCases = {
         ` won:is ?is.
           ?is s:priceSpecification ?pricespec.
           ?pricespec s:price ?price.
-          ?pricespec s:priceCurrency ?currency. ` +
+          ?pricespec s:priceCurrency ?currency.
+          ?is s:floorSize ?floorSize.
+          ?is s:numberOfRooms ?numberOfRooms.` +
         (filterStrings && filterStrings.join(" ")) +
         " }";
 
@@ -1018,8 +1061,14 @@ const realEstateUseCases = {
         ...details.location,
         mandatory: true,
       },
-      floorSize: { ...realEstateFloorSizeDetail },
-      numberOfRooms: { ...realEstateNumberOfRoomsDetail },
+      floorSize: {
+        ...realEstateFloorSizeDetail,
+        mandatory: true,
+      },
+      numberOfRooms: {
+        ...realEstateNumberOfRoomsDetail,
+        mandatory: true,
+      },
       features: { ...realEstateFeaturesDetail },
       rent: {
         ...realEstateRentDetail,
