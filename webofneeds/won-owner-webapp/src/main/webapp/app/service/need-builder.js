@@ -189,7 +189,7 @@ import { Generator } from "sparqljs";
             if (!Array.isArray(contentNode[key]))
               contentNode[key] = Array.of(contentNode[key]);
 
-            contentNode[key].concat(detailRDF[key]);
+            contentNode[key] = contentNode[key].concat(detailRDF[key]);
           } else {
             contentNode[key] = detailRDF[key];
           }
