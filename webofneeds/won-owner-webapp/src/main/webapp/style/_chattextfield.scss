@@ -1,39 +1,71 @@
 @import "won";
 @import "button";
 @import "textfield";
+@import "sizing-utils";
 
 chat-textfield-simple {
   display: grid;
-  grid-gap: 0.5rem;
-  grid-template-columns: 1fr auto;
-  // grid-template-rows: auto;
-  // grid-template-areas:
-  //   "text button";
-  // "cnt cnt"
-  // "help help";
+  grid-template-columns: auto 1fr auto;
   min-width: 0; // so a size is specified and break-word works
+
+  .cts__add {
+    grid-area: add;
+    grid-row: 1 / span 1;
+    grid-column: 1 / span 1;
+
+    @extend .won-button--filled;
+
+    border: $thinGrayBorder;
+    background: white;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    padding: 0.66rem;
+
+    --local-primary: #{$won-primary-text-color};
+
+    &:hover {
+      background: $won-primary-color;
+      --local-primary: #{$won-secondary-text-color};
+    }
+
+    &__icon {
+      @include fixed-square(1rem);
+    }
+  }
 
   .cts__text {
     grid-area: text;
     grid-row: 1 / span 1;
-    grid-column: 1 / span 1;
+    grid-column: 2 / span 1;
+
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+
+    &:hover,
+    &:focus {
+      outline: 0;
+    }
   }
   .cts__submitbutton {
     grid-area: button;
     grid-row: 1 / span 1;
-    grid-column: 2 / span 1;
+    grid-column: 3 / span 1;
   }
   .cts__charcount {
     grid-area: cnt;
-    grid-column: 1 / span 2;
+    grid-column: 1 / span 3;
   }
   .cts__helptext {
     grid-area: help;
-    grid-column: 1 / span 2;
+    grid-column: 1 / span 3;
   }
 
   .cts__submitbutton {
     @extend .won-button--filled;
+
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
   }
 
   .cts__charcount,

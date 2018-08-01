@@ -16,6 +16,11 @@ import { actionCreators } from "../actions/actions.js";
 
 function genComponentConf() {
   let template = `
+        <button class="cts__add">
+            <svg class="cts__add__icon">
+                <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
+            </svg>
+        </button>
         <textarea 
             won-textarea-autogrow
             data-min-rows="1"
