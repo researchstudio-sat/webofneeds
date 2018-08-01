@@ -804,9 +804,11 @@ const realEstateUseCases = {
     draft: {
       ...emptyDraft,
       seeks: {
+        type: "won:Rent",
         tags: ["for-rent"],
       },
       is: {
+        type: "won:SearchRent",
         tags: ["to-rent"],
       },
     },

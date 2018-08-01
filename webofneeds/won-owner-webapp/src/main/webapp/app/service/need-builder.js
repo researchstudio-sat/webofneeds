@@ -137,6 +137,7 @@ import { Generator } from "sparqljs";
     const buildContentNode = (id, isOrSeeksData) => {
       let contentNode = {
         "@id": id,
+        "@type": isOrSeeksData.type,
         "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
           ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,

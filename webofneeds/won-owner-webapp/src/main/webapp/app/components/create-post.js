@@ -312,7 +312,6 @@ function genComponentConf() {
         this.pendingPublishing = true;
 
         this.draftObject.useCase = get(this.useCase, "identifier");
-        // this.draftObject.type = get(this.useCase, "type");
 
         sanitizeDraft(this.draftObject);
 
