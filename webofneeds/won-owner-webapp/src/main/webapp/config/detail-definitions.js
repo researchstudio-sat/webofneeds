@@ -295,6 +295,11 @@ export const details = {
             "@type": "s:GeoCoordinates",
             "s:latitude": value.lat.toFixed(6),
             "s:longitude": value.lng.toFixed(6),
+            "won:geoSpatial": {
+              "@type":
+                "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon",
+              "@value": `${value.lat.toFixed(6)}#${value.lng.toFixed(6)}`,
+            },
           },
           "s:name": value.name,
           "won:hasBoundingBox":
