@@ -443,13 +443,7 @@ won.mergeIntoLast = function(/*args...*/) {
 // it is possible to do a reverse lookup. The table contains former values
 // as keys and maps to arrays that define the lookup-path.
 won.constantsReverseLookupTable = {};
-for (const root of [
-  "WON",
-  "UNREAD",
-  "WONMSG",
-  "EVENT",
-  "COMMUNUCATION_STATE",
-]) {
+for (const root of ["WON", "UNREAD", "WONMSG", "EVENT"]) {
   won.mergeIntoLast(
     buildReverseLookup(won[root], [root]),
     won.constantsReverseLookupTable
