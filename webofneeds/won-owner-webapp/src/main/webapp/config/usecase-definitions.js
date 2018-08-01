@@ -1027,6 +1027,7 @@ const realEstateUseCases = {
             ?geo geo:predicate won:geoSpatial .
             ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
             ?geo geo:spatialCircleRadius "10" .
+            ?geo geo:distanceValue ?geoDistance .
           }`
         );
       }
@@ -1038,9 +1039,10 @@ const realEstateUseCases = {
         prefix geo: <http://www.bigdata.com/rdf/geospatial#>
         prefix geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
       `;
-      let queryTemplate = `
+      let queryTemplate =
+        `
         ${prefixes}
-        SELECT ${resultName}
+        SELECT DISTINCT ${resultName}
         WHERE {
         ${resultName}
           won:is ?is.
@@ -1050,7 +1052,9 @@ const realEstateUseCases = {
           ?is s:floorSize/s:value ?floorSize.
           ?is s:numberOfRooms ?numberOfRooms.
           ${filterStrings && filterStrings.join(" ")}
-        }`;
+        }` + location
+          ? `ORDER BY ASC(?geoDistance)`
+          : "";
 
       return new SparqlParser().parse(queryTemplate);
     },
