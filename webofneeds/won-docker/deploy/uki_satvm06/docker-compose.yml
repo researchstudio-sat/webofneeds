@@ -109,7 +109,7 @@ services:
       - "node.host=satvm06.researchstudio.at"
       - "matcher.uri=https://cbi.matchat.org/matcher_service"
       - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
-      - "uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+      - "uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://cbi.matchat.org/won/resource,https://node.matchat.org/won/resource" # crawl uki won node and matchat won node
       - "cluster.local.port=2561"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
@@ -186,7 +186,7 @@ services:
     - "node.host=satvm06.researchstudio.at"
     - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
     - "cluster.local.port=2563"
-    - "matcher.sparql.uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+    - "matcher.sparql.uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
     - "matcher.sparql.uri.public=http://satvm06.researchstudio.at/sparql/"
     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
