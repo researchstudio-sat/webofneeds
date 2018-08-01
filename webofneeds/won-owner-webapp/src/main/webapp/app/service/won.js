@@ -372,22 +372,19 @@ won.WON.contentNodeBlankUri = Object.freeze({
 });
 
 /**
- * Returns the "compacted" alternative of the value (e.g.
- *    "http://purl.org/webofneeds/model#Demand"
- *    ->  via 'won.WON.BasicNeedTypeDemand'
- *    ->  and 'won.WON.BasicNeedTypeDemandCompacted'
- *    ->  to: "won:Demand";
- * returns `undefined` if the compacted version couldn't be found (see `lookup(...)`)
- * @param longValue
+ * Compacts the passed string if possible.
+ * e.g. "http://purl.org/webofneeds/model#Demand" -> "won:Demand"
+ * @param {*} longValue
+ * @param {*} context
  */
-won.toCompacted = function(longValue) {
-  if (!longValue) {
-    return undefined;
+won.toCompacted = function(longValue, context = won.defaultContext) {
+  if (!longValue) return;
+  for (let k in context) {
+    if (longValue.startsWith(context[k])) {
+      return longValue.replace(context[k], k + ":"); // replace first occurance
+    }
   }
-  const propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
-  propertyPath[propertyPath.length - 1] += "Compacted";
-  //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
-  return won.lookup(won, propertyPath);
+  return longValue;
 };
 
 won.clone = function(obj) {
@@ -438,58 +435,6 @@ won.mergeIntoLast = function(/*args...*/) {
   }
   return obj1;
 };
-
-// as the constants above should be unique (thus their mapping bijective)
-// it is possible to do a reverse lookup. The table contains former values
-// as keys and maps to arrays that define the lookup-path.
-won.constantsReverseLookupTable = {};
-for (const root of ["WON", "UNREAD", "WONMSG", "EVENT"]) {
-  won.mergeIntoLast(
-    buildReverseLookup(won[root], [root]),
-    won.constantsReverseLookupTable
-  );
-}
-
-won.buildReverseLookup = buildReverseLookup;
-/**
- * Builds a reverse lookup-table for the objects properties.
- *
- * NOTE: all properties of the object need to have unique values!
- *
- * e.g.:
- *
- *     const obj = { propA: { subProp: 'foo'}, probB: 2 }
- *
- *     buildReverseLookup(obj)
- *          ----> {foo  ['propA', 'subProp'], 2: ['probB']}
- *
- * @param obj
- * @param accumulatedPath
- * @returns {{}}
- */
-function buildReverseLookup(obj, accumulatedPath /* = [] */) {
-  //TODO this should be in a utils file
-  accumulatedPath =
-    typeof accumulatedPath !== "undefined" ? accumulatedPath : []; // to allow calling with only obj
-
-  const lookupAcc = {};
-  for (const k in obj) {
-    if (obj.hasOwnProperty(k)) {
-      const v = obj[k];
-      const accPathAppended = accumulatedPath.concat([k]);
-      let foundLookups = {};
-      if (typeof v === "string" || typeof v === "number") {
-        //terminal node
-        foundLookups[v] = accPathAppended;
-      } else if (typeof v === "object") {
-        //recurse into objects
-        foundLookups = buildReverseLookup(v, accPathAppended);
-      }
-      won.mergeIntoLast(foundLookups, lookupAcc);
-    }
-  }
-  return lookupAcc;
-}
 
 won.lookup = lookup;
 /**
