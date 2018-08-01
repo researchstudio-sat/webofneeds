@@ -102,7 +102,7 @@ services:
 
   # bigdata rdf store for matcher service
   bigdata:
-    image: webofneeds/bigdata
+    build: ../../image/bigdata
     #volumes:
     #  - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
