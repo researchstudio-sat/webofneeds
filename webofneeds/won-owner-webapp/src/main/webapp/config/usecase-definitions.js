@@ -1052,9 +1052,7 @@ const realEstateUseCases = {
           ?is s:floorSize/s:value ?floorSize.
           ?is s:numberOfRooms ?numberOfRooms.
           ${filterStrings && filterStrings.join(" ")}
-        }` + location
-          ? `ORDER BY ASC(?geoDistance)`
-          : "";
+        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
     },
