@@ -744,7 +744,10 @@ export const details = {
       return { "won:hasTag": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      const tags = jsonLDImm && jsonLDImm.get("won:hasTag");
+      const tags =
+        jsonLDImm &&
+        (jsonLDImm.get("won:hasTag") ||
+          jsonLDImm.get("http://purl.org/webofneeds/model#hasTag"));
 
       if (!tags) {
         return undefined;

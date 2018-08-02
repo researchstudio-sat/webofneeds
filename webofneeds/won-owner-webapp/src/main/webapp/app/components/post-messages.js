@@ -69,7 +69,7 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="self.theirNeedUri"
+              ng-if="!self.showAgreementData && self.theirNeedUri"
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"

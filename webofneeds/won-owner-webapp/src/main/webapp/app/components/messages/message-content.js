@@ -2,10 +2,26 @@ import angular from "angular";
 
 import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
+import { getAllDetails } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
+// TODO: these should be replaced by importing defintions from config
+import personViewerModule from "../details/viewer/person-viewer.js";
+import descriptionViewerModule from "../details/viewer/description-viewer.js";
+import locationViewerModule from "../details/viewer/location-viewer.js";
+import tagsViewerModule from "../details/viewer/tags-viewer.js";
+import travelActionViewerModule from "../details/viewer/travel-action-viewer.js";
+import titleViewerModule from "../details/viewer/title-viewer.js";
+import numberViewerModule from "../details/viewer/number-viewer.js";
+import dateViewerModule from "../details/viewer/date-viewer.js";
+import datetimeViewerModule from "../details/viewer/datetime-viewer.js";
+import monthViewerModule from "../details/viewer/month-viewer.js";
+import timeViewerModule from "../details/viewer/time-viewer.js";
+import dropdownViewerModule from "../details/viewer/dropdown-viewer.js";
+import selectViewerModule from "../details/viewer/select-viewer.js";
+import rangeViewerModule from "../details/viewer/range-viewer.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -17,6 +33,13 @@ function genComponentConf() {
       </div>
       <div class="msgcontent__body" ng-if="self.message">
         <div class="msgcontent__body__text--prewrap" ng-if="self.hasText">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+        <div class="msgcontent__body__content"
+          ng-repeat="detail in self.allDetails"
+          ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
+          message-detail-viewer-element="{{detail.viewerComponent}}"
+          detail="detail"
+          content="self.getDetailContent(detail.identifier)">
+        </div>
         <div class="msgcontent__body__matchScore" ng-if="self.hasMatchScore">MatchScore: {{self.matchScorePercentage }}%</div>
         <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
       </div>
@@ -37,6 +60,8 @@ function genComponentConf() {
         "any parsable content! " +
         'Click on the "Show raw RDF data"-button in ' +
         'the main-menu on the right side of the navigationbar to see the "raw" message-data.»';
+
+      this.allDetails = getAllDetails();
 
       const selectFromState = state => {
         const ownNeed =
@@ -61,6 +86,7 @@ function genComponentConf() {
           hasMatchScore: !!matchScore,
           hasText: !!text,
           text,
+          details: message && message.get("content"),
         };
       };
 
@@ -101,6 +127,23 @@ function genComponentConf() {
         this.isConnectionMessage()
       );
     }
+
+    getDetail(key) {
+      const detail = this.allDetails && this.allDetails[key];
+      if (!detail) {
+        console.error(
+          "Could not find detail with key: ",
+          key,
+          " in:  ",
+          this.allDetails
+        );
+      }
+      return detail;
+    }
+
+    getDetailContent(key) {
+      return key && this.details && this.details.get(key);
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -118,5 +161,42 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.messageContent", [])
+  .module("won.owner.components.messageContent", [
+    personViewerModule,
+    descriptionViewerModule,
+    locationViewerModule,
+    travelActionViewerModule,
+    tagsViewerModule,
+    titleViewerModule,
+    numberViewerModule,
+    dropdownViewerModule,
+    dateViewerModule,
+    timeViewerModule,
+    datetimeViewerModule,
+    monthViewerModule,
+    selectViewerModule,
+    rangeViewerModule,
+  ])
+  .directive("messageDetailViewerElement", [
+    "$compile",
+    function($compile) {
+      return {
+        restrict: "A",
+        scope: {
+          content: "=",
+          detail: "=",
+        },
+        link: function(scope, element, attrs) {
+          const customTag = attrs.messageDetailViewerElement;
+          if (!customTag) return;
+
+          const customElem = angular.element(
+            `<${customTag} detail="detail" content="content"></${customTag}>`
+          );
+
+          element.append($compile(customElem)(scope));
+        },
+      };
+    },
+  ])
   .directive("wonMessageContent", genComponentConf).name;
