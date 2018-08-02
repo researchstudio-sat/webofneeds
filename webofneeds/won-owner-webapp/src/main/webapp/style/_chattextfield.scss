@@ -33,7 +33,6 @@ chat-textfield-simple {
     );
 
     margin-bottom: $local-margin-bottom;
-
     @include speech-bubble-bottom(
       $won-light-gray,
       $won-line-gray,
@@ -41,16 +40,15 @@ chat-textfield-simple {
       $thinBorderWidth,
       1.15rem
     );
-
     .cts__details__input {
       height: $local-height;
       max-height: $local-height;
       padding: 0.5rem;
       overflow-y: auto;
       display: grid;
+
       grid-gap: 0.5rem;
       grid-template-rows: auto 1fr;
-
       &__header {
         display: grid;
         grid-template-columns: auto auto 1fr auto auto;
@@ -59,17 +57,14 @@ chat-textfield-simple {
         text-align: left;
         min-width: 0;
         align-items: center;
-
         &__icon,
         &__back {
           --local-primary: #{$won-primary-color};
           @include fixed-square(1.5rem);
         }
-
         &__back {
           cursor: pointer;
         }
-
         &__label {
           color: $won-primary-color;
         }
@@ -81,7 +76,6 @@ chat-textfield-simple {
           cursor: pointer;
           color: $won-primary-color;
           --local-primary: #{$won-primary-color};
-
           &__icon {
             @include fixed-square(1.5rem);
           }
@@ -90,81 +84,66 @@ chat-textfield-simple {
           }
         }
       }
-
       &__content {
       }
     }
-
     .cts__details__grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
-      grid-gap: 0.5rem;
 
+      grid-gap: 0.5rem;
       height: $local-height;
       max-height: $local-height;
       padding: 0.5rem;
       overflow-y: auto;
-
       &__detail {
         display: flex;
+
         flex-direction: column;
         align-items: center;
-
         --local-primary: #{$won-primary-text-color};
         color: $won-primary-text-color;
-
         &:hover {
           cursor: pointer;
           --local-primary: #{$won-primary-color};
           color: $won-primary-color;
         }
-
         &__label {
           font-size: $smallFontSize;
           text-align: center;
         }
-
         &__icon {
           @include fixed-square(1.5rem);
         }
       }
     }
   }
-
   .cts__add {
     grid-area: add;
     grid-row: 2 / span 1;
     grid-column: 1 / span 1;
-
     @extend .won-button--filled;
-
     border: $thinGrayBorder;
     background: white;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
     padding: 0.66rem;
-
     --local-primary: #{$won-primary-text-color};
-
     &:hover {
       background: $won-primary-color;
       --local-primary: #{$won-secondary-text-color};
     }
-
     &__icon {
       @include fixed-square(1rem);
     }
   }
-
   .cts__text {
     grid-area: text;
     grid-row: 2 / span 1;
     grid-column: 2 / span 1;
-
     border-radius: 0;
     border-left: 0;
     border-right: 0;
-
     &:hover,
     &:focus {
       outline: 0;
@@ -175,20 +154,15 @@ chat-textfield-simple {
     grid-row: 2 / span 1;
     grid-column: 3 / span 1;
   }
-
   .cts__additionalcontent {
     grid-area: additionalcontent;
     grid-column: 1 / span 3;
     font-size: $smallFontSize;
-
     &__header {
-      padding-bottom: 0.25rem;
     }
-
     &__list {
       display: flex;
       flex-wrap: wrap;
-
       &__item {
         padding: 0.25rem;
         background: $won-secondary-color;
@@ -196,27 +170,19 @@ chat-textfield-simple {
         border-radius: 0.5rem;
         display: flex;
         align-items: center;
-        margin-left: 0.5rem;
+        margin-right: 0.25rem;
         margin-top: 0.25rem;
-
-        &:first-child {
-          margin-left: 0;
-        }
-
         &__label {
           padding: 0 0.25rem;
           white-space: nowrap;
-
           &:hover {
             color: $won-primary-color;
           }
         }
-
         &__discard,
         &__icon {
           @include fixed-square(1.5rem);
           --local-primary: #{$won-secondary-text-color};
-
           &:hover {
             --local-primary: #{$won-primary-color};
           }
@@ -224,7 +190,6 @@ chat-textfield-simple {
       }
     }
   }
-
   .cts__charcount {
     grid-area: cnt;
     grid-column: 1 / span 3;
@@ -233,14 +198,11 @@ chat-textfield-simple {
     grid-area: help;
     grid-column: 1 / span 3;
   }
-
   .cts__submitbutton {
     @extend .won-button--filled;
-
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
   }
-
   .cts__charcount,
   .cts__helptext {
     @include fine-print;

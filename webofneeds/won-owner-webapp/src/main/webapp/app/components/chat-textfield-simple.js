@@ -128,7 +128,7 @@ function genComponentConf() {
                 {{ self.getHumanReadableString(key, self.additionalContent.get(key)) }}
               </span>
               <svg class="cts__additionalcontent__list__item__discard clickable"
-                ng-click="self.updateDetail(key, undefined)">
+                ng-click="self.updateDetail(key, undefined, true)">
                 <use xlink:href="#ico36_close" href="#ico36_close"></use>
               </svg>
             </div>
@@ -271,9 +271,12 @@ function genComponentConf() {
       this.selectAddMessageContent({ selectedDetail: detail.identifier });
     }
 
-    updateDetail(name, value) {
+    updateDetail(name, value, closeOnDelete = false) {
       if (!value) {
         this.additionalContent.delete(name);
+        if (closeOnDelete) {
+          this.hideAddMessageContentDisplay();
+        }
       } else {
         this.additionalContent.set(name, value);
       }
