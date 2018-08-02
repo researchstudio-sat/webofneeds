@@ -46,7 +46,6 @@ chat-textfield-simple {
       padding: 0.5rem;
       overflow-y: auto;
       display: grid;
-
       grid-gap: 0.5rem;
       grid-template-rows: auto 1fr;
       &__header {
@@ -68,7 +67,6 @@ chat-textfield-simple {
         &__label {
           color: $won-primary-color;
         }
-
         &__discard,
         &__add {
           display: flex;
@@ -90,7 +88,6 @@ chat-textfield-simple {
     .cts__details__grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
-
       grid-gap: 0.5rem;
       height: $local-height;
       max-height: $local-height;
@@ -98,7 +95,6 @@ chat-textfield-simple {
       overflow-y: auto;
       &__detail {
         display: flex;
-
         flex-direction: column;
         align-items: center;
         --local-primary: #{$won-primary-text-color};
@@ -129,9 +125,14 @@ chat-textfield-simple {
     border-top-right-radius: 0;
     padding: 0.66rem;
     --local-primary: #{$won-primary-text-color};
-    &:hover {
+    &:hover:not(:disabled) {
       background: $won-primary-color;
       --local-primary: #{$won-secondary-text-color};
+    }
+    &:disabled {
+      cursor: default;
+      background: $won-light-gray;
+      --local-primary: #{$won-line-gray};
     }
     &__icon {
       @include fixed-square(1rem);

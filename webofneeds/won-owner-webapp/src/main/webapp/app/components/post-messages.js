@@ -131,9 +131,10 @@ function genComponentConf() {
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
-                on-submit="self.send(value, self.shouldShowRdf)"
+                on-submit="self.send(value, additionalContent, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
+                allow-details="!self.shouldShowRdf"
                 is-code="self.shouldShowRdf? 'true' : ''"
             >
             </chat-textfield-simple>
@@ -147,6 +148,7 @@ function genComponentConf() {
                 class="pm__footer__chattexfield"
                 placeholder="::'Message (optional)'"
                 on-submit="::self.openRequest(value)"
+                allow-details="::false"
                 allow-empty-submit="::true"
                 submit-button-label="::'Accept Chat'"
             >
@@ -162,6 +164,7 @@ function genComponentConf() {
             <chat-textfield-simple
                 placeholder="::'Message (optional)'"
                 on-submit="::self.sendRequest(value)"
+                allow-details="::false"
                 allow-empty-submit="::true"
                 submit-button-label="::'Ask to Chat'"
                 ng-if="!self.connection || self.connection.get('isRated')"
@@ -443,12 +446,15 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
-    send(chatMessage, isTTL = false) {
+    send(chatMessage, additionalContent, isTTL = false) {
       this.setShowAgreementData(false);
+      this.hideAddMessageContentDisplay();
+
       const trimmedMsg = chatMessage.trim();
-      if (trimmedMsg) {
+      if (trimmedMsg || additionalContent) {
         this.connections__sendChatMessage(
           trimmedMsg,
+          additionalContent,
           this.connection.get("uri"),
           isTTL
         );

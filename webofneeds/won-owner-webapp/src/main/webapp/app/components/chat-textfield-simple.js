@@ -36,7 +36,7 @@ import rangePickerModule from "./details/picker/range-picker.js";
 function genComponentConf() {
   let template = `
         <div class="cts__details"
-          ng-if="self.showAddMessageContent">
+          ng-if="self.allowDetails && self.showAddMessageContent">
           <div class="cts__details__grid"
               ng-if="!self.selectedDetail">
             <div class="cts__details__grid__detail"
@@ -90,6 +90,7 @@ function genComponentConf() {
           </div>
         </div>
         <button class="cts__add"
+          ng-disabled="!self.allowDetails"
           ng-click="self.toggleAddMessageContentDisplay()">
             <svg class="cts__add__icon" ng-if="!self.showAddMessageContent">
                 <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
@@ -105,14 +106,13 @@ function genComponentConf() {
             class="cts__text won-txt"
             ng-class="{'won-txt--code': self.isCode, 'won-txt--valid' : self.belowMaxLength(), 'won-txt--invalid' : !self.belowMaxLength() }"
             tabindex="0"
-            ng-disabled="self.showAddMessageContent"
             placeholder="{{self.placeholder}}"></textarea>
 
         <button
             class="cts__submitbutton red"
             ng-show="self.submitButtonLabel"
             ng-click="self.submit()"
-            ng-disabled="!self.valid() || self.showAddMessageContent">
+            ng-disabled="!self.valid()">
             {{ (self.submitButtonLabel || 'Submit') }}
         </button>
         <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent()">
@@ -233,7 +233,11 @@ function genComponentConf() {
           txtEl.dispatchEvent(new Event("input")); // dispatch input event so autoresizer notices value-change
           txtEl.focus(); //refocus so people can keep writing
         }
-        const payload = { value, valid };
+        const payload = {
+          value,
+          valid,
+          additionalContent: this.additionalContent,
+        };
         this.onSubmit(payload);
         dispatchEvent(this.$element[0], "submit", payload);
       }
@@ -247,7 +251,9 @@ function genComponentConf() {
     valid() {
       return (
         !this.connectionHasBeenLost &&
-        (this.allowEmptySubmit || this.value().length > 0) &&
+        (this.allowEmptySubmit ||
+          this.hasAdditionalContent() ||
+          this.value().length > 0) &&
         this.belowMaxLength()
       );
     }
@@ -283,21 +289,15 @@ function genComponentConf() {
     }
 
     hasAdditionalContent() {
-      const hasAdditionalContent =
-        this.additionalContent && this.additionalContent.size > 0;
-      console.log("hasAdditionalContent: ", hasAdditionalContent);
-      return hasAdditionalContent;
+      return this.additionalContent && this.additionalContent.size > 0;
     }
 
     getAdditionalContentKeysArray() {
-      console.log("getAdditionalContentKeys", this.additionalContent.keys());
-      const additionalContentKeysArray =
+      return (
         this.additionalContent &&
         this.additionalContent.keys() &&
-        Array.from(this.additionalContent.keys());
-      console.log("getAdditionalContentKeysArray", additionalContentKeysArray);
-
-      return additionalContentKeysArray;
+        Array.from(this.additionalContent.keys())
+      );
     }
 
     getHumanReadableString(key, value) {
@@ -322,6 +322,7 @@ function genComponentConf() {
       helpText: "=",
 
       isCode: "=", // whether or not the text is code and e.g. should use monospace
+      allowDetails: "=", //whether or not it is allowed to add content other than text
 
       allowEmptySubmit: "=", // allows submitting empty messages
 
