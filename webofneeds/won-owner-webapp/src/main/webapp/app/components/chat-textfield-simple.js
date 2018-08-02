@@ -238,6 +238,9 @@ function genComponentConf() {
           valid,
           additionalContent: this.additionalContent,
         };
+        if (this.additionalContent) {
+          this.additionalContent = new Map();
+        }
         this.onSubmit(payload);
         dispatchEvent(this.$element[0], "submit", payload);
       }
