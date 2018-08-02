@@ -200,6 +200,7 @@ export function buildConnectMessage({
 
 export function buildChatMessage({
   chatMessage,
+  additionalContent,
   connectionUri,
   ownNeedUri,
   theirNeedUri,
@@ -236,6 +237,10 @@ export function buildChatMessage({
         .forEnvelopeData(envelopeData)
         .hasOwnerDirection()
         .hasSentTimestamp(new Date().getTime().toString());
+
+      //TODO: IMPLEMENT ADDITIONALCONTENT STUFF
+      additionalContent &&
+        console.log("AdditionalContent in Message: ", additionalContent);
 
       if (isTTL && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);

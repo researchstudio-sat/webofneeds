@@ -28,6 +28,7 @@ import {
 
 export function connectionsChatMessage(
   chatMessage,
+  additionalContent,
   connectionUri,
   isTTL = false
 ) {
@@ -52,6 +53,7 @@ export function connectionsChatMessage(
 
     buildChatMessage({
       chatMessage: chatMessage,
+      additionalContent: additionalContent,
       connectionUri,
       ownNeedUri: ownNeed.get("uri"),
       theirNeedUri: theirNeedUri,
