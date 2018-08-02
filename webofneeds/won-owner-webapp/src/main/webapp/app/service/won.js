@@ -1928,15 +1928,6 @@ won.MessageBuilder.prototype = {
     return this;
   },
 
-  addUnsetRelevantMessage: function(messageUri) {
-    this.getContentGraphNode()[won.WONMSG.unsetRelevantMessage] = {
-      //Message uri to set unrelevant
-      "@id": messageUri,
-    };
-
-    return this;
-  },
-
   addRating: function(rating, connectionUri) {
     this.getContentGraphNode()[won.WON.hasFeedback] = {
       "@id": "_:b0",
