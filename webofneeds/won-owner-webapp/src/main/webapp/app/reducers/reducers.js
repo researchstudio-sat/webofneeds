@@ -117,6 +117,36 @@ const reducers = {
     }
   },
 
+  showAddMessageContent: (isShowingAddMessageContent = false, action = {}) => {
+    switch (action.type) {
+      case actionTypes.toggleAddMessageContentDisplay:
+        return !isShowingAddMessageContent;
+      case actionTypes.selectAddMessageContent:
+      case actionTypes.showAddMessageContentDisplay:
+        return true;
+      case actionTypes.hideAddMessageContentDisplay:
+        return false;
+      default:
+        return isShowingAddMessageContent;
+    }
+  },
+
+  selectedAddMessageContent: (
+    selectedAddMessageContent = undefined,
+    action = {}
+  ) => {
+    switch (action.type) {
+      case actionTypes.selectAddMessageContent:
+        return getIn(action, ["payload", "selectedDetail"]);
+      case actionTypes.toggleAddMessageContentDisplay:
+      case actionTypes.hideAddMessageContentDisplay:
+      case actionTypes.removeAddMessageContent:
+        return undefined;
+      default:
+        return selectedAddMessageContent;
+    }
+  },
+
   showModalDialog: (isShowingModalDialog = false, action = {}) => {
     switch (action.type) {
       case actionTypes.openModalDialog:
