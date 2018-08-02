@@ -60,156 +60,6 @@ const allDetailsUseCase = {
     isDetails: details,
     seeksDetails: details,
   },
-  testPickerUseCase: {
-    identifier: "pickerTestUseCase",
-    label: "Picker Test",
-    icon: "#ico36_uc_custom",
-    draft: {
-      ...emptyDraft,
-      is: {
-        checkbox: ["1", "2", "4", "5+"],
-        minMaxFloorSize: { min: 10, max: 15 },
-      },
-      seeks: {
-        radio: "4",
-        minMaxFloorSize: { min: 10, max: 15 },
-      },
-    },
-    isDetails: {
-      checkbox: {
-        component: "won-select-picker",
-        viewerComponent: "won-select-viewer",
-        identifier: "checkbox",
-        label: "Checkbox",
-        icon: "#ico36_tags_circle",
-        multiSelect: true,
-        options: [
-          { value: "1", label: "one" },
-          { value: "2", label: "two" },
-          { value: "3", label: "three" },
-          { value: "4", label: "four" },
-          { value: "5+", label: "more" },
-        ],
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "won:hasCheckbox": undefined };
-          }
-          return { "won:hasCheckbox": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const checkbox = jsonLDImm && jsonLDImm.get("won:hasCheckbox");
-
-          if (!checkbox) {
-            return undefined;
-          } else if (is("String", checkbox)) {
-            return Immutable.fromJS([checkbox]);
-          } else if (is("Array", checkbox)) {
-            return Immutable.fromJS(checkbox);
-          } else if (Immutable.List.isList(checkbox)) {
-            return checkbox; // id; it is already in the format we want
-          } else {
-            console.error(
-              "Found unexpected format of checkbox (should be Array, " +
-                "Immutable.List, or a single checkbox as string): " +
-                JSON.stringify(checkbox)
-            );
-            return undefined;
-          }
-        },
-        generateHumanReadable: function({ value, includeLabel }) {
-          if (value && this.options) {
-            let humanReadable = "";
-
-            for (const key in value) {
-              const foundOption = this.options.find(
-                elem => elem.value === value[key]
-              );
-              const foundOptionLabel = foundOption && foundOption.label;
-              if (foundOptionLabel) {
-                humanReadable += foundOptionLabel + ", ";
-              }
-            }
-            humanReadable = humanReadable.trim();
-
-            if (humanReadable.length > 0) {
-              humanReadable = humanReadable.substr(0, humanReadable.length - 1);
-              return includeLabel
-                ? this.label + ": " + humanReadable
-                : humanReadable;
-            }
-          }
-          return undefined;
-        },
-      },
-    },
-    seeksDetails: {
-      radio: {
-        component: "won-select-picker",
-        viewerComponent: "won-select-viewer",
-        identifier: "radio",
-        label: "Radio",
-        icon: "#ico36_tags_circle",
-        multiSelect: false,
-        options: [
-          { value: "1", label: "one" },
-          { value: "2", label: "two" },
-          { value: "3", label: "three" },
-          { value: "4", label: "four" },
-          { value: "5+", label: "more" },
-        ],
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "won:hasRadio": undefined };
-          }
-          return { "won:hasRadio": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          const radio = jsonLDImm && jsonLDImm.get("won:hasRadio");
-
-          if (!radio) {
-            return undefined;
-          } else if (is("String", radio)) {
-            return Immutable.fromJS([radio]);
-          } else if (is("Array", radio)) {
-            return Immutable.fromJS(radio);
-          } else if (Immutable.List.isList(radio)) {
-            return radio; // id; it is already in the format we want
-          } else {
-            console.error(
-              "Found unexpected format of checkbox (should be Array, " +
-                "Immutable.List, or a single radio as string): " +
-                JSON.stringify(radio)
-            );
-            return undefined;
-          }
-        },
-        generateHumanReadable: function({ value, includeLabel }) {
-          if (value && this.options) {
-            let humanReadable = "";
-
-            for (const key in value) {
-              const foundOption = this.options.find(
-                elem => elem.value === value[key]
-              );
-              const foundOptionLabel = foundOption && foundOption.label;
-              if (foundOptionLabel) {
-                humanReadable += foundOptionLabel + ", ";
-              }
-            }
-            humanReadable = humanReadable.trim();
-
-            if (humanReadable.length > 0) {
-              humanReadable = humanReadable.substr(0, humanReadable.length - 1);
-              return includeLabel
-                ? this.label + ": " + humanReadable
-                : humanReadable;
-            }
-          }
-          return undefined;
-        },
-      },
-    },
-  },
 };
 
 const skillsDetail = {
@@ -299,6 +149,10 @@ const socialUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
+      date: { ...details.date },
+      time: { ...details.time },
+      location: { ...details.location },
+      interests: { ...interestsDetail },
       foodAllergies: {
         ...details.description,
         identifier: "foodallergies",
@@ -313,8 +167,6 @@ const socialUseCases = {
           return jsonLDImm && jsonLDImm.get("won:foodAllergies");
         },
       },
-      location: { ...details.location },
-      interests: { ...interestsDetail },
     },
     seeksDetails: undefined,
   },
@@ -333,6 +185,10 @@ const socialUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
+      date: { ...details.date },
+      time: { ...details.time },
+      location: { ...details.location },
+      interests: { ...interestsDetail },
       foodAllergies: {
         ...details.description,
         identifier: "foodallergies",
@@ -347,8 +203,6 @@ const socialUseCases = {
           return jsonLDImm && jsonLDImm.get("won:foodAllergies");
         },
       },
-      location: { ...details.location },
-      interests: { ...interestsDetail },
     },
     seeksDetails: undefined,
   },
@@ -366,6 +220,8 @@ const socialUseCases = {
     },
     isDetails: {
       title: { ...details.title },
+      date: { ...details.date },
+      time: { ...details.time },
       description: { ...details.description },
       location: { ...details.location },
       interests: { ...interestsDetail },
@@ -383,9 +239,55 @@ const socialUseCases = {
     isDetails: {
       title: { ...details.title },
       description: { ...details.description },
+      date: { ...details.date },
+      time: { ...details.time },
       location: { ...details.location },
       interests: { ...interestsDetail },
     },
+  },
+};
+
+const complainUseCases = {
+  complain: {
+    identifier: "complain",
+    label: "Complain about something",
+    icon: "#ico36_uc_wtf",
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "WTF?",
+        tags: ["wtf"],
+      },
+      seeks: {},
+      searchString: "wtf",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+      tags: { ...details.tags },
+    },
+    seeksDetails: undefined,
+  },
+  handleComplaints: {
+    identifier: "handleComplaints",
+    label: "Handle complaints",
+    icon: "#ico36_uc_wtf_interest",
+    draft: {
+      ...emptyDraft,
+      is: {
+        title: "I'll discuss complaints",
+      },
+      seeks: {},
+      searchString: "wtf",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+      tags: { ...details.tags },
+    },
+    seeksDetails: undefined,
   },
 };
 
@@ -556,53 +458,6 @@ const professionalUseCases = {
       description: { ...details.description },
       location: { ...details.location },
     },
-  },
-};
-
-const infoUseCases = {
-  question: {
-    identifier: "question",
-    label: "Ask a question",
-    icon: "#ico36_uc_question",
-    draft: {
-      ...emptyDraft,
-      is: { tags: ["question"] },
-      seeks: { tags: "answer" },
-    },
-    isDetails: {
-      title: { ...details.title },
-      description: { ...details.description },
-      location: { ...details.location },
-      tags: {
-        ...details.tags,
-        placeholder: "e.g. question, general, area-of-interest",
-      },
-    },
-    seeksDetails: undefined,
-  },
-  answer: {
-    //answer should have 'no hint for counterpart'
-    identifier: "answer",
-    label: "Answer questions",
-    icon: "#ico36_uc_answer",
-    draft: {
-      ...emptyDraft,
-      is: {
-        title: "Answer questions",
-        tags: ["answer"],
-      },
-      seeks: { tags: "question" },
-    },
-    isDetails: {
-      title: { ...details.title },
-      description: { ...details.description },
-      location: { ...details.location },
-      tags: {
-        ...details.tags,
-        placeholder: "e.g. answer, general, area-of-interest",
-      },
-    },
-    seeksDetails: undefined,
   },
 };
 
@@ -1082,47 +937,13 @@ const realEstateUseCases = {
 };
 
 const transportUseCases = {
-  taxiDemand: {
-    identifier: "taxiDemand",
-    label: "Find a taxi",
-    icon: "#ico36_uc_route_demand",
-    draft: {
-      ...emptyDraft,
-      is: { title: "Looking for a taxi", tags: "search-taxi" },
-      searchString: "offer-taxi",
-    },
-    // TODO: amount of people? other details?
-    isDetails: {
-      title: { ...details.title },
-      description: { ...details.description },
-    },
-    seeksDetails: {
-      location: { ...details.location },
-      travelAction: { ...details.travelAction },
-    },
-  },
-  taxiOffer: {
-    identifier: "taxiOffer",
-    label: "Offer a taxi",
-    icon: "#ico36_uc_taxi_offer",
-    draft: {
-      ...emptyDraft,
-      is: { title: "Taxi", tags: "offer-taxi" },
-      searchString: "search-taxi",
-    },
-    isDetails: {
-      title: { ...details.title },
-      description: { ...details.description },
-      // location: {...details.location}, // TODO: add area of service
-    },
-  },
   transportDemand: {
     identifier: "transportDemand",
     label: "Send something",
     icon: "#ico36_uc_transport_demand",
     draft: {
       ...emptyDraft,
-      is: { title: "Looking to get something transported" },
+      is: { title: "Want to send something" },
     },
     isDetails: {
       title: { ...details.title },
@@ -1330,11 +1151,11 @@ const transportUseCases = {
   },
   transportOffer: {
     identifier: "transportOffer",
-    label: "Offer Transportation",
+    label: "Offer goods transport",
     icon: "#ico36_uc_transport_offer",
     draft: {
       ...emptyDraft,
-      is: { title: "Transportation Offer" },
+      is: { title: "Transportation offer" },
       searchString: "transport", // TODO: replace this with a query
     },
     isDetails: {
@@ -1348,27 +1169,77 @@ const transportUseCases = {
   },
 };
 
+const mobilityUseCases = {
+  liftDemand: {
+    identifier: "liftDemand",
+    label: "Need a Lift",
+    icon: "#ico36_uc_route_demand",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Need a lift", tags: "search-lift" },
+      searchString: "offer-lift",
+    },
+    // TODO: amount of people? other details?
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+    },
+    seeksDetails: {
+      date: { ...details.date },
+      time: { ...details.time },
+      travelAction: { ...details.travelAction },
+    },
+  },
+  taxiOffer: {
+    identifier: "taxiOffer",
+    label: "Offer Taxi Service",
+    icon: "#ico36_uc_taxi_offer",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Taxi", tags: "offer-lift" },
+      searchString: "search-lift",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      location: { ...details.location },
+    },
+  },
+  rideShareOffer: {
+    identifier: "rideShareOffer",
+    label: "Offer to Share a Ride",
+    icon: "#ico36_uc_taxi_offer",
+    draft: {
+      ...emptyDraft,
+      is: { title: "Share a Ride", tags: "offer-lift" },
+      searchString: "search-lift",
+    },
+    isDetails: {
+      title: { ...details.title },
+      description: { ...details.description },
+      date: { ...details.date },
+      time: { ...details.time },
+      travelAction: { ...details.travelAction },
+    },
+  },
+};
+
 export const useCases = {
+  ...complainUseCases,
   ...socialUseCases,
   ...professionalUseCases,
-  ...infoUseCases,
   ...realEstateUseCases,
   ...transportUseCases,
+  ...mobilityUseCases,
   ...allDetailsUseCase,
 };
 
 export const useCaseGroups = {
-  social: {
-    identifier: "socialgroup",
-    label: "Fun activities to do together",
+  complain: {
+    identifier: "complaingroup",
+    label: "Complaints",
     icon: undefined,
-    useCases: { ...socialUseCases },
-  },
-  realEstate: {
-    identifier: "realestategroup",
-    label: "Real Estate",
-    icon: undefined,
-    useCases: { ...realEstateUseCases },
+    useCases: { ...complainUseCases },
   },
   transport: {
     identifier: "transportgroup",
@@ -1376,17 +1247,29 @@ export const useCaseGroups = {
     icon: undefined,
     useCases: { ...transportUseCases },
   },
+  mobility: {
+    identifier: "mobilitygroup",
+    label: "Mobility",
+    icon: undefined,
+    useCases: { ...mobilityUseCases },
+  },
+  realEstate: {
+    identifier: "realestategroup",
+    label: "Real Estate",
+    icon: undefined,
+    useCases: { ...realEstateUseCases },
+  },
+  social: {
+    identifier: "socialgroup",
+    label: "Fun activities to do together",
+    icon: undefined,
+    useCases: { ...socialUseCases },
+  },
   professional: {
     identifier: "professionalgroup",
     label: "Professional networking",
     icon: undefined,
     useCases: { ...professionalUseCases },
-  },
-  info: {
-    identifier: "infogroup",
-    label: "Questions and Answers",
-    icon: undefined,
-    useCases: { ...infoUseCases },
   },
   other: {
     identifier: "othergroup",
