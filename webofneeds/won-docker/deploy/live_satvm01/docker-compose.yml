@@ -159,7 +159,7 @@ services:
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
-    image: webofneeds/bigdata
+    build: ../../image/bigdata
     volumes:
       - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
@@ -173,7 +173,7 @@ services:
       - "node.host=satvm01.researchstudio.at"
       - "matcher.uri=https://matchat.org/matcher_service"
       - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2562"
-      - "uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+      - "uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://node.matchat.org/won/resource"
       - "cluster.local.port=2561"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
@@ -221,7 +221,7 @@ services:
       - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
       - "cluster.local.port=2563"
       - "matcher.rescal.uri.public=http://satvm01.researchstudio.at/rescal/"
-      - "matcher.rescal.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+      - "matcher.rescal.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
       - "matcher.rescal.executionDurationMinutes=30"
       - "matcher.rescal.threshold=0.2"
       - "matcher.rescal.rank=10"
@@ -293,7 +293,7 @@ services:
     - "node.host=satvm01.researchstudio.at"
     - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2563"
     - "cluster.local.port=2564"
-    - "matcher.sparql.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+    - "matcher.sparql.uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
     - "matcher.sparql.uri.public=http://satvm01.researchstudio.at/sparql/"
     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:

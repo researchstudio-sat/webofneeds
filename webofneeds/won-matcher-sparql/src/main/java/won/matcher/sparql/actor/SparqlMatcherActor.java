@@ -199,7 +199,7 @@ public class SparqlMatcherActor extends UntypedActor {
                     boolean noHintForCounterpart = need.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForCounterpart"));
                     boolean noHintForMe = matchedNeed.hasFlag(ResourceFactory.createResource("http://purl.org/webofneeds/model#NoHintForMe"));
                     if (!noHintForCounterpart && !noHintForMe && !need.getNeedUri().equals(matchedNeed.getNeedUri())) {
-                        Set<NeedModelWrapper> matchedNeedMatches = queryNeed(need);
+                        Set<NeedModelWrapper> matchedNeedMatches = queryNeed(matchedNeed);
                         return new AbstractMap.SimpleEntry<>(matchedNeed, matchedNeedMatches);
                     } else {
                         return new AbstractMap.SimpleEntry<>(matchedNeed, new HashSet<NeedModelWrapper>());

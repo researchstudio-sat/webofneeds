@@ -102,7 +102,7 @@ services:
 
   # bigdata rdf store for matcher service
   bigdata:
-    image: webofneeds/bigdata
+    build: ../../image/bigdata
     #volumes:
     #  - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
@@ -115,7 +115,7 @@ services:
     environment:
       - "node.host=$deploy_host"
       - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2562"
-      - "uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
+      - "uri.sparql.endpoint=http://$deploy_host:10000/blazegraph/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://$deploy_host:8889/won/resource"
       - "cluster.local.port=2561"
     ports:
@@ -157,7 +157,7 @@ services:
       - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2563"
       - "cluster.local.port=2563"
       - "matcher.rescal.uri.public=http://$deploy_host/rescal/"
-      - "matcher.rescal.uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
+      - "matcher.rescal.uri.sparql.endpoint=http://$deploy_host:10000/blazegraph/namespace/kb/sparql"
       - "matcher.rescal.executionDurationMinutes=1"
       - "matcher.rescal.threshold=0.15"
       - "matcher.rescal.rank=10"
@@ -175,7 +175,7 @@ services:
     - "node.host=$deploy_host"
     - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2563"
     - "cluster.local.port=2564"
-    - "matcher.sparql.uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
+    - "matcher.sparql.uri.sparql.endpoint=http://$deploy_host:10000/blazegraph/namespace/kb/sparql"
     - "matcher.sparql.uri.public=http://$deploy_host/sparql/"
     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
