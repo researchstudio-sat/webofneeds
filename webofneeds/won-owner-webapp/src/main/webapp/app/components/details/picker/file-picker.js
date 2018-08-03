@@ -50,7 +50,7 @@ function genComponentConf() {
      * Checks validity and uses callback method
      */
     update(data) {
-      if (data) {
+      if (data && data.length > 0) {
         this.onUpdate({ value: data });
       } else {
         this.onUpdate({ value: undefined });
@@ -72,9 +72,14 @@ function genComponentConf() {
       this.$scope.$apply();
     }
 
-    removeFile(file) {
-      console.log("Removing file: " + file);
-      //TODO: IMPL ME
+    removeFile(fileToRemove) {
+      console.log("Removing file: " + fileToRemove);
+      if (!this.addedFiles) {
+        this.addedFiles = [];
+      }
+      this.addedFiles = this.addedFiles.filter(file => fileToRemove !== file);
+      this.update(this.addedFiles);
+      this.$scope.$apply();
     }
 
     isImage(file) {
