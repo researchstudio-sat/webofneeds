@@ -6,7 +6,7 @@
 FROM openjdk:8u121-jdk
 
 # download the (manually downloaded) jar and the properties file
-ADD ./bigdata-bundled.jar /usr/src/bigdata/bigdata-bundled.jar
+ADD https://sourceforge.net/projects/bigdata/files/bigdata/2.1.4/blazegraph.jar/download# /usr/src/bigdata/bigdata-bundled.jar
 ADD ./RWStore.properties /usr/src/bigdata/RWStore.properties
 
 # do not make explicit volumes here, this will just fill up disk space in our integration test environment very fast

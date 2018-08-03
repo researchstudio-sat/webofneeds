@@ -823,6 +823,7 @@ const realEstateUseCases = {
       const rentRange = seeksBranch && seeksBranch.rentRange;
       const floorSizeRange = seeksBranch && seeksBranch.floorSizeRange;
       const numberOfRoomsRange = seeksBranch && seeksBranch.numberOfRoomsRange;
+      const location = seeksBranch && seeksBranch.location;
 
       let filterStrings = [];
 
@@ -872,25 +873,41 @@ const realEstateUseCases = {
         }
       }
 
+      if (location) {
+        filterStrings.push(
+          `?result won:is/won:hasLocation/s:geo ?geo
+          SERVICE geo:search {
+            ?geo geo:search "inCircle" .
+            ?geo geo:searchDatatype geoliteral:lat-lon .
+            ?geo geo:predicate won:geoSpatial .
+            ?geo geo:spatialCircleCenter "${location.lat}#${location.lng}" .
+            ?geo geo:spatialCircleRadius "10" .
+            ?geo geo:distanceValue ?geoDistance .
+          }`
+        );
+      }
+
       const prefixes = `
         prefix s:     <http://schema.org/>
         prefix won:   <http://purl.org/webofneeds/model#>
         prefix dc:    <http://purl.org/dc/elements/1.1/>
+        prefix geo: <http://www.bigdata.com/rdf/geospatial#>
+        prefix geoliteral: <http://www.bigdata.com/rdf/geospatial/literals/v1#>
       `;
       let queryTemplate =
-        prefixes +
-        " Select " +
-        resultName +
-        "WHERE { " +
-        resultName +
-        ` won:is ?is.
+        `
+        ${prefixes}
+        SELECT DISTINCT ${resultName}
+        WHERE {
+        ${resultName}
+          won:is ?is.
           ?is s:priceSpecification ?pricespec.
           ?pricespec s:price ?price.
           ?pricespec s:priceCurrency ?currency.
-          ?is s:floorSize ?floorSize.
-          ?is s:numberOfRooms ?numberOfRooms.` +
-        (filterStrings && filterStrings.join(" ")) +
-        " }";
+          ?is s:floorSize/s:value ?floorSize.
+          ?is s:numberOfRooms ?numberOfRooms.
+          ${filterStrings && filterStrings.join(" ")}
+        }` + (location ? `ORDER BY ASC(?geoDistance)` : "");
 
       return new SparqlParser().parse(queryTemplate);
     },

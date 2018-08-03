@@ -259,7 +259,7 @@ services:
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
-    image: webofneeds/bigdata
+    build: ../../image/bigdata
     volumes:
       - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
@@ -273,7 +273,7 @@ services:
       - "node.host=satvm05.researchstudio.at"
       - "matcher.uri=https://satvm05.researchstudio.at/matcher_service" # set this for the trust store alias
       - "cluster.seedNodes=satvm05.researchstudio.at:2551,satvm05.researchstudio.at:2552"
-      - "uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/bigdata/namespace/kb/sparql"
+      - "uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://satvm05.researchstudio.at:8888/won/resource,https://satvm05.researchstudio.at/won/resource"
       - "cluster.local.port=2551"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
@@ -334,7 +334,7 @@ services:
       - "cluster.seedNodes=satvm05.researchstudio.at:2551,satvm05.researchstudio.at:2553"
       - "cluster.local.port=2553"
       - "matcher.rescal.uri.public=http://satvm05.researchstudio.at/rescal/"
-      - "matcher.rescal.uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/bigdata/namespace/kb/sparql"
+      - "matcher.rescal.uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
       - "matcher.rescal.executionDurationMinutes=5"
       - "matcher.rescal.threshold=0.15"
       - "matcher.rescal.rank=10"
@@ -359,7 +359,7 @@ services:
       - "node.host=satvm05.researchstudio.at"
       - "cluster.seedNodes=satvm05.researchstudio.at:2551,satvm05.researchstudio.at:2552"
       - "cluster.local.port=2554"
-      - "matcher.sparql.uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/bigdata/namespace/kb/sparql"
+      - "matcher.sparql.uri.sparql.endpoint=http://satvm05.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
       - "matcher.sparql.uri.public=http://satvm05.researchstudio.at/sparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62923,server=y,suspend=n
