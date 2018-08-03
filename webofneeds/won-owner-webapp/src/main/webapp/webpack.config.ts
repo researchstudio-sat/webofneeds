@@ -6,7 +6,7 @@ import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
-import * as LiveReloadPlugin from "webpack-livereload-plugin";
+import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
 
 export default config;
@@ -16,25 +16,6 @@ function config(env, argv): Configuration {
     argv.mode || (argv.watch ? "development" : "production");
 
   const nodeEnv = process.env.WON_DEPLOY_NODE_ENV || "default";
-
-  //TODO: When `webpack-watch-time-plugin` is updated for newer versions of webpack switch to that.
-  const WatchTimePlugin = {
-    apply: compiler => {
-      const RED = "\x1B[0;31m";
-      const GREEN = "\x1B[0;32m";
-      const NC = "\x1B[0m";
-
-      compiler.hooks.watchRun.tap("TimePrinter", () => {
-        const time = new Date();
-        console.log(
-          `_____________\n`,
-          `${GREEN}${time.getHours()}:${RED}${("0" + time.getMinutes()).slice(
-            -2
-          )}:${("0" + time.getSeconds()).slice(-2)} ${GREEN}⇩${NC}`
-        );
-      });
-    },
-  };
 
   return {
     entry: "./app/app_webpack.js",
@@ -62,8 +43,16 @@ function config(env, argv): Configuration {
         "angular-ui-router-shim$": require.resolve(
           "angular-ui-router/release/stateEvents.js"
         ),
-        detailDefinitions$: path.resolve(__dirname, "config", `detail-definitions.js`),
-        useCaseDefinitions$: path.resolve(__dirname, "config", `usecase-definitions.js`),
+        detailDefinitions$: path.resolve(
+          __dirname,
+          "config",
+          `detail-definitions.js`
+        ),
+        useCaseDefinitions$: path.resolve(
+          __dirname,
+          "config",
+          `usecase-definitions.js`
+        ),
         config$: path.resolve(__dirname, "config", `${nodeEnv}.js`),
         jsonld$: require.resolve("jsonld/dist/jsonld.js"), // This is needed because `jsonld`s entrypoint is not compiled to compatible js (uses spread operators). With this resolve hook we instead use the compiled version.
       },
@@ -148,8 +137,12 @@ function config(env, argv): Configuration {
         ],
         {}
       ),
-      new LiveReloadPlugin(),
-      WatchTimePlugin,
+      new WatchTimePlugin({
+        noChanges: {
+          detect: true,
+          report: true,
+        },
+      }),
       new UnusedWebpackPlugin({
         // Source directories
         directories: [
