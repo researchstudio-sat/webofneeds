@@ -788,8 +788,9 @@ export const details = {
   file: {
     identifier: "file",
     label: "File",
-    icon: "#ico36_tags_circle", //TODO: CHANGE LOGO
+    icon: "#ico36_media_circle",
     placeholder: "",
+    accepts: "*/*",
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
@@ -824,21 +825,15 @@ export const details = {
       }
     },
     generateHumanReadable: function({ value, includeLabel }) {
-      //TODO: IMPL THIS METHOD
       if (value) {
         let humanReadable = "";
-
-        for (const key in value) {
-          humanReadable += value[key] + ", ";
+        if (value.length > 1) {
+          humanReadable = value.length + " Files";
+        } else {
+          humanReadable = value[0].name;
         }
-        humanReadable = humanReadable.trim();
 
-        if (humanReadable.length > 0) {
-          humanReadable = humanReadable.substr(0, humanReadable.length - 1);
-          return includeLabel
-            ? this.label + ": " + humanReadable
-            : humanReadable;
-        }
+        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
       }
       return undefined;
     },

@@ -2,37 +2,111 @@
 @import "textfield";
 
 won-file-picker {
-  .filep__input {
-    position: relative;
+  display: grid;
+  grid-gap: 0.5rem;
+
+  won-file-dropzone {
+    $borderSize: 5.66rem;
+    $padding: 1rem;
+    width: 100%;
+    height: $borderSize;
+    display: block;
+
+    %wid__dropzone {
+      box-sizing: border-box;
+      height: 100%;
+      width: 100%;
+
+      position: relative; //to allow children to use pos:absolute
+
+      overflow: hidden; // to crop the `fill`ing image
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      /* the preview is set via js:
+       * background-image: url({{self.imageDataUrl}});
+       */
+
+      input {
+        filter: alpha(opacity=0);
+        opacity: 0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+
+      & .wid__dropzone__bg {
+        @extend %center--absolute;
+        pointer-events: none;
+      }
+    }
+
+    .wid__dropzone--empty {
+      @extend %wid__dropzone;
+
+      border: $boldBorderWidth dashed $won-line-gray;
+      border-radius: $boldBorderWidth;
+
+      background-color: white;
+
+      .wid__dropzone__bg {
+        @include max-square($borderSize - 2 * $padding - 2 * $boldBorderWidth);
+      }
+    }
+  }
+  .filep__header {
+    font-size: $smallFontSize;
+  }
+
+  .filep__preview {
+    width: 100%;
     display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 0.5rem;
 
-    .filep__input__icon {
-      @include fixed-square($bigiconSize);
-      position: absolute;
-      right: 0.5rem;
-      top: $formInputHeight / 2 - $bigiconSize / 2;
-      z-index: 1;
-    }
-
-    .filep__input__inner {
+    .filep__preview__item {
+      display: grid;
+      grid-template-columns: 1fr min-content;
+      grid-template-rows: min-content 1fr;
       border: $thinGrayBorder;
-      min-height: $formInputHeight;
-      min-height: $formInputHeight;
-      word-wrap: break-word;
+      border-radius: 0.19rem;
+      height: 5rem;
+      background: $won-lighter-gray;
+      grid-gap: 0.25rem;
+      padding: 0.25rem;
+      justify-items: center;
 
-      $verticalPadding: calcVerticalPaddingToHeight(
-        $normalFontSize,
-        22/16,
-        $thinBorderWidth,
-        $formInputHeight
-      );
-      padding: $verticalPadding 0.438rem + $bigiconSize $verticalPadding
-        0.438rem;
-    }
+      .filep__preview__item__image,
+      .filep__preview__item__typeicon {
+        grid-row: 2 / span 1;
+        grid-column: 1 / span 2;
+        max-width: 100%;
+        max-height: 100%;
+        --local-primary: #{$won-line-gray};
+      }
 
-    .filep__input__inner::-ms-clear {
-      width: 0;
-      height: 0;
+      .filep__preview__item__label {
+        grid-row: 1 / span 1;
+        grid-column: 1 / span 1;
+        font-size: $smallFontSize;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+
+      .filep__preview__item__remove {
+        grid-row: 1 / span 1;
+        grid-column: 2 / span 1;
+
+        --local-primary: #{$won-primary-text-color};
+        @include fixed-square(1rem);
+
+        &:hover {
+          cursor: pointer;
+          --local-primary: #{$won-primary-color};
+        }
+      }
     }
   }
 }

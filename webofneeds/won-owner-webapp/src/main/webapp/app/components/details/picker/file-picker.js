@@ -1,17 +1,36 @@
 import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
-import wonInput from "../../../directives/input.js";
+import dropzoneModule from "../../file-dropzone.js";
 
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-      <div class="filep__input">
-          <input
-              type="file"
-              class="filep__input__inner"
-              placeholder="{{self.detail.placeholder}}"
-              won-input="::self.updateTitle()" />
+      <won-file-dropzone on-image-picked="::self.updateFiles(image)" accepts="::self.detail.accepts">
+      </won-file-dropzone>
+      <div class="filep__header" ng-if="self.addedFiles && self.addedFiles.length > 0">
+        Chosen Files:
+      </div>
+      <div class="filep__preview" ng-if="self.addedFiles && self.addedFiles.length > 0">
+        <div class="filep__preview__item"
+          ng-repeat="file in self.addedFiles">
+          <div class="filep__preview__item__label">
+            {{ file.name }}
+          </div>
+          <svg
+            class="filep__preview__item__remove"
+            ng-click="self.removeFile(file)">
+            <use xlink:href="#ico36_close" href="#ico36_close"></use>
+          </svg>
+          <img class="filep__preview__item__image"
+            ng-if="self.isImage(file)"
+            alt="{{file.name}}"
+            ng-src="data:{{file.type}};base64,{{file.data}}"/>
+          <svg ng-if="!self.isImage(file)"
+            class="filep__preview__item__typeicon">
+            <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
+          </svg>
+        </div>
       </div>
     `;
 
@@ -22,53 +41,44 @@ function genComponentConf() {
 
       window.filep4dbg = this;
 
-      this.addedTitle = this.initialValue;
+      this.addedFiles = this.initialValue;
 
-      delay(0).then(() => this.showInitialTitle());
+      delay(0).then(() => this.showInitialFiles());
     }
 
     /**
      * Checks validity and uses callback method
      */
-    update(title) {
-      console.log("title: ", title);
-      /*if (title && title.trim().length > 0) {
-        this.onUpdate({ value: title });
+    update(data) {
+      if (data) {
+        this.onUpdate({ value: data });
       } else {
         this.onUpdate({ value: undefined });
-      }*/
+      }
     }
 
-    showInitialTitle() {
-      /*this.addedTitle = this.initialValue;
-
-      if (this.initialValue && this.initialValue.trim().length > 0) {
-        this.textfield().value = this.initialValue.trim();
-        this.showResetButton = true;
-      }*/
-
+    showInitialFiles() {
+      this.addedFiles = this.initialValue;
       this.$scope.$apply();
     }
 
-    updateTitle() {
-      /*const text = this.textfield().value;
-
-      if (text && text.trim().length > 0) {
-        this.addedTitle = text.trim();
-        this.update(this.addedTitle);
-      }*/
-    }
-
-    textfieldNg() {
-      return angular.element(this.textfield());
-    }
-    textfield() {
-      if (!this._titleInput) {
-        this._titleInput = this.$element[0].querySelector(
-          ".filep__input__inner"
-        );
+    updateFiles(file) {
+      console.log("called updateFiles: ", file);
+      if (!this.addedFiles) {
+        this.addedFiles = [];
       }
-      return this._titleInput;
+      this.addedFiles.push(file);
+      this.update(this.addedFiles);
+      this.$scope.$apply();
+    }
+
+    removeFile(file) {
+      console.log("Removing file: " + file);
+      //TODO: IMPL ME
+    }
+
+    isImage(file) {
+      return file && /^image\//.test(file.type);
     }
   }
   Controller.$inject = serviceDependencies;
@@ -88,5 +98,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.filePicker", [wonInput])
+  .module("won.owner.components.filePicker", [dropzoneModule])
   .directive("wonFilePicker", genComponentConf).name;
