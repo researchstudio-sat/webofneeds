@@ -802,12 +802,14 @@ export const details = {
     },
     parseFromRDF: function(jsonLDImm) {
       //TODO: IMPL THIS METHOD
-      const tags =
+      const files =
         jsonLDImm &&
         (jsonLDImm.get("won:hasFile") ||
           jsonLDImm.get("http://purl.org/webofneeds/model#hasFile"));
+      console.log("files", files);
+      return undefined;
 
-      if (!tags) {
+      /*if (!tags) {
         return undefined;
       } else if (is("String", tags)) {
         return Immutable.fromJS([tags]);
@@ -822,7 +824,7 @@ export const details = {
             JSON.stringify(tags)
         );
         return undefined;
-      }
+      }*/
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
@@ -855,12 +857,14 @@ export const details = {
     },
     parseFromRDF: function(jsonLDImm) {
       //TODO: IMPL THIS METHOD
-      const tags =
+      const images =
         jsonLDImm &&
         (jsonLDImm.get("won:hasImage") ||
           jsonLDImm.get("http://purl.org/webofneeds/model#hasImage"));
+      console.log("images", images);
+      return undefined;
 
-      if (!tags) {
+      /*if (!tags) {
         return undefined;
       } else if (is("String", tags)) {
         return Immutable.fromJS([tags]);
@@ -875,7 +879,7 @@ export const details = {
             JSON.stringify(tags)
         );
         return undefined;
-      }
+      }*/
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
