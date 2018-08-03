@@ -246,6 +246,9 @@ import { Generator } from "sparqljs";
           noHints ? "won:NoHintForMe" : undefined,
           noHints ? "won:NoHintForCounterpart" : undefined,
         ]), ///.toArray().filter(f => f),
+        "won:doNotMatchAfter": args.doNotMatchAfter
+          ? { "@value": args.doNotMatchAfter, "@type": "xsd:dateTime" }
+          : undefined,
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
         "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,

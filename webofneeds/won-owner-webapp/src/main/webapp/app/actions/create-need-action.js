@@ -18,6 +18,8 @@ export function needCreate(draft, nodeUri) {
   return (dispatch, getState) => {
     const state = getState();
 
+    // draft.doNotMatchAfter = "2018-11-01T00:59"; // TODO deleteme
+
     if (!nodeUri) {
       nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     }

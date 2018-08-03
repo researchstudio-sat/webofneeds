@@ -402,6 +402,7 @@ export async function buildCreateMessage(needData, wonNodeUri) {
       : undefined,
     searchString: needData.searchString ? needData.searchString : undefined,
     useCase: needData.useCase ? needData.useCase : undefined, //only needed for need building
+    doNotMatchAfter: needData.doNotMatchAfter,
   });
 
   const msgUri = wonNodeUri + "/event/" + getRandomWonId(); //mandatory
