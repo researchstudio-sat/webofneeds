@@ -79,7 +79,6 @@ function genComponentConf() {
       }
       this.addedFiles = this.addedFiles.filter(file => fileToRemove !== file);
       this.update(this.addedFiles);
-      this.$scope.$apply();
     }
 
     isImage(file) {

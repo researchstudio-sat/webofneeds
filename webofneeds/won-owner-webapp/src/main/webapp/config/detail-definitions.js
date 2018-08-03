@@ -785,9 +785,9 @@ export const details = {
       return undefined;
     },
   },
-  file: {
-    identifier: "file",
-    label: "File",
+  files: {
+    identifier: "files",
+    label: "Files",
     icon: "#ico36_media_circle",
     placeholder: "",
     accepts: "*/*",
@@ -829,6 +829,59 @@ export const details = {
         let humanReadable = "";
         if (value.length > 1) {
           humanReadable = value.length + " Files";
+        } else {
+          humanReadable = value[0].name;
+        }
+
+        return includeLabel ? this.label + ": " + humanReadable : humanReadable;
+      }
+      return undefined;
+    },
+  },
+  images: {
+    identifier: "images",
+    label: "Images",
+    icon: "#ico36_media_circle",
+    placeholder: "",
+    accepts: "image/*",
+    component: "won-file-picker",
+    viewerComponent: "won-file-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: IMPL THIS METHOD
+      if (!value) {
+        return { "won:hasImage": undefined };
+      }
+      return { "won:hasImage": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: IMPL THIS METHOD
+      const tags =
+        jsonLDImm &&
+        (jsonLDImm.get("won:hasImage") ||
+          jsonLDImm.get("http://purl.org/webofneeds/model#hasImage"));
+
+      if (!tags) {
+        return undefined;
+      } else if (is("String", tags)) {
+        return Immutable.fromJS([tags]);
+      } else if (is("Array", tags)) {
+        return Immutable.fromJS(tags);
+      } else if (Immutable.List.isList(tags)) {
+        return tags; // id; it is already in the format we want
+      } else {
+        console.error(
+          "Found unexpected format of tags (should be Array, " +
+            "Immutable.List, or a single tag as string): " +
+            JSON.stringify(tags)
+        );
+        return undefined;
+      }
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      if (value) {
+        let humanReadable = "";
+        if (value.length > 1) {
+          humanReadable = value.length + " Images";
         } else {
           humanReadable = value[0].name;
         }
