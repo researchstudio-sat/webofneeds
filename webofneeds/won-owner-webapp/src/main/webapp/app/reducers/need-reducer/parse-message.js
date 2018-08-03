@@ -96,11 +96,13 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
-  parsedMessage.data.content = generateContent(
-    Immutable.fromJS(wonMessage.__getFramedMessage()["@graph"][0]),
-    detailsToParse,
-    parsedMessage.data.content
-  ); //TODO THIS IS VERY VERY WEIRD AND UNSTABLE I FEEL
+  if (wonMessage.getContentGraphs()) {
+    parsedMessage.data.content = generateContent(
+      Immutable.fromJS(wonMessage.getContentGraphs()[0]["@graph"][0]),
+      detailsToParse,
+      parsedMessage.data.content
+    ); //TODO THIS IS VERY VERY WEIRD AND UNSTABLE I FEEL
+  }
 
   parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);
   parsedMessage.data.hasReferences = hasReferences(

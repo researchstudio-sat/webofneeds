@@ -2,7 +2,7 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { getIn, is } from "../app/utils.js";
+import { get, getIn, is } from "../app/utils.js";
 import Immutable from "immutable";
 
 /**
@@ -761,7 +761,7 @@ export const details = {
       } else if (is("Array", tags)) {
         return Immutable.fromJS(tags);
       } else if (Immutable.List.isList(tags)) {
-        return tags; // id; it is already in the format we want
+        return tags.map(tag => get(tag, "@value") || tag);
       } else {
         console.error(
           "Found unexpected format of tags (should be Array, " +
