@@ -785,6 +785,64 @@ export const details = {
       return undefined;
     },
   },
+  file: {
+    identifier: "file",
+    label: "File",
+    icon: "#ico36_tags_circle", //TODO: CHANGE LOGO
+    placeholder: "",
+    component: "won-file-picker",
+    viewerComponent: "won-file-viewer",
+    parseToRDF: function({ value }) {
+      //TODO: IMPL THIS METHOD
+      if (!value) {
+        return { "won:hasFile": undefined };
+      }
+      return { "won:hasFile": value };
+    },
+    parseFromRDF: function(jsonLDImm) {
+      //TODO: IMPL THIS METHOD
+      const tags =
+        jsonLDImm &&
+        (jsonLDImm.get("won:hasFile") ||
+          jsonLDImm.get("http://purl.org/webofneeds/model#hasFile"));
+
+      if (!tags) {
+        return undefined;
+      } else if (is("String", tags)) {
+        return Immutable.fromJS([tags]);
+      } else if (is("Array", tags)) {
+        return Immutable.fromJS(tags);
+      } else if (Immutable.List.isList(tags)) {
+        return tags; // id; it is already in the format we want
+      } else {
+        console.error(
+          "Found unexpected format of tags (should be Array, " +
+            "Immutable.List, or a single tag as string): " +
+            JSON.stringify(tags)
+        );
+        return undefined;
+      }
+    },
+    generateHumanReadable: function({ value, includeLabel }) {
+      //TODO: IMPL THIS METHOD
+      if (value) {
+        let humanReadable = "";
+
+        for (const key in value) {
+          humanReadable += value[key] + ", ";
+        }
+        humanReadable = humanReadable.trim();
+
+        if (humanReadable.length > 0) {
+          humanReadable = humanReadable.substr(0, humanReadable.length - 1);
+          return includeLabel
+            ? this.label + ": " + humanReadable
+            : humanReadable;
+        }
+      }
+      return undefined;
+    },
+  },
   ttl: {
     identifier: "ttl",
     label: "Turtle (TTL)",

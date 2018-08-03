@@ -1,0 +1,6 @@
+@import "won-config";
+@import "sizing-utils";
+
+won-file-viewer {
+  @include won-detail-viewer("filev");
+}

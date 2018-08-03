@@ -22,6 +22,7 @@ import timeViewerModule from "../details/viewer/time-viewer.js";
 import dropdownViewerModule from "../details/viewer/dropdown-viewer.js";
 import selectViewerModule from "../details/viewer/select-viewer.js";
 import rangeViewerModule from "../details/viewer/range-viewer.js";
+import fileViewerModule from "../details/viewer/file-viewer.js";
 
 const serviceDependencies = ["$ngRedux", "$scope"];
 
@@ -176,6 +177,7 @@ export default angular
     monthViewerModule,
     selectViewerModule,
     rangeViewerModule,
+    fileViewerModule,
   ])
   .directive("messageDetailViewerElement", [
     "$compile",
