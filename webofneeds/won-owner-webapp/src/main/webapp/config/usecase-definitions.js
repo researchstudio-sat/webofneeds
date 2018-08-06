@@ -979,8 +979,12 @@ const transportUseCases = {
         parseFromRDF: function(jsonLDImm) {
           const content = jsonLDImm && jsonLDImm.get("s:name");
           if (content) {
-            console.log("JSONLDImm of @type: ", jsonLDImm.get("@type"));
-            return content;
+            const type = jsonLDImm.get("@type");
+            if (type === "s:Product") {
+              return content;
+            } else {
+              return undefined;
+            }
           }
         },
       },
