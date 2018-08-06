@@ -254,7 +254,12 @@ export function buildChatMessage({
           const detailList = getAllDetails();
           additionalContent.forEach((value, key) => {
             const detail = detailList[key];
-            const detailRDF = detail && detail.parseToRDF({ value: value });
+            const detailRDF =
+              detail &&
+              detail.parseToRDF({
+                value: value,
+                identifier: detail.identifier,
+              });
 
             if (detailRDF) {
               for (const key in detailRDF) {
