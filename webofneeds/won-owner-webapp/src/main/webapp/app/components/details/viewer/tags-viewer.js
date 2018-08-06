@@ -11,7 +11,7 @@ function genComponentConf() {
           <span class="tv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="tv__content">
-          <div class="tv__content__tag" ng-repeat="tag in self.content.toJS()">{{tag}}</div>
+          <div class="tv__content__tag" ng-repeat="tag in self.content.toArray()">{{tag}}</div>
         </div>
     `;
 
