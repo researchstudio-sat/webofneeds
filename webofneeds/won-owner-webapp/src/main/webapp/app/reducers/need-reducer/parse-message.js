@@ -96,12 +96,12 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
-  if (wonMessage.getContentGraphs()) {
+  if (wonMessage.getCompactContentGraph()) {
     parsedMessage.data.content = generateContent(
-      Immutable.fromJS(wonMessage.getContentGraphs()[0]["@graph"][0]),
+      Immutable.fromJS(wonMessage.getCompactContentGraph()),
       detailsToParse,
       parsedMessage.data.content
-    ); //TODO THIS IS VERY VERY WEIRD AND UNSTABLE I FEEL
+    );
   }
 
   parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);

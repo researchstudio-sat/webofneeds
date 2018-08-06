@@ -953,6 +953,7 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   const wonMessage = new WonMessage(expandedJsonLd);
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
+  await wonMessage.generateCompactContentGraph();
   return wonMessage;
 };
 
@@ -1154,6 +1155,7 @@ WonMessage.prototype = {
           ),
           "@graph": contentGraphs,
         };
+        this.jsonldData = jsonldData;
         this.contentGraphTrig = await won.jsonLdToTrig(jsonldData);
         return this.contentGraphTrig;
       } catch (e) {
@@ -1169,7 +1171,39 @@ WonMessage.prototype = {
       }
     }
   },
+  generateCompactContentGraph: async function() {
+    //TODO: change it so it returns all the contnetgraphscontent
+    if (this.compactContentGraph) {
+      return this.compactContentGraph;
+    }
+    const contentGraphs = this.getContentGraphs();
+    if (contentGraphs && contentGraphs.length > 0) {
+      try {
+        if (!is("Array", contentGraphs)) {
+          throw new Error(
+            "Unexpected content-graph structure: \n\n" +
+              JSON.stringify(contentGraphs)
+          );
+        }
+        this.compactContentGraph = await jsonld.compact(
+          contentGraphs[0]["@graph"][0],
+          won.defaultContext
+        );
 
+        return this.compactContentGraph;
+      } catch (e) {
+        const msg =
+          "Failed to generate jsonld for message " +
+          this.getMessageUri() +
+          "\n\n" +
+          e.message +
+          "\n\n" +
+          e.stack;
+        console.error(msg);
+        this.compactContentGraphError = msg;
+      }
+    }
+  },
   frameInPromise: function() {
     if (this.framedMessage) {
       return Promise.resolve(this.framedMessage);
@@ -1236,6 +1270,9 @@ WonMessage.prototype = {
   },
   getContentGraphsAsJsonLD: function() {
     return JSON.stringify(this.getContentGraphs());
+  },
+  getCompactContentGraph: function() {
+    return this.compactContentGraph;
   },
   getMessageType: function() {
     return this.getProperty(
