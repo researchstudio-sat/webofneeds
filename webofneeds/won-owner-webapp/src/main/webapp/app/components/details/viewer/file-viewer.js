@@ -10,7 +10,23 @@ function genComponentConf() {
           </svg>
           <span class="filev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="filev__content">{{ self.content }}</div>
+        <div class="filev__content" ng-if="self.content && self.content.size > 0">
+          <div class="filev__content__item"
+            ng-repeat="file in self.content.toArray()">
+            <div class="filev__content__item__label">
+              {{ file.get('name') }}
+            </div>
+            <img class="filev__content__item__image"
+              ng-if="self.isImage(file)"
+              alt="{{file.get('name')}}"
+              ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
+            <svg ng-if="!self.isImage(file)"
+              class="filev__content__item__typeicon">
+              <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
     `;
 
   class Controller {
@@ -35,6 +51,10 @@ function genComponentConf() {
       if (newContent && newContent != prevContent) {
         this.content = newContent;
       }
+    }
+
+    isImage(file) {
+      return file && /^image\//.test(file.get("type"));
     }
   }
   Controller.$inject = serviceDependencies;
