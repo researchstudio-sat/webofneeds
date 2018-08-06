@@ -32,6 +32,7 @@ won-file-viewer {
       .filev__content__item__label {
         grid-row: 1 / span 1;
         font-size: $smallFontSize;
+        color: $won-primary-text-color;
         text-overflow: ellipsis;
         overflow: hidden;
         max-width: 100%;

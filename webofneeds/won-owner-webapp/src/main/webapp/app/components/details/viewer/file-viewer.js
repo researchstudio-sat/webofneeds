@@ -11,7 +11,7 @@ function genComponentConf() {
           <span class="filev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="filev__content" ng-if="self.content && self.content.size > 0">
-          <div class="filev__content__item"
+          <a class="filev__content__item"
             ng-repeat="file in self.content.toArray()">
             <div class="filev__content__item__label">
               {{ file.get('name') }}
@@ -24,7 +24,7 @@ function genComponentConf() {
               class="filev__content__item__typeicon">
               <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
             </svg>
-          </div>
+          </a>
         </div>
       </div>
     `;
