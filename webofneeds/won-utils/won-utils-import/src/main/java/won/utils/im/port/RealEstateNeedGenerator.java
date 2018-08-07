@@ -1,5 +1,6 @@
 package won.utils.im.port;
 
+import java.io.FileOutputStream;
 import java.util.HashMap;
 
 import org.apache.jena.rdf.model.*;
@@ -192,7 +193,13 @@ public class RealEstateNeedGenerator {
             need.addProperty(won_is, isPart);
             need.addProperty(won_seeks, seeksPart);
 
-            model.write(System.out, "TURTLE");
+            try {
+                FileOutputStream out = new FileOutputStream("sample_needs/real_estate_need_" + i + ".trig");
+                model.write(out, "TURTLE");
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
