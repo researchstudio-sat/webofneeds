@@ -96,9 +96,9 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
-  if (wonMessage.getCompactContentGraph()) {
+  if (wonMessage.getCompactFramedMessage()) {
     parsedMessage.data.content = generateContent(
-      Immutable.fromJS(wonMessage.getCompactContentGraph()),
+      Immutable.fromJS(wonMessage.getCompactFramedMessage()),
       detailsToParse,
       parsedMessage.data.content
     );

@@ -953,7 +953,7 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   const wonMessage = new WonMessage(expandedJsonLd);
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
-  await wonMessage.generateCompactContentGraph();
+  await wonMessage.generateCompactedFramedMessage();
   return wonMessage;
 };
 
@@ -1171,26 +1171,19 @@ WonMessage.prototype = {
       }
     }
   },
-  generateCompactContentGraph: async function() {
-    //TODO: change it so it returns all the contnetgraphscontent
-    if (this.compactContentGraph) {
-      return this.compactContentGraph;
+  generateCompactedFramedMessage: async function() {
+    //TODO: change it so it returns all the contentgraphscontent
+    if (this.compactFramedMessage) {
+      return this.compactFramedMessage;
     }
-    const contentGraphs = this.getContentGraphs();
-    if (contentGraphs && contentGraphs.length > 0) {
+    if (this.framedMessage) {
       try {
-        if (!is("Array", contentGraphs)) {
-          throw new Error(
-            "Unexpected content-graph structure: \n\n" +
-              JSON.stringify(contentGraphs)
-          );
-        }
-        this.compactContentGraph = await jsonld.compact(
-          contentGraphs[0]["@graph"][0],
+        this.compactFramedMessage = await jsonld.compact(
+          this.framedMessage,
           won.defaultContext
         );
 
-        return this.compactContentGraph;
+        return this.compactFramedMessage;
       } catch (e) {
         const msg =
           "Failed to generate jsonld for message " +
@@ -1200,7 +1193,7 @@ WonMessage.prototype = {
           "\n\n" +
           e.stack;
         console.error(msg);
-        this.compactContentGraphError = msg;
+        this.compactFramedMessageError = msg;
       }
     }
   },
@@ -1271,8 +1264,8 @@ WonMessage.prototype = {
   getContentGraphsAsJsonLD: function() {
     return JSON.stringify(this.getContentGraphs());
   },
-  getCompactContentGraph: function() {
-    return this.compactContentGraph;
+  getCompactFramedMessage: function() {
+    return this.compactFramedMessage;
   },
   getMessageType: function() {
     return this.getProperty(
