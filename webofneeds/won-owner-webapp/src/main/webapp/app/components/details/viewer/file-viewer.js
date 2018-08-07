@@ -12,6 +12,9 @@ function genComponentConf() {
         </div>
         <div class="filev__content" ng-if="self.content && self.content.size > 0">
           <a class="filev__content__item"
+            ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
+            download="{{ file.get('name') }}"
+            target="_blank"
             ng-repeat="file in self.content.toArray()">
             <div class="filev__content__item__label">
               {{ file.get('name') }}

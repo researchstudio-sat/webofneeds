@@ -125,7 +125,14 @@ app
     };
   });
 
-app.config(configRouting);
+app.config(configRouting).config([
+  "$compileProvider",
+  function($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(
+      /^\s*(https?|ftp|mailto|tel|file|blob|data):/
+    );
+  },
+]);
 app.run(["$ngRedux", $ngRedux => runMessagingAgent($ngRedux)]);
 
 app.run([
