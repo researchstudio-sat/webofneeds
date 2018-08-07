@@ -7,6 +7,7 @@ import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
 import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
+import * as DartSass from "dart-sass";
 
 export default config;
 
@@ -95,6 +96,7 @@ function config(env, argv): Configuration {
               loader: "sass-loader",
               options: {
                 sourceMap: mode == "development",
+                implementation: DartSass,
               },
             },
           ],
