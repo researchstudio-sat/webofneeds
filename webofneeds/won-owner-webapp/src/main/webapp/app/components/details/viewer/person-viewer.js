@@ -1,6 +1,8 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
 
+import "style/_person-viewer.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `

@@ -72,9 +72,6 @@ export const configRouting = [
       //return updatedRoute;
     });
 
-    //make sure create-need is called with a draftId
-    //$urlRouterProvider.when('/create-need/', [() => '/create-need/' + getRandomPosInt()]);
-
     [
       { path: "/about?privateId", component: "about" },
       { path: "/signup?privateId", component: "signup" },

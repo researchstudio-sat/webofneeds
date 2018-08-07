@@ -8,6 +8,8 @@ import { connect2Redux } from "../won-utils.js";
 import { selectOpenPostUri } from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
+import "style/_visitor-title-bar.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `

@@ -1,5 +1,7 @@
 import angular from "angular";
 
+import "style/_accordion.scss";
+
 function genComponentConf() {
   let template = `
             <div class="accordion__element clickable" ng-click="self.openElement($index)" ng-repeat="item in self.items">

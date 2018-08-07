@@ -11,6 +11,8 @@ import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 import { useCaseGroups } from "useCaseDefinitions";
 
+import "style/_usecase-picker-content.scss";
+
 const serviceDependencies = [
   "$ngRedux",
   "$scope",

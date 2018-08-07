@@ -2,6 +2,8 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
+import "style/_numberpicker.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
@@ -16,7 +18,7 @@ function genComponentConf() {
         </div>
         <input
             type="number"
-            class="numberp__input__inner won-txt"
+            class="numberp__input__inner"
             placeholder="{{self.detail.placeholder}}"
             ng-blur="::self.updateNumber(true)"
             won-input="::self.updateNumber(false)"

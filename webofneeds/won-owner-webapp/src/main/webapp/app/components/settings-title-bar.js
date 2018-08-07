@@ -6,6 +6,8 @@ import { attach, getIn } from "../utils.js";
 import { actionCreators } from "../actions/actions.js";
 import { connect2Redux } from "../won-utils.js";
 
+import "style/_settings-tab-bar.scss";
+
 function genComponentConf() {
   let template = `
         <nav class="settings-tab-bar" ng-cloak ng-show="{{true}}">

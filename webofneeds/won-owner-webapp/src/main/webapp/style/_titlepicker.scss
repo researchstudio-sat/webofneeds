@@ -1,5 +1,6 @@
 @import "won-config";
 @import "textfield";
+@import "sizing-utils";
 
 won-title-picker {
   .titlep__input {
@@ -15,6 +16,7 @@ won-title-picker {
     }
 
     .titlep__input__inner {
+      @extend .won-txt;
       border: $thinGrayBorder;
       min-height: $formInputHeight;
       min-height: $formInputHeight;

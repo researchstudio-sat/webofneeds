@@ -7,6 +7,8 @@ import { connect2Redux } from "../won-utils.js";
 
 import { ownerBaseUrl } from "config";
 
+import "style/_post-share-link.scss";
+
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `

@@ -7,6 +7,8 @@ import { actionCreators } from "../actions/actions.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 
+import "style/_modal-dialog.scss";
+
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `

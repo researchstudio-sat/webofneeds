@@ -1,0 +1,19 @@
+@import "sizing-utils";
+
+.rdflink__small {
+  @include fixed-square($iconSize);
+}
+
+.rdflink {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+
+  .rdflink__label {
+    padding-left: 0.5rem;
+
+    &:hover {
+      color: $won-primary-color;
+    }
+  }
+}

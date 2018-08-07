@@ -7,6 +7,8 @@ import { attach, getIn, toAbsoluteURL } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { ownerBaseUrl } from "config";
 
+import "style/_about.scss";
+
 const goodServicesOffer = "matchat.org";
 const goodServicesOfferLink = goodServicesOffer.link("https://www.matchat.org");
 

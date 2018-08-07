@@ -3,11 +3,6 @@
 @import "fonts";
 @import "flex-layout";
 
-@import "connections-overview";
-@import "responsiveness-utils";
-@import "post-messages";
-@import "usecase-picker";
-
 .connectionscontent {
   display: flex;
   justify-content: center;
@@ -62,7 +57,7 @@
         width: 100%;
         padding-bottom: 1rem;
         h1 {
-          padding-bottom: 1.5rem; 
+          padding-bottom: 1.5rem;
           text-align: center;
         }
         p {

@@ -26,6 +26,8 @@ import { getAllDetails } from "../won-utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
+import "style/_post-is-or-seeks-info.scss";
+
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
 const serviceDependencies = [
   "$ngRedux",

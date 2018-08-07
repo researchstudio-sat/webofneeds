@@ -6,6 +6,8 @@ import { attach, getIn } from "../utils.js";
 import { useCases } from "useCaseDefinitions";
 import { connect2Redux } from "../won-utils.js";
 
+import "style/_create-post-item.scss";
+
 const serviceDependencies = ["$scope", "$ngRedux"];
 function genComponentConf() {
   let template = `

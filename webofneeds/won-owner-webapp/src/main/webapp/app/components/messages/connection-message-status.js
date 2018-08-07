@@ -7,6 +7,8 @@ import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 
+import "style/_connection-message-status.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
