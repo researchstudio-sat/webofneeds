@@ -8,6 +8,7 @@ import * as CopyWebpackPlugin from "copy-webpack-plugin";
 import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
 import * as DartSass from "dart-sass";
+import * as Fiber from "fibers";
 
 export default config;
 
@@ -97,6 +98,7 @@ function config(env, argv): Configuration {
               options: {
                 sourceMap: mode == "development",
                 implementation: DartSass,
+                fiber: Fiber,
               },
             },
           ],

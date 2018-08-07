@@ -63,6 +63,7 @@
     "eslint-loader": "^2.1.0",
     "eslint-plugin-prettier": "^2.6.2",
     "exports-loader": "^0.7.0",
+    "fibers": "^3.0.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.2.0",
     "mini-css-extract-plugin": "^0.4.1",
