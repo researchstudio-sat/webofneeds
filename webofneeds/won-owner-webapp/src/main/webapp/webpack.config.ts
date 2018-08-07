@@ -1,7 +1,6 @@
 import * as path from "path";
 import { Configuration } from "webpack";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
-import * as SassImporter from "node-sass-import-once";
 import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
