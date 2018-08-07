@@ -1,5 +1,7 @@
 import angular from "angular";
 
+import "style/_labelledhr.scss";
+
 function genComponentConf() {
   let template = `<div class="wlh__label">
     					<span class="wlh__label__text" ng-show="!self.arrow">{{ self.label }}</span>

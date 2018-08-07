@@ -2,6 +2,8 @@ import angular from "angular";
 import { attach } from "../../../utils.js";
 import needMapModule from "../../need-map.js";
 
+import "style/_travel-action-viewer.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `

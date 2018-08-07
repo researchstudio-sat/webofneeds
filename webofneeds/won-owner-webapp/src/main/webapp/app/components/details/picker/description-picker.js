@@ -3,6 +3,8 @@ import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
+import "style/_descriptionpicker.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
@@ -15,7 +17,7 @@ function genComponentConf() {
         </svg>
         <textarea
           won-textarea-autogrow
-          class="dp__input__inner won-txt"
+          class="dp__input__inner"
           won-input="::self.updateDescription()"
           placeholder="{{self.detail.placeholder}}"></textarea>
       </div> 

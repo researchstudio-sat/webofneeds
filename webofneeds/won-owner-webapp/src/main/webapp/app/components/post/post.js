@@ -10,6 +10,8 @@ import sendRequestModule from "../send-request.js";
 import visitorTitleBarModule from "../visitor-title-bar.js";
 import { selectOpenPostUri } from "../../selectors.js";
 
+import "style/_post-visitor.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope"];
 class Controller {
   constructor() {

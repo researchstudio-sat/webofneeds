@@ -1,5 +1,6 @@
 @import "won-config";
 @import "textfield";
+@import "sizing-utils";
 
 won-description-picker {
   .dp__input {
@@ -15,6 +16,7 @@ won-description-picker {
     }
 
     .dp__input__inner {
+      @extend .won-txt;
       border: $thinGrayBorder;
 
       // @include textfieldPadding(

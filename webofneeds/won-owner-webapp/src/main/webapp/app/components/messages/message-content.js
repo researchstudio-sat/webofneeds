@@ -24,6 +24,8 @@ import selectViewerModule from "../details/viewer/select-viewer.js";
 import rangeViewerModule from "../details/viewer/range-viewer.js";
 import fileViewerModule from "../details/viewer/file-viewer.js";
 
+import "style/_message-content.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {

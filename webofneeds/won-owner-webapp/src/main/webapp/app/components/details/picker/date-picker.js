@@ -2,6 +2,8 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 
+import "style/_datepicker.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
@@ -14,7 +16,7 @@ function genComponentConf() {
           </svg>
           <input
               type="date"
-              class="datep__input__inner won-txt"
+              class="datep__input__inner"
               placeholder="{{self.detail.placeholder}}"
               ng-model="self.value"
               ng-change="::self.updateDate()"

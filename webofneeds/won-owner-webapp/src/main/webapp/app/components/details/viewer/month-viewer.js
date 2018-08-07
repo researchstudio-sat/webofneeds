@@ -1,6 +1,8 @@
 import angular from "angular";
 import { attach } from "../../../utils.js";
 
+import "style/_month-viewer.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `

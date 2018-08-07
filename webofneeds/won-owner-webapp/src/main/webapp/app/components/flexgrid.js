@@ -1,6 +1,8 @@
 import angular from "angular";
 import labelledHrModule from "./labelled-hr.js";
 
+import "style/_flexgrid.scss";
+
 function genComponentConf() {
   let template = `
             <div class="flexgrid__item" ng-repeat="item in self.items">

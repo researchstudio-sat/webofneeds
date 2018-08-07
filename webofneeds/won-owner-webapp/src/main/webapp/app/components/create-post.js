@@ -33,6 +33,9 @@ import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
 import filePickerModule from "./details/picker/file-picker.js";
 
+import "style/_create-post.scss";
+import "style/_responsiveness-utils.scss";
+
 const serviceDependencies = [
   "$ngRedux",
   "$scope",

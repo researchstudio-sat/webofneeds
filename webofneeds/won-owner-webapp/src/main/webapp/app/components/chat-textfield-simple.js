@@ -33,6 +33,9 @@ import dropdownPickerModule from "./details/picker/dropdown-picker.js";
 import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
 
+import "style/_chattextfield.scss";
+import "style/_textfield.scss";
+
 function genComponentConf() {
   let template = `
         <div class="cts__details"

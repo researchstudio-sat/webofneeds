@@ -9,6 +9,8 @@ import {
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
+import "style/_ttlpicker.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
@@ -22,7 +24,7 @@ function genComponentConf() {
         </svg>
         <textarea
           won-textarea-autogrow
-          class="ttlp__input__inner won-txt won-txt--code"
+          class="ttlp__input__inner"
           won-input="::self.updateTTLBuffered()"
           ng-blur="::self.updateTTL()"
           placeholder="{{self.detail.placeholder}}"></textarea>

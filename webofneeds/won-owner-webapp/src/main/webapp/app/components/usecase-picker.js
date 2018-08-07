@@ -11,6 +11,8 @@ import { connect2Redux } from "../won-utils.js";
 import { selectIsConnected } from "../selectors.js";
 import usecasePickerContentModule from "./usecase-picker-content.js";
 
+import "style/_usecase-picker.scss";
+
 const serviceDependencies = [
   "$ngRedux",
   "$scope",

@@ -34,6 +34,7 @@ function config(env, argv): Configuration {
       filename: "app_jspm.bundle.js",
     },
     resolve: {
+      modules: [__dirname, "node_modules"],
       alias: {
         fetch: "whatwg-fetch",
         "rdfstore-js$": path.resolve(
@@ -76,14 +77,14 @@ function config(env, argv): Configuration {
           ],
         },
         {
-          test: /\.scss$/,
+          test: /\.s?css$/,
           use: [
             MiniCssExtractPlugin.loader,
             {
               loader: "css-loader",
               options: {
                 sourceMap: mode == "development",
-                minimize: mode == "production",
+                minimize: true,
                 import: false,
                 url: false,
               },
@@ -95,7 +96,6 @@ function config(env, argv): Configuration {
               loader: "sass-loader",
               options: {
                 sourceMap: mode == "development",
-                importer: SassImporter,
               },
             },
           ],
@@ -156,5 +156,8 @@ function config(env, argv): Configuration {
       }),
     ],
     devtool: "source-map",
+    stats: {
+      children: false,
+    },
   };
 }

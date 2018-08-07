@@ -18,3 +18,14 @@ form {
   padding: 0;
   margin: 0;
 }
+
+/*
+ * form elements don't inherit the font-family so we
+ * need to set it manually here
+ */
+button,
+input,
+textarea {
+  font-family: inherit;
+  font-weight: inherit;
+}

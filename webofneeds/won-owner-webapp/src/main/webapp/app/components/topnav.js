@@ -16,6 +16,10 @@ import { selectNeedByConnectionUri } from "../selectors.js";
 
 import * as srefUtils from "../sref-utils.js";
 
+import "style/_responsiveness-utils.scss";
+import "style/_slidein.scss";
+import "style/_topnav.scss";
+
 function genTopnavConf() {
   let template = `
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">

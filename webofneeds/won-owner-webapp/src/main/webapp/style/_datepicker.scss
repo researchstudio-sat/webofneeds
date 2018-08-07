@@ -1,4 +1,5 @@
 @import "won-config";
+@import "sizing-utils";
 @import "textfield";
 
 won-date-picker {
@@ -15,6 +16,7 @@ won-date-picker {
     }
 
     .datep__input__inner {
+      @extend .won-txt;
       width: 100%;
       box-sizing: border-box;
       border: $thinGrayBorder;
