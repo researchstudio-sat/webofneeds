@@ -81,6 +81,6 @@
     "unused-webpack-plugin": "^2.0.0",
     "webpack": "^4.8.1",
     "webpack-cli": "^2.0.14",
-    "webpack-watch-time-plugin": "^0.2.2"
+    "webpack-watch-time-plugin": "^0.3.0"
   }
 }
