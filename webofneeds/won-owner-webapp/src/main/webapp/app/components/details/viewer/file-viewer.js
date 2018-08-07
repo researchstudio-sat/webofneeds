@@ -11,23 +11,31 @@ function genComponentConf() {
           <span class="filev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="filev__content" ng-if="self.content && self.content.size > 0">
-          <a class="filev__content__item"
-            ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
-            download="{{ file.get('name') }}"
-            target="_blank"
+          <div class="filev__content__item"
             ng-repeat="file in self.content.toArray()">
-            <div class="filev__content__item__label">
-              {{ file.get('name') }}
-            </div>
-            <img class="filev__content__item__image"
-              ng-if="self.isImage(file)"
-              alt="{{file.get('name')}}"
-              ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
-            <svg ng-if="!self.isImage(file)"
-              class="filev__content__item__typeicon">
-              <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
-            </svg>
-          </a>
+            <a class="filev__content__item__inner"
+              ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
+              download="{{ file.get('name') }}"
+              ng-if="!self.isImage(file)">
+              <div class="filev__content__item__inner__label">
+                {{ file.get('name') }}
+              </div>
+              <svg class="filev__content__item__inner__typeicon">
+                <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
+              </svg>
+            </a>
+            <a class="filev__content__item__inner"
+              ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
+              target="_blank"
+              ng-if="self.isImage(file)">
+              <div class="filev__content__item__inner__label">
+                {{ file.get('name') }}
+              </div>
+              <img class="filev__content__item__inner__image"
+                alt="{{file.get('name')}}"
+                ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
+            </a>
+          </div>
         </div>
       </div>
     `;
