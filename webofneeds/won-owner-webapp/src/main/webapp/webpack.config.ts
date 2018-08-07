@@ -1,13 +1,14 @@
 import * as path from "path";
 import { Configuration } from "webpack";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
-import * as SassImporter from "node-sass-import-once";
 import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
 import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
+import * as DartSass from "dart-sass";
+import * as Fiber from "fibers";
 
 export default config;
 
@@ -96,6 +97,8 @@ function config(env, argv): Configuration {
               loader: "sass-loader",
               options: {
                 sourceMap: mode == "development",
+                implementation: DartSass,
+                fiber: Fiber,
               },
             },
           ],

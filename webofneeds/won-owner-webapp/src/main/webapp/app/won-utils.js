@@ -138,9 +138,10 @@ export function connect2Redux(
   properties,
   ctrl
 ) {
-  const disconnectRdx = ctrl.$ngRedux.connect(selectFromState, actionCreators)(
-    ctrl
-  );
+  const disconnectRdx = ctrl.$ngRedux.connect(
+    selectFromState,
+    actionCreators
+  )(ctrl);
   const disconnectProps = reduxSelectDependsOnProperties(
     properties,
     selectFromState,
