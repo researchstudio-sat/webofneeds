@@ -29,7 +29,6 @@ import { Generator } from "sparqljs";
    *
    * **mandatory parameters:**
    *
-   * * args.type: the type of the need (e.g. 'won:Supply')
    * * args.title: a string with the title (e.g. 'Couch to give away')
    * * args.description: a longer string describing the need in detail
    *
@@ -138,6 +137,7 @@ import { Generator } from "sparqljs";
     const buildContentNode = (id, isOrSeeksData) => {
       let contentNode = {
         "@id": id,
+        "@type": isOrSeeksData.type,
         "won:hasAttachment": hasAttachmentUrls(isOrSeeksData)
           ? isOrSeeksData.attachmentUris.map(uri => ({ "@id": uri }))
           : undefined,

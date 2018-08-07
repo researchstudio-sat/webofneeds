@@ -11,7 +11,7 @@
     "geopoint": "^1.0.1",
     "identicon.js": "^2.3.2",
     "immutable": "^3.7.5",
-    "jsonld": "^1.0.1",
+    "jsonld": "^1.0.2",
     "leaflet": "^0.7.7",
     "loadcss": "^0.0.2",
     "n3": "^1.0.0-beta.1",
