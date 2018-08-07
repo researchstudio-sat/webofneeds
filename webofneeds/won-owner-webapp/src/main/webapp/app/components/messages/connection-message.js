@@ -332,7 +332,12 @@ function genComponentConf() {
         "proposes",
         "Ok, I am hereby making a proposal"
       );
-      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        undefined,
+        this.connectionUri,
+        true
+      );
     }
 
     proposeToCancel() {
@@ -342,7 +347,12 @@ function genComponentConf() {
         : this.message.get("remoteUri");
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
-      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        undefined,
+        this.connectionUri,
+        true
+      );
     }
 
     sendAccept() {
@@ -352,7 +362,12 @@ function genComponentConf() {
         "accepts",
         "I accept the following proposition"
       );
-      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        undefined,
+        this.connectionUri,
+        true
+      );
 
       this.markAsAccepted(true);
     }
@@ -367,7 +382,12 @@ function genComponentConf() {
         "retracts",
         "Retracting the message"
       );
-      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        undefined,
+        this.connectionUri,
+        true
+      );
 
       this.markAsRetracted(true);
     }
@@ -382,7 +402,12 @@ function genComponentConf() {
         "rejects",
         "Rejecting the message"
       );
-      this.connections__sendChatMessage(trimmedMsg, this.connectionUri, true);
+      this.connections__sendChatMessage(
+        trimmedMsg,
+        undefined,
+        this.connectionUri,
+        true
+      );
 
       this.markAsRejected(true);
     }

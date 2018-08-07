@@ -1,41 +1,214 @@
 @import "won";
 @import "button";
 @import "textfield";
+@import "sizing-utils";
+@import "speech-bubble";
+@import "animate";
 
 chat-textfield-simple {
   display: grid;
-  grid-gap: 0.5rem;
-  grid-template-columns: 1fr auto;
-  // grid-template-rows: auto;
-  // grid-template-areas:
-  //   "text button";
-  // "cnt cnt"
-  // "help help";
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
   min-width: 0; // so a size is specified and break-word works
 
+  .cts__details {
+    grid-area: details;
+    grid-row: 1 / span 1;
+    grid-column: 1 / span 3;
+    border: $thinGrayBorder;
+    background: $won-light-gray;
+    border-radius: 0.19rem;
+
+    $local-margin-bottom: 0.5rem;
+    $local-height: 15rem;
+
+    @include slideAnimationFixedHorizontal(
+      0.5s,
+      linear,
+      $local-height,
+      0,
+      0,
+      0,
+      $local-margin-bottom
+    );
+
+    margin-bottom: $local-margin-bottom;
+    @include speech-bubble-bottom(
+      $won-light-gray,
+      $won-line-gray,
+      $speechBubbleTailSize / 2,
+      $thinBorderWidth,
+      1.15rem
+    );
+    .cts__details__input {
+      height: $local-height;
+      max-height: $local-height;
+      padding: 0.5rem;
+      overflow-y: auto;
+      display: grid;
+      grid-gap: 0.5rem;
+      grid-template-rows: auto 1fr;
+      &__header {
+        display: grid;
+        grid-template-columns: auto auto 1fr auto auto;
+        grid-gap: 0.5rem;
+        font-size: $smallFontSize;
+        text-align: left;
+        min-width: 0;
+        align-items: center;
+        &__icon,
+        &__back {
+          --local-primary: #{$won-primary-color};
+          @include fixed-square(1.5rem);
+        }
+        &__back {
+          cursor: pointer;
+        }
+        &__label {
+          color: $won-primary-color;
+        }
+        &__discard,
+        &__add {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          color: $won-primary-color;
+          --local-primary: #{$won-primary-color};
+          &__icon {
+            @include fixed-square(1.5rem);
+          }
+          &__label {
+            padding-left: 0.25rem;
+          }
+        }
+      }
+      &__content {
+      }
+    }
+    .cts__details__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-gap: 0.5rem;
+      height: $local-height;
+      max-height: $local-height;
+      padding: 0.5rem;
+      overflow-y: auto;
+      &__detail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        --local-primary: #{$won-primary-text-color};
+        color: $won-primary-text-color;
+        &:hover {
+          cursor: pointer;
+          --local-primary: #{$won-primary-color};
+          color: $won-primary-color;
+        }
+        &__label {
+          font-size: $smallFontSize;
+          text-align: center;
+        }
+        &__icon {
+          @include fixed-square(1.5rem);
+        }
+      }
+    }
+  }
+  .cts__add {
+    grid-area: add;
+    grid-row: 2 / span 1;
+    grid-column: 1 / span 1;
+    @extend .won-button--filled;
+    border: $thinGrayBorder;
+    background: white;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    padding: 0.66rem;
+    --local-primary: #{$won-primary-text-color};
+    &:hover:not(:disabled) {
+      background: $won-primary-color;
+      --local-primary: #{$won-secondary-text-color};
+    }
+    &:disabled {
+      cursor: default;
+      background: $won-light-gray;
+      --local-primary: #{$won-line-gray};
+    }
+    &__icon {
+      @include fixed-square(1rem);
+    }
+  }
   .cts__text {
     grid-area: text;
-    grid-row: 1 / span 1;
-    grid-column: 1 / span 1;
+    grid-row: 2 / span 1;
+    grid-column: 2 / span 1;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    &:hover,
+    &:focus {
+      outline: 0;
+    }
   }
   .cts__submitbutton {
     grid-area: button;
-    grid-row: 1 / span 1;
-    grid-column: 2 / span 1;
+    grid-row: 2 / span 1;
+    grid-column: 3 / span 1;
+  }
+  .cts__additionalcontent {
+    grid-area: additionalcontent;
+    grid-column: 1 / span 3;
+    font-size: $smallFontSize;
+    &__header {
+    }
+    &__list {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      &__item {
+        padding: 0.25rem;
+        background: $won-secondary-color;
+        color: $won-secondary-text-color;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        margin-right: 0.25rem;
+        margin-top: 0.25rem;
+        &__label {
+          padding: 0 0.25rem;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          &:hover {
+            color: $won-primary-color;
+          }
+        }
+        &__discard,
+        &__icon {
+          @include fixed-square(1.5rem);
+          --local-primary: #{$won-secondary-text-color};
+          &:hover {
+            --local-primary: #{$won-primary-color};
+          }
+        }
+      }
+    }
   }
   .cts__charcount {
     grid-area: cnt;
-    grid-column: 1 / span 2;
+    grid-column: 1 / span 3;
   }
   .cts__helptext {
     grid-area: help;
-    grid-column: 1 / span 2;
+    grid-column: 1 / span 3;
   }
-
   .cts__submitbutton {
     @extend .won-button--filled;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
   }
-
   .cts__charcount,
   .cts__helptext {
     @include fine-print;

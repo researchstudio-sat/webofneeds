@@ -6,7 +6,6 @@ import ngAnimate from "angular-animate";
 
 import "ng-redux";
 import labelledHrModule from "./labelled-hr.js";
-import imageDropzoneModule from "./image-dropzone.js";
 import matchingContextModule from "./details/picker/matching-context-picker.js"; // TODO: should be renamed
 import createIsseeksModule from "./create-isseeks.js";
 import { get, getIn, attach, delay } from "../utils.js";
@@ -32,6 +31,7 @@ import monthPickerModule from "./details/picker/month-picker.js";
 import dropdownPickerModule from "./details/picker/dropdown-picker.js";
 import selectPickerModule from "./details/picker/select-picker.js";
 import rangePickerModule from "./details/picker/range-picker.js";
+import filePickerModule from "./details/picker/file-picker.js";
 
 const serviceDependencies = [
   "$ngRedux",
@@ -394,7 +394,6 @@ export default //.controller('CreateNeedController', [...serviceDependencies, Cr
 angular
   .module("won.owner.components.createPost", [
     labelledHrModule,
-    imageDropzoneModule,
     descriptionPickerModule,
     locationPickerModule,
     personPickerModule,
@@ -412,6 +411,7 @@ angular
     matchingContextModule,
     selectPickerModule,
     rangePickerModule,
+    filePickerModule,
     ngAnimate,
   ])
   .directive("wonCreatePost", genComponentConf).name;

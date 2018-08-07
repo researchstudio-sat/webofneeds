@@ -55,6 +55,11 @@
 
   flex-shrink: 0;
 
+  &:hover,
+  &:focus {
+    outline: 0;
+  }
+
   svg.won-button-icon {
     @include fixed-square($normalFontSize);
     margin-right: 0.5rem;

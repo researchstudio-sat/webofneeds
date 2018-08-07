@@ -1,6 +1,7 @@
 import Immutable from "immutable";
 import { msStringToDate, trigPrefixesAndBody } from "../../utils.js";
 import { isUriRead } from "../../won-localstorage.js";
+import { getAllDetails } from "../../won-utils.js";
 
 export function parseMessage(wonMessage, alreadyProcessed = false) {
   //seperating off header/@prefix-statements, so they can be folded in
@@ -15,6 +16,8 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
   const retractedMessages = wonMessage.getRetractMessages();
 
   const matchScoreFloat = parseFloat(wonMessage.getMatchScore());
+
+  const detailsToParse = getAllDetails();
 
   let parsedMessage = {
     belongsToUri: undefined,
@@ -93,6 +96,14 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     parsedMessage.belongsToUri = wonMessage.getReceiver();
   }
 
+  if (wonMessage.getCompactFramedMessageContent()) {
+    parsedMessage.data.content = generateContent(
+      Immutable.fromJS(wonMessage.getCompactFramedMessageContent()),
+      detailsToParse,
+      parsedMessage.data.content
+    );
+  }
+
   parsedMessage.data.hasContent = hasContent(parsedMessage.data.content);
   parsedMessage.data.hasReferences = hasReferences(
     parsedMessage.data.references
@@ -136,4 +147,29 @@ function hasReferences(refContent) {
 export function getHumanReadableStringFromMessage(message) {
   const text = message && message.getIn(["content", "text"]);
   return text;
+}
+
+/**
+ * Tries to extract all the detailsToParse from the given contentJsonLd
+ * uses the parseFromRdf function defined in the detail to extract the content
+ * uses the detail identifier as the key of the contentDetail that is to be added
+ * @param contentJsonLd
+ * @param detailsToParse
+ * @returns {{title: *, type: *}}
+ */
+function generateContent(contentJsonLd, detailsToParse, content) {
+  if (detailsToParse) {
+    for (const detailKey in detailsToParse) {
+      const detailToParse = detailsToParse[detailKey];
+      const detailIdentifier = detailToParse && detailToParse.identifier;
+      const detailValue =
+        detailToParse && detailToParse.parseFromRDF(contentJsonLd);
+
+      if (detailIdentifier && detailValue) {
+        content[detailIdentifier] = detailValue;
+      }
+    }
+  }
+
+  return content;
 }

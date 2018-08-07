@@ -19,6 +19,7 @@ import timeViewerModule from "./details/viewer/time-viewer.js";
 import dropdownViewerModule from "./details/viewer/dropdown-viewer.js";
 import selectViewerModule from "./details/viewer/select-viewer.js";
 import rangeViewerModule from "./details/viewer/range-viewer.js";
+import fileViewerModule from "./details/viewer/file-viewer.js";
 
 import { attach } from "../utils.js";
 import { getAllDetails } from "../won-utils.js";
@@ -119,6 +120,7 @@ angular
     monthViewerModule,
     selectViewerModule,
     rangeViewerModule,
+    fileViewerModule,
   ])
   .directive("detailViewerElement", [
     "$compile",

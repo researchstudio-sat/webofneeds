@@ -953,6 +953,7 @@ won.wonMessageFromJsonLd = async function(wonMessageAsJsonLD) {
   const wonMessage = new WonMessage(expandedJsonLd);
   await wonMessage.frameInPromise();
   await wonMessage.generateContentGraphTrig();
+  await wonMessage.generateCompactedFramedMessage();
   return wonMessage;
 };
 
@@ -1154,6 +1155,7 @@ WonMessage.prototype = {
           ),
           "@graph": contentGraphs,
         };
+        this.jsonldData = jsonldData;
         this.contentGraphTrig = await won.jsonLdToTrig(jsonldData);
         return this.contentGraphTrig;
       } catch (e) {
@@ -1169,7 +1171,32 @@ WonMessage.prototype = {
       }
     }
   },
+  generateCompactedFramedMessage: async function() {
+    //TODO: change it so it returns all the contentgraphscontent
+    if (this.compactFramedMessage) {
+      return this.compactFramedMessage;
+    }
+    if (this.framedMessage) {
+      try {
+        this.compactFramedMessage = await jsonld.compact(
+          this.framedMessage,
+          won.defaultContext
+        );
 
+        return this.compactFramedMessage;
+      } catch (e) {
+        const msg =
+          "Failed to generate jsonld for message " +
+          this.getMessageUri() +
+          "\n\n" +
+          e.message +
+          "\n\n" +
+          e.stack;
+        console.error(msg);
+        this.compactFramedMessageError = msg;
+      }
+    }
+  },
   frameInPromise: function() {
     if (this.framedMessage) {
       return Promise.resolve(this.framedMessage);
@@ -1236,6 +1263,14 @@ WonMessage.prototype = {
   },
   getContentGraphsAsJsonLD: function() {
     return JSON.stringify(this.getContentGraphs());
+  },
+  getCompactFramedMessageContent: function() {
+    // Returns the compacted Framed Message depending on the message direction
+    if (this.isFromOwner()) {
+      return this.compactFramedMessage;
+    } else {
+      return this.compactFramedMessage["msg:hasCorrespondingRemoteMessage"];
+    }
   },
   getMessageType: function() {
     return this.getProperty(
@@ -1925,15 +1960,6 @@ won.MessageBuilder.prototype = {
   },
   addContentGraphData: function(predicate, object) {
     this.getContentGraphNode()[predicate] = object;
-    return this;
-  },
-
-  addUnsetRelevantMessage: function(messageUri) {
-    this.getContentGraphNode()[won.WONMSG.unsetRelevantMessage] = {
-      //Message uri to set unrelevant
-      "@id": messageUri,
-    };
-
     return this;
   },
 

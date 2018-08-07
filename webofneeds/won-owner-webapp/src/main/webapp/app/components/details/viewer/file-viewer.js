@@ -4,21 +4,35 @@ import { attach } from "../../../utils.js";
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
-        <div class="tv__header">
-          <svg class="tv__header__icon" ng-if="self.detail.icon">
+        <div class="filev__header">
+          <svg class="filev__header__icon" ng-if="self.detail.icon">
               <use xlink:href={{self.detail.icon}} href={{self.detail.icon}}></use>
           </svg>
-          <span class="tv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
+          <span class="filev__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
-        <div class="tv__content">
-          <div class="tv__content__tag" ng-repeat="tag in self.content.toArray()">{{tag}}</div>
+        <div class="filev__content" ng-if="self.content && self.content.size > 0">
+          <a class="filev__content__item"
+            ng-repeat="file in self.content.toArray()">
+            <div class="filev__content__item__label">
+              {{ file.get('name') }}
+            </div>
+            <img class="filev__content__item__image"
+              ng-if="self.isImage(file)"
+              alt="{{file.get('name')}}"
+              ng-src="data:{{file.get('type')}};base64,{{file.get('data')}}"/>
+            <svg ng-if="!self.isImage(file)"
+              class="filev__content__item__typeicon">
+              <use xlink:href="#ico36_uc_transport_demand" href="#ico36_uc_transport_demand"></use>
+            </svg>
+          </a>
         </div>
+      </div>
     `;
 
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      window.tv4dbg = this;
+      window.filev4dbg = this;
 
       this.$scope.$watch("self.content", (newContent, prevContent) =>
         this.updatedContent(newContent, prevContent)
@@ -38,6 +52,10 @@ function genComponentConf() {
         this.content = newContent;
       }
     }
+
+    isImage(file) {
+      return file && /^image\//.test(file.get("type"));
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -55,5 +73,5 @@ function genComponentConf() {
 }
 
 export default angular
-  .module("won.owner.components.tagsViewer", [])
-  .directive("wonTagsViewer", genComponentConf).name;
+  .module("won.owner.components.fileViewer", [])
+  .directive("wonFileViewer", genComponentConf).name;

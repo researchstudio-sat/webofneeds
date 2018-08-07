@@ -9,7 +9,7 @@ import { checkHttpStatus, urisToLookupMap, is } from "./utils.js";
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
-import { getRandomWonId } from "./won-utils.js";
+import { getRandomWonId, getAllDetails } from "./won-utils.js";
 import { isConnUriClosed } from "./won-localstorage.js";
 
 export const emptyDataset = Immutable.fromJS({
@@ -200,6 +200,7 @@ export function buildConnectMessage({
 
 export function buildChatMessage({
   chatMessage,
+  additionalContent,
   connectionUri,
   ownNeedUri,
   theirNeedUri,
@@ -239,12 +240,42 @@ export function buildChatMessage({
 
       if (isTTL && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);
-      } else if (!isTTL && chatMessage) {
+      } else if (!isTTL && (chatMessage || additionalContent)) {
         //add the chatMessage as normal text message
-        wonMessageBuilder.addContentGraphData(
-          won.WON.hasTextMessage,
-          chatMessage
-        );
+        if (chatMessage) {
+          wonMessageBuilder.addContentGraphData(
+            won.WON.hasTextMessage,
+            chatMessage
+          );
+        }
+
+        if (additionalContent) {
+          const contentNode = wonMessageBuilder.getContentGraphNode();
+          const detailList = getAllDetails();
+          additionalContent.forEach((value, key) => {
+            const detail = detailList[key];
+            const detailRDF =
+              detail &&
+              detail.parseToRDF({
+                value: value,
+                identifier: detail.identifier,
+              });
+
+            if (detailRDF) {
+              for (const key in detailRDF) {
+                //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
+                if (contentNode[key]) {
+                  if (!Array.isArray(contentNode[key]))
+                    contentNode[key] = Array.of(contentNode[key]);
+
+                  contentNode[key] = contentNode[key].concat(detailRDF[key]);
+                } else {
+                  contentNode[key] = detailRDF[key];
+                }
+              }
+            }
+          });
+        }
       } else {
         throw new Error(
           "No textmessage or valid graph as payload of chat message:" +
