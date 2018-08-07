@@ -1264,8 +1264,13 @@ WonMessage.prototype = {
   getContentGraphsAsJsonLD: function() {
     return JSON.stringify(this.getContentGraphs());
   },
-  getCompactFramedMessage: function() {
-    return this.compactFramedMessage;
+  getCompactFramedMessageContent: function() {
+    // Returns the compacted Framed Message depending on the message direction
+    if (this.isFromOwner()) {
+      return this.compactFramedMessage;
+    } else {
+      return this.compactFramedMessage["msg:hasCorrespondingRemoteMessage"];
+    }
   },
   getMessageType: function() {
     return this.getProperty(
