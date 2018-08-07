@@ -33,22 +33,26 @@ function genComponentConf() {
     }
 
     fileDropped(f) {
-      readAsDataURL(f)
-        .then(dataUrl => {
-          this.$scope.$digest(); // so the preview is displayed
+      if (this.accepts && new RegExp(this.accepts).test(f.type)) {
+        readAsDataURL(f)
+          .then(dataUrl => {
+            this.$scope.$digest(); // so the preview is displayed
 
-          const b64data = dataUrl.split("base64,")[1];
-          const imageData = {
-            name: f.name,
-            type: f.type,
-            data: b64data,
-          };
-          return imageData;
-        })
-        .then(imageData => {
-          this.onImagePicked({ image: imageData });
-          dispatchEvent(this.$element[0], "image-picked", imageData);
-        });
+            const b64data = dataUrl.split("base64,")[1];
+            const fileData = {
+              name: f.name,
+              type: f.type,
+              data: b64data,
+            };
+            return fileData;
+          })
+          .then(imageData => {
+            this.onImagePicked({ image: imageData });
+            dispatchEvent(this.$element[0], "image-picked", imageData);
+          });
+      } else {
+        console.log("FILE TYPE NOT ACCEPTED");
+      }
     }
   }
   Controller.$inject = serviceDependencies;
