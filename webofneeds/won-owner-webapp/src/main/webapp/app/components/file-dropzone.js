@@ -33,7 +33,11 @@ function genComponentConf() {
     }
 
     fileDropped(f) {
-      if (this.accepts && new RegExp(this.accepts).test(f.type)) {
+      if (
+        !this.accepts ||
+        this.accepts === "*/*" ||
+        (this.accepts && new RegExp(this.accepts).test(f.type))
+      ) {
         readAsDataURL(f)
           .then(dataUrl => {
             this.$scope.$digest(); // so the preview is displayed
