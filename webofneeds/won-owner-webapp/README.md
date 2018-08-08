@@ -145,8 +145,10 @@ $ngRedux.getState();
                    agreementUris: Immutable.Set(), //agreementUris with the current state uris of the connection
                    cancellationPendingAgreementUris: Immutable.Set(), ///proposeToCancelUris with the current state uris of the connection
                    pendingProposalUris: Immutable.Set(), //pendingProposalUris with the current state uris of the connection
+                   isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
                },
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
+               isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
                showAgreementData: true | false // default ist false, wheather or not the agreementDataPanel is active
                unread: true|false, //whether or not this connection is new (or already seen if you will)
