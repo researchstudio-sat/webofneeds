@@ -29,6 +29,7 @@ import {
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
   setConnectionLoadingMessages,
+  setConnectionLoadingAgreementData,
   markConnectionAsRead,
   selectNeedByConnectionUri,
   changeConnectionState,
@@ -509,6 +510,12 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri
       );
 
+    case actionTypes.connections.setLoadingAgreementData:
+      return setConnectionLoadingAgreementData(
+        allNeedsInState,
+        action.payload.connectionUri,
+        action.payload.isLoadingAgreementData
+      );
     case actionTypes.connections.showAgreementData:
       return setShowAgreementData(
         allNeedsInState,
