@@ -120,6 +120,16 @@ won-post-messages {
     &.won-agreement-content {
       background: $won-lighter-gray;
     }
+    &__agreement__loadingtext {
+      font-size: $smallFontSize;
+      color: $won-subtitle-gray;
+      text-align: center;
+    }
+    &__agreement__emptytext {
+      text-align: center;
+      font-size: $normalFontSize;
+      color: $won-subtitle-gray;
+    }
     &__agreement__title {
       font-size: $mediumFontSize;
       font-weight: bold;
@@ -127,6 +137,7 @@ won-post-messages {
       padding-bottom: 0.5rem;
       margin-bottom: 0.5rem;
     }
+
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
       width: 100%;

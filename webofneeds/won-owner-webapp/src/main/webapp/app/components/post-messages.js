@@ -81,6 +81,9 @@ function genComponentConf() {
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
               </svg>
             </div>
+            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.connection.get('isLoadingMessages')">
+              Calculating Agreement Status
+            </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
                 ng-if="!self.isSuggested && !self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
                 ng-click="self.loadPreviousMessages()">
@@ -92,6 +95,9 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
             </won-connection-message>
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementUris && self.hasCancellationPendingAgreementUris && self.hasPendingProposalUris) && !self.connection.get('isLoadingMessages')">
+              No Agreements within this Conversation
+            </div>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.connection.get('isLoadingMessages')">
               Agreements
             </div>
