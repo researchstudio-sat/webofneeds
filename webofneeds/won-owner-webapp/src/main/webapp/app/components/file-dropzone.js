@@ -5,6 +5,7 @@ import angular from "angular";
 import "angular-sanitize";
 import enterModule from "../directives/enter.js";
 import { dispatchEvent, attach, readAsDataURL } from "../utils.js";
+import globToRegexp from "glob-to-regexp";
 
 function genComponentConf() {
   let template = `
@@ -35,8 +36,7 @@ function genComponentConf() {
     fileDropped(f) {
       if (
         !this.accepts ||
-        this.accepts === "*/*" ||
-        (this.accepts && new RegExp(this.accepts).test(f.type))
+        (this.accepts && globToRegexp(this.accepts).test(f.type))
       ) {
         readAsDataURL(f)
           .then(dataUrl => {

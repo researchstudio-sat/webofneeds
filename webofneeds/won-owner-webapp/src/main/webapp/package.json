@@ -9,6 +9,7 @@
     "angular-sanitize": "1.6.6",
     "angular-ui-router": "1.0.3",
     "geopoint": "^1.0.1",
+    "glob-to-regexp": "^0.4.0",
     "identicon.js": "^2.3.2",
     "immutable": "^3.8.2",
     "jsonld": "^1.0.2",
