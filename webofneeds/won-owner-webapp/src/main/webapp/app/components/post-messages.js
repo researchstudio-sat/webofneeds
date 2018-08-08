@@ -76,16 +76,16 @@ function genComponentConf() {
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.connection.get('isLoadingMessages')">
+                ng-if="self.isLoadingMessages || self.isLoadingAgreementData">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
               </svg>
             </div>
-            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.connection.isLoadingAgreementData">
               Calculating Agreement Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
-                ng-if="!self.isSuggested && !self.showAgreementData && !self.connection.get('isLoadingMessages') && !self.allLoaded"
+                ng-if="!self.isSuggested && !self.showAgreementData && !self.isLoadingMessages && !self.allMessagesLoaded"
                 ng-click="self.loadPreviousMessages()">
                 Load previous messages
             </button>
@@ -95,32 +95,32 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementUris || self.hasCancellationPendingAgreementUris || self.hasPendingProposalUris) && !self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementUris || self.hasCancellationPendingAgreementUris || self.hasPendingProposalUris) && !self.isLoadingAgreementData">
               No Agreements within this Conversation
             </div>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.isLoadingAgreementData">
               Agreements
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
+              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
               ng-repeat="agreement in self.agreementUrisArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('stateUri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris && !self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris && !self.isLoadingAgreementData">
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
+              ng-if="self.showAgreementData && !self.isLoadingMessages"
               ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
               connection-uri="self.connectionUri"
               message-uri="proposeToCancel.get('stateUri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris && !self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris && !self.isLoadingAgreementData">
               Open Proposals
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.connection.get('isLoadingMessages')"
+              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
               ng-repeat="proposal in self.pendingProposalUrisArray"
               connection-uri="self.connectionUri"
               message-uri="proposal.get('stateUri')">
@@ -212,7 +212,7 @@ function genComponentConf() {
         const theirNeedUri = connection && connection.get("remoteNeedUri");
         const theirNeed = theirNeedUri && state.getIn(["needs", theirNeedUri]);
         const chatMessages = connection && connection.get("messages");
-        const allLoaded =
+        const allMessagesLoaded =
           chatMessages &&
           chatMessages.filter(
             msg => msg.get("messageType") === won.WONMSG.connectMessage
@@ -307,6 +307,8 @@ function genComponentConf() {
           chatMessages,
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
+          isLoadingAgreementData:
+            connection && connection.get("isLoadingAgreementData"),
           showAgreementData: connection && connection.get("showAgreementData"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
@@ -320,9 +322,10 @@ function genComponentConf() {
           debugmode: won.debugmode,
           shouldShowRdf: state.get("showRdf"),
           // if the connect-message is here, everything else should be as well
-          allLoaded,
+          allMessagesLoaded,
           //agreementUrisToDisplay
           agreementData,
+          agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
           hasAgreementUris: agreementUris && agreementUris.size > 0,
           hasCancellationPendingAgreementUris:
             cancellationPendingAgreementUris &&
@@ -342,9 +345,10 @@ function genComponentConf() {
 
       this.snapToBottom();
 
-      this.$scope.$watchGroup(["self.connection"], () =>
-        this.ensureMessagesAreLoaded()
-      );
+      this.$scope.$watchGroup(["self.connection"], () => {
+        this.ensureMessagesAreLoaded();
+        this.ensureAgreementDataIsLoaded();
+      });
 
       this.$scope.$watch(
         () => this.sortedMessages && this.sortedMessages.length, // trigger if there's messages added (or removed)
@@ -375,8 +379,8 @@ function genComponentConf() {
         const INITIAL_MESSAGECOUNT = 15;
         if (
           this.connection &&
-          !this.connection.get("isLoadingMessages") &&
-          !(this.allLoaded || this.connection.get("messages").size > 0)
+          !this.isLoadingMessages &&
+          !(this.allMessagesLoaded || this.connection.get("messages").size > 0)
         ) {
           this.connections__showLatestMessages(
             this.connection.get("uri"),
@@ -386,10 +390,23 @@ function genComponentConf() {
       });
     }
 
+    ensureAgreementDataIsLoaded() {
+      delay(0).then(() => {
+        if (
+          this.connection &&
+          this.isConnected &&
+          !this.isLoadingAgreementData &&
+          !this.agreementDataLoaded
+        ) {
+          this.getAgreementData();
+        }
+      });
+    }
+
     getAgreementData() {
-      this.connections__setLoadingMessages({
+      this.connections__setLoadingAgreementData({
         connectionUri: this.connectionUri,
-        isLoadingMessages: true,
+        isLoadingAgreementData: true,
       });
 
       this.getAgreementDataUris();
@@ -471,7 +488,7 @@ function genComponentConf() {
     }
 
     showAgreementDataField() {
-      this.getAgreementData();
+      //this.getAgreementData();
       this.setShowAgreementData(true);
     }
 
@@ -561,17 +578,17 @@ function genComponentConf() {
         })
         .then(() => {
           if (!hasChanged) {
-            this.connections__setLoadingMessages({
+            this.connections__setLoadingAgreementData({
               connectionUri: this.connectionUri,
-              isLoadingMessages: false,
+              isLoadingAgreementData: false,
             });
           }
         })
         .catch(error => {
           console.error("Error:", error);
-          this.connections__setLoadingMessages({
+          this.connections__setLoadingAgreementData({
             connectionUri: this.connectionUri,
-            isLoadingMessages: false,
+            isLoadingAgreementData: false,
           });
         });
     }
