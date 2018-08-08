@@ -81,7 +81,7 @@ function genComponentConf() {
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
               </svg>
             </div>
-            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.connection.isLoadingAgreementData">
+            <div class="pm__content__agreement__loadingtext"  ng-if="self.showAgreementData && self.isLoadingAgreementData">
               Calculating Agreement Status
             </div>
             <button class="pm__content__loadbutton won-button--outlined thin red"
