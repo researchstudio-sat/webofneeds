@@ -131,13 +131,13 @@ won-post-messages {
       color: $won-subtitle-gray;
     }
     &__agreement__title {
-      font-size: $mediumFontSize;
+      color: $won-subtitle-gray;
+      font-size: $normalFontSize;
       font-weight: bold;
       border-bottom: $thinGrayBorder;
-      padding-bottom: 0.5rem;
-      margin-bottom: 0.5rem;
+      padding-bottom: 0.25rem;
+      margin-bottom: 0.25rem;
     }
-
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
     &__loadspinner {
       width: 100%;
