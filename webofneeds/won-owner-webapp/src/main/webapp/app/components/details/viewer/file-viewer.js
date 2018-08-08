@@ -27,8 +27,7 @@ function genComponentConf() {
               </svg>
             </a>
             <a class="filev__content__item__inner"
-              ng-href="data:{{file.get('type')}};base64,{{file.get('data')}}"
-              target="_blank"
+              ng-click="self.openImageInNewTab(file)"
               ng-if="self.isImage(file)">
               <div class="filev__content__item__inner__label">
                 {{ file.get('name') }}
@@ -68,6 +67,16 @@ function genComponentConf() {
 
     isImage(file) {
       return file && /^image\//.test(file.get("type"));
+    }
+
+    openImageInNewTab(file) {
+      if (file) {
+        let image = new Image();
+        image.src = "data:" + file.get("type") + ";base64," + file.get("data");
+
+        let w = window.open("");
+        w.document.write(image.outerHTML);
+      }
     }
   }
   Controller.$inject = serviceDependencies;
