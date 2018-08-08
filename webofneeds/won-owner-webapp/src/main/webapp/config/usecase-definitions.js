@@ -2,6 +2,7 @@ import { is } from "../app/utils.js";
 import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
+import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
 
 export const emptyDraft = {
   is: {},
@@ -174,6 +175,7 @@ const socialUseCases = {
     identifier: "lunch",
     label: "Get lunch",
     icon: "#ico36_uc_meal-half",
+    doNotMatchAfter: findLatestIntervallEndInJsonLd,
     draft: {
       ...emptyDraft,
       is: {

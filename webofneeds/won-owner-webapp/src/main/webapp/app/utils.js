@@ -1217,3 +1217,80 @@ export function callBuffer(fn, delay = 1000) {
   };
   return buffer;
 }
+
+/**
+ * NOTE: don't pass recursive structures!
+ * NOTE: don't pass immutablejs structures
+ * @param {*} fieldName
+ * @param {*} obj a (nested) json-structure
+ * @param {*} _acc array that's used as accumulator.
+ * @returns an array with the values of all occurances of `obj[fieldName]`, `obj[...][fieldNamE]` etc.
+ */
+export function findAllFieldOccurancesRecursively(fieldName, obj, _acc = []) {
+  if (!obj) {
+    return _acc;
+  }
+  if (obj[fieldName]) {
+    _acc.push(obj[fieldName]);
+  }
+  if (obj.toJS && obj.get) {
+    /* obj is an immutabljs-object
+             * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+             * but that would require including immutable as dependency her and it'd be better
+             * to keep this library independent of anything.
+             */
+
+    obj.forEach(val => {
+      // iterate and recurse down
+      findAllFieldOccurancesRecursively(fieldName, val, _acc);
+    });
+  } else if (is("Array", obj) || is("Object", obj)) {
+    // vannilla-js array or object
+    Object.values(obj).forEach(val => {
+      // iterate and recurse down
+      findAllFieldOccurancesRecursively(fieldName, val, _acc);
+    });
+  }
+
+  return _acc;
+}
+
+/**
+ * Takes an `xsd:date` or `xsd:datetime` string and returns a `Date` that marks
+ * the exact time (for `xsd:datetime`) or the end of the year, month or day (for `xsd:date`)
+ * e.g. xsd:datetime: "2011-04-11T10:20:30Z"
+ * e.g. xsd:date: "2011-04-11"
+ *
+ * @param {*} xsdDateStr
+ */
+export function endOfXsdDateInterval(xsdDateStr) {
+  // "2011-04-11T10:20:30Z".split(/[-T]/) => ["2011", "04", "11", "10:20:30Z"]
+  // "2011-04-11".split(/[-T]/) => ["2011", "04", "11"]
+  const split = xsdDateStr.split(/[-T]/);
+  if (split.length > 3) {
+    // precise datetime
+    return new Date(xsdDateStr);
+  } else if (split.length === 3) {
+    // end of day
+    const year = split[0];
+    const monthIdx = split[1] - 1;
+    const day = split[2];
+    return new Date(year, monthIdx, day, 23, 59, 59);
+  } else if (split.length === 2) {
+    // end of month
+    const year = split[0];
+    const monthIdx = split[1] - 1;
+    const firstOfNextMonth = new Date(year, monthIdx + 1, 1, 23, 59, 59);
+    return new Date(firstOfNextMonth - 1000 * 60 * 60 * 24);
+  } else if (split.length === 1) {
+    // end of year
+    const year = split[0];
+    const monthIdx = 11;
+    return new Date(year, monthIdx, 31, 23, 59, 59);
+  } else {
+    console.error(
+      "Found unexpected date when calculating exact end-datetime of `xsd:date` string: ",
+      xsdDateStr
+    );
+  }
+}
