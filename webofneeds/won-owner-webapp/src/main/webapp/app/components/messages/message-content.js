@@ -195,7 +195,7 @@ export default angular
           if (!customTag) return;
 
           const customElem = angular.element(
-            `<${customTag} detail="detail" content="content"></${customTag}>`
+            `<${customTag} class="won-in-message" detail="detail" content="content"></${customTag}>`
           );
 
           element.append($compile(customElem)(scope));

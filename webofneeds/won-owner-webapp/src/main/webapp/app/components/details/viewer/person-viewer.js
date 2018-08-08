@@ -13,37 +13,32 @@ function genComponentConf() {
           <span class="pv__header__label" ng-if="self.detail.label">{{self.detail.label}}</span>
         </div>
         <div class="pv__content">
-          <div class="pv__content__detail" ng-if="self.content.get('title')">
-            <div class="pv__content__detail__label">
-              Title
-            </div>
-            <div class="pv__content__detail__value">
-              {{self.content.get('title')}}
-            </div>
+          <div class="pv__content__label" ng-if="self.content.get('title')">
+            Title
           </div>
-          <div class="pv__content__detail" ng-if="self.content.get('name')">
-            <div class="pv__content__detail__label">
-              Name
-            </div>
-            <div class="pv__content__detail__value">
-              {{self.content.get('name')}}
-            </div>
+          <div class="pv__content__value" ng-if="self.content.get('title')">
+            {{self.content.get('title')}}
           </div>
-          <div class="pv__content__detail" ng-if="self.content.get('position')">
-            <div class="pv__content__detail__label">
-              Position
-            </div>
-            <div class="pv__content__detail__value">
-              {{self.content.get('position')}}
-            </div>
+
+          <div class="pv__content__label" ng-if="self.content.get('name')">
+            Name
           </div>
-          <div class="pv__content__detail" ng-if="self.content.get('company')">
-            <div class="pv__content__detail__label">
-              Company
-            </div>
-            <div class="pv__content__detail__value">
-              {{self.content.get('company')}}
-            </div>
+          <div class="pv__content__value" ng-if="self.content.get('name')">
+            {{self.content.get('name')}}
+          </div>
+
+          <div class="pv__content__label" ng-if="self.content.get('position')">
+            Position
+          </div>
+          <div class="pv__content__value" ng-if="self.content.get('position')">
+            {{self.content.get('position')}}
+          </div>
+
+          <div class="pv__content__label" ng-if="self.content.get('company')">
+            Company
+          </div>
+          <div class="pv__content__value" ng-if="self.content.get('company')">
+            {{self.content.get('company')}}
           </div>
         </div>
     `;
