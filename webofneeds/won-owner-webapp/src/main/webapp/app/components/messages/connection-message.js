@@ -22,6 +22,9 @@ import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
 
+import "style/_connection-message.scss";
+import "style/_rdflink.scss";
+
 const MESSAGE_READ_TIMEOUT = 1500;
 
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];

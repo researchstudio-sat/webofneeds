@@ -1,13 +1,14 @@
 import * as path from "path";
 import { Configuration } from "webpack";
 import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
-import * as SassImporter from "node-sass-import-once";
 import * as UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import * as OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import * as SpriteLoaderPlugin from "svg-sprite-loader/plugin";
 import * as CopyWebpackPlugin from "copy-webpack-plugin";
 import * as WatchTimePlugin from "webpack-watch-time-plugin";
 import * as UnusedWebpackPlugin from "unused-webpack-plugin";
+import * as DartSass from "dart-sass";
+import * as Fiber from "fibers";
 
 export default config;
 
@@ -34,6 +35,7 @@ function config(env, argv): Configuration {
       filename: "app_jspm.bundle.js",
     },
     resolve: {
+      modules: [__dirname, "node_modules"],
       alias: {
         fetch: "whatwg-fetch",
         "rdfstore-js$": path.resolve(
@@ -76,14 +78,14 @@ function config(env, argv): Configuration {
           ],
         },
         {
-          test: /\.scss$/,
+          test: /\.s?css$/,
           use: [
             MiniCssExtractPlugin.loader,
             {
               loader: "css-loader",
               options: {
                 sourceMap: mode == "development",
-                minimize: mode == "production",
+                minimize: true,
                 import: false,
                 url: false,
               },
@@ -95,7 +97,8 @@ function config(env, argv): Configuration {
               loader: "sass-loader",
               options: {
                 sourceMap: mode == "development",
-                importer: SassImporter,
+                implementation: DartSass,
+                fiber: Fiber,
               },
             },
           ],
@@ -156,5 +159,8 @@ function config(env, argv): Configuration {
       }),
     ],
     devtool: "source-map",
+    stats: {
+      children: false,
+    },
   };
 }

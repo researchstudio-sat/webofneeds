@@ -1,6 +1,7 @@
 @import "won-config";
 @import "underlined-tabs";
 @import "sizing-utils";
+@import "tri-aligned";
 
 @mixin title-bar($prefix) {
   background-color: $won-light-gray;

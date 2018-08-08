@@ -9,6 +9,8 @@ import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
 import { callAgreementEventFetch } from "../../won-message-utils.js";
 
+import "style/_referenced-message-content.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {

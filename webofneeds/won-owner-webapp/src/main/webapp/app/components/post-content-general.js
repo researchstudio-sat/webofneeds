@@ -11,6 +11,8 @@ import { connect2Redux } from "../won-utils.js";
 import { selectLastUpdateTime } from "../selectors.js";
 import { actionCreators } from "../actions/actions.js";
 
+import "style/_post-content-general.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `

@@ -17,6 +17,9 @@ import {
 } from "../../selectors.js";
 import { resetParams } from "../../configRouting.js";
 
+import "style/_connections.scss";
+import "style/_responsiveness-utils.scss";
+
 const serviceDependencies = ["$element", "$ngRedux", "$scope"];
 
 class ConnectionsController {

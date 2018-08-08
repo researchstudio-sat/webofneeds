@@ -1,60 +1,7 @@
-//span the following over the whole scss to win specificity battles
-//#body-id {
-
-$skinningTestVar: --skinning-test-var;
-:root {
-  //--skinning-test-var:  rgb(54, 54, 158);
-}
-// a {
-//   background-color: var($skinningTestVar) !important;
-// }
-
-@import "reset";
-
-@import "won-config";
-
-@import "fonts";
-@import "flex-layout";
 @import "sizing-utils";
-@import "positioning-utils";
-@import "speech-bubble";
-@import "square-image";
-@import "tri-aligned";
-@import "border-utils";
-@import "responsiveness-utils";
-
 @import "text";
-
-// global styling
-
-/*
- * form elements don't inherit the font-family so we
- * need to set it manually here
- */
-button,
-input,
-textarea {
-  font-family: inherit;
-  font-weight: inherit;
-}
-
-.rdflink__small {
-  @include fixed-square($iconSize);
-}
-
-.rdflink {
-  display: flex;
-  align-items: center;
-  margin: 0.5rem 0;
-
-  .rdflink__label {
-    padding-left: 0.5rem;
-
-    &:hover {
-      color: $won-primary-color;
-    }
-  }
-}
+@import "flex-layout";
+@import "reset";
 
 body {
   //this font will be inherited down the cascade
@@ -70,16 +17,6 @@ body {
     flex-grow: 1;
   }
 }
-
-@import "topnav";
-@import "login";
-@import "need-tab-bar";
-@import "main-tab-bar";
-@import "create-need";
-@import "visitor-title-bar";
-@import "settings-tab-bar";
-
-@import "button";
 
 input[type="text"],
 input[type="password"],
@@ -156,29 +93,6 @@ svg {
   user-select: none;
 }
 
-@import "post-info";
-@import "post-messages";
-@import "create-post";
-@import "create-post-item";
-
 //TODO in topnav, make create-button black when the dialog is open
 //TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
 //TODO enable keyboard selection. add aria-information
-
-@import "typeselect";
-
-@import "labelledhr";
-@import "about";
-@import "signup";
-@import "accordion";
-@import "flexgrid";
-@import "settings";
-@import "connections";
-@import "feedback-grid";
-@import "post-visitor";
-@import "connections-map";
-@import "covering-dropdown";
-@import "tab";
-@import "connection-indicators";
-@import "post-share-link";
-@import "context-dropdown";

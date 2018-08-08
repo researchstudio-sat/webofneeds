@@ -20,6 +20,8 @@ import { attach, delay, sortByDate, get } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
 
+import "style/_connections-overview.scss";
+
 import {
   selectAllNeeds,
   selectRouterParams,

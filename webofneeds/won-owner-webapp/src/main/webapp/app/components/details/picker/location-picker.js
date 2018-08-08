@@ -18,6 +18,10 @@ import { doneTypingBufferNg, DomCache } from "../../../cstm-ng-utils.js";
 
 import { initLeaflet } from "../../../won-utils.js";
 
+import "style/_locationpicker.scss";
+
+import "leaflet/dist/leaflet.css";
+
 const serviceDependencies = ["$scope", "$element", "$sce"];
 function genComponentConf() {
   let template = `

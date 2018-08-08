@@ -1,6 +1,6 @@
 @import "won-config";
-@import "text";
 @import "textfield";
+@import "sizing-utils";
 
 won-ttl-picker {
   display: grid;
@@ -19,6 +19,8 @@ won-ttl-picker {
     }
 
     .ttlp__input__inner {
+      @extend .won-txt;
+      @extend .won-txt--code;
       $verticalPadding: calcVerticalPaddingToHeight(
         $normalFontSize,
         22/16,

@@ -14,6 +14,8 @@ import loggedInMenuModule from "./logged-in-menu.js";
 import * as srefUtils from "../sref-utils.js";
 import { isPrivateUser } from "../selectors.js";
 
+import "style/_login.scss";
+
 function genLogoutConf() {
   let template = `
         <won-dropdown class="dd-right-aligned-header">

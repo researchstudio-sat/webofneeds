@@ -1,6 +1,18 @@
 @import "won-config";
 @import "fonts";
 
+@mixin carretSized {
+  //the small down-arrow
+  /*
+  // without svg-included margins
+  @include fixed-height(0.5rem);
+  @include fixed-width(0.875rem);
+  */
+
+  // with svg-included margins
+  @include fixed-square(1rem);
+}
+
 @mixin fixed-height($h) {
   height: $h;
   min-height: $h;

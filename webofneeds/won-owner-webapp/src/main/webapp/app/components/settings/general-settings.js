@@ -3,6 +3,8 @@ import accountSettingsModule from "../settings/account-settings.js";
 import addressSettingsModule from "../settings/address-settings.js";
 import notificationSettingsModule from "../settings/notification-settings.js";
 
+import "style/_settings.scss";
+
 function genComponentConf() {
   let template = `
         <won-account-settings></won-account-settings>

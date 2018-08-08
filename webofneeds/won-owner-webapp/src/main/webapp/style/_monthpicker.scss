@@ -1,5 +1,6 @@
 @import "won-config";
 @import "textfield";
+@import "sizing-utils";
 
 won-month-picker {
   .monthp__input {
@@ -15,6 +16,7 @@ won-month-picker {
     }
 
     .monthp__input__inner {
+      @extend .won-txt;
       width: 100%;
       box-sizing: border-box;
       border: $thinGrayBorder;

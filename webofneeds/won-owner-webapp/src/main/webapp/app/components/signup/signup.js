@@ -12,6 +12,8 @@ import topNavModule from "../topnav.js";
 
 import * as srefUtils from "../../sref-utils.js";
 
+import "style/_signup.scss";
+
 const serviceDependencies = [
   "$ngRedux",
   "$scope",

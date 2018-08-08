@@ -13,6 +13,8 @@ import { attach, sortByDate } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
+import "style/_connection-indicators.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `

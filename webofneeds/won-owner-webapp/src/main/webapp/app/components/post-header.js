@@ -13,6 +13,8 @@ import { selectLastUpdateTime } from "../selectors.js";
 import won from "../won-es6.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
 
+import "style/_post-header.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 function genComponentConf() {
   let template = `

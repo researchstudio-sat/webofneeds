@@ -3,6 +3,8 @@ import { attach, delay } from "../../../utils.js";
 import { DomCache } from "../../../cstm-ng-utils.js";
 import wonInput from "../../../directives/input.js";
 
+import "style/_titlepicker.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `
@@ -15,7 +17,7 @@ function genComponentConf() {
           </svg>
           <input
               type="text"
-              class="titlep__input__inner won-txt"
+              class="titlep__input__inner"
               placeholder="{{self.detail.placeholder}}"
               won-input="::self.updateTitle()" />
       </div>

@@ -2,6 +2,8 @@ import angular from "angular";
 import { attach, delay } from "../../../utils.js";
 import wonInput from "../../../directives/input.js";
 
+import "style/_rangepicker.scss";
+
 const serviceDependencies = ["$scope", "$element"];
 function genComponentConf() {
   let template = `

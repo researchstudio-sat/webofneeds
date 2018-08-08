@@ -7,6 +7,8 @@ import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import trigModule from "../trig.js";
 
+import "style/_combined-message-content.scss";
+
 const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {

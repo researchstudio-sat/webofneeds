@@ -10,6 +10,8 @@ import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { selectOpenPostUri } from "../selectors.js";
 
+import "style/_context-dropdown.scss";
+
 const serviceDependencies = ["$scope", "$ngRedux", "$element"];
 function genComponentConf() {
   let template = `
