@@ -221,7 +221,9 @@ export function processConnectionMessage(event) {
     );
 
     callAgreementsFetch(url).then(response => {
-      console.log("response : ", response);
+      if (response && response.length > 0) {
+        console.log("agreement response : ", response);
+      }
       for (const effect of response) {
         console.log("effect : ", effect);
         switch (effect.type) {

@@ -170,8 +170,9 @@ function genComponentConf() {
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
-            !message.get("hasReferences") &&
-            message.get("hasContent"), //allow showing details only when the connection is already present
+            message &&
+            message.get("hasContent") &&
+            !message.get("hasReferences"), //allow showing details only when the connection is already present
         };
       };
 
@@ -419,19 +420,25 @@ function genComponentConf() {
      * determines if the sent message is not received by any of the servers yet but not failed either
      */
     isPending() {
-      return (
+      const pending =
+        this.message &&
         this.message.get("outgoingMessage") &&
         !this.message.get("failedToSend") &&
         !this.message.get("isReceivedByOwn") &&
-        !this.message.get("isReceivedByRemote")
-      );
+        !this.message.get("isReceivedByRemote");
+
+      if (pending) {
+        console.log("pending message: ", this.message);
+      }
+      return pending;
     }
 
     /**
      * determines if the sent message is received by any of the servers yet but not failed either
      */
     isPartiallyLoaded() {
-      return (
+      const partiallyLoaded =
+        this.message &&
         this.message.get("outgoingMessage") &&
         !this.message.get("failedToSend") &&
         (!(
@@ -439,8 +446,9 @@ function genComponentConf() {
           this.message.get("isReceivedByRemote")
         ) &&
           (this.message.get("isReceivedByOwn") ||
-            this.message.get("isReceivedByRemote")))
-      );
+            this.message.get("isReceivedByRemote")));
+
+      return partiallyLoaded;
     }
 
     encodeParam(param) {
