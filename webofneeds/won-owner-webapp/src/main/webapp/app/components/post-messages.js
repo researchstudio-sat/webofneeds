@@ -95,7 +95,7 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementUris && self.hasCancellationPendingAgreementUris && self.hasPendingProposalUris) && !self.connection.get('isLoadingMessages')">
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementUris || self.hasCancellationPendingAgreementUris || self.hasPendingProposalUris) && !self.connection.get('isLoadingMessages')">
               No Agreements within this Conversation
             </div>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.connection.get('isLoadingMessages')">
