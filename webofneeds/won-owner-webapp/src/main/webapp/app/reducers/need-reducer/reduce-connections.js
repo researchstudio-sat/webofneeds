@@ -263,7 +263,7 @@ export function clearAgreementStateData(state, connectionUri) {
         pendingProposalUris: Immutable.Set(),
         agreementUris: Immutable.Set(),
         cancellationPendingAgreementUris: Immutable.Set(),
-        isLoaded: false,
+        isLoaded: true,
       })
     )
     .setIn(

@@ -76,7 +76,7 @@ function genComponentConf() {
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
-                ng-if="self.isLoadingMessages || self.isLoadingAgreementData">
+                ng-if="self.isLoadingMessages || (self.showAgreementData && self.isLoadingAgreementData)">
                 <svg class="hspinner">
                   <use xlink:href="#ico_loading_anim" href="#ico_loading_anim"></use>
               </svg>
@@ -393,7 +393,6 @@ function genComponentConf() {
     ensureAgreementDataIsLoaded() {
       delay(0).then(() => {
         if (
-          this.connection &&
           this.isConnected &&
           !this.isLoadingAgreementData &&
           !this.agreementDataLoaded
@@ -415,7 +414,7 @@ function genComponentConf() {
     loadPreviousMessages() {
       delay(0).then(() => {
         const MORE_MESSAGECOUNT = 5;
-        if (this.connection && !this.connection.get("isLoadingMessages")) {
+        if (this.connection && !this.isLoadingMessages) {
           this.connections__showMoreMessages(
             this.connection.get("uri"),
             MORE_MESSAGECOUNT
@@ -488,7 +487,7 @@ function genComponentConf() {
     }
 
     showAgreementDataField() {
-      //this.getAgreementData();
+      this.getAgreementData();
       this.setShowAgreementData(true);
     }
 
