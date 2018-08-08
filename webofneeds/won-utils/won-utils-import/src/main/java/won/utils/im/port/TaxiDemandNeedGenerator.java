@@ -18,32 +18,23 @@ public class TaxiDemandNeedGenerator {
     static Property won_seeks = model.createProperty("http://purl.org/webofneeds/model#seeks");
     static Property won_hasTag = model.createProperty("http://purl.org/webofneeds/model#hasTag");
     static Property won_hasLocation = model.createProperty("http://purl.org/webofneeds/model#hasLocation");
-    static Property won_hasBoundingBox = model.createProperty("http://purl.org/webofneeds/model#hasBoundingBox");
-    static Property won_hasNorthWestCorner = model
-            .createProperty("http://purl.org/webofneeds/model#hasNorthWestCorner");
-    static Property won_hasSouthEastCorner = model
-            .createProperty("http://purl.org/webofneeds/model#hasSouthEastCorner");
+    static Property won_travelAction = model.createProperty("http://purl.org/webofneeds/model#travelAction");
 
     static Property schema_priceSpecification = model.createProperty("http://schema.org/priceSpecification");
     static Property schema_geo = model.createProperty("http://schema.org/geo");
     static Property schema_latitude = model.createProperty("http://schema.org/latitude");
     static Property schema_longitude = model.createProperty("http://schema.org/longitude");
     static Property schema_name = model.createProperty("http://schema.org/name");
-    static Property schema_description = model.createProperty("http://schema.org/description");
-    static Property schema_price = model.createProperty("http://schema.org/price");
-    static Property schema_priceCurrency = model.createProperty("http://schema.org/priceCurrency");
-    static Property schema_unitCode = model.createProperty("http://schema.org/unitCode");
-    static Property schema_value = model.createProperty("http://schema.org/value");
 
     static HashMap<String, String>[] locations = new HashMap[10];
 
     public static void main(String[] args) {
-    	initializeLocations();
+        initializeLocations();
         generateNeeds();
     }
 
-	private static void generateNeeds() {
-        for (int i = 0; i < 9; i++) {
+    private static void generateNeeds() {
+        for (int i = 0; i < 100; i++) {
             String needURI = "https://localhost:8443/won/resource/event/" + "taxi_demand_need_" + i + "#need";
 
             model = ModelFactory.createDefaultModel();
@@ -57,15 +48,13 @@ public class TaxiDemandNeedGenerator {
             Resource won_OwnerFacet = model.createResource("http://purl.org/webofneeds/model#OwnerFacet");
 
             // method signatures: branch, probability that detail is added, min, max
-//            isPart = addTitle(isPart, 1.0, i);
-//            isPart = addDescription(isPart, 1.0);
-//            isPart = addLocation(isPart, 1.0);
-//            isPart = addAmenities(isPart, 0.8, 1, 4);
-//            isPart = addFloorSize(isPart, 0.8, 28, 250);
-//            isPart = addNumberOfRooms(isPart, 0.8, 1, 9);
-//            isPart = addPriceSpecification(isPart, 1.0, 250, 2200);
-//
-//            seeksPart.addProperty(won_hasTag, "to-rent");
+            isPart = addTitle(isPart, 1.0, i);
+            isPart = addDescription(isPart, 1.0);
+            isPart.addProperty(won_hasTag, "search-lift");
+
+            seeksPart = addDate(seeksPart, 0.9);
+            // seeksPart = addTime(seeksPart, 0.9);
+            seeksPart = addTravelAction(seeksPart, 0.9);
 
             need.addProperty(RDF.type, won_Need);
             need.addProperty(won_hasFacet, won_OwnerFacet);
@@ -81,8 +70,8 @@ public class TaxiDemandNeedGenerator {
             }
         }
     }
-	
-	private static Resource addTitle(Resource resource, double probability, int counter) {
+
+    private static Resource addTitle(Resource resource, double probability, int counter) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
@@ -100,69 +89,74 @@ public class TaxiDemandNeedGenerator {
         return resource;
     }
 
-    private static Resource addLocation(Resource resource, double probability) {
+    // dc:date "2015-12-01" ;
+    private static Resource addDate(Resource resource, double probability) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
 
-        // pick a location
-        int locNr = (int) (Math.random() * 10);
-        String nwlat = locations[locNr].get("nwlat");
-        String nwlng = locations[locNr].get("nwlng");
-        String selat = locations[locNr].get("selat");
-        String selng = locations[locNr].get("selng");
-        String lat = locations[locNr].get("lat");
-        String lng = locations[locNr].get("lng");
-        String name = locations[locNr].get("name");
+        int year = (int) (Math.random() * 2100 - 1989 + 1990);
+        int month = (int) (Math.random() * 13);
+        int day = (int) (Math.random() * 29);
 
-        Resource locationResource = model.createResource();
-        Resource boundingBoxResource = model.createResource();
-        Resource nwCornerResource = model.createResource();
-        Resource seCornerResource = model.createResource();
-        Resource geoResource = model.createResource();
-        Resource schema_Place = model.createResource("http://schema.org/Place");
-        Resource schema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
+        resource.addProperty(DC.date, year + "-" + month + "-" + day);
 
-        resource.addProperty(won_hasLocation, locationResource);
-        locationResource.addProperty(RDF.type, schema_Place);
-        locationResource.addProperty(schema_name, name);
-        locationResource.addProperty(schema_geo, geoResource);
-        geoResource.addProperty(RDF.type, schema_GeoCoordinates);
-        geoResource.addProperty(schema_latitude, lat);
-        geoResource.addProperty(schema_longitude, lng);
-        locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
-        boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
-        nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        nwCornerResource.addProperty(schema_latitude, nwlat);
-        nwCornerResource.addProperty(schema_longitude, nwlng);
-        boundingBoxResource.addProperty(won_hasNorthWestCorner, seCornerResource);
-        seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        seCornerResource.addProperty(schema_latitude, selat);
-        seCornerResource.addProperty(schema_longitude, selng);
         return resource;
     }
 
-    private static Resource addPriceSpecification(Resource resource, double probability, double min, double max) {
+    // TODO: comment this back in once we have a good rdf representation of time
+    // private static Resource addTime(Resource resource, double probability) {
+    // if (Math.random() < (1.0 - probability)) {
+    // return resource;
+    // }
+
+    // int hours = (int) (Math.random() * 24);
+    // int minutes = (int) (Math.random() * 60);
+
+    // return resource;
+    // }
+
+    private static Resource addTravelAction(Resource resource, double probability) {
         if (Math.random() < (1.0 - probability)) {
             return resource;
         }
 
-        int price = (int) (Math.random() * Math.abs(max - min + 1) + min);
+        Collections.shuffle(Arrays.asList(locations));
+        Resource fromLocationResource = model.createResource();
+        Resource fromGeoResource = model.createResource();
+        Resource fromSchema_Place = model.createResource("http://schema.org/Place");
+        Resource fromSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
 
-        Resource schema_CompoundPriceSpecification = model
-                .createResource("http://schema.org/CompoundPriceSpecification");
-        Resource priceSpecificationResource = model.createResource();
+        resource.addProperty(won_travelAction, fromLocationResource);
+        fromLocationResource.addProperty(RDF.type, fromSchema_Place);
+        fromLocationResource.addProperty(schema_name, locations[0].get("name"));
+        fromLocationResource.addProperty(schema_geo, fromGeoResource);
+        fromGeoResource.addProperty(RDF.type, fromSchema_GeoCoordinates);
+        fromGeoResource.addProperty(schema_latitude, locations[0].get("lat"));
+        fromGeoResource.addProperty(schema_longitude, locations[0].get("lng"));
 
-        resource.addProperty(schema_priceSpecification, priceSpecificationResource);
-        priceSpecificationResource.addProperty(RDF.type, schema_CompoundPriceSpecification);
-        priceSpecificationResource.addProperty(schema_description, "total rent per month");
-        priceSpecificationResource.addProperty(schema_price, String.valueOf(price));
-        priceSpecificationResource.addProperty(schema_priceCurrency, "EUR");
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+        Resource toLocationResource = model.createResource();
+        Resource toGeoResource = model.createResource();
+        Resource toSchema_Place = model.createResource("http://schema.org/Place");
+        Resource toSchema_GeoCoordinates = model.createResource("http://schema.org/GeoCoordinates");
+
+        resource.addProperty(won_travelAction, toLocationResource);
+        toLocationResource.addProperty(RDF.type, toSchema_Place);
+        toLocationResource.addProperty(schema_name, locations[1].get("name"));
+        toLocationResource.addProperty(schema_geo, toGeoResource);
+        toGeoResource.addProperty(RDF.type, toSchema_GeoCoordinates);
+        toGeoResource.addProperty(schema_latitude, locations[1].get("lat"));
+        toGeoResource.addProperty(schema_longitude, locations[1].get("lng"));
+
         return resource;
+
     }
 
     private static void initializeLocations() {
-		HashMap<String, String> loc0 = new HashMap<String, String>();
+        HashMap<String, String> loc0 = new HashMap<String, String>();
         loc0.put("nwlat", "48.385349");
         loc0.put("nwlng", "16.821063");
         loc0.put("selat", "48.309745");
@@ -261,22 +255,22 @@ public class TaxiDemandNeedGenerator {
         loc9.put("lng", "15.866162");
         loc9.put("name", "Bezirk Baden, Lower Austria, Austria");
         locations[9] = loc9;
-	}
-    
-	private static void setPrefixes() {
-		model.setNsPrefix("conn", "https://localhost:8443/won/resource/connection/");
-		model.setNsPrefix("need", "https://localhost:8443/won/resource/need/");
-		model.setNsPrefix("local", "https://localhost:8443/won/resource/");
-		model.setNsPrefix("event", "https://localhost:8443/won/resource/event/");
-		model.setNsPrefix("msg", "http://purl.org/webofneeds/message#");
-		model.setNsPrefix("won", "http://purl.org/webofneeds/model#");
-		model.setNsPrefix("woncrypt", "http://purl.org/webofneeds/woncrypt#");
-		model.setNsPrefix("cert", "http://www.w3.org/ns/auth/cert#");
-		model.setNsPrefix("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
-		model.setNsPrefix("sig", "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#");
-		model.setNsPrefix("s", "http://schema.org/");
-		model.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
-		model.setNsPrefix("ldp", "http://www.w3.org/ns/ldp#");
-		model.setNsPrefix("sioc", "http://rdfs.org/sioc/ns#");
-	}
+    }
+
+    private static void setPrefixes() {
+        model.setNsPrefix("conn", "https://localhost:8443/won/resource/connection/");
+        model.setNsPrefix("need", "https://localhost:8443/won/resource/need/");
+        model.setNsPrefix("local", "https://localhost:8443/won/resource/");
+        model.setNsPrefix("event", "https://localhost:8443/won/resource/event/");
+        model.setNsPrefix("msg", "http://purl.org/webofneeds/message#");
+        model.setNsPrefix("won", "http://purl.org/webofneeds/model#");
+        model.setNsPrefix("woncrypt", "http://purl.org/webofneeds/woncrypt#");
+        model.setNsPrefix("cert", "http://www.w3.org/ns/auth/cert#");
+        model.setNsPrefix("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
+        model.setNsPrefix("sig", "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#");
+        model.setNsPrefix("s", "http://schema.org/");
+        model.setNsPrefix("sh", "http://www.w3.org/ns/shacl#");
+        model.setNsPrefix("ldp", "http://www.w3.org/ns/ldp#");
+        model.setNsPrefix("sioc", "http://rdfs.org/sioc/ns#");
+    }
 }
