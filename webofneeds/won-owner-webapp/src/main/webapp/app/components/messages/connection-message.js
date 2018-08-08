@@ -427,9 +427,6 @@ function genComponentConf() {
         !this.message.get("isReceivedByOwn") &&
         !this.message.get("isReceivedByRemote");
 
-      if (pending) {
-        console.log("pending message: ", this.message);
-      }
       return pending;
     }
 
