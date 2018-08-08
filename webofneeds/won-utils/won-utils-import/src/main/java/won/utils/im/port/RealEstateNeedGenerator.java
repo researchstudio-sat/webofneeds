@@ -1,13 +1,13 @@
 package won.utils.im.port;
 
 import java.io.FileOutputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-//import org.apache.jena.vocabulary.XSD;
 
 public class RealEstateNeedGenerator {
 
@@ -38,16 +38,16 @@ public class RealEstateNeedGenerator {
     static Property schema_unitCode = model.createProperty("http://schema.org/unitCode");
     static Property schema_value = model.createProperty("http://schema.org/value");
 
-    private static HashMap<String, String> loc1 = new HashMap();
-    private static HashMap<String, String> loc2 = new HashMap();
-    private static HashMap<String, String> loc3 = new HashMap();
-    private static HashMap<String, String> loc4 = new HashMap();
-    private static HashMap<String, String> loc5 = new HashMap();
-    private static HashMap<String, String> loc6 = new HashMap();
-    private static HashMap<String, String> loc7 = new HashMap();
-    private static HashMap<String, String> loc8 = new HashMap();
-    private static HashMap<String, String> loc9 = new HashMap();
-    private static HashMap<String, String> loc0 = new HashMap();
+    private static HashMap<String, String> loc1 = new HashMap<String, String>();
+    private static HashMap<String, String> loc2 = new HashMap<String, String>();
+    private static HashMap<String, String> loc3 = new HashMap<String, String>();
+    private static HashMap<String, String> loc4 = new HashMap<String, String>();
+    private static HashMap<String, String> loc5 = new HashMap<String, String>();
+    private static HashMap<String, String> loc6 = new HashMap<String, String>();
+    private static HashMap<String, String> loc7 = new HashMap<String, String>();
+    private static HashMap<String, String> loc8 = new HashMap<String, String>();
+    private static HashMap<String, String> loc9 = new HashMap<String, String>();
+    private static HashMap<String, String> loc0 = new HashMap<String, String>();
 
     private static HashMap<String, String>[] locations = new HashMap[10];
     private static String[] amenities = { "Balcony", "Parkingspace", "Garden", "Bathtub", "furnished",
@@ -150,7 +150,6 @@ public class RealEstateNeedGenerator {
 
     private static void generateNeeds() {
         for (int i = 0; i < 9; i++) {
-            // TODO: unique URI
             // String needURI =
             // "https://localhost:8443/won/resource/event/m3tuwsuahplc#need";
             String needURI = "https://localhost:8443/won/resource/event/" + "real_estate_sample_" + i + "#need";
@@ -178,13 +177,14 @@ public class RealEstateNeedGenerator {
             Resource won_Need = model.createResource("http://purl.org/webofneeds/model#Need");
             Resource won_OwnerFacet = model.createResource("http://purl.org/webofneeds/model#OwnerFacet");
 
-            isPart = addTitle(isPart, i);
-            isPart = addDescription(isPart);
-            isPart = addLocation(isPart);
-            isPart = addAmenities(isPart);
-            isPart = addFloorSize(isPart);
-            isPart = addNumberOfRooms(isPart);
-            isPart = addPriceSpecification(isPart);
+            // method signatures: branch, probability that detail is added, min, max
+            isPart = addTitle(isPart, 1.0, i);
+            isPart = addDescription(isPart, 1.0);
+            isPart = addLocation(isPart, 1.0);
+            isPart = addAmenities(isPart, 0.8, 1, 4);
+            isPart = addFloorSize(isPart, 0.8, 28, 250);
+            isPart = addNumberOfRooms(isPart, 0.8, 1, 9);
+            isPart = addPriceSpecification(isPart, 1.0, 250, 2200);
 
             seeksPart.addProperty(won_hasTag, "to-rent");
 
@@ -204,17 +204,39 @@ public class RealEstateNeedGenerator {
     }
 
     // resource is isPart or seeksPart
-    private static Resource addTitle(Resource resource, int counter) {
+    private static Resource addTitle(Resource resource, double probability, int counter) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
         resource.addProperty(DC.title, "Sample Real Estate Need " + counter);
         return resource;
     }
 
-    private static Resource addDescription(Resource resource) {
+    private static Resource addDescription(Resource resource, double probability) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
         resource.addProperty(DC.description, "This is a sample offer that was automatically generated.");
         return resource;
     }
 
-    private static Resource addLocation(Resource resource) {
+    private static Resource addLocation(Resource resource, double probability) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
+        // pick a location
+        int locNr = (int) (Math.random() * 10);
+        String nwlat = locations[locNr].get("nwlat");
+        String nwlng = locations[locNr].get("nwlng");
+        String selat = locations[locNr].get("selat");
+        String selng = locations[locNr].get("selng");
+        String lat = locations[locNr].get("lat");
+        String lng = locations[locNr].get("lng");
+        String name = locations[locNr].get("name");
+
         Resource locationResource = model.createResource();
         Resource boundingBoxResource = model.createResource();
         Resource nwCornerResource = model.createResource();
@@ -225,54 +247,78 @@ public class RealEstateNeedGenerator {
 
         resource.addProperty(won_hasLocation, locationResource);
         locationResource.addProperty(RDF.type, schema_Place);
-        locationResource.addProperty(schema_name, "Some Location Name");
+        locationResource.addProperty(schema_name, name);
         locationResource.addProperty(schema_geo, geoResource);
         geoResource.addProperty(RDF.type, schema_GeoCoordinates);
-        geoResource.addProperty(schema_latitude, "11.11");
-        geoResource.addProperty(schema_longitude, "22.22");
+        geoResource.addProperty(schema_latitude, lat);
+        geoResource.addProperty(schema_longitude, lng);
         locationResource.addProperty(won_hasBoundingBox, boundingBoxResource);
         boundingBoxResource.addProperty(won_hasNorthWestCorner, nwCornerResource);
         nwCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        nwCornerResource.addProperty(schema_latitude, "33.11");
-        nwCornerResource.addProperty(schema_longitude, "44.22");
+        nwCornerResource.addProperty(schema_latitude, nwlat);
+        nwCornerResource.addProperty(schema_longitude, nwlng);
         boundingBoxResource.addProperty(won_hasNorthWestCorner, seCornerResource);
         seCornerResource.addProperty(RDF.type, schema_GeoCoordinates);
-        seCornerResource.addProperty(schema_latitude, "55.11");
-        seCornerResource.addProperty(schema_longitude, "66.22");
+        seCornerResource.addProperty(schema_latitude, selat);
+        seCornerResource.addProperty(schema_longitude, selng);
         return resource;
     }
 
-    private static Resource addAmenities(Resource resource) {
+    private static Resource addAmenities(Resource resource, double probability, int min, int max) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
+        int numberOfAmenities = (int) (Math.random() * Math.abs(max - min + 1) + min);
+        Collections.shuffle(Arrays.asList(amenities));
+
         Resource amenityResource = model.createResource();
         Resource schema_LocationFeatureSpecification = model
                 .createResource("http://schema.org/LocationFeatureSpecification");
 
         resource.addProperty(schema_amenityFeature, amenityResource);
         amenityResource.addProperty(RDF.type, schema_LocationFeatureSpecification);
-        amenityResource.addProperty(schema_name, "some amenity");
-        amenityResource.addProperty(schema_name, "some amenity2");
-        amenityResource.addProperty(schema_name, "some amenity3");
-        amenityResource.addProperty(schema_name, "some amenity4");
+        for (int j = 0; j < numberOfAmenities; j++) {
+            amenityResource.addProperty(schema_name, amenities[j]);
+        }
         return resource;
     }
 
-    private static Resource addFloorSize(Resource resource) {
+    private static Resource addFloorSize(Resource resource, double probability, int min, int max) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
+        int floorSize = (int) (Math.random() * Math.abs(max - min + 1)) + min;
+
         Resource floorSizeResource = model.createResource();
         Resource schema_QuantitativeValue = model.createResource("http://schema.org/QuantitativeValue");
 
         resource.addProperty(schema_floorSize, floorSizeResource);
         floorSizeResource.addProperty(RDF.type, schema_QuantitativeValue);
         floorSizeResource.addProperty(schema_unitCode, "MTK");
-        floorSizeResource.addProperty(schema_value, "111");
+        floorSizeResource.addProperty(schema_value, String.valueOf(floorSize));
         return resource;
     }
 
-    private static Resource addNumberOfRooms(Resource resource) {
-        resource.addProperty(schema_numberOfRooms, "5");
+    private static Resource addNumberOfRooms(Resource resource, double probability, int min, int max) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
+        int numberOfRooms = (int) (Math.random() * Math.abs(max - min + 1)) + min;
+
+        resource.addProperty(schema_numberOfRooms, String.valueOf(numberOfRooms));
         return resource;
     }
 
-    private static Resource addPriceSpecification(Resource resource) {
+    private static Resource addPriceSpecification(Resource resource, double probability, double min, double max) {
+        if (Math.random() < (1.0 - probability)) {
+            return resource;
+        }
+
+        int price = (int) (Math.random() * Math.abs(max - min + 1) + min);
+
         Resource schema_CompoundPriceSpecification = model
                 .createResource("http://schema.org/CompoundPriceSpecification");
         Resource priceSpecificationResource = model.createResource();
@@ -280,7 +326,7 @@ public class RealEstateNeedGenerator {
         resource.addProperty(schema_priceSpecification, priceSpecificationResource);
         priceSpecificationResource.addProperty(RDF.type, schema_CompoundPriceSpecification);
         priceSpecificationResource.addProperty(schema_description, "total rent per month");
-        priceSpecificationResource.addProperty(schema_price, "333");
+        priceSpecificationResource.addProperty(schema_price, String.valueOf(price));
         priceSpecificationResource.addProperty(schema_priceCurrency, "EUR");
         return resource;
     }
