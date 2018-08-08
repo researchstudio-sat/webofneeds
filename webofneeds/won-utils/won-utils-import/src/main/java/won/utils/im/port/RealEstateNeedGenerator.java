@@ -1,5 +1,6 @@
 package won.utils.im.port;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +49,9 @@ public class RealEstateNeedGenerator {
     }
 
 	private static void generateNeeds() {
-        for (int i = 0; i < 9; i++) {
+        File parentFolder = new File("sample_needs");
+        parentFolder.mkdirs();
+        for (int i = 0; i < 100; i++) {
             String needURI = "https://localhost:8443/won/resource/event/" + "real_estate_sample_" + i + "#need";
 
             model = ModelFactory.createDefaultModel();
@@ -78,11 +81,11 @@ public class RealEstateNeedGenerator {
             need.addProperty(won_seeks, seeksPart);
 
             try {
-                FileOutputStream out = new FileOutputStream("sample_needs/real_estate_need_" + i + ".trig");
+                FileOutputStream out = new FileOutputStream(new File(parentFolder, "real_estate_need_" + i + ".trig"));
                 model.write(out, "TURTLE");
                 out.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
