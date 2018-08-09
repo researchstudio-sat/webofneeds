@@ -470,7 +470,6 @@ function genComponentConf() {
             " Messages"
           );
           this.chatMessagesWithUnknownState.forEach(msg => {
-            console.log("# Ensure messageStatus ", msg.toJS(), "is up to date");
             let messageStatus = msg && msg.get("messageStatus");
             const msgUri = msg.get("uri");
             const remoteMsgUri = msg.get("remoteUri");
