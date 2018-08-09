@@ -23,6 +23,7 @@ import {
   markMessageAsAccepted,
   markMessageAsCancelled,
   markMessageAsCancellationPending,
+  markMessageStatusUpToDate,
 } from "./reduce-messages.js";
 import {
   addConnectionFull,
@@ -479,6 +480,14 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri,
         action.payload.cancellationPending
+      );
+    case actionTypes.messages.markMessageStatusUpToDate:
+      return markMessageStatusUpToDate(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.isMessageStatusUpToDate
       );
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(

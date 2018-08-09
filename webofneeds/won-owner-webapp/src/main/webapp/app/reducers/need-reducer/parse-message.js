@@ -73,6 +73,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
         isCancellationPending: false,
         isCancelled: false,
       },
+      isMessageStatusUpToDate: false,
       contentGraphTrig: {
         prefixes: trigPrefixes,
         body: trigBody,

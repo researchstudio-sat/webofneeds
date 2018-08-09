@@ -151,6 +151,42 @@ export function markMessageAsRejected(
   );
 }
 
+export function markMessageStatusUpToDate(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  isMessageStatusUpToDate
+) {
+  let need = state.get(needUri);
+  let connection = need && need.getIn(["connections", connectionUri]);
+  let message = connection && connection.getIn(["messages", messageUri]);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "isMessageStatusUpToDate",
+    ],
+    isMessageStatusUpToDate
+  );
+}
+
 export function markMessageAsRetracted(
   state,
   messageUri,
