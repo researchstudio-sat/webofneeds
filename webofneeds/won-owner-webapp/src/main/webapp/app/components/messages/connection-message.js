@@ -111,9 +111,14 @@ function genComponentConf() {
                       Propose To Cancel
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isAccepted() && self.isCancellationPending()"
+                        ng-if="self.isCancellationPending()"
                         ng-disabled="true">
                       Cancellation Pending...
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isCancelled()"
+                        ng-disabled="true">
+                      Cancelled
                     </button>
                 </div>
             </div>
