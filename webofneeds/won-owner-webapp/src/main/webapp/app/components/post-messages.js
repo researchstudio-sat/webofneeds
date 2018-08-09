@@ -111,7 +111,7 @@ function genComponentConf() {
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
-              ng-if="self.showAgreementData && !self.isLoadingMessages"
+              ng-if="self.showAgreementData && !self.isLoadingAgreementData"
               ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
               connection-uri="self.connectionUri"
               message-uri="proposeToCancel.get('stateUri')">
