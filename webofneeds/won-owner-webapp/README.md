@@ -127,6 +127,7 @@ $ngRedux.getState();
                        hasReferences: true|false //whether it contains any non-null/non-undefined references within the references block of the message
                        hasContent: true|false //whether it contains any non-null/non-undefined content within the content block of the message
                        isParsable: true|false //true if hasReferences or hasContent is true
+                       isMessageStatusUpToDate: true|false //true if the agreementData has been checked to define the status of the message
                        messageStatus: {
                            isRetracted: true|false //if the message was retracted
                            isRejected: true|false //if the message was rejected
