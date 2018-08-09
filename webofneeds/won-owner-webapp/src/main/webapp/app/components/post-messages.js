@@ -261,6 +261,10 @@ function genComponentConf() {
         const unreadMessages =
           chatMessages && chatMessages.filter(msg => msg.get("unread"));
 
+        const chatMessagesWithUnknownState =
+          chatMessages &&
+          chatMessages.filter(msg => !msg.get("isMessageStatusUpToDate"));
+
         return {
           ownNeed,
           theirNeed,
@@ -270,6 +274,7 @@ function genComponentConf() {
 
           sortedMessages: sortedMessages,
           chatMessages,
+          chatMessagesWithUnknownState,
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           isLoadingAgreementData:
@@ -464,55 +469,89 @@ function genComponentConf() {
           this.isConnected &&
           !this.isLoadingAgreementData &&
           !this.isLoadingMessages &&
-          this.agreementDataLoaded
+          this.agreementDataLoaded &&
+          this.chatMessagesWithUnknownState &&
+          this.chatMessagesWithUnknownState.size > 0
         ) {
-          console.log("Ensure Message Status is up-to-date");
-          this.chatMessages.forEach(msg => {
-            console.log("Ensure message ", msg, "is up to date");
-            if (
-              !msg.getIn(["messageStatus", "isAccepted"]) &&
-              this.isOldAcceptedMsg(msg)
-            ) {
+          console.log(
+            "Ensure Message Status is up-to-date for: ",
+            this.chatMessagesWithUnknownState.size,
+            " Messages"
+          );
+          this.chatMessagesWithUnknownState.forEach(msg => {
+            console.log("-- Ensure message ", msg, "is up to date");
+            const messageStatus = msg && msg.get("messageStatus");
+            const isAccepted = messageStatus && messageStatus.get("isAccepted");
+            const isRejected = messageStatus && messageStatus.get("isRejected");
+            const isRetracted =
+              messageStatus && messageStatus.get("isRetracted");
+            const isCancelled =
+              messageStatus && messageStatus.get("isCancelled");
+            const isCancellationPending =
+              messageStatus && messageStatus.get("isCancellationPending");
+
+            this.messages__markMessageStatusUpToDate({
+              messageUri: msg.get("uri"),
+              connectionUri: this.connectionUri,
+              needUri: this.ownNeed.get("uri"),
+              isMessageStatusUpToDate: true,
+            });
+
+            if (!isAccepted && this.isOldAcceptedMsg(msg)) {
+              console.log(
+                "---- is an old accepted message but was not set yet"
+              );
               this.messages__messageStatus__markAsAccepted({
                 messageUri: msg.get("uri"),
                 connectionUri: this.connectionUri,
                 needUri: this.ownNeed.get("uri"),
                 accepted: true,
               });
-            } else if (
-              !msg.getIn(["messageStatus", "isRejected"]) &&
-              this.isOldRejectedMsg(msg)
-            ) {
+            }
+
+            if (!isRejected && this.isOldRejectedMsg(msg)) {
+              console.log(
+                "---- is an old rejected message but was not set yet"
+              );
               this.messages__messageStatus__markAsRejected({
                 messageUri: msg.get("uri"),
                 connectionUri: this.connectionUri,
                 needUri: this.ownNeed.get("uri"),
                 rejected: true,
               });
-            } else if (
-              !msg.getIn(["messageStatus", "isRetracted"]) &&
-              this.isOldRetractedMsg(msg)
-            ) {
+            }
+
+            if (!isRetracted && this.isOldRetractedMsg(msg)) {
+              console.log(
+                "---- is an old retracted message but was not set yet"
+              );
               this.messages__messageStatus__markAsRetracted({
                 messageUri: msg.get("uri"),
                 connectionUri: this.connectionUri,
                 needUri: this.ownNeed.get("uri"),
                 retracted: true,
               });
-            } else if (
-              !msg.getIn(["messageStatus", "isCancelled"]) &&
-              this.isOldCancelledMsg(msg)
-            ) {
+            }
+
+            if (!isCancelled && this.isOldCancelledMsg(msg)) {
+              console.log(
+                "---- is an old cancelled message but was not set yet"
+              );
               this.messages__messageStatus__markAsCancelled({
                 messageUri: msg.get("uri"),
                 connectionUri: this.connectionUri,
                 needUri: this.ownNeed.get("uri"),
                 cancelled: true,
               });
-            } else if (
-              !msg.getIn(["messageStatus", "isCancellationPending"]) &&
+            }
+
+            if (
+              !isCancellationPending &&
               this.isOldCancellationPendingMsg(msg)
             ) {
+              console.log(
+                "---- is an old cancellation pending message but was not set yet"
+              );
               this.messages__messageStatus__markAsCancellationPending({
                 messageUri: msg.get("uri"),
                 connectionUri: this.connectionUri,
@@ -733,6 +772,8 @@ function genComponentConf() {
     isOpenProposal(msg) {
       const isAccepted = msg && msg.getIn(["messageStatus", "isAccepted"]);
       const isCancelled = msg && msg.getIn(["messageStatus", "isCancelled"]);
+      const isRejected = msg && msg.getIn(["messageStatus", "isRejected"]);
+      const isRetracted = msg && msg.getIn(["messageStatus", "isRetracted"]);
       const isCancellationPending =
         msg && msg.getIn(["messageStatus", "isCancellationPending"]);
       const references =
@@ -740,7 +781,13 @@ function genComponentConf() {
 
       return (
         references &&
-        !(isAccepted || isCancellationPending || isCancelled) &&
+        !(
+          isAccepted ||
+          isCancellationPending ||
+          isCancelled ||
+          isRejected ||
+          isRetracted
+        ) &&
         ((references.get("proposesToCancel") &&
           references.get("proposesToCancel").size > 0) ||
           (references.get("proposes") && references.get("proposes").size > 0))
