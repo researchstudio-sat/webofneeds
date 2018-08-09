@@ -357,6 +357,8 @@ function genComponentConf() {
         this.connectionUri,
         true
       );
+
+      this.markAsCancellationPending(true);
     }
 
     sendAccept() {
