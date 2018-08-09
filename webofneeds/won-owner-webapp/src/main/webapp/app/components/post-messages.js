@@ -95,35 +95,35 @@ function genComponentConf() {
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementUris || self.hasCancellationPendingAgreementUris || self.hasPendingProposalUris) && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__emptytext"  ng-if="self.showAgreementData && !(self.hasAgreementMessages || self.hasCancellationPendingMessages || self.hasProposalMessages) && !self.isLoadingAgreementData">
               No Agreements within this Conversation
             </div>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementUris && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasAgreementMessages && !self.isLoadingAgreementData">
               Agreements
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-repeat="agreement in self.agreementUrisArray"
+              ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
-              message-uri="agreement.get('stateUri')">
+              message-uri="agreement.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingAgreementUris && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasCancellationPendingMessages && !self.isLoadingAgreementData">
               Agreements with Pending Cancellation
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-repeat="proposeToCancel in self.cancellationPendingAgreementUrisArray"
+              ng-repeat="proposeToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
-              message-uri="proposeToCancel.get('stateUri')">
+              message-uri="proposeToCancel.get('uri')">
             </won-connection-message>
-            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasPendingProposalUris && !self.isLoadingAgreementData">
+            <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isLoadingAgreementData">
               Open Proposals
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-repeat="proposal in self.pendingProposalUrisArray"
+              ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
-              message-uri="proposal.get('stateUri')">
+              message-uri="proposal.get('uri')">
             </won-connection-message>
             <a class="rdflink clickable"
                ng-if="self.shouldShowRdf"
@@ -219,13 +219,21 @@ function genComponentConf() {
           ).size > 0;
 
         const agreementData = connection && connection.get("agreementData");
-        const agreementUris =
-          agreementData && agreementData.get("agreementUris");
-        const cancellationPendingAgreementUris =
-          agreementData &&
-          agreementData.get("cancellationPendingAgreementUris");
-        const pendingProposalUris =
-          agreementData && agreementData.get("pendingProposalUris");
+
+        const agreementMessages =
+          chatMessages &&
+          chatMessages.filter(
+            msg =>
+              msg.getIn(["messageStatus", "isAccepted"]) &&
+              !msg.getIn(["messageStatus", "isCancellationPending"])
+          );
+        const cancellationPendingMessages =
+          chatMessages &&
+          chatMessages.filter(msg =>
+            msg.getIn(["messageStatus", "isCancellationPending"])
+          );
+        const proposalMessages =
+          chatMessages && chatMessages.filter(msg => this.isOpenProposal(msg));
 
         //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
@@ -326,18 +334,16 @@ function genComponentConf() {
           //agreementUrisToDisplay
           agreementData,
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
-          hasAgreementUris: agreementUris && agreementUris.size > 0,
-          hasCancellationPendingAgreementUris:
-            cancellationPendingAgreementUris &&
-            cancellationPendingAgreementUris.size > 0,
-          hasPendingProposalUris:
-            pendingProposalUris && pendingProposalUris.size > 0,
-          agreementUrisArray: agreementUris && agreementUris.toArray(),
-          cancellationPendingAgreementUrisArray:
-            cancellationPendingAgreementUris &&
-            cancellationPendingAgreementUris.toArray(),
-          pendingProposalUrisArray:
-            pendingProposalUris && pendingProposalUris.toArray(),
+          hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
+          agreementMessagesArray:
+            agreementMessages && agreementMessages.toArray(),
+          hasProposalMessages: proposalMessages && proposalMessages.size > 0,
+          proposalMessagesArray: proposalMessages && proposalMessages.toArray(),
+          hasCancellationPendingMessages:
+            cancellationPendingMessages && cancellationPendingMessages.size > 0,
+          cancellationPendingMessagesArray:
+            cancellationPendingMessages &&
+            cancellationPendingMessages.toArray(),
         };
       };
 
@@ -487,7 +493,7 @@ function genComponentConf() {
     }
 
     showAgreementDataField() {
-      this.getAgreementData();
+      //this.getAgreementData();
       this.setShowAgreementData(true);
     }
 
@@ -512,6 +518,7 @@ function genComponentConf() {
       callAgreementsFetch(url)
         .then(response => {
           this.agreementHead = this.transformDataToSet(response);
+          console.log("Retrieved AgreementData: ", this.agreementHead);
 
           const agreementUris = this.agreementHead.get("agreementUris");
           const pendingProposalUris = this.agreementHead.get(
@@ -676,8 +683,8 @@ function genComponentConf() {
             );
 
             //If message isnt in the state we add it
-            if (this.chatMessages.get(agreementObject.get("stateUri"))) {
-              this.messages__processConnectionMessage(msg);
+            if (!this.chatMessages.get(agreementObject.get("stateUri"))) {
+              this.messages__processAgreementMessage(msg);
             }
 
             //Update agreementData in State
@@ -705,6 +712,20 @@ function genComponentConf() {
         return true;
       }
       return false;
+    }
+
+    isOpenProposal(msg) {
+      const isAccepted = msg && msg.getIn(["messageStatus", "isAccepted"]);
+      const references = msg && msg.get("references");
+
+      return (
+        !isAccepted &&
+        references &&
+        references.get("proposesToCancel") &&
+        references.get("proposesToCancel").size > 0 &&
+        references.get("proposes") &&
+        references.get("proposes").size > 0
+      );
     }
 
     isOldCancellationPendingMsg(msg) {
@@ -779,6 +800,7 @@ function genComponentConf() {
         pendingProposalUris: Immutable.Set(),
         agreementUris: Immutable.Set(),
         cancellationPendingAgreementUris: Immutable.Set(),
+        isLoaded: false,
       });
     }
 
