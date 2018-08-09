@@ -522,6 +522,9 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.showAgreementData
       );
+    case actionTypes.messages.processAgreementMessage:
+      //add a message that has been already processed (so sent status is ommitted)
+      return addMessage(allNeedsInState, action.payload, true);
     // NEW MESSAGE STATE UPDATES
     case actionTypes.messages.processConnectionMessage:
       // ADD RECEIVED CHAT MESSAGES

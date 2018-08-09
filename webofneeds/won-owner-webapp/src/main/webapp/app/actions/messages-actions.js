@@ -188,6 +188,15 @@ export function openMessageReceived(event) {
     });
   };
 }
+export function processAgreementMessage(event) {
+  return dispatch => {
+    console.log("processAgreementMessage");
+    dispatch({
+      type: actionTypes.messages.processAgreementMessage,
+      payload: event,
+    });
+  };
+}
 
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
