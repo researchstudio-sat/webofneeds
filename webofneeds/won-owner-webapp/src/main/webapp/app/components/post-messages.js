@@ -481,6 +481,24 @@ function genComponentConf() {
           this.chatMessagesWithUnknownState.forEach(msg => {
             console.log("# Ensure messageStatus ", msg.toJS(), "is up to date");
             let messageStatus = msg && msg.get("messageStatus");
+            const msgUri = msg.get("uri");
+            const remoteMsgUri = msg.get("remoteUri");
+
+            const acceptedUris =
+              this.agreementHead && this.agreementHead.get("agreementUris");
+            const rejectedUris =
+              this.agreementHead &&
+              this.agreementHead.get("rejectedMessageUris");
+            const retractedUris =
+              this.agreementHead &&
+              this.agreementHead.get("retractedMessageUris");
+            const cancelledUris =
+              this.agreementHead &&
+              this.agreementHead.get("cancelledAgreementUris");
+            const cancellationPendingUris =
+              this.agreementHead &&
+              this.agreementHead.get("cancellationPendingAgreementUris");
+
             const isAccepted = messageStatus && messageStatus.get("isAccepted");
             const isRejected = messageStatus && messageStatus.get("isRejected");
             const isRetracted =
@@ -490,31 +508,35 @@ function genComponentConf() {
             const isCancellationPending =
               messageStatus && messageStatus.get("isCancellationPending");
 
-            if (!isAccepted && this.isOldAcceptedMsg(msg)) {
-              messageStatus = messageStatus.set("isAccepted", true);
-            }
+            const isOldAccepted =
+              (acceptedUris && acceptedUris.get(msgUri)) ||
+              acceptedUris.get(remoteMsgUri);
+            const isOldRejected =
+              (rejectedUris && rejectedUris.get(msgUri)) ||
+              rejectedUris.get(remoteMsgUri);
+            const isOldRetracted =
+              (retractedUris && retractedUris.get(msgUri)) ||
+              retractedUris.get(remoteMsgUri);
+            const isOldCancelled =
+              (cancelledUris && cancelledUris.get(msgUri)) ||
+              cancelledUris.get(remoteMsgUri);
+            const isOldCancellationPending =
+              (cancellationPendingUris &&
+                cancellationPendingUris.get(msgUri)) ||
+              cancellationPendingUris.get(remoteMsgUri);
 
-            if (!isRejected && this.isOldRejectedMsg(msg)) {
-              messageStatus = messageStatus.set("isRejected", true);
-            }
-
-            if (!isRetracted && this.isOldRetractedMsg(msg)) {
-              messageStatus = messageStatus.set("isRetracted", true);
-            }
-
-            if (!isCancelled && this.isOldCancelledMsg(msg)) {
-              messageStatus = messageStatus.set("isCancelled", true);
-            }
-
-            if (
-              !isCancellationPending &&
-              this.isOldCancellationPendingMsg(msg)
-            ) {
-              messageStatus = messageStatus.set("isCancellationPending", true);
-            }
+            messageStatus = messageStatus
+              .set("isAccepted", isAccepted || isOldAccepted)
+              .set("isRejected", isRejected || isOldRejected)
+              .set("isRetracted", isRetracted || isOldRetracted)
+              .set("isCancelled", isCancelled || isOldCancelled)
+              .set(
+                "isCancellationPending",
+                isCancellationPending || isOldCancellationPending
+              );
 
             this.messages__updateMessageStatus({
-              messageUri: msg.get("uri"),
+              messageUri: msgUri,
               connectionUri: this.connectionUri,
               needUri: this.ownNeed.get("uri"),
               messageStatus: messageStatus,
@@ -712,23 +734,6 @@ function genComponentConf() {
       });
     }
 
-    isOldCancelledMsg(msg) {
-      if (
-        this.agreementHead &&
-        (this.agreementHead.getIn([
-          "acceptedCancellationProposalUris",
-          msg.get("uri"),
-        ]) ||
-          this.agreementHead.getIn([
-            "acceptedCancellationProposalUris",
-            msg.get("remoteUri"),
-          ]))
-      ) {
-        return true;
-      }
-      return false;
-    }
-
     isOpenProposal(msg) {
       const isAccepted = msg && msg.getIn(["messageStatus", "isAccepted"]);
       const isCancelled = msg && msg.getIn(["messageStatus", "isCancelled"]);
@@ -752,59 +757,6 @@ function genComponentConf() {
           references.get("proposesToCancel").size > 0) ||
           (references.get("proposes") && references.get("proposes").size > 0))
       );
-    }
-
-    isOldCancellationPendingMsg(msg) {
-      if (
-        this.agreementHead &&
-        (this.agreementHead.getIn(["cancelledAgreementUris", msg.get("uri")]) ||
-          this.agreementHead.getIn([
-            "cancelledAgreementUris",
-            msg.get("remoteUri"),
-          ]))
-      ) {
-        return true;
-      }
-      return false;
-    }
-
-    isOldAcceptedMsg(msg) {
-      if (
-        this.agreementHead &&
-        (this.agreementHead.getIn(["agreementUris", msg.get("uri")]) ||
-          this.agreementHead.getIn(["agreementUris", msg.get("remoteUri")]))
-      ) {
-        return true;
-      }
-      return false;
-    }
-
-    isOldRetractedMsg(msg) {
-      if (
-        this.agreementHead &&
-        (this.agreementHead.getIn(["retractedMessageUris", msg.get("uri")]) ||
-          this.agreementHead.getIn([
-            "retractedMessageUris",
-            msg.get("remoteUri"),
-          ]))
-      ) {
-        return true;
-      }
-      return false;
-    }
-
-    isOldRejectedMsg(msg) {
-      if (
-        this.agreementHead &&
-        (this.agreementHead.getIn(["rejectedMessageUris", msg.get("uri")]) ||
-          this.agreementHead.getIn([
-            "rejectedMessageUris",
-            msg.get("remoteUri"),
-          ]))
-      ) {
-        return true;
-      }
-      return false;
     }
 
     openRequest(message) {
