@@ -479,8 +479,8 @@ function genComponentConf() {
             " Messages"
           );
           this.chatMessagesWithUnknownState.forEach(msg => {
-            console.log("-- Ensure message ", msg, "is up to date");
-            const messageStatus = msg && msg.get("messageStatus");
+            console.log("# Ensure messageStatus ", msg.toJS(), "is up to date");
+            let messageStatus = msg && msg.get("messageStatus");
             const isAccepted = messageStatus && messageStatus.get("isAccepted");
             const isRejected = messageStatus && messageStatus.get("isRejected");
             const isRetracted =
@@ -490,75 +490,35 @@ function genComponentConf() {
             const isCancellationPending =
               messageStatus && messageStatus.get("isCancellationPending");
 
-            this.messages__markMessageStatusUpToDate({
-              messageUri: msg.get("uri"),
-              connectionUri: this.connectionUri,
-              needUri: this.ownNeed.get("uri"),
-              isMessageStatusUpToDate: true,
-            });
-
             if (!isAccepted && this.isOldAcceptedMsg(msg)) {
-              console.log(
-                "---- is an old accepted message but was not set yet"
-              );
-              this.messages__messageStatus__markAsAccepted({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                accepted: true,
-              });
+              messageStatus = messageStatus.set("isAccepted", true);
             }
 
             if (!isRejected && this.isOldRejectedMsg(msg)) {
-              console.log(
-                "---- is an old rejected message but was not set yet"
-              );
-              this.messages__messageStatus__markAsRejected({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                rejected: true,
-              });
+              messageStatus = messageStatus.set("isRejected", true);
             }
 
             if (!isRetracted && this.isOldRetractedMsg(msg)) {
-              console.log(
-                "---- is an old retracted message but was not set yet"
-              );
-              this.messages__messageStatus__markAsRetracted({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                retracted: true,
-              });
+              messageStatus = messageStatus.set("isRetracted", true);
             }
 
             if (!isCancelled && this.isOldCancelledMsg(msg)) {
-              console.log(
-                "---- is an old cancelled message but was not set yet"
-              );
-              this.messages__messageStatus__markAsCancelled({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                cancelled: true,
-              });
+              messageStatus = messageStatus.set("isCancelled", true);
             }
 
             if (
               !isCancellationPending &&
               this.isOldCancellationPendingMsg(msg)
             ) {
-              console.log(
-                "---- is an old cancellation pending message but was not set yet"
-              );
-              this.messages__messageStatus__markAsCancellationPending({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                cancellationPending: true,
-              });
+              messageStatus = messageStatus.set("isCancellationPending", true);
             }
+
+            this.messages__updateMessageStatus({
+              messageUri: msg.get("uri"),
+              connectionUri: this.connectionUri,
+              needUri: this.ownNeed.get("uri"),
+              messageStatus: messageStatus,
+            });
           });
         }
       });

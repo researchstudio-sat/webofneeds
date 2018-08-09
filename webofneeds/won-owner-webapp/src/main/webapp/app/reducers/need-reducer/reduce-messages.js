@@ -151,12 +151,12 @@ export function markMessageAsRejected(
   );
 }
 
-export function markMessageStatusUpToDate(
+export function updateMessageStatus(
   state,
   messageUri,
   connectionUri,
   needUri,
-  isMessageStatusUpToDate
+  messageStatus
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -174,17 +174,29 @@ export function markMessageStatusUpToDate(
     );
     return state;
   }
-  return state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "isMessageStatusUpToDate",
-    ],
-    isMessageStatusUpToDate
-  );
+  return state
+    .setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+      ],
+      messageStatus
+    )
+    .setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "isMessageStatusUpToDate",
+      ],
+      true
+    );
 }
 
 export function markMessageAsRetracted(

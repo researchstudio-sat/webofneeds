@@ -198,7 +198,7 @@ const actionHierarchy = {
       markAsCancelled: messages.markAsCancelled,
       markAsCancellationPending: messages.markAsCancellationPending,
     },
-    markMessageStatusUpToDate: messages.markMessageStatusUpToDate,
+    updateMessageStatus: messages.updateMessageStatus,
     processConnectionMessage: messages.processConnectionMessage,
     processAgreementMessage: messages.processAgreementMessage,
     needMessageReceived: messages.needMessageReceived,

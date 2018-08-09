@@ -393,7 +393,7 @@ export function markAsRetracted(event) {
   };
 }
 
-export function markMessageStatusAsUpToDate(event) {
+export function updateMessageStatus(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
       "needs",
@@ -408,11 +408,11 @@ export function markMessageStatusAsUpToDate(event) {
       messageUri: messageUri,
       connectionUri: event.connectionUri,
       needUri: event.needUri,
-      isMessageStatusUpToDate: event.retracted,
+      messageStatus: event.messageStatus,
     };
 
     dispatch({
-      type: actionTypes.messages.markMessageStatusAsUpToDate,
+      type: actionTypes.messages.updateMessageStatus,
       payload: payload,
     });
   };
