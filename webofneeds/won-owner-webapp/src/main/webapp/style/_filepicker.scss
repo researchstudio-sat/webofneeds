@@ -6,55 +6,6 @@ won-file-picker {
   display: grid;
   grid-gap: 0.5rem;
 
-  won-file-dropzone {
-    $borderSize: 5.66rem;
-    $padding: 1rem;
-    width: 100%;
-    height: $borderSize;
-    display: block;
-
-    %wid__dropzone {
-      box-sizing: border-box;
-      height: 100%;
-      width: 100%;
-
-      position: relative; //to allow children to use pos:absolute
-
-      overflow: hidden; // to crop the `fill`ing image
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      /* the preview is set via js:
-       * background-image: url({{self.imageDataUrl}});
-       */
-
-      input {
-        filter: alpha(opacity=0);
-        opacity: 0;
-        height: 100%;
-        width: 100%;
-        position: absolute;
-      }
-
-      & .wid__dropzone__bg {
-        @extend %center--absolute;
-        pointer-events: none;
-      }
-    }
-
-    .wid__dropzone--empty {
-      @extend %wid__dropzone;
-
-      border: $boldBorderWidth dashed $won-line-gray;
-      border-radius: $boldBorderWidth;
-
-      background-color: white;
-
-      .wid__dropzone__bg {
-        @include max-square($borderSize - 2 * $padding - 2 * $boldBorderWidth);
-      }
-    }
-  }
   .filep__header {
     font-size: $smallFontSize;
   }

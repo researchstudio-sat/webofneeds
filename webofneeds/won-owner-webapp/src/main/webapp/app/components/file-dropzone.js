@@ -7,14 +7,14 @@ import enterModule from "../directives/enter.js";
 import { dispatchEvent, attach, readAsDataURL } from "../utils.js";
 import globToRegexp from "glob-to-regexp";
 
+import "style/_file-dropzone.scss";
+
 function genComponentConf() {
   let template = `
-        <div class="wid__dropzone--empty">
-            <input type="file" accept="{{self.accepts}}" />
-            <svg class="wid__dropzone__bg" style="--local-primary:#CCD2D2;">
-                <use xlink:href="#illu_drag_here" href="#illu_drag_here"></use>
-            </svg>
-        </div>
+        <svg class="wid__dropzone__bg">
+            <use xlink:href="{{self.getIcon()}}" href="{{self.getIcon()}}"></use>
+        </svg>
+        <input type="file" accept="{{self.accepts}}" multiple />
     `;
 
   const serviceDependencies = [
@@ -28,16 +28,101 @@ function genComponentConf() {
 
       window.idc4dbg = this;
 
-      this.$element[0]
-        .querySelector('input[type="file"]')
-        .addEventListener("change", e => this.fileDropped(e.target.files[0]));
+      const fileInput = this.$element[0].querySelector("input");
+
+      fileInput.addEventListener("change", () => {
+        for (const file of fileInput.files) {
+          this.fileDropped(file);
+        }
+      });
+
+      this.$element[0].addEventListener("dragenter", e =>
+        this.handleDragOver(e)
+      );
+
+      this.$element[0].addEventListener("dragover", e =>
+        this.handleDragOver(e)
+      );
+
+      this.$element[0].addEventListener("dragleave", () =>
+        this.handleDragStop()
+      );
+
+      this.$element[0].addEventListener("drop", e => this.handleDrop(e));
+
+      this.$element[0].addEventListener("click", e => {
+        if (e.target == e.currentTarget) {
+          this.openFilePicker();
+        }
+      });
+    }
+
+    getIcon() {
+      if (this.invalid) {
+        return "#ico36_close";
+      } else {
+        return "#illu_drag_here";
+      }
+    }
+
+    handleDragOver(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const items = event.dataTransfer.items;
+      for (const item of items) {
+        if (item.kind !== "file" || !this.fileIsValid(item)) {
+          //show error state
+          this.$element[0].classList.add("invalid");
+          this.$element[0].classList.remove("valid");
+          this.invalid = true;
+          event.dataTransfer.dropEffect = "none";
+          this.$scope.$digest();
+          return;
+        }
+      }
+
+      this.$element[0].classList.add("valid");
+      this.$element[0].classList.remove("invalid");
+      event.dataTransfer.dropEffect = "copy";
+      this.invalid = false;
+      this.$scope.$digest();
+    }
+
+    handleDragStop() {
+      this.invalid = false;
+      this.$element[0].classList.remove("valid", "invalid");
+      this.$scope.$digest();
+    }
+
+    handleDrop(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.handleDragStop();
+
+      const items = event.dataTransfer.items;
+      for (const item of items) {
+        if (item.kind !== "file" || !this.fileIsValid(item)) {
+          return;
+        }
+      }
+
+      for (const item of items) {
+        this.fileDropped(item.getAsFile());
+      }
+    }
+
+    openFilePicker() {
+      const fileInput = this.$element[0].querySelector("input");
+      fileInput.value = "";
+      fileInput.click();
+    }
+
+    fileIsValid(f) {
+      return !this.accepts || globToRegexp(this.accepts).test(f.type);
     }
 
     fileDropped(f) {
-      if (
-        !this.accepts ||
-        (this.accepts && globToRegexp(this.accepts).test(f.type))
-      ) {
+      if (this.fileIsValid(f)) {
         readAsDataURL(f)
           .then(dataUrl => {
             this.$scope.$digest(); // so the preview is displayed

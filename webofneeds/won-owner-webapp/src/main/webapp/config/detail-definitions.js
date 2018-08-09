@@ -792,7 +792,7 @@ export const details = {
     label: "Files",
     icon: "#ico36_media_circle",
     placeholder: "",
-    accepts: "*/*",
+    accepts: "",
     component: "won-file-picker",
     viewerComponent: "won-file-viewer",
     parseToRDF: function({ value }) {
