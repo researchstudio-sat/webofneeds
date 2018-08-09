@@ -42,7 +42,7 @@ function genComponentConf() {
                 </svg>
             </a>
             <won-connection-header
-                connection-uri="self.connection.get('uri')"
+                connection-uri="self.connectionUri"
                 timestamp="self.lastUpdateTimestamp"
                 hide-image="::false">
             </won-connection-header>
@@ -187,8 +187,24 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
 
-      this.agreementHead = this.cloneDefaultData();
-      this.agreementLoading = this.cloneDefaultStateData();
+      this.agreementHead = Immutable.fromJS({
+        agreementUris: Immutable.Set(),
+        pendingProposalUris: Immutable.Set(),
+        pendingProposals: Immutable.Set(),
+        acceptedCancellationProposalUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+        pendingCancellationProposalUris: Immutable.Set(),
+        cancelledAgreementUris: Immutable.Set(),
+        rejectedMessageUris: Immutable.Set(),
+        retractedMessageUris: Immutable.Set(),
+      });
+
+      this.agreementLoading = Immutable.fromJS({
+        pendingProposalUris: Immutable.Set(),
+        agreementUris: Immutable.Set(),
+        cancellationPendingAgreementUris: Immutable.Set(),
+        isLoaded: false,
+      });
 
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
@@ -237,69 +253,10 @@ function genComponentConf() {
 
         //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
-        if (sortedMessages) {
-          const msgSet = new Set(sortedMessages);
-
-          // TODO: Optimization
-          for (const msg of msgSet) {
-            if (
-              !msg.getIn(["messageStatus", "isAccepted"]) &&
-              this.isOldAcceptedMsg(msg)
-            ) {
-              this.messages__messageStatus__markAsAccepted({
-                messageUri: msg.get("uri"),
-                connectionUri: connectionUri,
-                needUri: ownNeed.get("uri"),
-                accepted: true,
-              });
-            } else if (
-              !msg.getIn(["messageStatus", "isRejected"]) &&
-              this.isOldRejectedMsg(msg)
-            ) {
-              this.messages__messageStatus__markAsRejected({
-                messageUri: msg.get("uri"),
-                connectionUri: connectionUri,
-                needUri: ownNeed.get("uri"),
-                rejected: true,
-              });
-            } else if (
-              !msg.getIn(["messageStatus", "isRetracted"]) &&
-              this.isOldRetractedMsg(msg)
-            ) {
-              this.messages__messageStatus__markAsRetracted({
-                messageUri: msg.get("uri"),
-                connectionUri: connectionUri,
-                needUri: ownNeed.get("uri"),
-                retracted: true,
-              });
-            } else if (
-              !msg.getIn(["messageStatus", "isCancelled"]) &&
-              this.isOldCancelledMsg(msg)
-            ) {
-              this.messages__messageStatus__markAsCancelled({
-                messageUri: msg.get("uri"),
-                connectionUri: connectionUri,
-                needUri: ownNeed.get("uri"),
-                cancelled: true,
-              });
-            } else if (
-              !msg.getIn(["messageStatus", "isCancellationPending"]) &&
-              this.isOldCancellationPendingMsg(msg)
-            ) {
-              this.messages__messageStatus__markAsCancellationPending({
-                messageUri: msg.get("uri"),
-                connectionUri: connectionUri,
-                needUri: ownNeed.get("uri"),
-                cancellationPending: true,
-              });
-            }
-          }
-
-          sortedMessages = Array.from(msgSet);
+        sortedMessages &&
           sortedMessages.sort(function(a, b) {
             return a.get("date").getTime() - b.get("date").getTime();
           });
-        }
 
         const unreadMessages =
           chatMessages && chatMessages.filter(msg => msg.get("unread"));
@@ -354,6 +311,7 @@ function genComponentConf() {
       this.$scope.$watchGroup(["self.connection"], () => {
         this.ensureMessagesAreLoaded();
         this.ensureAgreementDataIsLoaded();
+        this.ensureMessageStateIsUpToDate();
       });
 
       this.$scope.$watch(
@@ -403,18 +361,168 @@ function genComponentConf() {
           !this.isLoadingAgreementData &&
           !this.agreementDataLoaded
         ) {
-          this.getAgreementData();
+          this.connections__setLoadingAgreementData({
+            connectionUri: this.connectionUri,
+            isLoadingAgreementData: true,
+          });
+
+          const url = urljoin(
+            ownerBaseUrl,
+            "/rest/agreement/getAgreementProtocolUris",
+            `?connectionUri=${this.encodeParam(this.connection.get("uri"))}`
+          );
+          let hasChanged = false;
+          callAgreementsFetch(url)
+            .then(response => {
+              this.agreementHead = this.transformDataToSet(response);
+              console.log("Retrieved AgreementData: ", this.agreementHead);
+
+              const agreementUris = this.agreementHead.get("agreementUris");
+              const pendingProposalUris = this.agreementHead.get(
+                "pendingProposalUris"
+              );
+              const cancellationPendingAgreementUris = this.agreementHead.get(
+                "cancellationPendingAgreementUris"
+              );
+
+              agreementUris.map(data => {
+                this.addAgreementDataToState(data, "agreementUris");
+                hasChanged = true;
+              });
+              pendingProposalUris.map(data => {
+                this.addAgreementDataToState(data, "pendingProposalUris");
+                hasChanged = true;
+              });
+              cancellationPendingAgreementUris.map(data => {
+                this.addAgreementDataToState(
+                  data,
+                  "cancellationPendingAgreementUris"
+                );
+                hasChanged = true;
+              });
+
+              //no data found for keyset: no relevant agreementData to show in GUI - clean state data
+              if (!hasChanged) {
+                this.connections__clearAgreementData({
+                  connectionUri: this.connectionUri,
+                });
+              }
+              //Remove all retracted/rejected messages
+              else if (
+                this.agreementData &&
+                (this.agreementHead.get("rejectedMessageUris") ||
+                  this.agreementHead.get("retractedMessageUris"))
+              ) {
+                const pendingProposalUris = this.agreementData.get(
+                  "pendingProposalUris"
+                );
+                const pendingProposalUrisWithout =
+                  pendingProposalUris &&
+                  pendingProposalUris
+                    .subtract(this.agreementHead.get("rejectedMessageUris"))
+                    .subtract(this.agreementHead.get("retractedMessageUris"));
+
+                this.agreementData = this.agreementData.set(
+                  "pendingProposalUris",
+                  pendingProposalUrisWithout
+                );
+
+                if (
+                  pendingProposalUris &&
+                  pendingProposalUrisWithout &&
+                  pendingProposalUris.size != pendingProposalUrisWithout.size
+                ) {
+                  hasChanged = true;
+                  this.connections__clearAgreementData({
+                    connectionUri: this.connectionUri,
+                  });
+                }
+              }
+            })
+            .then(() => {
+              if (!hasChanged) {
+                this.connections__setLoadingAgreementData({
+                  connectionUri: this.connectionUri,
+                  isLoadingAgreementData: false,
+                });
+              }
+            })
+            .catch(error => {
+              console.error("Error:", error);
+              this.connections__setLoadingAgreementData({
+                connectionUri: this.connectionUri,
+                isLoadingAgreementData: false,
+              });
+            });
         }
       });
     }
 
-    getAgreementData() {
-      this.connections__setLoadingAgreementData({
-        connectionUri: this.connectionUri,
-        isLoadingAgreementData: true,
+    ensureMessageStateIsUpToDate() {
+      delay(0).then(() => {
+        if (
+          this.isConnected &&
+          !this.isLoadingAgreementData &&
+          !this.isLoadingMessages &&
+          this.agreementDataLoaded
+        ) {
+          console.log("Ensure Message Status is up-to-date");
+          this.chatMessages.forEach(msg => {
+            console.log("Ensure message ", msg, "is up to date");
+            if (
+              !msg.getIn(["messageStatus", "isAccepted"]) &&
+              this.isOldAcceptedMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsAccepted({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                accepted: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isRejected"]) &&
+              this.isOldRejectedMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsRejected({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                rejected: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isRetracted"]) &&
+              this.isOldRetractedMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsRetracted({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                retracted: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isCancelled"]) &&
+              this.isOldCancelledMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsCancelled({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                cancelled: true,
+              });
+            } else if (
+              !msg.getIn(["messageStatus", "isCancellationPending"]) &&
+              this.isOldCancellationPendingMsg(msg)
+            ) {
+              this.messages__messageStatus__markAsCancellationPending({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                cancellationPending: true,
+              });
+            }
+          });
+        }
       });
-
-      this.getAgreementDataUris();
     }
 
     loadPreviousMessages() {
@@ -493,7 +601,6 @@ function genComponentConf() {
     }
 
     showAgreementDataField() {
-      //this.getAgreementData();
       this.setShowAgreementData(true);
     }
 
@@ -506,97 +613,6 @@ function genComponentConf() {
 
     encodeParam(param) {
       return encodeURIComponent(param);
-    }
-
-    getAgreementDataUris() {
-      const url = urljoin(
-        ownerBaseUrl,
-        "/rest/agreement/getAgreementProtocolUris",
-        `?connectionUri=${this.encodeParam(this.connection.get("uri"))}`
-      );
-      let hasChanged = false;
-      callAgreementsFetch(url)
-        .then(response => {
-          this.agreementHead = this.transformDataToSet(response);
-          console.log("Retrieved AgreementData: ", this.agreementHead);
-
-          const agreementUris = this.agreementHead.get("agreementUris");
-          const pendingProposalUris = this.agreementHead.get(
-            "pendingProposalUris"
-          );
-          const cancellationPendingAgreementUris = this.agreementHead.get(
-            "cancellationPendingAgreementUris"
-          );
-
-          agreementUris.map(data => {
-            this.addAgreementDataToState(data, "agreementUris");
-            hasChanged = true;
-          });
-          pendingProposalUris.map(data => {
-            this.addAgreementDataToState(data, "pendingProposalUris");
-            hasChanged = true;
-          });
-          cancellationPendingAgreementUris.map(data => {
-            this.addAgreementDataToState(
-              data,
-              "cancellationPendingAgreementUris"
-            );
-            hasChanged = true;
-          });
-
-          //no data found for keyset: no relevant agreementData to show in GUI - clean state data
-          if (!hasChanged) {
-            this.connections__clearAgreementData({
-              connectionUri: this.connectionUri,
-            });
-          }
-          //Remove all retracted/rejected messages
-          else if (
-            this.agreementData &&
-            (this.agreementHead.get("rejectedMessageUris") ||
-              this.agreementHead.get("retractedMessageUris"))
-          ) {
-            const pendingProposalUris = this.agreementData.get(
-              "pendingProposalUris"
-            );
-            const pendingProposalUrisWithout =
-              pendingProposalUris &&
-              pendingProposalUris
-                .subtract(this.agreementHead.get("rejectedMessageUris"))
-                .subtract(this.agreementHead.get("retractedMessageUris"));
-
-            this.agreementData = this.agreementData.set(
-              "pendingProposalUris",
-              pendingProposalUrisWithout
-            );
-
-            if (
-              pendingProposalUris &&
-              pendingProposalUrisWithout &&
-              pendingProposalUris.size != pendingProposalUrisWithout.size
-            ) {
-              hasChanged = true;
-              this.connections__clearAgreementData({
-                connectionUri: this.connectionUri,
-              });
-            }
-          }
-        })
-        .then(() => {
-          if (!hasChanged) {
-            this.connections__setLoadingAgreementData({
-              connectionUri: this.connectionUri,
-              isLoadingAgreementData: false,
-            });
-          }
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          this.connections__setLoadingAgreementData({
-            connectionUri: this.connectionUri,
-            isLoadingAgreementData: false,
-          });
-        });
     }
 
     transformDataToSet(response) {
@@ -782,29 +798,6 @@ function genComponentConf() {
         return true;
       }
       return false;
-    }
-
-    cloneDefaultData() {
-      return Immutable.fromJS({
-        agreementUris: Immutable.Set(),
-        pendingProposalUris: Immutable.Set(),
-        pendingProposals: Immutable.Set(),
-        acceptedCancellationProposalUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        pendingCancellationProposalUris: Immutable.Set(),
-        cancelledAgreementUris: Immutable.Set(),
-        rejectedMessageUris: Immutable.Set(),
-        retractedMessageUris: Immutable.Set(),
-      });
-    }
-
-    cloneDefaultStateData() {
-      return Immutable.fromJS({
-        pendingProposalUris: Immutable.Set(),
-        agreementUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        isLoaded: false,
-      });
     }
 
     openRequest(message) {
