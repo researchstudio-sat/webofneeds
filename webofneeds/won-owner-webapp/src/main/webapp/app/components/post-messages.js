@@ -721,10 +721,9 @@ function genComponentConf() {
       return (
         !isAccepted &&
         references &&
-        references.get("proposesToCancel") &&
-        references.get("proposesToCancel").size > 0 &&
-        references.get("proposes") &&
-        references.get("proposes").size > 0
+        ((references.get("proposesToCancel") &&
+          references.get("proposesToCancel").size > 0) ||
+          (references.get("proposes") && references.get("proposes").size > 0))
       );
     }
 
