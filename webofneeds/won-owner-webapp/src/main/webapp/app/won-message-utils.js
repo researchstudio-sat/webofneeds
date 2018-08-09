@@ -542,8 +542,8 @@ function fetchOwnedActiveNeedUris() {
 }
 
 // API call to get agreements data for a connection
-export function callAgreementsFetch(url) {
-  console.log("callAgreementsFetch: ", url);
+export function fetchAgreementData(url) {
+  console.log("fetchAgreementData: ", url);
   return fetch(url, {
     method: "get",
     headers: {
@@ -556,8 +556,8 @@ export function callAgreementsFetch(url) {
     .then(response => response.json());
 }
 
-export function callAgreementEventFetch(needUri, eventUri) {
-  console.log("callAgreementEventFetch: ", needUri, " eventUri: ", eventUri);
+export function fetchMessage(needUri, eventUri) {
+  console.log("fetchMessage: ", needUri, " eventUri: ", eventUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/linked-data/",

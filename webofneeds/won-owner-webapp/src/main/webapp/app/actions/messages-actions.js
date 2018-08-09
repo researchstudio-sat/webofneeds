@@ -17,7 +17,7 @@ import Immutable from "immutable";
 
 import {
   fetchDataForOwnedNeeds,
-  callAgreementsFetch,
+  fetchAgreementData,
 } from "../won-message-utils.js";
 
 export function successfulCloseNeed(event) {
@@ -229,15 +229,15 @@ export function processConnectionMessage(event) {
       `&messageUri=${event.getMessageUri()}`
     );
 
-    callAgreementsFetch(url).then(response => {
+    fetchAgreementData(url).then(response => {
       if (response && response.length > 0) {
         console.log("agreement response : ", response);
       }
       for (const effect of response) {
+        //THIS DOES NOT REALLY WORK FOR ME AS THERE ARE MULTIPLE THINGS THAT CAN HAPPEN AS A RESPONSE OF ONE MESSAGE
         console.log("effect : ", effect);
         switch (effect.type) {
           case "ACCEPTS":
-            console.log("ACCEPTS");
             if (effect.accepts) {
               let messageUri = getEventUri(messages, effect.acceptedMessageUri);
               dispatch({
@@ -251,13 +251,10 @@ export function processConnectionMessage(event) {
               });
             }
             break;
-
           case "PROPOSES":
-            console.log("PROPOSES");
             break;
 
           case "REJECTS":
-            console.log("REJECTS");
             if (effect.rejects) {
               let messageUri = getEventUri(messages, effect.rejectedMessageUri);
               dispatch({
@@ -273,7 +270,6 @@ export function processConnectionMessage(event) {
             break;
 
           case "RETRACTS":
-            console.log("RETRACTS");
             if (effect.retracts) {
               let messageUri = getEventUri(
                 messages,

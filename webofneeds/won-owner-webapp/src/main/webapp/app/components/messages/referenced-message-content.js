@@ -7,7 +7,7 @@ import { attach, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
-import { callAgreementEventFetch } from "../../won-message-utils.js";
+import { fetchMessage } from "../../won-message-utils.js";
 
 import "style/_referenced-message-content.scss";
 
@@ -180,7 +180,7 @@ function genComponentConf() {
 
     addMessageToState(eventUri) {
       const ownNeedUri = this.ownNeedUri;
-      return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
+      return fetchMessage(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
             /*if we find out that the receiverneed of the crawled event is actually our

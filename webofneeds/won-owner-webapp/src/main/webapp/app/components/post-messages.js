@@ -14,10 +14,7 @@ import urljoin from "url-join";
 
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay } from "../utils.js";
-import {
-  callAgreementsFetch,
-  callAgreementEventFetch,
-} from "../won-message-utils.js";
+import { fetchAgreementData, fetchMessage } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
@@ -377,7 +374,7 @@ function genComponentConf() {
             `?connectionUri=${this.encodeParam(this.connection.get("uri"))}`
           );
           let hasChanged = false;
-          callAgreementsFetch(url)
+          fetchAgreementData(url)
             .then(response => {
               this.agreementHead = this.transformDataToSet(response);
               console.log("Retrieved AgreementData: ", this.agreementHead);
@@ -673,7 +670,7 @@ function genComponentConf() {
 
     addAgreementDataToState(eventUri, key, obj) {
       const ownNeedUri = this.ownNeed.get("uri");
-      return callAgreementEventFetch(ownNeedUri, eventUri).then(response => {
+      return fetchMessage(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
           let agreementObject = obj;
 
