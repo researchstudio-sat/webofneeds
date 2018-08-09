@@ -87,19 +87,19 @@ function genComponentConf() {
                 </div>
                 <div class="won-cm__center__bubble__button-area" ng-if="(self.hasProposesReferences() || self.hasProposesToCancelReferences())">
                     <button class="won-button--filled thin red"
-                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
+                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
                         ng-disabled="self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted()"
+                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
                         ng-disabled="self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted()"
+                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
                         ng-disabled="self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
@@ -119,6 +119,16 @@ function genComponentConf() {
                         ng-if="self.isCancelled()"
                         ng-disabled="true">
                       Cancelled
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isRejected()"
+                        ng-disabled="true">
+                      Rejected
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isRetracted()"
+                        ng-disabled="true">
+                      Retracted
                     </button>
                 </div>
             </div>
