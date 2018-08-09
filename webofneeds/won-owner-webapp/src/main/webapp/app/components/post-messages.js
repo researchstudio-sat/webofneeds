@@ -8,13 +8,12 @@ import connectionHeaderModule from "./connection-header.js";
 import labelledHrModule from "./labelled-hr.js";
 import connectionContextDropdownModule from "./connection-context-dropdown.js";
 import feedbackGridModule from "./feedback-grid.js";
-
-import { ownerBaseUrl } from "config";
-import urljoin from "url-join";
-
 import { connect2Redux } from "../won-utils.js";
 import { attach, delay } from "../utils.js";
-import { fetchAgreementData, fetchMessage } from "../won-message-utils.js";
+import {
+  fetchAgreementProtocolUris,
+  fetchMessage,
+} from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
@@ -368,13 +367,8 @@ function genComponentConf() {
             isLoadingAgreementData: true,
           });
 
-          const url = urljoin(
-            ownerBaseUrl,
-            "/rest/agreement/getAgreementProtocolUris",
-            `?connectionUri=${this.encodeParam(this.connection.get("uri"))}`
-          );
           let hasChanged = false;
-          fetchAgreementData(url)
+          fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
               this.agreementHead = this.transformDataToSet(response);
               console.log("Retrieved AgreementData: ", this.agreementHead);
@@ -627,10 +621,6 @@ function genComponentConf() {
         connectionUri: this.connectionUri,
         showAgreementData: value,
       });
-    }
-
-    encodeParam(param) {
-      return encodeURIComponent(param);
     }
 
     transformDataToSet(response) {

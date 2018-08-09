@@ -25,14 +25,9 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
         parsedNeed = parsedNeed
           .set("connections", existingNeed.get("connections"))
           .set("ownNeed", true);
-        console.log(
-          "updateOwnNeed after load or creation: ",
-          parsedNeed.get("uri")
-        );
         return needs.setIn([parsedNeed.get("uri")], parsedNeed);
       } else {
         // just be sure we mark it as own need
-        console.log("updateOwnNeed just in case: ", parsedNeed.get("uri"));
         return needs.setIn([parsedNeed.get("uri"), "ownNeed"], true);
       }
     } else if (!ownNeed && existingNeed) {
@@ -46,15 +41,12 @@ export function addNeed(needs, jsonldNeed, ownNeed) {
         parsedNeed = parsedNeed
           .set("connections", existingNeed.get("connections"))
           .set("ownNeed", false);
-        console.log("updateTheirNeed after load: ", parsedNeed.get("uri"));
         return needs.setIn([parsedNeed.get("uri")], parsedNeed);
       } else {
         // just be sure we mark it as non own need
-        console.log("updateTheirNeed just in case: ", parsedNeed.get("uri"));
         return needs.setIn([parsedNeed.get("uri"), "ownNeed"], false);
       }
     } else {
-      console.log("addNeed if new: ", parsedNeed.get("uri"));
       return setIfNew(needs, parsedNeed.get("uri"), parsedNeed);
     }
   } else {

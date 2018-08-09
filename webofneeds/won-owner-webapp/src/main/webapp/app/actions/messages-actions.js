@@ -9,15 +9,11 @@ import {
   getConnectionRelatedData,
 } from "./actions.js";
 
-import urljoin from "url-join";
-
-import { ownerBaseUrl } from "config";
-
 import Immutable from "immutable";
 
 import {
   fetchDataForOwnedNeeds,
-  fetchAgreementData,
+  fetchMessageEffects,
 } from "../won-message-utils.js";
 
 export function successfulCloseNeed(event) {
@@ -222,14 +218,7 @@ export function processConnectionMessage(event) {
       "messages",
     ]);
 
-    const url = urljoin(
-      ownerBaseUrl,
-      "/rest/agreement/getMessageEffects",
-      `?connectionUri=${connectionUri}`,
-      `&messageUri=${event.getMessageUri()}`
-    );
-
-    fetchAgreementData(url).then(response => {
+    fetchMessageEffects(connectionUri, event.getMessageUri()).then(response => {
       if (response && response.length > 0) {
         console.log("agreement response : ", response);
       }
