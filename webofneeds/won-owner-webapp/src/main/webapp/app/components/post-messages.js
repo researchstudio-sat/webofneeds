@@ -716,11 +716,15 @@ function genComponentConf() {
 
     isOpenProposal(msg) {
       const isAccepted = msg && msg.getIn(["messageStatus", "isAccepted"]);
-      const references = msg && msg.get("references");
+      const isCancelled = msg && msg.getIn(["messageStatus", "isCancelled"]);
+      const isCancellationPending =
+        msg && msg.getIn(["messageStatus", "isCancellationPending"]);
+      const references =
+        msg && msg.get("hasReferences") && msg.get("references");
 
       return (
-        !isAccepted &&
         references &&
+        !(isAccepted || isCancellationPending || isCancelled) &&
         ((references.get("proposesToCancel") &&
           references.get("proposesToCancel").size > 0) ||
           (references.get("proposes") && references.get("proposes").size > 0))
