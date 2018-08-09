@@ -370,15 +370,51 @@ function genComponentConf() {
           let hasChanged = false;
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
-              this.agreementHead = this.transformDataToSet(response);
+              this.agreementHead = Immutable.fromJS({
+                agreementUris: Immutable.Set(response.agreementUris),
+                pendingProposalUris: Immutable.Set(
+                  response.pendingProposalUris
+                ),
+                pendingProposals: Immutable.Set(response.pendingProposals),
+                acceptedCancellationProposalUris: Immutable.Set(
+                  response.acceptedCancellationProposalUris
+                ),
+                cancellationPendingAgreementUris: Immutable.Set(
+                  response.cancellationPendingAgreementUris
+                ),
+                pendingCancellationProposalUris: Immutable.Set(
+                  response.pendingCancellationProposalUris
+                ),
+                cancelledAgreementUris: Immutable.Set(
+                  response.cancelledAgreementUris
+                ),
+                rejectedMessageUris: Immutable.Set(
+                  response.rejectedMessageUris
+                ),
+                retractedMessageUris: Immutable.Set(
+                  response.retractedMessageUris
+                ),
+              });
+
+              const cancellationPendingAgreementUris =
+                this.agreementHead &&
+                this.agreementHead.get("cancellationPendingAgreementUris");
+              const agreementUrisWithout =
+                this.agreementHead &&
+                this.agreementHead
+                  .get("agreementUris")
+                  .subtract(cancellationPendingAgreementUris);
+
+              this.agreementHead = this.agreementHead.set(
+                "agreementUris",
+                agreementUrisWithout
+              );
+
               console.log("Retrieved AgreementData: ", this.agreementHead);
 
               const agreementUris = this.agreementHead.get("agreementUris");
               const pendingProposalUris = this.agreementHead.get(
                 "pendingProposalUris"
-              );
-              const cancellationPendingAgreementUris = this.agreementHead.get(
-                "cancellationPendingAgreementUris"
               );
 
               agreementUris.map(data => {
@@ -620,41 +656,6 @@ function genComponentConf() {
         connectionUri: this.connectionUri,
         showAgreementData: value,
       });
-    }
-
-    transformDataToSet(response) {
-      const tmpAgreementData = Immutable.fromJS({
-        agreementUris: Immutable.Set(response.agreementUris),
-        pendingProposalUris: Immutable.Set(response.pendingProposalUris),
-        pendingProposals: Immutable.Set(response.pendingProposals),
-        acceptedCancellationProposalUris: Immutable.Set(
-          response.acceptedCancellationProposalUris
-        ),
-        cancellationPendingAgreementUris: Immutable.Set(
-          response.cancellationPendingAgreementUris
-        ),
-        pendingCancellationProposalUris: Immutable.Set(
-          response.pendingCancellationProposalUris
-        ),
-        cancelledAgreementUris: Immutable.Set(response.cancelledAgreementUris),
-        rejectedMessageUris: Immutable.Set(response.rejectedMessageUris),
-        retractedMessageUris: Immutable.Set(response.retractedMessageUris),
-      });
-
-      return this.filterAgreementSet(tmpAgreementData);
-    }
-
-    filterAgreementSet(tmpAgreementData) {
-      const cancellationPendingAgreementUris =
-        tmpAgreementData &&
-        tmpAgreementData.get("cancellationPendingAgreementUris");
-      const agreementUrisWithout =
-        tmpAgreementData &&
-        tmpAgreementData
-          .get("agreementUris")
-          .subtract(cancellationPendingAgreementUris);
-
-      return tmpAgreementData.set("agreementUris", agreementUrisWithout);
     }
 
     addAgreementDataToState(eventUri, key, obj) {
