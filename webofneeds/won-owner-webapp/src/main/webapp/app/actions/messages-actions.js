@@ -393,6 +393,31 @@ export function markAsRetracted(event) {
   };
 }
 
+export function markMessageStatusAsUpToDate(event) {
+  return (dispatch, getState) => {
+    const messages = getState().getIn([
+      "needs",
+      event.needUri,
+      "connections",
+      event.connectionUri,
+      "messages",
+    ]);
+    const messageUri = getEventUri(messages, event.messageUri);
+
+    const payload = {
+      messageUri: messageUri,
+      connectionUri: event.connectionUri,
+      needUri: event.needUri,
+      isMessageStatusUpToDate: event.retracted,
+    };
+
+    dispatch({
+      type: actionTypes.messages.markMessageStatusAsUpToDate,
+      payload: payload,
+    });
+  };
+}
+
 export function markAsRejected(event) {
   return (dispatch, getState) => {
     const messages = getState().getIn([
