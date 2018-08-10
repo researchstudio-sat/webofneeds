@@ -361,9 +361,9 @@ function genComponentConf() {
 
     proposeToCancel() {
       this.clicked = true;
-      const uri = this.isOwn
-        ? this.message.get("uri")
-        : this.message.get("remoteUri");
+      const uri = this.message.get("remoteUri")
+        ? this.message.get("remoteUri")
+        : this.message.get("uri");
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
       this.connections__sendChatMessage(
