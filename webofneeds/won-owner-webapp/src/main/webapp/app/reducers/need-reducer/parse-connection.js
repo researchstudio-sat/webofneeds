@@ -34,6 +34,7 @@ export function parseConnection(jsonldConnection) {
       isLoadingAgreementData: false,
       isLoading: false,
       showAgreementData: false,
+      showMultiSelect: false,
     },
   };
 

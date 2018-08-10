@@ -293,6 +293,23 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
   );
 }
 
+export function setShowMultiSelect(state, connectionUri, showMultiSelect) {
+  const need = selectNeedByConnectionUri(state, connectionUri);
+
+  if (!need) {
+    console.error("no need found for connectionUri", connectionUri);
+    return state;
+  }
+
+  const needUri = need.get("uri");
+
+  //TODO: RESET ALL THE SELECTIONS IF THE SHOWMULTISELECT IS SET TO FALSE
+  return state.setIn(
+    [needUri, "connections", connectionUri, "showMultiSelect"],
+    showMultiSelect
+  );
+}
+
 export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
   needUri &&
     connUris &&
