@@ -260,9 +260,14 @@ export function clearAgreementStateData(state, connectionUri) {
     .setIn(
       [needUri, "connections", connectionUri, "agreementData"],
       Immutable.fromJS({
-        pendingProposalUris: Immutable.Set(),
         agreementUris: Immutable.Set(),
+        pendingProposalUris: Immutable.Set(),
+        pendingCancellationProposalUris: Immutable.Set(),
         cancellationPendingAgreementUris: Immutable.Set(),
+        acceptedCancellationProposalUris: Immutable.Set(),
+        cancelledAgreementUris: Immutable.Set(),
+        rejectedMessageUris: Immutable.Set(),
+        retractedMessageUris: Immutable.Set(),
         isLoaded: true,
       })
     )

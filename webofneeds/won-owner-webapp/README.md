@@ -143,9 +143,14 @@ $ngRedux.getState();
                    ...
                },
                agreementData: { //contains agreementData that is necessary to display for the user
-                   agreementUris: Immutable.Set(), //agreementUris with the current state uris of the connection
-                   cancellationPendingAgreementUris: Immutable.Set(), ///proposeToCancelUris with the current state uris of the connection
-                   pendingProposalUris: Immutable.Set(), //pendingProposalUris with the current state uris of the connection
+                   agreementUris: Immutable.Set(),
+                   pendingProposalUris: Immutable.Set(),
+                   pendingCancellationProposalUris: Immutable.Set(),
+                   cancellationPendingAgreementUris: Immutable.Set(),
+                   acceptedCancellationProposalUris: Immutable.Set(),
+                   cancelledAgreementUris: Immutable.Set(),
+                   rejectedMessageUris: Immutable.Set(),
+                   retractedMessageUris: Immutable.Set(),
                    isLoaded: true|false, //default is false, whether or not the agreementData has been loaded already
                },
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements

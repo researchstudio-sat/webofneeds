@@ -183,25 +183,6 @@ function genComponentConf() {
       attach(this, serviceDependencies, arguments);
       window.pm4dbg = this;
 
-      this.agreementHead = Immutable.fromJS({
-        agreementUris: Immutable.Set(),
-        pendingProposalUris: Immutable.Set(),
-        pendingProposals: Immutable.Set(),
-        acceptedCancellationProposalUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        pendingCancellationProposalUris: Immutable.Set(),
-        cancelledAgreementUris: Immutable.Set(),
-        rejectedMessageUris: Immutable.Set(),
-        retractedMessageUris: Immutable.Set(),
-      });
-
-      this.agreementLoading = Immutable.fromJS({
-        pendingProposalUris: Immutable.Set(),
-        agreementUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        isLoaded: false,
-      });
-
       this.rdfTextfieldHelpText =
         "Expects valid turtle. " +
         `<${won.WONMSG.uriPlaceholder.event}> will ` +
@@ -355,27 +336,27 @@ function genComponentConf() {
       });
     }
 
-    ensureAgreementDataIsLoaded() {
+    ensureAgreementDataIsLoaded(forceFetch = false) {
       delay(0).then(() => {
         if (
-          this.isConnected &&
-          !this.isLoadingAgreementData &&
-          !this.agreementDataLoaded
+          forceFetch ||
+          (this.isConnected &&
+            !this.isLoadingAgreementData &&
+            !this.agreementDataLoaded)
         ) {
           this.connections__setLoadingAgreementData({
             connectionUri: this.connectionUri,
             isLoadingAgreementData: true,
           });
 
-          let hasChanged = false;
           fetchAgreementProtocolUris(this.connection.get("uri"))
             .then(response => {
-              this.agreementHead = Immutable.fromJS({
+              console.log("retrieved agreement Protocol Uris: ", response);
+              const agreementData = Immutable.fromJS({
                 agreementUris: Immutable.Set(response.agreementUris),
                 pendingProposalUris: Immutable.Set(
                   response.pendingProposalUris
                 ),
-                pendingProposals: Immutable.Set(response.pendingProposals),
                 acceptedCancellationProposalUris: Immutable.Set(
                   response.acceptedCancellationProposalUris
                 ),
@@ -396,88 +377,15 @@ function genComponentConf() {
                 ),
               });
 
-              const cancellationPendingAgreementUris =
-                this.agreementHead &&
-                this.agreementHead.get("cancellationPendingAgreementUris");
-              const agreementUrisWithout =
-                this.agreementHead &&
-                this.agreementHead
-                  .get("agreementUris")
-                  .subtract(cancellationPendingAgreementUris);
+              this.connections__updateAgreementData({
+                connectionUri: this.connectionUri,
+                agreementData: agreementData,
+              });
 
-              this.agreementHead = this.agreementHead.set(
-                "agreementUris",
-                agreementUrisWithout
+              //Retrieve all the relevant messages
+              agreementData.map((uriList, key) =>
+                uriList.map(uri => this.addAgreementDataToState(uri, key))
               );
-
-              console.log("Retrieved AgreementData: ", this.agreementHead);
-
-              const agreementUris = this.agreementHead.get("agreementUris");
-              const pendingProposalUris = this.agreementHead.get(
-                "pendingProposalUris"
-              );
-
-              agreementUris.map(data => {
-                this.addAgreementDataToState(data, "agreementUris");
-                hasChanged = true;
-              });
-              pendingProposalUris.map(data => {
-                this.addAgreementDataToState(data, "pendingProposalUris");
-                hasChanged = true;
-              });
-              cancellationPendingAgreementUris.map(data => {
-                this.addAgreementDataToState(
-                  data,
-                  "cancellationPendingAgreementUris"
-                );
-                hasChanged = true;
-              });
-
-              //no data found for keyset: no relevant agreementData to show in GUI - clean state data
-              if (!hasChanged) {
-                this.connections__clearAgreementData({
-                  connectionUri: this.connectionUri,
-                });
-              }
-              //Remove all retracted/rejected messages
-              else if (
-                this.agreementData &&
-                (this.agreementHead.get("rejectedMessageUris") ||
-                  this.agreementHead.get("retractedMessageUris"))
-              ) {
-                const pendingProposalUris = this.agreementData.get(
-                  "pendingProposalUris"
-                );
-                const pendingProposalUrisWithout =
-                  pendingProposalUris &&
-                  pendingProposalUris
-                    .subtract(this.agreementHead.get("rejectedMessageUris"))
-                    .subtract(this.agreementHead.get("retractedMessageUris"));
-
-                this.agreementData = this.agreementData.set(
-                  "pendingProposalUris",
-                  pendingProposalUrisWithout
-                );
-
-                if (
-                  pendingProposalUris &&
-                  pendingProposalUrisWithout &&
-                  pendingProposalUris.size != pendingProposalUrisWithout.size
-                ) {
-                  hasChanged = true;
-                  this.connections__clearAgreementData({
-                    connectionUri: this.connectionUri,
-                  });
-                }
-              }
-            })
-            .then(() => {
-              if (!hasChanged) {
-                this.connections__setLoadingAgreementData({
-                  connectionUri: this.connectionUri,
-                  isLoadingAgreementData: false,
-                });
-              }
             })
             .catch(error => {
               console.error("Error:", error);
@@ -511,19 +419,19 @@ function genComponentConf() {
             const remoteMsgUri = msg.get("remoteUri");
 
             const acceptedUris =
-              this.agreementHead && this.agreementHead.get("agreementUris");
+              this.agreementData && this.agreementData.get("agreementUris");
             const rejectedUris =
-              this.agreementHead &&
-              this.agreementHead.get("rejectedMessageUris");
+              this.agreementData &&
+              this.agreementData.get("rejectedMessageUris");
             const retractedUris =
-              this.agreementHead &&
-              this.agreementHead.get("retractedMessageUris");
+              this.agreementData &&
+              this.agreementData.get("retractedMessageUris");
             const cancelledUris =
-              this.agreementHead &&
-              this.agreementHead.get("cancelledAgreementUris");
+              this.agreementData &&
+              this.agreementData.get("cancelledAgreementUris");
             const cancellationPendingUris =
-              this.agreementHead &&
-              this.agreementHead.get("cancellationPendingAgreementUris");
+              this.agreementData &&
+              this.agreementData.get("cancellationPendingAgreementUris");
 
             const isAccepted = messageStatus && messageStatus.get("isAccepted");
             const isRejected = messageStatus && messageStatus.get("isRejected");
@@ -622,9 +530,6 @@ function genComponentConf() {
 
       this._programmaticallyScrolling = false;
     }
-    scrollContainerNg() {
-      return angular.element(this.scrollContainer());
-    }
     scrollContainer() {
       if (!this._scrollContainer) {
         this._scrollContainer = this.$element[0].querySelector(".pm__content");
@@ -658,64 +563,45 @@ function genComponentConf() {
       });
     }
 
-    addAgreementDataToState(eventUri, key, obj) {
+    addAgreementDataToState(eventUri, key) {
+      console.log(
+        "addAgreementDataToState: key:[",
+        key,
+        "] eventUri: [",
+        eventUri,
+        "]"
+      );
       const ownNeedUri = this.ownNeed.get("uri");
       return fetchMessage(ownNeedUri, eventUri).then(response => {
         won.wonMessageFromJsonLd(response).then(msg => {
-          let agreementObject = obj;
-
           if (msg.isFromOwner() && msg.getReceiverNeed() === ownNeedUri) {
+            console.log(
+              "eventUri was from other try again with remoteMessageUri"
+            );
             /*if we find out that the receiverneed of the crawled event is actually our
-                         need we will call the method again but this time with the correct eventUri
-                         */
-            if (!agreementObject) {
-              agreementObject = Immutable.fromJS({
-                stateUri: undefined,
-                headUri: undefined,
-              });
-            }
-            agreementObject = agreementObject.set(
-              "headUri",
-              msg.getMessageUri()
-            );
-            this.addAgreementDataToState(
-              msg.getRemoteMessageUri(),
-              key,
-              agreementObject
-            );
+              need we will call the method again but this time with the correct eventUri
+            */
+            this.addAgreementDataToState(msg.getRemoteMessageUri(), key);
           } else {
-            if (!agreementObject) {
-              agreementObject = Immutable.fromJS({
-                stateUri: undefined,
-                headUri: undefined,
-              });
-              agreementObject = agreementObject.set(
-                "headUri",
-                msg.getMessageUri()
+            //If message isnt in the state we add it
+            if (!this.chatMessages.get(eventUri)) {
+              console.log(
+                "AgreementMessage not present in state, adding message: key:[",
+                key,
+                "] eventUri: [",
+                eventUri,
+                "]"
+              );
+              this.messages__processAgreementMessage(msg);
+            } else {
+              console.log(
+                "AgreementMessage already present in state: key:[",
+                key,
+                "] eventUri: [",
+                eventUri,
+                "]"
               );
             }
-            agreementObject = agreementObject.set(
-              "stateUri",
-              msg.getMessageUri()
-            );
-
-            //this.agreementLoadingJS[key].add(agreementObject);
-            //TODO: does the line below do the same?
-            this.agreementLoading = this.agreementLoading.set(
-              key,
-              this.agreementLoading.get(key).add(agreementObject)
-            );
-
-            //If message isnt in the state we add it
-            if (!this.chatMessages.get(agreementObject.get("stateUri"))) {
-              this.messages__processAgreementMessage(msg);
-            }
-
-            //Update agreementData in State
-            this.connections__updateAgreementData({
-              connectionUri: this.connectionUri,
-              agreementData: this.agreementLoading,
-            });
           }
         });
       });
