@@ -8,6 +8,7 @@
 import won from "./won.js";
 // import { useCases } from "useCaseDefinitions";
 import { getAllDetails } from "../won-utils";
+import { is } from "../utils";
 import { useCases } from "../../config/usecase-definitions.js";
 
 import { Generator } from "sparqljs";
@@ -225,6 +226,21 @@ import { Generator } from "sparqljs";
 
     const sparqlGenerator = new Generator();
 
+    const isContentNode = args.is
+      ? buildContentNode(isContentUri, args.is)
+      : {};
+    const seeksContentNode =
+      args.seeks && !isWhatsAround
+        ? buildContentNode(seeksContentUri, args.seeks)
+        : {};
+
+    const doNotMatchAfterFnOrLit = useCase && useCase.doNotMatchAfter;
+    const doNotMatchAfter = is("Function", doNotMatchAfterFnOrLit)
+      ? doNotMatchAfterFnOrLit(args, {
+          "@graph": [isContentNode, seeksContentNode],
+        }) // TODO pass draft and jsonld
+      : doNotMatchAfterFnOrLit;
+
     const graph = [
       {
         "@id": args.is
@@ -246,15 +262,16 @@ import { Generator } from "sparqljs";
           noHints ? "won:NoHintForMe" : undefined,
           noHints ? "won:NoHintForCounterpart" : undefined,
         ]), ///.toArray().filter(f => f),
+        "won:doNotMatchAfter": doNotMatchAfter
+          ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
+          : undefined,
         "won:hasMatchingContext": matchingContext ? matchingContext : undefined,
         "won:hasSearchString": searchString ? searchString : undefined,
         "won:hasQuery": query ? sparqlGenerator.stringify(query) : undefined,
       },
       //, <if _hasModalities> {... (see directly below) } </if>
-      args.is ? buildContentNode(isContentUri, args.is) : {},
-      args.seeks && !isWhatsAround
-        ? buildContentNode(seeksContentUri, args.seeks)
-        : {},
+      isContentNode,
+      seeksContentNode,
       ...(args.is && args.is.arbitraryJsonLd ? args.is.arbitraryJsonLd : []),
       ...(args.seeks && args.seeks.arbitraryJsonLd
         ? args.seeks.arbitraryJsonLd

@@ -9,6 +9,9 @@ import {
   generateIdString,
   getIn,
   getRandomString,
+  findAllFieldOccurancesRecursively,
+  is,
+  endOfXsdDateInterval,
 } from "./utils.js";
 
 import { ownerBaseUrl } from "config";
@@ -317,4 +320,36 @@ export function getAllDetails() {
 
 function hasSubElements(obj) {
   return obj && obj !== {} && Object.keys(obj).length > 0;
+}
+
+export function findLatestIntervallEndInJsonLd(draft, jsonld) {
+  // get all occurrances of `dc:time`, `dc:date` or `dc:datetime` in the jsonld
+  const allTimes = Array.concat(
+    findAllFieldOccurancesRecursively("dc:date", jsonld),
+    findAllFieldOccurancesRecursively("dc:datetime", jsonld)
+  );
+
+  // filter for string-literals (just in case)
+  const allTimesStrs = allTimes.filter(s => {
+    if (is("String", s)) {
+      return true;
+    } else {
+      console.error(
+        "Found a non-string date. Ignoring it for calculating `doNotMatchAfter`. ",
+        s
+      );
+    }
+  });
+
+  if (allTimesStrs.length === 0) return undefined; // no time strings found
+
+  // determine if any of them are intervals (e.g. days or months) and if so calculate the end of these
+  const endDatetimes = allTimesStrs.map(str => endOfXsdDateInterval(str));
+
+  // find the latest mentioned point in time
+  const sorted = endDatetimes.sort((a, b) => b - a); // sort descending
+  const latest = sorted[0];
+
+  // convert to an `xsd:datetime` string and return
+  return latest.toISOString();
 }
