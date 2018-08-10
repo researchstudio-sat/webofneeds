@@ -120,6 +120,14 @@ export default function(allToasts = initialState, action = {}) {
       );
     }
 
+    case actionTypes.failedToGetLocation: {
+      return pushNewToast(
+        allToasts,
+        "Could not get location. You may need to allow this in your browser",
+        won.WON.errorToast
+      );
+    }
+
     //SPECIFIC TOAST ACTIONS
     case actionTypes.toasts.delete:
       return allToasts.deleteIn([action.payload.get("id")]);

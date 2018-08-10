@@ -238,6 +238,7 @@ const actionHierarchy = {
   registerFailed: INJ_DEFAULT,
   geoLocationDenied: INJ_DEFAULT,
   lostConnection: INJ_DEFAULT,
+  failedToGetLocation: INJ_DEFAULT,
 
   reconnect: {
     start: reconnect,

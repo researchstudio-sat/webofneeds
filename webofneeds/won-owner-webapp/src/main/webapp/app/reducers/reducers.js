@@ -168,6 +168,19 @@ const reducers = {
     }
   },
 
+  creatingWhatsX: (creatingWhatsX = false, action = {}) => {
+    switch (action.type) {
+      case actionTypes.needs.whatsNew:
+      case actionTypes.needs.whatsAround:
+        return true;
+      case actionTypes.failedToGetLocation:
+      case actionTypes.needs.createSuccessful:
+        return false;
+      default:
+        return creatingWhatsX;
+    }
+  },
+
   //config: createReducer(
   config: (
     config = Immutable.fromJS({ theme: { name: "current" } }),

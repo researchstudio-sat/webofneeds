@@ -79,14 +79,13 @@ function genComponentConf() {
     constructor(/* arguments <- serviceDependencies */) {
       attach(this, serviceDependencies, arguments);
 
-      this.pendingPublishing = false;
-
       window.ucpc4dbg = this;
       this.useCaseGroups = useCaseGroups;
       this.showUseCaseGroupHeaders = this.showUseCaseGroups();
 
       const selectFromState = state => {
         return {
+          pendingPublishing: state.get("creatingWhatsX"),
           connectionHasBeenLost: !selectIsConnected(state),
         };
       };
@@ -97,14 +96,12 @@ function genComponentConf() {
 
     createWhatsAround() {
       if (!this.pendingPublishing) {
-        this.pendingPublishing = true;
         this.needs__whatsAround();
       }
     }
 
     createWhatsNew() {
       if (!this.pendingPublishing) {
-        this.pendingPublishing = true;
         this.needs__whatsNew();
       }
     }

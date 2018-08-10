@@ -66,6 +66,8 @@ export function createWhatsNew() {
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
 
+    dispatch({ type: actionTypes.needs.whatsNew });
+
     const whatsNew = {
       title: "What's New?",
       type: "http://purl.org/webofneeds/model#DoTogether",
@@ -104,6 +106,8 @@ export function createWhatsAround() {
     const nodeUri = getIn(state, ["config", "defaultNodeUri"]);
     const defaultContext = getIn(state, ["config", "theme", "defaultContext"]);
 
+    dispatch({ type: actionTypes.needs.whatsAround });
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         currentLocation => {
@@ -127,10 +131,11 @@ export function createWhatsAround() {
             getIn(state, ["needs"])
               .filter(
                 need =>
-                  need.get("state") === "won:Active" && need.get("isWhatsNew")
+                  need.get("state") === "won:Active" &&
+                  (need.get("isWhatsAround") || need.get("isWhatsNew"))
               )
               .map(need => {
-                dispatch(actionCreators.needs__close(need.get("uri")));
+                dispatch(actionCreators.needs__close(need.get("uri"))); //TODO action creators should not call other action creators, according to Moru
               });
             const whatsAroundObject = {
               is: whatsAround,
@@ -143,6 +148,7 @@ export function createWhatsAround() {
         },
         error => {
           //error handler
+          dispatch({ type: actionTypes.failedToGetLocation });
           console.error(
             "Could not retrieve geolocation due to error: ",
             error.code,
@@ -153,7 +159,6 @@ export function createWhatsAround() {
         {
           //options
           enableHighAccuracy: true,
-          timeout: 5000,
           maximumAge: 0,
         }
       );
