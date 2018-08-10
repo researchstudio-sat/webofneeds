@@ -622,7 +622,7 @@ function minMaxLabel(min, max) {
   } else if (maxIsNumber) {
     return "At most " + max_;
   } else {
-    return "Unspecified number of";
+    return "Unspecified number of ";
   }
 }
 
