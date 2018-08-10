@@ -257,6 +257,8 @@ function genComponentConf() {
           isLoadingAgreementData:
             connection && connection.get("isLoadingAgreementData"),
           showAgreementData: connection && connection.get("showAgreementData"),
+          agreementData,
+          agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
             connection && connection.get("state") === won.WON.RequestSent,
@@ -270,9 +272,6 @@ function genComponentConf() {
           shouldShowRdf: state.get("showRdf"),
           // if the connect-message is here, everything else should be as well
           allMessagesLoaded,
-          //agreementUrisToDisplay
-          agreementData,
-          agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
           hasAgreementMessages: agreementMessages && agreementMessages.size > 0,
           agreementMessagesArray:
             agreementMessages && agreementMessages.toArray(),
@@ -384,7 +383,7 @@ function genComponentConf() {
 
               //Retrieve all the relevant messages
               agreementData.map((uriList, key) =>
-                uriList.map(uri => this.addAgreementDataToState(uri, key))
+                uriList.map(uri => this.addMessageToState(uri, key))
               );
             })
             .catch(error => {
@@ -563,9 +562,9 @@ function genComponentConf() {
       });
     }
 
-    addAgreementDataToState(eventUri, key) {
+    addMessageToState(eventUri, key) {
       console.log(
-        "addAgreementDataToState: key:[",
+        "addMessageToState: key:[",
         key,
         "] eventUri: [",
         eventUri,
@@ -581,7 +580,7 @@ function genComponentConf() {
             /*if we find out that the receiverneed of the crawled event is actually our
               need we will call the method again but this time with the correct eventUri
             */
-            this.addAgreementDataToState(msg.getRemoteMessageUri(), key);
+            this.addMessageToState(msg.getRemoteMessageUri(), key);
           } else {
             //If message isnt in the state we add it
             if (!this.chatMessages.get(eventUri)) {
