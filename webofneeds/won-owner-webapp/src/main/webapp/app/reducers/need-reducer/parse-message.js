@@ -87,6 +87,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       //Send Status Flags
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      isSelected: false,
       failedToSend: false,
     },
   };

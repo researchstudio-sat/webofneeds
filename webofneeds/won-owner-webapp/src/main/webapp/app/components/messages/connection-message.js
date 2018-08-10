@@ -64,7 +64,7 @@ function genComponentConf() {
                   connection-uri="self.connection.get('uri')">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="self.allowProposals"
+                    ng-if="self.allowProposals && !self.showMultiSelect"
                     ng-click="self.showDetail = !self.showDetail">
                     <svg ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -74,7 +74,7 @@ function genComponentConf() {
                     </svg>
                 </div>
                 <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.showDetail">
+                    ng-if="self.showDetail && !self.showMultiSelect">
                     <button class="won-button--filled thin black"
                         ng-click="self.sendProposal(); self.showDetail = !self.showDetail">
                         Propose <span ng-show="self.clicked">(again)</span>
@@ -88,25 +88,25 @@ function genComponentConf() {
                 <div class="won-cm__center__bubble__button-area" ng-if="(self.hasProposesReferences() || self.hasProposesToCancelReferences())">
                     <button class="won-button--filled thin red"
                         ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.clicked"
+                        ng-disabled="self.showMultiSelect || self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
                         ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.clicked"
+                        ng-disabled="self.showMultiSelect || self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
                         ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.clicked"
+                        ng-disabled="self.showMultiSelect || self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
                     </button>
                     <button class="won-button--filled thin red"
                         ng-if="self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
-                        ng-disabled="self.clicked"
+                        ng-disabled="self.showMultiSelect || self.clicked"
                         ng-click="self.proposeToCancel()">
                       Propose To Cancel
                     </button>
@@ -180,6 +180,8 @@ function genComponentConf() {
           theirNeed,
           connection,
           message,
+          isSelected: message && message.get("isSelected"),
+          showMultiSelect: connection && connection.get("showMultiSelect"),
           shouldShowRdf,
           rdfLinkURL,
           allowProposals:
@@ -208,6 +210,12 @@ function genComponentConf() {
         () => this.isOutgoingMessage(),
         this
       );
+      classOnComponentRoot(
+        "won-is-multiSelect",
+        () => this.showMultiSelect,
+        this
+      );
+      classOnComponentRoot("won-is-selected", () => this.isSelected, this);
       classOnComponentRoot("won-is-rejected", () => this.isRejected(), this);
       classOnComponentRoot("won-is-retracted", () => this.isRetracted(), this);
       classOnComponentRoot("won-is-accepted", () => this.isAccepted(), this);

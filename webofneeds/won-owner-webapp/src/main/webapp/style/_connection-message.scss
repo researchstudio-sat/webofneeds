@@ -5,6 +5,23 @@
 
 won-post-content-message,
 won-connection-message {
+  &.won-is-multiSelect {
+    padding-left: 3rem;
+    cursor: pointer;
+
+    background-image: url("../images/matches.svg");
+    background-position: 0 0.5rem;
+    background-repeat: no-repeat;
+    background-size: 2.5rem;
+
+    &:hover {
+      background-image: url("../images/requests.svg");
+    }
+  }
+  &.won-is-multiSelect.won-is-selected {
+    background-image: url("../images/conversations.svg");
+  }
+
   &.won-unread {
     background-color: $won-unread;
   }
@@ -78,20 +95,20 @@ won-connection-message {
   &.won-is-accepted {
     //TODO: STYLING
   }
+  &.won-is-rejected,
+  &.won-is-cancellationPending,
   &.won-is-cancelled {
-    //TODO: STYLING
+    pointer-events: none;
   }
-  &.won-is-cancellationPending {
-    //TODO: STYLING
-  }
-  &.won-is-rejected {
-    //TODO: STYLING
-  }
+
   &.won-is-retracted {
     opacity: 0.35;
+    pointer-events: none;
     .won-cm__center__bubble {
-      text-decoration: line-through;
-      text-decoration-color: black;
+      won-combined-message-content {
+        text-decoration: line-through;
+        text-decoration-color: black;
+      }
     }
   }
 

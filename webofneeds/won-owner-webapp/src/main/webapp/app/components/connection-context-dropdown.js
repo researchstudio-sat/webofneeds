@@ -58,6 +58,12 @@ function genComponentConf() {
                         Show Agreement Data
                     </button>
                     <button
+                        ng-if="self.isConnected"
+                        class="won-button--outlined thin red"
+                        ng-click="self.toggleMultiSelect()">
+                        {{ self.getMultiSelectText() }}
+                    </button>
+                    <button
                         ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
@@ -89,6 +95,7 @@ function genComponentConf() {
           connection,
           connectionUri,
           showAgreementData: connection && connection.get("showAgreementData"),
+          showMultiSelect: connection && connection.get("showMultiSelect"),
           shouldShowRdf: state.get("showRdf"),
           isConnected: connectionState === won.WON.Connected,
           isSentRequest: connectionState === won.WON.RequestSent,
@@ -127,6 +134,17 @@ function genComponentConf() {
         useCase: undefined,
         connectionUri: undefined,
       });
+    }
+
+    toggleMultiSelect() {
+      this.connections__showMultiSelect({
+        connectionUri: this.connectionUri,
+        showMultiSelect: !this.showMultiSelect,
+      });
+    }
+
+    getMultiSelectText() {
+      return this.showMultiSelect ? "Close MultiSelect" : "Select Messages";
     }
 
     goToPost(postUri) {

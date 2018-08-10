@@ -138,6 +138,7 @@ $ngRedux.getState();
                        uri: string //unique identifier of this message
                        isReceivedByOwn: true|false //whether the sent request/message is received by the own server or not (default: false, if its not an outgoingMessage the default is true)
                        isReceivedByRemote: true|false //whether the sent request/message is received by the remote server or not (default: false, if its not an outgoingMessage the default is true)
+                       isSelected: true|false //whether or not the message is Selected in the MultiSelect view
                        failedToSend: true|false //whether the sent message failed for whatever reason (default: false, only relevant in outgoingMessages)
                    }
                    ...
@@ -156,7 +157,8 @@ $ngRedux.getState();
                isLoadingMessages: true|false, //default is false, whether or not this connection is currently loading messages or processing agreements
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
-               showAgreementData: true | false // default ist false, wheather or not the agreementDataPanel is active
+               showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
+               showMultiSelect: true|false // default is false, whether or not multiSelect checkboxes should be shown in the chat
                unread: true|false, //whether or not this connection is new (or already seen if you will)
                isRated: true|false, //whether or not this connection has been rated yet
                remoteNeedUri: string, //corresponding remote Need identifier

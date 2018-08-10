@@ -68,7 +68,7 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="!self.showAgreementData && self.theirNeedUri"
+              ng-if="!self.showAgreementData && !self.showMultiSelect && self.theirNeedUri"
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
@@ -87,6 +87,7 @@ function genComponentConf() {
             </button>
             <won-connection-message
                 ng-if="!self.showAgreementData"
+                ng-click="self.showMultiSelect && self.selectMessage(msg)"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
@@ -99,6 +100,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-click="self.showMultiSelect && self.selectMessage(msg)"
               ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('uri')">
@@ -108,6 +110,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-click="self.showMultiSelect && self.selectMessage(msg)"
               ng-repeat="proposeToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposeToCancel.get('uri')">
@@ -117,6 +120,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-click="self.showMultiSelect && self.selectMessage(msg)"
               ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposal.get('uri')">
@@ -131,7 +135,15 @@ function genComponentConf() {
                     <span class="rdflink__label">Connection</span>
             </a>
         </div>
-        <div class="pm__footer" ng-if="self.isConnected">
+        <div class="pm__footer" ng-if="self.showMultiSelect">
+          <div class="pm__footer__selectedlabel" ng-if="self.selectedMessages">
+            {{ self.selectedMessages.size }} Messages selected
+          </div>
+          <div class="pm__footer__label" ng-if="!self.selectedMessages">
+            0 Messages selected
+          </div>
+        </div>
+        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isConnected">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
@@ -144,11 +156,11 @@ function genComponentConf() {
             >
             </chat-textfield-simple>
         </div>
-        <div class="pm__footer" ng-if="self.isSentRequest">
+        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
-        <div class="pm__footer" ng-if="self.isReceivedRequest">
+        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isReceivedRequest">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="::'Message (optional)'"
@@ -163,7 +175,7 @@ function genComponentConf() {
                 Decline
             </button>
         </div>
-        <div class="pm__footer" ng-if="self.isSuggested">
+        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isSuggested">
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
@@ -242,6 +254,9 @@ function genComponentConf() {
           chatMessages &&
           chatMessages.filter(msg => !msg.get("isMessageStatusUpToDate"));
 
+        const selectedMessages =
+          chatMessages && chatMessages.filter(msg => msg.get("isSelected"));
+
         return {
           ownNeed,
           theirNeed,
@@ -252,6 +267,7 @@ function genComponentConf() {
           sortedMessages: sortedMessages,
           chatMessages,
           chatMessagesWithUnknownState,
+          selectedMessages,
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           isLoadingAgreementData:
@@ -259,6 +275,7 @@ function genComponentConf() {
           showAgreementData: connection && connection.get("showAgreementData"),
           agreementData,
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
+          showMultiSelect: connection && connection.get("showMultiSelect"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
             connection && connection.get("state") === won.WON.RequestSent,
@@ -667,6 +684,17 @@ function genComponentConf() {
     closeConnection() {
       this.connections__close(this.connection.get("uri"));
       this.router__stateGoCurrent({ connectionUri: null });
+    }
+
+    selectMessage(msg) {
+      const selected = msg.get("isSelected");
+
+      this.messages__setMessageSelected({
+        messageUri: msg.get("uri"),
+        connectionUri: this.connection.get("uri"),
+        needUri: this.ownNeed.get("uri"),
+        isSelected: !selected,
+      });
     }
   }
   Controller.$inject = serviceDependencies;
