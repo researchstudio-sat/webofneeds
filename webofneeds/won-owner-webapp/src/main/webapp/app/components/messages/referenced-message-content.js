@@ -194,7 +194,7 @@ function genComponentConf() {
           } else {
             //If message isnt in the state we add it
             console.log("retrieved message: ", msg);
-            this.messages__processConnectionMessage(msg);
+            this.messages__processAgreementMessage(msg);
           }
         });
       });
