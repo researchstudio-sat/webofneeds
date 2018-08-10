@@ -17,6 +17,7 @@ import {
 import {
   addMessage,
   addExistingMessages,
+  updateMessageStatus,
   markMessageAsRead,
   markMessageAsRejected,
   markMessageAsRetracted,
@@ -29,6 +30,7 @@ import {
   addActiveConnectionsToNeedInLoading,
   markConnectionAsRated,
   setConnectionLoadingMessages,
+  setConnectionLoadingAgreementData,
   markConnectionAsRead,
   selectNeedByConnectionUri,
   changeConnectionState,
@@ -439,6 +441,14 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.needUri
       );
+    case actionTypes.messages.updateMessageStatus:
+      return updateMessageStatus(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.messageStatus
+      );
     case actionTypes.messages.messageStatus.markAsRejected:
       return markMessageAsRejected(
         allNeedsInState,
@@ -509,12 +519,21 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri
       );
 
+    case actionTypes.connections.setLoadingAgreementData:
+      return setConnectionLoadingAgreementData(
+        allNeedsInState,
+        action.payload.connectionUri,
+        action.payload.isLoadingAgreementData
+      );
     case actionTypes.connections.showAgreementData:
       return setShowAgreementData(
         allNeedsInState,
         action.payload.connectionUri,
         action.payload.showAgreementData
       );
+    case actionTypes.messages.processAgreementMessage:
+      //add a message that has been already processed (so sent status is ommitted)
+      return addMessage(allNeedsInState, action.payload, true);
     // NEW MESSAGE STATE UPDATES
     case actionTypes.messages.processConnectionMessage:
       // ADD RECEIVED CHAT MESSAGES

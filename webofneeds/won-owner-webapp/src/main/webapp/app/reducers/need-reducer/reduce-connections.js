@@ -122,6 +122,32 @@ export function setConnectionLoadingMessages(
   );
 }
 
+export function setConnectionLoadingAgreementData(
+  state,
+  connectionUri,
+  isLoadingAgreementData
+) {
+  const need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
+  const needUri = need && need.get("uri");
+  const connection = need && need.getIn(["connections", connectionUri]);
+
+  if (!connection) {
+    console.error(
+      "no connection with connectionUri: <",
+      connectionUri,
+      "> found within needUri: <",
+      needUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [needUri, "connections", connectionUri, "isLoadingAgreementData"],
+    isLoadingAgreementData
+  );
+}
+
 export function markConnectionAsRated(state, connectionUri) {
   let need = connectionUri && selectNeedByConnectionUri(state, connectionUri);
   let connection = need && need.getIn(["connections", connectionUri]);
@@ -210,7 +236,14 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
       [needUri, "connections", connectionUri, "agreementData"],
       agreementData
     )
-    .setIn([needUri, "connections", connectionUri, "isLoadingMessages"], false);
+    .setIn(
+      [needUri, "connections", connectionUri, "agreementData", "isLoaded"],
+      true
+    )
+    .setIn(
+      [needUri, "connections", connectionUri, "isLoadingAgreementData"],
+      false
+    );
 }
 
 export function clearAgreementStateData(state, connectionUri) {
@@ -227,12 +260,21 @@ export function clearAgreementStateData(state, connectionUri) {
     .setIn(
       [needUri, "connections", connectionUri, "agreementData"],
       Immutable.fromJS({
-        pendingProposalUris: Immutable.Set(),
         agreementUris: Immutable.Set(),
+        pendingProposalUris: Immutable.Set(),
+        pendingCancellationProposalUris: Immutable.Set(),
         cancellationPendingAgreementUris: Immutable.Set(),
+        acceptedCancellationProposalUris: Immutable.Set(),
+        cancelledAgreementUris: Immutable.Set(),
+        rejectedMessageUris: Immutable.Set(),
+        retractedMessageUris: Immutable.Set(),
+        isLoaded: true,
       })
     )
-    .setIn([needUri, "connections", connectionUri, "isLoadingMessages"], false);
+    .setIn(
+      [needUri, "connections", connectionUri, "isLoadingAgreementData"],
+      false
+    );
 }
 
 export function setShowAgreementData(state, connectionUri, showAgreementData) {

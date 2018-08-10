@@ -541,9 +541,14 @@ function fetchOwnedActiveNeedUris() {
     .then(response => response.json());
 }
 
-// API call to get agreements data for a connection
-export function callAgreementsFetch(url) {
-  console.log("callAgreementsFetch: ", url);
+export function fetchAgreementProtocolUris(connectionUri) {
+  console.log("fetchAgreementProtocolUris: ", connectionUri);
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/agreement/getAgreementProtocolUris",
+    `?connectionUri=${connectionUri}`
+  );
+
   return fetch(url, {
     method: "get",
     headers: {
@@ -556,8 +561,35 @@ export function callAgreementsFetch(url) {
     .then(response => response.json());
 }
 
-export function callAgreementEventFetch(needUri, eventUri) {
-  console.log("callAgreementEventFetch: ", needUri, " eventUri: ", eventUri);
+export function fetchMessageEffects(connectionUri, messageUri) {
+  console.log(
+    "fetchMessageEffects: ",
+    connectionUri,
+    " messageUri:",
+    messageUri
+  );
+
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/agreement/getMessageEffects",
+    `?connectionUri=${connectionUri}`,
+    `&messageUri=${messageUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus)
+    .then(response => response.json());
+}
+
+export function fetchMessage(needUri, eventUri) {
+  console.log("fetchMessage: ", needUri, " eventUri: ", eventUri);
   const url = urljoin(
     ownerBaseUrl,
     "/rest/linked-data/",

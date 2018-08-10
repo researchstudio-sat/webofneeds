@@ -87,19 +87,19 @@ function genComponentConf() {
                 </div>
                 <div class="won-cm__center__bubble__button-area" ng-if="(self.hasProposesReferences() || self.hasProposesToCancelReferences())">
                     <button class="won-button--filled thin red"
-                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
+                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
                         ng-disabled="self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted()"
+                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
                         ng-disabled="self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted()"
+                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
                         ng-disabled="self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
@@ -111,9 +111,24 @@ function genComponentConf() {
                       Propose To Cancel
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isAccepted() && self.isCancellationPending()"
+                        ng-if="self.isCancellationPending()"
                         ng-disabled="true">
                       Cancellation Pending...
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isCancelled()"
+                        ng-disabled="true">
+                      Cancelled
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isRejected()"
+                        ng-disabled="true">
+                      Rejected
+                    </button>
+                    <button class="won-button--filled thin red"
+                        ng-if="self.isRetracted()"
+                        ng-disabled="true">
+                      Retracted
                     </button>
                 </div>
             </div>
@@ -170,8 +185,9 @@ function genComponentConf() {
           allowProposals:
             connection &&
             connection.get("state") === won.WON.Connected &&
-            !message.get("hasReferences") &&
-            message.get("hasContent"), //allow showing details only when the connection is already present
+            message &&
+            message.get("hasContent") &&
+            !message.get("hasReferences"), //allow showing details only when the connection is already present
         };
       };
 
@@ -345,9 +361,9 @@ function genComponentConf() {
 
     proposeToCancel() {
       this.clicked = true;
-      const uri = this.isOwn
-        ? this.message.get("uri")
-        : this.message.get("remoteUri");
+      const uri = this.message.get("remoteUri")
+        ? this.message.get("remoteUri")
+        : this.message.get("uri");
       const msg = "Propose to cancel agreement : " + uri;
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
       this.connections__sendChatMessage(
@@ -356,6 +372,8 @@ function genComponentConf() {
         this.connectionUri,
         true
       );
+
+      this.markAsCancellationPending(true);
     }
 
     sendAccept() {
@@ -419,19 +437,22 @@ function genComponentConf() {
      * determines if the sent message is not received by any of the servers yet but not failed either
      */
     isPending() {
-      return (
+      const pending =
+        this.message &&
         this.message.get("outgoingMessage") &&
         !this.message.get("failedToSend") &&
         !this.message.get("isReceivedByOwn") &&
-        !this.message.get("isReceivedByRemote")
-      );
+        !this.message.get("isReceivedByRemote");
+
+      return pending;
     }
 
     /**
      * determines if the sent message is received by any of the servers yet but not failed either
      */
     isPartiallyLoaded() {
-      return (
+      const partiallyLoaded =
+        this.message &&
         this.message.get("outgoingMessage") &&
         !this.message.get("failedToSend") &&
         (!(
@@ -439,8 +460,9 @@ function genComponentConf() {
           this.message.get("isReceivedByRemote")
         ) &&
           (this.message.get("isReceivedByOwn") ||
-            this.message.get("isReceivedByRemote")))
-      );
+            this.message.get("isReceivedByRemote")));
+
+      return partiallyLoaded;
     }
 
     encodeParam(param) {
