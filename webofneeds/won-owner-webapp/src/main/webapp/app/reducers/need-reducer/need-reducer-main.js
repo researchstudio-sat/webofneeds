@@ -38,7 +38,6 @@ import {
   changeConnectionStateByFun,
   storeConnectionsData,
   updateAgreementStateData,
-  clearAgreementStateData,
   setShowAgreementData,
   setShowMultiSelect,
 } from "./reduce-connections.js";
@@ -523,12 +522,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.agreementData
       );
-    case actionTypes.connections.clearAgreementData:
-      return clearAgreementStateData(
-        allNeedsInState,
-        action.payload.connectionUri
-      );
-
     case actionTypes.connections.setLoadingAgreementData:
       return setConnectionLoadingAgreementData(
         allNeedsInState,

@@ -246,37 +246,6 @@ export function updateAgreementStateData(state, connectionUri, agreementData) {
     );
 }
 
-export function clearAgreementStateData(state, connectionUri) {
-  const need = selectNeedByConnectionUri(state, connectionUri);
-
-  if (!need) {
-    console.error("no need found for connectionUri", connectionUri);
-    return state;
-  }
-
-  const needUri = need.get("uri");
-
-  return state
-    .setIn(
-      [needUri, "connections", connectionUri, "agreementData"],
-      Immutable.fromJS({
-        agreementUris: Immutable.Set(),
-        pendingProposalUris: Immutable.Set(),
-        pendingCancellationProposalUris: Immutable.Set(),
-        cancellationPendingAgreementUris: Immutable.Set(),
-        acceptedCancellationProposalUris: Immutable.Set(),
-        cancelledAgreementUris: Immutable.Set(),
-        rejectedMessageUris: Immutable.Set(),
-        retractedMessageUris: Immutable.Set(),
-        isLoaded: true,
-      })
-    )
-    .setIn(
-      [needUri, "connections", connectionUri, "isLoadingAgreementData"],
-      false
-    );
-}
-
 export function setShowAgreementData(state, connectionUri, showAgreementData) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
