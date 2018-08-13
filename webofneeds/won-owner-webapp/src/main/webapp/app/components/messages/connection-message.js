@@ -237,15 +237,15 @@ function genComponentConf() {
     isSelectable() {
       if (this.message && this.multiSelectType) {
         switch (this.multiSelectType) {
-          case "reject":
+          case "rejects":
             return this.isRejectable();
-          case "retract":
+          case "retracts":
             return this.isRetractable();
-          case "proposeToCancel":
+          case "proposesToCancel":
             return this.isCancelable();
-          case "accept":
+          case "accepts":
             return this.isAcceptable();
-          case "propose":
+          case "proposes":
             return this.isProposable;
         }
       }

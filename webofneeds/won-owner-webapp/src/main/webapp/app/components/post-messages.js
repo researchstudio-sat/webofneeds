@@ -13,6 +13,8 @@ import { attach, delay } from "../utils.js";
 import {
   fetchAgreementProtocolUris,
   fetchMessage,
+  buildProposalMessage,
+  buildModificationMessage,
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
@@ -111,9 +113,9 @@ function genComponentConf() {
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
               ng-click="self.multiSelectType && self.selectMessage(msg)"
-              ng-repeat="proposeToCancel in self.cancellationPendingMessagesArray"
+              ng-repeat="proposesToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
-              message-uri="proposeToCancel.get('uri')">
+              message-uri="proposesToCancel.get('uri')">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isLoadingAgreementData">
               Open Proposals
@@ -706,35 +708,72 @@ function genComponentConf() {
 
     submitSelection() {
       if (this.selectedMessages && this.selectedMessages.size > 0) {
+        const selectedMessageUris = this.selectedMessages.map(
+          msg => (msg.get("remoteUri") ? msg.get("remoteUri") : msg.get("uri"))
+        );
+        let trimmedMsg;
+
         console.log(
           "Sending Batch of: ",
-          this.selectedMessages.size,
+          selectedMessageUris.size,
           "to be",
           this.getMultiSelectText()
         );
 
         switch (this.multiSelectType) {
-          case "reject":
-            console.log("TODO: REJECT IMPL");
+          case "retracts":
+            trimmedMsg = buildModificationMessage(
+              selectedMessageUris.toArray(),
+              "retracts",
+              "Retracting the message"
+            );
+            //this.markAsRetracted(true); //TODO
             break;
-          case "retract":
-            console.log("TODO: RETRACT IMPL");
+          case "rejects":
+            trimmedMsg = buildProposalMessage(
+              selectedMessageUris.toArray(),
+              this.multiSelectType,
+              "Rejecting the following proposals:"
+            );
+            //this.markAsRejected(true); //TODO
             break;
-          case "propose":
-            console.log("TODO: PROPOSE IMPL");
+          case "proposes":
+            trimmedMsg = buildProposalMessage(
+              selectedMessageUris.toArray(),
+              this.multiSelectType,
+              "Proposing the following conditions:"
+            );
             break;
-          case "proposeToCancel":
-            console.log("TODO: PROPOSETOCANCEL IMPL");
+          case "proposesToCancel":
+            trimmedMsg = buildProposalMessage(
+              selectedMessageUris.toArray(),
+              this.multiSelectType,
+              "Proposing to cancel the agreements:"
+            );
+            //this.markAsCancellationPending(true); //TODO
+            break;
+          case "accepts":
+            trimmedMsg = buildProposalMessage(
+              selectedMessageUris.toArray(),
+              this.multiSelectType,
+              "Accepting the proposals:"
+            );
+            //this.markAsAccepted(true); //TODO
             break;
           default:
-            console.log("TODO: DEFAULT IMPL");
-            break;
+            console.error("type is not valid: ", this.multiSelectType);
+            return;
         }
+
+        this.connections__sendChatMessage(
+          trimmedMsg,
+          undefined,
+          this.connectionUri,
+          true
+        );
+
         //TODO: CLOSE MULTISELECT DIRECTLY IN THE REDUCER OF THE above actions
-        this.connections__setMultiSelectType({
-          connectionUri: this.connectionUri,
-          multiSelectType: undefined,
-        });
+        this.cancelSelection();
       }
     }
 
@@ -754,7 +793,7 @@ function genComponentConf() {
             return "retracted";
           case "propose":
             return "proposed";
-          case "proposeToCancel":
+          case "proposesToCancel":
             return "proposing for cancellation";
           default:
             return "illegal state";

@@ -60,31 +60,31 @@ function genComponentConf() {
                     <button
                         ng-if="self.isConnected && !self.multiSelectType && !self.showAgreementData"
                         class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('propose')">
+                        ng-click="self.activateMultiSelect('proposes')">
                         Make Proposal
                     </button>
                     <button
                         ng-if="self.isConnected && !self.multiSelectType && self.showAgreementData"
                         class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('accept')">
+                        ng-click="self.activateMultiSelect('accepts')">
                         Accept Proposal(s)
                     </button>
                     <button
                         ng-if="self.isConnected && !self.multiSelectType && self.showAgreementData"
                         class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('reject')">
+                        ng-click="self.activateMultiSelect('rejects')">
                         Reject Proposal(s)
                     </button>
                     <button
                         ng-if="self.isConnected && !self.multiSelectType && self.showAgreementData"
                         class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('proposeToCancel')">
+                        ng-click="self.activateMultiSelect('proposesToCancel')">
                         Cancel Agreement(s)
                     </button>
                     <button
                         ng-if="self.isConnected && !self.multiSelectType && !self.showAgreementData"
                         class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('retract')">
+                        ng-click="self.activateMultiSelect('retracts')">
                         Retract Message(s)
                     </button>
                     <button
