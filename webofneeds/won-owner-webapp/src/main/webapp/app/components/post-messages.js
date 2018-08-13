@@ -102,7 +102,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(msg)"
+              ng-click="self.multiSelectType && self.selectMessage(agreement)"
               ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('uri')">
@@ -112,7 +112,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(msg)"
+              ng-click="self.multiSelectType && self.selectMessage(proposesToCancel)"
               ng-repeat="proposesToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposesToCancel.get('uri')">
@@ -122,7 +122,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-click="self.multiSelectType && self.selectMessage(msg)"
+              ng-click="self.multiSelectType && self.selectMessage(proposal)"
               ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposal.get('uri')">
