@@ -272,11 +272,26 @@ export function setShowMultiSelect(state, connectionUri, showMultiSelect) {
 
   const needUri = need.get("uri");
 
-  //TODO: RESET ALL THE SELECTIONS IF THE SHOWMULTISELECT IS SET TO FALSE
-  return state.setIn(
-    [needUri, "connections", connectionUri, "showMultiSelect"],
-    showMultiSelect
-  );
+  let messages = state.getIn([
+    needUri,
+    "connections",
+    connectionUri,
+    "messages",
+  ]);
+
+  if (!showMultiSelect) {
+    messages = messages.map(msg => {
+      msg = msg.set("isSelected", false);
+      return msg;
+    });
+  }
+
+  return state
+    .setIn([needUri, "connections", connectionUri, "messages"], messages)
+    .setIn(
+      [needUri, "connections", connectionUri, "showMultiSelect"],
+      showMultiSelect
+    );
 }
 
 export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {
