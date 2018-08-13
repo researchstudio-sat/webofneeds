@@ -189,6 +189,7 @@ function genComponentConf() {
             connection.get("state") === won.WON.Connected &&
             message &&
             message.get("hasContent") &&
+            message.get("messageType") !== won.WONMSG.connectMessage &&
             !message.get("hasReferences"), //allow showing details only when the connection is already present
         };
       };
