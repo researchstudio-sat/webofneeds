@@ -600,13 +600,31 @@ const realEstateNumberOfRoomsRangeDetail = {
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
-      return `${includeLabel ? `${this.label}: ` : ""}${value.min} - ${
-        value.max
-      } Rooms`;
+      return (
+        (includeLabel ? `${this.label}: ` : "") +
+        minMaxLabel(value.min, value.max) +
+        " Room(s)"
+      );
     }
     return undefined;
   },
 };
+
+function minMaxLabel(min, max) {
+  const min_ = Number.parseFloat(min);
+  const max_ = Number.parseFloat(max);
+  const minIsNumber = !isNaN(min_);
+  const maxIsNumber = !isNaN(max_);
+  if (minIsNumber && maxIsNumber) {
+    return min_ + "–" + max_;
+  } else if (minIsNumber) {
+    return "At least " + min_;
+  } else if (maxIsNumber) {
+    return "At most " + max_;
+  } else {
+    return "Unspecified number of ";
+  }
+}
 
 const realEstateFloorSizeRangeDetail = {
   ...abstractDetails.range,
@@ -660,9 +678,11 @@ const realEstateFloorSizeRangeDetail = {
   },
   generateHumanReadable: function({ value, includeLabel }) {
     if (value) {
-      return `${includeLabel ? `${this.label}: ` : ""}${value.min} - ${
-        value.max
-      } m²`;
+      return (
+        (includeLabel ? `${this.label}: ` : "") +
+        minMaxLabel(value.min, value.max) +
+        "m²"
+      );
     }
     return undefined;
   },
