@@ -60,10 +60,7 @@ won-post-messages {
       grid-template-columns: 1fr 1fr;
 
       .pm__footer__selectedlabel {
-        grid-row: 1 / span 2;
-      }
-      .pm__footer__button {
-        grid-row: 2 / span 1;
+        grid-column: 1 / span 2;
       }
     }
   }
