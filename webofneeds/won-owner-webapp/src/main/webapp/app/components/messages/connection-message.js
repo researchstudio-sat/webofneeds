@@ -36,7 +36,7 @@ function genComponentConf() {
             title="self.theirNeed.get('humanReadable')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
-            ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
             ng-if="!self.message.get('outgoingMessage')">
         </won-square-image>
         <won-square-image
