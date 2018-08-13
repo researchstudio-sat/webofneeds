@@ -82,7 +82,7 @@ function genComponentConf() {
                         Cancel Agreement(s)
                     </button>
                     <button
-                        ng-if="self.isConnected && !self.multiSelectType && !self.showAgreementData"
+                        ng-if="self.isConnected && !self.multiSelectType"
                         class="won-button--outlined thin red"
                         ng-click="self.activateMultiSelect('retracts')">
                         Retract Message(s)

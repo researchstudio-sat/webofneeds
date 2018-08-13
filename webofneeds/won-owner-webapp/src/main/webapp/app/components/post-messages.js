@@ -771,8 +771,47 @@ function genComponentConf() {
           this.connectionUri,
           true
         );
+        this.selectedMessages.forEach(msg => {
+          console.log("Updating the status of the message: ", msg.toJS());
+          switch (this.multiSelectType) {
+            case "retracts":
+              this.messages__messageStatus__markAsRetracted({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                retracted: true,
+              });
+              break;
+            case "rejects":
+              this.messages__messageStatus__markAsRejected({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                rejected: true,
+              });
+              break;
+            case "proposesToCancel":
+              this.messages__messageStatus__markAsCancellationPending({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                cancellationPending: true,
+              });
+              break;
+            case "accepts":
+              this.messages__messageStatus__markAsAccepted({
+                messageUri: msg.get("uri"),
+                connectionUri: this.connectionUri,
+                needUri: this.ownNeed.get("uri"),
+                accepted: true,
+              });
+              break;
+            default:
+              console.error("type is not valid: ", this.multiSelectType);
+              return;
+          }
+        });
 
-        //TODO: CLOSE MULTISELECT DIRECTLY IN THE REDUCER OF THE above actions
         this.cancelSelection();
       }
     }
@@ -787,12 +826,14 @@ function genComponentConf() {
     getMultiSelectText() {
       if (this.multiSelectType) {
         switch (this.multiSelectType) {
-          case "reject":
+          case "rejects":
             return "rejected";
-          case "retract":
+          case "retracts":
             return "retracted";
-          case "propose":
+          case "proposes":
             return "proposed";
+          case "accepts":
+            return "accepting";
           case "proposesToCancel":
             return "proposing for cancellation";
           default:

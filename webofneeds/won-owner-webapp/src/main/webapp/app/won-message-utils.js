@@ -426,13 +426,12 @@ export function buildProposalMessage(uris, type, text) {
   const whM = "\n won:hasTextMessage ";
   let agreementTriples = "<" + msgP + "> ";
 
-  if (Array.isArray(uris)) {
-    uris.forEach(uri => {
-      agreementTriples += " <" + sc + "> <" + uri + ">; ";
-    });
-  } else {
-    agreementTriples = " <" + sc + "> <" + uris + ">; ";
+  if (!Array.isArray(uris)) {
+    uris = [uris];
   }
+  uris.forEach(uri => {
+    agreementTriples += " <" + sc + "> <" + uri + ">; ";
+  });
 
   return agreementTriples + whM + " '''" + text.replace(/'/g, "///'") + "'''.";
 }
@@ -443,13 +442,13 @@ export function buildModificationMessage(uris, type, text) {
   const whM = "\n won:hasTextMessage ";
   let modificationTriples = "<" + msgP + "> ";
 
-  if (Array.isArray(uris)) {
-    uris.forEach(uri => {
-      modificationTriples += " <" + sc + "> <" + uri + ">; ";
-    });
-  } else {
-    modificationTriples = " <" + sc + "> <" + uris + ">; ";
+  if (!Array.isArray(uris)) {
+    uris = [uris];
   }
+
+  uris.forEach(uri => {
+    modificationTriples += " <" + sc + "> <" + uri + ">; ";
+  });
 
   return (
     modificationTriples + whM + " '''" + text.replace(/'/g, "///'") + "'''."
