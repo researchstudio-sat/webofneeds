@@ -771,6 +771,7 @@ function genComponentConf() {
           this.connectionUri,
           true
         );
+
         this.selectedMessages.forEach(msg => {
           console.log("Updating the status of the message: ", msg.toJS());
           switch (this.multiSelectType) {
@@ -805,6 +806,8 @@ function genComponentConf() {
                 needUri: this.ownNeed.get("uri"),
                 accepted: true,
               });
+              break;
+            case "proposes":
               break;
             default:
               console.error("type is not valid: ", this.multiSelectType);
