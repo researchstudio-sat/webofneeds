@@ -9,17 +9,13 @@ won-connection-message {
     padding-left: 3rem;
     cursor: pointer;
 
-    background-image: url("../images/matches.svg");
+    background-image: url("../images/cb.svg");
     background-position: 0 0.5rem;
     background-repeat: no-repeat;
     background-size: 2.5rem;
-
-    &:hover {
-      background-image: url("../images/requests.svg");
-    }
   }
   &.won-is-multiSelect.won-is-selected {
-    background-image: url("../images/conversations.svg");
+    background-image: url("../images/cb-selected.svg");
   }
 
   &.won-unread {
