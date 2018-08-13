@@ -106,7 +106,7 @@ const actionHierarchy = {
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingMessages: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
-    showMultiSelect: INJ_DEFAULT,
+    setMultiSelectType: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
   },
   needs: {

@@ -68,7 +68,7 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="!self.showAgreementData && !self.showMultiSelect && self.theirNeedUri"
+              ng-if="!self.showAgreementData && !self.multiSelectType && self.theirNeedUri"
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
@@ -87,7 +87,7 @@ function genComponentConf() {
             </button>
             <won-connection-message
                 ng-if="!self.showAgreementData"
-                ng-click="self.showMultiSelect && self.selectMessage(msg)"
+                ng-click="self.multiSelectType && self.selectMessage(msg)"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
@@ -100,7 +100,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-click="self.showMultiSelect && self.selectMessage(msg)"
+              ng-click="self.multiSelectType && self.selectMessage(msg)"
               ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('uri')">
@@ -110,7 +110,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-click="self.showMultiSelect && self.selectMessage(msg)"
+              ng-click="self.multiSelectType && self.selectMessage(msg)"
               ng-repeat="proposeToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposeToCancel.get('uri')">
@@ -120,7 +120,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-click="self.showMultiSelect && self.selectMessage(msg)"
+              ng-click="self.multiSelectType && self.selectMessage(msg)"
               ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposal.get('uri')">
@@ -135,15 +135,22 @@ function genComponentConf() {
                     <span class="rdflink__label">Connection</span>
             </a>
         </div>
-        <div class="pm__footer" ng-if="self.showMultiSelect">
+        <div class="pm__footer" ng-if="self.multiSelectType">
           <div class="pm__footer__selectedlabel" ng-if="self.selectedMessages">
-            {{ self.selectedMessages.size }} Messages selected
+            {{ self.selectedMessages.size }} Messages selected to be {{ self.getMultiSelectText() }}
           </div>
           <div class="pm__footer__label" ng-if="!self.selectedMessages">
             0 Messages selected
           </div>
+          <button class="pm__footer__button won-button--filled red" ng-click="self.submitSelection()"
+            ng-disabled="!self.selectedMessages || self.selectedMessages.size == 0">
+            Execute
+          </button>
+          <button class="pm__footer__button won-button--filled black" ng-click="self.cancelSelection()">
+            Cancel
+          </button>
         </div>
-        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isConnected">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isConnected">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
@@ -156,11 +163,11 @@ function genComponentConf() {
             >
             </chat-textfield-simple>
         </div>
-        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isSentRequest">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
-        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isReceivedRequest">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isReceivedRequest">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="::'Message (optional)'"
@@ -175,7 +182,7 @@ function genComponentConf() {
                 Decline
             </button>
         </div>
-        <div class="pm__footer" ng-if="!self.showMultiSelect && self.isSuggested">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isSuggested">
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
@@ -275,7 +282,7 @@ function genComponentConf() {
           showAgreementData: connection && connection.get("showAgreementData"),
           agreementData,
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
-          showMultiSelect: connection && connection.get("showMultiSelect"),
+          multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
             connection && connection.get("state") === won.WON.RequestSent,
@@ -695,6 +702,65 @@ function genComponentConf() {
         needUri: this.ownNeed.get("uri"),
         isSelected: !selected,
       });
+    }
+
+    submitSelection() {
+      if (this.selectedMessages && this.selectedMessages.size > 0) {
+        console.log(
+          "Sending Batch of: ",
+          this.selectedMessages.size,
+          "to be",
+          this.getMultiSelectText()
+        );
+
+        switch (this.multiSelectType) {
+          case "reject":
+            console.log("TODO: REJECT IMPL");
+            break;
+          case "retract":
+            console.log("TODO: RETRACT IMPL");
+            break;
+          case "propose":
+            console.log("TODO: PROPOSE IMPL");
+            break;
+          case "proposeToCancel":
+            console.log("TODO: PROPOSETOCANCEL IMPL");
+            break;
+          default:
+            console.log("TODO: DEFAULT IMPL");
+            break;
+        }
+        //TODO: CLOSE MULTISELECT DIRECTLY IN THE REDUCER OF THE above actions
+        this.connections__setMultiSelectType({
+          connectionUri: this.connectionUri,
+          multiSelectType: undefined,
+        });
+      }
+    }
+
+    cancelSelection() {
+      this.connections__setMultiSelectType({
+        connectionUri: this.connectionUri,
+        multiSelectType: undefined,
+      });
+    }
+
+    getMultiSelectText() {
+      if (this.multiSelectType) {
+        switch (this.multiSelectType) {
+          case "reject":
+            return "rejected";
+          case "retract":
+            return "retracted";
+          case "propose":
+            return "proposed";
+          case "proposeToCancel":
+            return "proposing for cancellation";
+          default:
+            return "illegal state";
+        }
+      }
+      return "illegal state";
     }
   }
   Controller.$inject = serviceDependencies;

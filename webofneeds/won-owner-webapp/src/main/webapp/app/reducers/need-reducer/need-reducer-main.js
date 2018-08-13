@@ -39,7 +39,7 @@ import {
   storeConnectionsData,
   updateAgreementStateData,
   setShowAgreementData,
-  setShowMultiSelect,
+  setMultiSelectType,
 } from "./reduce-connections.js";
 
 const initialState = Immutable.fromJS({});
@@ -534,11 +534,11 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.showAgreementData
       );
-    case actionTypes.connections.showMultiSelect:
-      return setShowMultiSelect(
+    case actionTypes.connections.setMultiSelectType:
+      return setMultiSelectType(
         allNeedsInState,
         action.payload.connectionUri,
-        action.payload.showMultiSelect
+        action.payload.multiSelectType
       );
     case actionTypes.messages.processAgreementMessage:
       //add a message that has been already processed (so sent status is ommitted)

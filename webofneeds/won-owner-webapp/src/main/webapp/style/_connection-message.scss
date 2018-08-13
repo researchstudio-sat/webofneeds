@@ -14,6 +14,11 @@ won-connection-message {
     background-repeat: no-repeat;
     background-size: 2.5rem;
   }
+  &.won-is-multiSelect.won-not-selectable {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
   &.won-is-multiSelect.won-is-selected {
     background-image: url("../images/cb-selected.svg");
   }

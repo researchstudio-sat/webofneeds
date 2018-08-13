@@ -262,7 +262,11 @@ export function setShowAgreementData(state, connectionUri, showAgreementData) {
   );
 }
 
-export function setShowMultiSelect(state, connectionUri, showMultiSelect) {
+export function setMultiSelectType(
+  state,
+  connectionUri,
+  multiSelectType = undefined
+) {
   const need = selectNeedByConnectionUri(state, connectionUri);
 
   if (!need) {
@@ -279,19 +283,27 @@ export function setShowMultiSelect(state, connectionUri, showMultiSelect) {
     "messages",
   ]);
 
-  if (!showMultiSelect) {
+  if (!multiSelectType) {
     messages = messages.map(msg => {
       msg = msg.set("isSelected", false);
       return msg;
     });
+    state = state.setIn(
+      [needUri, "connections", connectionUri, "messages"],
+      messages
+    );
+    state = state.setIn(
+      [needUri, "connections", connectionUri, "multiSelectType"],
+      undefined
+    );
+  } else {
+    state = state.setIn(
+      [needUri, "connections", connectionUri, "multiSelectType"],
+      multiSelectType
+    );
   }
 
-  return state
-    .setIn([needUri, "connections", connectionUri, "messages"], messages)
-    .setIn(
-      [needUri, "connections", connectionUri, "showMultiSelect"],
-      showMultiSelect
-    );
+  return state;
 }
 
 export function addActiveConnectionsToNeedInLoading(state, needUri, connUris) {

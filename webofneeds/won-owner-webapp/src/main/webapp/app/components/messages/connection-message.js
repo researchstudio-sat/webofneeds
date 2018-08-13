@@ -64,7 +64,7 @@ function genComponentConf() {
                   connection-uri="self.connection.get('uri')">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="self.allowProposals && !self.showMultiSelect"
+                    ng-if="self.isProsable && !self.multiSelectType"
                     ng-click="self.showDetail = !self.showDetail">
                     <svg ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -74,39 +74,39 @@ function genComponentConf() {
                     </svg>
                 </div>
                 <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.showDetail && !self.showMultiSelect">
+                    ng-if="self.showDetail && !self.multiSelectType">
                     <button class="won-button--filled thin black"
                         ng-click="self.sendProposal(); self.showDetail = !self.showDetail">
                         Propose <span ng-show="self.clicked">(again)</span>
                     </button>
                     <button class="won-button--filled thin black"
                         ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
-                        ng-if="self.message.get('outgoingMessage')">
+                        ng-if="self.isRetractable()">
                         Retract
                     </button>
                 </div>
                 <div class="won-cm__center__bubble__button-area" ng-if="(self.hasProposesReferences() || self.hasProposesToCancelReferences())">
                     <button class="won-button--filled thin red"
-                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.showMultiSelect || self.clicked"
+                        ng-if="self.isAcceptable()"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.showMultiSelect || self.clicked"
+                        ng-show="self.isRejectable()"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.showMultiSelect || self.clicked"
+                        ng-if="self.isRetractable()"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
-                        ng-disabled="self.showMultiSelect || self.clicked"
+                        ng-if="self.isCancelable()"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.proposeToCancel()">
                       Propose To Cancel
                     </button>
@@ -181,10 +181,10 @@ function genComponentConf() {
           connection,
           message,
           isSelected: message && message.get("isSelected"),
-          showMultiSelect: connection && connection.get("showMultiSelect"),
+          multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
-          allowProposals:
+          isProposable:
             connection &&
             connection.get("state") === won.WON.Connected &&
             message &&
@@ -213,7 +213,12 @@ function genComponentConf() {
       );
       classOnComponentRoot(
         "won-is-multiSelect",
-        () => this.showMultiSelect,
+        () => !!this.multiSelectType,
+        this
+      );
+      classOnComponentRoot(
+        "won-not-selectable",
+        () => !this.isSelectable(),
         this
       );
       classOnComponentRoot("won-is-selected", () => this.isSelected, this);
@@ -227,6 +232,69 @@ function genComponentConf() {
         this
       );
       classOnComponentRoot("won-unread", () => this.isUnread(), this);
+    }
+
+    isSelectable() {
+      if (this.message && this.multiSelectType) {
+        switch (this.multiSelectType) {
+          case "reject":
+            return this.isRejectable();
+          case "retract":
+            return this.isRetractable();
+          case "proposeToCancel":
+            return this.isCancelable();
+          case "accept":
+            return this.isAcceptable();
+          case "propose":
+            return this.isProposable;
+        }
+      }
+      return false;
+    }
+
+    isRejectable() {
+      return (
+        (this.hasProposesReferences() ||
+          this.hasProposesToCancelReferences()) &&
+        !this.message.get("outgoingMessage") &&
+        !this.isAccepted() &&
+        !this.isCancelled() &&
+        !this.isCancellationPending() &&
+        !this.isRetracted() &&
+        !this.isRejected()
+      );
+    }
+    isAcceptable() {
+      return (
+        (this.hasProposesReferences() ||
+          this.hasProposesToCancelReferences()) &&
+        !this.message.get("outgoingMessage") &&
+        !this.isAccepted() &&
+        !this.isCancelled() &&
+        !this.isCancellationPending() &&
+        !this.isRetracted() &&
+        !this.isRejected()
+      );
+    }
+    isRetractable() {
+      return (
+        this.isProposable &&
+        this.message.get("outgoingMessage") &&
+        !this.isAccepted() &&
+        !this.isCancelled() &&
+        !this.isCancellationPending() &&
+        !this.isRetracted() &&
+        !this.isRejected()
+      );
+    }
+    isCancelable() {
+      return (
+        (this.hasProposesReferences() ||
+          this.hasProposesToCancelReferences()) &&
+        this.isAccepted() &&
+        !this.isCancelled() &&
+        !this.isCancellationPending()
+      );
     }
 
     isReceivedMessage() {

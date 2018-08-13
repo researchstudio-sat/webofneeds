@@ -158,7 +158,7 @@ $ngRedux.getState();
                isLoadingAgreementData: true|false, //default is false, whether or not the agreementData has been loaded,
                isLoading: true|false, //default is false, whether or not this connection is currently loading itself (similar to the isLoading in the need)
                showAgreementData: true|false // default is false, whether or not the agreementDataPanel is active
-               showMultiSelect: true|false // default is false, whether or not multiSelect checkboxes should be shown in the chat
+               multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
                unread: true|false, //whether or not this connection is new (or already seen if you will)
                isRated: true|false, //whether or not this connection has been rated yet
                remoteNeedUri: string, //corresponding remote Need identifier
