@@ -137,16 +137,16 @@ function genComponentConf() {
                     <span class="rdflink__label">Connection</span>
             </a>
         </div>
-        <div class="pm__footer" ng-if="self.multiSelectType">
+        <div class="pm__footer won-is-multiSelect" ng-if="self.multiSelectType">
           <div class="pm__footer__selectedlabel" ng-if="self.selectedMessages">
-            {{ self.selectedMessages.size }} Messages selected to be {{ self.getMultiSelectText() }}
+            {{ self.selectedMessages.size }} Messages
           </div>
           <div class="pm__footer__label" ng-if="!self.selectedMessages">
             0 Messages selected
           </div>
           <button class="pm__footer__button won-button--filled red" ng-click="self.submitSelection()"
             ng-disabled="!self.selectedMessages || self.selectedMessages.size == 0">
-            Execute
+            {{ self.getMultiSelectActionText() }}
           </button>
           <button class="pm__footer__button won-button--filled black" ng-click="self.cancelSelection()">
             Cancel
@@ -713,13 +713,6 @@ function genComponentConf() {
         );
         let trimmedMsg;
 
-        console.log(
-          "Sending Batch of: ",
-          selectedMessageUris.size,
-          "to be",
-          this.getMultiSelectText()
-        );
-
         switch (this.multiSelectType) {
           case "retracts":
             trimmedMsg = buildModificationMessage(
@@ -727,7 +720,6 @@ function genComponentConf() {
               "retracts",
               "Retracting the message"
             );
-            //this.markAsRetracted(true); //TODO
             break;
           case "rejects":
             trimmedMsg = buildProposalMessage(
@@ -735,7 +727,6 @@ function genComponentConf() {
               this.multiSelectType,
               "Rejecting the following proposals:"
             );
-            //this.markAsRejected(true); //TODO
             break;
           case "proposes":
             trimmedMsg = buildProposalMessage(
@@ -750,7 +741,6 @@ function genComponentConf() {
               this.multiSelectType,
               "Proposing to cancel the agreements:"
             );
-            //this.markAsCancellationPending(true); //TODO
             break;
           case "accepts":
             trimmedMsg = buildProposalMessage(
@@ -758,7 +748,6 @@ function genComponentConf() {
               this.multiSelectType,
               "Accepting the proposals:"
             );
-            //this.markAsAccepted(true); //TODO
             break;
           default:
             console.error("type is not valid: ", this.multiSelectType);
@@ -826,24 +815,23 @@ function genComponentConf() {
       });
     }
 
-    getMultiSelectText() {
+    getMultiSelectActionText() {
       if (this.multiSelectType) {
         switch (this.multiSelectType) {
           case "rejects":
-            return "rejected";
+            return "Reject selected";
           case "retracts":
-            return "retracted";
+            return "Retract selected";
           case "proposes":
-            return "proposed";
+            return "Propose selected";
           case "accepts":
-            return "accepting";
+            return "Accept selected";
           case "proposesToCancel":
-            return "proposing for cancellation";
+            return "Propose To Cancel selected";
           default:
             return "illegal state";
         }
       }
-      return "illegal state";
     }
   }
   Controller.$inject = serviceDependencies;
