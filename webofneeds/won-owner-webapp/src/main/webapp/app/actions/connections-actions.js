@@ -60,7 +60,7 @@ export function connectionsChatMessage(
 
         referencedMessages.map(msg => {
           const correctUri = msg.get("remoteUri") || msg.get("uri");
-          if (correctUri) contentUris.push(correctUri);
+          if (correctUri) contentUris.push({ "@id": correctUri });
         });
         referencedContentUris.set(key, contentUris);
       });
