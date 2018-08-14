@@ -142,7 +142,7 @@ function genComponentConf() {
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
-                on-submit="self.send(value, additionalContent, self.shouldShowRdf)"
+                on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
                 allow-details="!self.shouldShowRdf"
@@ -547,12 +547,14 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
-    send(chatMessage, additionalContent, isTTL = false) {
+    send(chatMessage, additionalContent, referencedContent, isTTL = false) {
       this.setShowAgreementData(false);
       this.hideAddMessageContentDisplay();
 
       const trimmedMsg = chatMessage.trim();
-      if (trimmedMsg || additionalContent) {
+      if (trimmedMsg || additionalContent || referencedContent) {
+        console.log("TODO: referencedContent to send:", referencedContent);
+
         this.connections__sendChatMessage(
           trimmedMsg,
           additionalContent,

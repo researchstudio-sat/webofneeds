@@ -358,10 +358,15 @@ function genComponentConf() {
           value,
           valid,
           additionalContent: this.additionalContent,
+          referencedContent: this.referencedContent,
         };
         if (this.additionalContent) {
           this.additionalContent = new Map();
         }
+        if (this.referencedContent) {
+          this.referencedContent = new Map();
+        }
+        this.cancelMultiSelect();
         this.onSubmit(payload);
         dispatchEvent(this.$element[0], "submit", payload);
       }
@@ -448,7 +453,7 @@ function genComponentConf() {
 
     getHumanReadableMessageString(msg) {
       return (
-        getHumanReadableStringFromMessage(msg) || "No Message Text Present"
+        getHumanReadableStringFromMessage(msg) || "«Message does not have text»"
       );
     }
 
