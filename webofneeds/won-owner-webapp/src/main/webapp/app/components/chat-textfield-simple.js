@@ -120,10 +120,17 @@ function genComponentConf() {
                 </span>
               </div>
             </div>
-            <div class="cts__details__input__content" ng-if="self.selectedMessages">
-              {{ self.selectedMessages.size }} Messages
+            <div class="cts__details__input__refcontent" ng-if="self.selectedMessages">
+              <div class="cts__details__input__refcontent__message"
+                ng-repeat="msg in self.selectedMessages.toArray()">
+                <div class="cts__details__input__refcontent__message__label">{{ msg.get('uri') }}</div>
+                <svg class="cts__details__input__refcontent__message__discard clickable"
+                  ng-click="self.removeMessageFromSelection(msg)">
+                  <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                </svg>
+              </div>
             </div>
-            <div class="cts__details__input__content" ng-if="!self.selectedMessages">
+            <div class="cts__details__input__refcontent" ng-if="!self.selectedMessages">
               0 Messages selected
             </div>
           </div>
@@ -488,6 +495,15 @@ function genComponentConf() {
     removeReferencedContent(ref = this.multiSelectType) {
       this.referencedContent.delete(ref);
       this.cancelMultiSelect();
+    }
+
+    removeMessageFromSelection(msg) {
+      this.messages__setMessageSelected({
+        messageUri: msg.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.post.get("uri"),
+        isSelected: false,
+      });
     }
 
     getHumanReadableReferencedContent(ref) {

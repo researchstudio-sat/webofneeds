@@ -3,7 +3,6 @@
 @import "sizing-utils";
 @import "speech-bubble";
 @import "animate";
-@import "labelledhr";
 
 chat-textfield-simple {
   display: grid;
@@ -41,7 +40,6 @@ chat-textfield-simple {
       1.15rem
     );
     .cts__details__input {
-      transition: height linear 0.5s;
       max-height: $local-height;
       padding: 0.5rem;
       overflow-y: auto;
@@ -84,6 +82,37 @@ chat-textfield-simple {
       }
       &__content {
       }
+      &__refcontent {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        width: 100%;
+        &__message {
+          padding: 0.25rem;
+          background: $won-secondary-color;
+          color: $won-secondary-text-color;
+          max-width: 100%;
+          box-sizing: border-box;
+          border-radius: 0.5rem;
+          display: flex;
+          align-items: center;
+          margin-right: 0.25rem;
+          margin-top: 0.25rem;
+          &__label {
+            padding: 0 0.25rem;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+          &__discard {
+            @include fixed-square(1.5rem);
+            --local-primary: #{$won-secondary-text-color};
+            &:hover {
+              --local-primary: #{$won-primary-color};
+            }
+          }
+        }
+      }
     }
     .cts__details__grid {
       display: grid;
@@ -95,6 +124,8 @@ chat-textfield-simple {
       overflow-y: auto;
       &__action {
         grid-column: span 2;
+        font-size: 0.75rem;
+        padding: 0.75rem;
       }
       &__hr {
         grid-column: span 4;
