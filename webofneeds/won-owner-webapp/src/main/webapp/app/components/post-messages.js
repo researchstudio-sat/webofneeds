@@ -13,8 +13,6 @@ import { attach, delay } from "../utils.js";
 import {
   fetchAgreementProtocolUris,
   fetchMessage,
-  buildProposalMessage,
-  buildModificationMessage,
 } from "../won-message-utils.js";
 import { actionCreators } from "../actions/actions.js";
 import {
@@ -248,9 +246,6 @@ function genComponentConf() {
           chatMessages &&
           chatMessages.filter(msg => !msg.get("isMessageStatusUpToDate"));
 
-        const selectedMessages =
-          chatMessages && chatMessages.filter(msg => msg.get("isSelected"));
-
         return {
           ownNeed,
           theirNeed,
@@ -261,7 +256,6 @@ function genComponentConf() {
           sortedMessages: sortedMessages,
           chatMessages,
           chatMessagesWithUnknownState,
-          selectedMessages,
           unreadMessageCount: unreadMessages && unreadMessages.size,
           isLoadingMessages: connection && connection.get("isLoadingMessages"),
           isLoadingAgreementData:
@@ -553,6 +547,54 @@ function genComponentConf() {
 
       const trimmedMsg = chatMessage.trim();
       if (trimmedMsg || additionalContent || referencedContent) {
+        if (referencedContent) {
+          this.referencedContent.forEach((msgs, key) => {
+            if (msgs) {
+              msgs.forEach(msg => {
+                switch (key) {
+                  case "retracts":
+                    this.messages__messageStatus__markAsRetracted({
+                      messageUri: msg.get("uri"),
+                      connectionUri: this.connectionUri,
+                      needUri: this.ownNeed.get("uri"),
+                      retracted: true,
+                    });
+                    break;
+                  case "rejects":
+                    this.messages__messageStatus__markAsRejected({
+                      messageUri: msg.get("uri"),
+                      connectionUri: this.connectionUri,
+                      needUri: this.ownNeed.get("uri"),
+                      rejected: true,
+                    });
+                    break;
+                  case "proposesToCancel":
+                    this.messages__messageStatus__markAsCancellationPending({
+                      messageUri: msg.get("uri"),
+                      connectionUri: this.connectionUri,
+                      needUri: this.ownNeed.get("uri"),
+                      cancellationPending: true,
+                    });
+                    break;
+                  case "accepts":
+                    this.messages__messageStatus__markAsAccepted({
+                      messageUri: msg.get("uri"),
+                      connectionUri: this.connectionUri,
+                      needUri: this.ownNeed.get("uri"),
+                      accepted: true,
+                    });
+                    break;
+                  case "proposes":
+                    break;
+                  default:
+                    console.error("referenced key/type is not valid: ", key);
+                    break;
+                }
+              });
+            }
+          });
+        }
+
         this.connections__sendChatMessage(
           trimmedMsg,
           additionalContent,
@@ -690,113 +732,6 @@ function genComponentConf() {
         needUri: this.ownNeed.get("uri"),
         isSelected: !selected,
       });
-    }
-
-    //TODO: MOVE THIS METHOD TO CHAT-TEXTFIELD-SIMPLE
-    submitSelection() {
-      if (this.selectedMessages && this.selectedMessages.size > 0) {
-        const selectedMessageUris = this.selectedMessages.map(
-          msg => (msg.get("remoteUri") ? msg.get("remoteUri") : msg.get("uri"))
-        );
-        let trimmedMsg;
-
-        switch (this.multiSelectType) {
-          case "retracts":
-            trimmedMsg = buildModificationMessage(
-              selectedMessageUris.toArray(),
-              "retracts",
-              "Retracting the message"
-            );
-            break;
-          case "rejects":
-            trimmedMsg = buildProposalMessage(
-              selectedMessageUris.toArray(),
-              this.multiSelectType,
-              "Rejecting the following proposals:"
-            );
-            break;
-          case "proposes":
-            trimmedMsg = buildProposalMessage(
-              selectedMessageUris.toArray(),
-              this.multiSelectType,
-              "Proposing the following conditions:"
-            );
-            break;
-          case "proposesToCancel":
-            trimmedMsg = buildProposalMessage(
-              selectedMessageUris.toArray(),
-              this.multiSelectType,
-              "Proposing to cancel the agreements:"
-            );
-            break;
-          case "accepts":
-            trimmedMsg = buildProposalMessage(
-              selectedMessageUris.toArray(),
-              this.multiSelectType,
-              "Accepting the proposals:"
-            );
-            break;
-          default:
-            console.error("type is not valid: ", this.multiSelectType);
-            return;
-        }
-
-        this.connections__sendChatMessage(
-          trimmedMsg,
-          undefined,
-          undefined,
-          this.connectionUri,
-          true
-        );
-
-        this.selectedMessages.forEach(msg => {
-          console.log("Updating the status of the message: ", msg.toJS());
-          switch (this.multiSelectType) {
-            case "retracts":
-              this.messages__messageStatus__markAsRetracted({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                retracted: true,
-              });
-              break;
-            case "rejects":
-              this.messages__messageStatus__markAsRejected({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                rejected: true,
-              });
-              break;
-            case "proposesToCancel":
-              this.messages__messageStatus__markAsCancellationPending({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                cancellationPending: true,
-              });
-              break;
-            case "accepts":
-              this.messages__messageStatus__markAsAccepted({
-                messageUri: msg.get("uri"),
-                connectionUri: this.connectionUri,
-                needUri: this.ownNeed.get("uri"),
-                accepted: true,
-              });
-              break;
-            case "proposes":
-              break;
-            default:
-              console.error("type is not valid: ", this.multiSelectType);
-              return;
-          }
-        });
-
-        this.connections__setMultiSelectType({
-          connectionUri: this.connectionUri,
-          multiSelectType: undefined,
-        });
-      }
     }
   }
   Controller.$inject = serviceDependencies;
