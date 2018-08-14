@@ -3,6 +3,7 @@
 @import "sizing-utils";
 @import "speech-bubble";
 @import "animate";
+@import "labelledhr";
 
 chat-textfield-simple {
   display: grid;
@@ -92,6 +93,15 @@ chat-textfield-simple {
       max-height: $local-height;
       padding: 0.5rem;
       overflow-y: auto;
+      &__action {
+        grid-column: span 2;
+      }
+      &__hr {
+        grid-column: span 4;
+        .wlh__label__text {
+          background: $won-light-gray;
+        }
+      }
       &__detail {
         display: flex;
         flex-direction: column;

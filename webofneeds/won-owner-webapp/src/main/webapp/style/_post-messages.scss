@@ -53,16 +53,6 @@ won-post-messages {
     &__button {
       width: 100%;
     }
-
-    &.won-is-multiSelect {
-      display: grid;
-      grid-gap: 0.5rem;
-      grid-template-columns: 1fr 1fr;
-
-      .pm__footer__selectedlabel {
-        grid-column: 1 / span 2;
-      }
-    }
   }
 
   .pm__content {

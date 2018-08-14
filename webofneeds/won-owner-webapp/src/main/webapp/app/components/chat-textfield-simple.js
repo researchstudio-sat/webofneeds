@@ -20,6 +20,7 @@ import {
 import { getAllDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
+import labelledHrModule from "./labelled-hr.js";
 
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/picker/description-picker.js";
@@ -45,39 +46,37 @@ function genComponentConf() {
   let template = `
         <div class="cts__details"
           ng-if="self.allowDetails && self.showAddMessageContent">
-          <div class="cts__details__actions" ng-if="!self.multiSelectType && self.isConnected">
+          <div class="cts__details__grid"
+              ng-if="!self.selectedDetail && !self.multiSelectType">
+            <button
+                ng-if="self.showAgreementData"
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('accepts')">
+                Accept Proposal(s)
+            </button>
             <button
                 ng-if="!self.showAgreementData"
-                class="won-button--outlined thin red"
+                class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('proposes')">
                 Make Proposal
             </button>
             <button
                 ng-if="self.showAgreementData"
-                class="won-button--outlined thin red"
-                ng-click="self.activateMultiSelect('accepts')">
-                Accept Proposal(s)
-            </button>
-            <button
-                ng-if="self.showAgreementData"
-                class="won-button--outlined thin red"
+                class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('rejects')">
                 Reject Proposal(s)
             </button>
             <button
-                ng-if="self.showAgreementData"
-                class="won-button--outlined thin red"
+                class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('proposesToCancel')">
                 Cancel Agreement(s)
             </button>
-            <button
-                class="won-button--outlined thin red"
+            <button class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('retracts')">
                 Retract Message(s)
             </button>
-          </div>
-          <div class="cts__details__grid"
-              ng-if="!self.selectedDetail">
+            <won-labelled-hr label="::'Or'" class="cts__details__grid__hr"
+              ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <div class="cts__details__grid__detail"
               ng-repeat="detail in self.allDetails"
               ng-click="self.pickDetail(detail)">
@@ -90,7 +89,44 @@ function genComponentConf() {
             </div>
           </div>
           <div class="cts__details__input"
-            ng-if="self.selectedDetail">
+            ng-if="!self.selectedDetail && self.multiSelectType">
+            <div class="cts__details__input__header">
+              <svg class="cts__details__input__header__back clickable"
+                ng-click="self.cancelMultiSelect()">
+                <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+              </svg>
+              <svg class="cts__details__input__header__icon">
+                <use xlink:href="#ico36_plus_circle" href="#ico36_plus_circle"></use>
+              </svg>
+              <div class="cts__details__input__header__label">
+                {{ self.getMultiSelectActionLabel() }}
+              </div>
+              <div class="cts__details__input__header__add" ng-click="self.saveMultiSelect()">
+                <svg class="cts__details__input__header__add__icon">
+                  <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                </svg>
+                <span class="cts__details__input__header__add__label hide-in-responsive">
+                  Save
+                </span>
+              </div>
+              <div class="cts__details__input__header__discard" ng-click="self.cancelMultiSelect()">
+                <svg class="cts__details__input__header__discard__icon">
+                  <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
+                </svg>
+                <span class="cts__details__input__header__discard__label hide-in-responsive">
+                  Discard
+                </span>
+              </div>
+            </div>
+            <div class="cts__details__input__content" ng-if="self.selectedMessages">
+              {{ self.selectedMessages.size }} Messages
+            </div>
+            <div class="cts__details__input__content" ng-if="!self.selectedMessages">
+              0 Messages selected
+            </div>
+          </div>
+          <div class="cts__details__input"
+            ng-if="self.selectedDetail && !self.multiSelectType">
             <div class="cts__details__input__header">
               <svg class="cts__details__input__header__back clickable"
                 ng-click="self.removeAddMessageContent()">
@@ -205,6 +241,10 @@ function genComponentConf() {
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
+        const chatMessages = connection && connection.get("messages");
+        const selectedMessages =
+          chatMessages && chatMessages.filter(msg => msg.get("isSelected"));
+
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
           this.allDetails &&
@@ -215,6 +255,7 @@ function genComponentConf() {
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState && connectionState === won.WON.Connected,
+          selectedMessages,
           connectionHasBeenLost:
             state.getIn(["messages", "reconnecting"]) ||
             state.getIn(["messages", "lostConnection"]),
@@ -367,6 +408,42 @@ function genComponentConf() {
         multiSelectType: type,
       });
     }
+
+    getMultiSelectActionLabel() {
+      if (this.multiSelectType) {
+        switch (this.multiSelectType) {
+          case "rejects":
+            return "Reject selected";
+          case "retracts":
+            return "Retract selected";
+          case "proposes":
+            return "Propose selected";
+          case "accepts":
+            return "Accept selected";
+          case "proposesToCancel":
+            return "Propose To Cancel selected";
+          default:
+            return "illegal state";
+        }
+      }
+    }
+
+    cancelMultiSelect() {
+      this.connections__setMultiSelectType({
+        connectionUri: this.connectionUri,
+        multiSelectType: undefined,
+      });
+    }
+
+    saveMultiSelect() {
+      console.log(
+        "TODO: IMPL Saving multiSelectType: ",
+        this.multiSelectType,
+        " with ",
+        this.selectMessages ? this.selectMessages.size : "no messages"
+      );
+      this.cancelMultiSelect();
+    }
   }
   Controller.$inject = serviceDependencies;
 
@@ -409,6 +486,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.chatTextfieldSimple", [
+    labelledHrModule,
     autoresizingTextareaModule,
     descriptionPickerModule,
     locationPickerModule,

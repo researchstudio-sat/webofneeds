@@ -137,22 +137,7 @@ function genComponentConf() {
                     <span class="rdflink__label">Connection</span>
             </a>
         </div>
-        <div class="pm__footer won-is-multiSelect" ng-if="self.multiSelectType">
-          <div class="pm__footer__selectedlabel" ng-if="self.selectedMessages">
-            {{ self.selectedMessages.size }} Messages
-          </div>
-          <div class="pm__footer__label" ng-if="!self.selectedMessages">
-            0 Messages selected
-          </div>
-          <button class="pm__footer__button won-button--filled red" ng-click="self.submitSelection()"
-            ng-disabled="!self.selectedMessages || self.selectedMessages.size == 0">
-            {{ self.getMultiSelectActionText() }}
-          </button>
-          <button class="pm__footer__button won-button--filled black" ng-click="self.cancelSelection()">
-            Cancel
-          </button>
-        </div>
-        <div class="pm__footer" ng-if="!self.multiSelectType && self.isConnected">
+        <div class="pm__footer" ng-if="self.isConnected">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
@@ -706,6 +691,7 @@ function genComponentConf() {
       });
     }
 
+    //TODO: MOVE THIS METHOD TO CHAT-TEXTFIELD-SIMPLE
     submitSelection() {
       if (this.selectedMessages && this.selectedMessages.size > 0) {
         const selectedMessageUris = this.selectedMessages.map(
@@ -804,33 +790,10 @@ function genComponentConf() {
           }
         });
 
-        this.cancelSelection();
-      }
-    }
-
-    cancelSelection() {
-      this.connections__setMultiSelectType({
-        connectionUri: this.connectionUri,
-        multiSelectType: undefined,
-      });
-    }
-
-    getMultiSelectActionText() {
-      if (this.multiSelectType) {
-        switch (this.multiSelectType) {
-          case "rejects":
-            return "Reject selected";
-          case "retracts":
-            return "Retract selected";
-          case "proposes":
-            return "Propose selected";
-          case "accepts":
-            return "Accept selected";
-          case "proposesToCancel":
-            return "Propose To Cancel selected";
-          default:
-            return "illegal state";
-        }
+        this.connections__setMultiSelectType({
+          connectionUri: this.connectionUri,
+          multiSelectType: undefined,
+        });
       }
     }
   }
