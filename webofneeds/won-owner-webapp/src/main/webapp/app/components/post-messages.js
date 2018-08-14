@@ -553,11 +553,10 @@ function genComponentConf() {
 
       const trimmedMsg = chatMessage.trim();
       if (trimmedMsg || additionalContent || referencedContent) {
-        console.log("TODO: referencedContent to send:", referencedContent);
-
         this.connections__sendChatMessage(
           trimmedMsg,
           additionalContent,
+          referencedContent,
           this.connection.get("uri"),
           isTTL
         );
@@ -744,6 +743,7 @@ function genComponentConf() {
 
         this.connections__sendChatMessage(
           trimmedMsg,
+          undefined,
           undefined,
           this.connectionUri,
           true

@@ -201,6 +201,7 @@ export function buildConnectMessage({
 export function buildChatMessage({
   chatMessage,
   additionalContent,
+  referencedContentUris, //this is a map of corresponding uris to be e.g. proposes or retracted... (it already includes the correct uri -> remoteUri for received messages, and uri for sent messages)
   connectionUri,
   ownNeedUri,
   theirNeedUri,
@@ -240,7 +241,10 @@ export function buildChatMessage({
 
       if (isTTL && graphPayload) {
         wonMessageBuilder.mergeIntoContentGraph(graphPayload);
-      } else if (!isTTL && (chatMessage || additionalContent)) {
+      } else if (
+        !isTTL &&
+        (chatMessage || additionalContent || referencedContentUris)
+      ) {
         //add the chatMessage as normal text message
         if (chatMessage) {
           wonMessageBuilder.addContentGraphData(
@@ -272,6 +276,50 @@ export function buildChatMessage({
                 } else {
                   contentNode[key] = detailRDF[key];
                 }
+              }
+            }
+          });
+        }
+
+        if (referencedContentUris) {
+          const contentNode = wonMessageBuilder.getContentGraphNode();
+          referencedContentUris.forEach((uris, key) => {
+            if (uris && uris.length > 0) {
+              switch (key) {
+                case "retracts":
+                  contentNode[
+                    "http://purl.org/webofneeds/modification#retracts"
+                  ] = uris;
+                  break;
+                case "rejects":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#rejects"
+                  ] = uris;
+                  break;
+                case "proposes":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#proposes"
+                  ] = uris;
+                  break;
+                case "proposesToCancel":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#proposesToCancel"
+                  ] = uris;
+                  break;
+                case "accepts":
+                  contentNode[
+                    "http://purl.org/webofneeds/agreement#accepts"
+                  ] = uris;
+                  break;
+                default:
+                  console.error(
+                    "key[",
+                    key,
+                    "] is not a valid reference omitting uris[",
+                    uris,
+                    "] in message"
+                  );
+                  break;
               }
             }
           });

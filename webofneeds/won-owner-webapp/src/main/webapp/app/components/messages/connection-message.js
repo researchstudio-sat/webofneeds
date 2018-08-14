@@ -430,6 +430,7 @@ function genComponentConf() {
       this.connections__sendChatMessage(
         trimmedMsg,
         undefined,
+        undefined,
         this.connectionUri,
         true
       );
@@ -444,6 +445,7 @@ function genComponentConf() {
       const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
       this.connections__sendChatMessage(
         trimmedMsg,
+        undefined,
         undefined,
         this.connectionUri,
         true
@@ -461,6 +463,7 @@ function genComponentConf() {
       );
       this.connections__sendChatMessage(
         trimmedMsg,
+        undefined,
         undefined,
         this.connectionUri,
         true
@@ -482,6 +485,7 @@ function genComponentConf() {
       this.connections__sendChatMessage(
         trimmedMsg,
         undefined,
+        undefined,
         this.connectionUri,
         true
       );
@@ -501,6 +505,7 @@ function genComponentConf() {
       );
       this.connections__sendChatMessage(
         trimmedMsg,
+        undefined,
         undefined,
         this.connectionUri,
         true

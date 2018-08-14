@@ -29,6 +29,7 @@ import {
 export function connectionsChatMessage(
   chatMessage,
   additionalContent,
+  referencedContent,
   connectionUri,
   isTTL = false
 ) {
@@ -51,9 +52,24 @@ export function connectionsChatMessage(
       "remoteConnectionUri",
     ]);
 
+    let referencedContentUris = undefined;
+    if (referencedContent) {
+      referencedContentUris = new Map();
+      referencedContent.forEach((referencedMessages, key) => {
+        let contentUris = [];
+
+        referencedMessages.map(msg => {
+          const correctUri = msg.get("remoteUri") || msg.get("uri");
+          if (correctUri) contentUris.push(correctUri);
+        });
+        referencedContentUris.set(key, contentUris);
+      });
+    }
+
     buildChatMessage({
       chatMessage: chatMessage,
       additionalContent: additionalContent,
+      referencedContentUris: referencedContentUris,
       connectionUri,
       ownNeedUri: ownNeed.get("uri"),
       theirNeedUri: theirNeedUri,
