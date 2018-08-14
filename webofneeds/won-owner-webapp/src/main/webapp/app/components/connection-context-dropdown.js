@@ -58,36 +58,6 @@ function genComponentConf() {
                         Show Agreement Data
                     </button>
                     <button
-                        ng-if="self.isConnected && !self.multiSelectType && !self.showAgreementData"
-                        class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('proposes')">
-                        Make Proposal
-                    </button>
-                    <button
-                        ng-if="self.isConnected && !self.multiSelectType && self.showAgreementData"
-                        class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('accepts')">
-                        Accept Proposal(s)
-                    </button>
-                    <button
-                        ng-if="self.isConnected && !self.multiSelectType && self.showAgreementData"
-                        class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('rejects')">
-                        Reject Proposal(s)
-                    </button>
-                    <button
-                        ng-if="self.isConnected && !self.multiSelectType && self.showAgreementData"
-                        class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('proposesToCancel')">
-                        Cancel Agreement(s)
-                    </button>
-                    <button
-                        ng-if="self.isConnected && !self.multiSelectType"
-                        class="won-button--outlined thin red"
-                        ng-click="self.activateMultiSelect('retracts')">
-                        Retract Message(s)
-                    </button>
-                    <button
                         ng-if="self.isConnected || self.isSuggested"
                         class="won-button--filled red"
                         ng-click="self.closeConnection()">
@@ -119,7 +89,6 @@ function genComponentConf() {
           connection,
           connectionUri,
           showAgreementData: connection && connection.get("showAgreementData"),
-          multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf: state.get("showRdf"),
           isConnected: connectionState === won.WON.Connected,
           isSentRequest: connectionState === won.WON.RequestSent,
@@ -157,13 +126,6 @@ function genComponentConf() {
       this.router__stateGoCurrent({
         useCase: undefined,
         connectionUri: undefined,
-      });
-    }
-
-    activateMultiSelect(type) {
-      this.connections__setMultiSelectType({
-        connectionUri: this.connectionUri,
-        multiSelectType: type,
       });
     }
 

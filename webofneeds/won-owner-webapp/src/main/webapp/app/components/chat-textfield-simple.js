@@ -12,6 +12,11 @@ import "ng-redux";
 import "angular-sanitize";
 import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay } from "../utils.js";
+import won from "../won-es6.js";
+import {
+  selectOpenConnectionUri,
+  selectNeedByConnectionUri,
+} from "../selectors.js";
 import { getAllDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
@@ -40,6 +45,37 @@ function genComponentConf() {
   let template = `
         <div class="cts__details"
           ng-if="self.allowDetails && self.showAddMessageContent">
+          <div class="cts__details__actions" ng-if="!self.multiSelectType && self.isConnected">
+            <button
+                ng-if="!self.showAgreementData"
+                class="won-button--outlined thin red"
+                ng-click="self.activateMultiSelect('proposes')">
+                Make Proposal
+            </button>
+            <button
+                ng-if="self.showAgreementData"
+                class="won-button--outlined thin red"
+                ng-click="self.activateMultiSelect('accepts')">
+                Accept Proposal(s)
+            </button>
+            <button
+                ng-if="self.showAgreementData"
+                class="won-button--outlined thin red"
+                ng-click="self.activateMultiSelect('rejects')">
+                Reject Proposal(s)
+            </button>
+            <button
+                ng-if="self.showAgreementData"
+                class="won-button--outlined thin red"
+                ng-click="self.activateMultiSelect('proposesToCancel')">
+                Cancel Agreement(s)
+            </button>
+            <button
+                class="won-button--outlined thin red"
+                ng-click="self.activateMultiSelect('retracts')">
+                Retract Message(s)
+            </button>
+          </div>
           <div class="cts__details__grid"
               ng-if="!self.selectedDetail">
             <div class="cts__details__grid__detail"
@@ -163,12 +199,22 @@ function genComponentConf() {
       this.additionalContentKeys = new Set();
 
       const selectFromState = state => {
+        const connectionUri = selectOpenConnectionUri(state);
+        const post =
+          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const connection = post && post.getIn(["connections", connectionUri]);
+        const connectionState = connection && connection.get("state");
+
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
           this.allDetails &&
           selectedDetailIdentifier &&
           this.allDetails[selectedDetailIdentifier];
         return {
+          connectionUri,
+          multiSelectType: connection && connection.get("multiSelectType"),
+          showAgreementData: connection && connection.get("showAgreementData"),
+          isConnected: connectionState && connectionState === won.WON.Connected,
           connectionHasBeenLost:
             state.getIn(["messages", "reconnecting"]) ||
             state.getIn(["messages", "lostConnection"]),
@@ -313,6 +359,13 @@ function genComponentConf() {
         usedDetail &&
         usedDetail.generateHumanReadable({ value: value, includeLabel: true })
       );
+    }
+
+    activateMultiSelect(type) {
+      this.connections__setMultiSelectType({
+        connectionUri: this.connectionUri,
+        multiSelectType: type,
+      });
     }
   }
   Controller.$inject = serviceDependencies;
