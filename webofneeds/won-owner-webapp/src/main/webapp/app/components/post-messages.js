@@ -548,7 +548,7 @@ function genComponentConf() {
       const trimmedMsg = chatMessage.trim();
       if (trimmedMsg || additionalContent || referencedContent) {
         if (referencedContent) {
-          this.referencedContent.forEach((msgs, key) => {
+          referencedContent.forEach((msgs, key) => {
             if (msgs) {
               msgs.forEach(msg => {
                 switch (key) {

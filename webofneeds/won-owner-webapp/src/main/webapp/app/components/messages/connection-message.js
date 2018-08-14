@@ -11,10 +11,6 @@ import combinedMessageContentModule from "./combined-message-content.js";
 
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
-import {
-  buildProposalMessage,
-  buildModificationMessage,
-} from "../../won-message-utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
@@ -419,99 +415,48 @@ function genComponentConf() {
 
     sendProposal() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const trimmedMsg = buildProposalMessage(
-        uri,
-        "proposes",
-        "Ok, I am hereby making a proposal"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("proposes");
     }
 
     proposeToCancel() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const msg = "Propose to cancel agreement : " + uri;
-      const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("proposesToCancel");
 
       this.markAsCancellationPending(true);
     }
 
     sendAccept() {
       this.clicked = true;
-      const trimmedMsg = buildProposalMessage(
-        this.message.get("remoteUri"),
-        "accepts",
-        "I accept the following proposition"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("accepts");
 
       this.markAsAccepted(true);
     }
 
     retractMessage() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const trimmedMsg = buildModificationMessage(
-        uri,
-        "retracts",
-        "Retracting the message"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("retracts");
 
       this.markAsRetracted(true);
     }
 
     rejectMessage() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const trimmedMsg = buildProposalMessage(
-        uri,
-        "rejects",
-        "Rejecting the message"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("rejects");
 
       this.markAsRejected(true);
+    }
+
+    sendActionMessage(type) {
+      this.connections__sendChatMessage(
+        undefined,
+        undefined,
+        new Map().set(
+          type,
+          Immutable.Map().set(this.message.get("uri"), this.message)
+        ),
+        this.connectionUri,
+        false
+      );
     }
 
     /**
