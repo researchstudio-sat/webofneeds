@@ -48,6 +48,8 @@ function genComponentConf() {
           ng-if="self.allowDetails && self.showAddMessageContent">
           <div class="cts__details__grid"
               ng-if="!self.selectedDetail && !self.multiSelectType">
+            <won-labelled-hr label="::'Actions'" class="cts__details__grid__hr"
+              ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <button
                 ng-if="self.showAgreementData"
                 class="cts__details__grid__action won-button--filled red"
@@ -75,7 +77,7 @@ function genComponentConf() {
                 ng-click="self.activateMultiSelect('retracts')">
                 Retract Message(s)
             </button>
-            <won-labelled-hr label="::'Or'" class="cts__details__grid__hr"
+            <won-labelled-hr label="::'Details'" class="cts__details__grid__hr"
               ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <div class="cts__details__grid__detail"
               ng-repeat="detail in self.allDetails"
@@ -101,7 +103,7 @@ function genComponentConf() {
               <div class="cts__details__input__header__label">
                 {{ self.getMultiSelectActionLabel() }}
               </div>
-              <div class="cts__details__input__header__add" ng-click="self.saveMultiSelect()">
+              <div class="cts__details__input__header__add" ng-click="self.saveReferencedContent()">
                 <svg class="cts__details__input__header__add__icon">
                   <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
                 </svg>
@@ -109,7 +111,7 @@ function genComponentConf() {
                   Save
                 </span>
               </div>
-              <div class="cts__details__input__header__discard" ng-click="self.cancelMultiSelect()">
+              <div class="cts__details__input__header__discard" ng-click="self.removeReferencedContent()">
                 <svg class="cts__details__input__header__discard__icon">
                   <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
                 </svg>
@@ -190,9 +192,23 @@ function genComponentConf() {
             ng-disabled="!self.valid()">
             {{ (self.submitButtonLabel || 'Submit') }}
         </button>
-        <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent()">
+        <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent() || self.hasReferencedContent()">
           <div class="cts__additionalcontent__header">Additional Content to send:</div>
           <div class="cts__additionalcontent__list">
+            <div class="cts__additionalcontent__list__item" ng-repeat="ref in self.getReferencedContentKeysArray()">
+              <svg class="cts__additionalcontent__list__item__icon clickable"
+                ng-click="self.activateMultiSelect(ref)">
+                <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
+              </svg>
+              <span class="cts__additionalcontent__list__item__label clickable"
+                ng-click="self.activateMultiSelect(ref)">
+                {{ self.getHumanReadableReferencedContent(ref) }}
+              </span>
+              <svg class="cts__additionalcontent__list__item__discard clickable"
+                ng-click="self.removeReferencedContent(ref)">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
+              </svg>
+            </div>
             <div class="cts__additionalcontent__list__item" ng-repeat="key in self.getAdditionalContentKeysArray()">
               <svg class="cts__additionalcontent__list__item__icon clickable"
                 ng-click="self.pickDetail(self.allDetails[key])">
@@ -231,8 +247,8 @@ function genComponentConf() {
       this.allDetails = getAllDetails();
 
       this.draftObject = {};
-      this.additionalContent = new Map();
-      this.additionalContentKeys = new Set();
+      this.additionalContent = new Map(); //Stores the additional Detail content of a message
+      this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
 
       const selectFromState = state => {
         const connectionUri = selectOpenConnectionUri(state);
@@ -252,6 +268,7 @@ function genComponentConf() {
           this.allDetails[selectedDetailIdentifier];
         return {
           connectionUri,
+          post,
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState && connectionState === won.WON.Connected,
@@ -346,6 +363,7 @@ function genComponentConf() {
         !this.connectionHasBeenLost &&
         (this.allowEmptySubmit ||
           this.hasAdditionalContent() ||
+          this.hasReferencedContent() ||
           this.value().length > 0) &&
         this.belowMaxLength()
       );
@@ -385,11 +403,23 @@ function genComponentConf() {
       return this.additionalContent && this.additionalContent.size > 0;
     }
 
+    hasReferencedContent() {
+      return this.referencedContent && this.referencedContent.size > 0;
+    }
+
     getAdditionalContentKeysArray() {
       return (
         this.additionalContent &&
         this.additionalContent.keys() &&
         Array.from(this.additionalContent.keys())
+      );
+    }
+
+    getReferencedContentKeysArray() {
+      return (
+        this.referencedContent &&
+        this.referencedContent.keys() &&
+        Array.from(this.referencedContent.keys())
       );
     }
 
@@ -403,10 +433,25 @@ function genComponentConf() {
     }
 
     activateMultiSelect(type) {
+      this.cancelMultiSelect(); //close the multiselection if its already open
+
       this.connections__setMultiSelectType({
         connectionUri: this.connectionUri,
         multiSelectType: type,
       });
+
+      const referencedContent =
+        this.referencedContent && this.referencedContent.get(type);
+      if (referencedContent) {
+        referencedContent.forEach(msg => {
+          this.messages__setMessageSelected({
+            messageUri: msg.get("uri"),
+            connectionUri: this.connectionUri,
+            needUri: this.post.get("uri"),
+            isSelected: true,
+          });
+        });
+      }
     }
 
     getMultiSelectActionLabel() {
@@ -435,14 +480,48 @@ function genComponentConf() {
       });
     }
 
-    saveMultiSelect() {
-      console.log(
-        "TODO: IMPL Saving multiSelectType: ",
-        this.multiSelectType,
-        " with ",
-        this.selectMessages ? this.selectMessages.size : "no messages"
-      );
+    saveReferencedContent() {
+      this.referencedContent.set(this.multiSelectType, this.selectedMessages);
       this.cancelMultiSelect();
+    }
+
+    removeReferencedContent(ref = this.multiSelectType) {
+      this.referencedContent.delete(ref);
+      this.cancelMultiSelect();
+    }
+
+    getHumanReadableReferencedContent(ref) {
+      const referencedMessages = this.referencedContent.get(ref);
+      const referencedMessagesSize = referencedMessages
+        ? referencedMessages.size
+        : 0;
+
+      let humanReadableReferenceString = "";
+
+      switch (ref) {
+        case "rejects":
+          humanReadableReferenceString = "Reject ";
+          break;
+        case "retracts":
+          humanReadableReferenceString = "Retract ";
+          break;
+        case "proposes":
+          humanReadableReferenceString = "Propose ";
+          break;
+        case "accepts":
+          humanReadableReferenceString = "Accept ";
+          break;
+        case "proposesToCancel":
+          humanReadableReferenceString = "Propose To Cancel ";
+          break;
+        default:
+          return "illegal state";
+      }
+
+      humanReadableReferenceString +=
+        referencedMessagesSize +
+        (referencedMessagesSize > 1 ? " Messages" : " Message");
+      return humanReadableReferenceString;
     }
   }
   Controller.$inject = serviceDependencies;

@@ -41,7 +41,7 @@ chat-textfield-simple {
       1.15rem
     );
     .cts__details__input {
-      height: $local-height;
+      transition: height linear 0.5s;
       max-height: $local-height;
       padding: 0.5rem;
       overflow-y: auto;
