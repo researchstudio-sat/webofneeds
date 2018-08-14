@@ -84,22 +84,21 @@ chat-textfield-simple {
       }
       &__refcontent {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-
         width: 100%;
+        grid-gap: 0.5rem;
+        grid-template-columns: 1fr 1fr;
+        font-size: $smallFontSize;
         &__message {
+          display: grid;
+          align-items: center;
+          grid-gap: 0.25rem;
+          grid-template-columns: 1fr min-content;
           padding: 0.25rem;
           background: $won-secondary-color;
           color: $won-secondary-text-color;
-          max-width: 100%;
           box-sizing: border-box;
           border-radius: 0.5rem;
-          display: flex;
-          align-items: center;
-          margin-right: 0.25rem;
-          margin-top: 0.25rem;
           &__label {
-            padding: 0 0.25rem;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;

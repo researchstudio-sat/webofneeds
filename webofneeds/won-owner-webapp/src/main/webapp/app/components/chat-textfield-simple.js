@@ -21,6 +21,7 @@ import { getAllDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
 import labelledHrModule from "./labelled-hr.js";
+import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/picker/description-picker.js";
@@ -100,7 +101,10 @@ function genComponentConf() {
               <svg class="cts__details__input__header__icon">
                 <use xlink:href="#ico36_plus_circle" href="#ico36_plus_circle"></use>
               </svg>
-              <div class="cts__details__input__header__label">
+              <div class="cts__details__input__header__label hide-in-responsive">
+                {{ self.getMultiSelectActionLabel() }} ({{ self.selectedMessages.size }} Messages selected)
+              </div>
+              <div class="cts__details__input__header__label show-in-responsive">
                 {{ self.getMultiSelectActionLabel() }}
               </div>
               <div class="cts__details__input__header__add" ng-click="self.saveReferencedContent()">
@@ -120,18 +124,21 @@ function genComponentConf() {
                 </span>
               </div>
             </div>
-            <div class="cts__details__input__refcontent" ng-if="self.selectedMessages">
+            <div class="cts__details__input__refcontent hide-in-responsive" ng-if="self.selectedMessages">
               <div class="cts__details__input__refcontent__message"
                 ng-repeat="msg in self.selectedMessages.toArray()">
-                <div class="cts__details__input__refcontent__message__label">{{ msg.get('uri') }}</div>
+                <div class="cts__details__input__refcontent__message__label">{{ self.getHumanReadableMessageString(msg) }}</div>
                 <svg class="cts__details__input__refcontent__message__discard clickable"
                   ng-click="self.removeMessageFromSelection(msg)">
                   <use xlink:href="#ico36_close" href="#ico36_close"></use>
                 </svg>
               </div>
             </div>
-            <div class="cts__details__input__refcontent" ng-if="!self.selectedMessages">
-              0 Messages selected
+            <div class="cts__details__input__refcontent" ng-if="!self.selectedMessages || self.selectedMessages.size == 0">
+              Select Messages above
+            </div>
+            <div class="cts__details__input__refcontent show-in-responsive" ng-if="self.selectedMessages && self.selectedMessages.size > 0">
+              {{ self.selectedMessages.size }} Messages selected
             </div>
           </div>
           <div class="cts__details__input"
@@ -223,7 +230,7 @@ function genComponentConf() {
               </svg>
               <span class="cts__additionalcontent__list__item__label clickable"
                 ng-click="self.pickDetail(self.allDetails[key])">
-                {{ self.getHumanReadableString(key, self.additionalContent.get(key)) }}
+                {{ self.getHumanReadableDetailString(key, self.additionalContent.get(key)) }}
               </span>
               <svg class="cts__additionalcontent__list__item__discard clickable"
                 ng-click="self.updateDetail(key, undefined, true)">
@@ -430,12 +437,18 @@ function genComponentConf() {
       );
     }
 
-    getHumanReadableString(key, value) {
+    getHumanReadableDetailString(key, value) {
       const usedDetail = this.allDetails[key];
 
       return (
         usedDetail &&
         usedDetail.generateHumanReadable({ value: value, includeLabel: true })
+      );
+    }
+
+    getHumanReadableMessageString(msg) {
+      return (
+        getHumanReadableStringFromMessage(msg) || "No Message Text Present"
       );
     }
 
@@ -488,7 +501,11 @@ function genComponentConf() {
     }
 
     saveReferencedContent() {
-      this.referencedContent.set(this.multiSelectType, this.selectedMessages);
+      if (!this.selectedMessages || this.selectedMessages.size == 0) {
+        this.referencedContent.delete(this.multiSelectType);
+      } else {
+        this.referencedContent.set(this.multiSelectType, this.selectedMessages);
+      }
       this.cancelMultiSelect();
     }
 
