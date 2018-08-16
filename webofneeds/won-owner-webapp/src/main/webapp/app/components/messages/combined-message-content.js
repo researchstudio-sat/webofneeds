@@ -18,7 +18,7 @@ function genComponentConf() {
           <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
       </div>
       <won-message-content
-          ng-if="self.hasContent"
+          ng-if="self.hasContent || self.hasNotBeenLoadedYet"
           message-uri="self.messageUri"
           connection-uri="self.connectionUri">
       </won-message-content>
@@ -54,6 +54,7 @@ function genComponentConf() {
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf: state.get("showRdf"),
           hasContent: message && message.get("hasContent"),
+          hasNotBeenLoadedYet: !message,
           hasReferences: message && message.get("hasReferences"),
           messageType,
           isConnectionMessage: messageType === won.WONMSG.connectionMessage,
