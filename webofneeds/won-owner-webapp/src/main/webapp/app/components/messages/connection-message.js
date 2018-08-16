@@ -48,31 +48,31 @@ function genComponentConf() {
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
             ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
-            ng-if="!self.message.get('outgoingMessage')">
+            ng-if="!self.isSent">
         </won-square-image>
         <won-square-image
             title="System"
             src=""
-            uri="self.message.get('senderUri')"
-            ng-if="self.message.get('systemMessage')">
+            uri="self.messageSenderUri"
+            ng-if="self.isFromSystem">
         </won-square-image>
         <div class="won-cm__center"
                 ng-class="{
-                  'won-cm__center--nondisplayable': (self.message.get('messageType') === self.won.WONMSG.connectionMessage) && !self.message.get('isParsable'),
-                  'won-cm__center--system': self.message.get('systemMessage')
+                  'won-cm__center--nondisplayable': self.isConnectionMessage && !self.isParsable,
+                  'won-cm__center--system': self.isFromSystem
                 }"
                 in-view="$inview && self.markAsRead()">
             <div 
                 class="won-cm__center__bubble"
     			      ng-class="{
-    			        'references' : 	self.message.get('hasReferences'),
-                  'pending': self.isPending(),
-                  'partiallyLoaded': self.isPartiallyLoaded(),
-                  'failure': self.message.get('outgoingMessage') && self.message.get('failedToSend'),
+    			        'references' : 	self.hasReferences,
+                  'pending': self.isPending,
+                  'partiallyLoaded': self.isPartiallyLoaded,
+                  'failure': self.isSent && self.isFailedToSend,
     			      }">
     			      <won-combined-message-content
-    			        message-uri="self.message.get('uri')"
-                  connection-uri="self.connection.get('uri')">
+    			        message-uri="self.messageUri"
+                  connection-uri="self.connectionUri')">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="self.isProposable && !self.multiSelectType"
@@ -87,11 +87,11 @@ function genComponentConf() {
                 <div class="won-cm__center__bubble__button-area"
                     ng-if="self.showDetail && !self.multiSelectType">
                     <button class="won-button--filled thin black"
-                        ng-click="self.sendProposal(); self.showDetail = !self.showDetail">
+                        ng-click="self.sendActionMessage('proposes'); self.showDetail = !self.showDetail">
                         Propose <span ng-show="self.clicked">(again)</span>
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
+                        ng-click="self.sendActionMessage('retracts'); self.showDetail = !self.showDetail"
                         ng-if="self.isRetractable">
                         Retract
                     </button>
@@ -100,25 +100,25 @@ function genComponentConf() {
                     <button class="won-button--filled thin red"
                         ng-if="self.isAcceptable"
                         ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.sendAccept()">
+                        ng-click="self.sendActionMessage('accepts')">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
                         ng-show="self.isRejectable"
                         ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.rejectMessage()">
+                        ng-click="self.sendActionMessage('rejects')">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
                         ng-if="self.isRetractable"
                         ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.retractMessage()">
+                        ng-click="self.sendActionMessage('retracts')">
                       Retract
                     </button>
                     <button class="won-button--filled thin red"
                         ng-if="self.isCancelable"
                         ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.proposeToCancel()">
+                        ng-click="self.sendActionMessage('proposesToCancel')">
                       Propose To Cancel
                     </button>
                     <button class="won-button--filled thin red"
@@ -143,7 +143,7 @@ function genComponentConf() {
                     </button>
                 </div>
             </div>
-            <won-connection-message-status message-uri="self.message.get('uri')" connection-uri="self.connection.get('uri')">
+            <won-connection-message-status message-uri="self.messageUri" connection-uri="self.connectionUri">
             </won-connection-message-status>
             <a ng-if="self.rdfLinkURL" target="_blank" href="{{self.rdfLinkURL}}">
                 <svg class="rdflink__small clickable">
@@ -185,16 +185,37 @@ function genComponentConf() {
             message.get("outgoingMessage") ? "&deep=true" : ""
           );
         }
+        const isSent = message && message.get("outgoingMessage");
+        const isReceived = message && !message.get("outgoingMessage");
+        const isFailedToSend = message && message.get("failedToSend");
+        const isReceivedByOwn = message && message.get("isReceivedByOwn");
+        const isReceivedByRemote = message && message.get("isReceivedByRemote");
+
+        // determines if the sent message is not received by any of the servers yet but not failed either
+        const isPending =
+          isSent && !isFailedToSend && !isReceivedByOwn && !isReceivedByRemote;
+
+        // determines if the sent message is received by any of the servers yet but not failed either
+        const isPartiallyLoaded =
+          isSent &&
+          !isFailedToSend &&
+          (!(isReceivedByOwn && isReceivedByRemote) &&
+            (isReceivedByOwn || isReceivedByRemote));
 
         return {
           ownNeed,
           theirNeed,
-          connection,
           message,
+          messageUri: message && message.get("uri"),
+          messageSenderUri: message && message.get("senderUri"),
+          isConnectionMessage:
+            message &&
+            message.get("messageType") === won.WONMSG.connectionMessage,
           isSelected: message && message.get("isSelected"),
           multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
+          isParsable: message.get("isParsable"),
           isAccepted: isMessageAccepted(this.message),
           isRejected: isMessageRejected(this.message),
           isRetracted: isMessageRetracted(this.message),
@@ -209,6 +230,13 @@ function genComponentConf() {
           isRejectable: isMessageRejectable(message),
           isAcceptable: isMessageAcceptable(message),
           isUnread: isMessageUnread(message),
+          isReceived,
+          isSent,
+          isFailedToSend,
+          isPending,
+          isPartiallyLoaded,
+          isFromSystem: message && message.get("systemMessage"),
+          hasReferences: message && message.get("hasReferences"),
         };
       };
 
@@ -219,16 +247,8 @@ function genComponentConf() {
         this
       );
 
-      classOnComponentRoot(
-        "won-cm--left",
-        () => this.isReceivedMessage(),
-        this
-      );
-      classOnComponentRoot(
-        "won-cm--right",
-        () => this.isOutgoingMessage(),
-        this
-      );
+      classOnComponentRoot("won-cm--left", () => this.isReceived, this);
+      classOnComponentRoot("won-cm--right", () => this.isSent, this);
       classOnComponentRoot(
         "won-is-multiSelect",
         () => !!this.multiSelectType,
@@ -270,14 +290,6 @@ function genComponentConf() {
       return false;
     }
 
-    isReceivedMessage() {
-      return this.message && !this.message.get("outgoingMessage");
-    }
-
-    isOutgoingMessage() {
-      return this.message && this.message.get("outgoingMessage");
-    }
-
     showActionButtons() {
       return (
         hasProposesReferences(this.message) ||
@@ -301,32 +313,8 @@ function genComponentConf() {
       }
     }
 
-    sendProposal() {
-      this.clicked = true;
-      this.sendActionMessage("proposes");
-    }
-
-    proposeToCancel() {
-      this.clicked = true;
-      this.sendActionMessage("proposesToCancel");
-    }
-
-    sendAccept() {
-      this.clicked = true;
-      this.sendActionMessage("accepts");
-    }
-
-    retractMessage() {
-      this.clicked = true;
-      this.sendActionMessage("retracts");
-    }
-
-    rejectMessage() {
-      this.clicked = true;
-      this.sendActionMessage("rejects");
-    }
-
     sendActionMessage(type) {
+      this.clicked = true;
       this.connections__sendChatMessage(
         undefined,
         undefined,
@@ -337,38 +325,6 @@ function genComponentConf() {
         this.connectionUri,
         false
       );
-    }
-
-    /**
-     * determines if the sent message is not received by any of the servers yet but not failed either
-     */
-    isPending() {
-      const pending =
-        this.message &&
-        this.message.get("outgoingMessage") &&
-        !this.message.get("failedToSend") &&
-        !this.message.get("isReceivedByOwn") &&
-        !this.message.get("isReceivedByRemote");
-
-      return pending;
-    }
-
-    /**
-     * determines if the sent message is received by any of the servers yet but not failed either
-     */
-    isPartiallyLoaded() {
-      const partiallyLoaded =
-        this.message &&
-        this.message.get("outgoingMessage") &&
-        !this.message.get("failedToSend") &&
-        (!(
-          this.message.get("isReceivedByOwn") &&
-          this.message.get("isReceivedByRemote")
-        ) &&
-          (this.message.get("isReceivedByOwn") ||
-            this.message.get("isReceivedByRemote")));
-
-      return partiallyLoaded;
     }
 
     encodeParam(param) {
