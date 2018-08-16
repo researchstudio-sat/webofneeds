@@ -14,18 +14,18 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msg__header" ng-if="self.message && !self.isConnectionMessage()">
+      <div class="msg__header" ng-if="!self.isConnectionMessage">
           <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
       </div>
       <won-message-content
-          ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
-          message-uri="self.message.get('uri')"
-          connection-uri="self.connection.get('uri')">
+          ng-if="self.hasContent"
+          message-uri="self.messageUri"
+          connection-uri="self.connectionUri">
       </won-message-content>
       <won-referenced-message-content
-          ng-if="self.message.get('hasReferences')"
-          message-uri="self.message.get('uri')"
-          connection-uri="self.connection.get('uri')">
+          ng-if="self.hasReferences"
+          message-uri="self.messageUri"
+          connection-uri="self.connectionUri">
       </won-referenced-message-content>
       <won-trig
           trig="self.contentGraphTrig"
@@ -48,11 +48,15 @@ function genComponentConf() {
           this.messageUri &&
           getIn(connection, ["messages", this.messageUri]);
 
+        const messageType = message && message.get("messageType");
+
         return {
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf: state.get("showRdf"),
-          connection,
-          message,
+          hasContent: message && message.get("hasContent"),
+          hasReferences: message && message.get("hasReferences"),
+          messageType,
+          isConnectionMessage: messageType === won.WONMSG.connectionMessage,
         };
       };
 
@@ -64,41 +68,9 @@ function genComponentConf() {
       );
     }
 
-    isConnectionMessage() {
-      return (
-        this.message &&
-        this.message.get("messageType") === won.WONMSG.connectionMessage
-      );
-    }
-
     getHeaderLabel() {
-      const isUnknownMessageType = !(
-        this.isHintMessage() ||
-        this.isHintFeedbackMessage() ||
-        this.isOpenMessage() ||
-        this.isConnectMessage() ||
-        this.isConnectionMessage()
-      );
-
-      return isUnknownMessageType
-        ? this.messageType
-        : labels.messageType[self.messageType];
-    }
-
-    isHintMessage() {
-      return this.messageType === won.WONMSG.hintMessage;
-    }
-
-    isHintFeedbackMessage() {
-      return this.messageType === won.WONMSG.hintFeedbackMessage;
-    }
-
-    isConnectMessage() {
-      return this.messageType === won.WONMSG.connectMessage;
-    }
-
-    isOpenMessage() {
-      return this.messageType === won.WONMSG.openMessage;
+      const headerLabel = labels.messageType[this.messageType];
+      return headerLabel || this.messageType;
     }
   }
   Controller.$inject = serviceDependencies;
