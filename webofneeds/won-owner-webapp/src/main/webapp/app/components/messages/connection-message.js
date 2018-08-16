@@ -72,7 +72,7 @@ function genComponentConf() {
     			      }">
     			      <won-combined-message-content
     			        message-uri="self.messageUri"
-                  connection-uri="self.connectionUri')">
+                  connection-uri="self.connectionUri">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
                     ng-if="self.isProposable && !self.multiSelectType"
