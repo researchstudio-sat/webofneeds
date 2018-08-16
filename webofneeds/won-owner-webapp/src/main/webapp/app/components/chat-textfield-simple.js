@@ -12,9 +12,22 @@ import "ng-redux";
 import "angular-sanitize";
 import ngAnimate from "angular-animate";
 import { dispatchEvent, attach, delay } from "../utils.js";
+import won from "../won-es6.js";
+import {
+  selectOpenConnectionUri,
+  selectNeedByConnectionUri,
+  selectAcceptableMessagesByConnectionUri,
+  selectRetractableMessagesByConnectionUri,
+  selectRejectableMessagesByConnectionUri,
+  selectCancelableMessagesByConnectionUri,
+  selectProposableMessagesByConnectionUri,
+  selectSelectedMessagesByConnectionUri,
+} from "../selectors.js";
 import { getAllDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { actionCreators } from "../actions/actions.js";
+import labelledHrModule from "./labelled-hr.js";
+import { getHumanReadableStringFromMessage } from "../reducers/need-reducer/parse-message.js";
 
 // TODO: these should be replaced by importing defintions from config
 import descriptionPickerModule from "./details/picker/description-picker.js";
@@ -41,7 +54,43 @@ function genComponentConf() {
         <div class="cts__details"
           ng-if="self.allowDetails && self.showAddMessageContent">
           <div class="cts__details__grid"
-              ng-if="!self.selectedDetail">
+              ng-if="!self.selectedDetail && !self.multiSelectType">
+            <won-labelled-hr label="::'Actions'" class="cts__details__grid__hr"
+              ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
+            <button
+                ng-if="!self.showAgreementData"
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('proposes')"
+                ng-disabled="!self.hasProposableMessages">
+                Make Proposal
+            </button>
+            <button
+                ng-if="self.showAgreementData"
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('accepts')"
+                ng-disabled="!self.hasAcceptableMessages">
+                Accept Proposal(s)
+            </button>
+            <button
+                ng-if="self.showAgreementData"
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('rejects')"
+                ng-disabled="!self.hasRejectableMessages">
+                Reject Proposal(s)
+            </button>
+            <button
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('proposesToCancel')"
+                ng-disabled="!self.hasCancelableMessages">
+                Cancel Agreement(s)
+            </button>
+            <button class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('retracts')"
+                ng-disabled="!self.hasRetractableMessages">
+                Retract Message(s)
+            </button>
+            <won-labelled-hr label="::'Details'" class="cts__details__grid__hr"
+              ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <div class="cts__details__grid__detail"
               ng-repeat="detail in self.allDetails"
               ng-click="self.pickDetail(detail)">
@@ -54,7 +103,57 @@ function genComponentConf() {
             </div>
           </div>
           <div class="cts__details__input"
-            ng-if="self.selectedDetail">
+            ng-if="!self.selectedDetail && self.multiSelectType">
+            <div class="cts__details__input__header">
+              <svg class="cts__details__input__header__back clickable"
+                ng-click="self.cancelMultiSelect()">
+                <use xlink:href="#ico36_backarrow" href="#ico36_backarrow"></use>
+              </svg>
+              <svg class="cts__details__input__header__icon">
+                <use xlink:href="#ico36_plus_circle" href="#ico36_plus_circle"></use>
+              </svg>
+              <div class="cts__details__input__header__label hide-in-responsive">
+                {{ self.getMultiSelectActionLabel() }} ({{ self.selectedMessages.size }} Messages)
+              </div>
+              <div class="cts__details__input__header__label show-in-responsive">
+                {{ self.getMultiSelectActionLabel() }}
+              </div>
+              <div class="cts__details__input__header__add" ng-click="self.saveReferencedContent()">
+                <svg class="cts__details__input__header__add__icon">
+                  <use xlink:href="#ico36_added_circle" href="#ico36_added_circle"></use>
+                </svg>
+                <span class="cts__details__input__header__add__label hide-in-responsive">
+                  Save
+                </span>
+              </div>
+              <div class="cts__details__input__header__discard" ng-click="self.removeReferencedContent()">
+                <svg class="cts__details__input__header__discard__icon">
+                  <use xlink:href="#ico36_close_circle" href="#ico36_close_circle"></use>
+                </svg>
+                <span class="cts__details__input__header__discard__label hide-in-responsive">
+                  Discard
+                </span>
+              </div>
+            </div>
+            <div class="cts__details__input__refcontent hide-in-responsive" ng-if="self.selectedMessages">
+              <div class="cts__details__input__refcontent__message"
+                ng-repeat="msg in self.selectedMessages.toArray()">
+                <div class="cts__details__input__refcontent__message__label">{{ self.getHumanReadableMessageString(msg) }}</div>
+                <svg class="cts__details__input__refcontent__message__discard clickable"
+                  ng-click="self.removeMessageFromSelection(msg)">
+                  <use xlink:href="#ico36_close" href="#ico36_close"></use>
+                </svg>
+              </div>
+            </div>
+            <div class="cts__details__input__refcontent" ng-if="!self.selectedMessages || self.selectedMessages.size == 0">
+              Select Messages above
+            </div>
+            <div class="cts__details__input__refcontent show-in-responsive" ng-if="self.selectedMessages && self.selectedMessages.size > 0">
+              {{ self.selectedMessages.size }} Messages selected
+            </div>
+          </div>
+          <div class="cts__details__input"
+            ng-if="self.selectedDetail && !self.multiSelectType">
             <div class="cts__details__input__header">
               <svg class="cts__details__input__header__back clickable"
                 ng-click="self.removeAddMessageContent()">
@@ -94,7 +193,7 @@ function genComponentConf() {
         </div>
         <button class="cts__add"
           ng-disabled="!self.allowDetails"
-          ng-click="self.toggleAddMessageContentDisplay()">
+          ng-click="self.toggleAdditionalContentDisplay()">
             <svg class="cts__add__icon" ng-if="!self.showAddMessageContent">
                 <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
             </svg>
@@ -118,9 +217,23 @@ function genComponentConf() {
             ng-disabled="!self.valid()">
             {{ (self.submitButtonLabel || 'Submit') }}
         </button>
-        <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent()">
+        <div class="cts__additionalcontent" ng-if="self.hasAdditionalContent() || self.hasReferencedContent()">
           <div class="cts__additionalcontent__header">Additional Content to send:</div>
           <div class="cts__additionalcontent__list">
+            <div class="cts__additionalcontent__list__item" ng-repeat="ref in self.getReferencedContentKeysArray()">
+              <svg class="cts__additionalcontent__list__item__icon clickable"
+                ng-click="self.activateMultiSelect(ref)">
+                <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
+              </svg>
+              <span class="cts__additionalcontent__list__item__label clickable"
+                ng-click="self.activateMultiSelect(ref)">
+                {{ self.getHumanReadableReferencedContent(ref) }}
+              </span>
+              <svg class="cts__additionalcontent__list__item__discard clickable"
+                ng-click="self.removeReferencedContent(ref)">
+                <use xlink:href="#ico36_close" href="#ico36_close"></use>
+              </svg>
+            </div>
             <div class="cts__additionalcontent__list__item" ng-repeat="key in self.getAdditionalContentKeysArray()">
               <svg class="cts__additionalcontent__list__item__icon clickable"
                 ng-click="self.pickDetail(self.allDetails[key])">
@@ -128,7 +241,7 @@ function genComponentConf() {
               </svg>
               <span class="cts__additionalcontent__list__item__label clickable"
                 ng-click="self.pickDetail(self.allDetails[key])">
-                {{ self.getHumanReadableString(key, self.additionalContent.get(key)) }}
+                {{ self.getHumanReadableDetailString(key, self.additionalContent.get(key)) }}
               </span>
               <svg class="cts__additionalcontent__list__item__discard clickable"
                 ng-click="self.updateDetail(key, undefined, true)">
@@ -159,16 +272,69 @@ function genComponentConf() {
       this.allDetails = getAllDetails();
 
       this.draftObject = {};
-      this.additionalContent = new Map();
-      this.additionalContentKeys = new Set();
+      this.additionalContent = new Map(); //Stores the additional Detail content of a message
+      this.referencedContent = new Map(); //Stores the reference Content of a message (e.g. proposes, retracts...)
 
       const selectFromState = state => {
+        const connectionUri = selectOpenConnectionUri(state);
+        const post =
+          connectionUri && selectNeedByConnectionUri(state, connectionUri);
+        const connection = post && post.getIn(["connections", connectionUri]);
+        const connectionState = connection && connection.get("state");
+
+        const rejectableMessages = selectRejectableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const retractableMessages = selectRetractableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const acceptableMessages = selectAcceptableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const proposableMessages = selectProposableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const cancelableMessages = selectCancelableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+
+        const hasRejectableMessages =
+          rejectableMessages && rejectableMessages.size > 0;
+        const hasRetractableMessages =
+          retractableMessages && retractableMessages.size > 0;
+
+        const hasAcceptableMessages =
+          acceptableMessages && acceptableMessages.size > 0;
+        const hasProposableMessages =
+          proposableMessages && proposableMessages.size > 0;
+        const hasCancelableMessages =
+          cancelableMessages && cancelableMessages.size > 0;
+
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
           this.allDetails &&
           selectedDetailIdentifier &&
           this.allDetails[selectedDetailIdentifier];
         return {
+          connectionUri,
+          post,
+          multiSelectType: connection && connection.get("multiSelectType"),
+          showAgreementData: connection && connection.get("showAgreementData"),
+          isConnected: connectionState && connectionState === won.WON.Connected,
+          selectedMessages: selectSelectedMessagesByConnectionUri(
+            state,
+            connectionUri
+          ),
+          hasProposableMessages,
+          hasCancelableMessages,
+          hasAcceptableMessages,
+          hasRetractableMessages,
+          hasRejectableMessages,
           connectionHasBeenLost:
             state.getIn(["messages", "reconnecting"]) ||
             state.getIn(["messages", "lostConnection"]),
@@ -240,10 +406,15 @@ function genComponentConf() {
           value,
           valid,
           additionalContent: this.additionalContent,
+          referencedContent: this.referencedContent,
         };
         if (this.additionalContent) {
           this.additionalContent = new Map();
         }
+        if (this.referencedContent) {
+          this.referencedContent = new Map();
+        }
+        this.cancelMultiSelect();
         this.onSubmit(payload);
         dispatchEvent(this.$element[0], "submit", payload);
       }
@@ -259,6 +430,7 @@ function genComponentConf() {
         !this.connectionHasBeenLost &&
         (this.allowEmptySubmit ||
           this.hasAdditionalContent() ||
+          this.hasReferencedContent() ||
           this.value().length > 0) &&
         this.belowMaxLength()
       );
@@ -298,6 +470,10 @@ function genComponentConf() {
       return this.additionalContent && this.additionalContent.size > 0;
     }
 
+    hasReferencedContent() {
+      return this.referencedContent && this.referencedContent.size > 0;
+    }
+
     getAdditionalContentKeysArray() {
       return (
         this.additionalContent &&
@@ -306,13 +482,137 @@ function genComponentConf() {
       );
     }
 
-    getHumanReadableString(key, value) {
+    getReferencedContentKeysArray() {
+      return (
+        this.referencedContent &&
+        this.referencedContent.keys() &&
+        Array.from(this.referencedContent.keys())
+      );
+    }
+
+    getHumanReadableDetailString(key, value) {
       const usedDetail = this.allDetails[key];
 
       return (
         usedDetail &&
         usedDetail.generateHumanReadable({ value: value, includeLabel: true })
       );
+    }
+
+    getHumanReadableMessageString(msg) {
+      return (
+        getHumanReadableStringFromMessage(msg) || "«Message does not have text»"
+      );
+    }
+
+    activateMultiSelect(type) {
+      this.cancelMultiSelect(); //close the multiselection if its already open
+
+      this.connections__setMultiSelectType({
+        connectionUri: this.connectionUri,
+        multiSelectType: type,
+      });
+
+      const referencedContent =
+        this.referencedContent && this.referencedContent.get(type);
+      if (referencedContent) {
+        referencedContent.forEach(msg => {
+          this.messages__setMessageSelected({
+            messageUri: msg.get("uri"),
+            connectionUri: this.connectionUri,
+            needUri: this.post.get("uri"),
+            isSelected: true,
+          });
+        });
+      }
+    }
+
+    getMultiSelectActionLabel() {
+      if (this.multiSelectType) {
+        switch (this.multiSelectType) {
+          case "rejects":
+            return "Reject selected";
+          case "retracts":
+            return "Retract selected";
+          case "proposes":
+            return "Propose selected";
+          case "accepts":
+            return "Accept selected";
+          case "proposesToCancel":
+            return "Propose To Cancel selected";
+          default:
+            return "illegal state";
+        }
+      }
+    }
+
+    cancelMultiSelect() {
+      this.connections__setMultiSelectType({
+        connectionUri: this.connectionUri,
+        multiSelectType: undefined,
+      });
+    }
+
+    saveReferencedContent() {
+      if (!this.selectedMessages || this.selectedMessages.size == 0) {
+        this.referencedContent.delete(this.multiSelectType);
+      } else {
+        this.referencedContent.set(this.multiSelectType, this.selectedMessages);
+      }
+      this.cancelMultiSelect();
+    }
+
+    removeReferencedContent(ref = this.multiSelectType) {
+      this.referencedContent.delete(ref);
+      this.cancelMultiSelect();
+    }
+
+    removeMessageFromSelection(msg) {
+      this.messages__setMessageSelected({
+        messageUri: msg.get("uri"),
+        connectionUri: this.connectionUri,
+        needUri: this.post.get("uri"),
+        isSelected: false,
+      });
+    }
+
+    getHumanReadableReferencedContent(ref) {
+      const referencedMessages = this.referencedContent.get(ref);
+      const referencedMessagesSize = referencedMessages
+        ? referencedMessages.size
+        : 0;
+
+      let humanReadableReferenceString = "";
+
+      switch (ref) {
+        case "rejects":
+          humanReadableReferenceString = "Reject ";
+          break;
+        case "retracts":
+          humanReadableReferenceString = "Retract ";
+          break;
+        case "proposes":
+          humanReadableReferenceString = "Propose ";
+          break;
+        case "accepts":
+          humanReadableReferenceString = "Accept ";
+          break;
+        case "proposesToCancel":
+          humanReadableReferenceString = "Propose To Cancel ";
+          break;
+        default:
+          return "illegal state";
+      }
+
+      humanReadableReferenceString +=
+        referencedMessagesSize +
+        (referencedMessagesSize > 1 ? " Messages" : " Message");
+      return humanReadableReferenceString;
+    }
+
+    toggleAdditionalContentDisplay() {
+      this.cancelMultiSelect();
+      this.toggleAddMessageContentDisplay();
     }
   }
   Controller.$inject = serviceDependencies;
@@ -356,6 +656,7 @@ function genComponentConf() {
 
 export default angular
   .module("won.owner.components.chatTextfieldSimple", [
+    labelledHrModule,
     autoresizingTextareaModule,
     descriptionPickerModule,
     locationPickerModule,

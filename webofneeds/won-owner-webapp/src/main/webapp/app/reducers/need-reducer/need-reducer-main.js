@@ -18,6 +18,7 @@ import {
   addMessage,
   addExistingMessages,
   updateMessageStatus,
+  setMessageSelected,
   markMessageAsRead,
   markMessageAsRejected,
   markMessageAsRetracted,
@@ -37,8 +38,8 @@ import {
   changeConnectionStateByFun,
   storeConnectionsData,
   updateAgreementStateData,
-  clearAgreementStateData,
   setShowAgreementData,
+  setMultiSelectType,
 } from "./reduce-connections.js";
 
 const initialState = Immutable.fromJS({});
@@ -434,6 +435,14 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.getReceiver(),
         won.WON.Closed
       );
+    case actionTypes.messages.setMessageSelected:
+      return setMessageSelected(
+        allNeedsInState,
+        action.payload.messageUri,
+        action.payload.connectionUri,
+        action.payload.needUri,
+        action.payload.isSelected
+      );
     case actionTypes.messages.markAsRead:
       return markMessageAsRead(
         allNeedsInState,
@@ -513,12 +522,6 @@ export default function(allNeedsInState = initialState, action = {}) {
         action.payload.connectionUri,
         action.payload.agreementData
       );
-    case actionTypes.connections.clearAgreementData:
-      return clearAgreementStateData(
-        allNeedsInState,
-        action.payload.connectionUri
-      );
-
     case actionTypes.connections.setLoadingAgreementData:
       return setConnectionLoadingAgreementData(
         allNeedsInState,
@@ -530,6 +533,12 @@ export default function(allNeedsInState = initialState, action = {}) {
         allNeedsInState,
         action.payload.connectionUri,
         action.payload.showAgreementData
+      );
+    case actionTypes.connections.setMultiSelectType:
+      return setMultiSelectType(
+        allNeedsInState,
+        action.payload.connectionUri,
+        action.payload.multiSelectType
       );
     case actionTypes.messages.processAgreementMessage:
       //add a message that has been already processed (so sent status is ommitted)

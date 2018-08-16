@@ -124,6 +124,11 @@ export function selectAllMessagesByNeedUri(state, needUri) {
   return messages;
 }
 
+export function selectAllMessagesByConnectionUri(state, connectionUri) {
+  const need = selectNeedByConnectionUri(state, connectionUri);
+  return need && need.getIn(["connections", connectionUri, "messages"]);
+}
+
 export function selectAllMessagesByNeedUriAndConnected(state, needUri) {
   const connections = state.getIn(["needs", needUri, "connections"]);
   const connectionsWithoutClosed =
@@ -166,4 +171,178 @@ export const selectOpenPostUri = createSelector(
 
 export function isPrivateUser(state) {
   return !!getIn(state, ["router", "currentParams", "privateId"]);
+}
+
+export function isMessageProposable(msg) {
+  return (
+    msg &&
+    msg.get("hasContent") &&
+    msg.get("messageType") !== won.WONMSG.connectMessage &&
+    !msg.get("hasReferences")
+  );
+}
+
+export function isMessageCancelable(msg) {
+  return (
+    msg &&
+    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg)
+  );
+}
+
+export function isMessageRetractable(msg) {
+  return (
+    msg &&
+    msg.get("outgoingMessage") &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+export function isMessageAcceptable(msg) {
+  return (
+    msg &&
+    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    !msg.get("outgoingMessage") &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+export function isMessageRejectable(msg) {
+  return (
+    msg &&
+    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    !msg.get("outgoingMessage") &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+export function hasProposesReferences(msg) {
+  const references = msg && msg.get("references");
+  return (
+    references &&
+    references.get("proposes") &&
+    references.get("proposes").size > 0
+  );
+}
+export function hasProposesToCancelReferences(msg) {
+  const references = msg && msg.get("references");
+  return (
+    references &&
+    references.get("proposesToCancel") &&
+    references.get("proposesToCancel").size > 0
+  );
+}
+
+export function isMessageRejected(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isRejected");
+}
+
+export function isMessageAccepted(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isAccepted");
+}
+
+export function isMessageRetracted(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isRetracted");
+}
+
+export function isMessageCancelled(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isCancelled");
+}
+
+export function isMessageCancellationPending(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isCancellationPending");
+}
+
+export function isMessageUnread(msg) {
+  return msg && msg.get("unread");
+}
+
+export function isMessageProposal(msg) {
+  return (
+    (hasProposesToCancelReferences(msg) || hasProposesReferences(msg)) &&
+    !(
+      isMessageAccepted(msg) ||
+      isMessageCancellationPending(msg) ||
+      isMessageCancelled(msg) ||
+      isMessageRejected(msg) ||
+      isMessageRetracted(msg)
+    )
+  );
+}
+
+export function selectAcceptableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageAcceptable(msg));
+}
+
+export function selectRejectableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageRejectable(msg));
+}
+
+export function selectRetractableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageRetractable(msg));
+}
+
+export function selectCancelableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageCancelable(msg));
+}
+
+export function selectProposableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageProposable(msg));
+}
+
+export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => msg.get("isSelected"));
+}
+
+export function selectAgreementMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return (
+    messages &&
+    messages.filter(
+      msg => isMessageAccepted(msg) && !isMessageCancellationPending(msg)
+    )
+  );
+}
+
+export function selectCancellationPendingMessagesByConnectionUri(
+  state,
+  connectionUri
+) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageCancellationPending(msg));
+}
+
+export function selectProposalMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageProposal(msg));
+}
+
+export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageUnread(msg));
 }

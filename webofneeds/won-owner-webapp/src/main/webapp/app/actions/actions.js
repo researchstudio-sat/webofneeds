@@ -106,8 +106,8 @@ const actionHierarchy = {
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingMessages: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
+    setMultiSelectType: INJ_DEFAULT,
     updateAgreementData: INJ_DEFAULT, //cnct.loadAgreementData,
-    clearAgreementData: INJ_DEFAULT,
   },
   needs: {
     received: INJ_DEFAULT,
@@ -191,6 +191,7 @@ const actionHierarchy = {
       failure: messages.failedReopenNeed,
     },
     markAsRead: INJ_DEFAULT,
+    setMessageSelected: INJ_DEFAULT,
     messageStatus: {
       markAsRetracted: messages.markAsRetracted,
       markAsRejected: messages.markAsRejected,

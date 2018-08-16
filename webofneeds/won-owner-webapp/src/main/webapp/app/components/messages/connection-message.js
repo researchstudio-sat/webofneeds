@@ -11,12 +11,23 @@ import combinedMessageContentModule from "./combined-message-content.js";
 
 import { connect2Redux } from "../../won-utils.js";
 import { attach, getIn } from "../../utils.js";
-import {
-  buildProposalMessage,
-  buildModificationMessage,
-} from "../../won-message-utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import { selectNeedByConnectionUri } from "../../selectors.js";
+import {
+  selectNeedByConnectionUri,
+  isMessageProposable,
+  isMessageCancelable,
+  isMessageRejectable,
+  isMessageRetractable,
+  isMessageAcceptable,
+  isMessageRejected,
+  isMessageAccepted,
+  isMessageRetracted,
+  isMessageCancelled,
+  isMessageCancellationPending,
+  isMessageUnread,
+  hasProposesReferences,
+  hasProposesToCancelReferences,
+} from "../../selectors.js";
 import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import { ownerBaseUrl } from "config";
@@ -36,7 +47,7 @@ function genComponentConf() {
             title="self.theirNeed.get('humanReadable')"
             src="self.theirNeed.get('TODOtitleImgSrc')"
             uri="self.theirNeed.get('uri')"
-            ng-click="self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
+            ng-click="!self.multiSelectType && self.router__stateGoCurrent({postUri: self.theirNeed.get('uri')})"
             ng-if="!self.message.get('outgoingMessage')">
         </won-square-image>
         <won-square-image
@@ -64,7 +75,7 @@ function genComponentConf() {
                   connection-uri="self.connection.get('uri')">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="self.allowProposals"
+                    ng-if="self.isProposable && !self.multiSelectType"
                     ng-click="self.showDetail = !self.showDetail">
                     <svg ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
@@ -74,59 +85,59 @@ function genComponentConf() {
                     </svg>
                 </div>
                 <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.showDetail">
+                    ng-if="self.showDetail && !self.multiSelectType">
                     <button class="won-button--filled thin black"
                         ng-click="self.sendProposal(); self.showDetail = !self.showDetail">
                         Propose <span ng-show="self.clicked">(again)</span>
                     </button>
                     <button class="won-button--filled thin black"
                         ng-click="self.retractMessage(); self.showDetail = !self.showDetail"
-                        ng-if="self.message.get('outgoingMessage')">
+                        ng-if="self.isRetractable">
                         Retract
                     </button>
                 </div>
-                <div class="won-cm__center__bubble__button-area" ng-if="(self.hasProposesReferences() || self.hasProposesToCancelReferences())">
+                <div class="won-cm__center__bubble__button-area" ng-if="self.showActionButtons()">
                     <button class="won-button--filled thin red"
-                        ng-if="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.clicked"
+                        ng-if="self.isAcceptable"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.sendAccept()">
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="!self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.clicked"
+                        ng-show="self.isRejectable"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-if="self.message.get('outgoingMessage') && !self.isAccepted() && !self.isCancelled() && !self.isCancellationPending() && !self.isRetracted() && !self.isRejected()"
-                        ng-disabled="self.clicked"
+                        ng-if="self.isRetractable"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.retractMessage()">
                       Retract
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isAccepted() && !self.isCancelled() && !self.isCancellationPending()"
-                        ng-disabled="self.clicked"
+                        ng-if="self.isCancelable"
+                        ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.proposeToCancel()">
                       Propose To Cancel
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isCancellationPending()"
+                        ng-if="self.isCancellationPending"
                         ng-disabled="true">
                       Cancellation Pending...
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isCancelled()"
+                        ng-if="self.isCancelled"
                         ng-disabled="true">
                       Cancelled
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isRejected()"
+                        ng-if="self.isRejected"
                         ng-disabled="true">
                       Rejected
                     </button>
                     <button class="won-button--filled thin red"
-                        ng-if="self.isRetracted()"
+                        ng-if="self.isRetracted"
                         ng-disabled="true">
                       Retracted
                     </button>
@@ -180,14 +191,24 @@ function genComponentConf() {
           theirNeed,
           connection,
           message,
+          isSelected: message && message.get("isSelected"),
+          multiSelectType: connection && connection.get("multiSelectType"),
           shouldShowRdf,
           rdfLinkURL,
-          allowProposals:
+          isAccepted: isMessageAccepted(this.message),
+          isRejected: isMessageRejected(this.message),
+          isRetracted: isMessageRetracted(this.message),
+          isCancellationPending: isMessageCancellationPending(this.message),
+          isCancelled: isMessageCancelled(this.message),
+          isProposable:
             connection &&
             connection.get("state") === won.WON.Connected &&
-            message &&
-            message.get("hasContent") &&
-            !message.get("hasReferences"), //allow showing details only when the connection is already present
+            isMessageProposable(message),
+          isCancelable: isMessageCancelable(message),
+          isRetractable: isMessageRetractable(message),
+          isRejectable: isMessageRejectable(message),
+          isAcceptable: isMessageAcceptable(message),
+          isUnread: isMessageUnread(message),
         };
       };
 
@@ -208,16 +229,45 @@ function genComponentConf() {
         () => this.isOutgoingMessage(),
         this
       );
-      classOnComponentRoot("won-is-rejected", () => this.isRejected(), this);
-      classOnComponentRoot("won-is-retracted", () => this.isRetracted(), this);
-      classOnComponentRoot("won-is-accepted", () => this.isAccepted(), this);
-      classOnComponentRoot("won-is-cancelled", () => this.isCancelled(), this);
       classOnComponentRoot(
-        "won-is-cancellationPending",
-        () => this.isCancellationPending(),
+        "won-is-multiSelect",
+        () => !!this.multiSelectType,
         this
       );
-      classOnComponentRoot("won-unread", () => this.isUnread(), this);
+      classOnComponentRoot(
+        "won-not-selectable",
+        () => !this.isSelectable(),
+        this
+      );
+      classOnComponentRoot("won-is-selected", () => this.isSelected, this);
+      classOnComponentRoot("won-is-rejected", () => this.isRejected, this);
+      classOnComponentRoot("won-is-retracted", () => this.isRetracted, this);
+      classOnComponentRoot("won-is-accepted", () => this.isAccepted, this);
+      classOnComponentRoot("won-is-cancelled", () => this.isCancelled, this);
+      classOnComponentRoot(
+        "won-is-cancellationPending",
+        () => this.isCancellationPending,
+        this
+      );
+      classOnComponentRoot("won-unread", () => this.isUnread, this);
+    }
+
+    isSelectable() {
+      if (this.message && this.multiSelectType) {
+        switch (this.multiSelectType) {
+          case "rejects":
+            return this.isRejectable;
+          case "retracts":
+            return this.isRetractable;
+          case "proposesToCancel":
+            return this.isCancelable;
+          case "accepts":
+            return this.isAcceptable;
+          case "proposes":
+            return this.isProposable;
+        }
+      }
+      return false;
     }
 
     isReceivedMessage() {
@@ -228,50 +278,15 @@ function genComponentConf() {
       return this.message && this.message.get("outgoingMessage");
     }
 
-    isUnread() {
-      return this.message && this.message.get("unread");
-    }
-
-    isRejected() {
-      const messageStatus = this.message && this.message.get("messageStatus");
-      return messageStatus && messageStatus.get("isRejected");
-    }
-    isAccepted() {
-      const messageStatus = this.message && this.message.get("messageStatus");
-      return messageStatus && messageStatus.get("isAccepted");
-    }
-    isRetracted() {
-      const messageStatus = this.message && this.message.get("messageStatus");
-      return messageStatus && messageStatus.get("isRetracted");
-    }
-    isCancelled() {
-      const messageStatus = this.message && this.message.get("messageStatus");
-      return messageStatus && messageStatus.get("isCancelled");
-    }
-    isCancellationPending() {
-      const messageStatus = this.message && this.message.get("messageStatus");
-      return messageStatus && messageStatus.get("isCancellationPending");
-    }
-
-    hasProposesReferences() {
-      const references = this.message && this.message.get("references");
+    showActionButtons() {
       return (
-        references &&
-        references.get("proposes") &&
-        references.get("proposes").size > 0
-      );
-    }
-    hasProposesToCancelReferences() {
-      const references = this.message && this.message.get("references");
-      return (
-        references &&
-        references.get("proposesToCancel") &&
-        references.get("proposesToCancel").size > 0
+        hasProposesReferences(this.message) ||
+        hasProposesToCancelReferences(this.message)
       );
     }
 
     markAsRead() {
-      if (this.message && this.message.get("unread")) {
+      if (this.isUnread) {
         const payload = {
           messageUri: this.message.get("uri"),
           connectionUri: this.connectionUri,
@@ -286,151 +301,42 @@ function genComponentConf() {
       }
     }
 
-    markAsAccepted(accepted) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        accepted: accepted,
-      };
-
-      this.messages__messageStatus__markAsAccepted(payload);
-    }
-
-    markAsRejected(rejected) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        rejected: rejected,
-      };
-
-      this.messages__messageStatus__markAsRejected(payload);
-    }
-
-    markAsRetracted(retracted) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        retracted: retracted,
-      };
-
-      this.messages__messageStatus__markAsRetracted(payload);
-    }
-
-    markAsCancelled(cancelled) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        cancelled: cancelled,
-      };
-
-      this.messages__messageStatus__markAsCancelled(payload);
-    }
-
-    markAsCancellationPending(cancellationPending) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        cancellationPending: cancellationPending,
-      };
-
-      this.messages__messageStatus__markAsCancellationPending(payload);
-    }
-
     sendProposal() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const trimmedMsg = buildProposalMessage(
-        uri,
-        "proposes",
-        "Ok, I am hereby making a proposal"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("proposes");
     }
 
     proposeToCancel() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const msg = "Propose to cancel agreement : " + uri;
-      const trimmedMsg = buildProposalMessage(uri, "proposesToCancel", msg);
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        this.connectionUri,
-        true
-      );
-
-      this.markAsCancellationPending(true);
+      this.sendActionMessage("proposesToCancel");
     }
 
     sendAccept() {
       this.clicked = true;
-      const trimmedMsg = buildProposalMessage(
-        this.message.get("remoteUri"),
-        "accepts",
-        "I accept the following proposition"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        this.connectionUri,
-        true
-      );
-
-      this.markAsAccepted(true);
+      this.sendActionMessage("accepts");
     }
 
     retractMessage() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const trimmedMsg = buildModificationMessage(
-        uri,
-        "retracts",
-        "Retracting the message"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        this.connectionUri,
-        true
-      );
-
-      this.markAsRetracted(true);
+      this.sendActionMessage("retracts");
     }
 
     rejectMessage() {
       this.clicked = true;
-      const uri = this.message.get("remoteUri")
-        ? this.message.get("remoteUri")
-        : this.message.get("uri");
-      const trimmedMsg = buildProposalMessage(
-        uri,
-        "rejects",
-        "Rejecting the message"
-      );
-      this.connections__sendChatMessage(
-        trimmedMsg,
-        undefined,
-        this.connectionUri,
-        true
-      );
+      this.sendActionMessage("rejects");
+    }
 
-      this.markAsRejected(true);
+    sendActionMessage(type) {
+      this.connections__sendChatMessage(
+        undefined,
+        undefined,
+        new Map().set(
+          type,
+          Immutable.Map().set(this.message.get("uri"), this.message)
+        ),
+        this.connectionUri,
+        false
+      );
     }
 
     /**

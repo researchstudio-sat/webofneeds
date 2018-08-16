@@ -75,6 +75,45 @@ export function addExistingMessages(state, wonMessages) {
   return state;
 }
 
+export function setMessageSelected(
+  state,
+  messageUri,
+  connectionUri,
+  needUri,
+  isSelected
+) {
+  const need = state.get(needUri);
+  const connection = need && need.getIn(["connections", connectionUri]);
+  const message = connection && connection.getIn(["messages", messageUri]);
+
+  markUriAsRead(messageUri);
+
+  if (!message) {
+    console.error(
+      "no message with messageUri: <",
+      messageUri,
+      "> found within needUri: <",
+      needUri,
+      "> connectionUri: <",
+      connectionUri,
+      ">"
+    );
+    return state;
+  }
+
+  return state.setIn(
+    [
+      needUri,
+      "connections",
+      connectionUri,
+      "messages",
+      messageUri,
+      "isSelected",
+    ],
+    isSelected
+  );
+}
+
 export function markMessageAsRead(state, messageUri, connectionUri, needUri) {
   const need = state.get(needUri);
   const connection = need && need.getIn(["connections", connectionUri]);

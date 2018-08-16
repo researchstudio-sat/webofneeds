@@ -18,6 +18,10 @@ import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
+  selectAgreementMessagesByConnectionUri,
+  selectCancellationPendingMessagesByConnectionUri,
+  selectProposalMessagesByConnectionUri,
+  selectUnreadMessagesByConnectionUri,
 } from "../selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -68,7 +72,7 @@ function genComponentConf() {
             </div>
             <won-post-content-message
               class="won-cm--left"
-              ng-if="!self.showAgreementData && self.theirNeedUri"
+              ng-if="!self.showAgreementData && !self.multiSelectType && self.theirNeedUri"
               post-uri="self.theirNeedUri">
             </won-post-content-message>
             <div class="pm__content__loadspinner"
@@ -87,6 +91,7 @@ function genComponentConf() {
             </button>
             <won-connection-message
                 ng-if="!self.showAgreementData"
+                ng-click="self.multiSelectType && self.selectMessage(msg)"
                 ng-repeat="msg in self.sortedMessages"
                 connection-uri="self.connectionUri"
                 message-uri="msg.get('uri')">
@@ -99,6 +104,7 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-click="self.multiSelectType && self.selectMessage(agreement)"
               ng-repeat="agreement in self.agreementMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="agreement.get('uri')">
@@ -108,15 +114,17 @@ function genComponentConf() {
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
-              ng-repeat="proposeToCancel in self.cancellationPendingMessagesArray"
+              ng-click="self.multiSelectType && self.selectMessage(proposesToCancel)"
+              ng-repeat="proposesToCancel in self.cancellationPendingMessagesArray"
               connection-uri="self.connectionUri"
-              message-uri="proposeToCancel.get('uri')">
+              message-uri="proposesToCancel.get('uri')">
             </won-connection-message>
             <div class="pm__content__agreement__title" ng-if="self.showAgreementData && self.hasProposalMessages && !self.isLoadingAgreementData">
               Open Proposals
             </div>
             <won-connection-message
               ng-if="self.showAgreementData && !self.isLoadingAgreementData"
+              ng-click="self.multiSelectType && self.selectMessage(proposal)"
               ng-repeat="proposal in self.proposalMessagesArray"
               connection-uri="self.connectionUri"
               message-uri="proposal.get('uri')">
@@ -136,7 +144,7 @@ function genComponentConf() {
                 class="pm__footer__chattexfield"
                 placeholder="self.shouldShowRdf? 'Enter TTL...' : 'Your message...'"
                 submit-button-label="self.shouldShowRdf? 'Send RDF' : 'Send'"
-                on-submit="self.send(value, additionalContent, self.shouldShowRdf)"
+                on-submit="self.send(value, additionalContent, referencedContent, self.shouldShowRdf)"
                 help-text="self.shouldShowRdf? self.rdfTextfieldHelpText : ''"
                 allow-empty-submit="::false"
                 allow-details="!self.shouldShowRdf"
@@ -144,11 +152,11 @@ function genComponentConf() {
             >
             </chat-textfield-simple>
         </div>
-        <div class="pm__footer" ng-if="self.isSentRequest">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isSentRequest">
             Waiting for them to accept your chat request.
         </div>
 
-        <div class="pm__footer" ng-if="self.isReceivedRequest">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isReceivedRequest">
             <chat-textfield-simple
                 class="pm__footer__chattexfield"
                 placeholder="::'Message (optional)'"
@@ -163,7 +171,7 @@ function genComponentConf() {
                 Decline
             </button>
         </div>
-        <div class="pm__footer" ng-if="self.isSuggested">
+        <div class="pm__footer" ng-if="!self.multiSelectType && self.isSuggested">
             <won-feedback-grid ng-if="self.connection && !self.connection.get('isRated')" connection-uri="self.connectionUri"></won-feedback-grid>
 
             <chat-textfield-simple
@@ -213,30 +221,29 @@ function genComponentConf() {
 
         const agreementData = connection && connection.get("agreementData");
 
-        const agreementMessages =
-          chatMessages &&
-          chatMessages.filter(
-            msg =>
-              msg.getIn(["messageStatus", "isAccepted"]) &&
-              !msg.getIn(["messageStatus", "isCancellationPending"])
-          );
-        const cancellationPendingMessages =
-          chatMessages &&
-          chatMessages.filter(msg =>
-            msg.getIn(["messageStatus", "isCancellationPending"])
-          );
-        const proposalMessages =
-          chatMessages && chatMessages.filter(msg => this.isOpenProposal(msg));
+        const agreementMessages = selectAgreementMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const cancellationPendingMessages = selectCancellationPendingMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const proposalMessages = selectProposalMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
 
-        //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
         sortedMessages &&
           sortedMessages.sort(function(a, b) {
             return a.get("date").getTime() - b.get("date").getTime();
           });
 
-        const unreadMessages =
-          chatMessages && chatMessages.filter(msg => msg.get("unread"));
+        const unreadMessages = selectUnreadMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
 
         const chatMessagesWithUnknownState =
           chatMessages &&
@@ -259,6 +266,7 @@ function genComponentConf() {
           showAgreementData: connection && connection.get("showAgreementData"),
           agreementData,
           agreementDataLoaded: agreementData && agreementData.get("isLoaded"),
+          multiSelectType: connection && connection.get("multiSelectType"),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
           isSentRequest:
             connection && connection.get("state") === won.WON.RequestSent,
@@ -536,15 +544,16 @@ function genComponentConf() {
       return this._scrollContainer;
     }
 
-    send(chatMessage, additionalContent, isTTL = false) {
+    send(chatMessage, additionalContent, referencedContent, isTTL = false) {
       this.setShowAgreementData(false);
       this.hideAddMessageContentDisplay();
 
       const trimmedMsg = chatMessage.trim();
-      if (trimmedMsg || additionalContent) {
+      if (trimmedMsg || additionalContent || referencedContent) {
         this.connections__sendChatMessage(
           trimmedMsg,
           additionalContent,
+          referencedContent,
           this.connection.get("uri"),
           isTTL
         );
@@ -606,31 +615,6 @@ function genComponentConf() {
       });
     }
 
-    isOpenProposal(msg) {
-      const isAccepted = msg && msg.getIn(["messageStatus", "isAccepted"]);
-      const isCancelled = msg && msg.getIn(["messageStatus", "isCancelled"]);
-      const isRejected = msg && msg.getIn(["messageStatus", "isRejected"]);
-      const isRetracted = msg && msg.getIn(["messageStatus", "isRetracted"]);
-      const isCancellationPending =
-        msg && msg.getIn(["messageStatus", "isCancellationPending"]);
-      const references =
-        msg && msg.get("hasReferences") && msg.get("references");
-
-      return (
-        references &&
-        !(
-          isAccepted ||
-          isCancellationPending ||
-          isCancelled ||
-          isRejected ||
-          isRetracted
-        ) &&
-        ((references.get("proposesToCancel") &&
-          references.get("proposesToCancel").size > 0) ||
-          (references.get("proposes") && references.get("proposes").size > 0))
-      );
-    }
-
     openRequest(message) {
       this.connections__open(this.connectionUri, message);
     }
@@ -667,6 +651,17 @@ function genComponentConf() {
     closeConnection() {
       this.connections__close(this.connection.get("uri"));
       this.router__stateGoCurrent({ connectionUri: null });
+    }
+
+    selectMessage(msg) {
+      const selected = msg.get("isSelected");
+
+      this.messages__setMessageSelected({
+        messageUri: msg.get("uri"),
+        connectionUri: this.connection.get("uri"),
+        needUri: this.ownNeed.get("uri"),
+        isSelected: !selected,
+      });
     }
   }
   Controller.$inject = serviceDependencies;

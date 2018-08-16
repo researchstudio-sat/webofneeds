@@ -23,7 +23,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
     belongsToUri: undefined,
     data: {
       uri: wonMessage.getMessageUri(),
-      remoteUri: !wonMessage.isFromOwner()
+      remoteUri: !wonMessage.isFromOwner() //THIS HAS TO STAY UNDEFINED If the message is not a received message
         ? wonMessage.getRemoteMessageUri()
         : undefined,
       content: {
@@ -87,6 +87,7 @@ export function parseMessage(wonMessage, alreadyProcessed = false) {
       //Send Status Flags
       isReceivedByOwn: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
       isReceivedByRemote: alreadyProcessed || !wonMessage.isFromOwner(), //if the message is not from the owner we know it has been received anyway
+      isSelected: false,
       failedToSend: false,
     },
   };
