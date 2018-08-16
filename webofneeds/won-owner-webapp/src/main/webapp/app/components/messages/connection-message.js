@@ -103,7 +103,7 @@ function genComponentConf() {
                       Accept
                     </button>
                     <button class="won-button--filled thin black"
-                        ng-show="self.isRejectable()"
+                        ng-show="self.isRejectable"
                         ng-disabled="self.multiSelectType || self.clicked"
                         ng-click="self.rejectMessage()">
                       Reject

@@ -124,6 +124,11 @@ export function selectAllMessagesByNeedUri(state, needUri) {
   return messages;
 }
 
+export function selectAllMessagesByConnectionUri(state, connectionUri) {
+  const need = selectNeedByConnectionUri(state, connectionUri);
+  return need && need.getIn(["connections", connectionUri, "messages"]);
+}
+
 export function selectAllMessagesByNeedUriAndConnected(state, needUri) {
   const connections = state.getIn(["needs", needUri, "connections"]);
   const connectionsWithoutClosed =
@@ -265,4 +270,34 @@ export function isMessageCancelled(msg) {
 export function isMessageCancellationPending(msg) {
   const messageStatus = msg && msg.get("messageStatus");
   return messageStatus && messageStatus.get("isCancellationPending");
+}
+
+export function selectAcceptableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageAcceptable(msg));
+}
+
+export function selectRejectableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageRejectable(msg));
+}
+
+export function selectRetractableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageRetractable(msg));
+}
+
+export function selectCancelableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageCancelable(msg));
+}
+
+export function selectProposableMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageProposable(msg));
+}
+
+export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => msg.get("isSelected"));
 }

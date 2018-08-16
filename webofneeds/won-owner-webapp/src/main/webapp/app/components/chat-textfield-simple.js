@@ -16,6 +16,12 @@ import won from "../won-es6.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
+  selectAcceptableMessagesByConnectionUri,
+  selectRetractableMessagesByConnectionUri,
+  selectRejectableMessagesByConnectionUri,
+  selectCancelableMessagesByConnectionUri,
+  selectProposableMessagesByConnectionUri,
+  selectSelectedMessagesByConnectionUri,
 } from "../selectors.js";
 import { getAllDetails } from "../won-utils.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
@@ -54,28 +60,33 @@ function genComponentConf() {
             <button
                 ng-if="!self.showAgreementData"
                 class="cts__details__grid__action won-button--filled red"
-                ng-click="self.activateMultiSelect('proposes')">
+                ng-click="self.activateMultiSelect('proposes')"
+                ng-disabled="!self.hasProposableMessages">
                 Make Proposal
             </button>
             <button
                 ng-if="self.showAgreementData"
                 class="cts__details__grid__action won-button--filled red"
-                ng-click="self.activateMultiSelect('accepts')">
+                ng-click="self.activateMultiSelect('accepts')"
+                ng-disabled="!self.hasAcceptableMessages">
                 Accept Proposal(s)
             </button>
             <button
                 ng-if="self.showAgreementData"
                 class="cts__details__grid__action won-button--filled red"
-                ng-click="self.activateMultiSelect('rejects')">
+                ng-click="self.activateMultiSelect('rejects')"
+                ng-disabled="!self.hasRejectableMessages">
                 Reject Proposal(s)
             </button>
             <button
                 class="cts__details__grid__action won-button--filled red"
-                ng-click="self.activateMultiSelect('proposesToCancel')">
+                ng-click="self.activateMultiSelect('proposesToCancel')"
+                ng-disabled="!self.hasCancelableMessages">
                 Cancel Agreement(s)
             </button>
             <button class="cts__details__grid__action won-button--filled red"
-                ng-click="self.activateMultiSelect('retracts')">
+                ng-click="self.activateMultiSelect('retracts')"
+                ng-disabled="!self.hasRetractableMessages">
                 Retract Message(s)
             </button>
             <won-labelled-hr label="::'Details'" class="cts__details__grid__hr"
@@ -271,9 +282,38 @@ function genComponentConf() {
         const connection = post && post.getIn(["connections", connectionUri]);
         const connectionState = connection && connection.get("state");
 
-        const chatMessages = connection && connection.get("messages");
-        const selectedMessages =
-          chatMessages && chatMessages.filter(msg => msg.get("isSelected"));
+        const rejectableMessages = selectRejectableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const retractableMessages = selectRetractableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const acceptableMessages = selectAcceptableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const proposableMessages = selectProposableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const cancelableMessages = selectCancelableMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+
+        const hasRejectableMessages =
+          rejectableMessages && rejectableMessages.size > 0;
+        const hasRetractableMessages =
+          retractableMessages && retractableMessages.size > 0;
+
+        const hasAcceptableMessages =
+          acceptableMessages && acceptableMessages.size > 0;
+        const hasProposableMessages =
+          proposableMessages && proposableMessages.size > 0;
+        const hasCancelableMessages =
+          cancelableMessages && cancelableMessages.size > 0;
 
         const selectedDetailIdentifier = state.get("selectedAddMessageContent");
         const selectedDetail =
@@ -286,7 +326,15 @@ function genComponentConf() {
           multiSelectType: connection && connection.get("multiSelectType"),
           showAgreementData: connection && connection.get("showAgreementData"),
           isConnected: connectionState && connectionState === won.WON.Connected,
-          selectedMessages,
+          selectedMessages: selectSelectedMessagesByConnectionUri(
+            state,
+            connectionUri
+          ),
+          hasProposableMessages,
+          hasCancelableMessages,
+          hasAcceptableMessages,
+          hasRetractableMessages,
+          hasRejectableMessages,
           connectionHasBeenLost:
             state.getIn(["messages", "reconnecting"]) ||
             state.getIn(["messages", "lostConnection"]),
