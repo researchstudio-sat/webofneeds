@@ -15,8 +15,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 function genComponentConf() {
   let template = `
       <div class="msg__header" ng-if="self.message && !self.isConnectionMessage()">
-          <div class="msg__header__type" ng-if="!self.isOtherMessage()">{{ self.labels.messageType[self.messageType] }}</div>
-          <div class="msg__header__type" ng-if="self.isOtherMessage()">{{ self.messageType }}</div>
+          <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
       </div>
       <won-message-content
           ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
@@ -37,8 +36,6 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
-
-      this.labels = labels;
 
       const selectFromState = state => {
         const ownNeed =
@@ -74,14 +71,18 @@ function genComponentConf() {
       );
     }
 
-    isOtherMessage() {
-      return !(
+    getHeaderLabel() {
+      const isUnknownMessageType = !(
         this.isHintMessage() ||
         this.isHintFeedbackMessage() ||
         this.isOpenMessage() ||
         this.isConnectMessage() ||
         this.isConnectionMessage()
       );
+
+      return isUnknownMessageType
+        ? this.messageType
+        : labels.messageType[self.messageType];
     }
 
     isHintMessage() {
