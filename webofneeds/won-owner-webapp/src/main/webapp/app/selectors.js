@@ -167,3 +167,102 @@ export const selectOpenPostUri = createSelector(
 export function isPrivateUser(state) {
   return !!getIn(state, ["router", "currentParams", "privateId"]);
 }
+
+export function isMessageProposable(msg) {
+  return (
+    msg &&
+    msg.get("hasContent") &&
+    msg.get("messageType") !== won.WONMSG.connectMessage &&
+    !msg.get("hasReferences")
+  );
+}
+
+export function isMessageCancelable(msg) {
+  return (
+    msg &&
+    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg)
+  );
+}
+
+export function isMessageRetractable(msg) {
+  return (
+    msg &&
+    msg.get("outgoingMessage") &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+export function isMessageAcceptable(msg) {
+  return (
+    msg &&
+    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    !msg.get("outgoingMessage") &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+export function isMessageRejectable(msg) {
+  return (
+    msg &&
+    (hasProposesReferences(msg) || hasProposesToCancelReferences(msg)) &&
+    !msg.get("outgoingMessage") &&
+    !isMessageAccepted(msg) &&
+    !isMessageCancelled(msg) &&
+    !isMessageCancellationPending(msg) &&
+    !isMessageRetracted(msg) &&
+    !isMessageRejected(msg)
+  );
+}
+
+export function hasProposesReferences(msg) {
+  const references = msg && msg.get("references");
+  return (
+    references &&
+    references.get("proposes") &&
+    references.get("proposes").size > 0
+  );
+}
+export function hasProposesToCancelReferences(msg) {
+  const references = msg && msg.get("references");
+  return (
+    references &&
+    references.get("proposesToCancel") &&
+    references.get("proposesToCancel").size > 0
+  );
+}
+
+export function isMessageRejected(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isRejected");
+}
+
+export function isMessageAccepted(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isAccepted");
+}
+
+export function isMessageRetracted(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isRetracted");
+}
+
+export function isMessageCancelled(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isCancelled");
+}
+
+export function isMessageCancellationPending(msg) {
+  const messageStatus = msg && msg.get("messageStatus");
+  return messageStatus && messageStatus.get("isCancellationPending");
+}
