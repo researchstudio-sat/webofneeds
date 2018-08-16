@@ -6,6 +6,7 @@ import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import trigModule from "../trig.js";
+import { labels } from "../../won-label-utils.js";
 
 import "style/_combined-message-content.scss";
 
@@ -13,6 +14,10 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
+      <div class="msg__header" ng-if="self.message && !self.isConnectionMessage()">
+          <div class="msg__header__type" ng-if="!self.isOtherMessage()">{{ self.labels.messageType[self.messageType] }}</div>
+          <div class="msg__header__type" ng-if="self.isOtherMessage()">{{ self.messageType }}</div>
+      </div>
       <won-message-content
           ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
           message-uri="self.message.get('uri')"
@@ -32,6 +37,8 @@ function genComponentConf() {
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
+
+      this.labels = labels;
 
       const selectFromState = state => {
         const ownNeed =
@@ -65,6 +72,32 @@ function genComponentConf() {
         this.message &&
         this.message.get("messageType") === won.WONMSG.connectionMessage
       );
+    }
+
+    isOtherMessage() {
+      return !(
+        this.isHintMessage() ||
+        this.isHintFeedbackMessage() ||
+        this.isOpenMessage() ||
+        this.isConnectMessage() ||
+        this.isConnectionMessage()
+      );
+    }
+
+    isHintMessage() {
+      return this.messageType === won.WONMSG.hintMessage;
+    }
+
+    isHintFeedbackMessage() {
+      return this.messageType === won.WONMSG.hintFeedbackMessage;
+    }
+
+    isConnectMessage() {
+      return this.messageType === won.WONMSG.connectMessage;
+    }
+
+    isOpenMessage() {
+      return this.messageType === won.WONMSG.openMessage;
     }
   }
   Controller.$inject = serviceDependencies;

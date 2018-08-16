@@ -10,4 +10,10 @@ won-combined-message-content {
     border-top: $thinGrayBorder;
     padding-top: 0.5rem;
   }
+
+  .msg__header {
+    &__type {
+      color: $won-subtitle-gray;
+    }
+  }
 }
