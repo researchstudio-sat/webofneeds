@@ -272,6 +272,23 @@ export function isMessageCancellationPending(msg) {
   return messageStatus && messageStatus.get("isCancellationPending");
 }
 
+export function isMessageUnread(msg) {
+  return msg && msg.get("unread");
+}
+
+export function isMessageProposal(msg) {
+  return (
+    (hasProposesToCancelReferences(msg) || hasProposesReferences(msg)) &&
+    !(
+      isMessageAccepted(msg) ||
+      isMessageCancellationPending(msg) ||
+      isMessageCancelled(msg) ||
+      isMessageRejected(msg) ||
+      isMessageRetracted(msg)
+    )
+  );
+}
+
 export function selectAcceptableMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageAcceptable(msg));
@@ -300,4 +317,32 @@ export function selectProposableMessagesByConnectionUri(state, connectionUri) {
 export function selectSelectedMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => msg.get("isSelected"));
+}
+
+export function selectAgreementMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return (
+    messages &&
+    messages.filter(
+      msg => isMessageAccepted(msg) && !isMessageCancellationPending(msg)
+    )
+  );
+}
+
+export function selectCancellationPendingMessagesByConnectionUri(
+  state,
+  connectionUri
+) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageCancellationPending(msg));
+}
+
+export function selectProposalMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageProposal(msg));
+}
+
+export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
+  const messages = selectAllMessagesByConnectionUri(state, connectionUri);
+  return messages && messages.filter(msg => isMessageUnread(msg));
 }

@@ -18,6 +18,10 @@ import { actionCreators } from "../actions/actions.js";
 import {
   selectOpenConnectionUri,
   selectNeedByConnectionUri,
+  selectAgreementMessagesByConnectionUri,
+  selectCancellationPendingMessagesByConnectionUri,
+  selectProposalMessagesByConnectionUri,
+  selectUnreadMessagesByConnectionUri,
 } from "../selectors.js";
 import autoresizingTextareaModule from "../directives/textarea-autogrow.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -217,30 +221,29 @@ function genComponentConf() {
 
         const agreementData = connection && connection.get("agreementData");
 
-        const agreementMessages =
-          chatMessages &&
-          chatMessages.filter(
-            msg =>
-              msg.getIn(["messageStatus", "isAccepted"]) &&
-              !msg.getIn(["messageStatus", "isCancellationPending"])
-          );
-        const cancellationPendingMessages =
-          chatMessages &&
-          chatMessages.filter(msg =>
-            msg.getIn(["messageStatus", "isCancellationPending"])
-          );
-        const proposalMessages =
-          chatMessages && chatMessages.filter(msg => this.isOpenProposal(msg));
+        const agreementMessages = selectAgreementMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const cancellationPendingMessages = selectCancellationPendingMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
+        const proposalMessages = selectProposalMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
 
-        //Filter already accepted proposals
         let sortedMessages = chatMessages && chatMessages.toArray();
         sortedMessages &&
           sortedMessages.sort(function(a, b) {
             return a.get("date").getTime() - b.get("date").getTime();
           });
 
-        const unreadMessages =
-          chatMessages && chatMessages.filter(msg => msg.get("unread"));
+        const unreadMessages = selectUnreadMessagesByConnectionUri(
+          state,
+          connectionUri
+        );
 
         const chatMessagesWithUnknownState =
           chatMessages &&
@@ -658,31 +661,6 @@ function genComponentConf() {
           }
         });
       });
-    }
-
-    isOpenProposal(msg) {
-      const isAccepted = msg && msg.getIn(["messageStatus", "isAccepted"]);
-      const isCancelled = msg && msg.getIn(["messageStatus", "isCancelled"]);
-      const isRejected = msg && msg.getIn(["messageStatus", "isRejected"]);
-      const isRetracted = msg && msg.getIn(["messageStatus", "isRetracted"]);
-      const isCancellationPending =
-        msg && msg.getIn(["messageStatus", "isCancellationPending"]);
-      const references =
-        msg && msg.get("hasReferences") && msg.get("references");
-
-      return (
-        references &&
-        !(
-          isAccepted ||
-          isCancellationPending ||
-          isCancelled ||
-          isRejected ||
-          isRetracted
-        ) &&
-        ((references.get("proposesToCancel") &&
-          references.get("proposesToCancel").size > 0) ||
-          (references.get("proposes") && references.get("proposes").size > 0))
-      );
     }
 
     openRequest(message) {

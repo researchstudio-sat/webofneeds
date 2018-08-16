@@ -24,6 +24,7 @@ import {
   isMessageRetracted,
   isMessageCancelled,
   isMessageCancellationPending,
+  isMessageUnread,
   hasProposesReferences,
   hasProposesToCancelReferences,
 } from "../../selectors.js";
@@ -207,6 +208,7 @@ function genComponentConf() {
           isRetractable: isMessageRetractable(message),
           isRejectable: isMessageRejectable(message),
           isAcceptable: isMessageAcceptable(message),
+          isUnread: isMessageUnread(message),
         };
       };
 
@@ -247,7 +249,7 @@ function genComponentConf() {
         () => this.isCancellationPending,
         this
       );
-      classOnComponentRoot("won-unread", () => this.isUnread(), this);
+      classOnComponentRoot("won-unread", () => this.isUnread, this);
     }
 
     isSelectable() {
@@ -276,10 +278,6 @@ function genComponentConf() {
       return this.message && this.message.get("outgoingMessage");
     }
 
-    isUnread() {
-      return this.message && this.message.get("unread");
-    }
-
     showActionButtons() {
       return (
         hasProposesReferences(this.message) ||
@@ -288,7 +286,7 @@ function genComponentConf() {
     }
 
     markAsRead() {
-      if (this.message && this.message.get("unread")) {
+      if (this.isUnread) {
         const payload = {
           messageUri: this.message.get("uri"),
           connectionUri: this.connectionUri,
