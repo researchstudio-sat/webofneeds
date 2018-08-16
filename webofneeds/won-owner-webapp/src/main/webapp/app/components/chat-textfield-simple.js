@@ -52,16 +52,16 @@ function genComponentConf() {
             <won-labelled-hr label="::'Actions'" class="cts__details__grid__hr"
               ng-if="!self.multiSelectType && self.isConnected"></won-labelled-hr>
             <button
-                ng-if="self.showAgreementData"
-                class="cts__details__grid__action won-button--filled red"
-                ng-click="self.activateMultiSelect('accepts')">
-                Accept Proposal(s)
-            </button>
-            <button
                 ng-if="!self.showAgreementData"
                 class="cts__details__grid__action won-button--filled red"
                 ng-click="self.activateMultiSelect('proposes')">
                 Make Proposal
+            </button>
+            <button
+                ng-if="self.showAgreementData"
+                class="cts__details__grid__action won-button--filled red"
+                ng-click="self.activateMultiSelect('accepts')">
+                Accept Proposal(s)
             </button>
             <button
                 ng-if="self.showAgreementData"
@@ -102,7 +102,7 @@ function genComponentConf() {
                 <use xlink:href="#ico36_plus_circle" href="#ico36_plus_circle"></use>
               </svg>
               <div class="cts__details__input__header__label hide-in-responsive">
-                {{ self.getMultiSelectActionLabel() }} ({{ self.selectedMessages.size }} Messages selected)
+                {{ self.getMultiSelectActionLabel() }} ({{ self.selectedMessages.size }} Messages)
               </div>
               <div class="cts__details__input__header__label show-in-responsive">
                 {{ self.getMultiSelectActionLabel() }}
@@ -182,7 +182,7 @@ function genComponentConf() {
         </div>
         <button class="cts__add"
           ng-disabled="!self.allowDetails"
-          ng-click="self.toggleAddMessageContentDisplay()">
+          ng-click="self.toggleAdditionalContentDisplay()">
             <svg class="cts__add__icon" ng-if="!self.showAddMessageContent">
                 <use xlink:href="#ico36_plus" href="#ico36_plus"></use>
             </svg>
@@ -560,6 +560,11 @@ function genComponentConf() {
         referencedMessagesSize +
         (referencedMessagesSize > 1 ? " Messages" : " Message");
       return humanReadableReferenceString;
+    }
+
+    toggleAdditionalContentDisplay() {
+      this.cancelMultiSelect();
+      this.toggleAddMessageContentDisplay();
     }
   }
   Controller.$inject = serviceDependencies;
