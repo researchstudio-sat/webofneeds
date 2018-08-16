@@ -2,14 +2,10 @@
 @import "sizing-utils";
 
 won-message-content {
-  display: block;
+  display: grid;
+  grid-gap: 0.25rem;
 
-  .msgcontent__body {
-    display: grid;
-    grid-gap: 0.25rem;
-
-    &__text--prewrap {
-      white-space: pre-wrap;
-    }
+  .msg__text--prewrap {
+    white-space: pre-wrap;
   }
 }

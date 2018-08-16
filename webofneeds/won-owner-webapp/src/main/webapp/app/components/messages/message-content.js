@@ -29,22 +29,18 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msgcontent__body" ng-if="self.message">
-        <div class="msgcontent__body__text--prewrap" ng-if="self.hasText">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-        <div class="msgcontent__body__content"
-          ng-repeat="detail in self.allDetails"
-          ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
-          message-detail-viewer-element="{{detail.viewerComponent}}"
-          detail="detail"
-          content="self.getDetailContent(detail.identifier)">
-        </div>
-        <div class="msgcontent__body__matchScore" ng-if="self.hasMatchScore">MatchScore: {{self.matchScorePercentage }}%</div>
-        <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
+      <div class="msg__text--prewrap" ng-if="self.message && self.hasText">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+      <div class="msg__content"
+        ng-repeat="detail in self.allDetails"
+        ng-if="self.message && detail.identifier && self.getDetailContent(detail.identifier)"
+        message-detail-viewer-element="{{detail.viewerComponent}}"
+        detail="detail"
+        content="self.getDetailContent(detail.identifier)">
       </div>
-      <div class="msgcontent__body clickable" ng-if="!self.message">
-        <div class="msgcontent__body__text hide-in-responsive">«Message not (yet) loaded. Click to Load»</div>
-        <div class="msgcontent__body__text show-in-responsive">«Message not (yet) loaded. Tap to Load»</div>
-      </div>
+      <div class="msg__matchScore" ng-if="self.message && self.hasMatchScore">MatchScore: {{self.matchScorePercentage }}%</div>
+      <div class="msg__text" ng-if="self.message && !self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
+      <div class="msg__text hide-in-responsive clickable" ng-if="!self.message">«Message not (yet) loaded. Click to Load»</div>
+      <div class="msg__text show-in-responsive clickable" ng-if="!self.message">«Message not (yet) loaded. Tap to Load»</div>
     `;
 
   class Controller {
