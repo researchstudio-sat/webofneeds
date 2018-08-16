@@ -301,61 +301,6 @@ function genComponentConf() {
       }
     }
 
-    markAsAccepted(accepted) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        accepted: accepted,
-      };
-
-      this.messages__messageStatus__markAsAccepted(payload);
-    }
-
-    markAsRejected(rejected) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        rejected: rejected,
-      };
-
-      this.messages__messageStatus__markAsRejected(payload);
-    }
-
-    markAsRetracted(retracted) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        retracted: retracted,
-      };
-
-      this.messages__messageStatus__markAsRetracted(payload);
-    }
-
-    markAsCancelled(cancelled) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        cancelled: cancelled,
-      };
-
-      this.messages__messageStatus__markAsCancelled(payload);
-    }
-
-    markAsCancellationPending(cancellationPending) {
-      const payload = {
-        messageUri: this.message.get("uri"),
-        connectionUri: this.connectionUri,
-        needUri: this.ownNeed.get("uri"),
-        cancellationPending: cancellationPending,
-      };
-
-      this.messages__messageStatus__markAsCancellationPending(payload);
-    }
-
     sendProposal() {
       this.clicked = true;
       this.sendActionMessage("proposes");
@@ -364,29 +309,21 @@ function genComponentConf() {
     proposeToCancel() {
       this.clicked = true;
       this.sendActionMessage("proposesToCancel");
-
-      this.markAsCancellationPending(true);
     }
 
     sendAccept() {
       this.clicked = true;
       this.sendActionMessage("accepts");
-
-      this.markAsAccepted(true);
     }
 
     retractMessage() {
       this.clicked = true;
       this.sendActionMessage("retracts");
-
-      this.markAsRetracted(true);
     }
 
     rejectMessage() {
       this.clicked = true;
       this.sendActionMessage("rejects");
-
-      this.markAsRejected(true);
     }
 
     sendActionMessage(type) {

@@ -550,54 +550,6 @@ function genComponentConf() {
 
       const trimmedMsg = chatMessage.trim();
       if (trimmedMsg || additionalContent || referencedContent) {
-        if (referencedContent) {
-          referencedContent.forEach((msgs, key) => {
-            if (msgs) {
-              msgs.forEach(msg => {
-                switch (key) {
-                  case "retracts":
-                    this.messages__messageStatus__markAsRetracted({
-                      messageUri: msg.get("uri"),
-                      connectionUri: this.connectionUri,
-                      needUri: this.ownNeed.get("uri"),
-                      retracted: true,
-                    });
-                    break;
-                  case "rejects":
-                    this.messages__messageStatus__markAsRejected({
-                      messageUri: msg.get("uri"),
-                      connectionUri: this.connectionUri,
-                      needUri: this.ownNeed.get("uri"),
-                      rejected: true,
-                    });
-                    break;
-                  case "proposesToCancel":
-                    this.messages__messageStatus__markAsCancellationPending({
-                      messageUri: msg.get("uri"),
-                      connectionUri: this.connectionUri,
-                      needUri: this.ownNeed.get("uri"),
-                      cancellationPending: true,
-                    });
-                    break;
-                  case "accepts":
-                    this.messages__messageStatus__markAsAccepted({
-                      messageUri: msg.get("uri"),
-                      connectionUri: this.connectionUri,
-                      needUri: this.ownNeed.get("uri"),
-                      accepted: true,
-                    });
-                    break;
-                  case "proposes":
-                    break;
-                  default:
-                    console.error("referenced key/type is not valid: ", key);
-                    break;
-                }
-              });
-            }
-          });
-        }
-
         this.connections__sendChatMessage(
           trimmedMsg,
           additionalContent,

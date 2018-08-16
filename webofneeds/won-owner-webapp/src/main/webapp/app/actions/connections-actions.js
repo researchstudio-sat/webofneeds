@@ -61,6 +61,59 @@ export function connectionsChatMessage(
         referencedMessages.map(msg => {
           const correctUri = msg.get("remoteUri") || msg.get("uri");
           if (correctUri) contentUris.push({ "@id": correctUri });
+          //THE PARTS BELOW SHOULD NOT BE CALLED WITHIN THIS DISPATCH
+          switch (key) {
+            case "retracts":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsRetracted,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  retracted: true,
+                },
+              });
+              break;
+            case "rejects":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsRejected,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  rejected: true,
+                },
+              });
+              break;
+            case "proposesToCancel":
+              dispatch({
+                type:
+                  actionTypes.messages.messageStatus.markAsCancellationPending,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  cancellationPending: true,
+                },
+              });
+              break;
+            case "accepts":
+              dispatch({
+                type: actionTypes.messages.messageStatus.markAsAccepted,
+                payload: {
+                  messageUri: msg.get("uri"),
+                  connectionUri: connectionUri,
+                  needUri: ownNeed.get("uri"),
+                  accepted: true,
+                },
+              });
+              break;
+            case "proposes":
+              break;
+            default:
+              console.error("referenced key/type is not valid: ", key);
+              break;
+          }
         });
         referencedContentUris.set(key, contentUris);
       });
