@@ -1,0 +1,10 @@
+@import "won-config";
+
+won-connection-message-actions {
+  border-top: $thinGrayBorder;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 0.5rem;
+}

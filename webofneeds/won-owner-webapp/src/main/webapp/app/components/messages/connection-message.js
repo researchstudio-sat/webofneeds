@@ -5,6 +5,7 @@ import won from "../../won-es6.js";
 import Immutable from "immutable";
 import squareImageModule from "../square-image.js";
 import connectionMessageStatusModule from "./connection-message-status.js";
+import connectionMessageActionsModule from "./connection-message-actions.js";
 import messageContentModule from "./message-content.js"; // due to our need of recursivley integrating the combinedMessageContentModule within referencedMessageModule, we need to import the components here otherwise we will not be able to generate the component
 import referencedMessageContentModule from "./referenced-message-content.js";
 import combinedMessageContentModule from "./combined-message-content.js";
@@ -83,64 +84,8 @@ function genComponentConf() {
                         <use xlink:href="#ico16_arrow_up" href="#ico16_arrow_up"></use>
                     </svg>
                 </div>
-                <div class="won-cm__center__bubble__button-area"
-                    ng-if="self.showDetail && !self.multiSelectType">
-                    <button class="won-button--filled thin black"
-                        ng-click="self.sendActionMessage('proposes'); self.showDetail = !self.showDetail">
-                        Propose <span ng-show="self.clicked">(again)</span>
-                    </button>
-                    <button class="won-button--filled thin black"
-                        ng-click="self.sendActionMessage('retracts'); self.showDetail = !self.showDetail"
-                        ng-if="self.isRetractable">
-                        Retract
-                    </button>
-                </div>
-                <div class="won-cm__center__bubble__button-area" ng-if="self.showActionButtons()">
-                    <button class="won-button--filled thin red"
-                        ng-if="self.isAcceptable"
-                        ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.sendActionMessage('accepts')">
-                      Accept
-                    </button>
-                    <button class="won-button--filled thin black"
-                        ng-show="self.isRejectable"
-                        ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.sendActionMessage('rejects')">
-                      Reject
-                    </button>
-                    <button class="won-button--filled thin black"
-                        ng-if="self.isRetractable"
-                        ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.sendActionMessage('retracts')">
-                      Retract
-                    </button>
-                    <button class="won-button--filled thin red"
-                        ng-if="self.isCancelable"
-                        ng-disabled="self.multiSelectType || self.clicked"
-                        ng-click="self.sendActionMessage('proposesToCancel')">
-                      Propose To Cancel
-                    </button>
-                    <button class="won-button--filled thin red"
-                        ng-if="self.isCancellationPending"
-                        ng-disabled="true">
-                      Cancellation Pending...
-                    </button>
-                    <button class="won-button--filled thin red"
-                        ng-if="self.isCancelled"
-                        ng-disabled="true">
-                      Cancelled
-                    </button>
-                    <button class="won-button--filled thin red"
-                        ng-if="self.isRejected"
-                        ng-disabled="true">
-                      Rejected
-                    </button>
-                    <button class="won-button--filled thin red"
-                        ng-if="self.isRetracted"
-                        ng-disabled="true">
-                      Retracted
-                    </button>
-                </div>
+                <won-connection-message-actions message-uri="self.messageUri" connection-uri="self.connectionUri" ng-if="self.showActionButtons()">
+                </won-connection-message-actions>
             </div>
             <won-connection-message-status message-uri="self.messageUri" connection-uri="self.connectionUri">
             </won-connection-message-status>
@@ -205,7 +150,6 @@ function genComponentConf() {
           ownNeed,
           theirNeed,
           message,
-          messageUri: message && message.get("uri"),
           messageSenderUri: message && message.get("senderUri"),
           isConnectionMessage:
             message &&
@@ -291,6 +235,7 @@ function genComponentConf() {
 
     showActionButtons() {
       return (
+        this.showDetail ||
         hasProposesReferences(this.message) ||
         hasProposesToCancelReferences(this.message)
       );
@@ -299,7 +244,7 @@ function genComponentConf() {
     markAsRead() {
       if (this.isUnread) {
         const payload = {
-          messageUri: this.message.get("uri"),
+          messageUri: this.messageUri,
           connectionUri: this.connectionUri,
           needUri: this.ownNeed.get("uri"),
         };
@@ -310,20 +255,6 @@ function genComponentConf() {
           tmp_messages__markAsRead(payload);
         }, MESSAGE_READ_TIMEOUT);
       }
-    }
-
-    sendActionMessage(type) {
-      this.clicked = true;
-      this.connections__sendChatMessage(
-        undefined,
-        undefined,
-        new Map().set(
-          type,
-          Immutable.Map().set(this.message.get("uri"), this.message)
-        ),
-        this.connectionUri,
-        false
-      );
     }
 
     encodeParam(param) {
@@ -349,6 +280,7 @@ export default angular
   .module("won.owner.components.connectionMessage", [
     squareImageModule,
     connectionMessageStatusModule,
+    connectionMessageActionsModule,
     messageContentModule,
     referencedMessageContentModule,
     combinedMessageContentModule,

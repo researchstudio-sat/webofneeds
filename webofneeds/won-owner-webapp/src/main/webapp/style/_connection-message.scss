@@ -141,14 +141,8 @@ won-connection-message {
         grid-area: content;
       }
 
-      &__button-area {
+      > won-connection-message-actions {
         grid-area: actions;
-        border-top: $thinGrayBorder;
-        padding-top: 0.5rem;
-        margin-top: 0.5rem;
-        display: grid;
-        grid-auto-flow: column;
-        grid-gap: 0.5rem;
       }
 
       //Message Type Styling
