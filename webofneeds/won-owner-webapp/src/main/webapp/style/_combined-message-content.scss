@@ -6,12 +6,21 @@ won-combined-message-content {
   grid-auto-flow: row;
   grid-gap: 0.5rem;
 
+  &.won-has-non-ref-content {
+    padding: 0.5rem 0;
+
+    &.won-has-ref-content {
+      padding-bottom: 0;
+    }
+  }
+
   > won-trig {
     border-top: $thinGrayBorder;
     padding-top: 0.5rem;
   }
 
   .msg__header {
+    padding: 0 0.5rem;
     &__type {
       color: $won-subtitle-gray;
     }

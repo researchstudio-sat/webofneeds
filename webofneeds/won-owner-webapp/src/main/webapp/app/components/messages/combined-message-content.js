@@ -7,10 +7,11 @@ import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import trigModule from "../trig.js";
 import { labels } from "../../won-label-utils.js";
+import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "style/_combined-message-content.scss";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
@@ -65,6 +66,17 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri", "self.messageUri"],
+        this
+      );
+
+      classOnComponentRoot(
+        "won-has-non-ref-content",
+        () => this.hasContent || this.hasNotBeenLoaded,
+        this
+      );
+      classOnComponentRoot(
+        "won-has-ref-content",
+        () => this.hasReferences,
         this
       );
     }

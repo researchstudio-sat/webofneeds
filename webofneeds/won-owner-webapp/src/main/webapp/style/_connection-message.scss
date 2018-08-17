@@ -120,34 +120,39 @@ won-connection-message {
 
     .won-cm__center__bubble {
       display: grid;
-      grid-template-areas: "content carret" "actions actions";
       grid-template-columns: 1fr min-content;
-      padding: 0.5rem;
       border: $thinGrayBorder;
       word-break: break-word;
-      min-height: 2.5rem;
       box-sizing: border-box; // background: $won-light-gray;
       background-color: $won-light-gray; // like the error toast-notifications
       color: black;
 
       &__carret {
-        grid-area: carret;
+        padding: 0.5rem;
         svg {
           @include fixed-square(1rem); // visually center icon on line
         }
       }
-      > won-post-content,
-      > won-combined-message-content {
-        grid-area: content;
+
+      > won-post-content {
+        padding: 0.5rem;
+
+        .wlh__label {
+          background: $won-light-gray;
+        }
       }
 
-      > won-connection-message-actions {
-        grid-area: actions;
+      > won-connection-message-actions,
+      > won-post-content {
+        grid-column: 1 / span 2;
+      }
+
+      > won-combined-message-content {
+        grid-column: 1 / span 1;
       }
 
       //Message Type Styling
       &.references {
-        padding: 0.5rem;
         border: $thinDarkBorder;
         background: $won-light-gray;
       }

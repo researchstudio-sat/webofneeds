@@ -9,7 +9,6 @@ won-referenced-message-content {
 
   .refmsgcontent__fragment {
     background-color: white;
-    border: $thinGrayBorder;
     padding: 0.25rem;
 
     &__header {
@@ -25,7 +24,6 @@ won-referenced-message-content {
       grid-auto-flow: row;
 
       won-combined-message-content {
-        padding: 0.25rem 0.5rem;
         border: $thinGrayBorder;
 
         &.won-cm--left {
