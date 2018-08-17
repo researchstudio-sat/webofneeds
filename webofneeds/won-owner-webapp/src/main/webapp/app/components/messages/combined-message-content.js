@@ -14,7 +14,7 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msg__header" ng-if="!self.isConnectionMessage">
+      <div class="msg__header" ng-if="!self.isConnectionMessage && !self.hasNotBeenLoaded">
           <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
       </div>
       <won-message-content

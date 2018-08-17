@@ -75,7 +75,7 @@ function genComponentConf() {
                   connection-uri="self.connectionUri">
     			      </won-combined-message-content>
                 <div class="won-cm__center__bubble__carret clickable"
-                    ng-if="(self.isProposable || self.isRetractable) && !self.multiSelectType"
+                    ng-if="self.isProposable && !self.multiSelectType"
                     ng-click="self.showDetail = !self.showDetail">
                     <svg ng-show="!self.showDetail">
                         <use xlink:href="#ico16_arrow_down" href="#ico16_arrow_down"></use>
