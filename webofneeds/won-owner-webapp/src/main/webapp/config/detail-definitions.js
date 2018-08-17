@@ -1019,3 +1019,101 @@ export const details = {
     },
   },
 };
+
+/**
+ * Strips any json-ld type annotations and returns a
+ * string or immutable list of strings.
+ * e.g.:
+ * ```
+ * [{"@value": "123.1", "@type": "xsd:float"}]
+ *
+ */
+function compactValuesImm(val) {
+  return val;
+}
+window.compactValuesImm4dbg = compactValuesImm; // TODO deleteme
+window.compactValue4dbg = compactValue; // TODO deleteme
+window.compactValue24dbg = compactValue2; // TODO deleteme
+window.bestGuessParse4dbg = bestGuessParse; // TODO deleteme
+
+/**
+ * e.g.
+ * ```
+ * compactValue({"@value": "123.1", "@type": "xsd:float"}) // => "123.1"
+ * compactValue("123.1") // => "123.1"
+ * ```
+ */
+function compactValue(val) {
+  const atValue = val["@value"] || (val.get && val.get("@value"));
+  if (atValue) {
+    return atValue;
+  } else if (is("String", val) || is("Number", val)) {
+    return val;
+  } else {
+    throw new Error(
+      "Trying to lift @value of unexpected value:\n" + JSON.stringify(val)
+    );
+  }
+}
+
+/**
+ *
+ * @param {*} val
+ *  * already parsed
+ *  * `{"@value": "<someval>", "@type": "<sometype>"}`, where `<sometype>` is one of:
+ *    * `xsd:float`
+ *    * `xsd:dateTime`
+ *    * `xsd:date`
+ *    * `xsd:time`
+ *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`
+ *  * anything, that _strictly_ parses to a number or date or is a string
+ * @param {*} type passing `val` and `type` is equivalent to passing an object with `@value` and `@type`
+ *
+ */
+function compactValue2(val, type) {
+  const val_ = get(val, "@value") || val;
+  const type_ = get(val, "@type") || type;
+  if (is("Number", val_) || is("Date", val_)) {
+    // already parsed
+    return val_;
+  }
+  switch (type_) {
+    case "xsd:float":
+      {
+        const parsedVal = Number(val_);
+        if (isNaN) {
+          throwParsingError(val, type);
+        } else {
+          return parsedVal;
+        }
+      }
+      break;
+
+    case "xsd:dateTime":
+    case "xsd:date":
+    case "xsd:time":
+    case "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon":
+    default:
+    // try strictly parsing without type information
+    // and as fallback check if it's at least a string
+  }
+}
+
+function bestGuessParse(val) {
+  if (val === undefined || val === null) {
+    return val;
+  }
+
+  const asNum = Number(val);
+  if (!isNaN(asNum)) {
+    return asNum;
+  }
+
+  throw new Error("NOT YET IMPLEMENTED");
+}
+
+function throwParsingError(val, type) {
+  throw new Error(
+    `Failed to parse jsonld value of type \`${type}\`:\n` + JSON.stringify(val)
+  );
+}
