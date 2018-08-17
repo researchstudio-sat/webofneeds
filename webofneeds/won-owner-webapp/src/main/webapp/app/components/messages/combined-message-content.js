@@ -71,7 +71,8 @@ function genComponentConf() {
 
       classOnComponentRoot(
         "won-has-non-ref-content",
-        () => this.hasContent || this.hasNotBeenLoaded,
+        () =>
+          !this.isConnectionMessage || this.hasContent || this.hasNotBeenLoaded,
         this
       );
       classOnComponentRoot(

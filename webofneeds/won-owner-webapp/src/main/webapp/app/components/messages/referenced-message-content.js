@@ -8,10 +8,11 @@ import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
 import { fetchMessage } from "../../won-message-utils.js";
+import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "style/_referenced-message-content.scss";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
@@ -148,6 +149,8 @@ function genComponentConf() {
           proposeToCancelUrisArray:
             proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
           acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),
+          hasContent: message && message.get("hasContent"),
+          hasNotBeenLoaded: !message,
         };
       };
 
@@ -155,6 +158,12 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri", "self.messageUri"],
+        this
+      );
+
+      classOnComponentRoot(
+        "won-has-non-ref-content",
+        () => this.hasContent || this.hasNotBeenLoaded,
         this
       );
     }
