@@ -62,8 +62,7 @@ function genComponentConf() {
                   'won-cm__center--system': self.isFromSystem
                 }"
                 in-view="$inview && self.markAsRead()">
-            <div 
-                class="won-cm__center__bubble"
+            <div class="won-cm__center__bubble"
     			      ng-class="{
     			        'references' : 	self.hasReferences,
                   'pending': self.isPending,
