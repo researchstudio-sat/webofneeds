@@ -346,3 +346,19 @@ export function selectUnreadMessagesByConnectionUri(state, connectionUri) {
   const messages = selectAllMessagesByConnectionUri(state, connectionUri);
   return messages && messages.filter(msg => isMessageUnread(msg));
 }
+
+export function getCorrectMessageUri(messages, messageUri) {
+  if (messageUri) {
+    if (messages.filter(msg => msg.get("uri") === messageUri).size > 0) {
+      return messageUri;
+    } else {
+      const messagesOfRemoteUri = messages.filter(
+        msg => msg.get("remoteUri") === messageUri
+      );
+      if (messagesOfRemoteUri.size > 0) {
+        return messagesOfRemoteUri.first().get("uri");
+      }
+    }
+  }
+  return undefined;
+}
