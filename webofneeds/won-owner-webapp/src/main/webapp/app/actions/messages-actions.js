@@ -10,6 +10,7 @@ import {
 } from "./actions.js";
 
 import Immutable from "immutable";
+import { getCorrectMessageUri } from "../selectors.js";
 
 import {
   fetchDataForOwnedNeeds,
@@ -355,22 +356,6 @@ export function processConnectionMessage(event) {
       });
     }
   };
-}
-
-function getCorrectMessageUri(messages, messageUri) {
-  if (messageUri) {
-    if (messages.filter(msg => msg.get("uri") === messageUri).size > 0) {
-      return messageUri;
-    } else {
-      const messagesOfRemoteUri = messages.filter(
-        msg => msg.get("remoteUri") === messageUri
-      );
-      if (messagesOfRemoteUri.size > 0) {
-        return messagesOfRemoteUri.first().get("uri");
-      }
-    }
-  }
-  return undefined;
 }
 
 export function connectMessageReceived(event) {
