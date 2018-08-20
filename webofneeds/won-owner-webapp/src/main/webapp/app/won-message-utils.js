@@ -30,6 +30,17 @@ export function wellFormedPayload(payload) {
   return emptyDataset.mergeDeep(Immutable.fromJS(payload));
 }
 
+export function messageHasReferences(wonMsg) {
+  return (
+    wonMsg &&
+    (wonMsg.getProposedMessages() ||
+      wonMsg.getRetractMessages() ||
+      wonMsg.getRejectsMessages() ||
+      wonMsg.getAcceptedMessages() ||
+      wonMsg.getProposedToCancelMessages())
+  );
+}
+
 export function buildRateMessage(
   msgToRateFor,
   ownNeedUri,
