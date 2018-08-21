@@ -14,12 +14,9 @@ export const labels = deepFreeze({
   },
   connectionState: {
     [won.WON.Suggested]: "Conversation suggested.",
-    [won.WON.RequestSent]:
-      "Conversation requested by you.",
-    [won.WON.RequestReceived]:
-      "Conversation requested.",
-    [won.WON.Connected]:
-      "Conversation open.",
+    [won.WON.RequestSent]: "Conversation requested by you.",
+    [won.WON.RequestReceived]: "Conversation requested.",
+    [won.WON.Connected]: "Conversation open.",
     [won.WON.Closed]: "Conversation closed.",
   },
   messageType: {
