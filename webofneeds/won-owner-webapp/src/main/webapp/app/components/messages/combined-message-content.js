@@ -6,22 +6,27 @@ import { attach, get, getIn } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import trigModule from "../trig.js";
+import { labels } from "../../won-label-utils.js";
+import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "style/_combined-message-content.scss";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
+      <div class="msg__header" ng-if="!self.isConnectionMessage && !self.hasNotBeenLoaded">
+          <div class="msg__header__type">{{ self.getHeaderLabel() }}</div>
+      </div>
       <won-message-content
-          ng-if="!self.isConnectionMessage() || self.message.get('hasContent')"
-          message-uri="self.message.get('uri')"
-          connection-uri="self.connection.get('uri')">
+          ng-if="self.hasContent || self.hasNotBeenLoaded"
+          message-uri="self.messageUri"
+          connection-uri="self.connectionUri">
       </won-message-content>
       <won-referenced-message-content
-          ng-if="self.message.get('hasReferences')"
-          message-uri="self.message.get('uri')"
-          connection-uri="self.connection.get('uri')">
+          ng-if="self.hasReferences"
+          message-uri="self.messageUri"
+          connection-uri="self.connectionUri">
       </won-referenced-message-content>
       <won-trig
           trig="self.contentGraphTrig"
@@ -44,11 +49,16 @@ function genComponentConf() {
           this.messageUri &&
           getIn(connection, ["messages", this.messageUri]);
 
+        const messageType = message && message.get("messageType");
+
         return {
           contentGraphTrig: get(message, "contentGraphTrigRaw"),
           shouldShowRdf: state.get("showRdf"),
-          connection,
-          message,
+          hasContent: message && message.get("hasContent"),
+          hasNotBeenLoaded: !message,
+          hasReferences: message && message.get("hasReferences"),
+          messageType,
+          isConnectionMessage: messageType === won.WONMSG.connectionMessage,
         };
       };
 
@@ -58,13 +68,23 @@ function genComponentConf() {
         ["self.connectionUri", "self.messageUri"],
         this
       );
+
+      classOnComponentRoot(
+        "won-has-non-ref-content",
+        () =>
+          !this.isConnectionMessage || this.hasContent || this.hasNotBeenLoaded,
+        this
+      );
+      classOnComponentRoot(
+        "won-has-ref-content",
+        () => this.hasReferences,
+        this
+      );
     }
 
-    isConnectionMessage() {
-      return (
-        this.message &&
-        this.message.get("messageType") === won.WONMSG.connectionMessage
-      );
+    getHeaderLabel() {
+      const headerLabel = labels.messageType[this.messageType];
+      return headerLabel || this.messageType;
     }
   }
   Controller.$inject = serviceDependencies;

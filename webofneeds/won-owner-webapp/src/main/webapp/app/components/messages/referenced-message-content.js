@@ -8,15 +8,16 @@ import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
 import { labels } from "../../won-label-utils.js";
 import { fetchMessage } from "../../won-message-utils.js";
+import { classOnComponentRoot } from "../../cstm-ng-utils.js";
 
 import "style/_referenced-message-content.scss";
 
-const serviceDependencies = ["$ngRedux", "$scope"];
+const serviceDependencies = ["$ngRedux", "$scope", "$element"];
 
 function genComponentConf() {
   let template = `
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeUris">
-        <div class="refmsgcontent__fragment__header">Proposes</div>
+        <div class="refmsgcontent__fragment__header">Proposes {{ self.getCountString(self.proposeUrisSize)}}</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -31,7 +32,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRetractUris">
-        <div class="refmsgcontent__fragment__header">Retracts</div>
+        <div class="refmsgcontent__fragment__header">Retracts {{ self.getCountString(self.retractUrisSize)}}</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -46,7 +47,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasAcceptUris">
-        <div class="refmsgcontent__fragment__header">Accepts</div>
+        <div class="refmsgcontent__fragment__header">Accepts {{ self.getCountString(self.acceptUrisSize)}}</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -61,7 +62,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasProposeToCancelUris">
-        <div class="refmsgcontent__fragment__header">Propose to cancel</div>
+        <div class="refmsgcontent__fragment__header">Propose to cancel {{ self.getCountString(self.proposeToCancelUrisSize)}}</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -76,7 +77,7 @@ function genComponentConf() {
         </div>
       </div>
       <div class="refmsgcontent__fragment" ng-if="self.hasRejectUris">
-        <div class="refmsgcontent__fragment__header">Rejects</div>
+        <div class="refmsgcontent__fragment__header">Rejects {{ self.getCountString(self.rejectUrisSize)}}</div>
         <div class="refmsgcontent__fragment__body">
           <won-combined-message-content
             ng-click="self.loadMessage(msgUri)"
@@ -120,29 +121,36 @@ function genComponentConf() {
           references && references.get("proposesToCancel");
         const acceptUris = references && references.get("accepts");
 
-        const hasAcceptUris = acceptUris && acceptUris.size > 0;
-        const hasProposeUris = proposeUris && proposeUris.size > 0;
-        const hasProposeToCancelUris =
-          proposeToCancelUris && proposeToCancelUris.size > 0;
-        const hasRetractUris = retractUris && retractUris.size > 0;
-        const hasRejectUris = rejectUris && rejectUris.size > 0;
+        const acceptUrisSize = acceptUris ? acceptUris.size : 0;
+        const proposeUrisSize = proposeUris ? proposeUris.size : 0;
+        const proposeToCancelUrisSize = proposeToCancelUris
+          ? proposeToCancelUris.size
+          : 0;
+        const rejectUrisSize = rejectUris ? rejectUris.size : 0;
+        const retractUrisSize = retractUris ? retractUris.size : 0;
 
         return {
           ownNeedUri: ownNeed && ownNeed.get("uri"),
           chatMessages: chatMessages,
           connection,
-          hasProposeUris,
-          hasAcceptUris,
-          hasProposeToCancelUris,
-          hasRetractUris,
-          hasRejectUris,
-          proposeUrisArray: hasProposeUris && Array.from(proposeUris.toSet()),
-          retractUrisArray: hasRetractUris && Array.from(retractUris.toSet()),
-          rejectUrisArray: hasRejectUris && Array.from(rejectUris.toSet()),
+          acceptUrisSize,
+          proposeUrisSize,
+          proposeToCancelUrisSize,
+          rejectUrisSize,
+          retractUrisSize,
+          hasProposeUris: proposeUrisSize > 0,
+          hasAcceptUris: acceptUrisSize > 0,
+          hasProposeToCancelUris: proposeToCancelUrisSize > 0,
+          hasRetractUris: retractUrisSize > 0,
+          hasRejectUris: rejectUrisSize > 0,
+          proposeUrisArray: proposeUris && Array.from(proposeUris.toSet()),
+          retractUrisArray: retractUris && Array.from(retractUris.toSet()),
+          rejectUrisArray: rejectUris && Array.from(rejectUris.toSet()),
           proposeToCancelUrisArray:
-            hasProposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
-          acceptUrisArray: hasAcceptUris && Array.from(acceptUris.toSet()),
-          message,
+            proposeToCancelUris && Array.from(proposeToCancelUris.toSet()),
+          acceptUrisArray: acceptUris && Array.from(acceptUris.toSet()),
+          hasContent: message && message.get("hasContent"),
+          hasNotBeenLoaded: !message,
         };
       };
 
@@ -150,6 +158,12 @@ function genComponentConf() {
         selectFromState,
         actionCreators,
         ["self.connectionUri", "self.messageUri"],
+        this
+      );
+
+      classOnComponentRoot(
+        "won-has-non-ref-content",
+        () => this.hasContent || this.hasNotBeenLoaded,
         this
       );
     }
@@ -168,6 +182,14 @@ function genComponentConf() {
         } else {
           return undefined;
         }
+      }
+    }
+
+    getCountString(elements) {
+      if (elements > 1 || elements == 0) {
+        return elements + " Messages";
+      } else {
+        return elements + " Message";
       }
     }
 

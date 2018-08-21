@@ -3,10 +3,9 @@ import angular from "angular";
 import won from "../../won-es6.js";
 import { connect2Redux } from "../../won-utils.js";
 import { getAllDetails } from "../../won-utils.js";
-import { attach, getIn } from "../../utils.js";
+import { attach, getIn, get } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
 import { selectNeedByConnectionUri } from "../../selectors.js";
-import { labels } from "../../won-label-utils.js";
 // TODO: these should be replaced by importing defintions from config
 import personViewerModule from "../details/viewer/person-viewer.js";
 import descriptionViewerModule from "../details/viewer/description-viewer.js";
@@ -30,33 +29,23 @@ const serviceDependencies = ["$ngRedux", "$scope"];
 
 function genComponentConf() {
   let template = `
-      <div class="msgcontent__header" ng-if="self.message && !self.isConnectionMessage()">
-        <div class="msgcontent__header__type" ng-if="!self.isOtherMessage()">{{ self.labels.messageType[self.messageType] }}</div>
-        <div class="msgcontent__header__type" ng-if="self.isOtherMessage()">{{ self.messageType }}</div>
+      <div class="msg__text--prewrap" ng-if="self.message && self.text">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
+      <div class="msg__content"
+        ng-repeat="detail in self.allDetails"
+        ng-if="self.message && detail.identifier && self.getDetailContent(detail.identifier)"
+        message-detail-viewer-element="{{detail.viewerComponent}}"
+        detail="detail"
+        content="self.getDetailContent(detail.identifier)">
       </div>
-      <div class="msgcontent__body" ng-if="self.message">
-        <div class="msgcontent__body__text--prewrap" ng-if="self.hasText">{{ self.text }}</div> <!-- no spaces or newlines within the code-tag, because it is preformatted -->
-        <div class="msgcontent__body__content"
-          ng-repeat="detail in self.allDetails"
-          ng-if="detail.identifier && self.getDetailContent(detail.identifier)"
-          message-detail-viewer-element="{{detail.viewerComponent}}"
-          detail="detail"
-          content="self.getDetailContent(detail.identifier)">
-        </div>
-        <div class="msgcontent__body__matchScore" ng-if="self.hasMatchScore">MatchScore: {{self.matchScorePercentage }}%</div>
-        <div class="msgcontent__body__text" ng-if="!self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
-      </div>
-      <div class="msgcontent__body clickable" ng-if="!self.message">
-        <div class="msgcontent__body__text hide-in-responsive">«Message not (yet) loaded. Click to Load»</div>
-        <div class="msgcontent__body__text show-in-responsive">«Message not (yet) loaded. Tap to Load»</div>
-      </div>
+      <div class="msg__matchScore" ng-if="self.message && self.matchScore">MatchScore: {{self.matchScorePercentage }}%</div>
+      <div class="msg__text" ng-if="self.message && !self.isConnectMessage() && !self.isOpenMessage() && !self.message.get('isParsable')">{{ self.noParsableContentPlaceholder }}</div>
+      <div class="msg__text hide-in-responsive clickable" ng-if="!self.message">«Message not (yet) loaded. Click to Load»</div>
+      <div class="msg__text show-in-responsive clickable" ng-if="!self.message">«Message not (yet) loaded. Tap to Load»</div>
     `;
 
   class Controller {
     constructor(/* arguments = dependency injections */) {
       attach(this, serviceDependencies, arguments);
-
-      this.labels = labels;
 
       this.noParsableContentPlaceholder =
         "«This message couldn't be displayed as it didn't contain," +
@@ -77,19 +66,18 @@ function genComponentConf() {
           this.messageUri &&
           getIn(connection, ["messages", this.messageUri]);
 
-        const matchScore = message && getIn(message, ["content", "matchScore"]);
-
-        const text = message && getIn(message, ["content", "text"]);
+        const content = get(message, "content");
+        const matchScore = get(content, "matchScore");
+        const text = get(content, "text");
 
         return {
           connection,
           message,
           messageType: message && message.get("messageType"),
           matchScorePercentage: matchScore && matchScore * 100,
-          hasMatchScore: !!matchScore,
-          hasText: !!text,
+          matchScore,
           text,
-          details: message && message.get("content"),
+          content,
         };
       };
 
@@ -101,34 +89,12 @@ function genComponentConf() {
       );
     }
 
-    isConnectionMessage() {
-      return this.messageType === won.WONMSG.connectionMessage;
-    }
-
     isConnectMessage() {
       return this.messageType === won.WONMSG.connectMessage;
     }
 
     isOpenMessage() {
       return this.messageType === won.WONMSG.openMessage;
-    }
-
-    isHintMessage() {
-      return this.messageType === won.WONMSG.hintMessage;
-    }
-
-    isHintFeedbackMessage() {
-      return this.messageType === won.WONMSG.hintFeedbackMessage;
-    }
-
-    isOtherMessage() {
-      return !(
-        this.isHintMessage() ||
-        this.isHintFeedbackMessage() ||
-        this.isOpenMessage() ||
-        this.isConnectMessage() ||
-        this.isConnectionMessage()
-      );
     }
 
     getDetail(key) {
@@ -145,7 +111,7 @@ function genComponentConf() {
     }
 
     getDetailContent(key) {
-      return key && this.details && this.details.get(key);
+      return key && this.content && this.content.get(key);
     }
   }
   Controller.$inject = serviceDependencies;

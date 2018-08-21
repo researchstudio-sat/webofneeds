@@ -2,9 +2,7 @@
  * Created by ksinger on 10.04.2017.
  */
 
-import won from "../won-es6.js";
 import angular from "angular";
-import { labels } from "../won-label-utils.js";
 import { attach } from "../utils.js";
 import { connect2Redux } from "../won-utils.js";
 import { actionCreators } from "../actions/actions.js";
@@ -32,29 +30,15 @@ function genComponentConf() {
   class Controller {
     constructor() {
       attach(this, serviceDependencies, arguments);
-      this.labels = labels;
-      //this.settingsOpen = false;
 
       const selectFromState = state => {
         const ownNeed = selectNeedByConnectionUri(state, this.connectionUri);
         const connection =
           ownNeed && ownNeed.getIn(["connections", this.connectionUri]);
 
-        const allMessages = connection && connection.get("messages");
-        const unreadMessages =
-          allMessages && allMessages.filter(msg => msg.get("unread"));
-
         return {
-          WON: won.WON,
-          ownNeed,
-          connection,
-          connectionUri: connection && connection.get("uri"),
           openConnectionUri: selectOpenConnectionUri(state),
           lastUpdateTimestamp: connection && connection.get("lastUpdateDate"),
-          unreadMessagesCount:
-            unreadMessages && unreadMessages.size > 0
-              ? unreadMessages.size
-              : undefined,
         };
       };
 

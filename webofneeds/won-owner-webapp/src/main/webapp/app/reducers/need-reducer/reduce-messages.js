@@ -1,6 +1,7 @@
 import { parseMessage } from "./parse-message.js";
 import { markUriAsRead } from "../../won-localstorage.js";
 import { markConnectionAsRead } from "./reduce-connections.js";
+import { getCorrectMessageUri } from "../../selectors.js";
 
 /*
  "alreadyProcessed" flag, which indicates that we do not care about the
@@ -162,7 +163,8 @@ export function markMessageAsRejected(
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
 
   if (!message) {
     console.error(
@@ -175,19 +177,41 @@ export function markMessageAsRejected(
       ">"
     );
     return state;
+  } else {
+    const proposedToCancelReferences = message.getIn([
+      "references",
+      "proposesToCancel",
+    ]);
+
+    if (proposedToCancelReferences) {
+      proposedToCancelReferences.forEach(proposedToCancelRef => {
+        const correctMessageUri = getCorrectMessageUri(
+          messages,
+          proposedToCancelRef
+        );
+        state = markMessageAsCancellationPending(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+      });
+    }
+
+    return state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isRejected",
+      ],
+      rejected
+    );
   }
-  return state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isRejected",
-    ],
-    rejected
-  );
 }
 
 export function updateMessageStatus(
@@ -247,7 +271,8 @@ export function markMessageAsRetracted(
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
 
   if (!message) {
     console.error(
@@ -260,19 +285,41 @@ export function markMessageAsRetracted(
       ">"
     );
     return state;
+  } else {
+    const proposedToCancelReferences = message.getIn([
+      "references",
+      "proposesToCancel",
+    ]);
+
+    if (proposedToCancelReferences) {
+      proposedToCancelReferences.forEach(proposedToCancelRef => {
+        const correctMessageUri = getCorrectMessageUri(
+          messages,
+          proposedToCancelRef
+        );
+        state = markMessageAsCancellationPending(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          false
+        );
+      });
+    }
+
+    return state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isRetracted",
+      ],
+      retracted
+    );
   }
-  return state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isRetracted",
-    ],
-    retracted
-  );
 }
 
 export function markMessageAsAccepted(
@@ -284,7 +331,8 @@ export function markMessageAsAccepted(
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
 
   if (!message) {
     console.error(
@@ -297,19 +345,69 @@ export function markMessageAsAccepted(
       ">"
     );
     return state;
+  } else {
+    const proposedToCancelReferences = message.getIn([
+      "references",
+      "proposesToCancel",
+    ]);
+
+    if (proposedToCancelReferences) {
+      proposedToCancelReferences.forEach(proposedToCancelRef => {
+        const correctMessageUri = getCorrectMessageUri(
+          messages,
+          proposedToCancelRef
+        );
+        state = markMessageAsCancelled(
+          state,
+          correctMessageUri,
+          connectionUri,
+          needUri,
+          true
+        );
+      });
+    }
+
+    if (accepted) {
+      state = state.setIn(
+        [
+          needUri,
+          "connections",
+          connectionUri,
+          "messages",
+          messageUri,
+          "messageStatus",
+          "isCancelled",
+        ],
+        false
+      );
+
+      state = state.setIn(
+        [
+          needUri,
+          "connections",
+          connectionUri,
+          "messages",
+          messageUri,
+          "messageStatus",
+          "isCancellationPending",
+        ],
+        false
+      );
+    }
+
+    return state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isAccepted",
+      ],
+      accepted
+    );
   }
-  return state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isAccepted",
-    ],
-    accepted
-  );
 }
 
 export function markMessageAsCancelled(
@@ -321,7 +419,8 @@ export function markMessageAsCancelled(
 ) {
   let need = state.get(needUri);
   let connection = need && need.getIn(["connections", connectionUri]);
-  let message = connection && connection.getIn(["messages", messageUri]);
+  let messages = connection && connection.get("messages");
+  let message = messages && messages.get(messageUri);
 
   if (!message) {
     console.error(
@@ -334,45 +433,46 @@ export function markMessageAsCancelled(
       ">"
     );
     return state;
+  } else {
+    state = state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isCancelled",
+      ],
+      cancelled
+    );
+
+    state = state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isAccepted",
+      ],
+      false
+    );
+
+    return state.setIn(
+      [
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+        messageUri,
+        "messageStatus",
+        "isCancellationPending",
+      ],
+      false
+    );
   }
-  state = state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isCancelled",
-    ],
-    cancelled
-  );
-
-  state = state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isAccepted",
-    ],
-    false
-  );
-
-  return state.setIn(
-    [
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-      messageUri,
-      "messageStatus",
-      "isCancellationPending",
-    ],
-    false
-  );
 }
 
 export function markMessageAsCancellationPending(

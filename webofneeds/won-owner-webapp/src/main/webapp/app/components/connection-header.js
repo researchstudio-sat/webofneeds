@@ -15,6 +15,8 @@ import {
   selectLastUpdateTime,
   selectNeedByConnectionUri,
   selectAllTheirNeeds,
+  selectAllMessagesByConnectionUri,
+  selectUnreadMessagesByConnectionUri,
 } from "../selectors.js";
 import connectionStateModule from "./connection-state.js";
 import { classOnComponentRoot } from "../cstm-ng-utils.js";
@@ -93,9 +95,14 @@ function genComponentConf() {
         const theirNeed =
           connection &&
           selectAllTheirNeeds(state).get(connection.get("remoteNeedUri"));
-        const allMessages = connection && connection.get("messages");
-        const unreadMessages =
-          allMessages && allMessages.filter(msg => msg.get("unread"));
+        const allMessages = selectAllMessagesByConnectionUri(
+          state,
+          this.connectionUri
+        );
+        const unreadMessages = selectUnreadMessagesByConnectionUri(
+          state,
+          this.connectionUri
+        );
 
         const sortedMessages = allMessages && allMessages.toArray();
         if (sortedMessages) {

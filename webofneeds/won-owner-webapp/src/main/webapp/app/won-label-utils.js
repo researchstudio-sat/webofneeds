@@ -13,14 +13,14 @@ export const labels = deepFreeze({
     [won.WON.BasicNeedTypeWhatsNewCompacted]: "What's New",
   },
   connectionState: {
-    [won.WON.Suggested]: "Conversation suggested. You can send a request.",
+    [won.WON.Suggested]: "Conversation suggested.",
     [won.WON.RequestSent]:
-      "Conversation requested by you. Close the connection if no longer interested.",
+      "Conversation requested by you.",
     [won.WON.RequestReceived]:
-      "Conversation requested. You can accept or deny this request.",
+      "Conversation requested.",
     [won.WON.Connected]:
-      "Conversation open. You can exchange messages with your counterpart.",
-    [won.WON.Closed]: "Conversation closed. You can reopen it.",
+      "Conversation open.",
+    [won.WON.Closed]: "Conversation closed.",
   },
   messageType: {
     [won.WONMSG.connectMessage]: "Contact Request",

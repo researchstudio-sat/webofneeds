@@ -10,10 +10,12 @@ import {
 } from "./actions.js";
 
 import Immutable from "immutable";
+import { getCorrectMessageUri } from "../selectors.js";
 
 import {
   fetchDataForOwnedNeeds,
   fetchMessageEffects,
+  messageHasReferences,
 } from "../won-message-utils.js";
 
 export function successfulCloseNeed(event) {
@@ -186,7 +188,6 @@ export function openMessageReceived(event) {
 }
 export function processAgreementMessage(event) {
   return dispatch => {
-    console.log("processAgreementMessage");
     dispatch({
       type: actionTypes.messages.processAgreementMessage,
       payload: event,
@@ -196,166 +197,165 @@ export function processAgreementMessage(event) {
 
 export function processConnectionMessage(event) {
   return (dispatch, getState) => {
-    const _needUri = event.getSenderNeed();
-    const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
+    if (messageHasReferences(event)) {
+      const _needUri = event.getSenderNeed();
+      const isSentEvent = getState().getIn(["needs", _needUri, "ownNeed"]);
 
-    let connectionUri;
-    let needUri;
+      let connectionUri;
+      let needUri;
 
-    if (isSentEvent) {
-      connectionUri = event.getSender();
-      needUri = event.getSenderNeed();
-    } else {
-      connectionUri = event.getReceiver();
-      needUri = event.getReceiverNeed();
-    }
-
-    const messages = getState().getIn([
-      "needs",
-      needUri,
-      "connections",
-      connectionUri,
-      "messages",
-    ]);
-
-    fetchMessageEffects(connectionUri, event.getMessageUri()).then(response => {
-      if (response && response.length > 0) {
-        console.log("agreement response : ", response);
+      if (isSentEvent) {
+        connectionUri = event.getSender();
+        needUri = event.getSenderNeed();
+      } else {
+        connectionUri = event.getReceiver();
+        needUri = event.getReceiverNeed();
       }
-      for (const effect of response) {
-        console.log("effect : ", effect, "effect-type: ", effect.type);
-        switch (effect.type) {
-          case "ACCEPTS":
-            if (effect.accepts) {
-              let acceptedMessageUris = Array.isArray(effect.acceptedMessageUri)
-                ? effect.acceptedMessageUri
-                : [effect.acceptedMessageUri];
-              acceptedMessageUris.forEach(acceptedMessageUri => {
-                let messageUri = getCorrectMessageUri(
-                  messages,
-                  acceptedMessageUri
-                );
-                dispatch({
-                  type: actionTypes.messages.messageStatus.markAsAccepted,
-                  payload: {
-                    messageUri: messageUri,
-                    connectionUri: connectionUri,
-                    needUri: needUri,
-                    accepted: true,
-                  },
-                });
-              });
+
+      const messages = getState().getIn([
+        "needs",
+        needUri,
+        "connections",
+        connectionUri,
+        "messages",
+      ]);
+
+      fetchMessageEffects(connectionUri, event.getMessageUri()).then(
+        response => {
+          if (response && response.length > 0) {
+            console.log("agreement response : ", response);
+          }
+          for (const effect of response) {
+            console.log("effect : ", effect, "effect-type: ", effect.type);
+            switch (effect.type) {
+              case "ACCEPTS":
+                if (effect.accepts) {
+                  let acceptedMessageUris = Array.isArray(
+                    effect.acceptedMessageUri
+                  )
+                    ? effect.acceptedMessageUri
+                    : [effect.acceptedMessageUri];
+                  acceptedMessageUris.forEach(acceptedMessageUri => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      acceptedMessageUri
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsAccepted,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        accepted: true,
+                      },
+                    });
+                  });
+                }
+                break;
+              case "PROPOSES":
+                if (effect.proposalType === "CANCELS") {
+                  let proposesToCancelUris = Array.isArray(
+                    effect.proposesToCancel
+                  )
+                    ? effect.proposesToCancel
+                    : [effect.proposesToCancel];
+
+                  proposesToCancelUris.forEach(proposesToCancelURI => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      proposesToCancelURI
+                    );
+                    console.log(
+                      "proposesToCancelURI: ",
+                      proposesToCancelURI,
+                      "messageUri: ",
+                      messageUri
+                    );
+                    dispatch({
+                      type:
+                        actionTypes.messages.messageStatus
+                          .markAsCancellationPending,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        cancellationPending: true,
+                      },
+                    });
+                  });
+                }
+                break;
+
+              case "REJECTS":
+                if (effect.rejects) {
+                  let rejectedMessageUris = Array.isArray(
+                    effect.rejectedMessageUri
+                  )
+                    ? effect.rejectedMessageUri
+                    : [effect.rejectedMessageUri];
+
+                  rejectedMessageUris.forEach(rejectedMessageUri => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      rejectedMessageUri
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsRejected,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        rejected: true,
+                      },
+                    });
+                  });
+                }
+                break;
+
+              case "RETRACTS":
+                if (effect.retracts) {
+                  let retractedMessageUris = Array.isArray(
+                    effect.retractedMessageUri
+                  )
+                    ? effect.retractedMessageUri
+                    : [effect.retractedMessageUri];
+
+                  retractedMessageUris.forEach(retractedMessageUri => {
+                    let messageUri = getCorrectMessageUri(
+                      messages,
+                      retractedMessageUri
+                    );
+                    dispatch({
+                      type: actionTypes.messages.messageStatus.markAsRetracted,
+                      payload: {
+                        messageUri: messageUri,
+                        connectionUri: connectionUri,
+                        needUri: needUri,
+                        retracted: true,
+                      },
+                    });
+                  });
+                }
+                break;
+
+              default:
+                break;
             }
-            break;
-          case "PROPOSES":
-            if (effect.proposalType === "CANCELS") {
-              let proposesToCancelUris = Array.isArray(effect.proposesToCancel)
-                ? effect.proposesToCancel
-                : [effect.proposesToCancel];
+          }
 
-              proposesToCancelUris.forEach(proposesToCancelURI => {
-                let messageUri = getCorrectMessageUri(
-                  messages,
-                  proposesToCancelURI
-                );
-                console.log(
-                  "proposesToCancelURI: ",
-                  proposesToCancelURI,
-                  "messageUri: ",
-                  messageUri
-                );
-                dispatch({
-                  type:
-                    actionTypes.messages.messageStatus
-                      .markAsCancellationPending,
-                  payload: {
-                    messageUri: messageUri,
-                    connectionUri: connectionUri,
-                    needUri: needUri,
-                    cancellationPending: true,
-                  },
-                });
-              });
-            }
-            break;
-
-          case "REJECTS":
-            if (effect.rejects) {
-              let rejectedMessageUris = Array.isArray(effect.rejectedMessageUri)
-                ? effect.rejectedMessageUri
-                : [effect.rejectedMessageUri];
-
-              rejectedMessageUris.forEach(rejectedMessageUri => {
-                let messageUri = getCorrectMessageUri(
-                  messages,
-                  rejectedMessageUri
-                );
-                dispatch({
-                  type: actionTypes.messages.messageStatus.markAsRejected,
-                  payload: {
-                    messageUri: messageUri,
-                    connectionUri: connectionUri,
-                    needUri: needUri,
-                    rejected: true,
-                  },
-                });
-              });
-            }
-            break;
-
-          case "RETRACTS":
-            if (effect.retracts) {
-              let retractedMessageUris = Array.isArray(
-                effect.retractedMessageUri
-              )
-                ? effect.retractedMessageUri
-                : [effect.retractedMessageUri];
-
-              retractedMessageUris.forEach(retractedMessageUri => {
-                let messageUri = getCorrectMessageUri(
-                  messages,
-                  retractedMessageUri
-                );
-                dispatch({
-                  type: actionTypes.messages.messageStatus.markAsRetracted,
-                  payload: {
-                    messageUri: messageUri,
-                    connectionUri: connectionUri,
-                    needUri: needUri,
-                    retracted: true,
-                  },
-                });
-              });
-            }
-            break;
-
-          default:
-            break;
+          dispatch({
+            type: actionTypes.messages.processConnectionMessage,
+            payload: event,
+          });
         }
-      }
-
+      );
+    } else {
       dispatch({
         type: actionTypes.messages.processConnectionMessage,
         payload: event,
       });
-    });
-  };
-}
-
-function getCorrectMessageUri(messages, messageUri) {
-  if (messageUri) {
-    if (messages.filter(msg => msg.get("uri") === messageUri).size > 0) {
-      return messageUri;
-    } else {
-      const messagesOfRemoteUri = messages.filter(
-        msg => msg.get("remoteUri") === messageUri
-      );
-      if (messagesOfRemoteUri.size > 0) {
-        return messagesOfRemoteUri.first().get("uri");
-      }
     }
-  }
-  return undefined;
+  };
 }
 
 export function connectMessageReceived(event) {

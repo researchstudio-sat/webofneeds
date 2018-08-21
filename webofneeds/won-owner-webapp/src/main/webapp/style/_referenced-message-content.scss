@@ -7,25 +7,33 @@ won-referenced-message-content {
   grid-gap: 0.5rem;
   grid-auto-flow: row;
 
+  &.won-has-non-ref-content > .refmsgcontent__fragment {
+    border-top: $thinGrayBorder;
+  }
+
+  .refmsgcontent__fragment:not(:first-child) {
+    border-top: $thinGrayBorder;
+  }
+  .refmsgcontent__fragment:not(:last-child) {
+    border-bottom: $thinGrayBorder;
+  }
+
   .refmsgcontent__fragment {
     background-color: white;
-    border: $thinGrayBorder;
-    padding: 0.25rem;
 
     &__header {
       font-weight: bold;
       border-bottom: $thinGrayBorder;
-      padding-bottom: 0.25rem;
-      margin-bottom: 0.25rem;
+      padding: 0.5rem;
     }
 
     &__body {
+      padding: 0.5rem;
       display: grid;
-      grid-gap: 0.25rem;
+      grid-gap: 0.5rem;
       grid-auto-flow: row;
 
-      won-combined-message-content {
-        padding: 0.25rem 0.5rem;
+      > won-combined-message-content {
         border: $thinGrayBorder;
 
         &.won-cm--left {
