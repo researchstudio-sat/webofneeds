@@ -732,8 +732,14 @@ export function get(obj, property) {
   if (!obj) {
     return undefined;
   } else if (obj.get) {
+    /* obj is an immutabljs-object
+           * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+           * but that would require including immutable as dependency her and it'd be better
+           * to keep this library independent of anything.
+           */
     return obj.get(property);
   } else {
+    /* obj is a vanilla object */
     return obj[property];
   }
 }
@@ -750,18 +756,19 @@ export function getIn(obj, path) {
   if (!path || !obj || path.length === 0) {
     return undefined;
   } else {
-    let child;
-    if (obj.toJS && obj.get) {
-      /* obj is an immutabljs-object
-             * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
-             * but that would require including immutable as dependency her and it'd be better
-             * to keep this library independent of anything.
-             */
-      child = obj.get(path[0]);
-    } else {
-      /* obj is a vanilla object */
-      child = obj[path[0]];
-    }
+    const child = get(obj, path[0]);
+    // let child;
+    // if (obj.toJS && obj.get) {
+    //   /* obj is an immutabljs-object
+    //          * NOTE: the canonical check atm would be `Immutable.Iterable.isIterable(obj)`
+    //          * but that would require including immutable as dependency her and it'd be better
+    //          * to keep this library independent of anything.
+    //          */
+    //   child = obj.get(path[0]);
+    // } else {
+    //   /* obj is a vanilla object */
+    //   child = obj[path[0]];
+    // }
     if (path.length === 1) {
       /* end of the path */
       return child;
@@ -772,6 +779,38 @@ export function getIn(obj, path) {
   }
 }
 window.getIn4dbg = getIn;
+
+/**
+ * Like `getIn` but allows passing a context
+ * that's used for prefix resolution (i.e. it
+ * checks both the prefixed and expanded version
+ * of that path-step).
+ */
+export function getInJsonLd(obj, path, context) {
+  if (!path || !obj || path.length === 0) {
+    return undefined;
+  } else {
+    const pathSegment = path[0];
+    // e.g. "ex:foo:bar".replace(/([^:]*):.*/, '$1') => "ex"
+    const prefixShort = pathSegment.replace(/^([^:]*):.*/, "$1");
+    const prefixLong = context && context[prefixShort];
+    let expandedPathSegment;
+    if (prefixShort && prefixLong) {
+      // "ex:foo:bar:ex".replace('ex:', 'http://example.org/') => "http://example.org/foo:bar:ex"
+      expandedPathSegment = pathSegment.replace(prefixShort + ":", prefixLong);
+    }
+
+    const child = get(obj, pathSegment) || get(obj, expandedPathSegment);
+    if (path.length === 1) {
+      /* end of the path */
+      return child;
+    } else {
+      /* recurse */
+      return getIn(child, path.slice(1));
+    }
+  }
+}
+window.getInJsonLd4dbg = getInJsonLd;
 
 export function contains(arr, el) {
   return arr.indexOf(el) > 0;
