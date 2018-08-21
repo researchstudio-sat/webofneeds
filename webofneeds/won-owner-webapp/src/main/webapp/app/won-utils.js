@@ -21,6 +21,9 @@ import { useCases } from "useCaseDefinitions";
 import jsonld from "jsonld";
 window.jsonld4dbg = jsonld;
 
+import Immutable from "immutable";
+import { get, parseXsdDateTime, isValidDate } from "./utils.js";
+
 export function initLeaflet(mapMount) {
   if (!L) {
     throw new Error(
@@ -352,4 +355,151 @@ export function findLatestIntervallEndInJsonLd(draft, jsonld) {
 
   // convert to an `xsd:datetime` string and return
   return latest.toISOString();
+}
+
+/**
+ * Behaves like `parseJsonldLeafNode`, but can also handle
+ * Arrays and Lists and turns those into ImmutableJS
+ * Lists if they get passed. Otherwise takes and returns
+ * flat values like compactValues.
+ *
+ * e.g.:
+ * ```
+ * parseJsonldLeafNodesImm("123.1") => 123.1
+ * parseJsonldLeafNodesImm([
+ *   {"@value": "123.1", "@type": "xsd:float"},
+ *   {"@value": "7", "@type": "xsd:float"}
+ * ]) // => Immutable.List([123.1, 7]);
+ * ```
+ * @param {*} val
+ * @param {*} type if specified, guides parsing
+ *  (see `compactValues`). Note that only one type can
+ *   be specified atm, even if passing an list/array atm.
+ *
+ */
+
+export function parseJsonldLeafNodesImm(val, type) {
+  if (is("Array", val)) {
+    const parsed = val.map(item => parseJsonldLeafNode(item, type));
+    return Immutable.List(parsed);
+  } else if (Immutable.List.isList(val)) {
+    return val.map(item => parseJsonldLeafNode(item, type));
+  } else {
+    return parseJsonldLeafNode(val, type);
+  }
+}
+window.compactValuesImm4dbg = parseJsonldLeafNodesImm; // TODO deleteme
+window.compactValue4dbg = parseJsonldLeafNode; // TODO deleteme
+window.compactValue24dbg = compactValue2; // TODO deleteme
+
+/**
+ * e.g.
+ * ```
+ * parseJsonldLeafNode({"@value": "123.1", "@type": "xsd:float"}) // => "123.1"
+ * parseJsonldLeafNode("123.1") // => "123.1"
+ * ```
+ */
+function compactValue2(val) {
+  const atValue = val["@value"] || (val.get && val.get("@value"));
+  if (atValue) {
+    return atValue;
+  } else if (is("String", val) || is("Number", val)) {
+    return val;
+  } else {
+    throw new Error(
+      "Trying to lift @value of unexpected value:\n" + JSON.stringify(val)
+    );
+  }
+}
+
+/**
+ * @param {*} val
+ *  * already parsed
+ *  * `{"@value": "<someval>", "@type": "<sometype>"}`, where `<sometype>` is one of:
+ *    * `xsd:float`
+ *    * `xsd:dateTime`
+ *    * `xsd:date`
+ *    * `xsd:time`
+ *    * `http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon`?, e.g. `"48.225073#16.358398"`
+ *  * anything, that _strictly_ parses to a number or date or is a string
+ * @param {*} type passing `val` and `type` is equivalent to passing an object with `@value` and `@type`
+ *
+ */
+export function parseJsonldLeafNode(val, type) {
+  const unwrappedVal = get(val, "@value") || val;
+
+  const atType = get(val, "@type");
+  if (type && atType && type !== atType) {
+    throwParsingError(val, type, "Conflicting types.");
+  }
+  const type_ = get(val, "@type") || type;
+  if (is("Number", unwrappedVal) || is("Date", unwrappedVal)) {
+    // already parsed
+    return unwrappedVal;
+  }
+  const throwErr = msg => throwParsingError(val, type, msg);
+  switch (type_) {
+    case "xsd:float":
+      {
+        const parsedVal = Number(unwrappedVal);
+        if (isNaN(parsedVal)) {
+          throwErr("Annotated `xsd:float` isn't parsable to a `Number`.");
+        } else {
+          return parsedVal;
+        }
+      }
+      break;
+
+    case "xsd:dateTime":
+      {
+        const parsedDateTime = parseXsdDateTime(unwrappedVal);
+        if (isValidDate(parsedDateTime)) {
+          return parsedDateTime;
+        } else {
+          throwErr("Annotated `xsd:dateTime` isn't parsable to a `Date`.");
+        }
+      }
+      break;
+
+    // TODO
+    // case "xsd:date":
+    // case "xsd:time":
+    // case "http://www.bigdata.com/rdf/geospatial/literals/v1#lat-lon":
+    //   break;
+
+    default: {
+      if (type_) {
+        throwErr("Encountered unexpected type annotation/specification.");
+      }
+
+      // try strictly parsing without type information
+      if (unwrappedVal === undefined || unwrappedVal === null) {
+        return val;
+      }
+
+      const asNum = Number(unwrappedVal);
+      if (!isNaN(asNum)) {
+        return asNum;
+      }
+      const asDateTime = parseXsdDateTime(unwrappedVal);
+      if (isValidDate(asDateTime)) {
+        return asDateTime;
+      }
+
+      // and as fallback check if it's at least a string (which it pretty almost will be)
+      if (is("String", unwrappedVal)) {
+        return unwrappedVal;
+      }
+
+      throwErr("Found no `@type`-annotation and also couldn't guess a type.");
+    }
+  }
+}
+
+function throwParsingError(val, type, prependedMsg = "") {
+  const fullMsg =
+    prependedMsg +
+    ` Failed to parse jsonld value of type \`${type}\`:\n` +
+    JSON.stringify(val);
+  throw new Error(fullMsg.trim());
 }
