@@ -434,27 +434,6 @@ export function markMessageAsCancelled(
     );
     return state;
   } else {
-    const proposedToCancelReferences = message.getIn([
-      "references",
-      "proposesToCancel",
-    ]);
-
-    if (proposedToCancelReferences) {
-      proposedToCancelReferences.forEach(proposedToCancelRef => {
-        const correctMessageUri = getCorrectMessageUri(
-          messages,
-          proposedToCancelRef
-        );
-        state = markMessageAsAccepted(
-          state,
-          correctMessageUri,
-          connectionUri,
-          needUri,
-          true
-        );
-      });
-    }
-
     state = state.setIn(
       [
         needUri,
