@@ -388,29 +388,6 @@ export function parseJsonldLeafNodesImm(val, type) {
     return parseJsonldLeafNode(val, type);
   }
 }
-window.compactValuesImm4dbg = parseJsonldLeafNodesImm; // TODO deleteme
-window.compactValue4dbg = parseJsonldLeafNode; // TODO deleteme
-window.compactValue24dbg = compactValue2; // TODO deleteme
-
-/**
- * e.g.
- * ```
- * parseJsonldLeafNode({"@value": "123.1", "@type": "xsd:float"}) // => "123.1"
- * parseJsonldLeafNode("123.1") // => "123.1"
- * ```
- */
-function compactValue2(val) {
-  const atValue = val["@value"] || (val.get && val.get("@value"));
-  if (atValue) {
-    return atValue;
-  } else if (is("String", val) || is("Number", val)) {
-    return val;
-  } else {
-    throw new Error(
-      "Trying to lift @value of unexpected value:\n" + JSON.stringify(val)
-    );
-  }
-}
 
 /**
  * @param {*} val
