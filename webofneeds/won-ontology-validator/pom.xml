@@ -19,7 +19,7 @@
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
-        <version>0.2</version>
+        <version>0.3-SNAPSHOT</version>
         <relativePath>../../webofneeds/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
