@@ -132,7 +132,7 @@ export const details = {
   title: {
     identifier: "title",
     label: "Title",
-    icon: "#ico36_title_circle",
+    icon: "#ico36_detail_title",
     placeholder: "What? (Short title shown in lists)",
     component: "won-title-picker",
     viewerComponent: "won-title-viewer",
@@ -155,7 +155,7 @@ export const details = {
   description: {
     identifier: "description",
     label: "Description",
-    icon: "#ico36_description_circle",
+    icon: "#ico36_detail_description",
     placeholder: "Enter Description...",
     component: "won-description-picker",
     viewerComponent: "won-description-viewer",
@@ -178,7 +178,7 @@ export const details = {
   date: {
     identifier: "date",
     label: "Date",
-    icon: "#ico36_time_circle",
+    icon: "#ico36_detail_date",
     placeholder: "Enter Date...",
     component: "won-date-picker",
     viewerComponent: "won-date-viewer",
@@ -203,7 +203,7 @@ export const details = {
   datetime: {
     identifier: "datetime",
     label: "Date & Time",
-    icon: "#ico36_time_circle",
+    icon: "#ico36_detail_datetime",
     placeholder: "Enter Date and Time...",
     component: "won-datetime-picker",
     viewerComponent: "won-datetime-viewer",
@@ -228,7 +228,7 @@ export const details = {
   time: {
     identifier: "time",
     label: "Time",
-    icon: "#ico36_time_circle",
+    icon: "#ico36_detail_time",
     placeholder: "Enter Time...",
     component: "won-time-picker",
     viewerComponent: "won-time-viewer",
@@ -253,7 +253,7 @@ export const details = {
   month: {
     identifier: "month",
     label: "Month",
-    icon: "#ico36_time_circle",
+    icon: "#ico36_detail_date",
     placeholder: "Enter Month...",
     component: "won-month-picker",
     viewerComponent: "won-month-viewer",
@@ -278,7 +278,7 @@ export const details = {
   location: {
     identifier: "location",
     label: "Location",
-    icon: "#ico36_location_circle",
+    icon: "#ico36_detail_location",
     placeholder: "Search for location",
     component: "won-location-picker",
     viewerComponent: "won-location-viewer",
@@ -454,7 +454,7 @@ export const details = {
   person: {
     identifier: "person",
     label: "Person",
-    icon: "#ico36_person_single_circle",
+    icon: "#ico36_detail_person",
     placeholder: undefined,
     component: "won-person-picker",
     viewerComponent: "won-person-viewer",
@@ -550,7 +550,7 @@ export const details = {
   travelAction: {
     identifier: "travelAction",
     label: "Route (From - To)",
-    icon: "#ico36_location_circle",
+    icon: "#ico36_detail_travelaction",
     placeholder: {
       departure: "Start location",
       destination: "Destination",
@@ -738,7 +738,7 @@ export const details = {
   tags: {
     identifier: "tags",
     label: "Tags",
-    icon: "#ico36_tags_circle",
+    icon: "#ico36_detail_tags",
     placeholder: "e.g. couch, free",
     component: "won-tags-picker",
     viewerComponent: "won-tags-viewer",
@@ -790,7 +790,7 @@ export const details = {
   files: {
     identifier: "files",
     label: "Files",
-    icon: "#ico36_media_circle",
+    icon: "#ico36_detail_files",
     placeholder: "",
     accepts: "",
     component: "won-file-picker",
@@ -867,7 +867,7 @@ export const details = {
   images: {
     identifier: "images",
     label: "Images",
-    icon: "#ico36_media_circle",
+    icon: "#ico36_detail_media",
     placeholder: "",
     accepts: "image/*",
     component: "won-file-picker",
@@ -944,7 +944,7 @@ export const details = {
   ttl: {
     identifier: "ttl",
     label: "Turtle (TTL)",
-    icon: "#ico36_rdf_logo_circle",
+    icon: "#ico36_detail_ttl",
     placeholder: "Enter TTL...",
     component: "won-ttl-picker",
     viewerComponent: undefined,
