@@ -385,8 +385,14 @@ export function parseJsonldLeafsImm(val, type) {
   } else if (Immutable.List.isList(val)) {
     return val.map(item => parseJsonldLeaf(item, type));
   } else {
-    // got a non-list; make it a 1-item list
-    return Immutable.List([parseJsonldLeaf(val, type)]);
+    const parsed = parseJsonldLeaf(val, type);
+    if (parsed) {
+      // got a non-list; make it a 1-item list...
+      return Immutable.List([parsed]);
+    } else {
+      // ... unless that one item would be `undefined` because lookup has failed.
+      return undefined;
+    }
   }
 }
 

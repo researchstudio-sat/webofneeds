@@ -3,6 +3,7 @@ import Immutable from "immutable";
 import { details, abstractDetails } from "detailDefinitions";
 import { Parser as SparqlParser } from "sparqljs";
 import { findLatestIntervallEndInJsonLd } from "../app/won-utils.js";
+import won from "../app/won-es6.js";
 
 export const emptyDraft = {
   is: {},
@@ -77,23 +78,7 @@ const skillsDetail = {
     return { "s:knowsAbout": value };
   },
   parseFromRDF: function(jsonLDImm) {
-    const skills = jsonLDImm && jsonLDImm.get("s:knowsAbout");
-    if (!skills) {
-      return undefined;
-    } else if (is("String", skills)) {
-      return Immutable.fromJS([skills]);
-    } else if (is("Array", skills)) {
-      return Immutable.fromJS(skills);
-    } else if (Immutable.List.isList(skills)) {
-      return skills; // id; it is already in the format we want
-    } else {
-      console.error(
-        "Found unexpected format of skills (should be Array, " +
-          "Immutable.List, or a single tag as string): " +
-          JSON.stringify(skills)
-      );
-      return undefined;
-    }
+    return won.parseListFrom(jsonLDImm, ["s:knowsAbout"], "xsd:string");
   },
 };
 
