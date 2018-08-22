@@ -404,6 +404,9 @@ export function parseJsonldLeafsImm(val, type) {
  */
 export function parseJsonldLeaf(val, type) {
   const unwrappedVal = get(val, "@value") || val;
+  if (unwrappedVal === undefined || unwrappedVal === null) {
+    return undefined;
+  }
 
   const atType = get(val, "@type");
   if (type && atType && type !== atType) {
@@ -417,7 +420,7 @@ export function parseJsonldLeaf(val, type) {
   const throwErr = msg => throwParsingError(val, type, msg);
   switch (type_) {
     case "xsd:string":
-      return val + ""; // everything can be parsed to a string in js
+      return unwrappedVal + ""; // everything can be parsed to a string in js
 
     case "xsd:float":
       {
@@ -453,10 +456,6 @@ export function parseJsonldLeaf(val, type) {
       }
 
       // try strictly parsing without type information
-      if (unwrappedVal === undefined || unwrappedVal === null) {
-        return val;
-      }
-
       const asNum = Number(unwrappedVal);
       if (!isNaN(asNum)) {
         return asNum;
