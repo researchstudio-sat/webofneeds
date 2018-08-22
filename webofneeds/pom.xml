@@ -18,6 +18,53 @@
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>webofneeds</artifactId>
     <version>0.2-SNAPSHOT</version>
+    <description>Finding people to cooperate with. Protocol, not platform. Decentralized. Linked Data. Open Source.</description>
+    <url>https://github.com/researchstudio-sat/webofneeds</url>
+    <developers>
+        <developer>
+            <id>kweinberger</id>
+            <name>Kristina Weinberger</name>
+            <email>kristina.weinberger@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>ksinger</id>
+            <name>Kevin Singer</name>
+            <email>kevin.singer@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>gpickl</id>
+            <name>Gabriel Pickl</name>
+            <email>gabriel.pickl@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>fkleedorfer</id>
+            <name>Florian Kleedorfer</name>
+            <email>florian.fleedorfer@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>soheilhuman</id>
+            <name>Soheil Human</name>
+            <email>soheil.human@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>fsuda</id>
+            <name>Fabian Suda</name>
+            <email>fabian.suda@researchstudio.at</email>
+        </developer>
+        <developer>
+            <id>maxstolze</id>
+            <name>Max Stolze</name>
+            <email>max.stolze@researchstudio.at</email>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
