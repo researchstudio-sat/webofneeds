@@ -457,19 +457,14 @@ export const details = {
         // bio: undefined,
       };
 
-      // person.name = jsonLDImm.get("foaf:name");
       person.name = won.parseFrom(jsonLDImm, ["foaf:name"], "xsd:string");
-      // person.title = jsonLDImm.get("foaf:title");
       person.title = won.parseFrom(jsonLDImm, ["foaf:title"], "xsd:string");
-      // person.company = jsonLDImm.getIn(["s:worksFor", "s:name"]);
       person.company = won.parseFrom(
         jsonLDImm,
         ["s:worksFor", "s:name"],
         "xsd:string"
       );
-      // person.position = jsonLDImm.get("s:jobTitle");
       person.position = won.parseFrom(jsonLDImm, ["s:jobTitle"], "xsd:string");
-      //person.bio = isOrSeeksImm.get("dc:description");
 
       // if there's anything, use it
       if (person.name || person.title || person.company || person.position) {
