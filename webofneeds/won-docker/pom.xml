@@ -4,12 +4,12 @@
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>at.researchstudio.sat</groupId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>won-docker</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <name>Docker</name>
     <packaging>pom</packaging>
     <properties>
@@ -31,10 +31,10 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <chmod file="deploy_live.sh" perm="777"/>
-                                <chmod file="deploy_int.sh" perm="777"/>
-                                <chmod file="deploy_master.sh" perm="777"/>
-                                <chmod file="deploy_uki.sh" perm="777"/>
+                                <chmod file="deploy_live.sh" perm="777" />
+                                <chmod file="deploy_int.sh" perm="777" />
+                                <chmod file="deploy_master.sh" perm="777" />
+                                <chmod file="deploy_uki.sh" perm="777" />
                             </target>
                         </configuration>
                         <goals>
