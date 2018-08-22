@@ -216,13 +216,13 @@ export const details = {
       return { "dc:datetime": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      //TODO: Correct parseFromRDF
-      return jsonLDImm && jsonLDImm.get("dc:datetime");
-      // return won.parseFrom(jsonLDImm, ["dc:datetime"], "xsd:dateTime");
+      return won.parseFrom(jsonLDImm, ["dc:datetime"], "xsd:dateTime");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
-        return includeLabel ? this.label + ": " + value : value;
+        const maybeLabel = includeLabel ? this.label + ": " : "";
+        const timestring = new Date(value).toLocaleString();
+        return maybeLabel + timestring;
       }
       return undefined;
     },
