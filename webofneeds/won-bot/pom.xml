@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>webofneeds</groupId>
+        <groupId>at.researchstudio.sat</groupId>
         <artifactId>webofneeds</artifactId>
         <version>0.2-SNAPSHOT</version>
     </parent>
@@ -134,22 +134,22 @@
     <dependencies>
         <!-- WON stuff -->
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-facets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-owner</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-matcher</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -160,17 +160,17 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-utils-goals</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>webofneeds</groupId>
+          <groupId>at.researchstudio.sat</groupId>
           <artifactId>won-utils-conversation</artifactId>
           <version>${project.version}</version>
         </dependency>

@@ -4,33 +4,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>webofneeds</artifactId>
-        <groupId>webofneeds</groupId>
+        <groupId>at.researchstudio.sat</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <groupId>webofneeds</groupId>
+    <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-matcher-solr</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-matcher-service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-matcher-utils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-bot</artifactId>
             <scope>test</scope>
             <version>${project.version}</version>

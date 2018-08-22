@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>webofneeds</artifactId>
-        <groupId>webofneeds</groupId>
+        <groupId>at.researchstudio.sat</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -17,17 +17,17 @@
 
         -->
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-facets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -87,7 +87,7 @@
             <artifactId>spring-websocket</artifactId>
         </dependency>
          <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-utils-goals</artifactId>            
             <version>${project.version}</version>
         </dependency>
@@ -115,7 +115,7 @@
         </dependency>
 
         <dependency>
-        	<groupId>webofneeds</groupId>
+        	<groupId>at.researchstudio.sat</groupId>
         	<artifactId>won-utils-conversation</artifactId>
         	<version>${project.version}</version>
         </dependency>

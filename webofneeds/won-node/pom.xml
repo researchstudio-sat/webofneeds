@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>webofneeds</groupId>
+        <groupId>at.researchstudio.sat</groupId>
         <artifactId>webofneeds</artifactId>
         <version>0.2-SNAPSHOT</version>
     </parent>
 
-    <groupId>webofneeds</groupId>
+    <groupId>at.researchstudio.sat</groupId>
     <artifactId>won-node</artifactId>
     <version>0.2-SNAPSHOT</version>
     <name>Node</name>
@@ -26,19 +26,19 @@
 
         -->
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-facets-tx</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>webofneeds</groupId>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
