@@ -2,7 +2,7 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { get, getIn, is, getFromJsonLd } from "../app/utils.js";
+import { get, getIn, getFromJsonLd } from "../app/utils.js";
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
 
@@ -723,24 +723,7 @@ export const details = {
       return { "won:hasTag": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      const tags = jsonLDImm && jsonLDImm.get("won:hasTag");
-
-      if (!tags) {
-        return undefined;
-      } else if (is("String", tags)) {
-        return Immutable.fromJS([tags]);
-      } else if (is("Array", tags)) {
-        return Immutable.fromJS(tags);
-      } else if (Immutable.List.isList(tags)) {
-        return tags.map(tag => get(tag, "@value") || tag);
-      } else {
-        console.error(
-          "Found unexpected format of tags (should be Array, " +
-            "Immutable.List, or a single tag as string): " +
-            JSON.stringify(tags)
-        );
-        return undefined;
-      }
+      return won.parseFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {
