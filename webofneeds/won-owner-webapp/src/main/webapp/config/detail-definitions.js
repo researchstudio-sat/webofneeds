@@ -2,7 +2,7 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { get, getIn, getFromJsonLd } from "../app/utils.js";
+import { get, getIn } from "../app/utils.js";
 import Immutable from "immutable";
 import won from "../app/won-es6.js";
 
@@ -344,10 +344,10 @@ export const details = {
         },
       };
 
-      location.address = getFromJsonLd(
+      location.address = won.parseFrom(
         jsonldLocationImm,
-        "s:name",
-        won.defaultContext
+        ["s:name"],
+        "xsd:string"
       );
 
       const parseFloatFromLocation = path =>
@@ -582,51 +582,42 @@ export const details = {
         },
       };
 
-      travelAction.fromAddress =
-        travelActionImm.getIn(["s:fromLocation", "s:name"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/fromLocation",
-          "http://schema.org/name",
-        ]);
+      travelAction.fromAddress = won.parseFrom(
+        travelActionImm,
+        ["s:fromLocation", "s:name"],
+        "xsd:string"
+      );
 
-      travelAction.fromLocation.lat =
-        travelActionImm.getIn(["s:fromLocation", "s:geo", "s:latitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/fromLocation",
-          "http://schema.org/geo",
-          "http://schema.org/latitude",
-        ]);
+      const parseFloatFromTravelAction = path =>
+        won.parseFrom(travelActionImm, path, "xsd:float");
 
-      travelAction.fromLocation.lng =
-        travelActionImm.getIn(["s:fromLocation", "s:geo", "s:longitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/fromLocation",
-          "http://schema.org/geo",
-          "http://schema.org/longitude",
-        ]);
+      travelAction.fromLocation.lat = parseFloatFromTravelAction([
+        "s:fromLocation",
+        "s:geo",
+        "s:latitude",
+      ]);
+      travelAction.fromLocation.lng = parseFloatFromTravelAction([
+        "s:fromLocation",
+        "s:geo",
+        "s:longitude",
+      ]);
 
-      travelAction.toAddress =
-        travelActionImm.getIn(["s:toLocation", "s:name"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/toLocation",
-          "http://schema.org/name",
-        ]);
+      travelAction.toAddress = won.parseFrom(
+        travelActionImm,
+        ["s:toLocation", "s:name"],
+        "xsd:string"
+      );
 
-      travelAction.toLocation.lat =
-        travelActionImm.getIn(["s:toLocation", "s:geo", "s:latitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/toLocation",
-          "http://schema.org/geo",
-          "http://schema.org/latitude",
-        ]);
-
-      travelAction.toLocation.lng =
-        travelActionImm.getIn(["s:toLocation", "s:geo", "s:longitude"]) ||
-        travelActionImm.getIn([
-          "http://schema.org/toLocation",
-          "http://schema.org/geo",
-          "http://schema.org/longitude",
-        ]);
+      travelAction.toLocation.lat = parseFloatFromTravelAction([
+        "s:toLocation",
+        "s:geo",
+        "s:latitude",
+      ]);
+      travelAction.toLocation.lng = parseFloatFromTravelAction([
+        "s:toLocation",
+        "s:geo",
+        "s:longitude",
+      ]);
 
       if (
         (travelAction.fromAddress &&
@@ -637,13 +628,13 @@ export const details = {
           travelAction.toLocation.lng)
       ) {
         return Immutable.fromJS(travelAction);
+      } else {
+        console.error(
+          "Cant parse travelAction, data is an invalid travelAction-object: ",
+          travelActionImm.toJS()
+        );
+        return undefined;
       }
-
-      console.error(
-        "Cant parse travelAction, data is an invalid travelAction-object: ",
-        travelActionImm.toJS()
-      );
-      return undefined;
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value && (value.fromLocation || value.toLocation)) {
