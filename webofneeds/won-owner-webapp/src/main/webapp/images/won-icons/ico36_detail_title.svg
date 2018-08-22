@@ -4,7 +4,7 @@
 	xmlns:cc="http://creativecommons.org/ns#" 
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 	xmlns:svg="http://www.w3.org/2000/svg" 
-	xmlns="http://www.w3.org/2000/svg" width="36px" height="36px" viewBox="0 0 36 36" id="detail_title" version="1.1">
+	xmlns="http://www.w3.org/2000/svg" version="1.1" id="detail_title" viewBox="0 0 36 36" height="36px" width="36px">
 	<metadata id="metadata4367">
 		<rdf:RDF>
 			<cc:Work rdf:about="">
@@ -14,8 +14,8 @@
 			</cc:Work>
 		</rdf:RDF>
 	</metadata>
-	<rect y="9.0401831" x="6.2401819" height="7.500001" width="23.000004" id="rect1998" style="fill:var(--local-primary);fill-opacity:1;stroke:none;" />
-	<path id="rect2000" d="m 6.1794248,19.450954 0.462584,0.932138 C 14.16689,19.159884 23.906295,21.780253 29.663995,20.372102 l -0.262777,-0.89526 c -5.577423,1.324325 -14.93878,-1.268013 -23.2217932,-0.02589 z" style="fill:var(--local-primary);fill-opacity:1;stroke:none;" />
-	<path id="rect2000-2" d="m 6.1912007,22.53202 0.462584,0.932138 C 14.178666,22.24095 23.918071,24.861319 29.675771,23.453168 l -0.262777,-0.89526 c -5.577423,1.324325 -14.93878,-1.268013 -23.2217933,-0.02589 z" style="fill:var(--local-primary);fill-opacity:1;stroke:none;" />
-	<path id="rect2000-8" d="m 6.278122,25.58912 0.462584,0.932138 c 7.524881,-1.223208 17.264286,1.397161 23.021986,-0.01099 l -0.262777,-0.89526 c -5.577423,1.324325 -14.93878,-1.268013 -23.221793,-0.02589 z" style="fill:var(--local-primary);fill-opacity:1;stroke:none;" />
+	<rect style="fill:var(--local-primary);fill-opacity:1;stroke:none" id="rect1998" width="35.257198" height="11.496912" x="0.49313515" y="3.6816106" />
+	<path style="fill:var(--local-primary);fill-opacity:1;stroke:none" d="m 0,19.640505 0.70910483,1.428894 C 12.244156,19.194317 27.173898,23.211137 36,21.052563 L 35.597183,19.6802 C 27.047433,21.710286 12.697207,17.736435 0,19.640512 Z" id="rect2000" />
+	<path style="fill:var(--local-primary);fill-opacity:1;stroke:none" d="m 0.01805125,24.363537 0.70910483,1.428894 C 12.262207,23.917349 27.19195,27.934169 36.018052,25.775583 L 35.615236,24.40322 C 27.065484,26.433306 12.715259,22.459455 0.01805125,24.363532 Z" id="rect2000-2" />
+	<path style="fill:var(--local-primary);fill-opacity:1;stroke:none" d="m 0.1512953,29.04983 0.70910482,1.428894 C 12.39545,28.603642 27.325192,32.620463 36.151295,30.461877 L 35.748478,29.089513 C 27.198727,31.119599 12.848502,27.145749 0.1512953,29.049825 Z" id="rect2000-8" />
 </svg>

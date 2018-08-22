@@ -4,7 +4,7 @@
 	xmlns:cc="http://creativecommons.org/ns#" 
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 	xmlns:svg="http://www.w3.org/2000/svg" 
-	xmlns="http://www.w3.org/2000/svg" version="1.1" id="detail_weight" width="36px" height="36px" viewBox="0 0 36 36">
+	xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36px" width="36px" id="detail_weight" version="1.1">
 	<metadata id="metadata29">
 		<rdf:RDF>
 			<cc:Work rdf:about="">
@@ -14,6 +14,6 @@
 			</cc:Work>
 		</rdf:RDF>
 	</metadata>
-	<path id="rect835" d="m 13.793434,11.474357 h 8.778599 c 0.499996,0 0.780746,0.359377 0.902519,0.765744 l 4.260103,14.216277 c 0.121773,0.406367 -0.402524,0.765744 -0.902519,0.765744 H 9.5333322 c -0.499997,0 -1.0242947,-0.359376 -0.902521,-0.765744 L 12.890914,12.240101 c 0.121773,-0.406366 0.402524,-0.765744 0.90252,-0.765744 z" style="fill:var(--local-primary);fill-opacity:1;stroke:none" />
-	<ellipse ry="2.2347202" rx="2.2133131" cy="-8.5192299" cx="-18.848064" transform="matrix(-0.99729387,-0.07351831,0.07210912,-0.99739675,0,0)" id="path833" style="fill:none;stroke:var(--local-primary);stroke-width:1.2;stroke-opacity:1" />
+	<path style="fill:var(--local-primary);fill-opacity:1;stroke:none" d="m 10.155802,7.9070483 h 15.65651 c 0.891735,0 1.392449,0.6409431 1.60963,1.3656937 l 7.597835,25.354533 c 0.21718,0.724749 -0.717897,1.365693 -1.60963,1.365693 H 2.5579694 c -0.8917376,0 -1.82681527,-0.640942 -1.60963358,-1.365693 L 8.5461699,9.272742 C 8.7633503,8.5479933 9.2640659,7.9070483 10.155802,7.9070483 Z" id="rect835" />
+	<ellipse style="fill:none;stroke:var(--local-primary);stroke-width:2.14018345;stroke-opacity:1" id="path833" transform="matrix(-0.99729387,-0.07351831,0.07210912,-0.99739675,0,0)" cx="-18.302773" cy="-3.7325304" rx="3.947413" ry="3.9855926" />
 </svg>

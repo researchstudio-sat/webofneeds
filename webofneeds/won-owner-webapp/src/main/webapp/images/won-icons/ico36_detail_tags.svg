@@ -4,7 +4,7 @@
 	xmlns:cc="http://creativecommons.org/ns#" 
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 	xmlns:svg="http://www.w3.org/2000/svg" 
-	xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 36 36" height="36px" width="36px" id="detail_tags" version="1.1">
+	xmlns="http://www.w3.org/2000/svg" version="1.1" id="detail_tags" width="36px" height="36px" viewBox="0 0 36 36">
 	<metadata id="metadata29">
 		<rdf:RDF>
 			<cc:Work rdf:about="">
@@ -14,5 +14,5 @@
 			</cc:Work>
 		</rdf:RDF>
 	</metadata>
-	<path id="path10" d="M 26,16.894 V 9.822 H 18.93 L 8.322,20.43 15.393,27.5 Z M 24,14 c 0,1.105 -0.895,2 -2,2 -1.105,0 -2,-0.895 -2,-2 0,-1.104 0.895,-2 2,-2 1.105,0 2,0.896 2,2 z" style="fill:var(--local-primary);fill-opacity:1;stroke:none;stroke-opacity:1" />
+	<path style="fill:var(--local-primary);fill-opacity:1;stroke:none" d="M 36,14.401629 V 0 H 21.602443 L 0,21.602444 14.399592,36 Z M 31.927141,8.5082023 c 0,2.2502547 -1.822604,4.0728587 -4.072859,4.0728587 -2.250254,0 -4.072859,-1.822604 -4.072859,-4.0728587 0,-2.2482182 1.822605,-4.072859 4.072859,-4.072859 2.250255,0 4.072859,1.8246408 4.072859,4.072859 z" id="path10" />
 </svg>
