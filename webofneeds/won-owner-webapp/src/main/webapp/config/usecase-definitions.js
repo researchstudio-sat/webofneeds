@@ -68,7 +68,7 @@ const skillsDetail = {
   ...details.tags,
   identifier: "skills",
   label: "Skills",
-  icon: "#ico36_skill_circle",
+  icon: "#ico36_detail_skill",
   placeholder: "e.g. RDF, project-management",
   parseToRDF: function({ value }) {
     if (!value) {
@@ -101,7 +101,7 @@ const interestsDetail = {
   ...details.tags,
   identifier: "interests",
   label: "Interests",
-  icon: "#ico36_heart_circle",
+  icon: "#ico36_detail_interests",
   placeholder: "e.g. food, cats",
   parseToRDF: function({ value }) {
     if (!value) {
@@ -480,7 +480,7 @@ const realEstateFloorSizeDetail = {
   ...abstractDetails.number,
   identifier: "floorSize",
   label: "Floor size in square meters",
-  icon: "#ico36_plus_circle", // TODO: better icon
+  icon: "#ico36_detail_floorsize",
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:floorSize": undefined };
@@ -524,7 +524,7 @@ const realEstateNumberOfRoomsDetail = {
   ...abstractDetails.number,
   identifier: "numberOfRooms",
   label: "Number of Rooms",
-  icon: "#ico36_plus_circle", // TODO: better icon
+  icon: "#ico36_detail_number-of-rooms",
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:numberOfRooms": undefined };
@@ -553,7 +553,7 @@ const realEstateNumberOfRoomsRangeDetail = {
   label: "Number of Rooms",
   minLabel: "From",
   maxLabel: "To",
-  icon: "#ico36_plus_circle", // TODO: better icon
+  icon: "#ico36_detail_number-of-rooms",
   parseToRDF: function({ value }) {
     if (!value) {
       return {};
@@ -632,7 +632,7 @@ const realEstateFloorSizeRangeDetail = {
   label: "Floor size in square meters",
   minLabel: "From",
   maxLabel: "To",
-  icon: "#ico36_plus_circle", // TODO: better icon
+  icon: "#ico36_detail_floorsize",
   parseToRDF: function({ value }) {
     if (!value) {
       return {};
@@ -692,7 +692,7 @@ const realEstateFeaturesDetail = {
   ...details.tags,
   identifier: "features",
   label: "Features",
-  icon: "#ico36_plus_circle", //TODO: better icon
+  icon: "#ico36_detail_feature",
   placeholder: "e.g. balcony, bathtub",
   parseToRDF: function({ value }) {
     if (!value) {
@@ -733,7 +733,7 @@ const realEstateRentDetail = {
   ...abstractDetails.number,
   identifier: "rent",
   label: "Rent in EUR/month",
-  icon: "#ico36_plus_circle", //TODO: better icon
+  icon: "#ico36_detail_rent",
   parseToRDF: function({ value }) {
     if (!value) {
       return { "s:priceSpecification": undefined };
@@ -777,7 +777,7 @@ const realEstateRentRangeDetail = {
   label: "Rent in EUR/month",
   minLabel: "From",
   maxLabel: "To",
-  icon: "#ico36_plus_circle", //TODO: better icon
+  icon: "#ico36_detail_rent",
   parseToRDF: function({ value }) {
     if (!value || !(value.min || value.max)) {
       return { "s:priceSpecification": undefined };
@@ -1032,7 +1032,7 @@ const transportUseCases = {
         ...abstractDetails.number,
         identifier: "weight",
         label: "Weight in kg",
-        icon: "#ico36_plus_circle",
+        icon: "#ico36_detail_weight",
         parseToRDF: function({ value }) {
           if (!value) {
             return { "s:weight": undefined };
@@ -1076,7 +1076,7 @@ const transportUseCases = {
         ...abstractDetails.number,
         identifier: "length",
         label: "Length in cm",
-        icon: "#ico36_plus_circle",
+        icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
           if (!value) {
             return { "s:length": undefined };
@@ -1120,7 +1120,7 @@ const transportUseCases = {
         ...abstractDetails.number,
         identifier: "width",
         label: "Width in cm",
-        icon: "#ico36_plus_circle",
+        icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
           if (!value) {
             return { "s:width": undefined };
@@ -1164,7 +1164,7 @@ const transportUseCases = {
         ...abstractDetails.number,
         identifier: "height",
         label: "Height in cm",
-        icon: "#ico36_plus_circle",
+        icon: "#ico36_detail_measurement",
         parseToRDF: function({ value }) {
           if (!value) {
             return { "s:height": undefined };
