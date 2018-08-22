@@ -156,20 +156,6 @@ const socialUseCases = {
       time: { ...details.time },
       location: { ...details.location },
       interests: { ...interestsDetail },
-      foodAllergies: {
-        ...details.description,
-        identifier: "foodallergies",
-        label: "Food Allergies",
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "won:foodAllergies": undefined }; // FIXME: won:foodAllergies does not exist
-          }
-          return { "won:foodAllergies": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          return jsonLDImm && jsonLDImm.get("won:foodAllergies");
-        },
-      },
     },
     seeksDetails: undefined,
   },
@@ -193,20 +179,6 @@ const socialUseCases = {
       time: { ...details.time },
       location: { ...details.location },
       interests: { ...interestsDetail },
-      foodAllergies: {
-        ...details.description,
-        identifier: "foodallergies",
-        label: "Food Allergies",
-        parseToRDF: function({ value }) {
-          if (!value) {
-            return { "won:foodAllergies": undefined }; // FIXME: won:foodAllergies does not exist
-          }
-          return { "won:foodAllergies": value };
-        },
-        parseFromRDF: function(jsonLDImm) {
-          return jsonLDImm && jsonLDImm.get("won:foodAllergies");
-        },
-      },
     },
     seeksDetails: undefined,
   },
