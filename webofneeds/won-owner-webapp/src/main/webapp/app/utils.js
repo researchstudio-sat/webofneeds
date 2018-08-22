@@ -785,32 +785,66 @@ window.getIn4dbg = getIn;
  * that's used for prefix resolution (i.e. it
  * checks both the prefixed and expanded version
  * of that path-step).
+ * ```js
+ * getInFromJsonLd(
+ *   {'ex:foo': { 'http://example.org/bar' : 42 }},
+ *   ['ex:foo', 'ex:bar'],
+ *   {'ex': 'http://example.org/'}
+ * ) // => 42
+ * ```
+ * @param obj
+ * @param path
+ * @param context a standard json-ld style context. Note, that
+ * only prefix-definitions will be minded.
  */
-export function getInJsonLd(obj, path, context) {
+export function getInFromJsonLd(obj, path, context) {
   if (!path || !obj || path.length === 0) {
     return undefined;
   } else {
-    const pathSegment = path[0];
-    // e.g. "ex:foo:bar".replace(/([^:]*):.*/, '$1') => "ex"
-    const prefixShort = pathSegment.replace(/^([^:]*):.*/, "$1");
-    const prefixLong = context && context[prefixShort];
-    let expandedPathSegment;
-    if (prefixShort && prefixLong) {
-      // "ex:foo:bar:ex".replace('ex:', 'http://example.org/') => "http://example.org/foo:bar:ex"
-      expandedPathSegment = pathSegment.replace(prefixShort + ":", prefixLong);
-    }
-
-    const child = get(obj, pathSegment) || get(obj, expandedPathSegment);
+    const child = getFromJsonLd(obj, path[0], context);
     if (path.length === 1) {
       /* end of the path */
       return child;
     } else {
       /* recurse */
-      return getIn(child, path.slice(1));
+      return getInFromJsonLd(child, path.slice(1), context);
     }
   }
 }
-window.getInJsonLd4dbg = getInJsonLd;
+window.getInFromJsonLd4dbg = getInFromJsonLd;
+
+/**
+ * Like `get` but allows passing a context
+ * that's used for prefix resolution (i.e. it
+ * checks both the prefixed and expanded version
+ * of that path-step).
+ *
+ * @param obj a json-ld object
+ * @param path an array used for traversal, e.g. `[0, "ex:foo", "ex:bar", "@value"]`. Use
+ *   the shortened form of prefixes -- full URLs won't be compacted, only prefixes expanded.
+ * @param context a standard json-ld style context. Note, that
+ * only prefix-definitions will be minded.
+ */
+export function getFromJsonLd(obj, predicate, context) {
+  if (!obj) {
+    return undefined;
+  } else {
+    // e.g. "ex:foo:bar".replace(/([^:]*):.*/, '$1') => "ex"
+    const prefixShort = predicate.replace(/^([^:]*):.*/, "$1");
+    const prefixLong = context && context[prefixShort];
+    let expandedPredicate;
+
+    if (prefixShort && prefixLong && is("String", prefixLong)) {
+      // ^ the string-check is because contexts can also have other
+      // fields beside prefix-definitions
+
+      // "ex:foo:bar:ex".replace('ex:', 'http://example.org/') => "http://example.org/foo:bar:ex"
+      expandedPredicate = predicate.replace(prefixShort + ":", prefixLong);
+    }
+
+    return get(obj, predicate) || get(obj, expandedPredicate);
+  }
+}
 
 export function contains(arr, el) {
   return arr.indexOf(el) > 0;

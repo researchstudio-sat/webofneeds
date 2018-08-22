@@ -358,15 +358,15 @@ export function findLatestIntervallEndInJsonLd(draft, jsonld) {
 }
 
 /**
- * Behaves like `parseJsonldLeafNode`, but can also handle
+ * Behaves like `parseJsonldLeaf`, but can also handle
  * Arrays and Lists and turns those into ImmutableJS
  * Lists if they get passed. Otherwise takes and returns
  * flat values like compactValues.
  *
  * e.g.:
  * ```
- * parseJsonldLeafNodesImm("123.1") => 123.1
- * parseJsonldLeafNodesImm([
+ * parseJsonldLeafsImm("123.1") => 123.1
+ * parseJsonldLeafsImm([
  *   {"@value": "123.1", "@type": "xsd:float"},
  *   {"@value": "7", "@type": "xsd:float"}
  * ]) // => Immutable.List([123.1, 7]);
@@ -378,14 +378,14 @@ export function findLatestIntervallEndInJsonLd(draft, jsonld) {
  *
  */
 
-export function parseJsonldLeafNodesImm(val, type) {
+export function parseJsonldLeafsImm(val, type) {
   if (is("Array", val)) {
-    const parsed = val.map(item => parseJsonldLeafNode(item, type));
+    const parsed = val.map(item => parseJsonldLeaf(item, type));
     return Immutable.List(parsed);
   } else if (Immutable.List.isList(val)) {
-    return val.map(item => parseJsonldLeafNode(item, type));
+    return val.map(item => parseJsonldLeaf(item, type));
   } else {
-    return parseJsonldLeafNode(val, type);
+    return parseJsonldLeaf(val, type);
   }
 }
 
@@ -402,7 +402,7 @@ export function parseJsonldLeafNodesImm(val, type) {
  * @param {*} type passing `val` and `type` is equivalent to passing an object with `@value` and `@type`
  *
  */
-export function parseJsonldLeafNode(val, type) {
+export function parseJsonldLeaf(val, type) {
   const unwrappedVal = get(val, "@value") || val;
 
   const atType = get(val, "@type");

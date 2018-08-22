@@ -2,8 +2,9 @@
 // TODO: each detail picker should know it's own rdf template
 // --> both for parsing to and from rdf
 // --> templates are used in need-builder (toRDF) and in parse-need (from RDF)
-import { get, getIn, is } from "../app/utils.js";
+import { get, getIn, is, getFromJsonLd } from "../app/utils.js";
 import Immutable from "immutable";
+import won from "../app/won-es6.js";
 
 /**
  * Defines a set of details that will only be visible within a specific 'implementation'
@@ -342,73 +343,37 @@ export const details = {
         },
       };
 
-      location.address =
-        jsonldLocationImm.get("s:name") ||
-        jsonldLocationImm.get("http://schema.org/name");
-
-      location.lat = Number.parseFloat(
-        jsonldLocationImm.getIn(["s:geo", "s:latitude"]) ||
-          jsonldLocationImm.getIn([
-            "http://schema.org/geo",
-            "http://schema.org/latitude",
-          ])
-      );
-      location.lng = Number.parseFloat(
-        jsonldLocationImm.getIn(["s:geo", "s:longitude"]) ||
-          jsonldLocationImm.getIn([
-            "http://schema.org/geo",
-            "http://schema.org/longitude",
-          ])
+      location.address = getFromJsonLd(
+        jsonldLocationImm,
+        "s:name",
+        won.defaultContext
       );
 
-      location.nwCorner.lat = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasNorthWestCorner",
-          "s:latitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasNorthWestCorner",
-            "http://schema.org/latitude",
-          ])
-      );
-      location.nwCorner.lng = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasNorthWestCorner",
-          "s:longitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasNorthWestCorner",
-            "http://schema.org/longitude",
-          ])
-      );
-      location.seCorner.lat = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasSouthEastCorner",
-          "s:latitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasSouthEastCorner",
-            "http://schema.org/latitude",
-          ])
-      );
-      location.seCorner.lng = Number.parseFloat(
-        jsonldLocationImm.getIn([
-          "won:hasBoundingBox",
-          "won:hasSouthEastCorner",
-          "s:longitude",
-        ]) ||
-          jsonldLocationImm.getIn([
-            "won:hasBoundingBox",
-            "won:hasSouthEastCorner",
-            "http://schema.org/longitude",
-          ])
-      );
+      const parseFloatFromLocation = path =>
+        won.parseFrom(jsonldLocationImm, path, "xsd:float");
+
+      location.lat = parseFloatFromLocation(["s:geo", "s:latitude"]);
+      location.lng = parseFloatFromLocation(["s:geo", "s:longitude"]);
+      location.nwCorner.lat = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasNorthWestCorner",
+        "s:latitude",
+      ]);
+      location.nwCorner.lng = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasNorthWestCorner",
+        "s:longitude",
+      ]);
+      location.seCorner.lat = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasSouthEastCorner",
+        "s:latitude",
+      ]);
+      location.seCorner.lng = parseFloatFromLocation([
+        "won:hasBoundingBox",
+        "won:hasSouthEastCorner",
+        "s:longitude",
+      ]);
 
       if (
         location.address &&

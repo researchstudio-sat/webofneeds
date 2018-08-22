@@ -26,7 +26,9 @@ import {
   rethrow,
   getIn,
   get,
+  getInFromJsonLd,
 } from "../utils.js";
+import { parseJsonldLeaf } from "../won-utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -2132,3 +2134,7 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
 
   return seperatedGraphsP;
 }
+
+won.parseFrom = (jsonld, path, type, context = won.defaultContext) => {
+  return parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
+};
