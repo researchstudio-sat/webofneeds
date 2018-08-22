@@ -28,7 +28,7 @@ import {
   get,
   getInFromJsonLd,
 } from "../utils.js";
-import { parseJsonldLeafsImm } from "../won-utils.js";
+import { parseJsonldLeaf, parseJsonldLeafsImm } from "../won-utils.js";
 
 import { ownerBaseUrl } from "config";
 import urljoin from "url-join";
@@ -2138,14 +2138,29 @@ function groupByGraphs(jsonldData, addDefaultContext = true) {
 /**
  * Traverses the `path` into the json-ld object and then tries to
  * parse that node as RDF literal object (see `parseJsonldLeafsImm` for
- * details on that). If it finds a `Immutable.List` or `Array`, it will
- * try to parse that one's children (see `parseJsonldLeafsImm` for details).
+ * details on that).
  *
  * @param {*} jsonld
  * @param {*} path
  * @param {*} type optional (see getFromJsonLd for details)
  * @param {*} context defaults to `won.defaultContext`
+ * @return the list at the path
+ */
+won.parseListFrom = (jsonld, path, type, context = won.defaultContext) => {
+  return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
+};
+
+/**
+ * Traverses the `path` into the json-ld object and then tries to
+ * parse that node as RDF literal object (see `parseJsonldLeafsImm` for
+ * details on that).
+ *
+ * @param {*} jsonld
+ * @param {*} path
+ * @param {*} type optional (see getFromJsonLd for details)
+ * @param {*} context defaults to `won.defaultContext`
+ * @return the value at the path
  */
 won.parseFrom = (jsonld, path, type, context = won.defaultContext) => {
-  return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
+  return parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
 };

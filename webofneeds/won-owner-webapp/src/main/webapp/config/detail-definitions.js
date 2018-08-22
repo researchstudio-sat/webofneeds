@@ -709,7 +709,7 @@ export const details = {
       return { "won:hasTag": value };
     },
     parseFromRDF: function(jsonLDImm) {
-      return won.parseFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
+      return won.parseListFrom(jsonLDImm, ["won:hasTag"], "xsd:string");
     },
     generateHumanReadable: function({ value, includeLabel }) {
       if (value) {

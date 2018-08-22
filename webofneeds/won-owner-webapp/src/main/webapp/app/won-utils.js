@@ -385,7 +385,8 @@ export function parseJsonldLeafsImm(val, type) {
   } else if (Immutable.List.isList(val)) {
     return val.map(item => parseJsonldLeaf(item, type));
   } else {
-    return parseJsonldLeaf(val, type);
+    // got a non-list; make it a 1-item list
+    return Immutable.List([parseJsonldLeaf(val, type)]);
   }
 }
 
