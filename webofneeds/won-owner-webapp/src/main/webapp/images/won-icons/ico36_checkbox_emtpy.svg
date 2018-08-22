@@ -4,7 +4,7 @@
 	xmlns:cc="http://creativecommons.org/ns#" 
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 	xmlns:svg="http://www.w3.org/2000/svg" 
-	xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="36px" width="36px" id="checkbox_empty" version="1.1">
+	xmlns="http://www.w3.org/2000/svg" version="1.1" id="checkbox_empty" width="36px" height="36px" viewBox="0 0 36 36">
 	<metadata id="metadata29">
 		<rdf:RDF>
 			<cc:Work rdf:about="">
@@ -14,5 +14,6 @@
 			</cc:Work>
 		</rdf:RDF>
 	</metadata>
-	<rect rx="0.5" ry="0.5" y="8.6130228" x="8.2762842" height="18.558941" width="19.5742" id="rect821" style="fill:var(--local-secondary);stroke:var(--local-primary);stroke-width:3" />
+	<path style="fill:var(--local-primary);fill-opacity:1;stroke:none" id="rect821-6" d="m 8.775391,7.1132812 c -1.082054,0 -2,0.9179459 -2,2 V 26.671875 c 0,1.082054 0.917946,2 2,2 h 18.574218 c 1.082055,0 2,-0.917946 2,-2 V 9.1132812 c 0,-1.0820541 -0.917945,-2 -2,-2 z m 1,2.9999998 H 26.349609 V 25.671875 H 9.775391 Z" />
+	<rect style="fill:var(--local-secondary);fill-opacity:1;stroke:none" id="rect821-8" width="16.607307" height="15.544162" x="9.7410259" y="10.102678" />
 </svg>
